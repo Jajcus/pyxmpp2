@@ -23,8 +23,8 @@ import weakref
 from types import StringType,UnicodeType
 from encodings import idna
 
-from utils import to_utf8,from_utf8
-from xmppstringprep import nodeprep,resourceprep
+from pyxmpp.utils import to_utf8,from_utf8
+from pyxmpp.xmppstringprep import nodeprep,resourceprep
 
 node_invalid_re=re.compile(ur"[" u'"' ur"&'/:<>@\s\x00-\x19]",re.UNICODE)
 resource_invalid_re=re.compile(ur"[\s\x00-\x19]",re.UNICODE)

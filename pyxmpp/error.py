@@ -18,9 +18,9 @@
 import libxml2
 from types import StringType,UnicodeType
 
-from utils import from_utf8,to_utf8
-from stanza import common_doc,common_root
-import xmlextra
+from pyxmpp.utils import from_utf8,to_utf8
+from pyxmpp.stanza import common_doc,common_root
+from pyxmpp import xmlextra
 
 stream_errors={
             u"bad-format":

@@ -31,16 +31,16 @@ import logging
 
 from types import StringType,UnicodeType
 
-from expdict import ExpiringDictionary
-from utils import from_utf8,to_utf8,remove_evil_characters
-from stanza import Stanza,common_doc,StanzaError
-from error import StreamErrorNode
-from iq import Iq
-from presence import Presence
-from message import Message
-from jid import JID
-import sasl
-import resolver
+from pyxmpp.expdict import ExpiringDictionary
+from pyxmpp.utils import from_utf8,to_utf8,remove_evil_characters
+from pyxmpp.stanza import Stanza,common_doc,StanzaError
+from pyxmpp.error import StreamErrorNode
+from pyxmpp.iq import Iq
+from pyxmpp.presence import Presence
+from pyxmpp.message import Message
+from pyxmpp.jid import JID
+from pyxmpp import sasl
+from pyxmpp import resolver
 
 try:
     from M2Crypto import SSL

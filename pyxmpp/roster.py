@@ -18,11 +18,12 @@
 """XMPP-IM roster handling"""
 
 from types import StringType,UnicodeType
-from stanza import common_doc,common_root
-from iq import Iq
-from jid import JID
 
-from utils import to_utf8,from_utf8,get_node_ns_uri,get_node_ns
+from pyxmpp.stanza import common_doc,common_root
+from pyxmpp.iq import Iq
+from pyxmpp.jid import JID
+
+from pyxmpp.utils import to_utf8,from_utf8,get_node_ns_uri,get_node_ns
 
 ROSTER_NS="jabber:iq:roster"
 

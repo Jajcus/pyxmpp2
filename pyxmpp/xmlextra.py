@@ -1,6 +1,6 @@
 import sys
 import libxml2
-import _xmlextra
+from pyxmpp import _xmlextra
 import threading
 
 """Extension to libxml2 for XMPP stream and stanza processing"""

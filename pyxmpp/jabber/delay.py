@@ -21,8 +21,8 @@ import sys
 import libxml2
 import time
 import datetime
-
 from types import StringType,UnicodeType
+
 from pyxmpp.stanza import common_doc,common_root
 from pyxmpp.jid import JID
 

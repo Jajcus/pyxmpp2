@@ -16,8 +16,8 @@
 #
 
 import libxml2
-from stanza import Stanza,StanzaError
-from utils import to_utf8,from_utf8
+from pyxmpp.stanza import Stanza,StanzaError
+from pyxmpp.utils import to_utf8,from_utf8
 
 message_types=("normal","chat","headline","error","groupchat")
 

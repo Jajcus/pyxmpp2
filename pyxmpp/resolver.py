@@ -10,8 +10,8 @@ import string
 import re
 from types import StringType,UnicodeType,IntType
 
-import dns
-from dns import ResolverError,DataTruncated,BadPacket,InvalidDomainName,resolve_errors
+from pyxmpp import dns
+from pyxmpp.dns import ResolverError,DataTruncated,BadPacket,InvalidDomainName,resolve_errors
 
 nameservers=[]
 search_list=[]

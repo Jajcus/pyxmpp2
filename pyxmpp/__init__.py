@@ -17,13 +17,14 @@
 
 """PyXMPP - Jabber/XMPP protocol implementation"""
 
-from stream import Stream,StreamError,FatalStreamError,StreamParseError
-from stream import StreamEncryptionRequired,tls_available,TLSSettings
-from clientstream import ClientStream,ClientStreamError
-from client import Client,ClientError
-from iq import Iq
-from presence import Presence
-from message import Message
-from jid import JID,JIDError
-from stanza import StanzaError
+from pyxmpp.stream import Stream,StreamError,FatalStreamError,StreamParseError
+from pyxmpp.stream import StreamEncryptionRequired,tls_available,TLSSettings
+from pyxmpp.clientstream import ClientStream,ClientStreamError
+from pyxmpp.client import Client,ClientError
+from pyxmpp.iq import Iq
+from pyxmpp.presence import Presence
+from pyxmpp.message import Message
+from pyxmpp.jid import JID,JIDError
+from pyxmpp.stanza import StanzaError
+
 # vi: sts=4 et sw=4

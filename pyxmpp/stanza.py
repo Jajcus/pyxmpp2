@@ -17,11 +17,11 @@
 
 import libxml2
 import random
-
-import xmlextra
-from utils import from_utf8,to_utf8
 from types import StringType,UnicodeType
-from jid import JID
+
+from pyxmpp import xmlextra
+from pyxmpp.utils import from_utf8,to_utf8
+from pyxmpp.jid import JID
 
 common_doc=libxml2.newDoc("1.0")
 common_root=common_doc.newChild(None,"root",None)

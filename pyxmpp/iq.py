@@ -17,8 +17,8 @@
 
 import libxml2
 
-from utils import from_utf8,to_utf8,get_node_ns_uri
-from stanza import Stanza,StanzaError,gen_id
+from pyxmpp.utils import from_utf8,to_utf8,get_node_ns_uri
+from pyxmpp.stanza import Stanza,StanzaError,gen_id
 
 class Iq(Stanza):
     stanza_type="iq"
