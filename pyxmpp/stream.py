@@ -245,11 +245,11 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 				
 	def send_stream_end(self):
 		self.doc_out.getRootElement().addContent(" ")
-		str=self.doc_out.getRootElement().serialize(encoding="UTF-8")
-		end=str.rindex("<")
+		s=self.doc_out.getRootElement().serialize(encoding="UTF-8")
+		end=s.rindex("<")
 		try:
-			self.write_raw(str[end:])
-		except (IOError,SystemError),e:
+			self.write_raw(s[end:])
+		except (IOError,SystemError,socket.error),e:
 			self.debug("Sending stream closing tag failed:"+str(e))
 		self.doc_out.freeDoc()
 		self.doc_out=None
@@ -286,10 +286,20 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		e.free()
 		self.send_stream_end()
 
+	def restart_stream(self):
+		self.reader=None
+		self.doc_out.freeDoc()
+		self.doc_out=None
+		self.doc_in.freeDoc()
+		self.doc_in=None
+		if self.initiator:
+			self.send_stream_start(self.stream_id)
+		self.make_reader()
+			
 	def get_stream_features(self):
 		root=self.doc_out.getRootElement()
 		features=root.newChild(root.ns(),"features",None)
-		if self.sasl_mechanisms:
+		if self.sasl_mechanisms and not self.authenticated:
 			ml=features.newChild(None,"mechanisms",None)
 			ns=ml.newNs(SASL_NS,None)
 			ml.setNs(ns)
@@ -805,6 +815,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			self.debug("SASL authentication succeeded")
 			self.me=JID(r.authzid)
 			self.authenticated=1
+			self.restart_stream()
 			self.post_auth()
 		else:
 			self.debug("SASL authentication failed")
