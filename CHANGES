@@ -1,0 +1,17 @@
+This file should describe the bigest and most important API changes.
+
+2005-05-28
+
+	Roster and RosterItems classes rewritten. Now they are not wrapper
+	around roster XML node any more. Old code was complicated, slow,
+	and not standard compliant (ingored stringprep profiles).
+
+	Most important changes:
+	- no `node` attribute in Roster and RosterItem
+	- RosterItem constructor doesn't take `roster` argument any more
+	- `jid`, `ask`, `subscription`, `name` and `groups` are now attributes,
+	  not methods, of `RosterItem`
+	- `add_group`, `rm_group`, etc. methods of `RosterItem` are gone. Use
+	  list operations on `groups` attribute now.
+	- inline documentation included
+	

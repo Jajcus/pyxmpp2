@@ -15,263 +15,297 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-import sys
-import re
-import libxml2
+"""XMPP-IM roster handling"""
 
 from types import StringType,UnicodeType
 from stanza import common_doc,common_root
 from iq import Iq
 from jid import JID
 
-from utils import to_utf8,from_utf8
+from utils import to_utf8,from_utf8,get_node_ns_uri,get_node_ns
 
 ROSTER_NS="jabber:iq:roster"
 
-class RosterError(StandardError):
-    pass
-
 class RosterItem:
-    def __init__(self,roster,node_or_jid,subscription="none",name=None):
-        self.roster=roster
+    """
+    Roster item.
+
+    Represents part of a roster, or roster update request.
+    """
+    
+    def __init__(self,node_or_jid,subscription="none",name=None,groups=[],ask=None):
+        """
+        Initialize a roster item from XML node (if `node_or_item` is an instance of
+        `libxml2.xmlNode`) or jid and optional attributes (when `node_or_item`
+        is a `JID`).
+        """
+        if type(node_or_jid) in (StringType,UnicodeType):
+            node_or_jid=JID(node_or_jid)
         if isinstance(node_or_jid,JID):
-            if roster:
-                self.node=roster.node.newChild(roster.node.ns(),"item",None)
-            else:
-                self.node=common_root.newChild(None,"item",None)
-                ns=self.node.newNs(ROSTER_NS,None)
-                self.node.setNs(ns)
-            self.node.setProp("jid",node_or_jid.as_utf8())
-            self.set_subscription(subscription)
+            if subscription not in ("none","from","to","both","remove"):
+                raise ValueError,"Bad subscription type: %r" % (subscription,)
+            if ask not in ("subscribe",None):
+                raise ValueError,"Bad ask type: %r" % (ask,)
+            self.jid=node_or_jid
+            self.ask=ask
+            self.subscription=subscription
+            self.name=name
+            self.groups=groups
         else:
-            if roster is None:
-                self.node=node_or_jid.copyNode(1)
-            else:
-                self.node=node_or_jid
-        self.xpath_ctxt=common_doc.xpathNewContext()
-        self.xpath_ctxt.setContextNode(self.node)
-        self.xpath_ctxt.xpathRegisterNs("r",ROSTER_NS)
-        if name is not None:
-            self.set_name(name)
-    def __del__(self):
-        if self.roster is None:
-            if self.node:
-                self.node.unlinkNode()
-                self.node.freeNode()
-                self.node=None
-        if self.xpath_ctxt:
-            self.xpath_ctxt.xpathFreeContext()
+            self.from_xml(node_or_jid)
+
+    def from_xml(self,node):
+        """Initialize RosterItem from XML node."""
+        if node.type!="element":
+            raise ValueError,"XML node is not a roster item (not en element)"
+        ns=get_node_ns_uri(node)
+        if ns and ns!=ROSTER_NS or node.name!="item":
+            raise ValueError,"XML node is not a roster item"
+        jid=JID(node.prop("jid"))
+        subscription=node.prop("subscription")
+        if subscription not in ("none","from","to","both","remove"):
+            subscription="none"
+        ask=node.prop("ask")
+        if ask not in ("subscribe",None):
+            ask=None
+        name=from_utf8(node.prop("name"))
+        groups=[]
+        n=node.children
+        while n:
+            if n.type!="element":
+                n=n.next
+                continue
+            ns=get_node_ns_uri(n)
+            if ns and ns!=ROSTER_NS or n.name!="group":
+                n=n.next
+                continue
+            group=n.getContent()
+            if group:
+                groups.append(group)
+            n=n.next
+        self.jid=jid
+        self.name=name
+        self.groups=groups
+        self.subscription=subscription
+        self.ask=ask
+
+    def as_xml(self,parent=None):
+        """
+        Return XML representation of the roster item.
+
+        If `parent` is given the item will be created as its child.
+        The item will be standalone node in `common_doc` context overwise.
+        """
+        if parent:
+            ns=get_node_ns(parent)
+            node=parent.newChild(ns,"item",None)
+        else:
+            ns=None
+            node=common_doc.newDocNode(None,"item",None)
+        if not ns:
+            ns=node.newNs(ROSTER_NS,None)
+            node.setNs(ns)
+        node.setProp("jid",self.jid.as_utf8())
+        if self.name:
+            node.setProp("name",to_utf8(self.name))
+        node.setProp("subscription",self.subscription)
+        if self.ask:
+            node.setProp("ask",to_utf8(self.ask))
+        for g in self.groups:
+            node.newTextChild(ns,"group",g)
+        return node
+
     def __str__(self):
-        return self.node.serialize()
-    def name(self):
-        name=self.node.prop("name")
-        if name is None:
-            return None
-        return unicode(name,"utf-8")
-    def set_name(self,name):
-        if name is None:
-            if self.node.hasProp("name"):
-                self.node.unsetProp("name")
-            return
-        self.node.setProp("name",name.encode("utf-8"))
-    def ask(self):
-        ask=self.node.prop("ask")
-        if ask is None:
-            return None
-        return unicode(ask,"utf-8")
-    def set_ask(self,ask):
-        if ask is None:
-            if self.node.hasProp("ask"):
-                self.node.unsetProp("ask")
-            return
-        self.node.setProp("ask",ask.encode("utf-8"))
-    def jid(self):
-        return JID(self.node.prop("jid"))
-    def set_jid(self,jid):
-        self.node.setProp("jid",jid.encode("utf-8"))
-    def subscription(self):
-        return unicode(self.node.prop("subscription"),"utf-8")
-    def set_subscription(self,subscription):
-        self.node.setProp("subscription",subscription.encode("utf-8"))
-    def groups(self):
-        l=self.xpath_ctxt.xpathEval("r:group")
-        if not l:
-            return []
-        ret=[]
-        for g in l:
-            gname=g.getContent()
-            if gname:
-                ret.append(unicode(gname,"utf-8","replace"))
-        return ret
-    def add_group(self,group):
-        groups=self.groups()
-        if group in self.groups():
-            return
-        self.node.newTextChild(self.node.ns(),"group",to_utf8(group))
-    def clear_groups(self):
-        groups=self.xpath_ctxt.xpathEval("r:group")
-        if not groups:
-            return
-        for g in groups:
-            g.unlinkNode()
-            g.freeNode()
-    def rm_group(self,group):
-        if group is None:
-            return
-        l=self.xpath_ctxt.xpathEval("r:group")
-        if not l:
-            return []
-        ret=[]
-        for g in l:
-            gname=unicode(g.getContent(),"utf-8","replace")
-            if gname==group:
-                g.unlinkNode()
-                g.freeNode()
+        n=self.as_xml()
+        r=n.serialize()
+        n.freeNode()
+        return r
+    
     def make_roster_push(self):
+        """
+        Make "roster push" IQ stanza from the item representing roster update
+        request.
+        """
         iq=Iq(type="set")
         q=iq.new_query(ROSTER_NS)
-        q.addChild(self.node.copyNode(1))
+        self.as_xml(q)
         return iq
 
 class Roster:
-    def __init__(self,node=None,server=0):
+    def __init__(self,node=None,server=False,strict=True):
+        """
+        Initialize Roster object.
+
+        `node` should be an XML representation of the roster (e.g. as sent
+        from server in response to roster request).  When `node` is None empty
+        roster will be created.
+
+        If `server` is true the object is considered server-side roster.
+
+        If `strict` is False, than invalid items in the XML will be ignored.
+        """
+        self.items_dict={}
         self.server=server
         self.node=None
-        self.xpath_ctxt=None
-        if node is None:
-            self.node=common_root.newChild(None,"query",None)
-            self.ns=self.node.newNs(ROSTER_NS,None)
-            self.node.setNs(self.ns)
-        else:
-            ns=node.ns()
-            if ns.getContent() != ROSTER_NS:
-                raise RosterError,"Bad roster namespace"
-            self.node=node.docCopyNode(common_doc,1)
-            common_root.addChild(self.node)
-            self.ns=self.node.ns()
-        self.xpath_ctxt=common_doc.xpathNewContext()
-        self.xpath_ctxt.setContextNode(self.node)
-        self.xpath_ctxt.xpathRegisterNs("r",ROSTER_NS)
+        if node:
+            self.from_xml(node,strict)
 
-    def __del__(self):
-        if self.node:
-            self.node.unlinkNode()
-            self.node.freeNode()
-            self.node=None
-        if self.xpath_ctxt:
-            self.xpath_ctxt.xpathFreeContext()
-            self.xpath_ctxt=None
+    def from_xml(self,node,strict=True):
+        """
+        Initialize Roster object from XML node.
 
-    def items(self):
-        l=self.xpath_ctxt.xpathEval("r:item")
-        ret=[]
-        for i in l:
-            ret.append(RosterItem(self,i))
-        return ret
-
-    def groups(self):
-        ret=[]
-        l=self.xpath_ctxt.xpathEval("r:item/r:group")
-        if l is not None:
-            for g in l:
-                gname=g.getContent()
-                if gname and gname not in ret:
-                    ret.append(gname)
-        l=self.xpath_ctxt.xpathEval("r:item[not(r:group)]")
-        if l:
-            ret.append(None)
-        return ret
-
-    def items_by_name(self,name,case_sensitive=1):
-        if not name:
-            raise ValueError,"name is None"
-        name=to_utf8(name)
-        if not case_sensitive:
-            name=name.lower()
-        ret=[]
-        n=self.node.children
+        If `strict` is False, than invalid items in the XML will be ignored.
+        """
+        self.items_dict={}
+        if node.type!="element":
+            raise ValueError,"XML node is not a roster (not en element)"
+        ns=get_node_ns_uri(node)
+        if ns and ns!=ROSTER_NS or node.name!="query":
+            raise ValueError,"XML node is not a roster"
+        n=node.children
         while n:
-            if n.type!='element':
+            if n.type!="element":
+                n=n.next
+                continue
+            nw=get_node_ns_uri(n)
+            if ns and ns!=ROSTER_NS or n.name!="item":
                 n=n.next
                 continue
             try:
-                ns=n.ns()
-            except libxml2.treeError:
-                return None
-            if ns and ns.getContent()!=ROSTER_NS:
-                n=n.next
-                continue
-            if n.name!='item':
-                continue
-            item_name=n.prop("name")
-            if item_name is None:
-                if name is None:
-                    ret.append(RosterItem(self,n))
-            else:
-                if case_sensitive:
-                    if name==item_name:
-                        ret.append(RosterItem(self,n))
-                elif name==item_name.lower():
-                    ret.append(RosterItem(self,n))
+                item=RosterItem(n)
+                self.items_dict[item.jid.as_unicode()]=item
+            except ValueError:
+                if strict:
+                    raise
             n=n.next
-        if not ret:
-            raise KeyError,name
-        return ret
 
-    def items_by_group(self,group):
-        if not group:
-            expr="r:item[not(r:group)]"
+    def as_xml(self,parent=None):
+        """
+        Return XML representation of the roster.
+
+        If `parent` is given (e.g. IQ stanza node) the roster node will be
+        created as its child.  The item will be standalone node in `common_doc`
+        context overwise.
+        """
+        if parent:
+            ns=get_node_ns(parent)
+            node=parent.newChild(ns,"query",None)
         else:
-            group=to_utf8(group)
-            if '"' not in group:
-                expr='r:item[r:group="%s"]' % group
-            elif "'" not in group:
-                expr="r:item[r:group='%s']" % group
+            ns=None
+            node=common_doc.newDocNode(None,"query",None)
+        if not ns:
+            ns=node.newNs(ROSTER_NS,None)
+            node.setNs(ns)
+        for it in self.items_dict.values():
+            n=it.as_xml(node)
+        return node
+
+    def __str__(self):
+        n=self.as_xml()
+        r=n.serialize()
+        n.freeNode()
+        return r
+
+    def items(self):
+        """Return a list of items in the roster."""
+        return self.items_dict.values()
+
+    def groups(self):
+        """Return a list of groups in the roster."""
+        r={}
+        for it in self.items_dict.values():
+            it.groups=[g for g in it.groups if g]
+            if it.groups:
+                for g in it.groups:
+                    r[g]=True
             else:
-                raise RosterError,"Unsupported roster group name format"
-        l=self.xpath_ctxt.xpathEval(expr)
-        if not l:
-            raise KeyError,group
-        ret=[]
-        for i in l:
-            ret.append(RosterItem(self,i))
-        return ret
+                r[None]=True
+        return r.keys()
+
+    def items_by_name(self,name,case_sensitive=True):
+        """
+        Return a list of items with given `name`.
+
+        If `case_sensitive` is False the matching will be case insensitive.
+        """
+        if not case_sensitive and name:
+            name=name.lower()
+        r=[]
+        for it in self.items_dict.values():
+            if it.name==name:
+                r.append(it)
+            elif it.name is None:
+                continue
+            elif not case_sensitive and it.name.lower()==name:
+                r.append(it)
+        return r
+
+    def items_by_group(self,group,case_sensitive=True):
+        """
+        Return a list of groups with given name.
+
+        If `case_sensitive` is False the matching will be case insensitive.
+        """
+        r=[]
+        if not group:
+            for it in self.items_dict.values():
+                it.groups=[g for g in it.groups if g]
+                if not it.groups:
+                    r.append(it)
+            return r
+        if not case_sensitive:
+            group=group.lower()
+        for it in self.items_dict.values():
+            if group in it.groups:
+                r.append(it)
+            elif not case_sensitive and group in [lower(g) for g in it.groups]:
+                r.append(it)
+        return r
 
     def item_by_jid(self,jid):
+        """
+        Return roster item with given `jid`.
+
+        Will raise KeyError if the item is not found.
+        """
         if not jid:
             raise ValueError,"jid is None"
-        if isinstance(jid,JID):
-            jid=jid.as_utf8()
-        if '"' not in jid:
-            expr='r:item[@jid="%s"]' % jid
-        elif "'" not in jid:
-            expr="r:item[@jid='%s']" % jid
-        else:
-            raise RosterError,"Unsupported roster item jid format"
-        l=self.xpath_ctxt.xpathEval(expr)
-        if not l:
-            raise KeyError,str(jid)
-        return RosterItem(self,l[0])
+        return self.items_dict[jid.as_unicode()]
 
-    def add_item(self,jid,subscription="none",name=None):
-        try:
-            item=self.item_by_jid(jid)
-            raise RosterError,"Item already exists"
-        except KeyError:
-            pass
-        if not self.server or subscription not in ("none","from","to","both"):
-            subscription="none"
-        item=RosterItem(self,jid,subscription,name)
+    def add_item(self,item_or_jid,subscription="none",name=None,groups=[],ask=None):
+        """
+        Add an item to the roster.
+
+        The `item_or_jid` argument may be a `RosterItem` object or a `JID`. If
+        it is a JID then `subscription`, `name`, `groups` and `ask` may also be
+        specified.
+        """
+        if isinstance(item_or_jid,RosterItem):
+            item=item_or_jid
+            if self.items_dict.has_key(item.jid.as_unicode()):
+                raise ValueError,"Item already exists"
+        else:
+            if self.items_dict.has_key(item_or_jid.as_unicode()):
+                raise ValueError,"Item already exists"
+            if not self.server or subscription not in ("none","from","to","both"):
+                subscription="none"
+            if not self.server:
+                ask=None
+            item=RosterItem(item_or_jid,subscription,name,groups,ask)
+        self.items_dict[item.jid.as_unicode()]=item
         return item
 
     def rm_item(self,jid):
-        item=self.item_by_jid(jid)
-        item.node.unlinkNode()
-        item.node.freeNode()
-        item.node=None
-        return RosterItem(None,jid,"remove")
+        """Remove item from the roster."""
+        del self.items_dict[jid.as_unicode()]
+        return RosterItem(jid,"remove")
 
     def update(self,query):
+        """
+        Apply an update request to the roster.
+
+        `query` should be a query included in a "roster push" IQ received.
+        """
         ctxt=common_doc.xpathNewContext()
         ctxt.setContextNode(query)
         ctxt.xpathRegisterNs("r",ROSTER_NS)
@@ -280,29 +314,26 @@ class Roster:
         if not item:
             raise RosterError,"No item to update"
         item=item[0]
-        item=RosterItem(None,item)
-        jid=item.jid()
-        subscription=item.subscription()
+        item=RosterItem(item)
+        jid=item.jid
+        subscription=item.subscription
         try:
             local_item=self.item_by_jid(jid)
-            local_item.set_subscription(subscription)
+            local_item.subscription=subscription
         except KeyError:
             if subscription=="remove":
-                return RosterItem(None,jid,"remove")
+                return RosterItem(jid,"remove")
             if self.server or subscription not in ("none","from","to","both"):
                 subscription="none"
-            local_item=RosterItem(self,jid,subscription)
+            local_item=RosterItem(jid,subscription)
         if subscription=="remove":
-            local_item.node.unlinkNode()
-            local_item.node.freeNode()
-            local_item.node=None
-            return RosterItem(None,jid,"remove")
-        local_item.set_name(item.name())
-        if item.groups() != local_item.groups():
-            local_item.clear_groups()
-            for g in item.groups():
-                local_item.add_group(g)
+            del self.items_dict[local_item.jid.as_unicode()]
+            return RosterItem(jid,"remove")
+        local_item.name=item.name
+        local_item.groups=item.groups
         if not self.server:
-            local_item.set_ask(item.ask())
+            local_item.ask=item.ask
+        self.items_dict[local_item.jid.as_unicode()]=local_item
         return local_item
+
 # vi: sts=4 et sw=4
