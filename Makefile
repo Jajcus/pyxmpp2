@@ -13,6 +13,11 @@ all: version
 
 doc:
 	$(MAKE) -C doc
+
+ChangeLog: FORCE
+	svn log -v --xml | svn2log.py -p '/(branches/[^/]+|trunk)' -x ChangeLog -u aux/users
+	
+FORCE:
 	
 version:
 	if test -f "CVS/Entries" ; then \
