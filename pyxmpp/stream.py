@@ -17,7 +17,7 @@
 
 """Core XMPP stream functionality"""
 
-__revision__="$Id: stream.py,v 1.66 2004/09/13 21:14:53 jajcus Exp $"
+__revision__="$Id: stream.py,v 1.67 2004/09/13 21:28:00 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -606,7 +606,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
     def _write_raw(self,data):
         """Same as `Stream.write_raw` but assume `self.lock` is acquired."""
-        logging.getLogger("pyxmpp.Stream.out").debug("OUT: %r",str)
+        logging.getLogger("pyxmpp.Stream.out").debug("OUT: %r",data)
         try:
             self.socket.send(data)
         except (IOError,OSError),e:
@@ -1292,8 +1292,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         if resource:
             q.newTextChild(q.ns(),"resource",to_utf8(resource))
         self.state_change("binding",resource)
-        self.send(iq)
         self.set_response_handlers(iq,self._bind_success,self._bind_error)
+        self.send(iq)
         iq.free()
 
     def _bind_success(self,stanza):
