@@ -1,7 +1,12 @@
 #! /usr/bin/env python
-# $Id: setup.py,v 1.6 2003/06/24 06:46:17 jajcus Exp $
+# $Id: setup.py,v 1.7 2003/08/15 15:51:46 jajcus Exp $
 
 import os.path
+import sys
+
+if not os.path.exists(os.path.join("pyxmpp","version.py")):
+	print >>sys.stderr,"You need to run 'make' to use pyxmpp from CVS"
+	sys.exit(1)
 
 execfile(os.path.join("pyxmpp","version.py"))
 
