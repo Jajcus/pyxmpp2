@@ -306,7 +306,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		return self.doc_out.newDocNode(ns,name,None)
 
 	def write_raw(self,str):
-		self.debug("OUT: %r" % (str,))
+		self.data_out(str)
 		self.socket.send(str)
 
 	def write_node(self,node):
@@ -369,7 +369,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		if self.eof:
 			return
 		r=os.read(self.socket.fileno(),1024)
-		self.debug("IN: %r" % (r,))
+		self.data_in(r)
 		if r:
 			try:
 				self.reader.feed(r)
@@ -381,6 +381,12 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			self.disconnect()
 		if self.eof:
 			self.stream_end(None)
+		
+	def data_in(self,data):
+		self.debug("IN: %r" % (data,))
+
+	def data_out(self,data):
+		self.debug("OUT: %r" % (data,))
 
 	def process_node(self,node):
 		ns_uri=node.ns().getContent()
