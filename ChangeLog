@@ -1,3 +1,8 @@
+2004-09-03  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* CHANGES:
+	- info about new logging
+
 2004-09-01  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/clientstream.py:
