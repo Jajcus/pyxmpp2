@@ -31,7 +31,10 @@ class RosterItem:
 		self.roster=roster
 		self.node=node
 	def name(self):
-		return unicode(self.node.prop("name"),"utf-8")
+		name=self.node.prop("name")
+		if name is None:
+			return None
+		return unicode(name,"utf-8")
 	def jid(self):
 		return JID(self.node.prop("jid"))
 	def subscription(self):
@@ -87,14 +90,16 @@ class Roster:
 		return ret
 	
 	def groups(self):
-		l=self.xpath_ctxt.xpathEval("r:item/r:group")
-		if not l:
-			return []
 		ret=[]
-		for g in l:
-			gname=g.getContent()
-			if gname:
-				ret.append(gname)
+		l=self.xpath_ctxt.xpathEval("r:item/r:group")
+		if l is not None:
+			for g in l:
+				gname=g.getContent()
+				if gname:
+					ret.append(gname)
+		l=self.xpath_ctxt.xpathEval("r:item[not(r:group)]")
+		if l:
+			ret.append(None)
 		return ret
 		
 	def items_by_name(self,name):
@@ -117,14 +122,15 @@ class Roster:
 	
 	def items_by_group(self,group):
 		if not group:
-			raise ValueError,"group is None"
-		group=to_utf8(group)
-		if '"' not in group:
-			expr='r:item[r:group="%s"]' % group
-		elif "'" not in group:
-			expr="r:item[r:group='%s']" % group
+			expr="r:item[not(r:group)]"
 		else:
-			raise RosterError,"Unsupported roster group name format"
+			group=to_utf8(group)
+			if '"' not in group:
+				expr='r:item[r:group="%s"]' % group
+			elif "'" not in group:
+				expr="r:item[r:group='%s']" % group
+			else:
+				raise RosterError,"Unsupported roster group name format"
 		l=self.xpath_ctxt.xpathEval(expr)
 		if not l:
 			raise KeyError,group
