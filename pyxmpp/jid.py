@@ -150,7 +150,10 @@ class JID:
 		if other is None:
 			return 0
 		elif type(other) in (StringType,UnicodeType):
-			other=JID(other)
+			try:
+				other=JID(other)
+			except:
+				return 0
 		elif not isinstance(other,JID):
 			raise TypeError,"Can't compare JID with %r" % (type(other),)
 			
