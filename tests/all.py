@@ -4,7 +4,7 @@ import unittest
 import sys
 import getopt
 
-all_modules=["vcard"]
+all_modules=["vcard","jid"]
 
 def suite(modules=None):
      if not modules:
