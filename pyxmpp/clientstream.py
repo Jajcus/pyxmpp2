@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: clientstream.py,v 1.31 2004/09/10 14:00:53 jajcus Exp $"
+__revision__="$Id: clientstream.py,v 1.32 2004/09/11 23:11:21 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -42,7 +42,7 @@ class LegacyAuthenticationError(StreamAuthenticationError):
 
 class ClientStream(Stream):
     def __init__(self,jid,password=None,server=None,port=None,
-            auth_methods=["sasl:DIGEST-MD5"],
+            auth_methods=("sasl:DIGEST-MD5",),
             tls_settings=None,keepalive=0):
         sasl_mechanisms=[]
         for m in auth_methods:

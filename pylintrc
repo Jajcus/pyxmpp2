@@ -45,7 +45,8 @@ include-ids=yes
 enable-basic=yes
 
 # Maximum number of arguments for function / method
-max-args=5
+#max-args=5
+max-args=15
 
 # Maximum number of locals for function / method body
 max-locals=15

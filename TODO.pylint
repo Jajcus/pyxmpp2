@@ -1,132 +1,49 @@
-************* Module pyxmpp.client
+************* Module pyxmpp.xmppstringprep
+W0403: 24: Uses of a deprecated module 'string'
+W0403: 25: Uses of a deprecated module 'stringprep'
+W0141: 29:LookupFunction: Missing docstring
+W0141: 33:LookupTable: Missing docstring
+W0622: 41:LookupTable.lookup: Redefining built-in 'max'
+W0622: 41:LookupTable.lookup: Redefining built-in 'min'
+W0141: 37:LookupTable.lookup: Missing docstring
+W0141: 50:b1_mapping: Missing docstring
+W0622: 73:NFKC: Redefining built-in 'input'
+W0133: 73:NFKC: Invalid name "NFKC" (should match [a-z_][a-z0-9_]*$)
+W0141: 73:NFKC: Missing docstring
+W0622:103:Profile.prepare: Redefining built-in 'input'
+W0704:123:Profile.prepare: Except doesn't do anything
+W0133:176:Profile.check_bidi: Invalid name "has_L" (should match [a-z_][a-z0-9_]*$)
+W0133:177:Profile.check_bidi: Invalid name "has_RAL" (should match [a-z_][a-z0-9_]*$)
+W0201:125:Profile.prepare: Attribute 'cache_items' defined outside __init__
+W0141:205:set_stringprep_cache_size: Missing docstring
+W0121:206:set_stringprep_cache_size: Use of the global statement
+W0704:213:set_stringprep_cache_size: Except doesn't do anything
+W0611: 27: Unused import weakref
+************* Module pyxmpp.roster
+W0102: 40:RosterItem.__init__: Dangerous default value [] as argument
+W0141:138:Roster: Missing docstring
+W0612:174:Roster.from_xml: Unused variable 'nw'
+W0612:204:Roster.as_xml: Unused variable 'n'
+E0602:265:Roster.items_by_group: Undefined variable 'lower'
+W0102:279:Roster.add_item: Dangerous default value [] as argument
+E0602:319:Roster.update: Undefined variable 'RosterError'
+W0611: 25: Unused import common_root
+************* Module pyxmpp.presence
 W0141:  0: Missing docstring
-W0141: 34:ClientError: Missing docstring
-W0141: 37:FatalClientError: Missing docstring
-W0141: 40:Client: Missing docstring
-W0102: 41:Client.__init__: Dangerous default value ['sasl:DIGEST-MD5'] as argument
-W0113: 41:Client.__init__: Too many arguments (8/5)
-W0141: 62:Client.connect: Missing docstring
-W0141: 98:Client.get_stream: Missing docstring
-W0141:104:Client.disconnect: Missing docstring
-W0141:109:Client.request_session: Missing docstring
-W0141:124:Client.request_roster: Missing docstring
-W0141:133:Client.socket: Missing docstring
-W0141:136:Client.loop: Missing docstring
-W0141:141:Client.__session_timeout: Missing docstring
-W0141:144:Client.__session_error: Missing docstring
-W0141:147:Client.__session_result: Missing docstring
-W0613:147:Client.__session_result: Unused argument 'iq'
-W0141:154:Client.__roster_timeout: Missing docstring
-W0141:157:Client.__roster_error: Missing docstring
-W0141:160:Client.__roster_result: Missing docstring
-W0141:171:Client.__roster_push: Missing docstring
-W0141:186:Client.__stream_state_change: Missing docstring
-W0141:205:Client.idle: Missing docstring
-W0141:210:Client.stream_created: Missing docstring
-W0141:213:Client.stream_closed: Missing docstring
-W0141:216:Client.session_started: Missing docstring
-W0141:221:Client.stream_error: Missing docstring
-W0141:225:Client.roster_updated: Missing docstring
-W0141:228:Client.stream_state_changed: Missing docstring
-W0141:231:Client.connected: Missing docstring
-W0141:234:Client.authenticated: Missing docstring
-W0141:237:Client.authorized: Missing docstring
-W0141:240:Client.disconnected: Missing docstring
-W0611: 28: Unused import JID
-W0611: 21: Unused import libxml2
-W0611: 31: Unused import to_utf8
-W0611: 31: Unused import from_utf8
-W0611: 22: Unused import sys
-W0611: 24: Unused import traceback
-************* Module pyxmpp.clientstream
-W0301: 27: Line too long (103/100)
-W0301:120: Line too long (103/100)
-W0141:  0: Missing docstring
-W0141: 34:ClientStreamError: Missing docstring
-W0141: 37:FatalClientStreamError: Missing docstring
-W0141: 40:LegacyAuthenticationError: Missing docstring
-W0141: 43:ClientStream: Missing docstring
-W0102: 44:ClientStream.__init__: Dangerous default value ['sasl:DIGEST-MD5'] as argument
-W0113: 44:ClientStream.__init__: Too many arguments (8/5)
-W0141: 64:ClientStream._reset: Missing docstring
-W0141: 68:ClientStream.connect: Missing docstring
-W0221: 68:ClientStream.connect: Arguments number differs from overriden method
-W0221: 75:ClientStream._connect: Arguments number differs from overriden method
-W0141: 75:ClientStream._connect: Missing docstring
-W0221: 93:ClientStream.accept: Arguments number differs from overriden method
-W0141: 93:ClientStream.accept: Missing docstring
-W0141: 96:ClientStream._post_connect: Missing docstring
-W0141:101:ClientStream._try_auth: Missing docstring
-W0612:115:ClientStream._try_auth: Unused variable 'e'
-W0141:127:ClientStream._get_stream_features: Missing docstring
-W0141:136:ClientStream.do_bind: Missing docstring
-W0141:162:ClientStream.get_password: Missing docstring
-W0613:162:ClientStream.get_password: Unused argument 'realm'
-W0141:168:ClientStream.get_realms: Missing docstring
-W0141:171:ClientStream.choose_realm: Missing docstring
-W0141:178:ClientStream.check_authzid: Missing docstring
-W0102:178:ClientStream.check_authzid: Dangerous default value {} as argument
-W0111:178:ClientStream.check_authzid: Too many return statements (7/6)
-W0141:194:ClientStream.get_serv_type: Missing docstring
-W0141:197:ClientStream.get_serv_name: Missing docstring
-W0141:200:ClientStream.get_serv_host: Missing docstring
-W0141:203:ClientStream.fix_out_stanza: Missing docstring
-W0141:210:ClientStream.fix_in_stanza: Missing docstring
-W0201: 66:ClientStream._reset: Attribute 'auth_methods_left' defined outside __init__
-W0611: 21: Unused import libxml2
-W0611: 30: Unused import common_doc
-W0611: 32: Unused import from_utf8
-W0611: 29: Unused import Iq
-W0611: 25: Unused import UnicodeType
-W0611: 22: Unused import sha
-W0611: 23: Unused import time
-************* Module pyxmpp.error
-W0141:  0: Missing docstring
-W0141:173:ErrorNodeError: Missing docstring
-W0141:176:ErrorNode: Missing docstring
-W0112:177:ErrorNode.__init__: Too many branches (15/12)
-W0141:238:ErrorNode.free: Missing docstring
-W0141:244:ErrorNode.free_borrowed: Missing docstring
-W0141:247:ErrorNode.is_legacy: Missing docstring
-W0141:250:ErrorNode.xpath_eval: Missing docstring
-E0602:257:ErrorNode.xpath_eval: Undefined variable 'COMMON_NS'
-W0141:263:ErrorNode.get_condition: Missing docstring
-W0141:278:ErrorNode.get_text: Missing docstring
-W0141:287:ErrorNode.add_custom_condition: Missing docstring
-W0141:293:ErrorNode.upgrade: Missing docstring
-W0133:299:ErrorNode.upgrade: Invalid name "KeyError" (should match [a-z_][a-z0-9_]*$)
-W0622:299:ErrorNode.upgrade: Redefining built-in 'KeyError'
-W0612:299:ErrorNode.upgrade: Unused variable 'KeyError'
-W0141:327:ErrorNode.downgrade: Missing docstring
-W0612:332:ErrorNode.downgrade: Unused variable 'typ'
-W0141:340:ErrorNode.serialize: Missing docstring
-W0141:343:StreamErrorNode: Missing docstring
-W0613:344:StreamErrorNode.__init__: Unused argument 'ns'
-W0141:358:StreamErrorNode.get_message: Missing docstring
-W0141:370:StanzaErrorNode: Missing docstring
-W0141:391:StanzaErrorNode.get_type: Missing docstring
-W0141:396:StanzaErrorNode.upgrade: Missing docstring
-W0141:406:StanzaErrorNode.get_message: Missing docstring
-W0611: 24: Unused import from_utf8
-************* Module pyxmpp.expdict
-W0141:  0: Missing docstring
-W0141: 24:ExpiringDictionary: Missing docstring
-W0231: 25:ExpiringDictionary.__init__: __init__ method from base class 'dict' is not called
-W0141: 53:ExpiringDictionary.expire: Missing docstring
-************* Module pyxmpp.iq
-W0141:  0: Missing docstring
-W0141: 26:Iq: Missing docstring
-W0231: 28:Iq.__init__: __init__ method from base class 'Stanza' is not called
-W0151:  0:Iq.__init__: Used builtin function 'apply'
-W0141: 51:Iq.copy: Missing docstring
-W0141: 54:Iq.make_error_response: Missing docstring
-W0141: 66:Iq.make_result_response: Missing docstring
-W0141: 73:Iq.new_query: Missing docstring
-W0141: 76:Iq.get_query: Missing docstring
-W0704: 81:Iq.get_query: Except doesn't do anything
-W0141: 85:Iq.get_query_ns: Missing docstring
-W0611: 23: Unused import to_utf8
-W0611: 23: Unused import from_utf8
+W0141: 43:Presence: Missing docstring
+W0231: 45:Presence.__init__: __init__ method from base class 'Stanza' is not called
+W0151:  0:Presence.__init__: Used builtin function 'apply'
+W0112: 45:Presence.__init__: Too many branches (16/12)
+W0141: 88:Presence.copy: Missing docstring
+W0141: 91:Presence.set_status: Missing docstring
+W0141:104:Presence.get_status: Missing docstring
+W0141:111:Presence.get_show: Missing docstring
+W0141:118:Presence.set_show: Missing docstring
+W0141:131:Presence.get_priority: Missing docstring
+W0141:141:Presence.set_priority: Missing docstring
+W0141:158:Presence.make_accept_response: Missing docstring
+W0141:167:Presence.make_deny_response: Missing docstring
+W0141:176:Presence.make_error_response: Missing docstring
 ************* Module pyxmpp.jid
 W0141: 35:is_domain_valid: Missing docstring
 W0702: 39:is_domain_valid: No exception's type specified
@@ -154,77 +71,119 @@ E0201:186:JID.bare: Access to undefined member 'domain'
 E0201:200:JID.__eq__: Access to undefined member 'domain'
 E0201:212:JID.__hash__: Access to undefined member 'domain'
 W0611: 29: Unused import to_utf8
-************* Module pyxmpp.message
+************* Module pyxmpp.xmlextra
 W0141:  0: Missing docstring
-W0141: 27:Message: Missing docstring
-W0231: 29:Message.__init__: __init__ method from base class 'Stanza' is not called
-W0151:  0:Message.__init__: Used builtin function 'apply'
-W0112: 29:Message.__init__: Too many branches (15/12)
-W0141: 71:Message.get_subject: Missing docstring
-W0141: 78:Message.get_thread: Missing docstring
-W0141: 85:Message.copy: Missing docstring
-W0141: 88:Message.get_body: Missing docstring
-W0141: 95:Message.make_error_response: Missing docstring
-************* Module pyxmpp.presence
+W0232: 32:StreamHandler: Class has no __init__ method
+W0141: 34:StreamHandler._stream_start: Missing docstring
+W0141: 37:StreamHandler._stream_end: Missing docstring
+W0141: 40:StreamHandler._stanza_start: Missing docstring
+W0141: 44:StreamHandler._stanza_end: Missing docstring
+W0141: 48:StreamHandler._stanza: Missing docstring
+W0613: 65:StreamHandler.stanza_start: Unused argument 'doc'
+W0613: 72:StreamHandler.stanza_end: Unused argument 'doc'
+W0613: 83:StreamHandler.stanza: Unused argument 'doc'
+W0141: 98:StreamReader: Missing docstring
+W0141:103:StreamReader.doc: Missing docstring
+W0321:131:remove_ns: More than one statement on a single line
+W0321:133:remove_ns: More than one statement on a single line
+W0321:145:replace_ns: More than one statement on a single line
+W0321:147:replace_ns: More than one statement on a single line
+W0321:149:replace_ns: More than one statement on a single line
+************* Module pyxmpp.dns
 W0141:  0: Missing docstring
-W0141: 43:Presence: Missing docstring
-W0231: 45:Presence.__init__: __init__ method from base class 'Stanza' is not called
-W0151:  0:Presence.__init__: Used builtin function 'apply'
-W0112: 45:Presence.__init__: Too many branches (16/12)
-W0141: 88:Presence.copy: Missing docstring
-W0141: 91:Presence.set_status: Missing docstring
-W0141:104:Presence.get_status: Missing docstring
-W0141:111:Presence.get_show: Missing docstring
-W0141:118:Presence.set_show: Missing docstring
-W0141:131:Presence.get_priority: Missing docstring
-W0141:141:Presence.set_priority: Missing docstring
-W0141:158:Presence.make_accept_response: Missing docstring
-W0141:167:Presence.make_deny_response: Missing docstring
-W0141:176:Presence.make_error_response: Missing docstring
-************* Module pyxmpp.resolver
+W0403: 24: Uses of a deprecated module 'string'
+W0141: 28:ResolverError: Missing docstring
+W0141: 31:DataTruncated: Missing docstring
+W0141: 34:BadPacket: Missing docstring
+W0141: 37:InvalidDomainName: Missing docstring
+W0141: 49:domain_str2bin: Missing docstring
+W0141: 61:domain_bin2str: Missing docstring
+W0141: 91:add_query_type: Missing docstring
+W0141: 95:add_record_type: Missing docstring
+W0141:101:RR: Missing docstring
+W0141:124:RR.format_data: Missing docstring
+W0141:127:RR.bin_format: Missing docstring
+W0141:136:RR.bin_format_data: Missing docstring
+W0133:139:RR_A: Invalid name "RR_A" (should match [A-Z][a-zA-Z0-9]+$)
+W0141:139:RR_A: Missing docstring
+W0141:146:RR_A.format_data: Missing docstring
+W0141:149:RR_A.bin_format_data: Missing docstring
+W0622:153:bin_parse_A: Redefining built-in 'len'
+W0133:153:bin_parse_A: Invalid name "bin_parse_A" (should match [a-z_][a-z0-9_]*$)
+W0141:153:bin_parse_A: Missing docstring
+W0613:153:bin_parse_A: Unused argument 'cls'
+W0133:163:RR_NS: Invalid name "RR_NS" (should match [A-Z][a-zA-Z0-9]+$)
+W0141:163:RR_NS: Missing docstring
+W0141:170:RR_NS.format_data: Missing docstring
+W0141:173:RR_NS.bin_format_data: Missing docstring
+W0622:176:bin_parse_NS: Redefining built-in 'len'
+W0133:176:bin_parse_NS: Invalid name "bin_parse_NS" (should match [a-z_][a-z0-9_]*$)
+W0141:176:bin_parse_NS: Missing docstring
+W0613:176:bin_parse_NS: Unused argument 'len'
+W0133:182:RR_CNAME: Invalid name "RR_CNAME" (should match [A-Z][a-zA-Z0-9]+$)
+W0141:182:RR_CNAME: Missing docstring
+W0141:189:RR_CNAME.format_data: Missing docstring
+W0141:192:RR_CNAME.bin_format_data: Missing docstring
+W0622:195:bin_parse_CNAME: Redefining built-in 'len'
+W0133:195:bin_parse_CNAME: Invalid name "bin_parse_CNAME" (should match [a-z_][a-z0-9_]*$)
+W0141:195:bin_parse_CNAME: Missing docstring
+W0613:195:bin_parse_CNAME: Unused argument 'len'
+W0133:201:RR_SOA: Invalid name "RR_SOA" (should match [A-Z][a-zA-Z0-9]+$)
+W0141:201:RR_SOA: Missing docstring
+W0141:214:RR_SOA.format_data: Missing docstring
+W0141:218:RR_SOA.bin_format_data: Missing docstring
+W0133:224:bin_parse_SOA: Invalid name "bin_parse_SOA" (should match [a-z_][a-z0-9_]*$)
+W0141:224:bin_parse_SOA: Missing docstring
+W0622:224:bin_parse_SOA: Redefining built-in 'len'
+W0133:235:RR_SRV: Invalid name "RR_SRV" (should match [A-Z][a-zA-Z0-9]+$)
+W0141:235:RR_SRV: Missing docstring
+W0141:245:RR_SRV.format_data: Missing docstring
+W0141:248:RR_SRV.bin_format_data: Missing docstring
+W0111:258:RR_SRV.__gt__: Too many return statements (11/6)
+W0111:284:RR_SRV.__lt__: Too many return statements (11/6)
+W0133:310:bin_parse_SRV: Invalid name "bin_parse_SRV" (should match [a-z_][a-z0-9_]*$)
+W0141:310:bin_parse_SRV: Missing docstring
+W0622:310:bin_parse_SRV: Redefining built-in 'len'
+W0613:310:bin_parse_SRV: Unused argument 'cls'
+W0141:322:parse_rr: Missing docstring
+W0141:344:Message: Missing docstring
+W0622:345:Message.__init__: Redefining built-in 'id'
+W0622:392:Message.__str__: Redefining built-in 'type'
+W0141:407:Message.is_query: Missing docstring
+W0141:410:Message.is_response: Missing docstring
+W0622:416:Message.bin_format: Redefining built-in 'type'
+W0141:413:Message.bin_format: Missing docstring
+W0112:413:Message.bin_format: Too many branches (13/12)
+W0141:465:parse_question: Missing docstring
+W0141:474:parse_message: Missing docstring
+W0114:474:parse_message: Too many local variables (22/15)
+W0622:477:parse_message: Redefining built-in 'id'
+W0612:492:parse_message: Unused variable 'i'
+W0611: 23: Unused import sys
+************* Module pyxmpp.rfc3454
+W0302:  0: Too many lines in module (2377)
 W0141:  0: Missing docstring
-W0403: 28: Uses of a deprecated module 'string'
-W0141: 43:load_resolv_conf: Missing docstring
-W0141: 68:query: Missing docstring
-W0141: 82:do_query: Missing docstring
-W0114: 82:do_query: Too many local variables (22/15)
-W0621:119:do_query: Redefining name 'query' from outer scope (line 68)
-W0112: 82:do_query: Too many branches (22/12)
-W0612:102:do_query: Unused variable 'canonname'
-W0141:144:query_ns: Missing docstring
-W0622:161:query_ns: Redefining built-in 'id'
-W0621:144:query_ns: Redefining name 'query' from outer scope (line 68)
-W0612:163:query_ns: Unused variable 'addr'
-W0612:161:query_ns: Unused variable 'ed'
-W0612:161:query_ns: Unused variable 'od'
-W0622:174:shuffle_srv: Redefining built-in 'sum'
-W0141:169:shuffle_srv: Missing docstring
-W0141:188:reorder_srv: Missing docstring
-W0141:202:resolve_srv: Missing docstring
-W0141:217:getaddrinfo: Missing docstring
-W0613:217:getaddrinfo: Unused argument 'family'
-W0611: 33: Unused import DataTruncated
-W0611: 30: Unused import IntType
-W0611: 33: Unused import resolve_errors
-W0611: 30: Unused import StringType
-W0611: 24: Unused import struct
-W0611: 26: Unused import binascii
-W0611: 28: Unused import string
-W0611: 25: Unused import sys
-W0611: 30: Unused import UnicodeType
-W0611: 33: Unused import InvalidDomainName
-W0611: 33: Unused import BadPacket
-************* Module pyxmpp.roster
-W0102: 40:RosterItem.__init__: Dangerous default value [] as argument
-W0113: 40:RosterItem.__init__: Too many arguments (6/5)
-W0141:138:Roster: Missing docstring
-W0612:174:Roster.from_xml: Unused variable 'nw'
-W0612:204:Roster.as_xml: Unused variable 'n'
-E0602:265:Roster.items_by_group: Undefined variable 'lower'
-W0102:279:Roster.add_item: Dangerous default value [] as argument
-W0113:279:Roster.add_item: Too many arguments (6/5)
-E0602:319:Roster.update: Undefined variable 'RosterError'
-W0611: 25: Unused import common_root
+W0103:  0: Missing required attribute "__revision__"
+W0103:  0: Missing required attribute "__docformat__"
+W0141:  3:LookupFunction: Missing docstring
+W0141:  7:LookupTable: Missing docstring
+W0141: 11:LookupTable.lookup: Missing docstring
+W0622: 15:LookupTable.lookup: Redefining built-in 'max'
+W0622: 15:LookupTable.lookup: Redefining built-in 'min'
+W0403: 23: Uses of a deprecated module 'stringprep'
+W0141: 26:b1_mapping: Missing docstring
+************* Module pyxmpp._xmlextra
+I0001:  0: Unable to run raw checkers on built-in module pyxmpp._xmlextra
+W0141:  0: Missing docstring
+W0103:  0: Missing required attribute "__revision__"
+W0103:  0: Missing required attribute "__docformat__"
+************* Module pyxmpp.utils
+W0311:112: Bad indentation. Found 16 spaces, expected 12
+W0311:114: Bad indentation. Found 16 spaces, expected 12
+W0311:116: Bad indentation. Found 16 spaces, expected 12
+W0311:121: Bad indentation. Found 8 spaces, expected 4
+W0311:125: Bad indentation. Found 8 spaces, expected 4
+W0311:126: Bad indentation. Found 8 spaces, expected 4
 ************* Module pyxmpp.stanza
 W0141:  0: Missing docstring
 W0141: 32:StanzaError: Missing docstring
@@ -261,420 +220,487 @@ W0101:  0:Stanza.__eq__: Unreachable code
 W0101:  0:Stanza.__ne__: Unreachable code
 W0611: 23: Unused import StringType
 W0611: 23: Unused import UnicodeType
-************* Module pyxmpp.stream
-W0302:  0: Too many lines in module (1337)
-W0113:114:TLSSettings.__init__: Too many arguments (8/5)
-W0113:154:Stream.__init__: Too many arguments (6/5)
-W0141:225:Stream._connect_socket: Missing docstring
-W0141:236:Stream.connect: Missing docstring
-W0141:243:Stream._connect: Missing docstring
-W0112:243:Stream._connect: Too many branches (13/12)
-W0612:259:Stream._connect: Unused variable 'canonname'
-W0141:285:Stream.accept: Missing docstring
-W0141:292:Stream._accept: Missing docstring
-W0141:305:Stream.disconnect: Missing docstring
-W0141:312:Stream._disconnect: Missing docstring
-W0141:316:Stream._post_connect: Missing docstring
-W0141:319:Stream._post_auth: Missing docstring
-W0141:322:Stream.state_change: Missing docstring
-W0141:325:Stream.close: Missing docstring
-W0141:332:Stream._close: Missing docstring
-W0141:344:Stream._make_reader: Missing docstring
-W0141:347:Stream.stream_start: Missing docstring
-W0112:347:Stream.stream_start: Too many branches (13/12)
-W0141:399:Stream.stream_end: Missing docstring
-W0613:399:Stream.stream_end: Unused argument 'doc'
-W0141:411:Stream.stanza_start: Missing docstring
-W0141:414:Stream.stanza_end: Missing docstring
-W0613:414:Stream.stanza_end: Unused argument 'doc'
-W0141:417:Stream.stanza: Missing docstring
-W0613:417:Stream.stanza: Unused argument 'doc'
-W0141:420:Stream.error: Missing docstring
-W0141:423:Stream._send_stream_end: Missing docstring
-W0622:436:Stream._send_stream_start: Redefining built-in 'id'
-W0141:436:Stream._send_stream_start: Missing docstring
-W0141:457:Stream._send_stream_error: Missing docstring
-W0141:466:Stream._restart_stream: Missing docstring
-W0141:478:Stream._get_stream_features: Missing docstring
-W0141:496:Stream._send_stream_features: Missing docstring
-W0141:500:Stream._write_raw: Missing docstring
-W0622:500:Stream._write_raw: Redefining built-in 'str'
-W0622:509:Stream.write_raw: Redefining built-in 'str'
-W0141:509:Stream.write_raw: Missing docstring
-W0141:516:Stream._write_node: Missing docstring
-W0141:529:Stream.send: Missing docstring
-W0141:536:Stream._send: Missing docstring
-W0141:550:Stream.idle: Missing docstring
-W0141:557:Stream._idle: Missing docstring
-W0141:566:Stream.fileno: Missing docstring
-W0141:573:Stream.loop: Missing docstring
-W0141:581:Stream.loop_iter: Missing docstring
-W0622:593:Stream._loop_iter: Redefining built-in 'id'
-W0141:588:Stream._loop_iter: Missing docstring
-W0612:593:Stream._loop_iter: Unused variable 'od'
-W0141:607:Stream.process: Missing docstring
-W0141:614:Stream._process: Missing docstring
-W0141:627:Stream._read: Missing docstring
-W0141:659:Stream._process_node: Missing docstring
-W0141:684:Stream._process_stream_node: Missing docstring
-W0141:707:Stream.process_stream_error: Missing docstring
-W0141:711:Stream.process_iq: Missing docstring
-W0622:712:Stream.process_iq: Redefining built-in 'id'
-W0141:755:Stream.__try_handlers: Missing docstring
-W0612:769:Stream.__try_handlers: Unused variable 'prio'
-W0141:778:Stream.process_message: Missing docstring
-W0141:790:Stream.process_presence: Missing docstring
-W0141:800:Stream.route_stanza: Missing docstring
-W0141:806:Stream.process_stanza: Missing docstring
-W0141:824:Stream.check_to: Missing docstring
-W0141:829:Stream.fix_in_stanza: Missing docstring
-W0141:832:Stream.fix_out_stanza: Missing docstring
-W0141:835:Stream.set_response_handlers: Missing docstring
-W0113:835:Stream.set_response_handlers: Too many arguments (6/5)
-W0141:842:Stream._set_response_handlers: Missing docstring
-W0113:842:Stream._set_response_handlers: Too many arguments (6/5)
-W0141:854:Stream.set_iq_get_handler: Missing docstring
-W0141:861:Stream.unset_iq_get_handler: Missing docstring
-W0141:869:Stream.set_iq_set_handler: Missing docstring
-W0141:876:Stream.unset_iq_set_handler: Missing docstring
-W0141:884:Stream.__add_handler: Missing docstring
-W0113:884:Stream.__add_handler: Too many arguments (6/5)
-W0622:890:Stream.set_message_handler: Redefining built-in 'type'
-W0141:890:Stream.set_message_handler: Missing docstring
-W0141:899:Stream.set_presence_handler: Missing docstring
-W0622:899:Stream.set_presence_handler: Redefining built-in 'type'
-W0141:908:Stream.generate_id: Missing docstring
-W0141:911:Stream._got_features: Missing docstring
-W0112:911:Stream._got_features: Too many branches (15/12)
-W0141:955:Stream.bind: Missing docstring
-W0141:965:Stream._bind_success: Missing docstring
-W0141:971:Stream._bind_error: Missing docstring
-W0141:974:Stream.connected: Missing docstring
-W0141:980:Stream._process_sasl_node: Missing docstring
-W0111:980:Stream._process_sasl_node: Too many return statements (9/6)
-W0141:1004:Stream._process_sasl_auth: Missing docstring
-W0141:1051:Stream._process_sasl_challenge: Missing docstring
-W0141:1080:Stream._process_sasl_response: Missing docstring
-W0141:1125:Stream._process_sasl_success: Missing docstring
-W0612:1132:Stream._process_sasl_success: Unused variable 'el_name'
-W0141:1147:Stream._process_sasl_failure: Missing docstring
-W0141:1155:Stream._process_sasl_abort: Missing docstring
-W0141:1164:Stream._sasl_authenticate: Missing docstring
-E0602:1166:Stream._sasl_authenticate: Undefined variable 'SASLAuthenticationError'
-W0141:1206:Stream._request_tls: Missing docstring
-W0141:1217:Stream._process_tls_node: Missing docstring
-E0602:1223:Stream._process_tls_node: Undefined variable 'TLSHanshakeFailed'
-W0141:1240:Stream._make_tls_connection: Missing docstring
-E0602:1260:Stream._make_tls_connection: Undefined variable 'key_file'
-W0702:1282:Stream._make_tls_connection: No exception's type specified
-W0613:1240:Stream._make_tls_connection: Unused argument 'mode'
-W0141:1284:Stream._tls_verify_callback: Missing docstring
-W0113:1284:Stream._tls_verify_callback: Too many arguments (6/5)
-W0141:1320:Stream.get_tls_connection: Missing docstring
-W0201:212:Stream._reset: Attribute 'features' defined outside __init__
-W0201:208:Stream._reset: Attribute 'message_handlers' defined outside __init__
-W0201:206:Stream._reset: Attribute 'iq_get_handlers' defined outside __init__
-W0201:194:Stream._reset: Attribute 'port' defined outside __init__
-W0201:196:Stream._reset: Attribute 'peer_sasl_mechanisms' defined outside __init__
-W0201:198:Stream._reset: Attribute 'stream_ns' defined outside __init__
-W0201:216:Stream._reset: Attribute 'authenticated' defined outside __init__
-W0201:193:Stream._reset: Attribute 'addr' defined outside __init__
-W0201:195:Stream._reset: Attribute 'default_ns' defined outside __init__
-W0201:219:Stream._reset: Attribute 'version' defined outside __init__
-W0201:192:Stream._reset: Attribute 'reader' defined outside __init__
-W0201:218:Stream._reset: Attribute 'auth_method_used' defined outside __init__
-W0201:190:Stream._reset: Attribute 'doc_out' defined outside __init__
-W0201:213:Stream._reset: Attribute 'tls' defined outside __init__
-W0201:220:Stream._reset: Attribute 'last_keepalive' defined outside __init__
-W0201:217:Stream._reset: Attribute 'peer_authenticated' defined outside __init__
-W0201:214:Stream._reset: Attribute 'tls_requested' defined outside __init__
-W0201:205:Stream._reset: Attribute 'iq_response_handlers' defined outside __init__
-W0201:215:Stream._reset: Attribute 'authenticator' defined outside __init__
-W0201:197:Stream._reset: Attribute 'extra_ns' defined outside __init__
-W0201:200:Stream._reset: Attribute 'ioreader' defined outside __init__
-W0201:203:Stream._reset: Attribute 'skip' defined outside __init__
-W0201:202:Stream._reset: Attribute 'peer' defined outside __init__
-W0201:210:Stream._reset: Attribute 'eof' defined outside __init__
-W0201:201:Stream._reset: Attribute 'me' defined outside __init__
-W0201:211:Stream._reset: Attribute 'initiator' defined outside __init__
-W0201:209:Stream._reset: Attribute 'presence_handlers' defined outside __init__
-W0201:191:Stream._reset: Attribute 'socket' defined outside __init__
-W0201:204:Stream._reset: Attribute 'stream_id' defined outside __init__
-W0201:189:Stream._reset: Attribute 'doc_in' defined outside __init__
-W0201:207:Stream._reset: Attribute 'iq_set_handlers' defined outside __init__
-E0201:951:Stream._got_features: Access to undefined member 'jid'
-E0201:953:Stream._got_features: Access to undefined member 'jid'
-E0201:1137:Stream._process_sasl_success: Access to undefined member 'jid'
-E0201:1169:Stream._sasl_authenticate: Access to undefined member 'read'
-E0201:492:Stream._get_stream_features: Access to undefined member 'tls_settiongs'
-W0141:1325:cert_verify_callback: Missing docstring
-W0611: 41: Unused import common_doc
-W0611: 40: Unused import from_utf8
-W0611: 30: Unused import traceback
-************* Module pyxmpp.utils
-W0311:112: Bad indentation. Found 16 spaces, expected 12
-W0311:114: Bad indentation. Found 16 spaces, expected 12
-W0311:116: Bad indentation. Found 16 spaces, expected 12
-W0311:121: Bad indentation. Found 8 spaces, expected 4
-W0311:125: Bad indentation. Found 8 spaces, expected 4
-W0311:126: Bad indentation. Found 8 spaces, expected 4
-************* Module pyxmpp.xmlextra
+************* Module pyxmpp.resolver
 W0141:  0: Missing docstring
-W0232: 32:StreamHandler: Class has no __init__ method
-W0141: 34:StreamHandler._stream_start: Missing docstring
-W0141: 37:StreamHandler._stream_end: Missing docstring
-W0141: 40:StreamHandler._stanza_start: Missing docstring
-W0141: 44:StreamHandler._stanza_end: Missing docstring
-W0141: 48:StreamHandler._stanza: Missing docstring
-W0613: 65:StreamHandler.stanza_start: Unused argument 'doc'
-W0613: 72:StreamHandler.stanza_end: Unused argument 'doc'
-W0613: 83:StreamHandler.stanza: Unused argument 'doc'
-W0141: 98:StreamReader: Missing docstring
-W0141:103:StreamReader.doc: Missing docstring
-W0321:131:remove_ns: More than one statement on a single line
-W0321:133:remove_ns: More than one statement on a single line
-W0321:145:replace_ns: More than one statement on a single line
-W0321:147:replace_ns: More than one statement on a single line
-W0321:149:replace_ns: More than one statement on a single line
+W0403: 28: Uses of a deprecated module 'string'
+W0141: 43:load_resolv_conf: Missing docstring
+W0141: 68:query: Missing docstring
+W0141: 82:do_query: Missing docstring
+W0114: 82:do_query: Too many local variables (22/15)
+W0621:119:do_query: Redefining name 'query' from outer scope (line 68)
+W0112: 82:do_query: Too many branches (22/12)
+W0612:102:do_query: Unused variable 'canonname'
+W0141:144:query_ns: Missing docstring
+W0622:161:query_ns: Redefining built-in 'id'
+W0621:144:query_ns: Redefining name 'query' from outer scope (line 68)
+W0612:163:query_ns: Unused variable 'addr'
+W0612:161:query_ns: Unused variable 'ed'
+W0612:161:query_ns: Unused variable 'od'
+W0622:174:shuffle_srv: Redefining built-in 'sum'
+W0141:169:shuffle_srv: Missing docstring
+W0141:188:reorder_srv: Missing docstring
+W0141:202:resolve_srv: Missing docstring
+W0141:217:getaddrinfo: Missing docstring
+W0613:217:getaddrinfo: Unused argument 'family'
+W0611: 33: Unused import DataTruncated
+W0611: 30: Unused import IntType
+W0611: 33: Unused import resolve_errors
+W0611: 30: Unused import StringType
+W0611: 24: Unused import struct
+W0611: 26: Unused import binascii
+W0611: 28: Unused import string
+W0611: 25: Unused import sys
+W0611: 30: Unused import UnicodeType
+W0611: 33: Unused import InvalidDomainName
+W0611: 33: Unused import BadPacket
+************* Module pyxmpp.clientstream
+W0301: 27: Line too long (103/100)
+W0301:120: Line too long (103/100)
+W0141:  0: Missing docstring
+W0141: 34:ClientStreamError: Missing docstring
+W0141: 37:FatalClientStreamError: Missing docstring
+W0141: 40:LegacyAuthenticationError: Missing docstring
+W0141: 43:ClientStream: Missing docstring
+W0141: 64:ClientStream._reset: Missing docstring
+W0141: 68:ClientStream.connect: Missing docstring
+W0221: 68:ClientStream.connect: Arguments number differs from overriden method
+W0221: 75:ClientStream._connect: Arguments number differs from overriden method
+W0141: 75:ClientStream._connect: Missing docstring
+W0221: 93:ClientStream.accept: Arguments number differs from overriden method
+W0141: 93:ClientStream.accept: Missing docstring
+W0141: 96:ClientStream._post_connect: Missing docstring
+W0141:101:ClientStream._try_auth: Missing docstring
+W0612:115:ClientStream._try_auth: Unused variable 'e'
+W0141:127:ClientStream._get_stream_features: Missing docstring
+W0141:136:ClientStream.do_bind: Missing docstring
+W0141:162:ClientStream.get_password: Missing docstring
+W0613:162:ClientStream.get_password: Unused argument 'realm'
+W0141:168:ClientStream.get_realms: Missing docstring
+W0141:171:ClientStream.choose_realm: Missing docstring
+W0141:178:ClientStream.check_authzid: Missing docstring
+W0102:178:ClientStream.check_authzid: Dangerous default value {} as argument
+W0111:178:ClientStream.check_authzid: Too many return statements (7/6)
+W0141:194:ClientStream.get_serv_type: Missing docstring
+W0141:197:ClientStream.get_serv_name: Missing docstring
+W0141:200:ClientStream.get_serv_host: Missing docstring
+W0141:203:ClientStream.fix_out_stanza: Missing docstring
+W0141:210:ClientStream.fix_in_stanza: Missing docstring
+W0201: 66:ClientStream._reset: Attribute 'auth_methods_left' defined outside __init__
+W0611: 21: Unused import libxml2
+W0611: 30: Unused import common_doc
+W0611: 32: Unused import from_utf8
+W0611: 29: Unused import Iq
+W0611: 25: Unused import UnicodeType
+W0611: 22: Unused import sha
+W0611: 23: Unused import time
+************* Module pyxmpp.message
+W0141:  0: Missing docstring
+W0141: 27:Message: Missing docstring
+W0231: 29:Message.__init__: __init__ method from base class 'Stanza' is not called
+W0151:  0:Message.__init__: Used builtin function 'apply'
+W0112: 29:Message.__init__: Too many branches (15/12)
+W0141: 71:Message.get_subject: Missing docstring
+W0141: 78:Message.get_thread: Missing docstring
+W0141: 85:Message.copy: Missing docstring
+W0141: 88:Message.get_body: Missing docstring
+W0141: 95:Message.make_error_response: Missing docstring
+************* Module pyxmpp.client
+W0141:  0: Missing docstring
+W0141: 34:ClientError: Missing docstring
+W0141: 37:FatalClientError: Missing docstring
+W0141: 40:Client: Missing docstring
+W0102: 41:Client.__init__: Dangerous default value ['sasl:DIGEST-MD5'] as argument
+W0141: 62:Client.connect: Missing docstring
+W0141: 98:Client.get_stream: Missing docstring
+W0141:104:Client.disconnect: Missing docstring
+W0141:109:Client.request_session: Missing docstring
+W0141:124:Client.request_roster: Missing docstring
+W0141:133:Client.socket: Missing docstring
+W0141:136:Client.loop: Missing docstring
+W0141:141:Client.__session_timeout: Missing docstring
+W0141:144:Client.__session_error: Missing docstring
+W0141:147:Client.__session_result: Missing docstring
+W0613:147:Client.__session_result: Unused argument 'iq'
+W0141:154:Client.__roster_timeout: Missing docstring
+W0141:157:Client.__roster_error: Missing docstring
+W0141:160:Client.__roster_result: Missing docstring
+W0141:171:Client.__roster_push: Missing docstring
+W0141:186:Client.__stream_state_change: Missing docstring
+W0141:205:Client.idle: Missing docstring
+W0141:210:Client.stream_created: Missing docstring
+W0141:213:Client.stream_closed: Missing docstring
+W0141:216:Client.session_started: Missing docstring
+W0141:221:Client.stream_error: Missing docstring
+W0141:225:Client.roster_updated: Missing docstring
+W0141:228:Client.stream_state_changed: Missing docstring
+W0141:231:Client.connected: Missing docstring
+W0141:234:Client.authenticated: Missing docstring
+W0141:237:Client.authorized: Missing docstring
+W0141:240:Client.disconnected: Missing docstring
+W0611: 28: Unused import JID
+W0611: 21: Unused import libxml2
+W0611: 31: Unused import to_utf8
+W0611: 31: Unused import from_utf8
+W0611: 22: Unused import sys
+W0611: 24: Unused import traceback
+************* Module pyxmpp.stream
+W0302:  0: Too many lines in module (1536)
+W0612:288:Stream._connect: Unused variable 'canonname'
+W0112:271:Stream._connect: Too many branches (13/12)
+W0112:398:Stream.stream_start: Too many branches (13/12)
+W0613:453:Stream.stream_end: Unused argument 'doc'
+W0613:479:Stream.stanza_end: Unused argument 'doc'
+W0613:488:Stream.stanza: Unused argument 'doc'
+W0612:710:Stream._loop_iter: Unused variable 'ofd'
+W0612:938:Stream.__try_handlers: Unused variable 'prio'
+W0141:1005:Stream.process_stanza: Missing docstring
+W0141:1023:Stream.check_to: Missing docstring
+W0141:1028:Stream.fix_in_stanza: Missing docstring
+W0141:1031:Stream.fix_out_stanza: Missing docstring
+W0141:1034:Stream.set_response_handlers: Missing docstring
+W0141:1041:Stream._set_response_handlers: Missing docstring
+W0141:1053:Stream.set_iq_get_handler: Missing docstring
+W0141:1060:Stream.unset_iq_get_handler: Missing docstring
+W0141:1068:Stream.set_iq_set_handler: Missing docstring
+W0141:1075:Stream.unset_iq_set_handler: Missing docstring
+W0141:1083:Stream.__add_handler: Missing docstring
+W0141:1089:Stream.set_message_handler: Missing docstring
+W0141:1098:Stream.set_presence_handler: Missing docstring
+W0141:1107:Stream.generate_id: Missing docstring
+W0141:1110:Stream._got_features: Missing docstring
+W0112:1110:Stream._got_features: Too many branches (15/12)
+W0141:1154:Stream.bind: Missing docstring
+W0141:1164:Stream._bind_success: Missing docstring
+W0141:1170:Stream._bind_error: Missing docstring
+W0141:1173:Stream.connected: Missing docstring
+W0141:1179:Stream._process_sasl_node: Missing docstring
+W0111:1179:Stream._process_sasl_node: Too many return statements (9/6)
+W0141:1203:Stream._process_sasl_auth: Missing docstring
+W0141:1250:Stream._process_sasl_challenge: Missing docstring
+W0141:1279:Stream._process_sasl_response: Missing docstring
+W0141:1324:Stream._process_sasl_success: Missing docstring
+W0612:1331:Stream._process_sasl_success: Unused variable 'el_name'
+W0141:1346:Stream._process_sasl_failure: Missing docstring
+W0141:1354:Stream._process_sasl_abort: Missing docstring
+W0141:1363:Stream._sasl_authenticate: Missing docstring
+E0602:1365:Stream._sasl_authenticate: Undefined variable 'SASLAuthenticationError'
+W0141:1405:Stream._request_tls: Missing docstring
+W0141:1416:Stream._process_tls_node: Missing docstring
+W0141:1439:Stream._make_tls_connection: Missing docstring
+W0702:1481:Stream._make_tls_connection: No exception's type specified
+W0613:1439:Stream._make_tls_connection: Unused argument 'mode'
+W0141:1483:Stream._tls_verify_callback: Missing docstring
+W0141:1519:Stream.get_tls_connection: Missing docstring
+W0201:226:Stream._reset: Attribute 'features' defined outside __init__
+W0201:222:Stream._reset: Attribute 'message_handlers' defined outside __init__
+W0201:220:Stream._reset: Attribute 'iq_get_handlers' defined outside __init__
+W0201:208:Stream._reset: Attribute 'port' defined outside __init__
+W0201:210:Stream._reset: Attribute 'peer_sasl_mechanisms' defined outside __init__
+W0201:212:Stream._reset: Attribute 'stream_ns' defined outside __init__
+W0201:230:Stream._reset: Attribute 'authenticated' defined outside __init__
+W0201:207:Stream._reset: Attribute 'addr' defined outside __init__
+W0201:209:Stream._reset: Attribute 'default_ns' defined outside __init__
+W0201:233:Stream._reset: Attribute 'version' defined outside __init__
+W0201:206:Stream._reset: Attribute 'reader' defined outside __init__
+W0201:232:Stream._reset: Attribute 'auth_method_used' defined outside __init__
+W0201:204:Stream._reset: Attribute 'doc_out' defined outside __init__
+W0201:227:Stream._reset: Attribute 'tls' defined outside __init__
+W0201:234:Stream._reset: Attribute 'last_keepalive' defined outside __init__
+W0201:231:Stream._reset: Attribute 'peer_authenticated' defined outside __init__
+W0201:228:Stream._reset: Attribute 'tls_requested' defined outside __init__
+W0201:219:Stream._reset: Attribute 'iq_response_handlers' defined outside __init__
+W0201:229:Stream._reset: Attribute 'authenticator' defined outside __init__
+W0201:211:Stream._reset: Attribute 'extra_ns' defined outside __init__
+W0201:214:Stream._reset: Attribute 'ioreader' defined outside __init__
+W0201:217:Stream._reset: Attribute 'skip' defined outside __init__
+W0201:216:Stream._reset: Attribute 'peer' defined outside __init__
+W0201:224:Stream._reset: Attribute 'eof' defined outside __init__
+W0201:215:Stream._reset: Attribute 'me' defined outside __init__
+W0201:225:Stream._reset: Attribute 'initiator' defined outside __init__
+W0201:223:Stream._reset: Attribute 'presence_handlers' defined outside __init__
+W0201:205:Stream._reset: Attribute 'socket' defined outside __init__
+W0201:218:Stream._reset: Attribute 'stream_id' defined outside __init__
+W0201:203:Stream._reset: Attribute 'doc_in' defined outside __init__
+W0201:221:Stream._reset: Attribute 'iq_set_handlers' defined outside __init__
+W0141:1524:cert_verify_callback: Missing docstring
+************* Module pyxmpp.expdict
+W0141:  0: Missing docstring
+W0141: 24:ExpiringDictionary: Missing docstring
+W0231: 25:ExpiringDictionary.__init__: __init__ method from base class 'dict' is not called
+W0141: 53:ExpiringDictionary.expire: Missing docstring
+************* Module pyxmpp.iq
+W0141:  0: Missing docstring
+W0141: 26:Iq: Missing docstring
+W0231: 28:Iq.__init__: __init__ method from base class 'Stanza' is not called
+W0151:  0:Iq.__init__: Used builtin function 'apply'
+W0141: 51:Iq.copy: Missing docstring
+W0141: 54:Iq.make_error_response: Missing docstring
+W0141: 66:Iq.make_result_response: Missing docstring
+W0141: 73:Iq.new_query: Missing docstring
+W0141: 76:Iq.get_query: Missing docstring
+W0704: 81:Iq.get_query: Except doesn't do anything
+W0141: 85:Iq.get_query_ns: Missing docstring
+W0611: 23: Unused import to_utf8
+W0611: 23: Unused import from_utf8
+************* Module pyxmpp.error
+W0141:  0: Missing docstring
+W0141:173:ErrorNodeError: Missing docstring
+W0141:176:ErrorNode: Missing docstring
+W0112:177:ErrorNode.__init__: Too many branches (15/12)
+W0141:238:ErrorNode.free: Missing docstring
+W0141:244:ErrorNode.free_borrowed: Missing docstring
+W0141:247:ErrorNode.is_legacy: Missing docstring
+W0141:250:ErrorNode.xpath_eval: Missing docstring
+E0602:257:ErrorNode.xpath_eval: Undefined variable 'COMMON_NS'
+W0141:263:ErrorNode.get_condition: Missing docstring
+W0141:278:ErrorNode.get_text: Missing docstring
+W0141:287:ErrorNode.add_custom_condition: Missing docstring
+W0141:293:ErrorNode.upgrade: Missing docstring
+W0133:299:ErrorNode.upgrade: Invalid name "KeyError" (should match [a-z_][a-z0-9_]*$)
+W0622:299:ErrorNode.upgrade: Redefining built-in 'KeyError'
+W0612:299:ErrorNode.upgrade: Unused variable 'KeyError'
+W0141:327:ErrorNode.downgrade: Missing docstring
+W0612:332:ErrorNode.downgrade: Unused variable 'typ'
+W0141:340:ErrorNode.serialize: Missing docstring
+W0141:343:StreamErrorNode: Missing docstring
+W0613:344:StreamErrorNode.__init__: Unused argument 'ns'
+W0141:358:StreamErrorNode.get_message: Missing docstring
+W0141:370:StanzaErrorNode: Missing docstring
+W0141:391:StanzaErrorNode.get_type: Missing docstring
+W0141:396:StanzaErrorNode.upgrade: Missing docstring
+W0141:406:StanzaErrorNode.get_message: Missing docstring
+W0611: 24: Unused import from_utf8
 ************* Module pyxmpp.version
 W0141:  0: Missing docstring
 W0103:  0: Missing required attribute "__revision__"
 W0103:  0: Missing required attribute "__docformat__"
-************* Module pyxmpp.dns
+************* Module pyxmpp.jabberd
+F0001:  0: Unable to load module pyxmpp.jabberd (cannot import name StanzaFactory)
+************* Module pyxmpp.jabberd.component
+F0001:  0: Unable to load module pyxmpp.jabberd.component (cannot import name ComponentStream)
+************* Module pyxmpp.jabberd.componentstream
+W0301: 27: Line too long (103/100)
 W0141:  0: Missing docstring
-W0403: 24: Uses of a deprecated module 'string'
-W0141: 28:ResolverError: Missing docstring
-W0141: 31:DataTruncated: Missing docstring
-W0141: 34:BadPacket: Missing docstring
-W0141: 37:InvalidDomainName: Missing docstring
-W0141: 49:domain_str2bin: Missing docstring
-W0141: 61:domain_bin2str: Missing docstring
-W0141: 91:add_query_type: Missing docstring
-W0141: 95:add_record_type: Missing docstring
-W0141:101:RR: Missing docstring
-W0141:124:RR.format_data: Missing docstring
-W0141:127:RR.bin_format: Missing docstring
-W0141:136:RR.bin_format_data: Missing docstring
-W0133:139:RR_A: Invalid name "RR_A" (should match [A-Z][a-zA-Z0-9]+$)
-W0141:139:RR_A: Missing docstring
-W0141:146:RR_A.format_data: Missing docstring
-W0141:149:RR_A.bin_format_data: Missing docstring
-W0622:153:bin_parse_A: Redefining built-in 'len'
-W0133:153:bin_parse_A: Invalid name "bin_parse_A" (should match [a-z_][a-z0-9_]*$)
-W0141:153:bin_parse_A: Missing docstring
-W0113:153:bin_parse_A: Too many arguments (6/5)
-W0613:153:bin_parse_A: Unused argument 'cls'
-W0133:163:RR_NS: Invalid name "RR_NS" (should match [A-Z][a-zA-Z0-9]+$)
-W0141:163:RR_NS: Missing docstring
-W0141:170:RR_NS.format_data: Missing docstring
-W0141:173:RR_NS.bin_format_data: Missing docstring
-W0622:176:bin_parse_NS: Redefining built-in 'len'
-W0133:176:bin_parse_NS: Invalid name "bin_parse_NS" (should match [a-z_][a-z0-9_]*$)
-W0141:176:bin_parse_NS: Missing docstring
-W0113:176:bin_parse_NS: Too many arguments (6/5)
-W0613:176:bin_parse_NS: Unused argument 'len'
-W0133:182:RR_CNAME: Invalid name "RR_CNAME" (should match [A-Z][a-zA-Z0-9]+$)
-W0141:182:RR_CNAME: Missing docstring
-W0141:189:RR_CNAME.format_data: Missing docstring
-W0141:192:RR_CNAME.bin_format_data: Missing docstring
-W0622:195:bin_parse_CNAME: Redefining built-in 'len'
-W0133:195:bin_parse_CNAME: Invalid name "bin_parse_CNAME" (should match [a-z_][a-z0-9_]*$)
-W0141:195:bin_parse_CNAME: Missing docstring
-W0113:195:bin_parse_CNAME: Too many arguments (6/5)
-W0613:195:bin_parse_CNAME: Unused argument 'len'
-W0133:201:RR_SOA: Invalid name "RR_SOA" (should match [A-Z][a-zA-Z0-9]+$)
-W0141:201:RR_SOA: Missing docstring
-W0113:204:RR_SOA.__init__: Too many arguments (11/5)
-W0141:214:RR_SOA.format_data: Missing docstring
-W0141:218:RR_SOA.bin_format_data: Missing docstring
-W0133:224:bin_parse_SOA: Invalid name "bin_parse_SOA" (should match [a-z_][a-z0-9_]*$)
-W0141:224:bin_parse_SOA: Missing docstring
-W0113:224:bin_parse_SOA: Too many arguments (6/5)
-W0622:224:bin_parse_SOA: Redefining built-in 'len'
-W0133:235:RR_SRV: Invalid name "RR_SRV" (should match [A-Z][a-zA-Z0-9]+$)
-W0141:235:RR_SRV: Missing docstring
-W0113:238:RR_SRV.__init__: Too many arguments (7/5)
-W0141:245:RR_SRV.format_data: Missing docstring
-W0141:248:RR_SRV.bin_format_data: Missing docstring
-W0111:258:RR_SRV.__gt__: Too many return statements (11/6)
-W0111:284:RR_SRV.__lt__: Too many return statements (11/6)
-W0133:310:bin_parse_SRV: Invalid name "bin_parse_SRV" (should match [a-z_][a-z0-9_]*$)
-W0141:310:bin_parse_SRV: Missing docstring
-W0113:310:bin_parse_SRV: Too many arguments (6/5)
-W0622:310:bin_parse_SRV: Redefining built-in 'len'
-W0613:310:bin_parse_SRV: Unused argument 'cls'
-W0141:322:parse_rr: Missing docstring
-W0141:344:Message: Missing docstring
-W0113:345:Message.__init__: Too many arguments (13/5)
-W0622:345:Message.__init__: Redefining built-in 'id'
-W0622:392:Message.__str__: Redefining built-in 'type'
-W0141:407:Message.is_query: Missing docstring
-W0141:410:Message.is_response: Missing docstring
-W0622:416:Message.bin_format: Redefining built-in 'type'
-W0141:413:Message.bin_format: Missing docstring
-W0112:413:Message.bin_format: Too many branches (13/12)
-W0141:465:parse_question: Missing docstring
-W0141:474:parse_message: Missing docstring
-W0114:474:parse_message: Too many local variables (22/15)
-W0622:477:parse_message: Redefining built-in 'id'
-W0612:492:parse_message: Unused variable 'i'
-W0611: 23: Unused import sys
-************* Module pyxmpp.xmppstringprep
-W0403: 24: Uses of a deprecated module 'string'
-W0403: 25: Uses of a deprecated module 'stringprep'
-W0141: 29:LookupFunction: Missing docstring
-W0141: 33:LookupTable: Missing docstring
-W0622: 41:LookupTable.lookup: Redefining built-in 'max'
-W0622: 41:LookupTable.lookup: Redefining built-in 'min'
-W0141: 37:LookupTable.lookup: Missing docstring
-W0141: 50:b1_mapping: Missing docstring
-W0622: 73:NFKC: Redefining built-in 'input'
-W0133: 73:NFKC: Invalid name "NFKC" (should match [a-z_][a-z0-9_]*$)
-W0141: 73:NFKC: Missing docstring
-W0113: 85:Profile.__init__: Too many arguments (6/5)
-W0622:103:Profile.prepare: Redefining built-in 'input'
-W0704:123:Profile.prepare: Except doesn't do anything
-W0133:176:Profile.check_bidi: Invalid name "has_L" (should match [a-z_][a-z0-9_]*$)
-W0133:177:Profile.check_bidi: Invalid name "has_RAL" (should match [a-z_][a-z0-9_]*$)
-W0201:125:Profile.prepare: Attribute 'cache_items' defined outside __init__
-W0141:205:set_stringprep_cache_size: Missing docstring
-W0121:206:set_stringprep_cache_size: Use of the global statement
-W0704:213:set_stringprep_cache_size: Except doesn't do anything
-W0611: 27: Unused import weakref
-************* Module pyxmpp._xmlextra
-I0001:  0: Unable to run raw checkers on built-in module pyxmpp._xmlextra
+W0141: 34:ComponentStreamError: Missing docstring
+W0141: 37:FatalComponentStreamError: Missing docstring
+W0141: 40:LegacyAuthenticationError: Missing docstring
+W0141: 43:ComponentStream: Missing docstring
+W0141: 56:ComponentStream._reset: Missing docstring
+W0221: 59:ComponentStream.connect: Arguments number differs from overriden method
+W0141: 59:ComponentStream.connect: Missing docstring
+W0141: 66:ComponentStream._connect: Missing docstring
+W0221: 66:ComponentStream._connect: Arguments number differs from overriden method
+W0141: 77:ComponentStream.accept: Missing docstring
+W0221: 77:ComponentStream.accept: Arguments number differs from overriden method
+W0141: 80:ComponentStream.stream_start: Missing docstring
+W0704: 83:ComponentStream.stream_start: Except doesn't do anything
+W0141: 86:ComponentStream._post_connect: Missing docstring
+W0141: 90:ComponentStream._compute_handshake: Missing docstring
+W0622: 98:ComponentStream._auth: Redefining built-in 'hash'
+W0141: 93:ComponentStream._auth: Missing docstring
+W0141:105:ComponentStream._process_node: Missing docstring
+W0201:111:ComponentStream._process_node: Attribute 'authenticated' defined outside __init__
+W0201:121:ComponentStream._process_node: Attribute 'peer_authenticated' defined outside __init__
+W0201:116:ComponentStream._process_node: Attribute 'peer' defined outside __init__
+W0611: 31: Unused import JID
+W0611: 21: Unused import libxml2
+W0611: 32: Unused import from_utf8
+W0611: 29: Unused import Iq
+W0611: 27: Unused import SASLNotAvailable
+W0611: 25: Unused import UnicodeType
+W0611: 23: Unused import time
+W0611: 27: Unused import SASLMechanismNotAvailable
+************* Module pyxmpp.unicode
 W0141:  0: Missing docstring
 W0103:  0: Missing required attribute "__revision__"
 W0103:  0: Missing required attribute "__docformat__"
-************* Module pyxmpp.jabber.client
-W0301: 24: Line too long (104/100)
+************* Module pyxmpp.unicode.ud_3_2_0
 W0141:  0: Missing docstring
-W0141: 28:JabberClient: Missing docstring
-W0102: 29:JabberClient.__init__: Dangerous default value ['sasl:DIGEST-MD5', 'digest'] as argument
-W0113: 29:JabberClient.__init__: Too many arguments (8/5)
-W0141: 41:JabberClient.connect: Missing docstring
-W0613: 41:JabberClient.connect: Unused argument 'register'
-W0141: 50:JabberClient.__disco_info: Missing docstring
-E0602: 53:JabberClient.__disco_info: Undefined variable 'from_utf8'
-E0602: 62:JabberClient.__disco_info: Undefined variable 'stanza'
-W0141: 69:JabberClient.__disco_items: Missing docstring
-E0602: 72:JabberClient.__disco_items: Undefined variable 'from_utf8'
-W0141: 90:JabberClient.authorized: Missing docstring
-W0141: 95:JabberClient.disco_get_info: Missing docstring
-W0141:103:JabberClient.disco_get_items: Missing docstring
-W0201: 45:JabberClient.connect: Attribute 'disco_identity' defined outside __init__
-W0611: 24: Unused import DiscoItem
-W0611: 25: Unused import ClientError
-W0611: 25: Unused import FatalClientError
-************* Module pyxmpp.jabber.clientstream
-W0301: 27: Line too long (103/100)
-W0311:192: Bad indentation. Found 24 spaces, expected 16
-W0311:194: Bad indentation. Found 24 spaces, expected 16
+W0103:  0: Missing required attribute "__revision__"
+W0103:  0: Missing required attribute "__docformat__"
+************* Module pyxmpp.unicode.nfkc
 W0141:  0: Missing docstring
-W0141: 37:LegacyClientStream: Missing docstring
-W0102: 38:LegacyClientStream.__init__: Dangerous default value ['sasl:DIGEST-MD5', 'digest'] as argument
-W0113: 38:LegacyClientStream.__init__: Too many arguments (8/5)
-W0141: 46:LegacyClientStream._reset: Missing docstring
-W0141: 51:LegacyClientStream._post_connect: Missing docstring
-W0141: 60:LegacyClientStream._post_auth: Missing docstring
-W0141: 66:LegacyClientStream._try_auth: Missing docstring
-W0141: 95:LegacyClientStream.auth_in_stage1: Missing docstring
-W0141:116:LegacyClientStream.auth_in_stage2: Missing docstring
-W0141:153:LegacyClientStream._auth_stage1: Missing docstring
-W0141:163:LegacyClientStream.auth_timeout: Missing docstring
-W0613:163:LegacyClientStream.auth_timeout: Unused argument 'args'
-W0141:172:LegacyClientStream.auth_error: Missing docstring
-W0141:186:LegacyClientStream.auth_stage2: Missing docstring
-W0141:200:LegacyClientStream._plain_auth_stage2: Missing docstring
-W0613:200:LegacyClientStream._plain_auth_stage2: Unused argument 'stanza'
-W0141:210:LegacyClientStream._plain_auth_in_stage2: Missing docstring
-W0613:210:LegacyClientStream._plain_auth_in_stage2: Unused argument 'resource'
-W0141:234:LegacyClientStream._digest_auth_stage2: Missing docstring
-W0613:234:LegacyClientStream._digest_auth_stage2: Unused argument 'stanza'
-W0141:245:LegacyClientStream._digest_auth_in_stage2: Missing docstring
-W0613:245:LegacyClientStream._digest_auth_in_stage2: Unused argument 'resource'
-W0141:279:LegacyClientStream.auth_finish: Missing docstring
-W0613:279:LegacyClientStream.auth_finish: Unused argument 'stanza'
-W0201:283:LegacyClientStream.auth_finish: Attribute 'me' defined outside __init__
-W0201: 48:LegacyClientStream._reset: Attribute 'available_auth_methods' defined outside __init__
-W0201:284:LegacyClientStream.auth_finish: Attribute 'authenticated' defined outside __init__
-W0201:223:LegacyClientStream._plain_auth_in_stage2: Attribute 'peer_authenticated' defined outside __init__
-W0201: 49:LegacyClientStream._reset: Attribute 'auth_stanza' defined outside __init__
-W0201: 83:LegacyClientStream._try_auth: Attribute 'auth_method_used' defined outside __init__
-W0611: 31: Unused import JID
-W0611: 21: Unused import libxml2
-W0611: 27: Unused import FatalStreamError
-W0611: 30: Unused import common_doc
-W0611: 27: Unused import Stream
-W0611: 27: Unused import SASLNotAvailable
-W0611: 34: Unused import FatalClientStreamError
-W0611: 25: Unused import UnicodeType
-W0611: 34: Unused import ClientStreamError
-W0611: 23: Unused import time
-W0611: 27: Unused import StreamError
-W0611: 27: Unused import SASLMechanismNotAvailable
-W0611: 28: Unused import StreamAuthenticationError
-************* Module pyxmpp.jabber.disco
+W0103:  0: Missing required attribute "__revision__"
+W0103:  0: Missing required attribute "__docformat__"
+W0403:  2: Uses of a deprecated module 'string'
+W0403:  8: Uses of a deprecated module 'string'
+W0405:  8: Reimport 'string' (imported line 2)
+W0622: 10:NFKC: Redefining built-in 'input'
+W0133: 10:NFKC: Invalid name "NFKC" (should match [a-z_][a-z0-9_]*$)
+W0141: 10:NFKC: Missing docstring
+W0404: 16: Relative import 'cexc'
+W0404: 17: Relative import 'ccomp'
+W0404: 18: Relative import 'ud_3_2_0'
+W0141: 30:hangul_decompose: Missing docstring
+W0133: 32:hangul_decompose: Invalid name "SIndex" (should match [a-z_][a-z0-9_]*$)
+W0133: 37:hangul_decompose: Invalid name "L" (should match [a-z_][a-z0-9_]*$)
+W0133: 39:hangul_decompose: Invalid name "T" (should match [a-z_][a-z0-9_]*$)
+W0133: 38:hangul_decompose: Invalid name "V" (should match [a-z_][a-z0-9_]*$)
+W0321:  0:hangul_decompose: More than one statement on a single line
+W0141: 45:decompose: Missing docstring
+W0141: 64:hangul_compose: Missing docstring
+W0133: 85:hangul_compose: Invalid name "TIndex" (should match [a-z_][a-z0-9_]*$)
+W0133: 83:hangul_compose: Invalid name "SIndex" (should match [a-z_][a-z0-9_]*$)
+W0133: 75:hangul_compose: Invalid name "LIndex" (should match [a-z_][a-z0-9_]*$)
+W0133: 77:hangul_compose: Invalid name "VIndex" (should match [a-z_][a-z0-9_]*$)
+W0141: 95:composetwo: Missing docstring
+W0141:105:compose: Missing docstring
+W0133:110:compose: Invalid name "C" (should match [a-z_][a-z0-9_]*$)
+W0133:113:compose: Invalid name "LC" (should match [a-z_][a-z0-9_]*$)
+W0133:112:compose: Invalid name "L" (should match [a-z_][a-z0-9_]*$)
+W0133:107:compose: Invalid name "Li" (should match [a-z_][a-z0-9_]*$)
+W0612:127:compose: Unused variable 'a'
+W0612:127:compose: Unused variable 'b'
+W0133:130:NFKC: Invalid name "NFKC" (should match [a-z_][a-z0-9_]*$)
+W0141:130:NFKC: Missing docstring
+W0622:130:NFKC: Redefining built-in 'input'
+W0611:  3: Unused import sys
+************* Module pyxmpp.unicode.ccomp
 W0141:  0: Missing docstring
-W0141: 35:DiscoError: Missing docstring
-W0141: 38:DiscoItem: Missing docstring
-W0113: 39:DiscoItem.__init__: Too many arguments (6/5)
-W0141: 75:DiscoItem.remove: Missing docstring
-W0141: 85:DiscoItem.name: Missing docstring
-W0141: 90:DiscoItem.set_name: Missing docstring
-W0141: 96:DiscoItem.node: Missing docstring
-W0141:101:DiscoItem.set_node: Missing docstring
-W0141:107:DiscoItem.action: Missing docstring
-W0141:112:DiscoItem.set_action: Missing docstring
-W0141:120:DiscoItem.jid: Missing docstring
-W0141:122:DiscoItem.set_jid: Missing docstring
-W0141:125:DiscoIdentity: Missing docstring
-W0622:126:DiscoIdentity.__init__: Redefining built-in 'type'
-W0113:126:DiscoIdentity.__init__: Too many arguments (6/5)
-W0141:165:DiscoIdentity.remove: Missing docstring
-W0141:175:DiscoIdentity.name: Missing docstring
-W0141:178:DiscoIdentity.set_name: Missing docstring
-W0141:182:DiscoIdentity.category: Missing docstring
-W0141:185:DiscoIdentity.set_category: Missing docstring
-W0622:188:DiscoIdentity.type: Redefining built-in 'type'
-W0141:187:DiscoIdentity.type: Missing docstring
-W0141:192:DiscoIdentity.set_type: Missing docstring
-W0622:192:DiscoIdentity.set_type: Redefining built-in 'type'
-W0141:199:DiscoItems: Missing docstring
-E0602:204:DiscoItems.__init__: Undefined variable 'xmlnode'
-E0602:206:DiscoItems.__init__: Undefined variable 'RosterError'
-W0141:229:DiscoItems.identities: Missing docstring
-W0141:237:DiscoItems.has_item: Missing docstring
-W0141:263:DiscoInfo: Missing docstring
-E0602:268:DiscoInfo.__init__: Undefined variable 'xmlnode'
-E0602:270:DiscoInfo.__init__: Undefined variable 'RosterError'
-W0141:294:DiscoInfo.features: Missing docstring
-E0602:300:DiscoInfo.features: Undefined variable 'reta'
-W0141:302:DiscoInfo.has_feature: Missing docstring
-E0602:310:DiscoInfo.has_feature: Undefined variable 'RosterError'
-W0141:318:DiscoInfo.add_feature: Missing docstring
-W0141:324:DiscoInfo.remove_feature: Missing docstring
-E0602:332:DiscoInfo.remove_feature: Undefined variable 'RosterError'
-W0141:342:DiscoInfo.identities: Missing docstring
-W0622:350:DiscoInfo.identity_is: Redefining built-in 'type'
-W0141:350:DiscoInfo.identity_is: Missing docstring
-W0611: 21: Unused import sys
-W0611: 29: Unused import from_utf8
-W0611: 24: Unused import StringType
-W0611: 22: Unused import re
-W0611: 24: Unused import UnicodeType
+W0103:  0: Missing required attribute "__revision__"
+W0103:  0: Missing required attribute "__docformat__"
+************* Module pyxmpp.unicode.cexc
+W0141:  0: Missing docstring
+W0103:  0: Missing required attribute "__revision__"
+W0103:  0: Missing required attribute "__docformat__"
+************* Module pyxmpp.sasl
+W0141:  0: Missing docstring
+W0403: 22: Uses of a deprecated module 'string'
+W0404: 24: Relative import 'core'
+W0404: 26: Relative import 'plain'
+W0404: 27: Relative import 'digest_md5'
+W0133: 38:ClientAuthenticator: Invalid name "ClientAuthenticator" (should match [a-z_][a-z0-9_]*$)
+W0141: 38:ClientAuthenticator: Missing docstring
+W0133: 42:ServerAuthenticator: Invalid name "ServerAuthenticator" (should match [a-z_][a-z0-9_]*$)
+W0141: 42:ServerAuthenticator: Missing docstring
+************* Module pyxmpp.sasl.plain
+W0141:  0: Missing docstring
+W0141: 27:PlainClientAuthenticator: Missing docstring
+W0141: 31:PlainClientAuthenticator.start: Missing docstring
+W0221: 31:PlainClientAuthenticator.start: Arguments number differs from overriden method
+W0141: 41:PlainClientAuthenticator.challenge: Missing docstring
+W0613: 41:PlainClientAuthenticator.challenge: Unused argument 'challenge'
+W0201: 32:PlainClientAuthenticator.start: Attribute 'username' defined outside __init__
+W0201: 38:PlainClientAuthenticator.start: Attribute 'finished' defined outside __init__
+W0201: 37:PlainClientAuthenticator.start: Attribute 'password' defined outside __init__
+W0201: 34:PlainClientAuthenticator.start: Attribute 'authzid' defined outside __init__
+W0141: 55:PlainServerAuthenticator: Missing docstring
+W0141: 59:PlainServerAuthenticator.start: Missing docstring
+W0141: 63:PlainServerAuthenticator.response: Missing docstring
+************* Module pyxmpp.sasl.core
+W0141:  0: Missing docstring
+W0403: 22: Uses of a deprecated module 'string'
+W0232: 27:PasswordManager: Class has no __init__ method
+W0141: 27:PasswordManager: Missing docstring
+W0141: 28:PasswordManager.get_password: Missing docstring
+W0613: 28:PasswordManager.get_password: Unused argument 'username'
+W0613: 28:PasswordManager.get_password: Unused argument 'realm'
+W0613: 28:PasswordManager.get_password: Unused argument 'acceptable_format'
+W0141: 30:PasswordManager.check_password: Missing docstring
+W0141: 35:PasswordManager.get_realms: Missing docstring
+W0141: 37:PasswordManager.choose_realm: Missing docstring
+W0141: 39:PasswordManager.check_authzid: Missing docstring
+W0102: 39:PasswordManager.check_authzid: Dangerous default value {} as argument
+E0602: 40:PasswordManager.check_authzid: Undefined variable 'username'
+W0141: 42:PasswordManager.get_serv_type: Missing docstring
+W0141: 44:PasswordManager.get_serv_host: Missing docstring
+W0141: 46:PasswordManager.get_serv_name: Missing docstring
+W0141: 49:PasswordManager.generate_nonce: Missing docstring
+W0232: 54:Reply: Class has no __init__ method
+W0141: 54:Reply: Missing docstring
+W0141: 55:Reply.base64: Missing docstring
+E0201: 56:Reply.base64: Access to undefined member 'data'
+E0201: 57:Reply.base64: Access to undefined member 'data'
+W0141: 63:Response: Missing docstring
+W0141: 69:Challenge: Missing docstring
+W0141: 75:Failure: Missing docstring
+W0141: 81:Success: Missing docstring
+W0141: 90:ClientAuthenticator: Missing docstring
+W0141: 94:ClientAuthenticator.start: Missing docstring
+E0602: 95:ClientAuthenticator.start: Undefined variable 'Abort'
+W0613: 94:ClientAuthenticator.start: Unused argument 'username'
+W0613: 94:ClientAuthenticator.start: Unused argument 'authzid'
+W0141: 96:ClientAuthenticator.challenge: Missing docstring
+E0602: 97:ClientAuthenticator.challenge: Undefined variable 'Abort'
+W0613: 96:ClientAuthenticator.challenge: Unused argument 'challenge'
+W0141: 98:ClientAuthenticator.finish: Missing docstring
+W0613: 98:ClientAuthenticator.finish: Unused argument 'data'
+E0201: 99:ClientAuthenticator.finish: Access to undefined member 'authzid'
+W0141:101:ServerAuthenticator: Missing docstring
+W0141:105:ServerAuthenticator.start: Missing docstring
+W0613:105:ServerAuthenticator.start: Unused argument 'initial_response'
+W0141:107:ServerAuthenticator.response: Missing docstring
+W0613:107:ServerAuthenticator.response: Unused argument 'response'
+W0611: 22: Unused import string
+W0611: 23: Unused import sys
+************* Module pyxmpp.sasl.digest_md5
+W0301: 79: Line too long (108/100)
+W0141:  0: Missing docstring
+W0403: 23: Uses of a deprecated module 'string'
+W0141: 36:unquote: Missing docstring
+W0141: 41:quote: Missing docstring
+W0133: 46:H: Invalid name "H" (should match [a-z_][a-z0-9_]*$)
+W0141: 46:H: Missing docstring
+W0133: 49:KD: Invalid name "KD" (should match [a-z_][a-z0-9_]*$)
+W0141: 49:KD: Missing docstring
+W0141: 52:make_urp_hash: Missing docstring
+W0141: 59:compute_response: Missing docstring
+W0133: 61:compute_response: Invalid name "A1" (should match [a-z_][a-z0-9_]*$)
+W0133: 64:compute_response: Invalid name "A2" (should match [a-z_][a-z0-9_]*$)
+W0613: 59:compute_response: Unused argument 'username'
+W0613: 59:compute_response: Unused argument 'realm'
+W0141: 69:compute_response_auth: Missing docstring
+W0133: 71:compute_response_auth: Invalid name "A1" (should match [a-z_][a-z0-9_]*$)
+W0133: 74:compute_response_auth: Invalid name "A2" (should match [a-z_][a-z0-9_]*$)
+W0613: 69:compute_response_auth: Unused argument 'username'
+W0613: 69:compute_response_auth: Unused argument 'realm'
+W0141: 81:DigestMD5ClientAuthenticator: Missing docstring
+W0221: 85:DigestMD5ClientAuthenticator.start: Arguments number differs from overriden method
+W0141: 85:DigestMD5ClientAuthenticator.start: Missing docstring
+W0141:103:DigestMD5ClientAuthenticator.challenge: Missing docstring
+W0114:103:DigestMD5ClientAuthenticator.challenge: Too many local variables (22/15)
+E0602:175:DigestMD5ClientAuthenticator.challenge: Undefined variable 'charser'
+W0111:103:DigestMD5ClientAuthenticator.challenge: Too many return statements (14/6)
+W0112:103:DigestMD5ClientAuthenticator.challenge: Too many branches (32/12)
+W0115:103:DigestMD5ClientAuthenticator.challenge: Too many statements (109/50)
+W0141:244:DigestMD5ClientAuthenticator.final_challenge: Missing docstring
+W0141:274:DigestMD5ClientAuthenticator.finish: Missing docstring
+W0201: 86:DigestMD5ClientAuthenticator.start: Attribute 'username' defined outside __init__
+W0201: 99:DigestMD5ClientAuthenticator.start: Attribute 'rspauth_checked' defined outside __init__
+W0201: 98:DigestMD5ClientAuthenticator.start: Attribute 'response_auth' defined outside __init__
+W0201: 88:DigestMD5ClientAuthenticator.start: Attribute 'authzid' defined outside __init__
+W0201: 93:DigestMD5ClientAuthenticator.start: Attribute 'pformat' defined outside __init__
+W0201:100:DigestMD5ClientAuthenticator.start: Attribute 'realm' defined outside __init__
+W0201: 92:DigestMD5ClientAuthenticator.start: Attribute 'password' defined outside __init__
+W0201: 97:DigestMD5ClientAuthenticator.start: Attribute 'nonce_count' defined outside __init__
+W0141:284:DigestMD5ServerAuthenticator: Missing docstring
+W0141:288:DigestMD5ServerAuthenticator.start: Missing docstring
+W0613:288:DigestMD5ServerAuthenticator.start: Unused argument 'response'
+W0141:309:DigestMD5ServerAuthenticator.response: Missing docstring
+W0114:309:DigestMD5ServerAuthenticator.response: Too many local variables (26/15)
+W0111:309:DigestMD5ServerAuthenticator.response: Too many return statements (16/6)
+W0112:309:DigestMD5ServerAuthenticator.response: Too many branches (35/12)
+W0115:309:DigestMD5ServerAuthenticator.response: Too many statements (112/50)
+W0201:300:DigestMD5ServerAuthenticator.start: Attribute 'nonce' defined outside __init__
+W0201:392:DigestMD5ServerAuthenticator.response: Attribute 'username' defined outside __init__
+W0201:293:DigestMD5ServerAuthenticator.start: Attribute 'realm' defined outside __init__
+W0201:305:DigestMD5ServerAuthenticator.start: Attribute 'authzid' defined outside __init__
+W0201:306:DigestMD5ServerAuthenticator.start: Attribute 'done' defined outside __init__
+W0201:289:DigestMD5ServerAuthenticator.start: Attribute 'last_nonce_count' defined outside __init__
+W0611: 21: Unused import unHEX
+W0611: 30: Unused import PasswordManager
+W0611: 30: Unused import Reply
+W0611: 26: Unused import sys
 ************* Module pyxmpp.jabber.muc
-W0302:  0: Too many lines in module (1001)
 W0511:140: FIXME: set/get password/history
 W0511:298: FIXME: alt,decline,invite,password
 W0511:862: TODO: kicks
+W0302:  0: Too many lines in module (1001)
 W0141:  0: Missing docstring
 E0602: 82:MucXBase.__init__: Undefined variable 'ErrorNodeError'
 W0613:138:MucX.__init__: Unused argument 'node'
-W0113:162:MucItem.__init__: Too many arguments (7/5)
 W0231:162:MucItem.__init__: __init__ method from base class 'MucItemBase' is not called
 W0141:172:MucItem.__init: Missing docstring
-W0113:172:MucItem.__init: Too many arguments (7/5)
 W0141:194:MucItem.__from_node: Missing docstring
 W0201:184:MucItem.__init: Attribute 'jid' defined outside __init__
 W0201:191:MucItem.__init: Attribute 'nick' defined outside __init__
@@ -715,9 +741,137 @@ W0201:911:MucRoomManager.set_stream: Attribute 'stream' defined outside __init__
 W0201:910:MucRoomManager.set_stream: Attribute 'jid' defined outside __init__
 W0611: 23: Unused import StringType
 W0611: 23: Unused import UnicodeType
+************* Module pyxmpp.jabber.clientstream
+W0301: 27: Line too long (103/100)
+W0311:192: Bad indentation. Found 24 spaces, expected 16
+W0311:194: Bad indentation. Found 24 spaces, expected 16
+W0141:  0: Missing docstring
+W0141: 37:LegacyClientStream: Missing docstring
+W0102: 38:LegacyClientStream.__init__: Dangerous default value ['sasl:DIGEST-MD5', 'digest'] as argument
+W0141: 46:LegacyClientStream._reset: Missing docstring
+W0141: 51:LegacyClientStream._post_connect: Missing docstring
+W0141: 60:LegacyClientStream._post_auth: Missing docstring
+W0141: 66:LegacyClientStream._try_auth: Missing docstring
+W0141: 95:LegacyClientStream.auth_in_stage1: Missing docstring
+W0141:116:LegacyClientStream.auth_in_stage2: Missing docstring
+W0141:153:LegacyClientStream._auth_stage1: Missing docstring
+W0141:163:LegacyClientStream.auth_timeout: Missing docstring
+W0613:163:LegacyClientStream.auth_timeout: Unused argument 'args'
+W0141:172:LegacyClientStream.auth_error: Missing docstring
+W0141:186:LegacyClientStream.auth_stage2: Missing docstring
+W0141:200:LegacyClientStream._plain_auth_stage2: Missing docstring
+W0613:200:LegacyClientStream._plain_auth_stage2: Unused argument 'stanza'
+W0141:210:LegacyClientStream._plain_auth_in_stage2: Missing docstring
+W0613:210:LegacyClientStream._plain_auth_in_stage2: Unused argument 'resource'
+W0141:234:LegacyClientStream._digest_auth_stage2: Missing docstring
+W0613:234:LegacyClientStream._digest_auth_stage2: Unused argument 'stanza'
+W0141:245:LegacyClientStream._digest_auth_in_stage2: Missing docstring
+W0613:245:LegacyClientStream._digest_auth_in_stage2: Unused argument 'resource'
+W0141:279:LegacyClientStream.auth_finish: Missing docstring
+W0613:279:LegacyClientStream.auth_finish: Unused argument 'stanza'
+W0201:283:LegacyClientStream.auth_finish: Attribute 'me' defined outside __init__
+W0201: 48:LegacyClientStream._reset: Attribute 'available_auth_methods' defined outside __init__
+W0201:284:LegacyClientStream.auth_finish: Attribute 'authenticated' defined outside __init__
+W0201:223:LegacyClientStream._plain_auth_in_stage2: Attribute 'peer_authenticated' defined outside __init__
+W0201: 49:LegacyClientStream._reset: Attribute 'auth_stanza' defined outside __init__
+W0201: 83:LegacyClientStream._try_auth: Attribute 'auth_method_used' defined outside __init__
+W0611: 31: Unused import JID
+W0611: 21: Unused import libxml2
+W0611: 27: Unused import FatalStreamError
+W0611: 30: Unused import common_doc
+W0611: 27: Unused import Stream
+W0611: 27: Unused import SASLNotAvailable
+W0611: 34: Unused import FatalClientStreamError
+W0611: 25: Unused import UnicodeType
+W0611: 34: Unused import ClientStreamError
+W0611: 23: Unused import time
+W0611: 27: Unused import StreamError
+W0611: 27: Unused import SASLMechanismNotAvailable
+W0611: 28: Unused import StreamAuthenticationError
+************* Module pyxmpp.jabber.client
+W0301: 24: Line too long (104/100)
+W0141:  0: Missing docstring
+W0141: 28:JabberClient: Missing docstring
+W0102: 29:JabberClient.__init__: Dangerous default value ['sasl:DIGEST-MD5', 'digest'] as argument
+W0141: 41:JabberClient.connect: Missing docstring
+W0613: 41:JabberClient.connect: Unused argument 'register'
+W0141: 50:JabberClient.__disco_info: Missing docstring
+E0602: 53:JabberClient.__disco_info: Undefined variable 'from_utf8'
+E0602: 62:JabberClient.__disco_info: Undefined variable 'stanza'
+W0141: 69:JabberClient.__disco_items: Missing docstring
+E0602: 72:JabberClient.__disco_items: Undefined variable 'from_utf8'
+W0141: 90:JabberClient.authorized: Missing docstring
+W0141: 95:JabberClient.disco_get_info: Missing docstring
+W0141:103:JabberClient.disco_get_items: Missing docstring
+W0201: 45:JabberClient.connect: Attribute 'disco_identity' defined outside __init__
+W0611: 24: Unused import DiscoItem
+W0611: 25: Unused import ClientError
+W0611: 25: Unused import FatalClientError
+************* Module pyxmpp.jabber.delay
+W0311:136: Bad indentation. Found 8 spaces, expected 4
+W0311:137: Bad indentation. Found 8 spaces, expected 4
+W0311:138: Bad indentation. Found 12 spaces, expected 8
+W0311:139: Bad indentation. Found 16 spaces, expected 12
+W0311:140: Bad indentation. Found 12 spaces, expected 8
+W0311:141: Bad indentation. Found 8 spaces, expected 4
+E0602:106:Delay.as_xml: Undefined variable 'ROSTER_NS'
+E0602:111:Delay.as_xml: Undefined variable 'fr'
+W0141:135:get_delay: Missing docstring
+W0611: 23: Unused import sys
+W0611: 27: Unused import StringType
+W0611: 32: Unused import get_node_ns
+W0611: 27: Unused import UnicodeType
+W0611: 29: Unused import common_root
+************* Module pyxmpp.jabber.disco
+W0141:  0: Missing docstring
+W0141: 35:DiscoError: Missing docstring
+W0141: 38:DiscoItem: Missing docstring
+W0141: 75:DiscoItem.remove: Missing docstring
+W0141: 85:DiscoItem.name: Missing docstring
+W0141: 90:DiscoItem.set_name: Missing docstring
+W0141: 96:DiscoItem.node: Missing docstring
+W0141:101:DiscoItem.set_node: Missing docstring
+W0141:107:DiscoItem.action: Missing docstring
+W0141:112:DiscoItem.set_action: Missing docstring
+W0141:120:DiscoItem.jid: Missing docstring
+W0141:122:DiscoItem.set_jid: Missing docstring
+W0141:125:DiscoIdentity: Missing docstring
+W0622:126:DiscoIdentity.__init__: Redefining built-in 'type'
+W0141:165:DiscoIdentity.remove: Missing docstring
+W0141:175:DiscoIdentity.name: Missing docstring
+W0141:178:DiscoIdentity.set_name: Missing docstring
+W0141:182:DiscoIdentity.category: Missing docstring
+W0141:185:DiscoIdentity.set_category: Missing docstring
+W0622:188:DiscoIdentity.type: Redefining built-in 'type'
+W0141:187:DiscoIdentity.type: Missing docstring
+W0141:192:DiscoIdentity.set_type: Missing docstring
+W0622:192:DiscoIdentity.set_type: Redefining built-in 'type'
+W0141:199:DiscoItems: Missing docstring
+E0602:204:DiscoItems.__init__: Undefined variable 'xmlnode'
+E0602:206:DiscoItems.__init__: Undefined variable 'RosterError'
+W0141:229:DiscoItems.identities: Missing docstring
+W0141:237:DiscoItems.has_item: Missing docstring
+W0141:263:DiscoInfo: Missing docstring
+E0602:268:DiscoInfo.__init__: Undefined variable 'xmlnode'
+E0602:270:DiscoInfo.__init__: Undefined variable 'RosterError'
+W0141:294:DiscoInfo.features: Missing docstring
+E0602:300:DiscoInfo.features: Undefined variable 'reta'
+W0141:302:DiscoInfo.has_feature: Missing docstring
+E0602:310:DiscoInfo.has_feature: Undefined variable 'RosterError'
+W0141:318:DiscoInfo.add_feature: Missing docstring
+W0141:324:DiscoInfo.remove_feature: Missing docstring
+E0602:332:DiscoInfo.remove_feature: Undefined variable 'RosterError'
+W0141:342:DiscoInfo.identities: Missing docstring
+W0622:350:DiscoInfo.identity_is: Redefining built-in 'type'
+W0141:350:DiscoInfo.identity_is: Missing docstring
+W0611: 21: Unused import sys
+W0611: 29: Unused import from_utf8
+W0611: 24: Unused import StringType
+W0611: 22: Unused import re
+W0611: 24: Unused import UnicodeType
 ************* Module pyxmpp.jabber.vcard
-W0301:103: Line too long (102/100)
 W0511:720: FIXME#
+W0301:103: Line too long (102/100)
 W0141:  0: Missing docstring
 W0403: 26: Uses of a deprecated module 'string'
 W0141: 33:Empty: Missing docstring
@@ -822,247 +976,65 @@ E0201:817:VCard.__init__: Access to undefined member 'n'
 E0201:818:VCard.__init__: Access to undefined member 'n'
 E0201:819:VCard.__init__: Access to undefined member 'n'
 E0201:799:VCard.__init__: Access to undefined member 'fn'
-************* Module pyxmpp.jabber.delay
-W0311:136: Bad indentation. Found 8 spaces, expected 4
-W0311:137: Bad indentation. Found 8 spaces, expected 4
-W0311:138: Bad indentation. Found 12 spaces, expected 8
-W0311:139: Bad indentation. Found 16 spaces, expected 12
-W0311:140: Bad indentation. Found 12 spaces, expected 8
-W0311:141: Bad indentation. Found 8 spaces, expected 4
-E0602:106:Delay.as_xml: Undefined variable 'ROSTER_NS'
-E0602:111:Delay.as_xml: Undefined variable 'fr'
-W0141:135:get_delay: Missing docstring
-W0611: 23: Unused import sys
-W0611: 27: Unused import StringType
-W0611: 32: Unused import get_node_ns
-W0611: 27: Unused import UnicodeType
-W0611: 29: Unused import common_root
-************* Module pyxmpp.jabberd
-F0001:  0: Unable to load module pyxmpp.jabberd (cannot import name StanzaFactory)
-************* Module pyxmpp.jabberd.component
-F0001:  0: Unable to load module pyxmpp.jabberd.component (cannot import name ComponentStream)
-************* Module pyxmpp.jabberd.componentstream
-W0301: 27: Line too long (103/100)
-W0141:  0: Missing docstring
-W0141: 34:ComponentStreamError: Missing docstring
-W0141: 37:FatalComponentStreamError: Missing docstring
-W0141: 40:LegacyAuthenticationError: Missing docstring
-W0141: 43:ComponentStream: Missing docstring
-W0113: 44:ComponentStream.__init__: Too many arguments (6/5)
-W0141: 56:ComponentStream._reset: Missing docstring
-W0221: 59:ComponentStream.connect: Arguments number differs from overriden method
-W0141: 59:ComponentStream.connect: Missing docstring
-W0141: 66:ComponentStream._connect: Missing docstring
-W0221: 66:ComponentStream._connect: Arguments number differs from overriden method
-W0141: 77:ComponentStream.accept: Missing docstring
-W0221: 77:ComponentStream.accept: Arguments number differs from overriden method
-W0141: 80:ComponentStream.stream_start: Missing docstring
-W0704: 83:ComponentStream.stream_start: Except doesn't do anything
-W0141: 86:ComponentStream._post_connect: Missing docstring
-W0141: 90:ComponentStream._compute_handshake: Missing docstring
-W0622: 98:ComponentStream._auth: Redefining built-in 'hash'
-W0141: 93:ComponentStream._auth: Missing docstring
-W0141:105:ComponentStream._process_node: Missing docstring
-W0201:111:ComponentStream._process_node: Attribute 'authenticated' defined outside __init__
-W0201:121:ComponentStream._process_node: Attribute 'peer_authenticated' defined outside __init__
-W0201:116:ComponentStream._process_node: Attribute 'peer' defined outside __init__
-W0611: 31: Unused import JID
-W0611: 21: Unused import libxml2
-W0611: 32: Unused import from_utf8
-W0611: 29: Unused import Iq
-W0611: 27: Unused import SASLNotAvailable
-W0611: 25: Unused import UnicodeType
-W0611: 23: Unused import time
-W0611: 27: Unused import SASLMechanismNotAvailable
-************* Module pyxmpp.sasl
-W0141:  0: Missing docstring
-W0403: 22: Uses of a deprecated module 'string'
-W0404: 24: Relative import 'core'
-W0404: 26: Relative import 'plain'
-W0404: 27: Relative import 'digest_md5'
-W0133: 38:ClientAuthenticator: Invalid name "ClientAuthenticator" (should match [a-z_][a-z0-9_]*$)
-W0141: 38:ClientAuthenticator: Missing docstring
-W0133: 42:ServerAuthenticator: Invalid name "ServerAuthenticator" (should match [a-z_][a-z0-9_]*$)
-W0141: 42:ServerAuthenticator: Missing docstring
-************* Module pyxmpp.sasl.core
-W0141:  0: Missing docstring
-W0403: 22: Uses of a deprecated module 'string'
-W0232: 27:PasswordManager: Class has no __init__ method
-W0141: 27:PasswordManager: Missing docstring
-W0141: 28:PasswordManager.get_password: Missing docstring
-W0613: 28:PasswordManager.get_password: Unused argument 'username'
-W0613: 28:PasswordManager.get_password: Unused argument 'realm'
-W0613: 28:PasswordManager.get_password: Unused argument 'acceptable_format'
-W0141: 30:PasswordManager.check_password: Missing docstring
-W0141: 35:PasswordManager.get_realms: Missing docstring
-W0141: 37:PasswordManager.choose_realm: Missing docstring
-W0141: 39:PasswordManager.check_authzid: Missing docstring
-W0102: 39:PasswordManager.check_authzid: Dangerous default value {} as argument
-E0602: 40:PasswordManager.check_authzid: Undefined variable 'username'
-W0141: 42:PasswordManager.get_serv_type: Missing docstring
-W0141: 44:PasswordManager.get_serv_host: Missing docstring
-W0141: 46:PasswordManager.get_serv_name: Missing docstring
-W0141: 49:PasswordManager.generate_nonce: Missing docstring
-W0232: 54:Reply: Class has no __init__ method
-W0141: 54:Reply: Missing docstring
-W0141: 55:Reply.base64: Missing docstring
-E0201: 56:Reply.base64: Access to undefined member 'data'
-E0201: 57:Reply.base64: Access to undefined member 'data'
-W0141: 63:Response: Missing docstring
-W0141: 69:Challenge: Missing docstring
-W0141: 75:Failure: Missing docstring
-W0141: 81:Success: Missing docstring
-W0141: 90:ClientAuthenticator: Missing docstring
-W0141: 94:ClientAuthenticator.start: Missing docstring
-E0602: 95:ClientAuthenticator.start: Undefined variable 'Abort'
-W0613: 94:ClientAuthenticator.start: Unused argument 'username'
-W0613: 94:ClientAuthenticator.start: Unused argument 'authzid'
-W0141: 96:ClientAuthenticator.challenge: Missing docstring
-E0602: 97:ClientAuthenticator.challenge: Undefined variable 'Abort'
-W0613: 96:ClientAuthenticator.challenge: Unused argument 'challenge'
-W0141: 98:ClientAuthenticator.finish: Missing docstring
-W0613: 98:ClientAuthenticator.finish: Unused argument 'data'
-E0201: 99:ClientAuthenticator.finish: Access to undefined member 'authzid'
-W0141:101:ServerAuthenticator: Missing docstring
-W0141:105:ServerAuthenticator.start: Missing docstring
-W0613:105:ServerAuthenticator.start: Unused argument 'initial_response'
-W0141:107:ServerAuthenticator.response: Missing docstring
-W0613:107:ServerAuthenticator.response: Unused argument 'response'
-W0611: 22: Unused import string
-W0611: 23: Unused import sys
-************* Module pyxmpp.sasl.digest_md5
-W0301: 79: Line too long (108/100)
-W0141:  0: Missing docstring
-W0403: 23: Uses of a deprecated module 'string'
-W0141: 36:unquote: Missing docstring
-W0141: 41:quote: Missing docstring
-W0133: 46:H: Invalid name "H" (should match [a-z_][a-z0-9_]*$)
-W0141: 46:H: Missing docstring
-W0133: 49:KD: Invalid name "KD" (should match [a-z_][a-z0-9_]*$)
-W0141: 49:KD: Missing docstring
-W0141: 52:make_urp_hash: Missing docstring
-W0141: 59:compute_response: Missing docstring
-W0113: 59:compute_response: Too many arguments (8/5)
-W0133: 61:compute_response: Invalid name "A1" (should match [a-z_][a-z0-9_]*$)
-W0133: 64:compute_response: Invalid name "A2" (should match [a-z_][a-z0-9_]*$)
-W0613: 59:compute_response: Unused argument 'username'
-W0613: 59:compute_response: Unused argument 'realm'
-W0141: 69:compute_response_auth: Missing docstring
-W0113: 69:compute_response_auth: Too many arguments (8/5)
-W0133: 71:compute_response_auth: Invalid name "A1" (should match [a-z_][a-z0-9_]*$)
-W0133: 74:compute_response_auth: Invalid name "A2" (should match [a-z_][a-z0-9_]*$)
-W0613: 69:compute_response_auth: Unused argument 'username'
-W0613: 69:compute_response_auth: Unused argument 'realm'
-W0141: 81:DigestMD5ClientAuthenticator: Missing docstring
-W0221: 85:DigestMD5ClientAuthenticator.start: Arguments number differs from overriden method
-W0141: 85:DigestMD5ClientAuthenticator.start: Missing docstring
-W0141:103:DigestMD5ClientAuthenticator.challenge: Missing docstring
-W0114:103:DigestMD5ClientAuthenticator.challenge: Too many local variables (22/15)
-E0602:175:DigestMD5ClientAuthenticator.challenge: Undefined variable 'charser'
-W0111:103:DigestMD5ClientAuthenticator.challenge: Too many return statements (14/6)
-W0112:103:DigestMD5ClientAuthenticator.challenge: Too many branches (32/12)
-W0115:103:DigestMD5ClientAuthenticator.challenge: Too many statements (109/50)
-W0141:244:DigestMD5ClientAuthenticator.final_challenge: Missing docstring
-W0141:274:DigestMD5ClientAuthenticator.finish: Missing docstring
-W0201: 86:DigestMD5ClientAuthenticator.start: Attribute 'username' defined outside __init__
-W0201: 99:DigestMD5ClientAuthenticator.start: Attribute 'rspauth_checked' defined outside __init__
-W0201: 98:DigestMD5ClientAuthenticator.start: Attribute 'response_auth' defined outside __init__
-W0201: 88:DigestMD5ClientAuthenticator.start: Attribute 'authzid' defined outside __init__
-W0201: 93:DigestMD5ClientAuthenticator.start: Attribute 'pformat' defined outside __init__
-W0201:100:DigestMD5ClientAuthenticator.start: Attribute 'realm' defined outside __init__
-W0201: 92:DigestMD5ClientAuthenticator.start: Attribute 'password' defined outside __init__
-W0201: 97:DigestMD5ClientAuthenticator.start: Attribute 'nonce_count' defined outside __init__
-W0141:284:DigestMD5ServerAuthenticator: Missing docstring
-W0141:288:DigestMD5ServerAuthenticator.start: Missing docstring
-W0613:288:DigestMD5ServerAuthenticator.start: Unused argument 'response'
-W0141:309:DigestMD5ServerAuthenticator.response: Missing docstring
-W0114:309:DigestMD5ServerAuthenticator.response: Too many local variables (26/15)
-W0111:309:DigestMD5ServerAuthenticator.response: Too many return statements (16/6)
-W0112:309:DigestMD5ServerAuthenticator.response: Too many branches (35/12)
-W0115:309:DigestMD5ServerAuthenticator.response: Too many statements (112/50)
-W0201:300:DigestMD5ServerAuthenticator.start: Attribute 'nonce' defined outside __init__
-W0201:392:DigestMD5ServerAuthenticator.response: Attribute 'username' defined outside __init__
-W0201:293:DigestMD5ServerAuthenticator.start: Attribute 'realm' defined outside __init__
-W0201:305:DigestMD5ServerAuthenticator.start: Attribute 'authzid' defined outside __init__
-W0201:306:DigestMD5ServerAuthenticator.start: Attribute 'done' defined outside __init__
-W0201:289:DigestMD5ServerAuthenticator.start: Attribute 'last_nonce_count' defined outside __init__
-W0611: 21: Unused import unHEX
-W0611: 30: Unused import PasswordManager
-W0611: 30: Unused import Reply
-W0611: 26: Unused import sys
-************* Module pyxmpp.sasl.plain
-W0141:  0: Missing docstring
-W0141: 27:PlainClientAuthenticator: Missing docstring
-W0141: 31:PlainClientAuthenticator.start: Missing docstring
-W0221: 31:PlainClientAuthenticator.start: Arguments number differs from overriden method
-W0141: 41:PlainClientAuthenticator.challenge: Missing docstring
-W0613: 41:PlainClientAuthenticator.challenge: Unused argument 'challenge'
-W0201: 32:PlainClientAuthenticator.start: Attribute 'username' defined outside __init__
-W0201: 38:PlainClientAuthenticator.start: Attribute 'finished' defined outside __init__
-W0201: 37:PlainClientAuthenticator.start: Attribute 'password' defined outside __init__
-W0201: 34:PlainClientAuthenticator.start: Attribute 'authzid' defined outside __init__
-W0141: 55:PlainServerAuthenticator: Missing docstring
-W0141: 59:PlainServerAuthenticator.start: Missing docstring
-W0141: 63:PlainServerAuthenticator.response: Missing docstring
 W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 
 Report
 ======
-5706 statements analysed.
-
-Raw metrics
------------
-
-type      number %     previous difference 
-:::::::::::::::::::::::::::::::::::::::::::
-code      6227   80.59 6227     =          
-docstring 744    9.63  744      =          
-comment   488    6.32  488      =          
-empty     268    3.47  268      =          
-
-
-External dependencies
----------------------
-::
-
-    stringprep (pyxmpp.xmppstringprep)
-    pyxmpp 
-      \-core (pyxmpp.sasl)
-      \-digest_md5 (pyxmpp.sasl)
-      \-plain (pyxmpp.sasl)
-    base64 (pyxmpp.stream,pyxmpp.jabber.vcard)
-    logging (pyxmpp.client,pyxmpp.clientstream,pyxmpp.stream,pyxmpp.jabber.client,pyxmpp.jabber.clientstream,pyxmpp.jabber.muc,pyxmpp.jabberd.componentstream,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.sasl.plain)
-    string (pyxmpp.resolver,pyxmpp.dns,pyxmpp.xmppstringprep,pyxmpp.jabber.vcard,pyxmpp.sasl,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5)
-    traceback (pyxmpp.client,pyxmpp.stream)
-    libxml2 (pyxmpp.client,pyxmpp.clientstream,pyxmpp.error,pyxmpp.iq,pyxmpp.message,pyxmpp.presence,pyxmpp.stanza,pyxmpp.stream,pyxmpp.utils,pyxmpp.xmlextra,pyxmpp.jabber.clientstream,pyxmpp.jabber.disco,pyxmpp.jabber.muc,pyxmpp.jabber.vcard,pyxmpp.jabber.delay,pyxmpp.jabberd.componentstream)
-    random (pyxmpp.resolver,pyxmpp.stanza,pyxmpp.stream,pyxmpp.dns,pyxmpp.sasl,pyxmpp.sasl.core)
-    encodings 
-      \-idna (pyxmpp.jid,pyxmpp.dns)
-    weakref (pyxmpp.jid,pyxmpp.xmppstringprep,pyxmpp.jabber.muc)
-    re (pyxmpp.jid,pyxmpp.resolver,pyxmpp.utils,pyxmpp.jabber.disco,pyxmpp.jabber.vcard,pyxmpp.sasl.digest_md5)
-    M2Crypto 
-      \-X509 (pyxmpp.stream)
-      \-SSL (pyxmpp.stream)
-      | \-cb (pyxmpp.stream)
-      | \-Context (pyxmpp.stream)
-      \-m2 (pyxmpp.stream)
-    threading (pyxmpp.client,pyxmpp.stream,pyxmpp.xmlextra)
-    os (pyxmpp.stream)
-    types (pyxmpp.clientstream,pyxmpp.error,pyxmpp.expdict,pyxmpp.jid,pyxmpp.resolver,pyxmpp.roster,pyxmpp.stanza,pyxmpp.stream,pyxmpp.utils,pyxmpp.dns,pyxmpp.xmppstringprep,pyxmpp.jabber.clientstream,pyxmpp.jabber.disco,pyxmpp.jabber.muc,pyxmpp.jabber.vcard,pyxmpp.jabber.delay,pyxmpp.jabberd.componentstream,pyxmpp.sasl.digest_md5)
-    socket (pyxmpp.resolver,pyxmpp.stream)
-
-
+5890 statements analysed.
 
 Statistics by type
 ------------------
 
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-module   31     31         =          25.81       0.00     
-class    109    109        =          32.11       4.59     
+module   37     37         =          21.62       0.00     
+class    111    111        =          31.53       4.50     
 method   0      0          =          0.00        0.00     
-function 580    580        =          36.55       1.72     
+function 591    591        =          44.16       2.03     
+
+
+Raw metrics
+-----------
+
+type      number %     previous difference 
+:::::::::::::::::::::::::::::::::::::::::::
+code      7033   60.38 7034     -1         
+docstring 3305   28.37 3305     =          
+comment   995    8.54  995      =          
+empty     315    2.70  315      =          
+
+
+External dependencies
+---------------------
+::
+
+    weakref (pyxmpp.xmppstringprep,pyxmpp.jid,pyxmpp.jabber.muc)
+    pyxmpp 
+      \-core (pyxmpp.sasl)
+      \-digest_md5 (pyxmpp.sasl)
+      \-plain (pyxmpp.sasl)
+    base64 (pyxmpp.stream,pyxmpp.jabber.vcard)
+    logging (pyxmpp.clientstream,pyxmpp.client,pyxmpp.stream,pyxmpp.jabberd.componentstream,pyxmpp.sasl.plain,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.client)
+    string (pyxmpp.xmppstringprep,pyxmpp.dns,pyxmpp.resolver,pyxmpp.unicode.nfkc,pyxmpp.sasl,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
+    traceback (pyxmpp.client)
+    libxml2 (pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.utils,pyxmpp.stanza,pyxmpp.clientstream,pyxmpp.message,pyxmpp.client,pyxmpp.stream,pyxmpp.iq,pyxmpp.error,pyxmpp.jabberd.componentstream,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    random (pyxmpp.dns,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.stream,pyxmpp.sasl,pyxmpp.sasl.core)
+    encodings 
+      \-idna (pyxmpp.jid,pyxmpp.dns)
+    stringprep (pyxmpp.xmppstringprep,pyxmpp.rfc3454)
+    re (pyxmpp.jid,pyxmpp.utils,pyxmpp.resolver,pyxmpp.sasl.digest_md5,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    M2Crypto 
+      \-X509 (pyxmpp.stream)
+      \-SSL (pyxmpp.stream)
+      | \-cb (pyxmpp.stream)
+      | \-Context (pyxmpp.stream)
+      \-m2 (pyxmpp.stream)
+    threading (pyxmpp.xmlextra,pyxmpp.client,pyxmpp.stream)
+    os (pyxmpp.stream)
+    types (pyxmpp.xmppstringprep,pyxmpp.roster,pyxmpp.jid,pyxmpp.dns,pyxmpp.utils,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.clientstream,pyxmpp.stream,pyxmpp.expdict,pyxmpp.error,pyxmpp.jabberd.componentstream,pyxmpp.unicode.nfkc,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    socket (pyxmpp.resolver,pyxmpp.stream)
+
 
 
 Messages
@@ -1070,39 +1042,39 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0141      465        
-W0611      78         
+W0141      435        
+W0611      76         
 W0201      70         
 W0613      46         
-E0201      42         
-W0622      31         
-W0113      28         
-E0602      26         
-W0102      23         
-W0133      22         
-W0612      17         
+E0201      37         
+W0133      36         
+W0622      28         
+E0602      24         
+W0102      22         
+W0612      19         
 W0112      16         
+W0103      16         
 W0311      14         
+W0403      11         
 W0704      9          
-W0403      8          
+W0404      8          
 W0231      8          
 W0221      8          
+W0321      7          
 W0301      7          
-W0321      6          
 W0111      6          
-W0404      5          
 W0232      5          
 W0151      5          
 W0511      4          
 W0114      4          
-W0103      4          
 W0702      3          
+W0302      3          
 W0121      3          
 W0115      3          
 W0621      2          
-W0302      2          
 W0101      2          
 F0001      2          
+W0405      1          
 W0401      1          
 
 
@@ -1111,8 +1083,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 905    924      -19        
-errors   68     68       =          
+warnings 878    887      -9         
+errors   61     68       -7         
 
 
 % errors / warnings by module
@@ -1120,39 +1092,45 @@ errors   68     68       =
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            22.06 10.06   
-pyxmpp.jid                     19.12 1.44    
-pyxmpp.jabber.muc              13.24 4.64    
-pyxmpp.stream                  11.76 15.58   
-pyxmpp.jabber.disco            10.29 4.53    
-pyxmpp.sasl.core               8.82  4.31    
-pyxmpp.jabber.client           4.41  1.77    
-pyxmpp.jabber.delay            2.94  1.33    
-pyxmpp.roster                  2.94  0.88    
-pyxmpp.sasl.digest_md5         1.47  6.41    
-pyxmpp.stanza                  1.47  3.76    
-pyxmpp.error                   1.47  2.87    
-pyxmpp.dns                     0.00  8.62    
-pyxmpp.jabber.clientstream     0.00  5.19    
-pyxmpp.clientstream            0.00  4.53    
-pyxmpp.client                  0.00  4.31    
-pyxmpp.resolver                0.00  3.54    
-pyxmpp.jabberd.componentstream 0.00  3.54    
-pyxmpp.xmppstringprep          0.00  2.32    
-pyxmpp.xmlextra                0.00  1.88    
-pyxmpp.presence                0.00  1.66    
-pyxmpp.sasl.plain              0.00  1.55    
-pyxmpp.iq                      0.00  1.44    
-pyxmpp.message                 0.00  1.10    
-pyxmpp.sasl                    0.00  0.99    
-pyxmpp.utils                   0.00  0.66    
-pyxmpp.expdict                 0.00  0.44    
-pyxmpp.version                 0.00  0.33    
-pyxmpp._xmlextra               0.00  0.33    
+pyxmpp.jabber.vcard            24.59 10.48   
+pyxmpp.jid                     21.31 1.48    
+pyxmpp.jabber.muc              14.75 4.56    
+pyxmpp.jabber.disco            11.48 4.44    
+pyxmpp.sasl.core               9.84  4.44    
+pyxmpp.jabber.client           4.92  1.71    
+pyxmpp.jabber.delay            3.28  1.37    
+pyxmpp.roster                  3.28  0.68    
+pyxmpp.stream                  1.64  8.88    
+pyxmpp.sasl.digest_md5         1.64  6.38    
+pyxmpp.stanza                  1.64  3.87    
+pyxmpp.error                   1.64  2.96    
+pyxmpp.dns                     0.00  7.97    
+pyxmpp.jabber.clientstream     0.00  5.24    
+pyxmpp.clientstream            0.00  4.44    
+pyxmpp.client                  0.00  4.33    
+pyxmpp.unicode.nfkc            0.00  4.10    
+pyxmpp.resolver                0.00  3.64    
+pyxmpp.jabberd.componentstream 0.00  3.53    
+pyxmpp.xmppstringprep          0.00  2.28    
+pyxmpp.xmlextra                0.00  1.94    
+pyxmpp.presence                0.00  1.71    
+pyxmpp.sasl.plain              0.00  1.48    
+pyxmpp.iq                      0.00  1.48    
+pyxmpp.rfc3454                 0.00  1.25    
+pyxmpp.message                 0.00  1.14    
+pyxmpp.sasl                    0.00  1.03    
+pyxmpp.utils                   0.00  0.68    
+pyxmpp.expdict                 0.00  0.46    
+pyxmpp.version                 0.00  0.34    
+pyxmpp.unicode.ud_3_2_0        0.00  0.34    
+pyxmpp.unicode.cexc            0.00  0.34    
+pyxmpp.unicode.ccomp           0.00  0.34    
+pyxmpp.unicode                 0.00  0.34    
+pyxmpp._xmlextra               0.00  0.34    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 7.82/10 (previous run: 7.78/10)
+Your code has been rated at 7.99/10 (previous run: 7.92/10)
 If you commit now, people should not be making nasty comments about you on c.l.py
 
