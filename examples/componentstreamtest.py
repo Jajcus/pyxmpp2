@@ -1,12 +1,8 @@
 #!/usr/bin/python -u
 
-import libxml2
-import time
 import sys
-import traceback
-import socket
 
-from pyxmpp import ClientStream,JID,Iq,Presence,Message,StreamError
+from pyxmpp import JID
 from pyxmpp.jabberd import ComponentStream
 
 class Stream(ComponentStream):
