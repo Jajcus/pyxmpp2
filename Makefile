@@ -3,7 +3,7 @@ SNAPSHOT=
 
 DESTDIR="/"
 
-.PHONY: all build test version snapshot dist doc cosmetics TODO.pylint pylint ChangeLog www publish
+.PHONY: all build test version dist doc cosmetics TODO.pylint pylint ChangeLog www publish
 
 all: build test
 
@@ -47,7 +47,7 @@ version:
 		echo "version='$(VERSION)+svn'" > pyxmpp/version.py ; \
 	fi
 
-dist: all ChangeLog
+dist: build ChangeLog
 	echo "version='$(VERSION)$(SNAPSHOT)'" > pyxmpp/version.py
 	python setup.py sdist
 
