@@ -130,7 +130,8 @@ class ClientStream(Stream):
 	def got_features(self):
 		self.debug("Got <features/>")
 		Stream.got_features(self)
-		self.try_auth()
+		if self.features_timeout:
+			self.try_auth()
 
 	def try_auth(self):
 		if self.authenticated:
@@ -139,7 +140,7 @@ class ClientStream(Stream):
 		self.features_timeout=None
 		self.debug("trying auth: %r" % (self.auth_methods_left,))
 		if not self.auth_methods_left:
-			raise AuthenticationError,"No allowed authentication methods available"
+			raise LegacyAuthenticationError,"No allowed authentication methods available"
 		method=self.auth_methods_left[0]
 		if method.startswith("sasl:"):
 			if self.features:
@@ -243,12 +244,16 @@ class ClientStream(Stream):
 	
 	def auth_error(self,stanza):
 		err=stanza.get_error()
-		raise AuthenticationError,("Athentication error class=%r condition=%r" 
-					% (err.get_class(), err.get_condition().serialize()))
+		ae=err.xpath_eval("e:*",{"e":"jabber:iq:auth:error"})
+		if ae:
+			ae=ae[0].name
+		else:
+			ae=err.get_condition().name
+		raise LegacyAuthenticationError,("Athentication error condition: %s" 
+					% (ae,))
 
 	def auth_stage2(self,stanza):
-		print "Procesing auth response..."
-	
+		debug("Procesing auth response...")
 		self.available_auth_methods=[]
 		if (stanza.xpath_eval("a:query/a:digest",{"a":"jabber:iq:auth"}) and self.stream_id):
 					self.available_auth_methods.append("digest")
@@ -335,7 +340,7 @@ class ClientStream(Stream):
 			self.send(iq)
 	
 	def auth_finish(self,stanza):
-		print "Authenticated"
+		debug("Authenticated")
 		self.me=self.jid
 		self.authenticated=1
 		self.post_auth()

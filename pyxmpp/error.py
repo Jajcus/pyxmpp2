@@ -97,18 +97,16 @@ class ErrorNode:
 		self.node=None
 		self.borrowed=0
 		if isinstance(node_or_cond,libxml2.xmlNode):
-			if ns is not None:
-				raise ErrorNodeError,"Both namespace and node given"
-		
-			ns=None
-			for c in node_or_cond.children:
-				ns=c.ns().getContent()
-				if ns in (STREAM_ERROR_NS,STANZA_ERROR_NS):
-					break
+			if not ns:	
 				ns=None
-			
-			if ns==ns1:
-				raise ErrorNodeError,"Bad error namespace"
+				for c in node_or_cond.children:
+					ns=c.ns().getContent()
+					if ns in (STREAM_ERROR_NS,STANZA_ERROR_NS):
+						break
+					ns=None
+				
+				if ns==ns1:
+					raise ErrorNodeError,"Bad error namespace"
 			self.ns=ns
 			
 			if copy:
@@ -179,10 +177,11 @@ class ErrorNode:
 			return None
 		return c[0]
 
-	def add_custom_codition(self,ns,cond,content=None):
-		self.node.newChild(none,cond,content)
-		ns=self.node.newNs(ns,None)
-		self.node.setNs(ns)
+	def add_custom_condition(self,ns,cond,content=None):
+		c=self.node.newChild(None,cond,content)
+		ns=c.newNs(ns,None)
+		c.setNs(ns)
+		return c
 		
 	def upgrade(self):
 		if not self.node.hasProp("code"):
@@ -262,10 +261,11 @@ class StanzaErrorNode(ErrorNode):
 			if not stanza_errors.has_key(node_or_cond):
 				raise ErrorNodeError,"Bad error condition"
 			
-		ErrorNode.__init__(self,node_or_cond,STREAM_ERROR_NS,copy=copy,parent=parent)
+		ErrorNode.__init__(self,node_or_cond,STANZA_ERROR_NS,copy=copy,parent=parent)
 
-		typ=stanza_errors[node_or_cond][0]
-		self.node.setProp("type",typ)
+		if type(node_or_cond) is UnicodeType:
+			typ=stanza_errors[node_or_cond][0]
+			self.node.setProp("type",typ)
 
 	def get_type(self):
 		if not self.node.hasProp("type"):
