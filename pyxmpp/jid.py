@@ -113,7 +113,9 @@ class JID:
 		return JID(self.node,self.domain)
 
 	def __eq__(self,other):
-		if type(other) in (StringType,UnicodeType):
+		if other is None:
+			return 0
+		elif type(other) in (StringType,UnicodeType):
 			other=JID(other)
 		elif not isinstance(other,JID):
 			raise TypeError,"Can't compare JID with %r" % (type(other),)
@@ -123,9 +125,4 @@ class JID:
 			and self.resource==other.resource)
 	
 	def __ne__(self,other):
-		if type(other) in (StringType,UnicodeType):
-			other=JID(other)
-		elif not isinstance(other,JID):
-			raise TypeError,"Can't compare JID with %r" % (type(other),)
-			
 		return not self.__eq__(other)
