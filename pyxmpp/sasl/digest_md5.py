@@ -176,6 +176,8 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 		cnonce=self.password_manager.generate_nonce()
 		cnonce=quote(cnonce)
 		params.append('cnonce="%s"' % (cnonce,))
+		
+		params.append('nonce="%s"' % (quote(nonce),))
 
 		self.nonce_count+=1
 		nonce_count="%08x" % (self.nonce_count,)
