@@ -23,6 +23,7 @@ Normative reference:
 __revision__="$Id: disco.py 513 2005-01-09 16:34:00Z jajcus $"
 __docformat__="restructuredtext en"
 
+import copy
 import libxml2
 from pyxmpp.objects import StanzaPayloadObject
 from pyxmpp.utils import from_utf8, to_utf8
@@ -62,8 +63,8 @@ class Option(StanzaPayloadObject):
               right name and namespace, but no attributes or content.
             - `doc`: document to which the element belongs.
         :Types:
-            - `xmlnode`: `libxml.xmlNode`
-            - `doc`: `libxml.xmlDoc"""
+            - `xmlnode`: `libxml2.xmlNode`
+            - `doc`: `libxml2.xmlDoc`"""
         _unused = doc
         xmlnode.setProp("label", self.label.encode("utf-8"))
         xmlnode.newTextChild(xmlnode.ns(), "value", self.value.encode("utf-8"))
@@ -100,8 +101,8 @@ class Field(StanzaPayloadObject):
         - `value`: field value parsed according to the form type.
         - `label`: field label (human-readable description).
         - `type`: field type ("boolean", "fixed", "hidden", "jid-multi",
-                "jid-single", "list-multi", "list-single", "text-multi", 
-                "text-private" or "text-single").
+          "jid-single", "list-multi", "list-single", "text-multi", 
+          "text-private" or "text-single").
         - `options`: field options (for "list-multi" or "list-single" fields).
         - `required`: `True` when the field is required.
         - `desc`: natural-language description of the field.
@@ -203,6 +204,9 @@ class Field(StanzaPayloadObject):
         if name != "value":
             self.__dict__[name] = value
             return
+        if value is None:
+            self.values = []
+            return
         t = self.type
         if t == "boolean":
             if value:
@@ -210,11 +214,11 @@ class Field(StanzaPayloadObject):
             else:
                 self.values = ["0"]
             return
-        if t.endswith("-multi"):
+        if t and t.endswith("-multi"):
             values = list(value)
         else:
             values = [value]
-        if t.startswith("jid-"):
+        if t and t.startswith("jid-"):
             values = [JID(v).as_unicode() for v in values]
         self.values = values
 
@@ -226,7 +230,7 @@ class Field(StanzaPayloadObject):
             - `value`: option value.
         :Types:
             - `label`: `unicode`
-            - `value`: `unicodez
+            - `value`: `unicode`
         """
         option = Option(value, label)
         self.options.append(option)
@@ -240,8 +244,8 @@ class Field(StanzaPayloadObject):
               right name and namespace, but no attributes or content.
             - `doc`: document to which the element belongs.
         :Types:
-            - `xmlnode`: `libxml.xmlNode`
-            - `doc`: `libxml.xmlDoc"""
+            - `xmlnode`: `libxml2.xmlNode`
+            - `doc`: `libxml2.xmlDoc`"""
         if self.type is not None and self.type not in self.allowed_types:
             raise ValueError, "Invalid form field type: %r" % (self.type,)
         xmlnode.setProp("type", self.type)
@@ -304,12 +308,17 @@ class Item(StanzaPayloadObject):
     Additionally to the direct access to the contained fields via the `fields` attribute,
     `Item` object provides an iterator and mapping interface for field access. E.g.::
 
-    for field in item:
-        ...
+        for field in item:
+            ...
 
     or::
 
-    field = item['field_name']
+        field = item['field_name']
+
+    or::
+
+        if 'field_name' in item:
+            ...
 
     :Ivariables:
         - `fields`: the fields of the item.
@@ -391,8 +400,8 @@ class Item(StanzaPayloadObject):
               right name and namespace, but no attributes or content.
             - `doc`: document to which the element belongs.
         :Types:
-            - `xmlnode`: `libxml.xmlNode`
-            - `doc`: `libxml.xmlDoc"""
+            - `xmlnode`: `libxml2.xmlNode`
+            - `doc`: `libxml2.xmlDoc`"""
         for field in self.fields:
             field.as_xml(xmlnode, doc)
 
@@ -424,12 +433,12 @@ class Form(StanzaPayloadObject):
     Additionally to the direct access to the contained fields via the `fields` attribute,
     `Form` object provides an iterator and mapping interface for field access. E.g.::
 
-    for field in form:
-        ...
+        for field in form:
+            ...
 
     or::
 
-    field = form['field_name']
+        field = form['field_name']
 
     :Ivariables:
         - `type`: form type ("form", "submit", "cancel" or "result").
@@ -555,6 +564,43 @@ class Form(StanzaPayloadObject):
         self.items.append(item)
         return item
 
+    def make_submit(self, keep_types = False):
+        """Make a "submit" form using data in `self`.
+
+        Remove uneeded information from the form. The information removed
+        includes: title, instructions, field labels, fixed fields etc.
+
+        :Raise: `ValueError` when any required field has no value.
+
+        :Parameters:
+            - `keep_types`: when `True` field type information will be included
+              in the result form. That is usually not needed.
+        :Types:
+            - `keep_types`: `bool`
+
+        :return: the form created.
+        :returntype: `Form`"""
+        result = Form("submit")
+        for field in self.fields:
+            if field.type == "fixed":
+                continue
+            if not field.values:
+                if field.required:
+                    raise ValueError, "Required field with no value!"
+                continue
+            if keep_types:
+                result.add_field(field.name, field.values, field.type)
+            else:
+                result.add_field(field.name, field.values)
+        return result
+
+    def copy(self):
+        """Get a deep copy of `self`.
+
+        :return: a deep copy of `self`.
+        :returntype: `Form`"""
+        return copy.deepcopy(self)
+
     def complete_xml_element(self, xmlnode, doc):
         """Complete the XML node with `self` content.
 
@@ -563,8 +609,8 @@ class Form(StanzaPayloadObject):
               right name and namespace, but no attributes or content.
             - `doc`: document to which the element belongs.
         :Types:
-            - `xmlnode`: `libxml.xmlNode`
-            - `doc`: `libxml.xmlDoc"""
+            - `xmlnode`: `libxml2.xmlNode`
+            - `doc`: `libxml2.xmlDoc`"""
         if self.type not in self.allowed_types:
             raise ValueError, "Form type %r not allowed." % (self.type,)
         xmlnode.setProp("type", self.type)
