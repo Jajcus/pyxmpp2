@@ -755,7 +755,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         self.fix_in_stanza(stanza)
         to=stanza.get_to()
 
-        if not self.process_all_stanzas and to and to!=self.me and to!=self.me.bare():
+        if not self.process_all_stanzas and to and to!=self.me and to.bare()!=self.me.bare():
             return self.route_stanza(stanza)
 
         if stanza.stanza_type=="iq":
