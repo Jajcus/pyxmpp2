@@ -1,5 +1,8 @@
 2004-09-12  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/xmppstringprep.py, TODO.pylint, pylint.sh:
+	- cleaning up...
+
 	* pyxmpp/jabberd/componentstream.py, pyxmpp/jabber/clientstream.py, pyxmpp/jabber/muc.py, pyxmpp/clientstream.py:
 	- stream.jid -> stream.me everywhere
 
