@@ -21,7 +21,7 @@ TODO.pylint:
 	./aux/pylint.sh | tee TODO.pylint
 
 ChangeLog: 
-	test -f .svn/entries && make cl-stamp
+	test -f .svn/entries && make cl-stamp || :
 	
 cl-stamp: .svn/entries
 	TZ=UTC svn log -v --xml \
