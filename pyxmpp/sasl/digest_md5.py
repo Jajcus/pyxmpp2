@@ -1,3 +1,20 @@
+#
+# (C) Copyright 2003 Jacek Konieczny <jajcus@bnet.pl>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License Version
+# 2.1 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+
 from binascii import b2a_hex as HEX, a2b_hex as unHEX
 import re
 import string
@@ -6,9 +23,9 @@ from types import UnicodeType
 import sys
 
 from core import ClientAuthenticator,ServerAuthenticator
-from core import Reply,Abort,Response,Challenge,Success,Failure,PasswordManager
+from core import Reply,Failure,Response,Challenge,Success,Failure,PasswordManager
 
-from utils import to_utf8,from_utf8
+from pyxmpp.utils import to_utf8,from_utf8
 
 def unquote(s):
 	if s[0]!='"':
@@ -34,7 +51,6 @@ def make_urp_hash(username,realm,passwd):
 	return H("%s:%s:%s" % (username,realm,passwd))
 
 def compute_response(username,realm,urp_hash,nonce,cnonce,nonce_count,authzid,digest_uri):
-	print >>sys.stderr,"Response of:",`(username,realm,urp_hash,nonce,cnonce,nonce_count,authzid,digest_uri)`
 	if authzid:
 		A1="%s:%s:%s:%s" % (urp_hash,nonce,cnonce,authzid)
 	else:
@@ -45,13 +61,11 @@ def compute_response(username,realm,urp_hash,nonce,cnonce,nonce_count,authzid,di
 			cnonce,"auth",HEX(H(A2)) ) ))
 
 def compute_response_auth(username,realm,urp_hash,nonce,cnonce,nonce_count,authzid,digest_uri):
-	print >>sys.stderr,"Response auth of:",`(username,realm,urp_hash,nonce,cnonce,nonce_count,authzid,digest_uri)`
 	if authzid:
 		A1="%s:%s:%s:%s" % (urp_hash,nonce,cnonce,authzid)
 	else:
 		A1="%s:%s:%s" % (urp_hash,nonce,cnonce)
 	A2=":"+digest_uri
-	nonce_count="%08x" % (nonce_count,)
 	return HEX(KD( HEX(H(A1)),"%s:%s:%s:%s:%s" % (
 			nonce,nonce_count,
 			cnonce,"auth",HEX(H(A2)) ) ))
@@ -70,14 +84,15 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 			self.pformat="plain"
 		else:
 			self.password=None
-			self.authzid=None
+			self.pformat=None
 		self.nonce_count=0
+		self.response_auth=None
 		return Response()
 
 	def challenge(self,challenge):
 		if not challenge:
 			self.debug("Empty challenge")
-			return Abort("bad-challenge")
+			return Failure("bad-challenge")
 	
 		realms=[]
 		nonce=None
@@ -86,7 +101,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 			m=param_re.match(challenge)
 			if not m:
 				self.debug("Challenge syntax error: %r" % (challenge,))
-				return Abort("bad-challenge")
+				return Failure("bad-challenge")
 			challenge=m.group("rest")
 			var=m.group("var")
 			val=m.group("val")
@@ -96,26 +111,26 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 			elif var=="nonce":
 				if nonce:
 					self.debug("Duplicate nonce")
-					return Abort("bad-challenge")
+					return Failure("bad-challenge")
 				nonce=unquote(val)
 			elif var=="qop":
 				qopl=unquote(val).split(",")
 				if "auth" not in qopl:
 					self.debug("auth not supported")
-					return Abort("not-implemented")
+					return Failure("not-implemented")
 			elif var=="charset":
 				if val!="utf-8":
 					self.debug("charset given and not utf-8")
-					return Abort("bad-challenge")
+					return Failure("bad-challenge")
 				charset="utf-8"
 			elif var=="algorithm":
 				if val!="md5-sess":
 					self.debug("algorithm given and not md5-sess")
-					return Abort("bad-challenge")
+					return Failure("bad-challenge")
 
 		if not nonce:
 			self.debug("nonce not given")
-			return Abort("bad-challenge")
+			return Failure("bad-challenge")
 
 		if self.password is None:
 			self.password,self.pformat=self.password_manager.get_password(
@@ -123,7 +138,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 		if not self.password or self.pformat not in ("plain","md5:user:realm:pass"):
 			self.debug("Couldn't get plain password. Password: %r Format: %r"
 							% (self.password,self.pformat))
-			return Abort("password-unavailable")
+			return Failure("password-unavailable")
 
 		params=[]
 		if realms:
@@ -135,14 +150,14 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 						realm=realm.encode(charset)
 					except UnicodeError:
 						self.debug("Couldn't encode realm to %r" % (charset,))
-						return Abort("incompatible-charset")
+						return Failure("incompatible-charset")
 				elif charset!="utf-8":
 					try:
 						realm=unicode(realm,"utf-8").encode(charser)
 					except UnicodeError:
 						self.debug("Couldn't encode realm from utf-8 to %r"
 											% (charset,))
-						return Abort("incompatible-charset")
+						return Failure("incompatible-charset")
 				realm=quote(realm)
 				params.append('realm="%s"' % (realm,))
 
@@ -150,7 +165,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 			username=self.username.encode(charset)
 		except UnicodeError:
 			self.debug("Couldn't encode username to %r" % (charset,))
-			return Abort("incompatible-charset")
+			return Failure("incompatible-charset")
 
 		username=quote(username)
 		params.append('username="%s"' % (username,))
@@ -182,7 +197,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 				authzid=self.authzid.encode(charset)
 			except UnicodeError:
 				self.debug("Couldn't encode authzid to %r" % (charset,))
-				return Abort("incompatible-charset")
+				return Failure("incompatible-charset")
 			authzid=quote(authzid)
 		else:
 			authzid=""
@@ -194,6 +209,8 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 			
 		response=compute_response(username,realm,urp_hash,nonce,cnonce,nonce_count,
 							authzid,digest_uri)
+		self.response_auth=compute_response_auth(username,realm,urp_hash,nonce,cnonce,
+							nonce_count,authzid,digest_uri)
 
 		params.append('response=%s' % (response,))
 
@@ -201,6 +218,37 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 			params.append('authzid="%s"' % (authzid,))
 	
 		return Response(string.join(params,","))
+
+	def finish(self,data):
+		if not data:
+			self.debug("Success extra data missing")
+			return Failure("bad-success")
+		if not self.response_auth:
+			self.debug("Got success too early")
+			return Failure("bad-success")
+
+		rspauth=None
+		while data:
+			m=param_re.match(data)
+			if not m:
+				self.debug("Challenge syntax error: %r" % (data,))
+				return Failure("bad-challenge")
+			data=m.group("rest")
+			var=m.group("var")
+			val=m.group("val")
+			self.debug("%r: %r" % (var,val))
+			if var=="rspauth":
+				rspauth=val
+		
+		if not rspauth:
+			self.debug("Success data without rspauth")
+			return Failure("bad-success")
+
+		if rspauth==self.response_auth:
+			return Success(self.authzid)
+		else:
+			self.debug("Wrong rspauth value - peer is cheating?")
+			return Failure("bad-success")
 
 class DigestMD5ServerAuthenticator(ServerAuthenticator):
 	def start(self,response):
@@ -224,7 +272,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 		
 	def response(self,response):
 		if not response:
-			return Abort("not-authorized")
+			return Failure("not-authorized")
 		
 		realm=to_utf8(self.realm)
 		realm=quote(realm)
@@ -302,7 +350,6 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 		if pformat=="md5:user:realm:pass":
 			urp_hash=password
 		elif pformat=="plain":
-			print `(username,realm,password)`
 			urp_hash=make_urp_hash(username,realm,password)
 		else:
 			self.debug("Couldn't get password.")
@@ -331,11 +378,10 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 		info["serv-type"]=serv_type
 		info["host"]=host
 		info["serv-name"]=serv_name
-		print `authzid`
 		if self.password_manager.check_authzid(authzid_uq,info):
 			rspauth=compute_response_auth(username,realm,urp_hash,self.nonce,
 							cnonce,nonce_count,authzid,digest_uri)
-			return Success("rspauth="+rspauth)
+			return Success(authzid,"rspauth="+rspauth)
 		else:
 			self.debug("Authzid check failed")
 			return Failure("not-authorized")

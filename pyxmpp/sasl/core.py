@@ -1,13 +1,31 @@
+#
+# (C) Copyright 2003 Jacek Konieczny <jajcus@bnet.pl>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License Version
+# 2.1 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+
 import random
 import string
 import sys
+import base64
 
 class PasswordManager:
 	def get_password(self,username,realm=None,acceptable_format=("plain",)):
 		return None,None
 	def check_password(self,username,password,realm=None):
 		pw,format=self.get_password(username,realm)
-		if pw and format=="plain" and p==password:
+		if pw and format=="plain" and pw==password:
 			return 1
 		return 0
 	def get_realms(self):
@@ -30,21 +48,35 @@ class PasswordManager:
 		return r1+r2
 
 class Reply:
-	pass
+	def base64(self):
+		if self.data is not None:
+			return base64.encodestring(self.data)
+		else:
+			return None
+class Response(Reply):
+	def __init__(self,data=""):
+		self.data=data
+	def __repr__(self):
+		return "<sasl.Response: %r>" % (self.data,)
 
-class Abort(Reply):
+class Challenge(Reply):
+	def __init__(self,data):
+		self.data=data
+	def __repr__(self):
+		return "<sasl.Challenge: %r>" % (self.data,)
+
+class Failure(Reply):
 	def __init__(self,reason):
 		self.reason=reason
 	def __repr__(self):
-		return "<sasl.Abort: %r>" % (self.reason,)
+		return "<sasl.Failure: %r>" % (self.reason,)
 
-class Response(Reply):
-	def __init__(self,response=""):
-		self.response=response
-	def __str__(self):
-		return self.response
+class Success(Reply):
+	def __init__(self,authzid,data=None):
+		self.authzid=authzid
+		self.data=data
 	def __repr__(self):
-		return "<sasl.Response: %r>" % (self.response,)
+		return "<sasl.Success: authzid: %r data: %r>" % (self.authzid,self.data)
 
 class ClientAuthenticator:
 	def __init__(self,password_manager):
@@ -53,34 +85,11 @@ class ClientAuthenticator:
 		return Abort("Not implemented")
 	def challenge(self,challenge):
 		return Abort("Not implemented")
+	def finish(self,data):
+		return Success(self.authzid)
 	def debug(self,s):
 		print >>sys.stderr,"SASL client:",self.__class__,s
 	
-class Challenge(Reply):
-	def __init__(self,challenge):
-		self.challenge=challenge
-	def __str__(self):
-		return self.challenge
-	def __repr__(self):
-		return "<sasl.Challenge: %r>" % (self.challenge,)
-
-class Failure(Reply):
-	def __init__(self,reason):
-		self.reason=reason
-	def __str__(self):
-		return self.reason
-	def __repr__(self):
-		return "<sasl.Failure: %r>" % (self.reason,)
-
-class Success(Reply):
-	def __init__(self,authzid,data=None):
-		self.authzid=authzid
-		self.data=None
-	def get_authzid(self):
-		return self.authzid
-	def __repr__(self):
-		return "<sasl.Success: authzid: %r data: %r>" % (self.authzid,self.data)
-
 class ServerAuthenticator:
 	def __init__(self,password_manager):
 		self.password_manager=password_manager

@@ -5,7 +5,7 @@ import time
 import traceback
 import sys
 
-from pyxmpp import ClientStream,JID,Iq,Presence,Message
+from pyxmpp import ClientStream,JID,Iq,Presence,Message,StreamError
 
 class Disconnected(Exception):
 	pass
@@ -15,7 +15,9 @@ class Stream(ClientStream):
 		print ":-)"
 		self.send(Presence())
 	def idle(self):
-		if self.authenticated():
+		print "idle"
+		ClientStream.idle(self)
+		if self.authenticated:
 			target=JID("jajcus",s.jid.domain)
 			self.send(Message(to=target,body=unicode("Te¶cik","iso-8859-2")))
 	def post_disconnect(self):
@@ -38,7 +40,7 @@ try:
 		s.disconnect()
 except KeyboardInterrupt:
 	traceback.print_exc(file=sys.stderr)
-except (stream.StreamError,Disconnected,KeyboardInterrupt),e:
+except (StreamError,Disconnected),e:
 	raise
 
 libxml2.cleanupParser()

@@ -1,3 +1,19 @@
+#
+# (C) Copyright 2003 Jacek Konieczny <jajcus@bnet.pl>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License Version
+# 2.1 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
 
 import re
 
@@ -41,8 +57,11 @@ class JID:
 			self.set_domain(s2[1])
 		else:
 			self.set_domain(s2[0])
+			self.node=None
 		if len(s1)==2:
 			self.set_resource(s1[1])
+		else:
+			self.resource=None
 
 	def set_node(self,s):
 		if s: s=from_utf8(s)

@@ -1,3 +1,19 @@
+#
+# (C) Copyright 2003 Jacek Konieczny <jajcus@bnet.pl>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License Version
+# 2.1 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
 
 import libxml2
 import socket
@@ -5,13 +21,16 @@ import os
 import sys
 import time
 import random
+import base64
 
+from expdict import ExpiringDictionary
 from utils import from_utf8,to_utf8
 from stanza import Stanza,common_ns,common_doc
 from error import ErrorNode
 from iq import Iq
 from presence import Presence
 from message import Message
+from jid import JID
 import sasl
 
 STREAM_NS="http://etherx.jabber.org/streams"
@@ -32,17 +51,32 @@ class StreamReader:
 	def __init__(self,stream):
 		self.stream=stream
 		self.fd=stream.socket.fileno()
-	def read(self,len):
-		r=os.read(self.fd,len)
-		self.stream.debug("IN: %r" % (r,))
+		self.left=None
+	def pending_input(self):
+		return self.left is not None
+		
+	def read(self,l):
+		if self.left:
+			r,self.left=self.left,None
+		else:
+			r=os.read(self.fd,l)
+			self.stream.debug("IN: %r" % (r,))
 		if r=="":
 			self.stream.eof_handler()
+		i=r.find(">")
+		if i>=0 and i<len(r)-1:
+			i+=1
+			self.left=r[i:]
+			r=r[:i]
 		return r
 
 class StreamError(RuntimeError):
 	pass
 
 class HostMismatch(StreamError):
+	pass
+
+class SASLMechanismNotAvailable(StreamError):
 	pass
 
 class Stream(sasl.PasswordManager):
@@ -66,18 +100,23 @@ class Stream(sasl.PasswordManager):
 		self.extra_ns={}
 		self.stream_ns=None
 		self.reader=None
+		self.ioreader=None
 		self.me=None
 		self.peer=None
 		self.skip=0
 		self.stream_id=None
-		self.iq_reply_handlers={}
+		self.iq_reply_handlers=ExpiringDictionary()
 		self.iq_get_handlers={}
 		self.iq_set_handlers={}
+		self.message_handlers={}
+		self.presence_handlers={}
 		self.eof=0
 		self.initiator=None
 		self.features=None
 		self.tls=0
 		self.authenticator=None
+		self.authenticated=0
+		self.peer_authenticated=0
 
 	def __del__(self):
 		self.close()
@@ -85,7 +124,10 @@ class Stream(sasl.PasswordManager):
 	def connect_socket(self,sock,to=None):
 		self.eof=0
 		self.socket=sock
-		self.peer=to
+		if to:
+			self.peer=JID(to)
+		else:
+			self.peer=None
 		self.initiator=1
 		self.send_stream_start()
 		self.make_reader(sock)
@@ -103,7 +145,10 @@ class Stream(sasl.PasswordManager):
 		self.eof=0
 		self.socket,addr=sock.accept()
 		self.addr,self.port=addr
-		self.me=myname
+		if myname:
+			self.me=JID(myname)
+		else:
+			self.me=None
 		self.initiator=0
 		self.make_reader(self.socket)
 
@@ -125,7 +170,8 @@ class Stream(sasl.PasswordManager):
 		self.reset()
 
 	def make_reader(self,sock):
-		input=libxml2.inputBuffer(StreamReader(self))
+		self.ioreader=StreamReader(self)
+		input=libxml2.inputBuffer(self.ioreader)
 		self.reader=input.newTextReader("input stream")
 
 	def send_stream_end(self):
@@ -149,7 +195,7 @@ class Stream(sasl.PasswordManager):
 		for prefix,uri in self.extra_ns:
 			self.extra_ns[uri]=root.newNs(uri,prefix)
 		if self.peer:
-			root.setProp("to",self.peer)
+			root.setProp("to",self.peer.as_string())
 		root.setProp("version","1.0")
 		if id:
 			root.setProp("id",id)
@@ -191,7 +237,7 @@ class Stream(sasl.PasswordManager):
 	def write_node(self,node):
 		node=node.docCopyNode(self.doc_out,1)
 		self.doc_out.addChild(node)
-		node.reconciliateNs(self.doc_out)
+		#node.reconciliateNs(self.doc_out)
 		self.write_raw(node.serialize(encoding="UTF-8"))
 		node.unlinkNode()
 		node.freeNode()
@@ -199,13 +245,14 @@ class Stream(sasl.PasswordManager):
 	def send(self,stanza):
 		if self.require_tls and not self.tls:
 			raise StreamError,"TLS encryption required and not started yet"
+		self.fix_out_stanza(stanza)
 		self.write_node(stanza.node)
 
 	def eof_handler(self):
 		self.eof=1
 
 	def idle(self):
-		pass
+		self.iq_reply_handlers.expire()
 
 	def loop(self,timeout):
 		import select
@@ -217,6 +264,11 @@ class Stream(sasl.PasswordManager):
 				self.idle()
 
 	def read(self):
+		self.read1()
+		while (self.ioreader.pending_input()):
+			self.read1()
+		
+	def read1(self):
 		self.debug("Stream.read()")
 		if not self.reader:
 			raise StreamError,"No reader defined. Socket not connected?"
@@ -276,6 +328,8 @@ class Stream(sasl.PasswordManager):
 		else:
 			self.stream_id=r.prop("id")
 			peer=r.prop("from")
+			if peer:
+				peer=JID(peer)
 			if self.peer:
 				if peer and peer!=self.peer:
 					to_from_mismatch=1
@@ -301,7 +355,7 @@ class Stream(sasl.PasswordManager):
 			stanza=StanzaFactory(node)
 			self.process_stanza(stanza)
 			stanza.free()
-		if ns_uri==SASL_NS:
+		elif ns_uri==SASL_NS:
 			self.process_sasl_node(node)
 		else:
 			self.debug("Unhandled node: %r" % (node.serialize(),))
@@ -329,16 +383,23 @@ class Stream(sasl.PasswordManager):
 				% (err.get_class(),err.get_condition().name,err.serialize()))
 
 	def process_iq(self,stanza):
+		if not self.initiator and not self.peer_authenticated:
+			pre_auth=1
+		else:
+			pre_auth=0
+			
+		self.fix_in_stanza(stanza)
 		id=stanza.get_id()
+		fr=stanza.get_from()
 		typ=stanza.get_type()
 		if typ in ("result","error"):
-			if self.iq_reply_handlers.has_key(id):
-				res_handler,err_handler=self.iq_reply_handlers[id]
+			if self.iq_reply_handlers.has_key((id,fr.as_unicode())):
+				res_handler,err_handler=self.iq_reply_handlers[(id,fr.as_unicode())]
 				if stanza.get_type()=="result":
 					res_handler(stanza)
 				else:
 					err_handler(stanza)
-				del self.iq_reply_handlers[id]
+				del self.iq_reply_handlers[(id,fr.as_unicode())]
 				return 1
 			else:
 				return 0
@@ -349,35 +410,101 @@ class Stream(sasl.PasswordManager):
 		el=q.name
 		ns=q.ns().getContent()
 
-		if typ=="get" and self.iq_get_handlers.has_key((el,ns)):
-			self.iq_get_handlers[(el,ns)](stanza)
+		if typ=="get" and self.iq_get_handlers.has_key((el,ns,pre_auth)):
+			self.iq_get_handlers[(el,ns,pre_auth)](stanza)
 			return 1
-		elif typ=="set":
-			self.iq_set_handlers[(el,ns)](stanza)
+		elif typ=="set" and self.iq_set_handlers.has_key((el,ns,pre_auth)):
+			self.iq_set_handlers[(el,ns,pre_auth)](stanza)
 			return 1
 		else:
 			return 0
 
+	def process_message(self,stanza):
+		if not self.initiator and not self.peer_authenticated:
+			self.debug("Ignoring message - peer not authenticated yet")
+			return 1	
+		
+		typ=stanza.get_type()
+		if not typ:
+			typ="normal"
+			
+		if self.message_handlers.has_key(typ):
+			self.message_handlers[typ](stanza)
+			return 1
+		return 0
+		
+	def process_presence(self,stanza):
+		if not self.initiator and not self.peer_authenticated:
+			self.debug("Ignoring presence - peer not authenticated yet")
+			return 1	
+		
+		typ=stanza.get_type()
+		
+		if not typ:
+			typ="available"
+			
+		if self.presence_handlers.has_key(typ):
+			self.presence_handlers[typ](stanza)
+			return 1
+		return 0
+		
 	def process_stanza(self,stanza):
 		if stanza.stanza_type=="iq":
 			if self.process_iq(stanza):
+				return
+		elif stanza.stanza_type=="message":
+			if self.process_message(stanza):
+				return
+		elif stanza.stanza_type=="presence":
+			if self.process_presence(stanza):
 				return
 		self.debug("Unhandled %r stanza: %r" % (stanza.stanza_type,stanza.serialize()))
 
 	def post_connect(self,node):
 		pass
 		
-	def post_disconnect(self,node):
+	def post_auth(self):
 		pass
 		
-	def set_reply_handlers(self,iq,res_handler,err_handler):
-		self.iq_reply_handlers[iq.get_id()]=(res_handler,err_handler)
+	def post_disconnect(self,node):
+		pass
 
-	def set_iq_get_handler(self,element,namespace,handler):
-		self.iq_get_handlers[(element,namespace)]=handler
+	def fix_in_stanza(self,stanza):
+		if not stanza.get_from() and self.peer:
+			stanza.set_from(self.peer)
+		if not stanza.get_to() and self.me:
+			stanza.set_to(self.me)
+		
+	def fix_out_stanza(self,stanza):
+		if not stanza.get_from() and self.me:
+			stanza.set_from(self.me)
+		if not stanza.get_to() and self.peer:
+			stanza.set_to(self.peer)
+		
+	def set_reply_handlers(self,iq,res_handler,err_handler,timeout_handler=None,timeout=300):
+		self.fix_out_stanza(iq)
+		if timeout_handler:
+			self.iq_reply_handlers[(iq.get_id(),iq.get_to().as_unicode()),timeout,timeout_handler]=(
+								res_handler,err_handler)
+		else:
+			self.iq_reply_handlers[(iq.get_id(),iq.get_to().as_unicode()),timeout]=(
+								res_handler,err_handler)
 
-	def set_iq_set_handler(self,element,namespace,handler):
-		self.iq_set_handlers[(element,namespace)]=handler
+	def set_iq_get_handler(self,element,namespace,handler,pre_auth=0):
+		self.iq_get_handlers[(element,namespace,pre_auth)]=handler
+
+	def set_iq_set_handler(self,element,namespace,handler,pre_auth=0):
+		self.iq_set_handlers[(element,namespace,pre_auth)]=handler
+
+	def set_message_handler(self,type,handler):
+		if not type:
+			type=="normal"
+		self.message_handlers[type]=handler
+
+	def set_presence_handler(self,type,handler):
+		if not type:
+			type=="available"
+		self.message_handlers[type]=handler
 
 	def generate_id(self):
 		return "%i-%i-%s" % (os.getpid(),time.time(),str(random.random())[2:])
@@ -448,14 +575,15 @@ class Stream(sasl.PasswordManager):
 			return 0
 		self.authenticator=sasl.ServerAuthenticator(mechanism,self)
 		
-		r=self.authenticator.start(content)
-		
+		r=self.authenticator.start(base64.decodestring(content))
+		print "R:",`r`
+	
 		if isinstance(r,sasl.Success):
 			el_name="success"
-			content=str(r)
+			content=r.base64()
 		elif isinstance(r,sasl.Challenge):
 			el_name="challenge"
-			content=str(r)
+			content=r.base64()
 		else:
 			el_name="failure"
 			content=None
@@ -472,6 +600,12 @@ class Stream(sasl.PasswordManager):
 		self.write_raw(node.serialize(encoding="UTF-8"))
 		node.unlinkNode()
 		node.freeNode()
+
+		if isinstance(r,sasl.Success):
+			self.peer=JID(r.get_authzid())
+			self.peer_authenticated=1
+			self.post_auth()
+			
 		return 1
 		
 	def process_sasl_challenge(self,content):
@@ -479,10 +613,10 @@ class Stream(sasl.PasswordManager):
 			self.debug("Unexpected SASL challenge")
 			return 0
 		
-		r=self.authenticator.challenge(content)
+		r=self.authenticator.challenge(base64.decodestring(content))
 		if isinstance(r,sasl.Response):
 			el_name="response"
-			content=str(r)
+			content=r.base64()
 		else:
 			el_name="abort"
 			content=None
@@ -497,6 +631,7 @@ class Stream(sasl.PasswordManager):
 		self.write_raw(node.serialize(encoding="UTF-8"))
 		node.unlinkNode()
 		node.freeNode()
+
 		return 1
 	
 	def process_sasl_response(self,content):
@@ -504,13 +639,13 @@ class Stream(sasl.PasswordManager):
 			self.debug("Unexpected SASL response")
 			return 0
 		
-		r=self.authenticator.response(content)
+		r=self.authenticator.response(base64.decodestring(content))
 		if isinstance(r,sasl.Success):
 			el_name="success"
-			content=str(r)
+			content=r.base64()
 		elif isinstance(r,sasl.Challenge):
 			el_name="challenge"
-			content=str(r)
+			content=r.base64()
 		else:
 			el_name="failure"
 			content=None
@@ -527,14 +662,36 @@ class Stream(sasl.PasswordManager):
 		self.write_raw(node.serialize(encoding="UTF-8"))
 		node.unlinkNode()
 		node.freeNode()
+		
+		if isinstance(r,sasl.Success):
+			self.peer=JID(r.get_authzid())
+			self.peer_authenticated=1
+			self.post_auth()
+
 		return 1
 
 	def process_sasl_success(self,content):
-		self.debug("SASL authentication succeeded")
-		self.authenticated=1
+		if not self.authenticator:
+			self.debug("Unexpected SASL response")
+			return 0
+			
+		r=self.authenticator.finish(base64.decodestring(content))
+		if isinstance(r,sasl.Success):
+			el_name="success"
+			self.debug("SASL authentication succeeded")
+			self.me=r.get_authzid()
+			self.authenticated=1
+			self.post_auth()
+		else:
+			self.debug("SASL authentication failed")
+			self.authenticated=0
 		return 1
 
 	def process_sasl_failure(self,node):
+		if not self.authenticator:
+			self.debug("Unexpected SASL response")
+			return 0
+
 		self.debug("SASL authentication failed: %r" % (node.serialize(),))
 		return 1
 
@@ -542,23 +699,29 @@ class Stream(sasl.PasswordManager):
 		self.debug("SASL authentication aborted")
 		return 1
 
-	def sasl_authorize(self,username,authzid):
+	def sasl_authenticate(self,username,authzid,mechanism=None):
 		if not self.initiator:
 			raise StreamError,"Only initiating entity start SASL authentication"
 		while not self.features:
 			self.debug("Waiting for features")
 			self.read()
 		if not self.peer_sasl_mechanisms:
-			raise StreamError,"Peer doesn't support SASL"
-		choice=None
-		for m in self.sasl_mechanisms:
-			if m in self.peer_sasl_mechanisms:
-				choice=m
-				break
-		if not choice:
-			raise StreamError,"Peer doesn't support any of our SASL mechanisms"
-		self.debug("Our choice: %r" % (choice,))
-		self.authenticator=sasl.ClientAuthenticator(choice,self)
+			raise SASLMechanismNotAvailable,"Peer doesn't support SASL"
+
+		if not mechanism:
+			mechanism=None
+			for m in self.sasl_mechanisms:
+				if m in self.peer_sasl_mechanisms:
+					mechanism=m
+					break
+			if not mechanism:
+				raise SASLMechanismNotAvailable,"Peer doesn't support any of our SASL mechanisms"
+			self.debug("Our mechanism: %r" % (mechanism,))
+		else:
+			if mechanism not in self.peer_sasl_mechanisms:
+				raise SASLMechanismNotAvailable,"%s is not available" % (mechanism,)
+				
+		self.authenticator=sasl.ClientAuthenticator(mechanism,self)
 	
 		initial_response=self.authenticator.start(username,authzid)
 		if not isinstance(initial_response,sasl.Response):
@@ -568,11 +731,10 @@ class Stream(sasl.PasswordManager):
 		node=root.newChild(None,"auth",None)
 		ns=node.newNs(SASL_NS,None)
 		node.setNs(ns)
-		node.setProp("mechanism",choice)
-		if str(initial_response):
-			node.setContent(str(initial_response))
+		node.setProp("mechanism",mechanism)
+		if initial_response.data:
+			node.setContent(initial_response.base64())
 		
 		self.write_raw(node.serialize(encoding="UTF-8"))
 		node.unlinkNode()
 		node.freeNode()
-

@@ -1,3 +1,20 @@
+#
+# (C) Copyright 2003 Jacek Konieczny <jajcus@bnet.pl>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License Version
+# 2.1 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+
 import libxml2
 import random
 
@@ -53,13 +70,13 @@ class Stanza:
 			if fr is not None:
 				if not isinstance(fr,JID):
 					fr=JID(fr)
-				self.node.setProp("from",fr.as_string())
+				self.node.setProp("from",fr.as_unicode())
 		if kw.has_key("to"):
 			to=kw["to"]
 			if to is not None:
 				if not isinstance(to,JID):
 					to=JID(to)
-				self.node.setProp("to",to.as_string())
+				self.node.setProp("to",to.as_unicode())
 		if kw.has_key("type"):
 			typ=kw["type"]
 			if typ:
@@ -88,6 +105,9 @@ class Stanza:
 		self.node.freeNode()
 		self.node=None
 		pass
+
+	def copy(self):
+		return Stanza(self)
 
 	def serialize(self):
 		return self.node.serialize()
@@ -119,13 +139,25 @@ class Stanza:
 		self.error=ErrorNode(n[0],copy=0)
 		return self.error
 	def set_from(self,fr):
-		return self.node.setProp("from",fr)
+		if fr:
+			return self.node.setProp("from",str(fr))
+		else:
+			return self.node.unsetProp("from")
 	def set_to(self,to):
-		return self.node.setProp("to",to)
+		if to:
+			return self.node.setProp("to",str(to))
+		else:
+			return self.node.unsetProp("to")
 	def set_type(self,type):
-		return self.node.setProp("type",type)
+		if type:
+			return self.node.setProp("type",type)
+		else:
+			return self.node.unsetProp("type")
 	def set_id(self,id):
-		return self.node.setProp("id",id)
+		if id:
+			return self.node.setProp("id",id)
+		else:
+			return self.node.unsetProp("id")
 	
 	def set_content(self,content):
 		while self.node.children:
