@@ -29,6 +29,8 @@ from pyxmpp.objects import StanzaPayloadObject
 from pyxmpp.utils import from_utf8, to_utf8
 from pyxmpp.jid import JID
 
+DATAFORM_NS = "jabber:x:data"
+
 class Option(StanzaPayloadObject):
     """One of optional data form field values.
 
@@ -40,7 +42,7 @@ class Option(StanzaPayloadObject):
         - `value`: `unicode`
     """
     xml_element_name = "option"
-    xml_element_namespace = "jabber:x:data"
+    xml_element_namespace = DATAFORM_NS
     
     def __init__(self, value, label = None):
         """Initialize an `Option` object.
@@ -84,7 +86,7 @@ class Option(StanzaPayloadObject):
         label = from_utf8(xmlnode.prop("label"))
         child = xmlnode.children
         while child:
-            if (child.type != "element" or child.ns().content != "jabber:x:data"):
+            if (child.type != "element" or child.ns().content != DATAFORM_NS):
                 pass
             elif child.name == "value":
                 value = from_utf8(child.getContent())
@@ -119,11 +121,11 @@ class Field(StanzaPayloadObject):
         - `desc`: `unicode`
     """ 
     xml_element_name = "field"
-    xml_element_namespace = "jabber:x:data"
+    xml_element_namespace = DATAFORM_NS
     allowed_types = ("boolean", "fixed", "hidden", "jid-multi",
                 "jid-single", "list-multi", "list-single", "text-multi", 
                 "text-private", "text-single")
-    def __init__(self, name, values = None, field_type = None, label = None,
+    def __init__(self, name = None, values = None, field_type = None, label = None,
             options = None, required = False, desc = None, value = None):
         """Initialize a `Field` object. 
 
@@ -286,7 +288,7 @@ class Field(StanzaPayloadObject):
         required = False
         desc = None
         while child:
-            if child.type != "element" or child.ns().content != "jabber:x:data":
+            if child.type != "element" or child.ns().content != DATAFORM_NS:
                 pass
             elif child.name == "required":
                 required = True
@@ -326,7 +328,7 @@ class Item(StanzaPayloadObject):
         - `fields`: `list` of `Field`.
     """
     xml_element_name = "item"
-    xml_element_namespace = "jabber:x:data"
+    xml_element_namespace = DATAFORM_NS
     
     def __init__(self, fields = None):
         """Initialize an `Item` object.
@@ -419,7 +421,7 @@ class Item(StanzaPayloadObject):
         child = xmlnode.children
         fields = []
         while child:
-            if child.type != "element" or child.ns().content != "jabber:x:data":
+            if child.type != "element" or child.ns().content != DATAFORM_NS:
                 pass
             elif child.name == "field":
                 fields.append(Field._new_from_xml(child))
@@ -456,7 +458,7 @@ class Form(StanzaPayloadObject):
     """
     allowed_types = ("form", "submit", "cancel", "result")
     xml_element_name = "x"
-    xml_element_namespace = "jabber:x:data"
+    xml_element_namespace = DATAFORM_NS
     
     def __init__(self, xmlnode_or_type = "form", title = None, instructions = None,
             fields = None, reported_fields = None, items = None):
@@ -646,14 +648,14 @@ class Form(StanzaPayloadObject):
         self.title = None
         self.instructions = None
         if (xmlnode.type != "element" or xmlnode.name != "x" 
-                or xmlnode.ns().content != "jabber:x:data"):
+                or xmlnode.ns().content != DATAFORM_NS):
             raise ValueError, "Not a form: %r" % (xmlnode.serialize(),)
         self.type = xmlnode.prop("type")
         if not self.type in self.allowed_types:
             raise ValueError, "Bad form type: %r" % (self.type,)
         child = xmlnode.children
         while child:
-            if child.type != "element" or child.ns().content != "jabber:x:data":
+            if child.type != "element" or child.ns().content != DATAFORM_NS:
                 pass
             elif child.name == "title":
                 self.title = from_utf8(child.getContent())
@@ -676,7 +678,7 @@ class Form(StanzaPayloadObject):
             - `xmlnode`: `libxml2.xmlNode`"""
         child = xmlnode.children
         while child:
-            if child.type != "element" or child.ns().content != "jabber:x:data":
+            if child.type != "element" or child.ns().content != DATAFORM_NS:
                 pass
             elif child.name == "field":
                 self.reported_fields.append(Field._new_from_xml(child))
