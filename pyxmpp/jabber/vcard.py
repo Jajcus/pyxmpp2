@@ -279,6 +279,7 @@ class VCardAdr:
 
 class VCardLabel:
 	def __init__(self,name,value,rfc2425parameters={}):
+		self.name=name
 		if self.name.upper()!="LABEL":
 			raise RuntimeError,"VCardAdr handles only 'LABEL' type"
 		if isinstance(value,libxml2.xmlNode):
@@ -424,6 +425,7 @@ class VCardEmail:
 
 class VCardGeo:
 	def __init__(self,name,value,rfc2425parameters={}):
+		self.name=name
 		if self.name.upper()!="GEO":
 			raise RuntimeError,"VCardName handles only 'GEO' type"
 		if isinstance(value,libxml2.xmlNode):
@@ -590,6 +592,7 @@ class VCardSound:
 
 class VCardPrivacy:
 	def __init__(self,name,value,rfc2425parameters={}):
+		self.name=name
 		if isinstance(value,libxml2.xmlNode):
 			self.value=None
 			n=value.children
