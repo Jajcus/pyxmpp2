@@ -1,7 +1,0 @@
-
-This are patches for libxml2 version 2.5.7 needed for pyxmpp.
-
-libxml2-reader-dontblock2.patch - makes reader return whole XML element without
-				  waiting for start of another.
-
-libxml2-ns_remove_replace.patch - adds ReplaceNs and RemoveNs functions

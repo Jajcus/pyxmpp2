@@ -27,8 +27,9 @@ class Stream(ClientStream):
 libxml2.debugMemory(1)
 
 print "creating stream..."
+s=Stream(JID("test@localhost/Test"),u"123")
 #s=Stream(JID(unicode("¿ó³tek","iso-8859-2"),"localhost","Test"),unicode("zieleñ","iso-8859-2"))
-s=Stream(JID("pyxmpp","jabberd.jabberstudio.org","Test"),"123",port=15222,auth_methods=["sasl:DIGEST-MD5","digest","plain"])
+#s=Stream(JID("pyxmpp","jabberd.jabberstudio.org","Test"),"123",port=15222,auth_methods=["sasl:DIGEST-MD5","digest","plain"])
 
 print "connecting..."
 s.connect()

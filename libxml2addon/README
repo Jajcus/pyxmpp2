@@ -1,5 +1,5 @@
-This directory (and a libxml2addon.py in parent directory) contains an ugly
-hack which makes it possible to use pyxmpp with not patched libxml2.
+This directory (pyxmpp/libxml2addon) contains an ugly hack which makes it
+possible to use pyxmpp with not patched libxml2.
 
 This will probably work only with libxml2 version 2.5.7 (or _very_ similar),
 and may even fail on systems a bit different than mine (copying config.h from 

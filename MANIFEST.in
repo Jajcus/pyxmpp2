@@ -3,3 +3,4 @@ include libxml2addon/Copyright
 include libxml2addon/README
 include libxml2addon/*.h
 include libxml2addon/libxml2-export.c
+include examples/*

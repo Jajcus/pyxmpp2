@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# $Id: setup.py,v 1.1 2003/06/03 12:50:43 jajcus Exp $
+# $Id: setup.py,v 1.2 2003/06/04 12:08:35 jajcus Exp $
 
 from distutils.core import setup, Extension
 
@@ -15,7 +15,7 @@ setup(
 	license =	'LGPL',
 	ext_modules = [
 		Extension(
-		    'pyxmpp._libxml2addon',
+		    'pyxmpp.libxml2addon._libxml2addon',
 		    [
 			'libxml2addon/xmlreader.c',
 			'libxml2addon/tree.c',
@@ -28,23 +28,10 @@ setup(
 		),
 	],
 	#-- Python modules
-	py_modules = [
-                'pyxmpp.client',
-                'pyxmpp.error',
-		'pyxmpp.expdict',
-		'pyxmpp.iq',
-		'pyxmpp.jid',
-		'pyxmpp.message',
-		'pyxmpp.presence',
-		'pyxmpp.stanza',
-		'pyxmpp.stream',
-		'pyxmpp.utils',
+	packages = [
+                'pyxmpp',
 		'pyxmpp.libxml2addon',
-		'pyxmpp.sasl.core',
-		'pyxmpp.sasl.plain',
-		'pyxmpp.sasl.digest_md5',
+		'pyxmpp.sasl',
 	],
-	#-- where to find the python modules
-	package_dir = { 'pyxmpp': '.' },
 )
 
