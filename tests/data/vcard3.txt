@@ -1,0 +1,29 @@
+Full name: u'Mi\u015b Uszatek'
+Structural name:
+  Family name: u'Uszatek'
+  Given name: u'Mi\u015b'
+  Middle name: u''
+  Prefix: u''
+  Suffix: u''
+Nickname: u'Misio'
+Birthday: u'1977-02-07T00:00:00Z'
+Telephone:
+  Type: [u'home']
+  Number: u'+99 12 3456789'
+Telephone:
+  Type: [u'work']
+  Number: u'+99 98 7654321'
+Telephone:
+  Type: [u'cell']
+  Number: u'+99 123123123'
+E-mail:
+  Type: [u'pref']
+  Address: u'mis.uszatek@example.com'
+Role: u'Nudziarz'
+Organization:
+  Name: u'Wieczorynka'
+  Unit: None
+Categories: [u'Friend']
+User id: u'Favdn6ur8U'
+URL: u'http://example.com/'
+Class: u'PUBLIC'

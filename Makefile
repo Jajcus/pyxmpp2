@@ -3,14 +3,19 @@ SNAPSHOT=
 
 DESTDIR="/"
 
-.PHONY: all version snapshot dist doc cosmetics TODO.pylint pylint ChangeLog www publish
+.PHONY: all build test version snapshot dist doc cosmetics TODO.pylint pylint ChangeLog www publish
 
-all: version
+all: build test
+
+build: version
 	umask 022 ; python setup.py build
 	-cd examples ; rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp .
 	-cd examples ; chmod a+x *.py
 	-cd tests ; rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp .
 	-cd tests ; chmod a+x *.py
+
+test:
+	$(MAKE) -C tests
 
 doc:
 	$(MAKE) -C doc

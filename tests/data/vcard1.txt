@@ -1,0 +1,44 @@
+Full name: u'Peter Saint-Andre'
+Structural name:
+  Family name: u'Saint-Andre'
+  Given name: u'Peter'
+  Middle name: u''
+  Prefix: u''
+  Suffix: u''
+Nickname: u'stpeter'
+Birthday: u'1966-08-06'
+Address:
+  Type: ['work']
+  POBox: ''
+  Extended: ''
+  Street: u'1899 Wynkoop Street'
+  Locality: u'Denver'
+  Region: u'CO'
+  Postal code: u'80202'
+  Country: u'USA'
+Address:
+  Type: ['home']
+  POBox: ''
+  Extended: ''
+  Street: u''
+  Locality: u'Denver'
+  Region: u'CO'
+  Postal code: u'80209'
+  Country: u'USA'
+Telephone:
+  Type: ['voice', 'work']
+  Number: u'303-308-3282'
+Telephone:
+  Type: ['voice', 'home']
+  Number: u'303-555-1212'
+E-mail:
+  Type: ['internet']
+  Address: u'stpeter@jabber.org'
+JID: <JID: u'stpeter@jabber.org'>
+Title: u'Executive Director'
+Role: u'Patron Saint'
+Organization:
+  Name: u'Jabber Software Foundation'
+  Unit: u''
+URL: u'http://www.jabber.org/people/stpeter.php'
+Description: u'More information about me is located on my\n    personal website: http://www.saint-andre.com/'

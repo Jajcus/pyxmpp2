@@ -1,0 +1,16 @@
+Full name: u'Bj=F8rn Jensen'
+Structural name:
+  Family name: u'Jensen'
+  Given name: u'Bj=F8rn'
+  Middle name: u''
+  Prefix: u''
+  Suffix: u''
+Telephone:
+  Type: [u'work', u'voice', u'msg']
+  Number: u'+1 313 747-4454'
+E-mail:
+  Type: [u'internet']
+  Address: u'bjorn@umich.edu'
+Key:
+  Type: u'x509'
+  Value: u'dGhpcyBjb3VsZCBiZSAKbXkgY2VydGlmaWNhdGUK'

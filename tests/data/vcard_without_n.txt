@@ -1,0 +1,7 @@
+Full name: u'Peter Saint-Andre'
+Structural name:
+  Family name: u'Saint-Andre'
+  Given name: u'Peter'
+  Middle name: u''
+  Prefix: u''
+  Suffix: u''
