@@ -109,51 +109,27 @@ ignore that: W0613:368:ServerAuthenticator.response: Unused argument 'response'
 ************* Module pyxmpp.sasl.digest_md5
 ignore that: W0613:488:DigestMD5ServerAuthenticator.start: Unused argument 'response'
 ************* Module pyxmpp.jabber.muc
-W0511:144: FIXME: set/get password/history
-W0511:302: FIXME: alt,decline,invite,password
-W0511:910: TODO: kicks
-W0302:  0: Too many lines in module (1049)
-E0602: 86:MucXBase.__init__: Undefined variable 'ErrorNodeError'
-W0613:142:MucX.__init__: Unused argument 'node'
-W0231:166:MucItem.__init__: __init__ method from base class 'MucItemBase' is not called
+W0511:444: TODO: kicks
+W0141:187:MucRoomHandler.error: Missing docstring
+W0141:262:MucRoomUser.same_as: Missing docstring
+W0613:315:MucRoomState.set_stream: Unused argument 'stream'
+W0141:525:MucRoomManager.get_room_state: Missing docstring
+W0141:537:MucRoomManager.__groupchat_message: Missing docstring
+W0141:547:MucRoomManager.__error_message: Missing docstring
+W0141:556:MucRoomManager.__presence_error: Missing docstring
+W0141:565:MucRoomManager.__presence_available: Missing docstring
+W0141:574:MucRoomManager.__presence_unavailable: Missing docstring
+************* Module pyxmpp.jabber.muccore
+W0511:141: FIXME: set/get password/history
+W0511:304: FIXME: alt,decline,invite,password
+W0511:336: FIXME: implement
 W0141:176:MucItem.__init: Missing docstring
 W0141:198:MucItem.__from_node: Missing docstring
-W0201:188:MucItem.__init: Attribute 'jid' defined outside __init__
-W0201:195:MucItem.__init: Attribute 'nick' defined outside __init__
-W0201:192:MucItem.__init: Attribute 'actor' defined outside __init__
-W0201:181:MucItem.__init: Attribute 'affiliation' defined outside __init__
-W0201:196:MucItem.__init: Attribute 'reason' defined outside __init__
-W0201:186:MucItem.__init: Attribute 'role' defined outside __init__
-W0231:246:MucStatus.__init__: __init__ method from base class 'MucItemBase' is not called
-W0141:256:MucStatus.__init: Missing docstring
-W0141:262:MucStatus.__from_node: Missing docstring
-W0201:260:MucStatus.__init: Attribute 'code' defined outside __init__
-W0141:320:MucUserX.add_item: Missing docstring
-E0201:311:MucUserX.clear: Access to undefined member 'children'
-E0602:374:MucStanzaExt.get_muc_child: Undefined variable 'MucOwnerX'
-E0201:352:MucStanzaExt.get_muc_child: Access to undefined member 'node'
-E0201:354:MucStanzaExt.get_muc_child: Access to undefined member 'node'
-E0201:385:MucStanzaExt.clear_muc_child: Access to undefined member 'node'
-E0201:387:MucStanzaExt.clear_muc_child: Access to undefined member 'node'
-E0201:407:MucStanzaExt.make_muc_userinfo: Access to undefined member 'node'
-E0201:415:MucStanzaExt.make_muc_admin_quey: Access to undefined member 'node'
-W0231:429:MucPresence.__init__: __init__ method from base class 'Presence' is not called
-W0151:  0:MucPresence.__init__: Used builtin function 'apply'
-W0141:464:MucPresence.free: Missing docstring
-W0231:472:MucIq.__init__: __init__ method from base class 'Iq' is not called
-W0151:  0:MucIq.__init__: Used builtin function 'apply'
-W0141:498:MucIq.free: Missing docstring
-W0141:653:MucRoomHandler.error: Missing docstring
-W0141:728:MucRoomUser.same_as: Missing docstring
-W0613:781:MucRoomState.set_stream: Unused argument 'stream'
-W0141:990:MucRoomManager.get_room_state: Missing docstring
-W0141:1002:MucRoomManager.__groupchat_message: Missing docstring
-W0141:1012:MucRoomManager.__error_message: Missing docstring
-W0141:1021:MucRoomManager.__presence_error: Missing docstring
-W0141:1030:MucRoomManager.__presence_available: Missing docstring
-W0141:1039:MucRoomManager.__presence_unavailable: Missing docstring
-W0201:959:MucRoomManager.set_stream: Attribute 'stream' defined outside __init__
-W0201:958:MucRoomManager.set_stream: Attribute 'jid' defined outside __init__
+W0141:258:MucStatus.__init: Missing docstring
+W0141:264:MucStatus.__from_node: Missing docstring
+W0141:322:MucUserX.add_item: Missing docstring
+W0141:482:MucPresence.free: Missing docstring
+W0141:518:MucIq.free: Missing docstring
 ************* Module pyxmpp.jabber.clientstream
 W0311:194: Bad indentation. Found 24 spaces, expected 16
 W0311:196: Bad indentation. Found 24 spaces, expected 16
@@ -342,17 +318,17 @@ W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 Report
 ======
-5978 statements analysed.
+5991 statements analysed.
 
 Statistics by type
 ------------------
 
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-module   37     37         =          97.30       0.00     
-class    114    114        =          78.07       0.00     
+module   38     37         +1         97.37       0.00     
+class    115    111        +4         78.26       0.00     
 method   0      0          =          0.00        0.00     
-function 642    642        =          85.51       0.00     
+function 642    601        +41        85.51       0.00     
 
 
 Raw metrics
@@ -360,10 +336,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6557   55.77 6569     -12        
-docstring 3889   33.08 3889     =          
-comment   590    5.02  590      =          
-empty     722    6.14  722      =          
+code      6578   55.68 6293     +285       
+docstring 3902   33.03 3668     +234       
+comment   608    5.15  591      +17        
+empty     725    6.14  686      +39        
 
 
 External dependencies
@@ -375,7 +351,7 @@ External dependencies
     logging (pyxmpp.streamsasl,pyxmpp.streambase,pyxmpp.clientstream,pyxmpp.client,pyxmpp.stream,pyxmpp.streamtls,pyxmpp.stanzaprocessor,pyxmpp.jabberd.component,pyxmpp.jabberd.componentstream,pyxmpp.sasl.plain,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.client)
     socket (pyxmpp.streambase,pyxmpp.resolver,pyxmpp.streamtls)
     re (pyxmpp.jid,pyxmpp.utils,pyxmpp.resolver,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
-    libxml2 (pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.utils,pyxmpp.stanza,pyxmpp.message,pyxmpp.stanzaprocessor,pyxmpp.iq,pyxmpp.error,pyxmpp.jabber.muc,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    libxml2 (pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.utils,pyxmpp.stanza,pyxmpp.message,pyxmpp.stanzaprocessor,pyxmpp.iq,pyxmpp.error,pyxmpp.jabber.muccore,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
     random (pyxmpp.dns,pyxmpp.streambase,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.sasl,pyxmpp.sasl.core)
     weakref (pyxmpp.jid,pyxmpp.jabber.muc)
     threading (pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.client,pyxmpp.expdict,pyxmpp.stanzaprocessor,pyxmpp.jabberd.component)
@@ -399,25 +375,22 @@ Messages
 message id occurences 
 ::::::::::::::::::::::
 W0141      119        
-W0201      48         
-W0613      42         
-E0201      34         
+W0613      41         
+W0201      39         
+E0201      27         
 W0102      17         
-E0602      12         
+E0602      10         
 W0612      7          
-W0511      6          
+W0511      7          
 W0221      6          
 W0622      4          
-W0231      4          
 W0103      4          
 W0403      2          
 W0311      2          
 W0232      2          
-W0151      2          
 W0112      2          
 W0611      1          
 W0401      1          
-W0302      1          
 W0301      1          
 W0115      1          
 
@@ -427,8 +400,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 272    295      -23        
-errors   46     46       =          
+warnings 256    246      +10        
+errors   37     37       =          
 
 
 % errors / warnings by module
@@ -436,31 +409,32 @@ errors   46     46       =
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            32.61 30.88   
-pyxmpp.jid                     28.26 0.37    
-pyxmpp.jabber.muc              19.57 13.24   
-pyxmpp.jabber.disco            8.70  12.13   
-pyxmpp.jabber.client           6.52  3.68    
-pyxmpp.jabber.clientstream     4.35  10.66   
-pyxmpp.streambase              0.00  8.09    
-pyxmpp.sasl.core               0.00  3.68    
-pyxmpp.dns                     0.00  2.94    
-pyxmpp.streamsasl              0.00  2.57    
-pyxmpp.clientstream            0.00  2.57    
-pyxmpp.jabberd.componentstream 0.00  2.21    
-pyxmpp.xmlextra                0.00  1.47    
-pyxmpp.streamtls               0.00  1.47    
-pyxmpp.version                 0.00  1.10    
-pyxmpp.sasl.plain              0.00  0.74    
-pyxmpp._xmlextra               0.00  0.74    
-pyxmpp.xmppstringprep          0.00  0.37    
-pyxmpp.sasl.digest_md5         0.00  0.37    
-pyxmpp.resolver                0.00  0.37    
-pyxmpp.client                  0.00  0.37    
+pyxmpp.jabber.vcard            40.54 32.81   
+pyxmpp.jid                     35.14 0.39    
+pyxmpp.jabber.disco            10.81 12.89   
+pyxmpp.jabber.client           8.11  3.91    
+pyxmpp.jabber.clientstream     5.41  11.33   
+pyxmpp.streambase              0.00  8.59    
+pyxmpp.sasl.core               0.00  3.91    
+pyxmpp.jabber.muccore          0.00  3.91    
+pyxmpp.jabber.muc              0.00  3.91    
+pyxmpp.dns                     0.00  3.12    
+pyxmpp.streamsasl              0.00  2.73    
+pyxmpp.clientstream            0.00  2.73    
+pyxmpp.jabberd.componentstream 0.00  2.34    
+pyxmpp.xmlextra                0.00  1.56    
+pyxmpp.streamtls               0.00  1.56    
+pyxmpp.version                 0.00  1.17    
+pyxmpp.sasl.plain              0.00  0.78    
+pyxmpp._xmlextra               0.00  0.78    
+pyxmpp.xmppstringprep          0.00  0.39    
+pyxmpp.sasl.digest_md5         0.00  0.39    
+pyxmpp.resolver                0.00  0.39    
+pyxmpp.client                  0.00  0.39    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 9.16/10 (previous run: 9.12/10)
+Your code has been rated at 9.26/10 (previous run: 9.25/10)
 So close to being perfect...
 
