@@ -21,7 +21,7 @@ import time
 from types import UnicodeType
 
 from pyxmpp.stream import Stream,StreamError,FatalStreamError,SASLNotAvailable,SASLMechanismNotAvailable
-from pyxmpp.stream import StreamAuthenticationError,StanzaFactory
+from pyxmpp.stream import StreamAuthenticationError,StanzaFactory,HostMismatch
 from pyxmpp.iq import Iq
 from pyxmpp.stanza import common_doc,common_root
 from pyxmpp.jid import JID
@@ -71,6 +71,12 @@ class ComponentStream(Stream):
 
 	def accept(self,sock):
 		Stream.accept(self,sock,None)
+
+	def stream_start(self,doc):
+		try:
+			Stream.stream_start(self,doc)
+		except HostMismatch:
+			pass
 
 	def _post_connect(self):
 		if self.initiator:
