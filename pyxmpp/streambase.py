@@ -464,9 +464,9 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         self.default_ns=root.newNs(self.default_ns_uri,None)
         for prefix,uri in self.extra_ns:
             self.extra_ns[uri]=root.newNs(uri,prefix)
-        if self.peer:
+        if self.peer and self.initiator:
             root.setProp("to",self.peer.as_utf8())
-        if self.me:
+        if self.me and not self.initiator:
             root.setProp("from",self.me.as_utf8())
         root.setProp("version","1.0")
         if sid:
