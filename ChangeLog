@@ -1,5 +1,17 @@
 2004-03-23  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/jabber/client.py, pyxmpp/jabber/disco.py, pyxmpp/jabber/vcard.py:
+	- constants for standard namespaces
+
+	* pyxmpp/jabber/__init__.py:
+	- standard namespace constants and VCard class imported
+
+	* pyxmpp/jabber/vcard.py:
+	- seems like it works
+
+	* tests/vcard.py, tests/vcard2.txt, tests/vcard2.vcf, tests/vcard3.vcf:
+	- vcard tests update
+
 	* pyxmpp/jabber/vcard.py:
 	- add 'version:3.0' to rfc2426 output
 
