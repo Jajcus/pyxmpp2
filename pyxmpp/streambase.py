@@ -539,7 +539,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
             return
         xmlnode=xmlnode.docCopyNode(self.doc_out,1)
         self.doc_out.addChild(xmlnode)
-        #node.reconciliateNs(self.doc_out)
+        xmlextra.replace_ns(xmlnode, xmlextra.common_ns, self.default_ns)
         s=xmlnode.serialize(encoding="UTF-8")
         s=remove_evil_characters(s)
         self._write_raw(s)

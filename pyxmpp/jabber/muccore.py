@@ -26,7 +26,7 @@ __docformat__="restructuredtext en"
 import libxml2
 
 from pyxmpp.utils import to_utf8,from_utf8
-from pyxmpp.stanza import common_doc,common_root
+from pyxmpp.xmlextra import common_doc, common_root, common_ns
 from pyxmpp.presence import Presence
 from pyxmpp.error import ErrorNodeError
 from pyxmpp.iq import Iq
@@ -80,8 +80,7 @@ class MucXBase(StanzaPayloadWrapperObject):
                 self.borrowed=True
             if copy:
                 ns=xmlnode.ns()
-                xmlextra.replace_ns(self.xmlnode,ns,None)
-                xmlextra.remove_ns(self.xmlnode,ns)
+                xmlextra.replace_ns(self.xmlnode, ns, common_ns)
         elif isinstance(xmlnode,MucXBase):
             if not copy:
                 raise ErrorNodeError,"MucXBase may only be copied"

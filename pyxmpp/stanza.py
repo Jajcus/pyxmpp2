@@ -30,9 +30,7 @@ import random
 from pyxmpp import xmlextra
 from pyxmpp.utils import from_utf8,to_utf8
 from pyxmpp.jid import JID
-
-common_doc=libxml2.newDoc("1.0")
-common_root=common_doc.newChild(None,"root",None)
+from pyxmpp.xmlextra import common_doc, common_root, common_ns
 
 class StanzaError(ValueError):
     """Raised on ivalid stanza objects usage."""
@@ -95,8 +93,7 @@ class Stanza:
             common_doc.addChild(self.xmlnode)
             ns=self.xmlnode.ns()
             if not ns.name:
-                xmlextra.replace_ns(self.xmlnode,ns,None)
-                xmlextra.remove_ns(self.xmlnode,ns)
+                xmlextra.replace_ns(self.xmlnode, ns, common_ns)
         else:
             self.xmlnode=common_doc.newChild(None,name_or_xmlnode,None)
 

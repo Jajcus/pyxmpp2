@@ -28,8 +28,8 @@ __docformat__="restructuredtext en"
 import libxml2
 from types import StringType,UnicodeType
 
-from pyxmpp.utils import from_utf8,to_utf8
-from pyxmpp.stanza import common_doc,common_root
+from pyxmpp.utils import from_utf8, to_utf8
+from pyxmpp.xmlextra import common_doc, common_root, common_ns
 from pyxmpp import xmlextra
 
 stream_errors={
@@ -264,8 +264,7 @@ class ErrorNode:
             self.borrowed=1
         if copy:
             ns1=xmlnode.ns()
-            xmlextra.replace_ns(self.xmlnode,ns1,None)
-            xmlextra.remove_ns(self.xmlnode,ns1)
+            xmlextra.replace_ns(self.xmlnode, ns1, common_ns)
 
     def __del__(self):
         if self.xmlnode:

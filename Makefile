@@ -57,6 +57,7 @@ dist: build ChangeLog
 
 clean:
 	python setup.py clean --all
+	-rm -rf build/*
 
 install: all
 	umask 022 ; python setup.py install --root $(DESTDIR)

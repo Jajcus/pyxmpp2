@@ -4,6 +4,8 @@
 import os.path
 import sys
 
+python_only = False
+
 if sys.hexversion<0x02030000:
     raise ImportError,"Python 2.3 or newer is required"
 
@@ -11,9 +13,26 @@ if not os.path.exists(os.path.join("pyxmpp","version.py")):
     print >>sys.stderr,"You need to run 'make' to use pyxmpp from SVN"
     sys.exit(1)
 
+
 execfile(os.path.join("pyxmpp","version.py"))
 
 from distutils.core import setup, Extension
+
+if python_only:
+    ext_modules = None
+else:
+    ext_modules = [
+        Extension(
+            'pyxmpp._xmlextra',
+            [
+            'ext/xmlextra.c',
+            ],
+            libraries =     ['xml2'],
+            include_dirs =  ['libxml2addon','/usr/include/libxml2','/usr/local/include/libxml2'],
+            extra_compile_args = ['-g2'],
+        ),
+    ]
+
 
 #-- Let distutils do the rest
 setup(
@@ -37,17 +56,8 @@ setup(
             "Topic :: Software Development :: Libraries :: Python Modules",
         ],
     license =   'LGPL',
-    ext_modules = [
-        Extension(
-            'pyxmpp._xmlextra',
-            [
-            'ext/xmlextra.c',
-            ],
-            libraries =     ['xml2'],
-            include_dirs =  ['libxml2addon','/usr/include/libxml2','/usr/local/include/libxml2'],
-            extra_compile_args = ['-g2'],
-        ),
-    ],
+    ext_modules = ext_modules,
+
     #-- Python modules
     packages = [
         'pyxmpp',
