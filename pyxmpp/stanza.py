@@ -62,13 +62,13 @@ class Stanza:
 			if fr is not None:
 				if not isinstance(fr,JID):
 					fr=JID(fr)
-				self.node.setProp("from",fr.as_unicode())
+				self.node.setProp("from",fr.as_utf8())
 		if kw.has_key("to"):
 			to=kw["to"]
 			if to is not None:
 				if not isinstance(to,JID):
 					to=JID(to)
-				self.node.setProp("to",to.as_unicode())
+				self.node.setProp("to",to.as_utf8())
 		if kw.has_key("type"):
 			typ=kw["type"]
 			if typ:
