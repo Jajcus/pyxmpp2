@@ -1,0 +1,26 @@
+
+				     PyXMPP 
+		   (c) 2003 Jacek Konieczny <jajcus@bnet.pl>
+
+
+This is PyXMPP - a python XMPP module. It is based on libxml2 - fast and
+fully-featured XML parser, so it has features like full namespace support,
+XPath queries etc. 
+
+Unfortunately original libxml2 doesn't work well with XML streams, so some
+warkarounds had to be included - thats why this module is not 100% pure
+python. There is also one more problem wiht libxml2 - its python binding are
+quite low-level and not well integrated with Python's garbage collector 
+- so it is easy to get Segmentation Fault when the module is used incorrectly.
+However high-level pyxmpp functions and classes should be quite safe. 
+
+To build the module just run:
+
+python setup.py build
+
+To install it:
+
+python setup.py install
+
+
+API documentation and examples are coming soon...

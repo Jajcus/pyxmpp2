@@ -16,6 +16,7 @@
 #
 
 import libxml2
+import libxml2addon
 import socket
 import os
 import sys
@@ -172,7 +173,7 @@ class Stream(sasl.PasswordManager):
 	def make_reader(self,sock):
 		self.ioreader=StreamReader(self)
 		input=libxml2.inputBuffer(self.ioreader)
-		self.reader=input.newTextReader("input stream")
+		self.reader=input.newStreamReader("input stream")
 
 	def send_stream_end(self):
 		self.doc_out.getRootElement().addContent(" ")

@@ -1,2 +1,6 @@
 *.pyc
 .memdump
+_libxml2addon.so
+build
+dist
+MANIFEST
