@@ -1,5 +1,8 @@
 2004-09-10  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* TODO.pylint:
+	- code-cleanup TODO list, made with pylint
+
 	* pylint.sh, pylintrc:
 	- tools to make me make the code better :)
 
