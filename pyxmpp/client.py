@@ -177,6 +177,26 @@ class Client:
         """Request an IM session."""
         stream=self.get_stream()
         if not stream.version:
+            need_session=False
+        elif not stream.features:
+            need_session=False
+        else:
+            ctxt = stream.doc_in.xpathNewContext()
+            ctxt.setContextNode(stream.features)
+            ctxt.xpathRegisterNs("sess","urn:ietf:params:xml:ns:xmpp-session")
+            # jabberd2 hack
+            ctxt.xpathRegisterNs("jsess","http://jabberd.jabberstudio.org/ns/session/1.0")
+            sess_n=None
+            try:
+                sess_n=ctxt.xpathEval("sess:session or jsess:session")
+            finally:
+                ctxt.xpathFreeContext()
+            if sess_n:
+                need_session=True
+            else:
+                need_session=False
+
+        if not need_session:
             self.state_changed.acquire()
             self.session_established=1
             self.state_changed.notify()
