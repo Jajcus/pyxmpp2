@@ -1,3 +1,8 @@
+2004-09-20  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/client.py, pyxmpp/stream.py, TODO.pylint, pylint.sh:
+	- cleaning up...
+
 2004-09-19  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/jabber/clientstream.py, pyxmpp/clientstream.py, pyxmpp/dns.py, pyxmpp/message.py, pyxmpp/resolver.py, pyxmpp/stream.py, TODO.pylint, pylint.sh:
