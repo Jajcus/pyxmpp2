@@ -53,6 +53,7 @@ class CacheItem(object):
         - `expire_time`: time when the object expires.
         - `purge_time`: time when the object should be purged. When 0 then
           item will never be automaticaly purged.
+        - `_lock`: lock for thread safety.
     :Types:
         - `value`: `instance`
         - `address`: any hashable
@@ -61,9 +62,10 @@ class CacheItem(object):
         - `timestamp`: `datetime`
         - `freshness_time`: `datetime`
         - `expire_time`: `datetime`
-        - `purge_time`: `datetime`"""
+        - `purge_time`: `datetime`
+        - `_lock`: `threading.RLock`"""
     __slots__ = ['value', 'address', 'state', 'timestamp', 'freshness_time',
-            'expire_time', 'purge_time', 'state_value']
+            'expire_time', 'purge_time', 'state_value', '_lock']
     def __init__(self, address, value, freshness_period, expiration_period,
             purge_period, state = "new"):
         """Initialize an CacheItem object.
@@ -99,6 +101,7 @@ class CacheItem(object):
             self.purge_time = datetime.max
         self.state = state
         self.state_value = _state_values[state]
+        self._lock = threading.RLock()
 
     def update_state(self):
         """Update current status of the item and compute time of the next
@@ -106,20 +109,24 @@ class CacheItem(object):
 
         :return: the new state.
         :returntype: `datetime`"""
-        now = datetime.utcnow()
-        if self.state == 'new':
-            self.state = 'fresh'
-        if self.state == 'fresh':
-            if now > self.freshness_time:
-                self.state = 'old'
-        if self.state == 'old':
-            if now > self.expire_time:
-                self.state = 'stale'
-        if self.state == 'stale':
-            if now > self.purge_time:
-                self.state = 'purged'
-        self.state_value = _state_values[self.state]
-        return self.state
+        self._lock.acquire()
+        try:
+            now = datetime.utcnow()
+            if self.state == 'new':
+                self.state = 'fresh'
+            if self.state == 'fresh':
+                if now > self.freshness_time:
+                    self.state = 'old'
+            if self.state == 'old':
+                if now > self.expire_time:
+                    self.state = 'stale'
+            if self.state == 'stale':
+                if now > self.purge_time:
+                    self.state = 'purged'
+            self.state_value = _state_values[self.state]
+            return self.state
+        finally:
+            self._lock.release()
 
     def __cmp__(self,other):
         try:
@@ -202,7 +209,7 @@ class CacheFetcher:
         self.cache.remove_fetcher(self)
         if self.active:
             self._deactivated()
-        
+    
     def _deactivated(self):
         """Mark the fetcher inactive after it is removed from the cache."""
         self.active = False
@@ -252,6 +259,7 @@ class CacheFetcher:
             return
         if not self._try_backup_item():
             self._error_handler(self.address, error_data)
+        self.cache.invalidate_object(self.address)
         self._deactivate()
 
     def timeout(self):
@@ -269,6 +277,7 @@ class CacheFetcher:
                 self._timeout_handler(self.address)
             else:
                 self._error_handler(self.address, None)
+        self.cache.invalidate_object(self.address)
         self._deactivate()
 
     def _try_backup_item(self):
@@ -281,7 +290,7 @@ class CacheFetcher:
             return False
         item = self.cache.get_item(self.address, self._backup_state)
         if item:
-            self.object_handler(item.address, item.value, item.state)
+            self._object_handler(item.address, item.value, item.state)
             return True
         else:
             False
@@ -316,6 +325,7 @@ class Cache:
         - `_fetchers`: dictionary of registered object fetchers.
         - `_active_fetchers`: list of active fetchers sorted by the time of
           its expiration time.
+        - `_lock`: lock for thread safety.
     :Types:
         - `default_freshness_period`: timedelta
         - `default_expiration_period`: timedelta
@@ -325,6 +335,7 @@ class Cache:
         - `_items_list`: `list` of (`int`, `timestamp`, `CacheItem`)
         - `_fetchers`: `dict` of `classobj` -> `CacheFetcher` based class
         - `_active_fetchers`: `list` of (`int`, `CacheFetcher`)
+        - `_lock`: `threading.RLock`
     """
     def __init__(self, max_items, default_freshness_period = _hour,
             default_expiration_period = 12*_hour, default_purge_period = 24*_hour):
@@ -351,37 +362,49 @@ class Cache:
         self._fetcher_class = None
         self._active_fetchers = []
         self._purged = 0
+        self._lock = threading.RLock()
 
     def request_object(self, address, state, object_handler, 
             error_handler = None, timeout_handler = None,
             backup_state = None, timeout = timedelta(minutes=60),
             freshness_period = None, expiration_period = None, purge_period = None):
 
-        item = self.get_item(address, state)
+        self._lock.acquire()
+        try:
+            item = self.get_item(address, state)
+            if item:
+                object_handler(item.address, item.value, item.state)
+            if not self._fetcher:
+                raise TypeError, "No cache fetcher defined"
+            if not error_handler:
+                def error_handler(address, data):
+                    return object_handler(address, None, 'error')
+            if freshness_period is None:
+                freshness_period = self.default_freshness_period
+            if expiration_period is None:
+                expiration_period = self.default_expiration_period
+            if purge_period is None:
+                purge_period = self.default_purge_period
+            
+            fetcher = self._fetcher(self, address, freshness_period,
+                    expiration_period, purge_period, object_handler, error_handler,
+                    timeout_handler, timeout, backup_state)
+            fetcher.fetch()
+            self._active_fetchers.append((fetcher.timeout_time,fetcher))
+            self._active_fetchers.sort()
+        finally:
+            self._lock.release()
 
-        if item:
-            object_handler(item.address, item.value, item.state)
-
-        if not self._fetcher:
-            raise TypeError, "No cache fetcher defined"
-
-        if not error_handler:
-            def error_handler(address, data):
-                return object_handler(address, None, 'error')
-        
-        if freshness_period is None:
-            freshness_period = self.default_freshness_period
-        if expiration_period is None:
-            expiration_period = self.default_expiration_period
-        if purge_period is None:
-            purge_period = self.default_purge_period
-        
-        fetcher = self._fetcher(self, address, freshness_period,
-                expiration_period, purge_period, object_handler, error_handler,
-                timeout_handler, timeout, backup_state)
-        fetcher.fetch()
-        self._active_fetchers.append((fetcher.timeout_time,fetcher))
-        self._active_fetchers.sort()
+    def invalidate_object(self, address, state = 'stale'):
+        self._lock.acquire()
+        try:
+            item = self.get_item(address)
+            if item and item.state_value<_state_values[state]:
+                item.state=state
+                item.update_state()
+                self._items_list.sort()
+        finally:
+            self._lock.release()
 
     def add_item(self, item):
         """Add an item to the cache.
@@ -396,14 +419,18 @@ class Cache:
         :return: state of the item after addition.
         :returntype: `str`
         """
-        state = item.update_state()
-        if state != 'purged':
-            if len(self._items_list) >= self.max_items:
-                self.purge_items()
-            self._items[item.address] = item
-            self._items_list.append(item)
-            self._items_list.sort()
-        return item.state
+        self._lock.acquire()
+        try:
+            state = item.update_state()
+            if state != 'purged':
+                if len(self._items_list) >= self.max_items:
+                    self.purge_items()
+                self._items[item.address] = item
+                self._items_list.append(item)
+                self._items_list.sort()
+            return item.state
+        finally:
+            self._lock.release()
 
     def get_item(self, address, state = 'fresh'):
         """Get an item from the cache.
@@ -419,13 +446,17 @@ class Cache:
            
         :return: the item or `None` if it was not found.
         :returntype: `CacheItem`"""
-        item = self._items.get(address)
-        if not item:
+        self._lock.acquire()
+        try:
+            item = self._items.get(address)
+            if not item:
+                return None
+            new_state = self.update_item(item)
+            if _state_values[state] >= item.state_value:
+                return item
             return None
-        new_state = self.update_item(item)
-        if _state_values[state] >= item.state_value:
-            return item
-        return None
+        finally:
+            self._lock.release()
 
     def update_item(self, item):
         """Update state of an item in the cache.
@@ -441,14 +472,17 @@ class Cache:
         :return: new state of the item.
         :returntype: `str`"""
 
-        state = item.update_state()
-        if item.state == 'purged':
-            self._purged += 1
-            if self._purged > 0.25*self.max_items:
-                self.purge_items()
-        else:
+        self._lock.acquire()
+        try:
+            state = item.update_state()
             self._items_list.sort()
-        return state
+            if item.state == 'purged':
+                self._purged += 1
+                if self._purged > 0.25*self.max_items:
+                    self.purge_items()
+            return state
+        finally:
+            self._lock.release()
 
     def num_items(self):
         return len(self._items_list)
@@ -459,32 +493,39 @@ class Cache:
         TODO: optimize somehow.
         
         Leave no more than 75% of `self.max_items` items in the cache."""
+        self._lock.acquire()
+        try:
+            il=self._items_list
+            num_items = len(il)
+            need_remove = num_items - int(0.75 * self.max_items)
 
-        il=self._items_list
-        num_items = len(il)
-        need_remove = num_items - int(0.75 * self.max_items)
+            for i in range(need_remove):
+                item=il.pop(0)
+                try:
+                    del self._items[item.address]
+                except KeyError:
+                    pass
 
-        for i in range(need_remove):
-            item=il.pop(0)
-            try:
-                del self._items[item.address]
-            except KeyError:
-                pass
-
-        while il and il[0].update_state()=="purged":
-            item=il.pop(0)
-            try:
-                del self._items[item.address]
-            except KeyError:
-                pass
+            while il and il[0].update_state()=="purged":
+                item=il.pop(0)
+                try:
+                    del self._items[item.address]
+                except KeyError:
+                    pass
+        finally:
+            self._lock.release()
 
     def tick(self):
-        now = datetime.utcnow()
-        for t,f in list(self._active_fetchers):
-            if t > now:
-                break
-            self._active_fetchers.remove((t,f))
-        self.purge_items()
+        self._lock.acquire()
+        try:
+            now = datetime.utcnow()
+            for t,f in list(self._active_fetchers):
+                if t > now:
+                    break
+                f.timeout()
+            self.purge_items()
+        finally:
+            self._lock.release()
 
     def remove_fetcher(self, fetcher):
         """Remove a running fetcher from the list of active fetchers.
@@ -493,11 +534,15 @@ class Cache:
             - `fetcher`: fetcher instance.
         :Types:
             - `fetcher`: `CacheFetcher`"""
-        for t, f in list(self._active_fetchers):
-            if f is fetcher:
-                self._active_fetchers.remove((t, f))
-                f._deactivated()
-                return
+        self._lock.acquire()
+        try:
+            for t, f in list(self._active_fetchers):
+                if f is fetcher:
+                    self._active_fetchers.remove((t, f))
+                    f._deactivated()
+                    return
+        finally:
+            self._lock.release()
 
     def set_fetcher(self, fetcher_class):
         """Set the fetcher class.
@@ -507,7 +552,11 @@ class Cache:
         :Types:
             - `fetcher_class`: `CacheFetcher` based class
         """
-        self._fetcher = fetcher_class
+        self._lock.acquire()
+        try:
+            self._fetcher = fetcher_class
+        finally:
+            self._lock.release()
 
 class CacheSuite:
     """Caching proxy for object retrieval and caching.
@@ -538,12 +587,14 @@ class CacheSuite:
           0 then items are never purged because of their age.
         - `max_items`: maximum number of obejects of one class to store.
         - `_caches`: dictionary of per-class caches.
+        - `_lock`: lock for thread safety.
     :Types:
         - `default_freshness_period`: timedelta
         - `default_expiration_period`: timedelta
         - `default_purge_period`: timedelta
         - `max_items`: `int`
         - `_caches`: `dict` of (`classobj`, addr) -> `Cache`
+        - `_lock`: `threading.RLock`
     """
     def __init__(self, max_items, default_freshness_period = _hour,
             default_expiration_period = 12*_hour, default_purge_period = 24*_hour):
@@ -566,18 +617,23 @@ class CacheSuite:
         self.default_purge_period = default_purge_period
         self.max_items = max_items
         self._caches = {}
+        self._lock = threading.RLock()
 
     def request_object(self, object_class, address, state, object_handler, 
             error_handler = None, timeout_handler = None,
             backup_state = None, timeout = None,
             freshness_period = None, expiration_period = None, purge_period = None):
 
-        if object_class not in self._caches:
-            raise TypeError, "No cache for %r" % (object_class,)
-  
-        self._caches[object_class].request_object(address, state, object_handler,
-                error_handler, timeout_handler, backup_state, timeout,
-                freshness_period, expiration_period, purge_period)
+        self._lock.acquire()
+        try:
+            if object_class not in self._caches:
+                raise TypeError, "No cache for %r" % (object_class,)
+      
+            self._caches[object_class].request_object(address, state, object_handler,
+                    error_handler, timeout_handler, backup_state, timeout,
+                    freshness_period, expiration_period, purge_period)
+        finally:
+            self._lock.release()
 
     def register_fetcher(self, object_class, fetcher_class):
         """Register a fetcher class for an object class.
@@ -589,12 +645,16 @@ class CacheSuite:
             - `object_class`: `classobj`
             - `fetcher_class`: `CacheFetcher` based class
         """
-        cache = self._caches.get(object_class)
-        if not cache:
-            cache = Cache(self.max_items, self.default_freshness_period,
-                    self.default_expiration_period, self.defaut_purge_period)
-            self._caches[object_class] = cache
-        cache.set_fetcher(fetcher_class)
+        self._lock.acquire()
+        try:
+            cache = self._caches.get(object_class)
+            if not cache:
+                cache = Cache(self.max_items, self.default_freshness_period,
+                        self.default_expiration_period, self.defaut_purge_period)
+                self._caches[object_class] = cache
+            cache.set_fetcher(fetcher_class)
+        finally:
+            self._lock.release()
 
     def unregister_fetcher(self, object_class):
         """Unregister a fetcher class for an object class.
@@ -604,9 +664,13 @@ class CacheSuite:
         :Types:
             - `object_class`: `classobj`
         """
-        cache = self._caches.get(object_class)
-        if not cache:
-            return
-        cache.set_fetcher(None)
+        self._lock.acquire()
+        try:
+            cache = self._caches.get(object_class)
+            if not cache:
+                return
+            cache.set_fetcher(None)
+        finally:
+            self._lock.release()
                
-# vi: sts = 4 et sw = 4
+# vi: sts=4 et sw=4
