@@ -1,3 +1,8 @@
+2004-09-15  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/dns.py, pyxmpp/iq.py, pyxmpp/message.py, pyxmpp/presence.py, pyxmpp/resolver.py, pyxmpp/stanza.py, pyxmpp/xmlextra.py, TODO.pylint, pylintrc:
+	- cleaning up...
+
 2004-09-14  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/jabber/muc.py, pyxmpp/iq.py, pyxmpp/jid.py, pyxmpp/message.py, pyxmpp/presence.py, pyxmpp/roster.py, pyxmpp/stanza.py, pyxmpp/stream.py, pyxmpp/xmlextra.py, pyxmpp/xmppstringprep.py, doc/Makefile, TODO.pylint:
