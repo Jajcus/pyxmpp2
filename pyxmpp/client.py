@@ -17,6 +17,7 @@
 
 import libxml2
 import sys
+import threading
 
 from clientstream import ClientStream
 from jid import JID
@@ -41,6 +42,7 @@ class Client:
 		self.enable_tls=0
 		self.require_tls=0
 		self.stream=None
+		self.stream_cond=threading.Condition()
 		self.session_established=0
 		self.roster=None
 
@@ -53,38 +55,57 @@ class Client:
 			raise ClientError,"Cannot connect: no password given"
 		if register:
 			raise ClientError,"In-band registration not implemented yet"
-		if self.stream:
-			self.stream.close()
+
+		self.stream_cond.acquire()
+		stream=self.stream
+		self.stream=None
+		if stream:
+			stream.close()
+		self.stream_cond.notify()
+		self.stream_cond.release()
 			
-		self.stream=ClientStream(self.jid,self.password,self.server,
+		stream=ClientStream(self.jid,self.password,self.server,
 			self.port,self.auth_methods,self.enable_tls,self.require_tls)
-		self.stream.debug=self.debug
-		self.stream.print_exception=self.print_exception
-		self.stream.connect()
-		self.stream.post_auth=self.__post_auth
+		stream.debug=self.debug
+		stream.print_exception=self.print_exception
+		stream.connect()
+		stream.post_auth=self.__post_auth
+		self.stream_cond.acquire()
+		self.stream=stream
+		self.stream_cond.notify()
+		self.stream_cond.release()
+
+	def get_stream(self):
+		self.stream_cond.acquire()
+		stream=self.stream
+		self.stream_cond.release()
+		return stream
 
 	def disconnect(self):
-		if self.stream:
-			self.stream.disconnect()
+		stream=self.get_stream()
+		if stream:
+			stream.disconnect()
 
 	def request_session(self):
-		if not self.stream.version:
+		stream=self.get_stream()
+		if not stream.version:
 			self.session_established=1
 			self.session_started()
 		else:
 			iq=Iq(type="set")
 			iq.new_query("urn:ietf:params:xml:ns:xmpp-session","session")
-			self.stream.set_response_handlers(iq,
+			stream.set_response_handlers(iq,
 				self.__session_result,self.__session_error,self.__session_timeout)
-			self.stream.send(iq)
+			stream.send(iq)
 	
 	def request_roster(self):
+		stream=self.get_stream()
 		iq=Iq(type="get")
 		iq.new_query("jabber:iq:roster")
-		self.stream.set_response_handlers(iq,
+		stream.set_response_handlers(iq,
 			self.__roster_result,self.__roster_error,self.__roster_timeout)
-		self.stream.set_iq_set_handler("query","jabber:iq:roster",self.__roster_push)
-		self.stream.send(iq)
+		stream.set_iq_set_handler("query","jabber:iq:roster",self.__roster_push)
+		stream.send(iq)
 
 	def socket(self):
 		return self.stream.socket
@@ -139,8 +160,9 @@ class Client:
 		
 # Method to override
 	def idle(self):
-		if self.stream:
-			self.stream.idle()
+		stream=self.get_stream()
+		if stream:
+			stream.idle()
 
 	def session_started(self):
 		p=Presence()
