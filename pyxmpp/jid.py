@@ -181,7 +181,7 @@ class JID:
 			raise TypeError,"Can't compare JID with %r" % (type(other),)
 			
 		return (self.node==other.node
-			and are_domains_equal(self.domain)
+			and are_domains_equal(self.domain,other.domain)
 			and self.resource==other.resource)
 	
 	def __ne__(self,other):
