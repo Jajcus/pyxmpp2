@@ -42,7 +42,8 @@ class Client:
 		self.enable_tls=0
 		self.require_tls=0
 		self.stream=None
-		self.stream_cond=threading.Condition()
+		self.lock=threading.RLock()
+		self.state_changed=threading.Condition(self.lock)
 		self.session_established=0
 		self.roster=None
 
@@ -56,13 +57,11 @@ class Client:
 		if register:
 			raise ClientError,"In-band registration not implemented yet"
 
-		self.stream_cond.acquire()
+		self.lock.acquire()
 		stream=self.stream
 		self.stream=None
 		if stream:
 			stream.close()
-		self.stream_cond.notify()
-		self.stream_cond.release()
 			
 		stream=ClientStream(self.jid,self.password,self.server,
 			self.port,self.auth_methods,self.enable_tls,self.require_tls)
@@ -70,15 +69,15 @@ class Client:
 		stream.print_exception=self.print_exception
 		stream.connect()
 		stream.post_auth=self.__post_auth
-		self.stream_cond.acquire()
+		stream.post_disconnect=self.__post_disconnect
 		self.stream=stream
-		self.stream_cond.notify()
-		self.stream_cond.release()
+		self.state_changed.notify()
+		self.state_changed.release()
 
 	def get_stream(self):
-		self.stream_cond.acquire()
+		self.lock.acquire()
 		stream=self.stream
-		self.stream_cond.release()
+		self.lock.release()
 		return stream
 
 	def disconnect(self):
@@ -89,7 +88,10 @@ class Client:
 	def request_session(self):
 		stream=self.get_stream()
 		if not stream.version:
+			self.state_changed.acquire()
 			self.session_established=1
+			self.state_changed.notify()
+			self.state_changed.release()
 			self.session_started()
 		else:
 			iq=Iq(type="set")
@@ -122,7 +124,10 @@ class Client:
 		raise FatalClientError("Failed establish session")
 	
 	def __session_result(self,iq):
+		self.state_changed.acquire()
 		self.session_established=1
+		self.state_changed.notify()
+		self.state_changed.release()
 		self.session_started()
 	
 	def __roster_timeout(self,k,v):
@@ -134,7 +139,10 @@ class Client:
 	def __roster_result(self,iq):
 		q=iq.get_query()
 		if q:
+			self.state_changed.acquire()
 			self.roster=Roster(q)
+			self.state_changed.notify()
+			self.state_changed.release()
 			self.roster_updated()
 		else:
 			raise ClientError("Roster retrieval failed")
@@ -156,7 +164,16 @@ class Client:
 	
 	def __post_auth(self):
 		ClientStream.post_auth(self.stream)
-		self.post_auth()
+		self.authenticated()
+	
+	def __post_disconnect(self):
+		self.state_changed.acquire()
+		if self.stream:
+			self.stream.close()
+		self.stream=None
+		self.state_changed.notify()
+		self.state_changed.release()
+		self.disconnected()
 		
 # Method to override
 	def idle(self):
@@ -172,8 +189,11 @@ class Client:
 	def roster_updated(self):
 		pass
 
-	def post_auth(self):
+	def authenticated(self):
 		self.request_session()
+
+	def disconnected(self):
+		pass
 
 	def debug(self,str):
 		print >>sys.stderr,"DEBUG:",str
