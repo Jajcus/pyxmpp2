@@ -116,8 +116,14 @@ class DiscoItem:
 		self.xmlnode.setProp("jid",jid.encode("utf-8"))
 
 class DiscoIdentity:
-	def __init__(self,disco,xmlnode_or_name,category,type=None):
+	def __init__(self,disco,xmlnode_or_name,category,type=None,replace=0):
 		self.disco=disco
+		if disco and replace:
+			old=disco.xpath_ctxt.xpathEval("d:identity")
+			if old:
+				for n in old:
+					n.unlinkNode()
+					n.freeNode()
 		if isinstance(xmlnode_or_name,libxml2.xmlNode):
 			if disco is None:
 				self.xmlnode=xmlnode_or_name.copyNode(1)

@@ -23,6 +23,7 @@ import traceback
 from componentstream import ComponentStream
 from pyxmpp.utils import to_utf8,from_utf8
 from pyxmpp.jabber import DiscoItems,DiscoInfo,DiscoIdentity
+from pyxmpp.stanza import Stanza
 
 class ComponentError(StandardError):
 	pass
@@ -142,7 +143,7 @@ class Component:
 			self.debug("Disco-info query: %s preparing response: %s with reply: %s" 
 				% (iq.serialize(),resp.serialize(),info.xmlnode.serialize()))
 			resp.set_content(info.xmlnode.copyNode(1))
-		elif isinstance(info,stanza):
+		elif isinstance(info,Stanza):
 			resp=info
 		else:
 			resp=iq.make_error_response("item-not-found")
@@ -156,12 +157,12 @@ class Component:
 		else:
 			node=None
 		items=self.disco_get_items(node,iq)
-		if isinstance(items,DiscoInfo):
+		if isinstance(items,DiscoItems):
 			resp=iq.make_result_response()
 			self.debug("Disco-items query: %s preparing response: %s with reply: %s" 
 				% (iq.serialize(),resp.serialize(),items.xmlnode.serialize()))
 			resp.set_content(items.xmlnode.copyNode(1))
-		elif isinstance(items,stanza):
+		elif isinstance(items,Stanza):
 			resp=items
 		else:
 			resp=iq.make_error_response("item-not-found")
