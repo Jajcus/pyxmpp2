@@ -7,8 +7,9 @@ from pyxmpp import xmlextra
 from pyxmpp.jid import JID,JIDError
 from pyxmpp import xmppstringprep
 
-def xml_elements_equal(a,b):
+def xml_elements_equal(a, b, ignore_level1_cdata = False):
     if a.name!=b.name:
+        print "Name mismatch: %r, %r" % (a.name, b.name)
         return False
     try:
         ns1 = a.ns()
@@ -20,8 +21,10 @@ def xml_elements_equal(a,b):
         ns2 = None
     if ns1 or ns2:
         if None in (ns1,ns2):
+            print "Ns mismatch: %r, %r" % (ns1, ns2)
             return False
         if ns1.content != ns2.content:
+            print "Ns mismatch: %r, %r on %r, %r" % (ns1.content, ns2.content, a, b)
             return False
  
     ap = a.properties
@@ -40,9 +43,14 @@ def xml_elements_equal(a,b):
    
     ac = a.children
     bc = b.children
-    while 1:
-        if (ac, bc) == (None, None):
-            return True
+    while ac != None or bc != None:
+        if ignore_level1_cdata:
+            if ac and ac.type!='element':
+                ac=ac.next
+                continue
+            if bc and bc.type!='element':
+                bc=bc.next
+                continue
         if None in (ac, bc):
             return False
         if ac.type != bc.type:
@@ -90,6 +98,7 @@ class StreamHandler(xmlextra.StreamHandler):
         self.test_case.event("node", node)
 
 expected_events = []
+whole_stream = None
 
 def load_expected_events():
     for l in file("data/stream_info.txt"):
@@ -97,6 +106,10 @@ def load_expected_events():
             continue
         l=l.strip()
         expected_events.append(EventTemplate(l))
+
+def load_whole_stream():
+    global whole_stream
+    whole_stream = libxml2.parseFile("data/stream.xml")
 
 class TestStreamReader(unittest.TestCase):
     def setUp(self):
@@ -106,21 +119,27 @@ class TestStreamReader(unittest.TestCase):
         self.file = file("data/stream.xml")
         self.chunk_start = 0
         self.chunk_end = 0
+        self.whole_stream = libxml2.newDoc("1.0")
+
+    def tearDown(self):
+        del self.handler
+        del self.reader
+        self.whole_stream.freeDoc()
         
     def test_1(self):
-        return self.do_test(1)
+        self.do_test(1)
         
     def test_2(self):
-        return self.do_test(2)
+        self.do_test(2)
         
     def test_10(self):
-        return self.do_test(10)
+        self.do_test(10)
         
     def test_100(self):
-        return self.do_test(100)
+        self.do_test(100)
         
     def test_1000(self):
-        return self.do_test(1000)
+        self.do_test(1000)
         
     def do_test(self, chunk_length):
         while 1:
@@ -135,6 +154,11 @@ class TestStreamReader(unittest.TestCase):
                 self.event("end", None)
                 break
             self.chunk_start = self.chunk_end
+        r1 = self.whole_stream.getRootElement()
+        r2 = whole_stream.getRootElement()
+        if not xml_elements_equal(r1, r2, True):
+            self.fail("Whole stream invalid. Got: %r, Expected: %r"
+                    % (self.whole_stream.serialize(), whole_stream.serialize()))
 
     def event(self, event, node):
         expected = self.expected_events.pop(0)
@@ -148,9 +172,18 @@ class TestStreamReader(unittest.TestCase):
         if not expected.match(event,node):
             self.fail("Unmatched event. Expected: %r, got: %r;%r" 
                     % (expected, event, node.serialize()))
-        
+        if event == "start":
+            n = node.docCopyNode(self.whole_stream,1)
+            self.whole_stream.addChild(n)
+            self.whole_stream.setRootElement(n)
+        elif event == "node":
+            n = node.docCopyNode(self.whole_stream,1)
+            r = self.whole_stream.getRootElement()
+            r.addChild(n)
+            
 def suite():
     load_expected_events()
+    load_whole_stream()
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestStreamReader))
     return suite
