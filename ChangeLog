@@ -1,6 +1,15 @@
 2004-06-02  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/jabber/muc.py:
+	- pass stanza to MucRoomHandler.other_joined() and MucRoomHandler.other_left() callbacks
+
+	* pyxmpp/utils.py:
+	- missing 'import libxml2' added
+
+	* pyxmpp/jabber/delay.py:
+	- JEP-0091 (jabber:x:delay) handling. There are still some problems with local time (Python time module sucks)
+
+	* pyxmpp/jabber/muc.py:
 	- pass user, not nick to MucRoomHandler.message_received and MucRoomHandler.subject_changed
 
 2004-05-31  Jacek Konieczny  <jajcus@bnet.pl>
