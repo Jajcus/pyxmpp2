@@ -33,9 +33,9 @@ unsafe_mechanisms=unsafe_mechanisms_dict.keys()
 all_mechanisms=safe_mechanisms+unsafe_mechanisms
 
 def ClientAuthenticator(mechanism,password_manager):
-	authenticator,None=all_mechanisms_dict[mechanism]
+	authenticator=all_mechanisms_dict[mechanism][0]
 	return authenticator(password_manager)
 
 def ServerAuthenticator(mechanism,password_manager):
-	None,authenticator=all_mechanisms_dict[mechanism]
+	authenticator=all_mechanisms_dict[mechanism][1]
 	return authenticator(password_manager)
