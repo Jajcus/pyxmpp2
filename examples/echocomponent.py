@@ -33,6 +33,7 @@ class Component(pyxmpp.jabberd.Component):
 	def authenticated(self):
 		pyxmpp.jabberd.Component.authenticated(self)
 		self.stream.set_iq_get_handler("query","jabber:iq:version",self.get_version)
+		self.disco_info.add_feature("jabber:iq:version")
 		self.stream.set_presence_handler("available",self.presence)
 		self.stream.set_presence_handler("subscribe",self.presence_control)
 		self.stream.set_message_handler("normal",self.message)
