@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: muc.py,v 1.24 2004/09/14 19:58:05 jajcus Exp $"
+__revision__="$Id: muc.py,v 1.25 2004/09/16 19:57:46 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -790,7 +790,7 @@ class MucRoomState:
         """
         if self.joined:
             raise RuntimeError,"Room is already joined"
-        p=MucPresence(to=self.room_jid)
+        p=MucPresence(to_jid=self.room_jid)
         p.make_join_request()
         self.manager.stream.send(p)
 
@@ -798,21 +798,21 @@ class MucRoomState:
         """
         Send a leave request for the room.
         """
-        p=MucPresence(to=self.room_jid,typ="unavailable")
+        p=MucPresence(to_jid=self.room_jid,stanza_type="unavailable")
         self.manager.stream.send(p)
 
     def send_message(self,body):
         """
         Send a message to the room.
         """
-        m=Message(to=self.room_jid.bare(),typ="groupchat",body=body)
+        m=Message(to_jid=self.room_jid.bare(),stanza_type="groupchat",body=body)
         self.manager.stream.send(m)
 
     def set_subject(self,subject):
         """
         Send a subject change request to the room.
         """
-        m=Message(to=self.room_jid.bare(),typ="groupchat",subject=subject)
+        m=Message(to_jid=self.room_jid.bare(),stanza_type="groupchat",subject=subject)
         self.manager.stream.send(m)
 
     def change_nick(self,new_nick):
@@ -820,7 +820,7 @@ class MucRoomState:
         Send a nick change request to the room.
         """
         new_room_jid=JID(self.room_jid.node,self.room_jid.domain,new_nick)
-        p=Presence(to=new_room_jid)
+        p=Presence(to_jid=new_room_jid)
         self.manager.stream.send(p)
 
     def get_room_jid(self,nick=None):

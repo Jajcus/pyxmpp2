@@ -17,7 +17,7 @@
 
 """Message XMPP stanza handling"""
 
-__revision__="$Id: message.py,v 1.19 2004/09/15 21:23:13 jajcus Exp $"
+__revision__="$Id: message.py,v 1.20 2004/09/16 19:57:26 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -29,29 +29,29 @@ message_types=("normal","chat","headline","error","groupchat")
 class Message(Stanza):
     """Wraper object for <message /> stanzas."""
     stanza_type="message"
-    def __init__(self,node=None,fr=None,to=None,typ=None,sid=None,
+    def __init__(self,node=None,from_jid=None,to_jid=None,stanza_type=None,stanza_id=None,
             subject=None, body=None, thread=None,error=None,error_cond=None):
         """Initialize a `Message` object.
 
         :Parameters:
-            - `node`: XML node to be wrapped into the `Message` object
-              or other Presence object to be copied. If not given then new
+            - `node`: XML node to_jid be wrapped into the `Message` object
+              or other Presence object to_jid be copied. If not given then new
               presence stanza is created using following parameters.
-            - `fr`: sender JID.
-            - `to`: recipient JID.
-            - `typ`: staza type: one of: "get", "set", "result" or "error".
-            - `sid`: stanza id -- value of stanza's "id" attribute. If not
+            - `from_jid`: sender JID.
+            - `to_jid`: recipient JID.
+            - `stanza_type`: staza type: one of: "get", "set", "result" or "error".
+            - `stanza_id`: stanza id -- value of stanza's "id" attribute. If not
               given, then unique for the session value is generated.
             - `subject`: message subject,
             - `body`: message body.
             - `thread`: message thread id.
-            - `error_cond`: error condition name. Ignored if `typ` is not "error".
+            - `error_cond`: error condition name. Ignored if `stanza_type` is not "error".
         :Types:
             - `name_or_node`: `unicode` or `libxml2.xmlNode` or `Stanza`
-            - `fr`: `JID`
-            - `to`: `JID`
-            - `typ`: `unicode`
-            - `sid`: `unicode`
+            - `from_jid`: `JID`
+            - `to_jid`: `JID`
+            - `stanza_type`: `unicode`
+            - `stanza_id`: `unicode`
             - `subject`: `unicode`
             - `body`: `unicode`
             - `thread`: `unicode`
@@ -67,13 +67,13 @@ class Message(Stanza):
         elif node is not None:
             raise TypeError,"Couldn't make Message from %r" % (type(node),)
 
-        if typ=="normal":
-            typ=None
+        if stanza_type=="normal":
+            stanza_type=None
 
         if node is None:
             node="message"
 
-        Stanza.__init__(self,node,fr=fr,to=to,typ=typ,sid=sid,
+        Stanza.__init__(self,node,from_jid=from_jid,to_jid=to_jid,stanza_type=stanza_type,stanza_id=stanza_id,
                 error=error, error_cond=error_cond)
         
         if subject is not None:
@@ -136,8 +136,8 @@ class Message(Stanza):
         if self.get_type() == "error":
             raise StanzaError,"Errors may not be generated in response to errors"
 
-        m=Message(typ="error",fr=self.get_to(),to=self.get_from(),
-            sid=self.get_id(),error_cond=cond)
+        m=Message(stanza_type="error",from_jid=self.get_to(),to_jid=self.get_from(),
+            stanza_id=self.get_id(),error_cond=cond)
 
         if self.node.children:
             n=self.node.children

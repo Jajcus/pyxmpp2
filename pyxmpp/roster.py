@@ -17,7 +17,7 @@
 
 """XMPP-IM roster handling"""
 
-__revision__="$Id: roster.py,v 1.21 2004/09/14 19:57:58 jajcus Exp $"
+__revision__="$Id: roster.py,v 1.22 2004/09/16 19:57:26 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 from types import StringType,UnicodeType
@@ -135,7 +135,7 @@ class RosterItem:
         Make "roster push" IQ stanza from the item representing roster update
         request.
         """
-        iq=Iq(typ="set")
+        iq=Iq(stanza_type="set")
         q=iq.new_query(ROSTER_NS)
         self.as_xml(q)
         return iq

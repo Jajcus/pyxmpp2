@@ -17,7 +17,7 @@
 
 """Core XMPP stream functionality"""
 
-__revision__="$Id: stream.py,v 1.68 2004/09/14 19:57:58 jajcus Exp $"
+__revision__="$Id: stream.py,v 1.69 2004/09/16 19:57:26 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -1298,7 +1298,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         XMPP stream is authenticated for bare JID only. To use
         the full JID it must be bound to a resource.
         """
-        iq=Iq(typ="set")
+        iq=Iq(stanza_type="set")
         q=iq.new_query(BIND_NS,"bind")
         if resource:
             q.newTextChild(q.ns(),"resource",to_utf8(resource))

@@ -1,5 +1,16 @@
 This file should describe the bigest and most important API changes.
 
+2004-09-16
+	
+	Stanza, Message, Iq and Presence constructors arguments have been
+	changed again. "typ" and "sid" were really stupid and ugly.
+	Now Stanza (derived classes) constructor keyword parameters are:
+	from_jid, to_jid, stanza_type, stanza_id
+	
+	I hope this will never change again, at least not after the next
+	official release. You may update your application code using
+	"migrate-0_5-0_6.py" script.
+
 2004-09-13
 	
 	Stanza, Message, Iq and Presence constructors arguments have been

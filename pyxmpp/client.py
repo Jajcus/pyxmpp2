@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: client.py,v 1.26 2004/09/13 21:14:53 jajcus Exp $"
+__revision__="$Id: client.py,v 1.27 2004/09/16 19:57:26 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -115,7 +115,7 @@ class Client:
             self.state_changed.release()
             self.session_started()
         else:
-            iq=Iq(typ="set")
+            iq=Iq(stanza_type="set")
             iq.new_query("urn:ietf:params:xml:ns:xmpp-session","session")
             stream.set_response_handlers(iq,
                 self.__session_result,self.__session_error,self.__session_timeout)
@@ -123,7 +123,7 @@ class Client:
 
     def request_roster(self):
         stream=self.get_stream()
-        iq=Iq(typ="get")
+        iq=Iq(stanza_type="get")
         iq.new_query("jabber:iq:roster")
         stream.set_response_handlers(iq,
             self.__roster_result,self.__roster_error,self.__roster_timeout)

@@ -17,7 +17,7 @@
 
 """General XMPP Stanza handling."""
 
-__revision__="$Id: stanza.py,v 1.19 2004/09/15 21:23:13 jajcus Exp $"
+__revision__="$Id: stanza.py,v 1.20 2004/09/16 19:57:26 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -57,27 +57,27 @@ class Stanza:
         - `_error`: `pyxmpp.error.StanzaErrorNode`"""
     stanza_type="Unknown"
 
-    def __init__(self,name_or_node,fr=None,to=None,typ=None,sid=None,
-                error=None,error_cond=None):
+    def __init__(self, name_or_node, from_jid=None, to_jid=None,
+            stanza_type=None, stanza_id=None, error=None, error_cond=None):
         """Initialize a Stanza object.
 
         :Parameters:
             - `name_or_node`: XML node to be wrapped into the Stanza object
               or other Presence object to be copied. If not given then new
               presence stanza is created using following parameters.
-            - `fr`: sender JID.
-            - `to`: recipient JID.
-            - `typ`: staza type: one of: "get", "set", "result" or "error".
-            - `sid`: stanza id -- value of stanza's "id" attribute. If not
-              given, then unique for the session value is generated. 
+            - `from_jid`: sender JID.
+            - `to_jid`: recipient JID.
+            - `stanza_type`: staza type: one of: "get", "set", "result" or "error".
+            - `stanza_id`: stanza id -- value of stanza's "id" attribute. If
+              not given, then unique for the session value is generated. 
             - `error_cond`: error condition name. Ignored if `typ` is not
               "error".
         :Types:
             - `name_or_node`: `unicode` or `libxml2.xmlNode` or `Stanza`
-            - `fr`: `JID`
-            - `to`: `JID`
-            - `typ`: `unicode`
-            - `sid`: `unicode`
+            - `from_jid`: `JID`
+            - `to_jid`: `JID`
+            - `stanza_type`: `unicode`
+            - `stanza_id`: `unicode`
             - `error_cond`: `unicode`"""
         self._error=None
         self.node=None
@@ -94,21 +94,21 @@ class Stanza:
         else:
             self.node=common_doc.newChild(None,name_or_node,None)
 
-        if fr is not None:
-            if not isinstance(fr,JID):
-                fr=JID(fr)
-            self.node.setProp("from",fr.as_utf8())
+        if from_jid is not None:
+            if not isinstance(from_jid,JID):
+                from_jid=JID(from_jid)
+            self.node.setProp("from",from_jid.as_utf8())
         
-        if to is not None:
-            if not isinstance(to,JID):
-                to=JID(to)
-            self.node.setProp("to",to.as_utf8())
+        if to_jid is not None:
+            if not isinstance(to_jid,JID):
+                to_jid=JID(to_jid)
+            self.node.setProp("to",to_jid.as_utf8())
             
-        if typ:
-            self.node.setProp("type",typ)
+        if stanza_type:
+            self.node.setProp("type",stanza_type)
             
-        if sid:
-            self.node.setProp("id",sid)
+        if stanza_id:
+            self.node.setProp("id",stanza_id)
 
         if (self.get_type()=="error" and error_cond):
             from pyxmpp.error import StanzaErrorNode
@@ -199,51 +199,51 @@ class Stanza:
         self._error=StanzaErrorNode(n[0],copy=0)
         return self._error
         
-    def set_from(self,fr):
+    def set_from(self,from_jid):
         """Set "from" attribute of the stanza.
         
         :Parameters:
-            - `fr`: new value of the "from" attribute (sender JID).
+            - `from_jid`: new value of the "from" attribute (sender JID).
         :Types:
-            - `fr`: `unicode`"""
-        if fr:
-            return self.node.setProp("from",to_utf8(fr))
+            - `from_jid`: `unicode`"""
+        if from_jid:
+            return self.node.setProp("from",to_utf8(from_jid))
         else:
             return self.node.unsetProp("from")
 
-    def set_to(self,to):
+    def set_to(self,to_jid):
         """Set "to" attribute of the stanza.
         
         :Parameters:
-            - `to`: new value of the "to" attribute (recipient JID).
+            - `to_jid`: new value of the "to" attribute (recipient JID).
         :Types:
-            - `to`: `unicode`"""
-        if to:
-            return self.node.setProp("to",to_utf8(to))
+            - `to_jid`: `unicode`"""
+        if to_jid:
+            return self.node.setProp("to",to_utf8(to_jid))
         else:
             return self.node.unsetProp("to")
             
-    def set_type(self,typ):
+    def set_type(self,stanza_type):
         """Set "type" attribute of the stanza.
         
         :Parameters:
-            - `typ`: new value of the "type" attribute (stanza type).
+            - `stanza_type`: new value of the "type" attribute (stanza type).
         :Types:
-            - `typ`: `unicode`"""
-        if typ:
-            return self.node.setProp("type",to_utf8(typ))
+            - `stanza_type`: `unicode`"""
+        if stanza_type:
+            return self.node.setProp("type",to_utf8(stanza_type))
         else:
             return self.node.unsetProp("type")
             
-    def set_id(self,sid):
+    def set_id(self,stanza_id):
         """Set "id" attribute of the stanza.
         
         :Parameters:
-            - `sid`: new value of the "id" attribute (stanza identifier).
+            - `stanza_id`: new value of the "id" attribute (stanza identifier).
         :Types:
-            - `sid`: `unicode`"""
-        if sid:
-            return self.node.setProp("id",to_utf8(sid))
+            - `stanza_id`: `unicode`"""
+        if stanza_id:
+            return self.node.setProp("id",to_utf8(stanza_id))
         else:
             return self.node.unsetProp("id")
 

@@ -17,7 +17,7 @@
 
 """Iq XMPP stanza handling"""
 
-__revision__="$Id: iq.py,v 1.16 2004/09/15 21:23:13 jajcus Exp $"
+__revision__="$Id: iq.py,v 1.17 2004/09/16 19:57:26 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -28,26 +28,26 @@ from pyxmpp.stanza import Stanza,StanzaError,gen_id
 class Iq(Stanza):
     """Wraper object for <iq /> stanzas."""
     stanza_type="iq"
-    def __init__(self,node=None,fr=None,to=None,typ=None,sid=None,
+    def __init__(self,node=None,from_jid=None,to_jid=None,stanza_type=None,stanza_id=None,
             error=None,error_cond=None):
         """Initialize an `Iq` object.
 
         :Parameters:
-            - `node`: XML node to be wrapped into the `Iq` object
-              or other Presence object to be copied. If not given then new
+            - `node`: XML node to_jid be wrapped into the `Iq` object
+              or other Presence object to_jid be copied. If not given then new
               presence stanza is created using following parameters.
-            - `fr`: sender JID.
-            - `to`: recipient JID.
-            - `typ`: staza type: one of: "get", "set", "result" or "error".
-            - `sid`: stanza id -- value of stanza's "id" attribute. If not
+            - `from_jid`: sender JID.
+            - `to_jid`: recipient JID.
+            - `stanza_type`: staza type: one of: "get", "set", "result" or "error".
+            - `stanza_id`: stanza id -- value of stanza's "id" attribute. If not
               given, then unique for the session value is generated. 
-            - `error_cond`: error condition name. Ignored if `typ` is not "error".
+            - `error_cond`: error condition name. Ignored if `stanza_type` is not "error".
         :Types:
             - `name_or_node`: `unicode` or `libxml2.xmlNode` or `Iq`
-            - `fr`: `JID`
-            - `to`: `JID`
-            - `typ`: `unicode`
-            - `sid`: `unicode`
+            - `from_jid`: `JID`
+            - `to_jid`: `JID`
+            - `stanza_type`: `unicode`
+            - `stanza_id`: `unicode`
             - `error_cond`: `unicode`"""
         self.node=None
         if isinstance(node,Iq):
@@ -58,20 +58,21 @@ class Iq(Stanza):
             pass
         elif node is not None:
             raise TypeError,"Couldn't make Iq from %r" % (type(node),)
-        elif not typ:
+        elif not stanza_type:
             raise StanzaError,"type is required for Iq"
         else:
-            if not sid:
-                sid=gen_id()
+            if not stanza_id:
+                stanza_id=gen_id()
 
-        if not node and typ not in ("get","set","result","error"):
-            raise StanzaError,"Invalid Iq type: %r" % (typ,)
+        if not node and stanza_type not in ("get","set","result","error"):
+            raise StanzaError,"Invalid Iq type: %r" % (stanza_type,)
 
         if node is None:
             node="iq"
 
-        Stanza.__init__(self, node, fr=fr, to=to, typ=typ, sid=sid,
-                error=error, error_cond=error_cond)
+        Stanza.__init__(self, node, from_jid=from_jid, to_jid=to_jid,
+            stanza_type=stanza_type, stanza_id=stanza_id, error=error,
+            error_cond=error_cond)
 
     def copy(self):
         """Create a deep copy of the iq stanza.
@@ -93,8 +94,8 @@ class Iq(Stanza):
         if self.get_type() not in ("set","get"):
             raise StanzaError,"Errors may only be generated for 'set' or 'get' iq"
 
-        iq=Iq(typ="error",fr=self.get_to(),to=self.get_from(),
-            sid=self.get_id(),error_cond=cond)
+        iq=Iq(stanza_type="error",from_jid=self.get_to(),to_jid=self.get_from(),
+            stanza_id=self.get_id(),error_cond=cond)
         n=self.get_query()
         if n:
             n=n.copyNode(1)
@@ -111,7 +112,7 @@ class Iq(Stanza):
         if self.get_type() not in ("set","get"):
             raise StanzaError,"Results may only be generated for 'set' or 'get' iq"
 
-        iq=Iq(typ="result",fr=self.get_to(),to=self.get_from(),sid=self.get_id())
+        iq=Iq(stanza_type="result",from_jid=self.get_to(),to_jid=self.get_from(),stanza_id=self.get_id())
         return iq
 
     def new_query(self,ns_uri,name="query"):
