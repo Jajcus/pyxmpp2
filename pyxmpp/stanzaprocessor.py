@@ -17,7 +17,7 @@
 
 """Handling of XMPP stanzas."""
 
-__revision__="$Id: stanzaprocessor.py,v 1.2 2004/09/21 06:15:36 jajcus Exp $"
+__revision__="$Id: stanzaprocessor.py,v 1.3 2004/09/25 15:42:19 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -279,11 +279,12 @@ class StanzaProcessor:
         if to:
             to=to.as_unicode()
         if timeout_handler:
-            self._iq_response_handlers[(iq.get_id(),to),timeout,timeout_handler]=(
-                                res_handler,err_handler)
+            self._iq_response_handlers.set_item((iq.get_id(),to),
+                    (res_handler,err_handler),
+                    timeout,timeout_handler)
         else:
-            self._iq_response_handlers[(iq.get_id(),to),timeout]=(
-                                res_handler,err_handler)
+            self._iq_response_handlers.set_item((iq.get_id(),to),
+                    (res_handler,err_handler),timeout)
 
     def set_iq_get_handler(self,element,namespace,handler):
         """Set <iq type="get"/> handler.

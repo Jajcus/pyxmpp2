@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: clientstream.py,v 1.17 2004/09/22 21:32:32 jajcus Exp $"
+__revision__="$Id: clientstream.py,v 1.18 2004/09/25 15:42:26 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -165,7 +165,7 @@ class LegacyClientStream(ClientStream):
                             self.auth_timeout,timeout=60)
         iq.free()
 
-    def auth_timeout(self,*args):
+    def auth_timeout(self):
         self.lock.acquire()
         try:
             self.__logger.debug("Timeout while waiting for jabber:iq:auth result")

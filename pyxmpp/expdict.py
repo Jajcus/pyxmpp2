@@ -15,46 +15,118 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: expdict.py,v 1.5 2004/09/10 14:00:54 jajcus Exp $"
+"""Dictionary with item expiration."""
+
+__revision__="$Id: expdict.py,v 1.6 2004/09/25 15:42:19 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import time
+import threading
 from types import TupleType,IntType,FloatType
 
 class ExpiringDictionary(dict):
+    """An extension to standard Python dictionary objects which implements item
+    expiration.
+
+    Each item in ExpiringDictionary has its expiration time assigned, after
+    which the item is removed from the mapping.
+    
+    :Ivariables:
+        - `_timeouts`: a dictionary with timeout values and timeout callback for
+          stored objects.
+        - `_default_timeout`: the default timeout value (in seconds from now).
+        - `_lock`: access synchronization lock.
+    :Types:
+        - `_timeouts`: `dict`
+        - `_default_timeout`: `int`
+        - `_lock`: `threading.RLock`"""
+
+    __slots__=['_timeouts','_default_timeout','_lock']
+    
     def __init__(self,default_timeout=300):
-        self.timeouts={}
-        self.default_timeout=default_timeout
+        """Initialize an `ExpiringDictionary` object.
+
+        :Parameters:
+            - `default_timeout`: default timeout value for stored objects.
+        :Types:
+            - `default_timeout`: `int`"""
+        self._timeouts={}
+        self._default_timeout=default_timeout
+        self._lock=threading.RLock()
 
     def __delitem__(self,key):
-        del self.timeouts[key]
-        return dict.__delitem__(self,key)
+        self._lock.acquire()
+        try:
+            del self._timeouts[key]
+            return dict.__delitem__(self,key)
+        finally:
+            self._lock.release()
+
+    def __getitem__(self,key):
+        self._lock.acquire()
+        try:
+            self._expire_item(key)
+            return dict.__getitem__(self,key)
+        finally:
+            self._lock.release()
 
     def __setitem__(self,key,value):
-        now=time.time()
-        if type(key) is TupleType:
-            if len(key)==2 and type(key[1]) in (IntType,FloatType):
-                timeout=key[1]
-                callback=None
-            elif len(key)==2 and callable(key[1]):
-                timeout=self.default_timeout
-                callback=key[1]
-            elif len(key)==3 and type(key[1]) in (IntType,FloatType) and callable(key[2]):
-                timeout=key[1]
-                callback=key[2]
-            else:
-                raise TypeError,"Key is a tuple, but invalid"
-            self.timeouts[key[0]]=(now+timeout,callback)
-            key=key[0]
-        else:
-            self.timeouts[key]=(now+self.default_timeout,None)
-        return dict.__setitem__(self,key,value)
+        return self.setitem(key,value)
+
+    def set_item(self,key,value,timeout=None,timeout_callback=None):
+        """Set item of the dictionary.
+        
+        :Parameters:
+            - `key`: the key.
+            - `value`: the object to store.
+            - `timeout`: timeout value for the object (in seconds from now).
+            - `timeout_callback`: function to be called when the item expires.
+              The callback should accept none, one (the key) or two (the key
+              and the value) arguments.
+        :Types:
+            - `key`: any hashable value
+            - `value`: any python object
+            - `timeout`: `int`
+            - `timeout_callback`: callable"""
+        self._lock.acquire()
+        try:
+            if not timeout:
+                timeout=self._default_timeout
+            self._timeouts[key]=(time.time()+timeout,timeout_callback)
+            return dict.__setitem__(self,key,value)
+        finally:
+            self._lock.release()
 
     def expire(self):
-        now=time.time()
-        for k,(timeout,callback) in self.timeouts.items():
-            if timeout<=now:
-                if callback:
+        """Do the expiration of dictionary items.
+        
+        Remove items that expired by now from the dictionary."""
+        self._lock.acquire()
+        try:
+            for k in self._timeouts.iterkeys():
+                self._expire_item(k)
+        finally:
+            self._lock.release()
+
+    def _expire_item(self,key):
+        """Do the expiration of a dictionary item.
+        
+        Remove the item if it has expired by now.
+        
+        :Parameters:
+            - `key`: key to the object. 
+        :Types:
+            - `key`: any hashable value"""
+        (timeout,callback)=self._timeouts[key]
+        if timeout<=time.time():
+            if callback:
+                try:
                     callback(k,self[k])
-                del self[k]
+                except TypeError:
+                    try:
+                        callback(k)
+                    except TypeError:
+                        callback()
+            del self[k]
+
 # vi: sts=4 et sw=4

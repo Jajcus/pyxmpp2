@@ -17,7 +17,7 @@
 
 """Basic XHTML-IM client implementation."""
 
-__revision__="$Id: client.py,v 1.29 2004/09/20 21:07:19 jajcus Exp $"
+__revision__="$Id: client.py,v 1.30 2004/09/25 15:42:19 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import threading
@@ -202,12 +202,8 @@ class Client:
 
 # private methods
 
-    def __session_timeout(self,k,v):
+    def __session_timeout(self):
         """Process session request time out. 
-
-        :Parameters:
-            - `k`: unused
-            - `v`: unused
 
         :raise FatalClientError:"""
         raise FatalClientError("Timeout while tryin to establish a session")
@@ -238,12 +234,8 @@ class Client:
         self.state_changed.release()
         self.session_started()
 
-    def __roster_timeout(self,k,v):
+    def __roster_timeout(self):
         """Process roster request time out. 
-
-        :Parameters:
-            - `k`: unused
-            - `v`: unused
 
         :raise ClientError:"""
         raise ClientError("Timeout while tryin to retrieve roster")
