@@ -91,7 +91,7 @@ class VCardField:
         - `name`: name of the field.
     """
     def __init__(self,name):
-        """Initialize the `VCardField` object.
+        """Initialize a `VCardField` object.
 
         Set its name.
 
@@ -110,7 +110,23 @@ class VCardField:
         return ""
 
 class VCardString(VCardField):
+    """Generic class for all standard text fields in the vCard.
+
+    :Ivariables:
+        - `value`: field value.
+    :Types:
+        - `value`: `unicode`"""
     def __init__(self,name,value,rfc2425parameters=None):
+        """Initialize a `VCardString` object.
+
+        :Parameters:
+            - `name`: field name
+            - `value`: field value as string or an XML node
+            - `rfc2425parameters`: optional RFC 2425 parameters
+        :Types:
+            - `name`: `str`
+            - `value`: `str` or `libxml2.xmlNode`
+            - `rfc2425parameters`: `dict`"""
         VCardField.__init__(self,name)
         if isinstance(value,libxml2.xmlNode):
             value=value.getContent()
@@ -146,6 +162,14 @@ class VCardString(VCardField):
         return self.value.encode("utf-8")
 
 class VCardXString(VCardString):
+    """Generic class for all text vCard fields not defined in RFC 2426.
+
+    In the RFC 2425 representation field name will be prefixed with 'x-'.
+
+    :Ivariables:
+        - `value`: field value.
+    :Types:
+        - `value`: `unicode`"""
     def rfc2426(self):
         """RFC2426-encode the field content.
 
@@ -154,7 +178,26 @@ class VCardXString(VCardString):
         return rfc2425encode("x-"+self.name,self.value)
 
 class VCardJID(VCardField):
+    """JID vCard field.
+
+    This field is not defined in RFC 2426, so it will be named 'x-jabberid'
+    in RFC 2425 output.
+
+    :Ivariables:
+        - `value`: field value.
+    :Types:
+        - `value`: `JID`"""
     def __init__(self,name,value,rfc2425parameters=None):
+        """Initialize a `VCardJID` object.
+
+        :Parameters:
+            - `name`: field name
+            - `value`: field value as string or an XML node
+            - `rfc2425parameters`: optional RFC 2425 parameters
+        :Types:
+            - `name`: `str`
+            - `value`: `str` or `libxml2.xmlNode`
+            - `rfc2425parameters`: `dict`"""
         VCardField.__init__(self,name)
         if isinstance(value,libxml2.xmlNode):
             self.value=pyxmpp.jid.JID(value.getContent())
@@ -188,7 +231,31 @@ class VCardJID(VCardField):
         return self.value.as_string()
 
 class VCardName(VCardField):
+    """Name vCard field.
+
+    :Ivariables:
+        - `family`: family name.
+        - `given`: given name.
+        - `middle`: middle name.
+        - `prefix`: name prefix.
+        - `suffix`: name suffix.
+    :Types:
+        - `family`: `unicode`
+        - `given`: `unicode`
+        - `middle`: `unicode`
+        - `prefix`: `unicode`
+        - `suffix`: `unicode`"""
     def __init__(self,name,value,rfc2425parameters=None):
+        """Initialize a `VCardName` object.
+
+        :Parameters:
+            - `name`: field name
+            - `value`: field value as string or an XML node
+            - `rfc2425parameters`: optional RFC 2425 parameters
+        :Types:
+            - `name`: `str`
+            - `value`: `str` or `libxml2.xmlNode`
+            - `rfc2425parameters`: `dict`"""
         VCardField.__init__(self,name)
         if self.name.upper()!="N":
             raise RuntimeError,"VCardName handles only 'N' type"
@@ -270,7 +337,27 @@ class VCardName(VCardField):
         return self.__unicode__().encode("utf-8")
 
 class VCardImage(VCardField):
+    """Image vCard field.
+
+    :Ivariables:
+        - `image`: image binary data (when `uri` is None)
+        - `uri`: image URI (when `image` is None)
+        - `type`: optional image type
+    :Types:
+        - `image`: `str`
+        - `uri`: `unicode`
+        - `type`: `unicode`"""
     def __init__(self,name,value,rfc2425parameters=None):
+        """Initialize a `VCardImage` object.
+
+        :Parameters:
+            - `name`: field name
+            - `value`: field value as string or an XML node
+            - `rfc2425parameters`: optional RFC 2425 parameters
+        :Types:
+            - `name`: `str`
+            - `value`: `str` or `libxml2.xmlNode`
+            - `rfc2425parameters`: `dict`"""
         VCardField.__init__(self,name)
         if not rfc2425parameters:
             rfc2425parameters={}
@@ -347,7 +434,35 @@ class VCardImage(VCardField):
 
 
 class VCardAdr(VCardField):
+    """Address vCard field.
+
+    :Ivariables:
+        - `pobox`: the post office box.
+        - `extadr`: the extended address.
+        - `street`: the street address.
+        - `locality`: the locality (e.g. city).
+        - `region`: the region.
+        - `pcode`: the postal code.
+        - `ctry`: the country.
+    :Types:
+        - `pobox`: `unicode`
+        - `extadr`: `unicode`
+        - `street`: `unicode`
+        - `locality`: `unicode`
+        - `region`: `unicode`
+        - `pcode`: `unicode`
+        - `ctry`: `unicode`"""
     def __init__(self,name,value,rfc2425parameters=None):
+        """Initialize a `VCardAdr` object.
+
+        :Parameters:
+            - `name`: field name
+            - `value`: field value as string or an XML node
+            - `rfc2425parameters`: optional RFC 2425 parameters
+        :Types:
+            - `name`: `str`
+            - `value`: `str` or `libxml2.xmlNode`
+            - `rfc2425parameters`: `dict`"""
         VCardField.__init__(self,name)
         if not rfc2425parameters:
             rfc2425parameters={}
@@ -436,6 +551,16 @@ class VCardAdr(VCardField):
 
 class VCardLabel(VCardField):
     def __init__(self,name,value,rfc2425parameters=None):
+        """Initialize a `VCardLabel` object.
+
+        :Parameters:
+            - `name`: field name
+            - `value`: field value as string or an XML node
+            - `rfc2425parameters`: optional RFC 2425 parameters
+        :Types:
+            - `name`: `str`
+            - `value`: `str` or `libxml2.xmlNode`
+            - `rfc2425parameters`: `dict`"""
         VCardField.__init__(self,name)
         if not rfc2425parameters:
             rfc2425parameters={}
@@ -504,6 +629,16 @@ class VCardLabel(VCardField):
 
 class VCardTel(VCardField):
     def __init__(self,name,value,rfc2425parameters=None):
+        """Initialize a `VCardTel` object.
+
+        :Parameters:
+            - `name`: field name
+            - `value`: field value as string or an XML node
+            - `rfc2425parameters`: optional RFC 2425 parameters
+        :Types:
+            - `name`: `str`
+            - `value`: `str` or `libxml2.xmlNode`
+            - `rfc2425parameters`: `dict`"""
         VCardField.__init__(self,name)
         if not rfc2425parameters:
             rfc2425parameters={}
@@ -567,6 +702,16 @@ class VCardTel(VCardField):
 
 class VCardEmail(VCardField):
     def __init__(self,name,value,rfc2425parameters=None):
+        """Initialize a `VCardEmail` object.
+
+        :Parameters:
+            - `name`: field name
+            - `value`: field value as string or an XML node
+            - `rfc2425parameters`: optional RFC 2425 parameters
+        :Types:
+            - `name`: `str`
+            - `value`: `str` or `libxml2.xmlNode`
+            - `rfc2425parameters`: `dict`"""
         VCardField.__init__(self,name)
         if not rfc2425parameters:
             rfc2425parameters={}
@@ -627,6 +772,16 @@ class VCardEmail(VCardField):
 
 class VCardGeo(VCardField):
     def __init__(self,name,value,rfc2425parameters=None):
+        """Initialize a `VCardGeo` object.
+
+        :Parameters:
+            - `name`: field name
+            - `value`: field value as string or an XML node
+            - `rfc2425parameters`: optional RFC 2425 parameters
+        :Types:
+            - `name`: `str`
+            - `value`: `str` or `libxml2.xmlNode`
+            - `rfc2425parameters`: `dict`"""
         VCardField.__init__(self,name)
         if self.name.upper()!="GEO":
             raise RuntimeError,"VCardName handles only 'GEO' type"
@@ -676,6 +831,16 @@ class VCardGeo(VCardField):
 
 class VCardOrg(VCardField):
     def __init__(self,name,value,rfc2425parameters=None):
+        """Initialize a `VCardOrg` object.
+
+        :Parameters:
+            - `name`: field name
+            - `value`: field value as string or an XML node
+            - `rfc2425parameters`: optional RFC 2425 parameters
+        :Types:
+            - `name`: `str`
+            - `value`: `str` or `libxml2.xmlNode`
+            - `rfc2425parameters`: `dict`"""
         VCardField.__init__(self,name)
         if self.name.upper()!="ORG":
             raise RuntimeError,"VCardName handles only 'ORG' type"
@@ -732,6 +897,16 @@ class VCardOrg(VCardField):
 
 class VCardCategories(VCardField):
     def __init__(self,name,value,rfc2425parameters=None):
+        """Initialize a `VCardCategories` object.
+
+        :Parameters:
+            - `name`: field name
+            - `value`: field value as string or an XML node
+            - `rfc2425parameters`: optional RFC 2425 parameters
+        :Types:
+            - `name`: `str`
+            - `value`: `str` or `libxml2.xmlNode`
+            - `rfc2425parameters`: `dict`"""
         VCardField.__init__(self,name)
         self.name=name
         if self.name.upper()!="CATEGORIES":
@@ -779,6 +954,16 @@ class VCardCategories(VCardField):
 
 class VCardSound(VCardField):
     def __init__(self,name,value,rfc2425parameters=None):
+        """Initialize a `VCardSound` object.
+
+        :Parameters:
+            - `name`: field name
+            - `value`: field value as string or an XML node
+            - `rfc2425parameters`: optional RFC 2425 parameters
+        :Types:
+            - `name`: `str`
+            - `value`: `str` or `libxml2.xmlNode`
+            - `rfc2425parameters`: `dict`"""
         VCardField.__init__(self,name)
         if not rfc2425parameters:
             rfc2425parameters={}
@@ -849,6 +1034,16 @@ class VCardSound(VCardField):
 
 class VCardPrivacy(VCardField):
     def __init__(self,name,value,rfc2425parameters=None):
+        """Initialize a `VCardPrivacy` object.
+
+        :Parameters:
+            - `name`: field name
+            - `value`: field value as string or an XML node
+            - `rfc2425parameters`: optional RFC 2425 parameters
+        :Types:
+            - `name`: `str`
+            - `value`: `str` or `libxml2.xmlNode`
+            - `rfc2425parameters`: `dict`"""
         VCardField.__init__(self,name)
         if isinstance(value,libxml2.xmlNode):
             self.value=None
@@ -898,6 +1093,16 @@ class VCardPrivacy(VCardField):
 
 class VCardKey(VCardField):
     def __init__(self,name,value,rfc2425parameters=None):
+        """Initialize a `VCardKey` object.
+
+        :Parameters:
+            - `name`: field name
+            - `value`: field value as string or an XML node
+            - `rfc2425parameters`: optional RFC 2425 parameters
+        :Types:
+            - `name`: `str`
+            - `value`: `str` or `libxml2.xmlNode`
+            - `rfc2425parameters`: `dict`"""
         VCardField.__init__(self,name)
         if not rfc2425parameters:
             rfc2425parameters={}
@@ -1165,4 +1370,5 @@ class VCard:
         if self.content.has_key(name.upper()):
             return self.content[name.upper()]
         raise AttributeError,"Attribute %r not found" % (name,)
+
 # vi: sts=4 et sw=4
