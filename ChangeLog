@@ -1,3 +1,8 @@
+2004-09-18  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* migrate-0_5-0_6.py:
+	- a little fix (match only whole words as stanza class name, include MUC stanzas)
+
 2004-09-16  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/jabber/clientstream.py, pyxmpp/jabber/muc.py, pyxmpp/client.py, pyxmpp/iq.py, pyxmpp/message.py, pyxmpp/presence.py, pyxmpp/roster.py, pyxmpp/stanza.py, pyxmpp/stream.py, CHANGES, migrate-0_5-0_6.py:
