@@ -26,7 +26,7 @@ import base64
 
 from expdict import ExpiringDictionary
 from utils import from_utf8,to_utf8
-from stanza import Stanza,common_ns,common_doc
+from stanza import Stanza,common_doc
 from error import ErrorNode
 from iq import Iq
 from presence import Presence

@@ -16,7 +16,7 @@
 #
 
 import libxml2
-from stanza import Stanza,StanzaError,common_ns
+from stanza import Stanza,StanzaError
 from utils import to_utf8,from_utf8
 
 message_types=("normal","chat","headline")
@@ -52,19 +52,19 @@ class Message(Stanza):
 			node="message"
 		apply(Stanza.__init__,[self,node],kw)
 		if subject:
-			self.node.newChild(common_ns,"subject",to_utf8(subject))
+			self.node.newChild(None,"subject",to_utf8(subject))
 		if body:
-			self.node.newChild(common_ns,"body",to_utf8(body))
+			self.node.newChild(None,"body",to_utf8(body))
 
 	def get_subject(self):
-		n=self.xpath_eval("common:subject")
+		n=self.xpath_eval("subject")
 		if n:
 			return from_utf8(n[0].getContent())
 		else:
 			return None
 	
 	def get_body(self):
-		n=self.xpath_eval("common:body")
+		n=self.xpath_eval("body")
 		if n:
 			return from_utf8(n[0].getContent())
 		else:

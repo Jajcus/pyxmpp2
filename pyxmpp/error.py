@@ -18,7 +18,7 @@
 import libxml2
 
 from utils import from_utf8,to_utf8
-from stanza import common_doc,common_ns,common_root,common_xpath_ctxt
+from stanza import common_doc,common_root
 
 stream_errors_conditions={
 			("host-gone","address"):1,
@@ -103,21 +103,18 @@ class ErrorNode:
 			else:
 				self.type="stanza"
 			if copy:
-				self.node.replaceNs(ns,common_ns)
-				try:
-					self.node.removeNs(ns)
-				except:
-					pass
+				self.node.replaceNs(ns,None)
+				self.node.removeNs(ns)
 		elif condition is None:
 			raise ErrorNodeError,"Condition not given"
 		elif typ not in ("stream","stanza"):
 			raise ErrorNodeError,"Bad error type"
 		else:
 			if parent:
-				self.node=parent.newChild(common_ns,"error",None)
+				self.node=parent.newChild(None,"error",None)
 				self.borrowed=1
 			else:
-				self.node=common_root.newChild(common_ns,"error",None)
+				self.node=common_root.newChild(None,"error",None)
 			self.node.setProp("class",node_or_class)
 			cond=self.node.newChild(None,"condition",None)
 			if typ=="stream":

@@ -22,13 +22,8 @@ from utils import from_utf8,to_utf8
 from types import StringType,UnicodeType
 from jid import JID
 
-COMMON_NS="http://www.bnet.pl/~jajcus/pyxmpp/common"
 common_doc=libxml2.newDoc("1.0")
 common_root=common_doc.newChild(None,"root",None)
-common_ns=common_root.newNs(COMMON_NS,None)
-common_root.setNs(common_ns)
-common_xpath_ctxt = common_doc.xpathNewContext()
-common_xpath_ctxt.xpathRegisterNs("common",common_ns.getContent())
 
 class StanzaError(RuntimeError):
 	pass
@@ -44,7 +39,7 @@ def gen_id():
 class Stanza:
 	stanza_type="Unknown"
 	def __init__(self,name_node,**kw):
-		global common_doc,common_ns
+		global common_doc
 		self.error=None
 		self.node=None
 		
@@ -56,14 +51,10 @@ class Stanza:
 			common_doc.addChild(self.node)
 			ns=self.node.ns()
 			if not ns.name:
-				self.node.replaceNs(ns,common_ns)
-				try:
-					self.node.removeNs(ns)
-				except:
-					pass
+				self.node.replaceNs(ns,None)
+				self.node.removeNs(ns)
 		else:	
-			self.node=common_doc.newChild(common_ns,name_node,None)
-			self.node.setNs(common_ns)
+			self.node=common_doc.newChild(None,name_node,None)
 
 		if kw.has_key("fr"):
 			fr=kw["fr"]
@@ -131,8 +122,7 @@ class Stanza:
 	def get_error(self):
 		if self.error:
 			return self.error
-		common_xpath_ctxt.setContextNode(self.node)
-		n=common_xpath_ctxt.xpathEval(u"common:error")
+		n=self.node.xpathEval(u"error")
 		if not n:
 			raise StanzaError,"This stanza contains no error"
 		from error import ErrorNode
@@ -187,8 +177,7 @@ class Stanza:
 
 	def xpath_eval(self,expr,namespaces=None):
 		if not namespaces:
-			common_xpath_ctxt.setContextNode(self.node)
-			return common_xpath_ctxt.xpathEval(expr)
+			return self.node.xpathEval(expr)
 		ctxt = common_doc.xpathNewContext()
 		ctxt.setContextNode(self.node)
 		for prefix,uri in namespaces.items():

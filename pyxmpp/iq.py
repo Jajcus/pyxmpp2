@@ -68,8 +68,11 @@ class Iq(Stanza):
 		
 	def get_query(self):
 		for c in self.node.xpathEval("*"):
-			if c.ns()!=self.node.ns():
-				return c
+			try:
+				if c.ns():
+					return c
+			except libxml2.treeError:
+				pass
 		raise StanzaError,"This iq stanza doesn't contain any query"
 
 	def get_query_ns(self):

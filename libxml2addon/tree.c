@@ -46,7 +46,7 @@
  * This function removes namespace declaration from a node. It will
  * refuse to do so if the namespace is used somwhere in the subtree.
  *
- * Returns the modified node or NULL in case of error
+ * Returns the tree pointer or NULL in case of error
  */
 xmlNodePtr
 xmlRemoveNs(xmlNodePtr tree,xmlNsPtr ns) {
@@ -127,9 +127,7 @@ xmlRemoveNs(xmlNodePtr tree,xmlNsPtr ns) {
 
     /* there is no such namespace declared here */
     if (declNode == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-            "xmlRemoveNs : no such namespace declared\n");
-        return(NULL);
+        return(tree);
     }
 
     prev=NULL;
@@ -145,7 +143,7 @@ xmlRemoveNs(xmlNodePtr tree,xmlNsPtr ns) {
           nsDef=nsDef->next;
     }
 
-    return(declNode);
+    return(tree);
 }
 
 /**
@@ -156,20 +154,15 @@ xmlRemoveNs(xmlNodePtr tree,xmlNsPtr ns) {
  *
  * This function replaces oldNs with newNs evereywhere within the tree.
  * oldNs declaration is left untouched. xmlReconciliateNs or xmlRemoveNs
- * should be used afterwards.
+ * should be used afterwards. Both oldNs and newNs may be NULL.
  *
- * Returns newNs or NULL in case of error
+ * Returns the tree pointer or NULL in case of error
  */
 xmlNsPtr
 xmlReplaceNs(xmlNodePtr tree,xmlNsPtr oldNs,xmlNsPtr newNs) {
     xmlNodePtr node = tree;
     xmlAttrPtr attr;
 
-    if (oldNs == NULL || newNs == NULL) {
-         xmlGenericError(xmlGenericErrorContext,
-                    "xmlReplaceNs : NULL namespace\n");
-         return(NULL);
-    }
     while (node != NULL) {
         /*
          * Check if the namespace is in use by the node
@@ -219,5 +212,5 @@ xmlReplaceNs(xmlNodePtr tree,xmlNsPtr oldNs,xmlNsPtr newNs) {
             break;
     }
 
-    return(newNs);
+    return(tree);
 }

@@ -18,7 +18,7 @@
 import libxml2
 
 from utils import to_utf8,from_utf8
-from stanza import Stanza,StanzaError,common_ns
+from stanza import Stanza,StanzaError
 
 presence_types=("available","unavailable","subscribe","unsubscribe","subscribed",
 		"unsubscribed","invisible","error")
@@ -54,19 +54,19 @@ class Presence(Stanza):
 			node="presence"
 		apply(Stanza.__init__,[self,node],kw)
 		if show:
-			self.node.newChild(common_ns,"show",to_utf8(show))
+			self.node.newChild(None,"show",to_utf8(show))
 		if status:
-			self.node.newChild(common_ns,"status",to_utf8(status))
+			self.node.newChild(None,"status",to_utf8(status))
 
 	def get_status(self):
-		n=self.xpath_eval("common:status")
+		n=self.xpath_eval("status")
 		if n:
 			return from_utf8(n[0].getContent())
 		else:
 			return None
 	
 	def get_show(self):
-		n=self.xpath_eval("common:show")
+		n=self.xpath_eval("show")
 		if n:
 			return from_utf8(n[0].getContent())
 		else:

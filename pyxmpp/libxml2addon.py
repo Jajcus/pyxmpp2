@@ -24,7 +24,7 @@ Original libxml2 (at least its xmlreader interface) is not suitable for parsing
 XMPP streams."""
 
 import libxml2
-from libxml2 import xmlNs,xmlDoc,xmlNode
+from libxml2 import xmlNs,xmlDoc,xmlNode,treeError
 import _libxml2addon
 
 def _xmlStreamReaderErrorFunc((f,arg),msg,severity,locator):
