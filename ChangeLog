@@ -1,5 +1,12 @@
 2004-03-23  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/jabber/vcard.py:
+	- some missing self.name assignments
+
+	* pyxmpp/jabber/vcard.py:
+	- minor bugfixes
+	- fix broken vCards (missing FN or N)
+
 	* pyxmpp/jabber/client.py, pyxmpp/jabber/disco.py, pyxmpp/jabber/vcard.py:
 	- constants for standard namespaces
 
