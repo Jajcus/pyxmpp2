@@ -149,13 +149,13 @@ class Stanza:
 	def set_content(self,content):
 		while self.node.children:
 			self.node.children.unlinkNode()
-		if isistance(content,libxml2.xmlNode):
+		if isinstance(content,libxml2.xmlNode):
 			self.node.addChild(content.docCopyNode(common_doc,1))
 		else:
 			self.node.setContent(content)
 			
 	def add_content(self,content):
-		if isistance(content,libxml2.xmlNode):
+		if isinstance(content,libxml2.xmlNode):
 			self.node.addChild(content.docCopyNode(common_doc,1))
 		else:
 			self.node.addContent(content)
