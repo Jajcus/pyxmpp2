@@ -5,6 +5,11 @@ Those are mentioned here as are not backward compatible.
 I want the api to be stable and consistent in the next release and later,
 so I do all the big changes now (I would have to do them at some time anyway).
 
+2005-03-20
+
+	"common_doc", "common_root", and "common_ns" can no longer be imported
+	from the "stanza" module. They were moved to the "xmlextra" module.
+
 2005-01-20
 
 	Minor change: now "disco_info" and "disco_items" attributes

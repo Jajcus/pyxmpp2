@@ -30,7 +30,7 @@ import logging
 from pyxmpp.stream import Stream
 from pyxmpp.streambase import StreamError,FatalStreamError
 from pyxmpp.streambase import stanza_factory,HostMismatch
-from pyxmpp.stanza import common_doc,common_root
+from pyxmpp.xmlextra import common_doc,common_root
 from pyxmpp.utils import to_utf8
 
 class ComponentStreamError(StreamError):

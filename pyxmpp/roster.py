@@ -26,7 +26,7 @@ __docformat__="restructuredtext en"
 
 import libxml2
 
-from pyxmpp.stanza import common_doc
+from pyxmpp.xmlextra import common_doc
 from pyxmpp.iq import Iq
 from pyxmpp.jid import JID
 

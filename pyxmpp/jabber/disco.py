@@ -26,7 +26,8 @@ __docformat__="restructuredtext en"
 
 import libxml2
 
-from pyxmpp.stanza import common_doc,common_root,StanzaError
+from pyxmpp.xmlextra import common_doc,common_root
+from pyxmpp.stanza import StanzaError
 from pyxmpp.jid import JID
 from pyxmpp import cache
 
