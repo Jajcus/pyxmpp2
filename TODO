@@ -3,7 +3,6 @@ general:
 - documentation
 
 xmpp-base:
-- full StartTLS support
 - jabber:server stream support
 
 xmpp-im:
