@@ -187,6 +187,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 				addrs=[(addr,port)]
 		else:
 			addrs=[(addr,port)]
+		msg="The host name is not known"
 		for addr,port in addrs:
 			if type(addr) in (StringType,UnicodeType):
 				self.state_change("resolving",addr)
