@@ -64,7 +64,11 @@ class VCardString:
 	def __init__(self,name,value,rfc2425parameters={}):
 		self.name=name
 		if isinstance(value,libxml2.xmlNode):
-			self.value=unicode(value.getContent(),"utf-8","replace").strip()
+			value=value.getContent()
+			if value:
+				self.value=unicode(value,"utf-8","replace").strip()
+			else:
+				self.value=u""
 		else:
 			self.value=value
 		if not self.value:
@@ -100,6 +104,7 @@ class VCardName:
 			raise RuntimeError,"VCardName handles only 'N' type"
 		if isinstance(value,libxml2.xmlNode):
 			self.family,self.given,self.middle,self.prefix,self.suffix=[u""]*5
+			empty=1
 			n=value.children
 			vns=get_node_ns(value)
 			while n:
@@ -112,15 +117,22 @@ class VCardName:
 					continue
 				if n.name=='FAMILY':
 					self.family=unicode(n.getContent(),"utf-8")
+					empty=0
 				if n.name=='GIVEN':
 					self.given=unicode(n.getContent(),"utf-8")
+					empty=0
 				if n.name=='MIDDLE':
 					self.middle=unicode(n.getContent(),"utf-8")
+					empty=0
 				if n.name=='PREFIX':
 					self.prefix=unicode(n.getContent(),"utf-8")
+					empty=0
 				if n.name=='SUFFIX':
 					self.suffix=unicode(n.getContent(),"utf-8")
+					empty=0
 				n=n.next
+			if empty:
+				raise Empty,"Empty N value"
 		else:
 			v=value.split(";")
 			value=[u""]*5
@@ -323,7 +335,7 @@ class VCardTel:
 		if self.name.upper()!="TEL":
 			raise RuntimeError,"VCardTel handles only 'TEL' type"
 		if isinstance(value,libxml2.xmlNode):
-			number=None
+			self.number=None
 			self.type=[]
 			n=value.children
 			vns=get_node_ns(value)
@@ -371,7 +383,7 @@ class VCardEmail:
 		if self.name.upper()!="EMAIL":
 			raise RuntimeError,"VCardEmail handles only 'EMAIL' type"
 		if isinstance(value,libxml2.xmlNode):
-			number=None
+			self.address=None
 			self.type=[]
 			n=value.children
 			vns=get_node_ns(value)
@@ -747,6 +759,30 @@ class VCard:
 				current=l
 			if started and current:
 				self.process_rfc2425_record(current)
+		if not self.content.get("N") and self.content.get("FN"):
+			s=self.fn.value.replace(";",",")
+			s=s.split(None,2)
+			if len(s)==2:
+				s=u"%s;%s;;;" % (s[1],s[0])
+			elif len(s)==3:
+				s=u"%s;%s;%s" % (s[2],s[0],s[1])
+			else:	
+				s=u"%s;;;;" % (s[0],)
+			self.content["N"]=VCardName("N",s)
+		elif not self.content.get("FN") and self.content.get("N"):
+			s=[]
+			if self.n.prefix:
+				s.append(self.n.prefix)
+			if self.n.given:
+				s.append(self.n.given)
+			if self.n.middle:
+				s.append(self.n.middle)
+			if self.n.family:
+				s.append(self.n.family)
+			if self.n.suffix:
+				s.append(self.n.suffix)
+			s=string.join(s," ")
+			self.content["FN"]=VCardString("FN",s)
 		for c,(cl,tp) in self.components.items():
 			if self.content.has_key(c):
 				continue
