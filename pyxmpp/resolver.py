@@ -29,6 +29,7 @@ import re
 import socket
 import dns.resolver
 import dns.name
+import dns.exception
 from encodings import idna
 
 service_aliases={"xmpp-server": ("jabber-server","jabber")}
@@ -108,7 +109,10 @@ def resolve_srv(domain,service,proto="tcp"):
             names_to_try.append(u"_%s._%s.%s" % (a,proto,domain))
     for name in names_to_try:
         name=idna.ToASCII(name)
-        r=dns.resolver.query(name, 'SRV')
+        try:
+            r=dns.resolver.query(name, 'SRV')
+        except dns.exception.DNSException:
+            continue
         if not r:
             continue
         return [(rr.target.to_text(),rr.port) for rr in reorder_srv(r)]
@@ -150,7 +154,10 @@ def getaddrinfo(host,port,family=0,socktype=socket.SOCK_STREAM,proto=0,allow_cna
     if ip_re.match(host):
         return [(socket.AF_INET,socktype,proto,host,(host,port))]
     host=idna.ToASCII(host)
-    r=dns.resolver.query(host, 'A')
+    try:
+        r=dns.resolver.query(host, 'A')
+    except dns.exception.DNSException:
+        r=dns.resolver.query(host+".", 'A')
     if not allow_cname and r.rrset.name!=dns.name.from_text(host):
         raise ValueError,"Unexpected CNAME record found for %s" % (host,)
     if r:
