@@ -1,5 +1,8 @@
 2004-09-11  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/clientstream.py, pyxmpp/stream.py, TODO.pylint, pylintrc:
+	- more cleanup
+
 	* pyxmpp/jabber/muc.py, pyxmpp/stream.py, pyxmpp/utils.py, Makefile, TODO.pylint:
 	- cleaning up the code
 
