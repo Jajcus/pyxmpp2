@@ -23,6 +23,7 @@ __docformat__="restructuredtext en"
 import sys
 import libxml2
 import threading
+import re
 
 common_doc = libxml2.newDoc("1.0")
 common_root = common_doc.newChild(None,"root",None)
@@ -320,6 +321,48 @@ except ImportError:
 ###########################################################
 # Common code                                    
 #-------------
+
+evil_characters_re=re.compile(r"[\000-\010\013\014\016-\037]",re.UNICODE)
+utf8_replacement_char=u"\ufffd".encode("utf-8")
+
+def remove_evil_characters(s):
+    """Remove control characters (not allowed in XML) from a string."""
+    if isinstance(s,unicode):
+        return evil_characters_re.sub(u"\ufffd",s)
+    else:
+        return evil_characters_re.sub(utf8_replacement_char,s)
+
+bad_nsdef_replace_re=re.compile(r"^([^<]*\<[^><]*\s+)(xmlns=((\"[^\"]*\")|(\'[^\']*\')))")
+
+def safe_serialize(xmlnode):
+    """Serialize an XML element making sure the result is sane.
+
+    Remove control characters and invalid namespace declarations from the
+    result string.
+
+    :Parameters:
+        - `xmlnode`: the XML element to serialize.
+    :Types:
+        - `xmlnode`: `libxml2.xmlNode`
+
+    :return: UTF-8 encoded serialized and sanitized element.
+    :returntype: `string`"""
+    try:
+        ns = xmlnode.ns()
+    except libxml2.treeError:
+        ns = None
+    try:
+        nsdef = xmlnode.nsDefs()
+    except libxml2.treeError:
+        nsdef = None
+    s=xmlnode.serialize(encoding="UTF-8")
+    while nsdef:
+        if nsdef.name is None and (not ns or (nsdef.name, nsdef.content)!=(ns.name, ns.content)):
+            s = bad_nsdef_replace_re.sub("\\1",s,1)
+            break
+        nsdef = nsdef.next
+    s=remove_evil_characters(s)
+    return s
 
 class StreamReader:
     """A simple push-parser interface for XML streams."""

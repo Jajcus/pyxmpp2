@@ -17,6 +17,8 @@ input_xml = """<?xml version="1.0" ?>
    <f/>
 </root>
 """
+input_doc = libxml2.parseDoc(input_xml)
+input_root = input_doc.getRootElement()
 
 output_xml = """<?xml version="1.0" ?>
 <root xmlns="http://pyxmpp.jabberstudio.org/xmlns/common" xmlns:prefix="http://pyxmpp.jabberstudio.org/xmlns/test1">
@@ -29,11 +31,9 @@ output_xml = """<?xml version="1.0" ?>
    <f/>
 </root>
 """
-
-input_doc = libxml2.parseDoc(input_xml)
-input_root = input_doc.getRootElement()
 output_doc = libxml2.parseDoc(output_xml)
 output_root = output_doc.getRootElement()
+
 
 class TestReplaceNs(unittest.TestCase):
     def test_replace_ns(self):
@@ -57,6 +57,23 @@ class TestReplaceNs(unittest.TestCase):
             n = n.next
         #print doc.serialize()
         self.failUnless(xml_elements_equal(root, output_root))
+        
+    def test_safe_serialize(self):
+        s1 = """<a xmlns="http://pyxmpp.jabberstudio.org/xmlns/test"><b a1="v1" xmlns="http://pyxmpp.jabberstudio.org/xmlns/test1" a2="v2"/></a>"""
+        doc1 = libxml2.parseDoc(s1)
+        root1 = doc1.getRootElement()
+        el1 = root1.children
+        el1.setNs(root1.ns())
+        
+        #s = el1.serialize()
+        s = xmlextra.safe_serialize(el1)
+
+        s2 = '<a xmlns="http://pyxmpp.jabberstudio.org/xmlns/test">%s</a>' % (s,)
+
+        doc2 = libxml2.parseDoc(s2)
+        root2 = doc2.getRootElement()
+        self.failUnless(xml_elements_equal(root1, root2))
+    
 
 def suite():
      suite = unittest.TestSuite()
