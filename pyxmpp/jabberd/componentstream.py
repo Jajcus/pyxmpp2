@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: componentstream.py,v 1.10 2004/09/12 08:21:39 jajcus Exp $"
+__revision__="$Id: componentstream.py,v 1.11 2004/09/13 21:15:08 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -25,7 +25,7 @@ import logging
 from types import UnicodeType
 
 from pyxmpp.stream import Stream,StreamError,FatalStreamError,SASLNotAvailable,SASLMechanismNotAvailable
-from pyxmpp.stream import StreamAuthenticationError,StanzaFactory,HostMismatch
+from pyxmpp.stream import StreamAuthenticationError,stanza_factory,HostMismatch
 from pyxmpp.iq import Iq
 from pyxmpp.stanza import common_doc,common_root
 from pyxmpp.jid import JID
@@ -127,7 +127,7 @@ class ComponentStream(Stream):
                 raise FatalComponentStreamError,"Hanshake error."
 
         if ns_uri in ("jabber:component:accept","jabber:client","jabber:server"):
-            stanza=StanzaFactory(node)
+            stanza=stanza_factory(node)
             self.lock.release()
             try:
                 self.process_stanza(stanza)

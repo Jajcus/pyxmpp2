@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: muc.py,v 1.22 2004/09/12 08:21:32 jajcus Exp $"
+__revision__="$Id: muc.py,v 1.23 2004/09/13 21:15:00 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -754,21 +754,21 @@ class MucRoomState:
         """
         Send a leave request for the room.
         """
-        p=MucPresence(to=self.room_jid,type="unavailable")
+        p=MucPresence(to=self.room_jid,typ="unavailable")
         self.manager.stream.send(p)
 
     def send_message(self,body):
         """
         Send a message to the room.
         """
-        m=Message(to=self.room_jid.bare(),type="groupchat",body=body)
+        m=Message(to=self.room_jid.bare(),typ="groupchat",body=body)
         self.manager.stream.send(m)
 
     def set_subject(self,subject):
         """
         Send a subject change request to the room.
         """
-        m=Message(to=self.room_jid.bare(),type="groupchat",subject=subject)
+        m=Message(to=self.room_jid.bare(),typ="groupchat",subject=subject)
         self.manager.stream.send(m)
 
     def change_nick(self,new_nick):

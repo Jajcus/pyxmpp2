@@ -8,11 +8,12 @@ cd $topdir
 topdir=`pwd`
 cd build/lib.*
 
-FLAGS="--disable-msg W0324,W0322,W0323,W0704,W0121"
+DISABLE_MSG="W0324,W0322,W0323,W0704,W0121,W0702"
+IGNORE="^\\(W0232\\|E0201\\):[^:]*:JID"
 
 export PYLINTRC=$topdir/pylintrc
 if [ -n "$1" ] ; then
-	pylint $FLAGS $1
+	pylint --disable-msg $DISABLE_MSG $1 | sed -e"s#$IGNORE#ignore that: &#"
 else
-	pylint $FLAGS pyxmpp
+	pylint --disable-msg $DISABLE_MSG pyxmpp | sed -e"s#$IGNORE#ignore that: &#"
 fi

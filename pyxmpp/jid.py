@@ -17,7 +17,7 @@
 
 """jid --- Jabber ID handling"""
 
-__revision__="$Id: jid.py,v 1.27 2004/09/10 14:00:54 jajcus Exp $"
+__revision__="$Id: jid.py,v 1.28 2004/09/13 21:14:53 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import re
@@ -26,19 +26,20 @@ import weakref
 from types import StringType,UnicodeType
 from encodings import idna
 
-from pyxmpp.utils import to_utf8,from_utf8
+from pyxmpp.utils import from_utf8
 from pyxmpp.xmppstringprep import nodeprep,resourceprep
 
 node_invalid_re=re.compile(ur"[" u'"' ur"&'/:<>@\s\x00-\x19]",re.UNICODE)
 resource_invalid_re=re.compile(ur"[\s\x00-\x19]",re.UNICODE)
 
-def is_domain_valid(domain):
-    try:
-        idna.ToASCII(domain)
-    except:
-        return 0
-    return 1
 def are_domains_equal(a,b):
+    """Compare two International Domain Names.
+
+    :Parameters:
+        - `a`,`b`: domains names to compare
+
+    :return: True `a` and `b` are equal as domain names."""
+
     a=idna.ToASCII(a)
     b=idna.ToASCII(b)
     return a.lower()==b.lower()
@@ -48,47 +49,57 @@ class JIDError(ValueError):
     pass
 
 class JID(object):
+    """JID.
+
+    :Ivariables:
+        - `node`: node part of the JID
+        - `domain`: domain part of the JID
+        - `resource`: resource part of the JID
+    
+    JID objects are immutable. They are also cached for better performance.
+    """
     cache=weakref.WeakValueDictionary()
     __slots__=["node","domain","resource","__weakref__"]
-    def __new__(cls,node=None,domain=None,resource=None,check=1):
-        """JID(string[,check=val]) -> JID
-        JID(domain[,check=val]) -> JID
-        JID(node,domain[,resource][,check=val]) -> JID
-
-        Constructor for JID object.
-        When check argument is given and equal 0, than JID
-        is not checked for specification compliance. This
-        should be used only when other arguments are known
-        to be valid.
-
-        JID objects are immutable
+    def __new__(cls,node_or_jid=None,domain=None,resource=None,check=True):
+        """Create a new JID object or take one from the cache.
+        
+        :Parameters:
+            - `node_or_jid`: node part of the JID, JID object to copy or
+              Unicode representation of the JID.
+            - `domain`: domain part of the JID
+            - `resource`: resource part of the JID
+            - `check`: if `False` then JID is not checked for specifiaction
+              compliance.
         """
 
-        if isinstance(node,JID):
-            return node
+        if isinstance(node_or_jid,JID):
+            return node_or_jid
 
         if domain is None and resource is None:
-            obj=cls.cache.get(node)
+            obj=cls.cache.get(node_or_jid)
+            if obj:
+                return obj
         else:
             obj=None
         if obj is None:
             obj=object.__new__(cls)
 
-        if node and ((u"@" in node) or (u"/" in node)):
-            obj.__from_string(node)
-            cls.cache[node]=obj
+        if (node_or_jid and
+                ((u"@" in node_or_jid) or (u"/" in node_or_jid))):
+            obj.__from_string(node_or_jid)
+            cls.cache[node_or_jid]=obj
         else:
             if domain is None and resource is None:
-                if node is None:
+                if node_or_jid is None:
                     raise JIDError,"At least domain must be given"
-                domain=node
-                node=None
+                domain=node_or_jid
+                node_or_jid=None
             if check:
-                obj.__set_node(node)
+                obj.__set_node(node_or_jid)
                 obj.__set_domain(domain)
                 obj.__set_resource(resource)
             else:
-                object.__setattr__(obj,"node",node)
+                object.__setattr__(obj,"node",node_or_jid)
                 object.__setattr__(obj,"domain",domain)
                 object.__setattr__(obj,"resource",resource)
         return obj
@@ -96,10 +107,22 @@ class JID(object):
     def __setattr__(self,name,value):
         raise RuntimeError,"JID objects are immutable!"
 
-    def __from_string(self,s,check=1):
+    def __from_string(self,s,check=True):
+        """Initialize JID object from UTF-8 string.
+        
+        :Parameters:
+            - `s`: the JID string
+            - `check`: when `False` then the JID is not checked for
+              specification compliance."""
         return self.__from_unicode(from_utf8(s),check)
 
-    def __from_unicode(self,s,check=1):
+    def __from_unicode(self,s,check=True):
+        """Initialize JID object from Unicode string.
+        
+        :Parameters:
+            - `s`: the JID string
+            - `check`: when `False` then the JID is not checked for
+              specification compliance."""
         s1=s.split(u"/",1)
         s2=s1[0].split(u"@",1)
         if len(s2)==2:
@@ -124,30 +147,53 @@ class JID(object):
             object.__setattr__(self,"resource",None)
 
     def __set_node(self,s):
+        """Initialize `self.node`
+
+        :Parameters:
+            - `s`: Unicode or UTF-8 node part of the JID
+
+        :raise: `JIDError` if the node name is too long.
+        :raise: `pyxmpp.xmppstringprep.StringprepError` if the
+            node name fails Nodeprep preparation."""
         if s:
             s=from_utf8(s)
             s=nodeprep.prepare(s)
-            if len(s)>1023:
+            if len(s.encode("utf-8"))>1023:
                 raise JIDError,"Node name too long"
         else:
             s=None
         object.__setattr__(self,"node",s)
 
     def __set_domain(self,s):
-        if s: s=from_utf8(s)
+        """Initialize `self.domain`
+
+        :Parameters:
+            - `s`: Unicode or UTF-8 domain part of the JID
+
+        :raise: `JIDError` if the domain name is too long."""
+
+        if s: 
+            s=from_utf8(s)
         if s is None:
             raise JIDError,"Domain must be given"
-        if not is_domain_valid(s):
-            raise JIDError,"Invalid domain"
-        if len(s)>1023:
+        s=idna.nameprep(s)
+        if len(s.encode("utf-8"))>1023:
             raise JIDError,"Domain name too long"
         object.__setattr__(self,"domain",s)
 
     def __set_resource(self,s):
+        """Initialize `self.resource`
+
+        :Parameters:
+            - `s`: Unicode or UTF-8 resource part of the JID
+
+        :raise: `JIDError` if the resource name is too long.
+        :raise: `pyxmpp.xmppstringprep.StringprepError` if the
+            node name fails Resourceprep preparation."""
         if s:
             s=from_utf8(s)
             s=resourceprep.prepare(s)
-            if len(s)>1023:
+            if len(s.encode("utf-8"))>1023:
                 raise JIDError,"Resource name too long"
         else:
             s=None
@@ -163,15 +209,21 @@ class JID(object):
         return "<JID: %r>" % (self.as_unicode())
 
     def as_utf8(self):
-        "Returns UTF-8 encoded JID representation"
+        """UTF-8 encoded JID representation.
+        
+        :return: UTF-8 encoded JID."""
         return self.as_unicode().encode("utf-8")
 
     def as_string(self):
-        "Returns UTF-8 encoded JID representation"
+        """UTF-8 encoded JID representation.
+        
+        :return: UTF-8 encoded JID."""
         return self.as_utf8()
 
     def as_unicode(self):
-        "Unicode JID representation"
+        """Unicode string JID representation.
+        
+        :return: JID as Unicode string."""
         r=self.domain
         if self.node:
             r=self.node+u'@'+r
@@ -182,17 +234,19 @@ class JID(object):
         return r
 
     def bare(self):
-        "Returns bare JID made by removing resource from current JID"
-        return JID(self.node,self.domain,check=0)
+        """Make bare JID made by removing resource from current `self`.
+        
+        :return: new JID object without resource part."""
+        return JID(self.node,self.domain,check=False)
 
     def __eq__(self,other):
         if other is None:
-            return 0
+            return False
         elif type(other) in (StringType,UnicodeType):
             try:
                 other=JID(other)
             except:
-                return 0
+                return False
         elif not isinstance(other,JID):
             raise TypeError,"Can't compare JID with %r" % (type(other),)
 

@@ -17,7 +17,7 @@
 
 """Core XMPP stream functionality"""
 
-__revision__="$Id: stream.py,v 1.65 2004/09/11 23:11:21 jajcus Exp $"
+__revision__="$Id: stream.py,v 1.66 2004/09/13 21:14:53 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -253,18 +253,18 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         self._send_stream_start()
         self._make_reader()
 
-    def connect(self,addr,port,to=None):
+    def connect(self,addr,port,service=None,to=None):
         """Establish XMPP connection with given address
         
         :Parameters:
             - `addr`: peer name or IP address
-            - `servixe`: service name (to be resolved using SRV DNS records)
-              or port number
+            - `port`: port number to connect to
+            - `service`: service name (to be resolved using SRV DNS records)
             - `to`: peer name if different than `addr`
         """
         self.lock.acquire()
         try:
-            return self._connect(addr,port,to)
+            return self._connect(addr,port,service,to)
         finally:
             self.lock.release()
 
@@ -367,7 +367,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         """Called when connection state is changed.
 
         This method is supposed to be overriden in derived classes
-        or replaced by an application."""
+        or replaced by an application.
+        
+        It may be used to display the connection progress."""
         self.__logger.debug("State: %s: %r" % (state,arg))
 
     def close(self):
@@ -1003,6 +1005,18 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         return 1
 
     def process_stanza(self,stanza):
+        """Process stanza received from the stream.
+
+        First "fix" the stanza with `self.fix_in_stanza()`,
+        then pass it to `self.route_stanza()` if it is not directed
+        to `self.me` and `self.process_all_stanzas` is not True. Otherwise
+        stanza is passwd to `self.process_iq()`, `self.process_message()`
+        or `self.process_presence()` appropriately.
+        
+        :Parameters:
+            - `stanza`: the stanza received.
+        """
+        
         self.fix_in_stanza(stanza)
         to=stanza.get_to()
 
@@ -1021,17 +1035,51 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         self.__logger.debug("Unhandled %r stanza: %r" % (stanza.stanza_type,stanza.serialize()))
 
     def check_to(self,to):
+        """Check "to" attribute of received stream header.
+
+        :return: `to` if it is equal to `self.me`, None otherwise.
+
+        Should be overriden in derived classes which require other logic
+        for handling that attribute."""
         if to!=self.me:
             return None
         return to
 
     def fix_in_stanza(self,stanza):
+        """Modify incoming stanza before processing it.
+
+        This implementation does nothig. It should be overriden in derived
+        classes if needed."""
         pass
 
     def fix_out_stanza(self,stanza):
+        """Modify outgoing stanza before sending into the stream.
+
+        This implementation does nothig. It should be overriden in derived
+        classes if needed."""
         pass
 
     def set_response_handlers(self,iq,res_handler,err_handler,timeout_handler=None,timeout=300):
+        """Set response handler for an IQ "get" or "set" stanza.
+
+        This should be called before the stanza is sent.
+
+        :Parameters:
+            - `iq`: an IQ stanza
+            - `res_handler`: result handler for the stanza. Will be called
+              when matching <iq type="result"/> is received. Its only
+              argument will be the stanza received.
+            - `err_handler`: error handler for the stanza. Will be called
+              when matching <iq type="error"/> is received. Its only
+              argument will be the stanza received.
+            - `timeout_handler`: timeout handler for the stanza. Will be called
+              when no matching <iq type="result"/> or <iq type="error"/> is
+              received in next `timeout` seconds. The handler should accept
+              two arguments and ignore them.
+            - `timeout`: timeout value for the stanza. After that time if no
+              matching <iq type="result"/> nor <iq type="error"/> stanza is
+              received, then timeout_handler (if given) will be called.
+        """
         self.lock.acquire()
         try:
             self._set_response_handlers(iq,res_handler,err_handler,timeout_handler,timeout)
@@ -1039,6 +1087,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             self.lock.release()
 
     def _set_response_handlers(self,iq,res_handler,err_handler,timeout_handler=None,timeout=300):
+        """Same as `Stream.set_response_handlers` but assume `self.lock` is acquired."""
         self.fix_out_stanza(iq)
         to=iq.get_to()
         if to:
@@ -1051,6 +1100,19 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
                                 res_handler,err_handler)
 
     def set_iq_get_handler(self,element,namespace,handler):
+        """Set <iq type="get"/> handler.
+
+        :Parameters:
+            - `element`: payload element name
+            - `namespace`: payload element namespace URI
+            - `handler`: function to be called when a stanza
+              with defined element is received. Its only argument
+              will be the stanza received.
+
+        Only one handler may be defined per one namespaced element.
+        If a handler for the element was already set it will be lost
+        after calling this method.
+        """
         self.lock.acquire()
         try:
             self.iq_get_handlers[(element,namespace)]=handler
@@ -1058,6 +1120,12 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             self.lock.release()
 
     def unset_iq_get_handler(self,element,namespace):
+        """Remove <iq type="get"/> handler.
+
+        :Parameters:
+            - `element`: payload element name
+            - `namespace`: payload element namespace URI
+        """
         self.lock.acquire()
         try:
             if self.iq_get_handlers.has_key((element,namespace)):
@@ -1066,6 +1134,18 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             self.lock.release()
 
     def set_iq_set_handler(self,element,namespace,handler):
+        """Set <iq type="set"/> handler.
+
+        :Parameters:
+            - `element`: payload element name
+            - `namespace`: payload element namespace URI
+            - `handler`: function to be called when a stanza
+              with defined element is received. Its only argument
+              will be the stanza received.
+
+        Only one handler may be defined per one namespaced element.
+        If a handler for the element was already set it will be lost
+        after calling this method."""
         self.lock.acquire()
         try:
             self.iq_set_handlers[(element,namespace)]=handler
@@ -1073,6 +1153,11 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             self.lock.release()
 
     def unset_iq_set_handler(self,element,namespace):
+        """Remove <iq type="set"/> handler.
+
+        :Parameters:
+            - `element`: payload element name.
+            - `namespace`: payload element namespace URI."""
         self.lock.acquire()
         try:
             if self.iq_set_handlers.has_key((element,namespace)):
@@ -1081,12 +1166,35 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             self.lock.release()
 
     def __add_handler(self,handler_list,typ,namespace,priority,handler):
+        """Add a handler function to a prioritized handler list.
+
+        :Parameters:
+            - `handler_list`: a handler list.
+            - `typ`: stanza type.
+            - `namespace`: stanza payload namespace.
+            - `priority`: handler priority. Must be >=0 and <=100. Handlers
+              with lower priority list will be tried first."""
         if priority<0 or priority>100:
             raise StreamError,"Bad handler priority (must be in 0:100)"
         handler_list.append((priority,typ,namespace,handler))
         handler_list.sort()
 
     def set_message_handler(self,typ,handler,namespace=None,priority=100):
+        """Set a handler for <message/> stanzas.
+
+        :Parameters:
+            - `typ`: message type. `None` will be treated the same as "normal",
+              and will be the default for unknown types (those that have no
+              handler associated).
+            - `namespace`: payload namespace. If `None` that message with any
+              payload (or even with no payload) will match.
+            - `priority`: priority value for the handler. Handlers with lower
+              priority value are tried first.
+
+        Multiple <message /> handlers with the same type/namespace/priority may
+        be set. Order of calling handlers with the same priority is not defined.
+        Handlers will be called in priority order until one of them returns True.
+        """
         self.lock.acquire()
         try:
             if not typ:
@@ -1096,6 +1204,19 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             self.lock.release()
 
     def set_presence_handler(self,typ,handler,namespace=None,priority=100):
+        """Set a handler for <presence/> stanzas.
+
+        :Parameters:
+            - `typ`: presence type. `None` will be treated the same as "available".
+            - `namespace`: payload namespace. If `None` that presence with any
+              payload (or even with no payload) will match.
+            - `priority`: priority value for the handler. Handlers with lower
+              priority value are tried first.
+
+        Multiple <presence /> handlers with the same type/namespace/priority may
+        be set. Order of calling handlers with the same priority is not defined.
+        Handlers will be called in priority order until one of them returns True.
+        """
         self.lock.acquire()
         try:
             if not typ:
@@ -1105,9 +1226,15 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             self.lock.release()
 
     def generate_id(self):
+        """Generate a random and unique stream ID.
+        
+        :return: the id string generated."""
         return "%i-%i-%s" % (os.getpid(),time.time(),str(random.random())[2:])
 
     def _got_features(self):
+        """Process incoming <stream:features/> element.
+
+        The received features node is available in `self.features`."""
         ctxt = self.doc_in.xpathNewContext()
         ctxt.setContextNode(self.features)
         ctxt.xpathRegisterNs("stream",STREAM_NS)
@@ -1152,7 +1279,15 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
                 self.state_change("authorized",self.me)
 
     def bind(self,resource):
-        iq=Iq(type="set")
+        """Bind to a resource.
+        
+        :Parameters:
+            - `resource`: the resource name to bind to.
+        
+        XMPP stream is authenticated for bare JID only. To use
+        the full JID it must be bound to a resource.
+        """
+        iq=Iq(typ="set")
         q=iq.new_query(BIND_NS,"bind")
         if resource:
             q.newTextChild(q.ns(),"resource",to_utf8(resource))
@@ -1162,25 +1297,42 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         iq.free()
 
     def _bind_success(self,stanza):
+        """Handle resource binding success.
+
+        :Parameters:
+            - `stanza`: <iq type="result"/> stanza received.
+        
+        Set `self.me` to the full JID negotiated."""
         jid_n=stanza.xpath_eval("bind:bind/bind:jid",{"bind":BIND_NS})
         if jid_n:
             self.me=JID(jid_n[0].getContent())
         self.state_change("authorized",self.me)
 
     def _bind_error(self,stanza):
+        """Handle resource binding success.
+
+        :raise: `FatalStreamError`"""
         raise FatalStreamError,"Resource binding failed"
 
     def connected(self):
+        """Check if stream is connected.
+
+        :return: True if stream connection is active."""
         if self.doc_in and self.doc_out and not self.eof:
-            return 1
+            return True
         else:
-            return 0
+            return False
 
     def _process_sasl_node(self,node):
+        """Process stream element in the SASL namespace.
+        
+        :Parameters:
+            - `node`: the XML node received
+        """
         if self.initiator:
             if not self.authenticator:
                 self.__logger.debug("Unexpected SASL response: %r" % (node.serialize()))
-                return 0
+                return False
             if node.name=="challenge":
                 return self._process_sasl_challenge(node.getContent())
             if node.name=="success":
@@ -1188,7 +1340,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             if node.name=="failure":
                 return self._process_sasl_failure(node)
             self.__logger.debug("Unexpected SASL node: %r" % (node.serialize()))
-            return 0
+            return False
         else:
             if node.name=="auth":
                 mechanism=node.prop("mechanism")
@@ -1198,12 +1350,18 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             if node.name=="abort":
                 return self._process_sasl_abort()
             self.__logger.debug("Unexpected SASL node: %r" % (node.serialize()))
-            return 0
+            return False
 
     def _process_sasl_auth(self,mechanism,content):
+        """Process incoming <sasl:auth/> element.
+
+        :Parameters:
+            - `mechanism`: mechanism choosen by the peer.
+            - `content`: optional "initial response" included in the element.
+        """
         if self.authenticator:
             self.__logger.debug("Authentication already started")
-            return 0
+            return False
 
         self.auth_method_used="sasl:"+mechanism
         self.authenticator=sasl.ServerAuthenticator(mechanism,self)
@@ -1245,12 +1403,17 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         if isinstance(r,sasl.Failure):
             raise SASLAuthenticationFailed,"SASL authentication failed"
 
-        return 1
+        return True
 
     def _process_sasl_challenge(self,content):
+        """Process incoming <sasl:challenge/> element.
+
+        :Parameters:
+            - `content`: the challenge data received (Base64-encoded).
+        """
         if not self.authenticator:
             self.__logger.debug("Unexpected SASL challenge")
-            return 0
+            return False
 
         r=self.authenticator.challenge(base64.decodestring(content))
         if isinstance(r,sasl.Response):
@@ -1274,9 +1437,14 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         if isinstance(r,sasl.Failure):
             raise SASLAuthenticationFailed,"SASL authentication failed"
 
-        return 1
+        return True
 
     def _process_sasl_response(self,content):
+        """Process incoming <sasl:response/> element.
+
+        :Parameters:
+            - `content`: the response data received (Base64-encoded).
+        """
         if not self.authenticator:
             self.__logger.debug("Unexpected SASL response")
             return 0
@@ -1322,13 +1490,17 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         return 1
 
     def _process_sasl_success(self,content):
+        """Process incoming <sasl:success/> element.
+
+        :Parameters:
+            - `content`: the "additional data with success" received (Base64-encoded).
+        """
         if not self.authenticator:
             self.__logger.debug("Unexpected SASL response")
-            return 0
+            return False
 
         r=self.authenticator.finish(base64.decodestring(content))
         if isinstance(r,sasl.Success):
-            el_name="success"
             self.__logger.debug("SASL authentication succeeded")
             if r.authzid:
                 self.me=JID(r.authzid)
@@ -1341,28 +1513,40 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         else:
             self.__logger.debug("SASL authentication failed")
             raise SASLAuthenticationFailed,"Additional success data procesing failed"
-        return 1
+        return True
 
     def _process_sasl_failure(self,node):
+        """Process incoming <sasl:failure/> element.
+
+        :Parameters:
+            - `node`: the XML node received.
+        """
         if not self.authenticator:
             self.__logger.debug("Unexpected SASL response")
-            return 0
+            return False
 
         self.__logger.debug("SASL authentication failed: %r" % (node.serialize(),))
         raise SASLAuthenticationFailed,"SASL authentication failed"
 
     def _process_sasl_abort(self):
+        """Process incoming <sasl:abort/> element."""
         if not self.authenticator:
             self.__logger.debug("Unexpected SASL response")
-            return 0
+            return False
 
         self.authenticator=None
         self.__logger.debug("SASL authentication aborted")
-        return 1
+        return True
 
     def _sasl_authenticate(self,username,authzid,mechanism=None):
+        """Start SASL authentication process.
+        
+        :Parameters:
+            - `username`: user name.
+            - `authzid`: authorization ID.
+            - `mechanism`: SASL mechanism to use."""
         if not self.initiator:
-            raise SASLAuthenticationError,"Only initiating entity start SASL authentication"
+            raise SASLAuthenticationFailed,"Only initiating entity start SASL authentication"
         while not self.features:
             self.__logger.debug("Waiting for features")
             self._read()
@@ -1403,6 +1587,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         node.freeNode()
 
     def _request_tls(self):
+        """Request a TLS-encrypted connection."""
         self.tls_requested=1
         self.features=None
         root=self.doc_out.getRootElement()
@@ -1414,15 +1599,20 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         node.freeNode()
 
     def _process_tls_node(self,node):
+        """Process stream element in the TLS namespace.
+        
+        :Parameters:
+            - `node`: the XML node received
+        """
         if not self.tls_settings or not tls_available:
             self.__logger.debug("Unexpected TLS node: %r" % (node.serialize()))
-            return 0
+            return False
         if self.initiator:
             if node.name=="failure":
                 raise TLSNegotiationFailed,"Peer failed to initialize TLS connection"
             elif node.name!="proceed" or not self.tls_requested:
                 self.__logger.debug("Unexpected TLS node: %r" % (node.serialize()))
-                return 0
+                return False
             try:
                 self.tls_requested=0
                 self._make_tls_connection()
@@ -1432,11 +1622,12 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
                 raise TLSError("TLS Error: "+str(e))
             self.__logger.debug("Restarting XMPP stream")
             self._restart_stream()
-            return 0
+            return True
         else:
             raise FatalStreamError,"TLS not implemented for the receiving side yet"
 
-    def _make_tls_connection(self,mode="connect"):
+    def _make_tls_connection(self):
+        """Initiate TLS connection."""
         if not tls_available or not self.tls_settings:
             raise TLSError,"TLS is not available"
 
@@ -1481,6 +1672,16 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             pass
 
     def _tls_verify_callback(self,ssl_ctx_ptr, x509_ptr, errnum, depth, ok):
+        """Certificate verification callback for TLS connections.
+        
+        :Parameters:
+            - `ssl_ctx_ptr`: TLS context pointer.
+            - `x509_ptr`: X.509 certificate pointer.
+            - `errnum`: error number.
+            - `depth`: verification depth.
+            - `ok`: current verification result.
+            
+        :return: computed verification result."""
         try:
             self.__logger.debug("tls_verify_callback(depth=%i,ok=%i)" % (depth,ok))
             from M2Crypto.SSL.Context import map as context_map
@@ -1517,11 +1718,26 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             raise
 
     def get_tls_connection(self):
+        """Get the TLS connection object for the stream.
+
+        :return: `self.tls`"""
         return self.tls
 
 TLS_ERR_BAD_CN=1001
 
 def cert_verify_callback(ssl_ctx_ptr, x509_ptr, errnum, depth, ok):
+    """Pass control to the right verification function for a TLS connection.
+
+    M2Crypto doesn't associate verification callbacks with connection, so
+    we have one global callback, which finds and calls right callback.
+
+    :Parameters:
+        - `ssl_ctx_ptr`: TLS context pointer.
+        - `x509_ptr`: X.509 certificate pointer.
+        - `errnum`: error number.
+        - `depth`: verification depth.
+        - `ok`: current verification result.
+    """
     from M2Crypto.SSL.Context import map as context_map
     ctx=context_map()[ssl_ctx_ptr]
     if hasattr(ctx,"_pyxmpp_stream"):

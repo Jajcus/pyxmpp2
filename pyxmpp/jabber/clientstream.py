@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: clientstream.py,v 1.13 2004/09/12 08:21:32 jajcus Exp $"
+__revision__="$Id: clientstream.py,v 1.14 2004/09/13 21:15:00 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -151,7 +151,7 @@ class LegacyClientStream(ClientStream):
             self.lock.release()
 
     def _auth_stage1(self):
-        iq=Iq(type="get")
+        iq=Iq(typ="get")
         q=iq.new_query("jabber:iq:auth")
         q.newTextChild(q.ns(),"username",to_utf8(self.me.node))
         q.newTextChild(q.ns(),"resource",to_utf8(self.me.resource))
@@ -198,7 +198,7 @@ class LegacyClientStream(ClientStream):
             self.lock.release()
 
     def _plain_auth_stage2(self,stanza):
-        iq=Iq(type="set")
+        iq=Iq(typ="set")
         q=iq.new_query("jabber:iq:auth")
         q.newTextChild(None,"username",to_utf8(self.me.node))
         q.newTextChild(None,"resource",to_utf8(self.me.resource))
@@ -232,7 +232,7 @@ class LegacyClientStream(ClientStream):
             self.send(iq)
 
     def _digest_auth_stage2(self,stanza):
-        iq=Iq(type="set")
+        iq=Iq(typ="set")
         q=iq.new_query("jabber:iq:auth")
         q.newTextChild(None,"username",to_utf8(self.me.node))
         q.newTextChild(None,"resource",to_utf8(self.me.resource))

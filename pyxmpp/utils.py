@@ -17,7 +17,7 @@
 
 """Utility functions for the pyxmpp package."""
 
-__revision__="$Id: utils.py,v 1.16 2004/09/11 20:48:50 jajcus Exp $"
+__revision__="$Id: utils.py,v 1.17 2004/09/13 21:14:53 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import sys
@@ -109,20 +109,20 @@ def datetime_utc_to_local(utc):
         u=datetime.datetime.utcfromtimestamp(ts)
         diff=u-utc
         if diff<minute and diff>-minute:
-                break
+            break
         if diff>nulldelta:
-                offset-=d
+            offset-=d
         else:
-                offset+=d
+            offset+=d
         d/=2
     return local
 
 def datetime_local_to_utc(local):
-        """
-        Simple function to convert naive `datetime.datetime` object containing
-        local time to a naive `datetime.datetime` object with UTC time.
-        """
-        ts=time.mktime(local.timetuple())
-        return datetime.datetime.utcfromtimestamp(ts)
+    """
+    Simple function to convert naive `datetime.datetime` object containing
+    local time to a naive `datetime.datetime` object with UTC time.
+    """
+    ts=time.mktime(local.timetuple())
+    return datetime.datetime.utcfromtimestamp(ts)
 
 # vi: sts=4 et sw=4

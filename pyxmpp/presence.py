@@ -17,7 +17,7 @@
 
 """Presence XMPP stanza handling"""
 
-__revision__="$Id: presence.py,v 1.19 2004/09/12 18:58:03 jajcus Exp $"
+__revision__="$Id: presence.py,v 1.20 2004/09/13 21:14:53 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -43,24 +43,27 @@ deny_responses={
         }
 
 class Presence(Stanza):
-    """Wraper object for Presence stanzas."""
+    """Wraper object for <presence /> stanzas."""
     stanza_type="presence"
-    def __init__(self,node=None,**kw):
-        """Initialize Presence object.
+    def __init__(self,node=None,fr=None,to=None,typ=None,sid=None,
+            show=None,status=None,priority=0,error=None,error_cond=None):
+        """Initialize a `Presence` object.
 
         :Parameters:
-            - `node`: XML node to be wrapped into Presence object
+            - `node`: XML node to be wrapped into the `Presence` object
               or other Presence object to be copied. If not given then new
               presence stanza is created using following parameters.
-            - `from`: sender JID.
+            - `fr`: sender JID.
             - `to`: recipient JID.
-            - `type`: staza type: one of: None, "available", "unavailable", "subscribe",
-              "subscribed", "unsubscribe", "unsubscribed". "available" is automaticaly
-              changed to None.
+            - `typ`: staza type: one of: None, "available", "unavailable",
+              "subscribe", "subscribed", "unsubscribe", "unsubscribed" or
+              "error". "available" is automaticaly changed to None.
+            - `sid`: stanza id -- value of stanza's "id" attribute
             - `show`: "show" field of presence stanza. One of: None, "away",
               "xa", "dnd", "chat".
             - `status`: descriptive text for the presence stanza.
-            - `priority`: presence priority."""
+            - `priority`: presence priority.
+            - `error_cond`: error condition name. Ignored if `typ` is not "error" """
         self.node=None
         if isinstance(node,Presence):
             pass
@@ -71,31 +74,18 @@ class Presence(Stanza):
         elif node is not None:
             raise TypeError,"Couldn't make Presence from %r" % (type(node),)
 
-        if kw.has_key("type") and kw["type"] and kw["type"] not in presence_types:
+        if typ and typ not in presence_types:
             raise StanzaError,"Invalid presence type: %r" % (type,)
 
-        if kw.get("type")=="available":
-            kw["type"]=None
-
-        if kw.has_key("show"):
-            show=kw["show"]
-            del kw["show"]
-        else:
-            show=None
-        if kw.has_key("status"):
-            status=kw["status"]
-            del kw["status"]
-        else:
-            status=None
-        if kw.has_key("priority"):
-            priority=kw["priority"]
-            del kw["priority"]
-        else:
-            priority=None
+        if typ=="available":
+            typ=None
 
         if node is None:
             node="presence"
-        apply(Stanza.__init__,[self,node],kw)
+            
+        Stanza.__init__(self, node, fr=fr, to=to, typ=typ, sid=sid,
+                error=error, error_cond=error_cond)
+       
         if show:
             self.node.newTextChild(None,"show",to_utf8(show))
         if status:
@@ -207,8 +197,8 @@ class Presence(Stanza):
             raise StanzaError,("Results may only be generated for 'subscribe',"
                 "'subscribed','unsubscribe' or 'unsubscribed' presence")
 
-        pr=Presence(type=accept_responses[self.get_type()],
-            fr=self.get_to(),to=self.get_from(),id=self.get_id())
+        pr=Presence(typ=accept_responses[self.get_type()],
+            fr=self.get_to(),to=self.get_from(),sid=self.get_id())
         return pr
 
     def make_deny_response(self):
@@ -220,8 +210,8 @@ class Presence(Stanza):
             raise StanzaError,("Results may only be generated for 'subscribe',"
                 "'subscribed','unsubscribe' or 'unsubscribed' presence")
 
-        pr=Presence(type=accept_responses[self.get_type()],
-            fr=self.get_to(),to=self.get_from(),id=self.get_id())
+        pr=Presence(typ=accept_responses[self.get_type()],
+            fr=self.get_to(),to=self.get_from(),sid=self.get_id())
         return pr
 
     def make_error_response(self,cond):
@@ -235,8 +225,8 @@ class Presence(Stanza):
         if self.get_type() == "error":
             raise StanzaError,"Errors may not be generated in response to errors"
 
-        p=Presence(type="error",fr=self.get_to(),to=self.get_from(),
-            id=self.get_id(),error_cond=cond)
+        p=Presence(typ="error",fr=self.get_to(),to=self.get_from(),
+            sid=self.get_id(),error_cond=cond)
 
         if self.node.children:
             n=self.node.children

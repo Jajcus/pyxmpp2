@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: error.py,v 1.21 2004/09/10 14:00:53 jajcus Exp $"
+__revision__="$Id: error.py,v 1.22 2004/09/13 21:14:53 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -253,8 +253,6 @@ class ErrorNode:
         ctxt = common_doc.xpathNewContext()
         ctxt.setContextNode(self.node)
         for prefix,uri in namespaces.items():
-            if uri==None:
-                uri=COMMON_NS
             ctxt.xpathRegisterNs(prefix,uri)
         ret=ctxt.xpathEval(expr)
         ctxt.xpathFreeContext()

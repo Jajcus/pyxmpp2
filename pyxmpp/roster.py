@@ -17,7 +17,7 @@
 
 """XMPP-IM roster handling"""
 
-__revision__="$Id: roster.py,v 1.19 2004/09/12 18:58:03 jajcus Exp $"
+__revision__="$Id: roster.py,v 1.20 2004/09/13 21:14:53 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 from types import StringType,UnicodeType
@@ -135,7 +135,7 @@ class RosterItem:
         Make "roster push" IQ stanza from the item representing roster update
         request.
         """
-        iq=Iq(type="set")
+        iq=Iq(typ="set")
         q=iq.new_query(ROSTER_NS)
         self.as_xml(q)
         return iq
@@ -276,7 +276,7 @@ class Roster:
         """
         Return roster item with given `jid`.
 
-        Will raise KeyError if the item is not found.
+        :raise: `KeyError` if the item is not found.
         """
         if not jid:
             raise ValueError,"jid is None"
@@ -322,7 +322,7 @@ class Roster:
         item=ctxt.xpathEval("r:item")
         ctxt.xpathFreeContext()
         if not item:
-            raise RosterError,"No item to update"
+            raise ValueError,"No item to update"
         item=item[0]
         item=RosterItem(item)
         jid=item.jid

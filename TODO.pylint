@@ -1,38 +1,20 @@
 ************* Module pyxmpp.xmppstringprep
 W0403: 24: Uses of a deprecated module 'stringprep'
-************* Module pyxmpp.roster
-E0602:325:Roster.update: Undefined variable 'RosterError'
-************* Module pyxmpp.presence
-W0231: 48:Presence.__init__: __init__ method from base class 'Stanza' is not called
-W0151:  0:Presence.__init__: Used builtin function 'apply'
-W0112: 48:Presence.__init__: Too many branches (16/12)
 ************* Module pyxmpp.jid
-W0141: 35:is_domain_valid: Missing docstring
-W0702: 39:is_domain_valid: No exception's type specified
-W0141: 41:are_domains_equal: Missing docstring
-W0141: 50:JID: Missing docstring
-W0232: 50:JID: Class has no __init__ method
-W0141: 99:JID.__from_string: Missing docstring
-W0141:102:JID.__from_unicode: Missing docstring
-W0141:126:JID.__set_node: Missing docstring
-W0141:136:JID.__set_domain: Missing docstring
-W0321:137:JID.__set_domain: More than one statement on a single line
-W0141:146:JID.__set_resource: Missing docstring
-W0702:195:JID.__eq__: No exception's type specified
-E0201:176:JID.as_unicode: Access to undefined member 'node'
-E0201:177:JID.as_unicode: Access to undefined member 'node'
-E0201:186:JID.bare: Access to undefined member 'node'
-E0201:199:JID.__eq__: Access to undefined member 'node'
-E0201:212:JID.__hash__: Access to undefined member 'node'
-E0201:178:JID.as_unicode: Access to undefined member 'resource'
-E0201:179:JID.as_unicode: Access to undefined member 'resource'
-E0201:201:JID.__eq__: Access to undefined member 'resource'
-E0201:212:JID.__hash__: Access to undefined member 'resource'
-E0201:175:JID.as_unicode: Access to undefined member 'domain'
-E0201:186:JID.bare: Access to undefined member 'domain'
-E0201:200:JID.__eq__: Access to undefined member 'domain'
-E0201:212:JID.__hash__: Access to undefined member 'domain'
-W0611: 29: Unused import to_utf8
+ignore that: W0232: 51:JID: Class has no __init__ method
+ignore that: E0201:228:JID.as_unicode: Access to undefined member 'node'
+ignore that: E0201:229:JID.as_unicode: Access to undefined member 'node'
+ignore that: E0201:240:JID.bare: Access to undefined member 'node'
+ignore that: E0201:253:JID.__eq__: Access to undefined member 'node'
+ignore that: E0201:266:JID.__hash__: Access to undefined member 'node'
+ignore that: E0201:230:JID.as_unicode: Access to undefined member 'resource'
+ignore that: E0201:231:JID.as_unicode: Access to undefined member 'resource'
+ignore that: E0201:255:JID.__eq__: Access to undefined member 'resource'
+ignore that: E0201:266:JID.__hash__: Access to undefined member 'resource'
+ignore that: E0201:227:JID.as_unicode: Access to undefined member 'domain'
+ignore that: E0201:240:JID.bare: Access to undefined member 'domain'
+ignore that: E0201:254:JID.__eq__: Access to undefined member 'domain'
+ignore that: E0201:266:JID.__hash__: Access to undefined member 'domain'
 ************* Module pyxmpp.xmlextra
 W0141:  0: Missing docstring
 W0232: 32:StreamHandler: Class has no __init__ method
@@ -127,47 +109,13 @@ I0001:  0: Unable to run raw checkers on built-in module pyxmpp._xmlextra
 W0141:  0: Missing docstring
 W0103:  0: Missing required attribute "__revision__"
 W0103:  0: Missing required attribute "__docformat__"
-************* Module pyxmpp.utils
-W0311:112: Bad indentation. Found 16 spaces, expected 12
-W0311:114: Bad indentation. Found 16 spaces, expected 12
-W0311:116: Bad indentation. Found 16 spaces, expected 12
-W0311:121: Bad indentation. Found 8 spaces, expected 4
-W0311:125: Bad indentation. Found 8 spaces, expected 4
-W0311:126: Bad indentation. Found 8 spaces, expected 4
 ************* Module pyxmpp.stanza
-W0141:  0: Missing docstring
-W0141: 32:StanzaError: Missing docstring
-W0141: 38:gen_id: Missing docstring
-W0141: 43:Stanza: Missing docstring
-W0622: 80:Stanza.__init__: Redefining built-in 'id'
-W0404: 85:Stanza.__init__: Relative import 'error'
-W0112: 45:Stanza.__init__: Too many branches (15/12)
-W0141: 92:Stanza.free: Missing docstring
-W0141:100:Stanza.copy: Missing docstring
-W0141:103:Stanza.serialize: Missing docstring
-W0141:106:Stanza.get_node: Missing docstring
-W0141:108:Stanza.get_from: Missing docstring
-W0141:113:Stanza.get_to: Missing docstring
-W0141:118:Stanza.get_type: Missing docstring
-W0141:120:Stanza.get_id: Missing docstring
-W0141:122:Stanza.get_error: Missing docstring
-W0404:128:Stanza.get_error: Relative import 'error'
-W0141:131:Stanza.set_from: Missing docstring
-W0141:136:Stanza.set_to: Missing docstring
-W0622:141:Stanza.set_type: Redefining built-in 'type'
-W0141:141:Stanza.set_type: Missing docstring
-W0141:146:Stanza.set_id: Missing docstring
-W0622:146:Stanza.set_id: Redefining built-in 'id'
-W0141:152:Stanza.set_content: Missing docstring
-W0141:160:Stanza.add_content: Missing docstring
-W0141:166:Stanza.set_new_content: Missing docstring
-W0141:171:Stanza.add_new_content: Missing docstring
-W0141:178:Stanza.xpath_eval: Missing docstring
-E0602:185:Stanza.xpath_eval: Undefined variable 'COMMON_NS'
-W0101:  0:Stanza.__eq__: Unreachable code
-W0101:  0:Stanza.__ne__: Unreachable code
-W0611: 23: Unused import StringType
-W0611: 23: Unused import UnicodeType
+W0613: 58:Stanza.__init__: Unused argument 'error'
+W0622:204:Stanza.set_type: Redefining built-in 'type'
+W0622:214:Stanza.set_id: Redefining built-in 'id'
+E0602:285:Stanza.xpath_eval: Undefined variable 'COMMON_NS'
+W0611: 25: Unused import StringType
+W0611: 25: Unused import UnicodeType
 ************* Module pyxmpp.resolver
 W0141:  0: Missing docstring
 W0403: 28: Uses of a deprecated module 'string'
@@ -241,17 +189,6 @@ W0611: 29: Unused import Iq
 W0611: 25: Unused import UnicodeType
 W0611: 22: Unused import sha
 W0611: 23: Unused import time
-************* Module pyxmpp.message
-W0141:  0: Missing docstring
-W0141: 27:Message: Missing docstring
-W0231: 29:Message.__init__: __init__ method from base class 'Stanza' is not called
-W0151:  0:Message.__init__: Used builtin function 'apply'
-W0112: 29:Message.__init__: Too many branches (15/12)
-W0141: 71:Message.get_subject: Missing docstring
-W0141: 78:Message.get_thread: Missing docstring
-W0141: 85:Message.copy: Missing docstring
-W0141: 88:Message.get_body: Missing docstring
-W0141: 95:Message.make_error_response: Missing docstring
 ************* Module pyxmpp.client
 W0141:  0: Missing docstring
 W0141: 34:ClientError: Missing docstring
@@ -292,53 +229,17 @@ W0611: 31: Unused import from_utf8
 W0611: 22: Unused import sys
 W0611: 24: Unused import traceback
 ************* Module pyxmpp.stream
-W0302:  0: Too many lines in module (1536)
+W0302:  0: Too many lines in module (1752)
 W0612:288:Stream._connect: Unused variable 'canonname'
 W0112:271:Stream._connect: Too many branches (13/12)
-W0112:398:Stream.stream_start: Too many branches (13/12)
-W0613:453:Stream.stream_end: Unused argument 'doc'
-W0613:479:Stream.stanza_end: Unused argument 'doc'
-W0613:488:Stream.stanza: Unused argument 'doc'
-W0612:710:Stream._loop_iter: Unused variable 'ofd'
-W0612:938:Stream.__try_handlers: Unused variable 'prio'
-W0141:1005:Stream.process_stanza: Missing docstring
-W0141:1023:Stream.check_to: Missing docstring
-W0141:1028:Stream.fix_in_stanza: Missing docstring
-W0141:1031:Stream.fix_out_stanza: Missing docstring
-W0141:1034:Stream.set_response_handlers: Missing docstring
-W0141:1041:Stream._set_response_handlers: Missing docstring
-W0141:1053:Stream.set_iq_get_handler: Missing docstring
-W0141:1060:Stream.unset_iq_get_handler: Missing docstring
-W0141:1068:Stream.set_iq_set_handler: Missing docstring
-W0141:1075:Stream.unset_iq_set_handler: Missing docstring
-W0141:1083:Stream.__add_handler: Missing docstring
-W0141:1089:Stream.set_message_handler: Missing docstring
-W0141:1098:Stream.set_presence_handler: Missing docstring
-W0141:1107:Stream.generate_id: Missing docstring
-W0141:1110:Stream._got_features: Missing docstring
-W0112:1110:Stream._got_features: Too many branches (15/12)
-W0141:1154:Stream.bind: Missing docstring
-W0141:1164:Stream._bind_success: Missing docstring
-W0141:1170:Stream._bind_error: Missing docstring
-W0141:1173:Stream.connected: Missing docstring
-W0141:1179:Stream._process_sasl_node: Missing docstring
-W0111:1179:Stream._process_sasl_node: Too many return statements (9/6)
-W0141:1203:Stream._process_sasl_auth: Missing docstring
-W0141:1250:Stream._process_sasl_challenge: Missing docstring
-W0141:1279:Stream._process_sasl_response: Missing docstring
-W0141:1324:Stream._process_sasl_success: Missing docstring
-W0612:1331:Stream._process_sasl_success: Unused variable 'el_name'
-W0141:1346:Stream._process_sasl_failure: Missing docstring
-W0141:1354:Stream._process_sasl_abort: Missing docstring
-W0141:1363:Stream._sasl_authenticate: Missing docstring
-E0602:1365:Stream._sasl_authenticate: Undefined variable 'SASLAuthenticationError'
-W0141:1405:Stream._request_tls: Missing docstring
-W0141:1416:Stream._process_tls_node: Missing docstring
-W0141:1439:Stream._make_tls_connection: Missing docstring
-W0702:1481:Stream._make_tls_connection: No exception's type specified
-W0613:1439:Stream._make_tls_connection: Unused argument 'mode'
-W0141:1483:Stream._tls_verify_callback: Missing docstring
-W0141:1519:Stream.get_tls_connection: Missing docstring
+W0112:400:Stream.stream_start: Too many branches (13/12)
+W0613:455:Stream.stream_end: Unused argument 'doc'
+W0613:481:Stream.stanza_end: Unused argument 'doc'
+W0613:490:Stream.stanza: Unused argument 'doc'
+W0612:712:Stream._loop_iter: Unused variable 'ofd'
+W0612:940:Stream.__try_handlers: Unused variable 'prio'
+W0112:1234:Stream._got_features: Too many branches (15/12)
+W0111:1326:Stream._process_sasl_node: Too many return statements (9/6)
 W0201:226:Stream._reset: Attribute 'features' defined outside __init__
 W0201:222:Stream._reset: Attribute 'message_handlers' defined outside __init__
 W0201:220:Stream._reset: Attribute 'iq_get_handlers' defined outside __init__
@@ -370,25 +271,11 @@ W0201:205:Stream._reset: Attribute 'socket' defined outside __init__
 W0201:218:Stream._reset: Attribute 'stream_id' defined outside __init__
 W0201:203:Stream._reset: Attribute 'doc_in' defined outside __init__
 W0201:221:Stream._reset: Attribute 'iq_set_handlers' defined outside __init__
-W0141:1524:cert_verify_callback: Missing docstring
 ************* Module pyxmpp.expdict
 W0141:  0: Missing docstring
 W0141: 24:ExpiringDictionary: Missing docstring
 W0231: 25:ExpiringDictionary.__init__: __init__ method from base class 'dict' is not called
 W0141: 53:ExpiringDictionary.expire: Missing docstring
-************* Module pyxmpp.iq
-W0141:  0: Missing docstring
-W0141: 26:Iq: Missing docstring
-W0231: 28:Iq.__init__: __init__ method from base class 'Stanza' is not called
-W0151:  0:Iq.__init__: Used builtin function 'apply'
-W0141: 51:Iq.copy: Missing docstring
-W0141: 54:Iq.make_error_response: Missing docstring
-W0141: 66:Iq.make_result_response: Missing docstring
-W0141: 73:Iq.new_query: Missing docstring
-W0141: 76:Iq.get_query: Missing docstring
-W0141: 85:Iq.get_query_ns: Missing docstring
-W0611: 23: Unused import to_utf8
-W0611: 23: Unused import from_utf8
 ************* Module pyxmpp.error
 W0141:  0: Missing docstring
 W0141:173:ErrorNodeError: Missing docstring
@@ -422,9 +309,38 @@ W0141:  0: Missing docstring
 W0103:  0: Missing required attribute "__revision__"
 W0103:  0: Missing required attribute "__docformat__"
 ************* Module pyxmpp.jabberd
-F0001:  0: Unable to load module pyxmpp.jabberd (cannot import name StanzaFactory)
+W0141:  0: Missing docstring
 ************* Module pyxmpp.jabberd.component
-F0001:  0: Unable to load module pyxmpp.jabberd.component (cannot import name ComponentStream)
+W0141:  0: Missing docstring
+W0141: 32:ComponentError: Missing docstring
+W0141: 35:FatalComponentError: Missing docstring
+W0141: 38:Component: Missing docstring
+W0622: 39:Component.__init__: Redefining built-in 'type'
+W0141: 58:Component.connect: Missing docstring
+E0602: 60:Component.connect: Undefined variable 'ClientError'
+W0141: 98:Component.get_stream: Missing docstring
+W0141:104:Component.disconnect: Missing docstring
+W0141:109:Component.socket: Missing docstring
+W0141:112:Component.loop: Missing docstring
+W0141:117:Component.__stream_state_change: Missing docstring
+W0141:137:Component.__disco_info: Missing docstring
+W0141:156:Component.__disco_items: Missing docstring
+W0141:176:Component.idle: Missing docstring
+W0141:181:Component.stream_created: Missing docstring
+W0141:184:Component.stream_closed: Missing docstring
+W0141:187:Component.stream_error: Missing docstring
+W0141:191:Component.stream_state_changed: Missing docstring
+W0141:194:Component.connected: Missing docstring
+W0141:197:Component.authenticated: Missing docstring
+W0141:204:Component.authorized: Missing docstring
+W0141:207:Component.disco_get_info: Missing docstring
+W0141:215:Component.disco_get_items: Missing docstring
+W0141:223:Component.disconnected: Missing docstring
+W0201: 94:Component.connect: Attribute 'disco_identity' defined outside __init__
+W0611: 21: Unused import libxml2
+W0611: 28: Unused import to_utf8
+W0611: 22: Unused import sys
+W0611: 24: Unused import traceback
 ************* Module pyxmpp.jabberd.componentstream
 W0301: 27: Line too long (103/100)
 W0141:  0: Missing docstring
@@ -868,17 +784,17 @@ W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 Report
 ======
-5703 statements analysed.
+5823 statements analysed.
 
 Statistics by type
 ------------------
 
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-module   31     31         =          29.03       0.00     
-class    109    109        =          35.78       4.59     
+module   33     33         =          36.36       0.00     
+class    112    112        =          39.29       4.46     
 method   0      0          =          0.00        0.00     
-function 580    580        =          47.07       1.55     
+function 599    599        =          57.26       1.50     
 
 
 Raw metrics
@@ -886,10 +802,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6224   76.96 6224     =          
-docstring 1055   13.05 994      +61        
-comment   488    6.03  488      =          
-empty     320    3.96  308      +12        
+code      6372   72.62 6367     +5         
+docstring 1489   16.97 1417     +72        
+comment   509    5.80  509      =          
+empty     405    4.62  391      +14        
 
 
 External dependencies
@@ -902,10 +818,10 @@ External dependencies
       \-digest_md5 (pyxmpp.sasl)
       \-plain (pyxmpp.sasl)
     base64 (pyxmpp.stream,pyxmpp.jabber.vcard)
-    logging (pyxmpp.clientstream,pyxmpp.client,pyxmpp.stream,pyxmpp.jabberd.componentstream,pyxmpp.sasl.plain,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.client)
+    logging (pyxmpp.clientstream,pyxmpp.client,pyxmpp.stream,pyxmpp.jabberd.component,pyxmpp.jabberd.componentstream,pyxmpp.sasl.plain,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.client)
     string (pyxmpp.dns,pyxmpp.resolver,pyxmpp.sasl,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
-    traceback (pyxmpp.client)
-    libxml2 (pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.utils,pyxmpp.stanza,pyxmpp.clientstream,pyxmpp.message,pyxmpp.client,pyxmpp.stream,pyxmpp.iq,pyxmpp.error,pyxmpp.jabberd.componentstream,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    traceback (pyxmpp.client,pyxmpp.jabberd.component)
+    libxml2 (pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.utils,pyxmpp.stanza,pyxmpp.clientstream,pyxmpp.message,pyxmpp.client,pyxmpp.stream,pyxmpp.iq,pyxmpp.error,pyxmpp.jabberd.component,pyxmpp.jabberd.componentstream,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
     random (pyxmpp.dns,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.stream,pyxmpp.sasl,pyxmpp.sasl.core)
     encodings 
       \-idna (pyxmpp.jid,pyxmpp.dns)
@@ -917,7 +833,7 @@ External dependencies
       | \-cb (pyxmpp.stream)
       | \-Context (pyxmpp.stream)
       \-m2 (pyxmpp.stream)
-    threading (pyxmpp.xmlextra,pyxmpp.client,pyxmpp.stream)
+    threading (pyxmpp.xmlextra,pyxmpp.client,pyxmpp.stream,pyxmpp.jabberd.component)
     os (pyxmpp.stream)
     types (pyxmpp.xmppstringprep,pyxmpp.roster,pyxmpp.jid,pyxmpp.dns,pyxmpp.utils,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.clientstream,pyxmpp.stream,pyxmpp.expdict,pyxmpp.error,pyxmpp.jabberd.componentstream,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
     socket (pyxmpp.resolver,pyxmpp.stream)
@@ -929,36 +845,33 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0141      399        
-W0611      73         
-W0201      68         
+W0141      345        
+W0611      74         
+W0201      69         
 W0613      46         
 E0201      37         
-E0602      23         
+E0602      22         
 W0622      20         
 W0102      20         
 W0133      19         
-W0112      16         
-W0612      15         
-W0311      14         
-W0231      8          
+W0612      14         
+W0112      13         
+W0311      8          
 W0221      8          
 W0403      7          
 W0301      7          
-W0321      6          
 W0111      6          
-W0404      5          
+W0321      5          
 W0232      5          
-W0151      5          
+W0231      5          
 W0511      4          
 W0114      4          
 W0103      4          
-W0702      3          
+W0404      3          
 W0115      3          
 W0621      2          
 W0302      2          
-W0101      2          
-F0001      2          
+W0151      2          
 W0401      1          
 
 
@@ -967,8 +880,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 772    790      -18        
-errors   60     61       -1         
+warnings 696    725      -29        
+errors   59     60       -1         
 
 
 % errors / warnings by module
@@ -976,39 +889,36 @@ errors   60     61       -1
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            25.00 11.40   
-pyxmpp.jid                     21.67 1.68    
-pyxmpp.jabber.muc              15.00 5.05    
-pyxmpp.jabber.disco            11.67 5.05    
-pyxmpp.sasl.core               10.00 5.05    
-pyxmpp.jabber.client           5.00  1.94    
-pyxmpp.jabber.delay            3.33  1.55    
-pyxmpp.stream                  1.67  10.10   
-pyxmpp.sasl.digest_md5         1.67  7.25    
-pyxmpp.stanza                  1.67  4.15    
-pyxmpp.error                   1.67  3.37    
-pyxmpp.roster                  1.67  0.00    
-pyxmpp.dns                     0.00  9.07    
-pyxmpp.jabber.clientstream     0.00  5.83    
-pyxmpp.clientstream            0.00  5.05    
-pyxmpp.client                  0.00  4.92    
-pyxmpp.resolver                0.00  4.15    
-pyxmpp.jabberd.componentstream 0.00  3.89    
-pyxmpp.xmlextra                0.00  2.20    
-pyxmpp.sasl.plain              0.00  1.68    
-pyxmpp.iq                      0.00  1.55    
-pyxmpp.message                 0.00  1.30    
-pyxmpp.sasl                    0.00  1.17    
-pyxmpp.utils                   0.00  0.78    
-pyxmpp.expdict                 0.00  0.52    
-pyxmpp.version                 0.00  0.39    
-pyxmpp.presence                0.00  0.39    
-pyxmpp._xmlextra               0.00  0.39    
-pyxmpp.xmppstringprep          0.00  0.13    
+pyxmpp.jabber.vcard            25.42 12.64   
+pyxmpp.jid                     22.03 0.14    
+pyxmpp.jabber.muc              15.25 5.60    
+pyxmpp.jabber.disco            11.86 5.60    
+pyxmpp.sasl.core               10.17 5.60    
+pyxmpp.jabber.client           5.08  2.16    
+pyxmpp.jabber.delay            3.39  1.72    
+pyxmpp.sasl.digest_md5         1.69  8.05    
+pyxmpp.jabberd.component       1.69  4.17    
+pyxmpp.error                   1.69  3.74    
+pyxmpp.stanza                  1.69  0.72    
+pyxmpp.dns                     0.00  10.06   
+pyxmpp.jabber.clientstream     0.00  6.47    
+pyxmpp.stream                  0.00  6.03    
+pyxmpp.clientstream            0.00  5.60    
+pyxmpp.client                  0.00  5.46    
+pyxmpp.resolver                0.00  4.60    
+pyxmpp.jabberd.componentstream 0.00  4.31    
+pyxmpp.xmlextra                0.00  2.44    
+pyxmpp.sasl.plain              0.00  1.87    
+pyxmpp.sasl                    0.00  1.29    
+pyxmpp.expdict                 0.00  0.57    
+pyxmpp.version                 0.00  0.43    
+pyxmpp._xmlextra               0.00  0.43    
+pyxmpp.xmppstringprep          0.00  0.14    
+pyxmpp.jabberd                 0.00  0.14    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 8.12/10 (previous run: 8.08/10)
+Your code has been rated at 8.30/10 (previous run: 8.24/10)
 That's pretty good. Good work mate.
 
