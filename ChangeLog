@@ -1,5 +1,8 @@
 2004-06-04  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/jabber/muc.py:
+	- MucRoomManager.get_room_state() method added and MucRoomState object me attribute initialized from room_jid
+
 	* pyxmpp/stream.py:
 	- allow local processing of stanzas directed to other resource of out JID
 
