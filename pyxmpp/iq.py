@@ -52,7 +52,6 @@ class Iq(Stanza):
 		iq=Iq(type="error",fr=self.get_to(),to=self.get_from(),
 			id=self.get_id(),error_cond=cond)
 		n=self.get_query().copyNode(1)
-		print iq.serialize()
 		iq.node.children.addPrevSibling(n)
 		return iq
 	
