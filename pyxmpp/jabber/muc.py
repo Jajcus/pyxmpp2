@@ -631,6 +631,8 @@ class MucRoomUser:
                     self.affiliation=item.affiliation
                 if item.jid:
                     self.real_jid=item.jid
+    def same_as(self,other):
+        return self.room_jid==other.room_jid
         
 class MucRoomState:
     """
@@ -645,6 +647,7 @@ class MucRoomState:
     joined - True if the channel is joined.
     subject - current subject of the room.
     users - dictionary of users in the room. Nicknames are the keys.
+    me - MucRoomUser instance of the owner
     """
     def __init__(self,manager,own_jid,room_jid,handler):
         """
@@ -657,7 +660,7 @@ class MucRoomState:
         self.joined=False
         self.subject=None
         self.users={}
-        self.me=None
+        self.me=MucRoomUser(room_jid)
         handler.assign_state(self)
 
     def get_user(self,nick_or_jid,create=False):
@@ -857,6 +860,9 @@ class MucRoomManager:
         self.rooms[rs.room_jid.bare().as_unicode()]=rs
         rs.join()
         return rs
+
+    def get_room_state(self,room):
+        return self.rooms.get(room.bare().as_unicode())
 
     def forget(self,rs):
         """
