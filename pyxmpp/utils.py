@@ -15,18 +15,16 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-""" Utility functions for pyxmpp package. """
+"""Utility functions for the pyxmpp package."""
 
 from types import UnicodeType,StringType
 import re
 
 def to_utf8(s):
-    """ to_utf8(string_or_unicode) -> string
-
-    If given unicode object returns is UTF-8 representation.
-    If given string object returns it unchanged.
-    If given object of any other type returns its string representation.
-    When given None returns None."""
+    """
+    Convevert `s` to UTF-8 if it is Unicode, leave unchanged 
+    if it is string or None and convert to string overwise
+    """
     if s is None:
         return None
     elif type(s) is UnicodeType:
@@ -35,12 +33,11 @@ def to_utf8(s):
         return str(s)
 
 def from_utf8(s):
-    """ from_utf8(string_or_unicode) -> unicode
-
-    If given unicode object returns it unchanged.
-    If given string object converts it to unicode assuming UTF-8 encoding.
-    If given object of any other type returns its unicode representation.
-    When given None returns None."""
+    """
+    Convert `s` to Unicode or leave unchanged if it is None.
+    
+    Regular strings are assumed to be UTF-8 encoded
+    """
     if s is None:
         return None
     elif type(s) is UnicodeType:
@@ -53,17 +50,14 @@ def from_utf8(s):
 evil_characters_re=re.compile(r"[\000-\010\013\014\016-\037]",re.UNICODE)
 utf8_replacement_char=u"\ufffd".encode("utf-8")
 def remove_evil_characters(s):
-    """ remove_evil_characters(unicode) -> unicode
-        remove_evil_characters(utf8_string) -> utf8_string
-
-    Remove control characters (not allowed in XML) from a string.
-    """
+    """Remove control characters (not allowed in XML) from a string."""
     if type(s) is UnicodeType:
         return evil_characters_re.sub(u"\ufffd",s)
     else:
         return evil_characters_re.sub(utf8_replacement_char,s)
 
 def get_node_ns(node):
+    """Return namespace of the XML `node` or None if namespace is not set."""
     try:
         return node.ns()
     except libxml2.treeError:
@@ -71,6 +65,7 @@ def get_node_ns(node):
 
 
 def get_node_ns_uri(node):
+    """Return namespace URI of the XML `node` or None if namespace is not set."""
     ns=get_node_ns(node)
     if ns:
         return ns.getContent()
