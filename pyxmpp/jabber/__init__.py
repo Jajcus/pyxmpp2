@@ -19,4 +19,6 @@
 
 from clientstream import LegacyClientStream
 from client import JabberClient as Client
+from disco import DISCO_NS,DISCO_INFO_NS,DISCO_ITEMS_NS
 from disco import DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
+from vcard import VCARD_NS,VCard
