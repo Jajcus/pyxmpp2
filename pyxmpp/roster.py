@@ -95,7 +95,7 @@ class Roster:
 		if l is not None:
 			for g in l:
 				gname=g.getContent()
-				if gname:
+				if gname and gname not in ret:
 					ret.append(gname)
 		l=self.xpath_ctxt.xpathEval("r:item[not(r:group)]")
 		if l:
