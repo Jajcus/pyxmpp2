@@ -15,6 +15,19 @@ accounts={
 
 class Stream(ClientStream):
 	def post_auth(self):
+		ClientStream.post_auth(self)
+		if not self.version:
+			self.welcome()
+			return
+		self.set_iq_set_handler("session","urn:ietf:params:xml:ns:xmpp-session",
+								self.set_session)
+	
+	def set_session(self):
+		iq=stanza.make_result_reply()
+		self.send(iq)
+		self.welcome()
+
+	def welcome(self):
 		self.disconnect_time=time.time()+60
 		m=Message(type="chat",to=self.peer,
 				body="You have authenticated with: %r" % (self.auth_method_used))
