@@ -38,6 +38,7 @@ from presence import Presence
 from message import Message
 from jid import JID
 import sasl
+import resolver
 
 try:
 	from M2Crypto import SSL
@@ -49,6 +50,8 @@ except ImportError:
 	class SSLError(Exception):
 		"dummy"
 		pass
+
+standard_ports={ "xmpp-client": 5222, "xmpp-server": 5269}
 
 STREAM_NS="http://etherx.jabber.org/streams"
 TLS_NS="urn:ietf:params:xml:ns:xmpp-tls"
@@ -179,23 +182,34 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def _connect(self,addr,port,to=None):
 		if to is None:
 			to=str(addr)
-		if type(addr) in (StringType,UnicodeType):
-			self.state_change("resolving",addr)
-		s=None
-		for res in socket.getaddrinfo(addr,port,0,socket.SOCK_STREAM):
-			family,socktype,proto,canonname,sockaddr=res
-			try:
-				s=socket.socket(family,socktype,proto)
-				self.state_change("connecting",sockaddr)
-				s.connect(sockaddr)
-				self.state_change("connected",sockaddr)
-			except socket.error, msg:
-				self.debug("Connect to %r failed" % (sockaddr,))
-				if s:
-					s.close()
-					s=None
-				continue
-			break
+		if (type(addr) in (StringType,UnicodeType) 
+				and type(port) in (StringType,UnicodeType)):
+			self.state_change("resolving srv",(addr,port))
+			addrs=resolver.resolve_srv(addr,port)
+			if not addrs:
+				addrs=[(addr,standard_ports[port])]
+		else:
+			addrs=[(addr,port)]
+		for addr,port in addrs:
+			if type(addr) in (StringType,UnicodeType):
+				self.state_change("resolving",addr)
+			s=None
+			for res in resolver.getaddrinfo(addr,port,0,socket.SOCK_STREAM):
+				family,socktype,proto,canonname,sockaddr=res
+				try:
+					s=socket.socket(family,socktype,proto)
+					self.state_change("connecting",sockaddr)
+					s.connect(sockaddr)
+					self.state_change("connected",sockaddr)
+				except socket.error, msg:
+					self.debug("Connect to %r failed" % (sockaddr,))
+					if s:
+						s.close()
+						s=None
+					continue
+				break
+			if s:
+				break
 		if not s:
 			raise socket.error, msg
 

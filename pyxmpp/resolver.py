@@ -191,37 +191,25 @@ def resolve_srv(domain,service,proto="tcp"):
 			continue
 		if r and r[0].type=="CNAME":
 			cname=r[0].target
-			r=query(cname)
+			r=query(cname,"SRV")
 		return [(rr.target,rr.port) for rr in reorder_srv(r) if rr.type=="SRV"]
 	return None
 
-def getaddrinfo(host,port):
+def getaddrinfo(host,port,family=0,socktype=socket.SOCK_STREAM,proto=0):
 	ret=[]
+	if proto==0:
+		proto=socket.getprotobyname("tcp")
 	r=query(host,"A")
 	if r and r[0].type=="CNAME":
 		cname=r[0].target
-		r=query(cname)
+		r=query(cname,"A")
 	else:
 		cname=host
 	for rr in r:
 		if rr.type!="A":
 			continue
-		ret.append((socket.AF_INET,socket.SOCK_STREAM,
-				socket.getprotobyname("tcp"),cname,(rr.ip,port)))
+		ret.append((socket.AF_INET,socktype,proto,cname,(rr.ip,port)))
 	return ret	
 
 load_resolv_conf()
 
-print "Resolving SRV for jabber.bnet.pl:"
-ret=resolve_srv("jabber.bnet.pl","xmpp-server")
-print "result:",ret
-
-for i in range(10):
-	print "Resolving SRV for nigdzie.:"
-	ret=resolve_srv("nigdzie.","xmpp-server")
-	for r in ret:
-		print "Resolving address of",r[0]
-		ai=getaddrinfo(r[0],r[1])
-		print "The address is:",ai
-
-#resolve_srv("jabber-server","tcp","bnet.pl")

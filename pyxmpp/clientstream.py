@@ -77,7 +77,7 @@ class ClientStream(Stream):
 			self.server=server
 		if port:
 			self.port=port
-		Stream._connect(self,self.server,self.port,self.jid.domain)
+		Stream._connect(self,self.server,"xmpp-client",self.jid.domain) # FIXME!
 
 	def accept(self,sock):
 		Stream.accept(self,sock,self.jid)
