@@ -1,3 +1,8 @@
+2004-06-23  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/resolver.py:
+	- fixed getaddrinfo() to return None if query() fails
+
 2004-06-16  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* .cvslog:
