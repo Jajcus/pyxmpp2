@@ -704,7 +704,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		if isinstance(r,sasl.Success):
 			el_name="success"
 			self.debug("SASL authentication succeeded")
-			self.me=r.authzid
+			self.me=JID(r.authzid)
 			self.authenticated=1
 			self.post_auth()
 		else:
