@@ -1,5 +1,8 @@
 2004-10-22  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/streamsasl.py:
+	- call __init__() of the PasswordManage
+
 	* pyxmpp/resolver.py:
 	- use 'nameserver 127.0.0.1' when resolv.conf not available or empty
 
