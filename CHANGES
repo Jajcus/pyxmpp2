@@ -1,5 +1,12 @@
 This file should describe the bigest and most important API changes.
 
+2004-12-18
+
+	dnspython (http://www.dnspython.org) is now used for resolving DNS
+	names. Please note, that because of a conflict between dnspython and
+	old PyXMPP DNS implementation you must clean up after old PyXMPP
+	installation and do 'make clean' before building PyXMPP.
+
 2004-09-16
 	
 	Stanza, Message, Iq and Presence constructors arguments have been

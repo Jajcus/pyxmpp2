@@ -12,8 +12,10 @@ clients, servers and services. Currently it is mainly developed for CJC
 (Console Jabber Client) and Jajcus' Jabber to IRC Gateway, so the client-side
 of protocol and basic component interface are the most complete.
 
-For PyXMPP you will need Python 2.3 (maybe it will work in 2.4 too) and recent
-libxml2 release (2.6.x) with python bindings.
+For PyXMPP you will need:
+  - Python 2.3 (maybe it will work in 2.4 too)
+  - recent libxml2 release (2.6.x) with python bindings. (http://xmlsoft.org/)
+  - dnspython (http://www.pythondns.org/). PyXMPP is tested with version 1.3.2.
 
 To build the package just invoke:
 

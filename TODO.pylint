@@ -153,7 +153,7 @@ type     number old number difference %documented %badname
 module   38     38         =          97.37       0.00     
 class    115    115        =          100.00      0.00     
 method   0      0          =          0.00        0.00     
-function 648    647        +1         100.00      0.00     
+function 648    648        =          100.00      0.00     
 
 
 Raw metrics
@@ -161,10 +161,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6613   49.48 6611     +2         
-docstring 5274   39.46 5271     +3         
+code      6613   49.48 6613     =          
+docstring 5274   39.46 5274     =          
 comment   611    4.57  611      =          
-empty     867    6.49  866      +1         
+empty     867    6.49  867      =          
 
 
 External dependencies
@@ -218,7 +218,7 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 105    106      -1         
+warnings 105    105      =          
 errors   13     13       =          
 
 
