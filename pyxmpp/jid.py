@@ -18,6 +18,8 @@
 """jid --- Jabber ID handling"""
 
 import re
+import weakref
+
 from types import StringType,UnicodeType
 from encodings import idna
 
@@ -42,8 +44,10 @@ class JIDError(ValueError):
     "Exception raised when invalid JID is used"
     pass
 
-class JID:
-    def __init__(self,node=None,domain=None,resource=None,check=1):
+class JID(object):
+    cache=weakref.WeakValueDictionary()
+    __slots__=["node","domain","resource","__weakref__"]
+    def __new__(cls,node=None,domain=None,resource=None,check=1):
         """JID(string[,check=val]) -> JID
         JID(domain[,check=val]) -> JID
         JID(node,domain[,resource][,check=val]) -> JID
@@ -52,66 +56,82 @@ class JID:
         When check argument is given and equal 0, than JID
         is not checked for specification compliance. This
         should be used only when other arguments are known
-        to be valid."""
-        if isinstance(node,JID):
-            self.node=node.node
-            self.domain=node.domain
-            self.resource=node.resource
-            return
-        if node and ((u"@" in node) or (u"/" in node)):
-            self.from_string(node)
-            return
+        to be valid.
+        
+        JID objects are immutable
+        """
+   
         if domain is None and resource is None:
-            self.set_domain(node)
-            self.node=None
-            self.resource=None
-            return
-
-        if check:
-            self.set_node(node)
-            self.set_domain(domain)
-            self.set_resource(resource)
+            obj=cls.cache.get(node)
         else:
-            self.node=node
-            self.domain=domain
-            self.resource=resource
+            obj=None
+        if obj is None:
+            obj=object.__new__(cls)
+        
+        if isinstance(node,JID):
+            object.__setattr__(obj,"node",node.node)
+            object.__setattr__(obj,"domain",node.domain)
+            object.__setattr__(obj,"resource",node.resource)
+        elif node and ((u"@" in node) or (u"/" in node)):
+            obj.__from_string(node)
+            cls.cache[node]=obj
+        else:
+            if domain is None and resource is None:
+                if node is None:
+                    raise JIDError,"At least domain must be given"
+                domain=node
+                node=None
+            if check:
+                obj.__set_node(node)
+                obj.__set_domain(domain)
+                obj.__set_resource(resource)
+            else:
+                object.__setattr__(obj,"node",node)
+                object.__setattr__(obj,"domain",domain)
+                object.__setattr__(obj,"resource",resource)
+        return obj
 
-    def from_string(self,s,check=1):
-        return self.from_unicode(from_utf8(s),check)
+    def __setattr__(self,name,value):
+        raise RuntimeError,"JID objects are immutable!"
 
-    def from_unicode(self,s,check=1):
+    def __from_string(self,s,check=1):
+        return self.__from_unicode(from_utf8(s),check)
+
+    def __from_unicode(self,s,check=1):
         s1=s.split(u"/",1)
         s2=s1[0].split(u"@",1)
         if len(s2)==2:
             if check:
-                self.set_node(s2[0])
-                self.set_domain(s2[1])
+                self.__set_node(s2[0])
+                self.__set_domain(s2[1])
             else:
-                self.node=s2[0]
-                self.domain=s2[1]
+                object.__setattr__(self,"node",s2[0])
+                object.__setattr__(self,"domain",s2[1])
         else:
             if check:
-                self.set_domain(s2[0])
+                self.__set_domain(s2[0])
             else:
-                self.domain=s2[0]
-            self.node=None
+                object.__setattr__(self,"domain",s2[0])
+            object.__setattr__(self,"node",None)
         if len(s1)==2:
             if check:
-                self.set_resource(s1[1])
+                self.__set_resource(s1[1])
             else:
-                self.resource=s1[1]
+                object.__setattr__(self,"resource",s1[1])
         else:
-            self.resource=None
+            object.__setattr__(self,"resource",None)
 
-    def set_node(self,s):
+    def __set_node(self,s):
         if s:
             s=from_utf8(s)
             s=nodeprep.prepare(s)
             if len(s)>1023:
                 raise JIDError,"Node name too long"
-        self.node=s
+        else:
+            s=None
+        object.__setattr__(self,"node",s)
 
-    def set_domain(self,s):
+    def __set_domain(self,s):
         if s: s=from_utf8(s)
         if s is None:
             raise JIDError,"Domain must be given"
@@ -119,15 +139,17 @@ class JID:
             raise JIDError,"Invalid domain"
         if len(s)>1023:
             raise JIDError,"Domain name too long"
-        self.domain=s
+        object.__setattr__(self,"domain",s)
 
-    def set_resource(self,s):
+    def __set_resource(self,s):
         if s:
             s=from_utf8(s)
             s=resourceprep.prepare(s)
             if len(s)>1023:
                 raise JIDError,"Resource name too long"
-        self.resource=s
+        else:
+            s=None
+        object.__setattr__(self,"resource",s)
 
     def __str__(self):
         return self.as_string()
@@ -136,7 +158,7 @@ class JID:
         return self.as_unicode()
 
     def __repr__(self):
-        return "<JID: %r>" % (self.as_string())
+        return "<JID: %r>" % (self.as_unicode())
 
     def as_utf8(self):
         "Returns UTF-8 encoded JID representation"
@@ -148,14 +170,15 @@ class JID:
 
     def as_unicode(self):
         "Unicode JID representation"
-        if not self.node and not self.resource:
-            return self.domain
-        elif not self.node:
-            return u"%s/%s" % (self.domain,self.resource)
-        elif not self.resource:
-            return u"%s@%s" % (self.node,self.domain)
-        else:
-            return u"%s@%s/%s" % (self.node,self.domain,self.resource)
+        r=self.domain
+        if self.node:
+            r=self.node+u'@'+r
+        if self.resource:
+            r=r+u'/'+self.resource
+        if not JID.cache.has_key(r):
+            JID.cache[r]=self
+        return r
+        
     def bare(self):
         "Returns bare JID made by removing resource from current JID"
         return JID(self.node,self.domain,check=0)
@@ -177,5 +200,13 @@ class JID:
 
     def __ne__(self,other):
         return not self.__eq__(other)
+
+    def __cmp__(self,other):
+        a=self.as_unicode()
+        b=unicode(other)
+        return cmp(a,b)
+
+    def __hash__(self):
+        return hash(self.node)^hash(self.domain)^hash(self.resource)
 
 # vi: sts=4 et sw=4
