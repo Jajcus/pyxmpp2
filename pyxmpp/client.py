@@ -158,7 +158,7 @@ class Client:
 		q=iq.get_query()
 		item=self.roster.update(q)
 		if item:
-			self.roster_updated(item.jid())
+			self.roster_updated(item)
 		resp=iq.make_result_response()
 		self.stream.send(resp)
 	
