@@ -1,5 +1,9 @@
 #! /usr/bin/env python
-# $Id: setup.py,v 1.5 2003/06/08 16:17:25 jajcus Exp $
+# $Id: setup.py,v 1.6 2003/06/24 06:46:17 jajcus Exp $
+
+import os.path
+
+execfile(os.path.join("pyxmpp","version.py"))
 
 from distutils.core import setup, Extension
 
@@ -7,7 +11,7 @@ from distutils.core import setup, Extension
 setup(
 	#-- Package description
 	name =		'pyxmpp',
-	version =	'0.0',
+	version =	version,
 	description =	'XMPP implementation for Python',
 	author =	'Jacek Konieczny', 
 	author_email =	'jajcus@bnet.pl',

@@ -1,2 +1,6 @@
+include Makefile
 include COPYING TODO DONE
-include examples/*
+include examples/*.py
+include examples/cjc/*.py
+include examples/cjc/plugins/*.py
+include tests/*.py
