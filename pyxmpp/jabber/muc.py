@@ -407,12 +407,12 @@ class MucRoomHandler:
         """
         pass
 
-    def other_joined(self,user):
+    def other_joined(self,user,stanza):
         """
         Called when a new participant joins the room.
         """
         pass
-    def other_left(self,user):
+    def other_left(self,user,stanza):
         """
         Called when a new participant leaves the room.
         """
@@ -579,7 +579,7 @@ class MucRoomState:
             self.joined=True
             self.handler.joined(user)
         elif not old_user:
-            self.handler.other_joined(user)
+            self.handler.other_joined(user,stanza)
         # TODO: role changes, affiliation changes, nick changes
         
     def process_unavailable_presence(self,stanza):
@@ -600,7 +600,7 @@ class MucRoomState:
             self.handler.left(user)
             self.manager.forget(self)
         elif old_user:
-            self.handler.other_left(user)
+            self.handler.other_left(user,stanza)
         # TODO: kicks, nick changes
         
     def process_groupchat_message(self,stanza):
