@@ -259,6 +259,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 			return Response("")
 		else:
 			self.debug("Wrong rspauth value - peer is cheating?")
+			self.debug("my rspauth: %r" % (self.response_auth,))
 			return Failure("bad-success")
 
 	def finish(self,data):
