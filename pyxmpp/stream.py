@@ -381,9 +381,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		for prefix,uri in self.extra_ns:
 			self.extra_ns[uri]=root.newNs(uri,prefix)
 		if self.peer:
-			root.setProp("to",self.peer.as_string())
+			root.setProp("to",self.peer.as_utf8())
 		if self.me:
-			root.setProp("from",self.me.as_string())
+			root.setProp("from",self.me.as_utf8())
 		root.setProp("version","1.0")
 		if id:
 			root.setProp("id",id)

@@ -38,7 +38,7 @@ class RosterItem:
 				self.node=common_root.newChild(None,"item",None)
 				ns=self.node.newNs("jabber:iq:roster",None)
 				self.node.setNs(ns)
-			self.node.setProp("jid",node_or_jid.as_string())
+			self.node.setProp("jid",node_or_jid.as_utf8())
 			self.set_subscription(subscription)
 		else:
 			if roster is None:
@@ -220,7 +220,7 @@ class Roster:
 		if not jid:
 			raise ValueError,"jid is None"
 		if isinstance(jid,JID):
-			jid=jid.as_string()
+			jid=jid.as_utf8()
 		if '"' not in jid:
 			expr='r:item[@jid="%s"]' % jid
 		elif "'" not in jid:
