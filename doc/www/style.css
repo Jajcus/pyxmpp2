@@ -1,0 +1,51 @@
+html,body {
+	margin: 0;
+	background: white;
+	color: black;
+	font-family: sans-serif;
+}
+
+#title {
+	text-align: center;
+}
+
+#navblock {
+	margin: 0;
+	padding: 0;
+	width: 22%;
+	float: left;
+}
+
+#navbar {
+	margin: 0.2em;
+	color: black;
+	background: #d5eeff;
+	border: thin solid black;
+}
+
+#mainblock {
+	padding: 0;
+	margin: 0;
+	width: 78%; 
+	float: left;
+}
+
+#main {
+	margin: 0 0.2em;
+}
+
+.linkhead {
+	margin: 0.2em 0 0 0;
+	padding: 0.1em;
+	font-weight: bold;
+}
+
+.link {
+	margin: 0;
+	padding: 0.1em;
+}
+
+.current, .current a {
+	font-style: underline;
+	font-weight: bold;
+}

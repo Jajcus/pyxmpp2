@@ -77,16 +77,16 @@ Download
 --------
 
 Latest releases of PyXMPP may be downloaded from `the files section of the project page
-<http://jabberstudio.org/projects/pyxmpp/files/>`__. There are also
-some `SVN snapshots <http://pyxmpp.jabberstudio.org/snapshots/` available.
+<http://jabberstudio.org/projects/pyxmpp/releases/>`__. There are also
+some `SVN snapshots <http://pyxmpp.jabberstudio.org/snapshots/>` available.
 
 You can also checkout latest sources directly from the SVN repository::
 svn checkout svn://jabberstudio.org/pyxmpp/svn/trunk pyxmpp
 
-License
+Licence
 -------
 
-PyXMPP is free software, licensed under the GNU LGPL. See the
+PyXMPP is free software, licenced under the GNU LGPL. See the
 COPYING file for details.
 
 .. $Id$

@@ -3,7 +3,7 @@ SNAPSHOT=
 
 DESTDIR="/"
 
-.PHONY: all version snapshot dist doc cosmetics TODO.pylint pylint ChangeLog
+.PHONY: all version snapshot dist doc cosmetics TODO.pylint pylint ChangeLog www publish
 
 all: version
 	umask 022 ; python setup.py build
@@ -14,6 +14,12 @@ all: version
 
 doc:
 	$(MAKE) -C doc
+
+www:
+	$(MAKE) -C www
+
+publish:
+	$(MAKE) -C publish
 
 pylint:	TODO.pylint
 

@@ -1,4 +1,5 @@
-This file should describe the bigest and most important API changes.
+Most Important API Changes
+--------------------------
 
 2004-12-18
 
@@ -53,6 +54,7 @@ This file should describe the bigest and most important API changes.
 	and not standard compliant (ingored stringprep profiles).
 
 	Most important changes:
+	
 	- no `node` attribute in Roster and RosterItem
 	- RosterItem constructor doesn't take `roster` argument any more
 	- `jid`, `ask`, `subscription`, `name` and `groups` are now attributes,
