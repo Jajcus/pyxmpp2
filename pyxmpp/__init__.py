@@ -25,3 +25,4 @@ from presence import Presence
 from message import Message
 from jid import JID,JIDError
 from stanza import StanzaError
+from disco import DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
