@@ -87,7 +87,6 @@ class Component:
 			raise
 		self.disco_items=DiscoItems()
 		self.disco_info=DiscoInfo()
-		self.disco_info.add_feature("iq")
 		self.disco_identity=DiscoIdentity(self.disco_info,
 							"PyXMPP based jabberd component",
 							self.category,self.type)

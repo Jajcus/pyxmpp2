@@ -35,7 +35,6 @@ class JabberClient(Client):
 		Client.connect(self)
 		self.disco_items=DiscoItems()
 		self.disco_info=DiscoInfo()
-		self.disco_info.add_feature("iq")
 		self.disco_identity=DiscoIdentity(self.disco_info,
 							"pyxmpp based Jabber client",
 							"client","pc")
