@@ -1,10 +1,12 @@
 #!/bin/sh
 
-topdir=`dirname $0`
+auxdir=`dirname $0`
 if [ -z $topdir ]; then
 	topdir="."
 fi
-cd $topdir
+cd $auxdir
+auxdir=`pwd`
+cd ..
 make >&2
 topdir=`pwd`
 cd build/lib.*
@@ -29,7 +31,7 @@ IGNORE="${IGNORE}\\|W0201:[^:]*:StreamTLSMixIn.*'\\(socket\\|features\\)'"
 IGNORE="${IGNORE}\\|W0201:[^:]*:ComponentStream._process_node"
 IGNORE="${IGNORE}\\|W0221:[^:]*:\\(Client\\|Component\\)Stream._\\?\\(connect\\|accept\\)"
 
-export PYLINTRC=$topdir/pylintrc
+export PYLINTRC=$auxdir/pylintrc
 if [ -n "$1" ] ; then
 	pylint --disable-msg $DISABLE_MSG $1 | sed -e"s#$IGNORE#ignore that: &#"
 else
