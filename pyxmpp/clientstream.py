@@ -238,7 +238,7 @@ class ClientStream(Stream):
 		iq.free()
 		
 	def features_timeout(self,*args):
-		debug("Timeout while waiting for jabber:iq:auth result")
+		self.debug("Timeout while waiting for jabber:iq:auth result")
 		if self.auth_methods_left:
 			self.auth_methods_left.pop(0)
 	
@@ -253,7 +253,7 @@ class ClientStream(Stream):
 					% (ae,))
 
 	def auth_stage2(self,stanza):
-		debug("Procesing auth response...")
+		self.debug("Procesing auth response...")
 		self.available_auth_methods=[]
 		if (stanza.xpath_eval("a:query/a:digest",{"a":"jabber:iq:auth"}) and self.stream_id):
 					self.available_auth_methods.append("digest")
@@ -340,7 +340,7 @@ class ClientStream(Stream):
 			self.send(iq)
 	
 	def auth_finish(self,stanza):
-		debug("Authenticated")
+		self.debug("Authenticated")
 		self.me=self.jid
 		self.authenticated=1
 		self.post_auth()
