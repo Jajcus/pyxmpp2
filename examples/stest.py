@@ -10,23 +10,30 @@ from pyxmpp import ClientStream,JID,Iq,Presence,Message,StreamError
 
 accounts={
 		u'test': '123',
-		u'kurczê': '¿ó³tko',
 	};
 
 class Stream(ClientStream):
-	def post_auth(self):
-		ClientStream.post_auth(self)
-		self.disconnect_time=time.time()+60
-		if not self.version:
-			self.welcome()
-			return
-		self.set_iq_set_handler("session","urn:ietf:params:xml:ns:xmpp-session",
-								self.set_session)
+	def state_change(self,state,arg):
+		print "*** State changed: %s %r ***" % (state,arg)
+		if state=="authorized":
+			self.disconnect_time=time.time()+60
+			if not self.version:
+				self.welcome()
+				return
+			self.set_iq_set_handler("session","urn:ietf:params:xml:ns:xmpp-session",
+									self.set_session)
 	
 	def set_session(self,stanza):
-		iq=stanza.make_result_response()
-		self.send(iq)
-		self.welcome()
+		fr=stanza.get_from()
+		if fr and fr!=self.peer:
+			iq=stanza.make_error_response("forbidden")
+			self.send(iq)
+		else:
+			iq=stanza.make_result_response()
+			iq.set_to(None)
+			self.send(iq)
+			self.welcome()
+		iq.free()
 
 	def welcome(self):
 		m=Message(type="chat",to=self.peer,

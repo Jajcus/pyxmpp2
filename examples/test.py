@@ -1,16 +1,19 @@
 #!/usr/bin/python -u
+# vi: encoding=utf-8
+# -*- coding: utf-8 -*-
 
 import libxml2
 import time
 import traceback
 import sys
 
-from pyxmpp import Client,JID,Iq,Presence,Message,StreamError
+from pyxmpp import JID,Iq,Presence,Message,StreamError
+from pyxmpp.jabber import Client
 
 class Disconnected(Exception):
 	pass
 
-class Stream(Client):
+class MyClient(Client):
 	def session_started(self):
 		self.stream.send(Presence())
 		
@@ -19,7 +22,7 @@ class Stream(Client):
 		Client.idle(self)
 		if self.session_established:
 			target=JID("jajcus",s.jid.domain)
-			self.stream.send(Message(to=target,body=unicode("Te¶cik","iso-8859-2")))
+			self.stream.send(Message(to=target,body=unicode("TeÅ›cik","utf-8")))
 
 	def post_disconnect(self):
 		print "Disconnected"
@@ -28,9 +31,7 @@ class Stream(Client):
 libxml2.debugMemory(1)
 
 print "creating stream..."
-s=Stream(JID("test@localhost/Test"),u"123",auth_methods=["sasl:DIGEST-MD5","digest"])
-#s=Stream(JID(unicode("¿ó³tek","iso-8859-2"),"localhost","Test"),unicode("zieleñ","iso-8859-2"))
-#s=Stream(JID("pyxmpp","jabberd.jabberstudio.org","Test"),"123",port=15222,auth_methods=["sasl:DIGEST-MD5","digest","plain"])
+s=MyClient(jid=JID("test@localhost/Test"),password=u"123",auth_methods=["sasl:DIGEST-MD5","digest"])
 
 print "connecting..."
 s.connect()
