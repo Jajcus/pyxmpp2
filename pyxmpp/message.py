@@ -19,7 +19,7 @@ import libxml2
 from stanza import Stanza,StanzaError
 from utils import to_utf8,from_utf8
 
-message_types=("normal","chat","headline","error")
+message_types=("normal","chat","headline","error","groupchat")
 
 class Message(Stanza):
 	stanza_type="message"
