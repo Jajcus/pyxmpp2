@@ -104,7 +104,7 @@ class RosterItem:
 		groups=self.groups()
 		if group in self.groups():
 			return
-		self.node.newChild(self.node.ns(),"group",to_utf8(group))
+		self.node.newTextChild(self.node.ns(),"group",to_utf8(group))
 	def clear_groups(self):
 		groups=self.xpath_ctxt.xpathEval("r:group")
 		if not groups:

@@ -73,11 +73,11 @@ class Presence(Stanza):
 			node="presence"
 		apply(Stanza.__init__,[self,node],kw)
 		if show:
-			self.node.newChild(None,"show",to_utf8(show))
+			self.node.newTextChild(None,"show",to_utf8(show))
 		if status:
-			self.node.newChild(None,"status",to_utf8(status))
+			self.node.newTextChild(None,"status",to_utf8(status))
 		if priority and priority!=0:
-			self.node.newChild(None,"priority",to_utf8(str(priority)))
+			self.node.newTextChild(None,"priority",to_utf8(str(priority)))
 
 	def copy(self):
 		return Presence(self)

@@ -148,8 +148,8 @@ class LegacyClientStream(ClientStream):
 	def _auth_stage1(self):
 		iq=Iq(type="get")
 		q=iq.new_query("jabber:iq:auth")
-		q.newChild(q.ns(),"username",to_utf8(self.jid.node))
-		q.newChild(q.ns(),"resource",to_utf8(self.jid.resource))
+		q.newTextChild(q.ns(),"username",to_utf8(self.jid.node))
+		q.newTextChild(q.ns(),"resource",to_utf8(self.jid.resource))
 		self.send(iq)
 		self.set_response_handlers(iq,self.auth_stage2,self.auth_error,
 							self.auth_timeout,timeout=60)
@@ -195,9 +195,9 @@ class LegacyClientStream(ClientStream):
 	def _plain_auth_stage2(self,stanza):
 		iq=Iq(type="set")
 		q=iq.new_query("jabber:iq:auth")
-		q.newChild(None,"username",to_utf8(self.jid.node))
-		q.newChild(None,"resource",to_utf8(self.jid.resource))
-		q.newChild(None,"password",to_utf8(self.password))
+		q.newTextChild(None,"username",to_utf8(self.jid.node))
+		q.newTextChild(None,"resource",to_utf8(self.jid.resource))
+		q.newTextChild(None,"password",to_utf8(self.password))
 		self.send(iq)
 		self.set_response_handlers(iq,self.auth_finish,self.auth_error)
 		iq.free()
@@ -229,10 +229,10 @@ class LegacyClientStream(ClientStream):
 	def _digest_auth_stage2(self,stanza):
 		iq=Iq(type="set")
 		q=iq.new_query("jabber:iq:auth")
-		q.newChild(None,"username",to_utf8(self.jid.node))
-		q.newChild(None,"resource",to_utf8(self.jid.resource))
+		q.newTextChild(None,"username",to_utf8(self.jid.node))
+		q.newTextChild(None,"resource",to_utf8(self.jid.resource))
 		digest=sha.new(to_utf8(self.stream_id)+to_utf8(self.password)).hexdigest()
-		q.newChild(None,"digest",digest)
+		q.newTextChild(None,"digest",digest)
 		self.send(iq)
 		self.set_response_handlers(iq,self.auth_finish,self.auth_error)
 		iq.free()

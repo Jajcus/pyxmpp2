@@ -417,7 +417,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			ml.setNs(ns)
 			for m in self.sasl_mechanisms:
 				if m in sasl.all_mechanisms:
-					ml.newChild(ns,"mechanism",m)
+					ml.newTextChild(ns,"mechanism",m)
 		if self.tls_settings and not self.tls:
 			tls=features.newChild(None,"starttls",None)
 			ns=tls.newNs(TLS_NS,None)
@@ -887,7 +887,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		iq=Iq(type="set")
 		q=iq.new_query(BIND_NS,"bind")
 		if resource:
-			q.newChild(q.ns(),"resource",to_utf8(resource))
+			q.newTextChild(q.ns(),"resource",to_utf8(resource))
 		self.state_change("binding",resource)
 		self.send(iq)
 		self.set_response_handlers(iq,self._bind_success,self._bind_error)

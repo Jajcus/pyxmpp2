@@ -55,7 +55,7 @@ class VCardString:
 	def rfc2426(self):
 		return rfc2425encode(self.name,self.value)
 	def xml(self,parent):
-		return parent.newChild(parent.ns(),to_utf8(self.name.upper()),value)
+		return parent.newTextChild(parent.ns(),to_utf8(self.name.upper()),value)
 
 class VCardName:
 	def __init__(self,name,value,rfc2425parameters={}):
@@ -89,11 +89,11 @@ class VCardName:
 				(self.family,self.given,self.middle,self.prefix,self.suffix)
 	def xml(self,parent):
 		n=parent.newChild(parent.ns(),"N",None)
-		n.newChild(n.ns(),"FAMILY",to_utf8(self.family))
-		n.newChild(n.ns(),"GIVEN",to_utf8(self.given))
-		n.newChild(n.ns(),"MIDDLE",to_utf8(self.middle))
-		n.newChild(n.ns(),"PREFIX",to_utf8(self.prefix))
-		n.newChild(n.ns(),"SUFFIX",to_utf8(self.suffix))
+		n.newTextChild(n.ns(),"FAMILY",to_utf8(self.family))
+		n.newTextChild(n.ns(),"GIVEN",to_utf8(self.given))
+		n.newTextChild(n.ns(),"MIDDLE",to_utf8(self.middle))
+		n.newTextChild(n.ns(),"PREFIX",to_utf8(self.prefix))
+		n.newTextChild(n.ns(),"SUFFIX",to_utf8(self.suffix))
 		return n
 
 class VCardImage:
@@ -134,11 +134,11 @@ class VCardImage:
 	def xml(self,parent):
 		n=parent.newChild(parent.ns(),self.name.upper(),None)
 		if self.uri:
-			n.newChild(n.ns(),"EXTVAL",to_utf8(self.uri))
+			n.newTextChild(n.ns(),"EXTVAL",to_utf8(self.uri))
 		else:
 			if self.type:
-				n.newChild(n.ns(),"TYPE",self.type)
-			n.newChild(n.ns(),"BINVAL",binascii.b2a_base64(self.image))
+				n.newTextChild(n.ns(),"TYPE",self.type)
+			n.newTextChild(n.ns(),"BINVAL",binascii.b2a_base64(self.image))
 		return n
 
 class VCardAdr:
@@ -198,13 +198,13 @@ class VCardAdr:
 		for t in ("home","work","postal","parcel","dom","intl","pref")
 			if t in self.type:
 				n.newChild(n.ns(),t.upper(),None)
-		n.newChild(n.ns(),"POBOX",to_utf8(self.pobox))
-		n.newChild(n.ns(),"EXTADR",to_utf8(self.extadr))
-		n.newChild(n.ns(),"STREET",to_utf8(self.street))
-		n.newChild(n.ns(),"LOCALITY",to_utf8(self.locality))
-		n.newChild(n.ns(),"REGION",to_utf8(self.region))
-		n.newChild(n.ns(),"PCODE",to_utf8(self.pcode))
-		n.newChild(n.ns(),"CTRY",to_utf8(self.ctry))
+		n.newTextChild(n.ns(),"POBOX",to_utf8(self.pobox))
+		n.newTextChild(n.ns(),"EXTADR",to_utf8(self.extadr))
+		n.newTextChild(n.ns(),"STREET",to_utf8(self.street))
+		n.newTextChild(n.ns(),"LOCALITY",to_utf8(self.locality))
+		n.newTextChild(n.ns(),"REGION",to_utf8(self.region))
+		n.newTextChild(n.ns(),"PCODE",to_utf8(self.pcode))
+		n.newTextChild(n.ns(),"CTRY",to_utf8(self.ctry))
 		return n
 
 class VCardLabel:
@@ -250,7 +250,7 @@ class VCardLabel:
 			if t in self.type:
 				n.newChild(n.ns(),t.upper(),None)
 		for l in self.lines:
-			n.newChild(n.ns(),"LINE",l)
+			n.newTextChild(n.ns(),"LINE",l)
 		return n
 
 class VCardTel:
@@ -289,7 +289,7 @@ class VCardTel:
 				"bbs","modem","isdn","pcs","pref"):
 			if t in self.type:
 				n.newChild(n.ns(),t.upper(),None)
-		n.newChild(n.ns(),"NUMBER",to_utf8(self.number))
+		n.newTextChild(n.ns(),"NUMBER",to_utf8(self.number))
 		return n
 
 class VCardEmail:
@@ -325,7 +325,7 @@ class VCardEmail:
 		for t in ("home","work","internet","x400"):
 			if t in self.type:
 				n.newChild(n.ns(),t.upper(),None)
-		n.newChild(n.ns(),"USERID",to_utf8(self.address))
+		n.newTextChild(n.ns(),"USERID",to_utf8(self.address))
 		return n
 
 class VCardGeo:
@@ -353,8 +353,8 @@ class VCardGeo:
 				(self.lat,self.lon)
 	def xml(self,parent):
 		n=parent.newChild(parent.ns(),"GEO",None)
-		n.newChild(n.ns(),"LAT",to_utf8(self.lat))
-		n.newChild(n.ns(),"LON",to_utf8(self.lon))
+		n.newTextChild(n.ns(),"LAT",to_utf8(self.lat))
+		n.newTextChild(n.ns(),"LON",to_utf8(self.lon))
 		return n
 
 class VCardOrg:
@@ -382,8 +382,8 @@ class VCardOrg:
 				(self.name,self.unit)
 	def xml(self,parent):
 		n=parent.newChild(parent.ns(),"ORG",None)
-		n.newChild(n.ns(),"ORGNAME",to_utf8(self.name))
-		n.newChild(n.ns(),"ORGUNIT",to_utf8(self.unit))
+		n.newTextChild(n.ns(),"ORGNAME",to_utf8(self.name))
+		n.newTextChild(n.ns(),"ORGUNIT",to_utf8(self.unit))
 		return n
 
 class VCardCategories:
@@ -409,7 +409,7 @@ class VCardCategories:
 	def xml(self,parent):
 		n=parent.newChild(parent.ns(),"CATEGORIES",None)
 		for k in self.keywords:
-			n.newChild(n.ns(),"KEYWORD",to_utf8(k))
+			n.newTextChild(n.ns(),"KEYWORD",to_utf8(k))
 		return n
 
 class VCardSound:
@@ -454,11 +454,11 @@ class VCardSound:
 	def xml(self,parent):
 		n=parent.newChild(parent.ns(),self.name.upper(),None)
 		if self.uri:
-			n.newChild(n.ns(),"EXTVAL",to_utf8(self.uri))
+			n.newTextChild(n.ns(),"EXTVAL",to_utf8(self.uri))
 		elif self.phonetic:
-			n.newChild(n.ns(),"PHONETIC",to_utf8(self.phonetic))
+			n.newTextChild(n.ns(),"PHONETIC",to_utf8(self.phonetic))
 		else:
-			n.newChild(n.ns(),"BINVAL",binascii.b2a_base64(self.image))
+			n.newTextChild(n.ns(),"BINVAL",binascii.b2a_base64(self.image))
 		return n
 
 class VCardPrivacy:

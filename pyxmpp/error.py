@@ -247,7 +247,7 @@ class ErrorNode:
 		return t[0].getContent()
 
 	def add_custom_condition(self,ns,cond,content=None):
-		c=self.node.newChild(None,cond,content)
+		c=self.node.newTextChild(None,cond,content)
 		ns=c.newNs(ns,None)
 		c.setNs(ns)
 		return c
@@ -282,7 +282,7 @@ class ErrorNode:
 			condition.setNs(ns)
 		txt=self.node.getContent()
 		if txt:
-			text=self.node.newChild(None,"text",txt)
+			text=self.node.newTextChild(None,"text",txt)
 			ns=text.newNs(self.ns,None)
 			text.setNs(ns)
 

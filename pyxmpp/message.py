@@ -59,11 +59,11 @@ class Message(Stanza):
 			node="message"
 		apply(Stanza.__init__,[self,node],kw)
 		if subject is not None:
-			self.node.newChild(None,"subject",to_utf8(subject))
+			self.node.newTextChild(None,"subject",to_utf8(subject))
 		if body is not None:
-			self.node.newChild(None,"body",to_utf8(body))
+			self.node.newTextChild(None,"body",to_utf8(body))
 		if thread is not None:
-			self.node.newChild(None,"thread",to_utf8(thread))
+			self.node.newTextChild(None,"thread",to_utf8(thread))
 
 	def get_subject(self):
 		n=self.xpath_eval("subject")
