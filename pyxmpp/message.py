@@ -19,7 +19,7 @@ import libxml2
 from stanza import Stanza,StanzaError
 from utils import to_utf8,from_utf8
 
-message_types=("normal","chat","headline")
+message_types=("normal","chat","headline","error")
 
 class Message(Stanza):
 	stanza_type="message"
@@ -69,3 +69,17 @@ class Message(Stanza):
 			return from_utf8(n[0].getContent())
 		else:
 			return None
+
+	def make_error_reply(self,clas,cond):
+		if self.get_type() == "error":
+			raise StanzaError,"Errors may not be generated in response to errors"
+		
+		m=Message(type="error",fr=self.get_to(),to=self.get_from(),
+			id=self.get_id(),error_class=clas,error_cond=cond)
+
+		if self.node.children:
+			for n in list(self.node.children):
+				n=n.copyNode(1)
+				m.node.children.addPrevSibling(n)
+		return m
+	
