@@ -188,7 +188,7 @@ class LegacyClientStream(ClientStream):
 			if (stanza.xpath_eval("a:query/a:password",{"a":"jabber:iq:auth"})):
 						self.available_auth_methods.append("plain")
 			self.auth_stanza=stanza.copy()
-			self.try_auth()
+			self._try_auth()
 		finally:
 			self.lock.release()
 	
@@ -218,7 +218,7 @@ class LegacyClientStream(ClientStream):
 			self.peer_authenticated=1
 			self.auth_method_used="plain"
 			self.state_change("authenticated",self.peer)
-			self.post_auth()
+			self._post_auth()
 		else:
 			self.debug("Plain auth failed")
 			iq=stanza.make_error_response("bad-request")
@@ -263,7 +263,7 @@ class LegacyClientStream(ClientStream):
 			self.peer_authenticated=1
 			self.auth_method_used="digest"
 			self.state_change("authenticated",self.peer)
-			self.post_auth()
+			self._post_auth()
 		else:
 			self.debug("Digest auth failed: %r != %r" % (digest,mydigest))
 			iq=stanza.make_error_response("bad-request")
@@ -278,6 +278,6 @@ class LegacyClientStream(ClientStream):
 			self.me=self.jid
 			self.authenticated=1
 			self.state_change("authenticated",self.me)
-			self.post_auth()
+			self._post_auth()
 		finally:
 			self.lock.release()
