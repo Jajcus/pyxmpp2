@@ -1,5 +1,11 @@
 2004-09-20  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/__init__.py, pyxmpp/client.py, pyxmpp/clientstream.py, pyxmpp/dns.py, pyxmpp/resolver.py, pyxmpp/stanza.py, TODO.pylint:
+	- cleaning up...
+
+	* pyxmpp/stanzaprocessor.py, pyxmpp/stream.py:
+	- splitting the big stream.py
+
 	* pyxmpp/client.py, pyxmpp/stream.py, TODO.pylint, pylint.sh:
 	- cleaning up...
 
