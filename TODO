@@ -10,3 +10,6 @@ xmpp-im:
 
 other:
 - jabber:component stream support
+- Data Forms (JEP-4)
+- jabber:iq:register (legacy in-band registration)
+- jabber:iq:search
