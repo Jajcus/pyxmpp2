@@ -27,9 +27,15 @@ import logging
 
 from pyxmpp.presence import Presence
 from pyxmpp.message import Message
+from pyxmpp.iq import Iq
 from pyxmpp.jid import JID
 
+from pyxmpp.xmlextra import xml_element_ns_iter
+
 from pyxmpp.jabber.muccore import MucPresence,MucUserX,MucItem,MucStatus
+from pyxmpp.jabber.muccore import MUC_OWNER_NS
+
+from pyxmpp.jabber.dataforms import DATAFORM_NS, Form
 
 import weakref
 
@@ -72,7 +78,7 @@ class MucRoomHandler:
         :Types:
             - `stanza`: `pyxmpp.stanza.Stanza`
         """
-        # TODO: self.room_state.request_instant_room() 
+        self.room_state.request_instant_room() 
 
     def configuration_form_received(self,form):
         """
@@ -88,16 +94,9 @@ class MucRoomHandler:
         """
         pass
 
-    def room_configured(self, form):
+    def room_configured(self):
         """
         Called after a successfull room configuration.
-
-        :Parameters:
-            - `form`: current configuration (the last received configuration
-              form updated with the submitted data).
-
-        :Types:
-            - `form`: `pyxmpp.jabber.dataforms.Form`
         """
         pass
 
@@ -233,6 +232,20 @@ class MucRoomHandler:
         """
         pass
 
+    def room_configuration_error(self,stanza):
+        """
+        Called when an error stanza is received in reply to a room
+        configuration request.
+
+        By default `self.error` is called.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `pyxmpp.stanza.Stanza`
+        """
+        self.error(stanza)
+
     def error(self,stanza):
         """
         Called when an error stanza is received.
@@ -365,6 +378,7 @@ class MucRoomState:
         - `subject`: current subject of the room.
         - `users`: dictionary of users in the room. Nicknames are the keys.
         - `me`: MucRoomUser instance of the owner.
+        - `configured`: `False` if the room requires configuration.
     """
     def __init__(self,manager,own_jid,room_jid,handler):
         """
@@ -390,6 +404,7 @@ class MucRoomState:
         self.subject=None
         self.users={}
         self.me=MucRoomUser(room_jid)
+        self.configured = None
         handler.assign_state(self)
         self.__logger=logging.getLogger("pyxmpp.jabber.MucRoomState")
 
@@ -541,10 +556,14 @@ class MucRoomState:
         if fr==self.room_jid and not self.joined:
             self.joined=True
             self.me=user
+            mc=stanza.get_muc_child()
             if isinstance(mc,MucUserX):
                 status = [i for i in mc.get_items() if isinstance(i,MucStatus) and i.code==201]
                 if status:
-                    self.handler.room_created(user,stanza)
+                    self.configured = False
+                    self.handler.room_created(stanza)
+            if self.configured is None:
+                self.configured = True
         if not old_user or old_user.role=="none":
             self.handler.user_joined(user,stanza)
         else:
@@ -637,6 +656,113 @@ class MucRoomState:
         """
         self.handler.error(stanza)
 
+    def process_configuration_form_success(self, stanza):
+        """
+        Process successful result of a room configuration form request.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `Presence`
+        """
+        if stanza.get_query_ns() != MUC_OWNER_NS:
+            raise ValueError, "Bad result namespace" # TODO: ProtocolError
+        query = stanza.get_query()
+        form = None
+        for el in xml_element_ns_iter(query.children, DATAFORM_NS):
+            form = Form(el)
+            break
+        if not form:
+            raise ValueError, "No form received" # TODO: ProtocolError
+        self.configuration_form = form
+        self.handler.configuration_form_received(self, form)
+
+    def process_configuration_form_error(self, stanza):
+        """
+        Process error response for a room configuration form request.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `Presence`
+        """
+        self.handler.error(stanza)
+
+    def request_configuration_form(self):
+        """
+        Request a configuration form for the room.
+
+        When the form is received `self.handler.configuration_form_received` will be called.
+        When an error response is received then `self.handler.error` will be called.
+
+        :return: id of the request stanza.
+        :returntype: `unicode`
+        """
+        iq = Iq(to_jid = self.room_jid.bare(), stanza_type = "get")
+        query = iq.new_query(MUC_OWNER_NS, "query")
+        self.manager.stream.set_response_handlers(
+                iq, self.process_configuration_form_success, self.process_configuration_form_error)
+        self.manager.stream.send(iq)
+        return iq.get_id()
+
+    def process_configuration_success(self, stanza):
+        """
+        Process success response for a room configuration request.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `Presence`
+        """
+        self.configured = True
+        self.handler.room_configured()
+
+    def process_configuration_error(self, stanza):
+        """
+        Process error response for a room configuration request.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `Presence`
+        """
+        self.handler.room_configuration_error(stanza)
+
+    def configure_room(self, form):
+        """
+        Configure the room using the provided data.
+
+        :Parameters:
+            - `form`: the configuration parameters. Should be a `submit` form made by filling-in 
+              the configuration form retireved using `self.request_configuration_form`.
+        :Types:
+            - `form`: `Form`
+
+        :return: id of the request stanza.
+        :returntype: `unicode`
+        """
+        if form.type!="submit":
+            raise ValueError, "A 'submit' form required to configure a room"
+        iq = Iq(to_jid = self.room_jid.bare(), stanza_type = "set")
+        query = iq.new_query(MUC_OWNER_NS, "query")
+        form.as_xml(query)
+        self.manager.stream.set_response_handlers(
+                iq, self.process_configuration_success, self.process_configuration_error)
+        self.manager.stream.send(iq)
+        return iq.get_id()
+
+    def request_instant_room(self):
+        """
+        Request an "instant room" -- the default configuration for a MUC room.
+
+        :return: id of the request stanza.
+        :returntype: `unicode`
+        """
+        if self.configured:
+            raise RuntimeError, "Instant room may be requested for unconfigured room only"
+        form = Form("submit")
+        return self.configure_room(form)
+    
 class MucRoomManager:
     """
     Manage collection of MucRoomState objects and dispatch events.
@@ -644,6 +770,7 @@ class MucRoomManager:
     :Ivariables:
       - `rooms`: a dictionary containing known MUC rooms. Unicode room JIDs are the
         keys.
+      - `stream`: the stream associated with the room manager.
 
     """
     def __init__(self,stream):
