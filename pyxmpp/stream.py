@@ -51,8 +51,6 @@ except ImportError:
 		"dummy"
 		pass
 
-standard_ports={ "xmpp-client": 5222, "xmpp-server": 5269}
-
 STREAM_NS="http://etherx.jabber.org/streams"
 TLS_NS="urn:ietf:params:xml:ns:xmpp-tls"
 SASL_NS="urn:ietf:params:xml:ns:xmpp-sasl"
@@ -179,15 +177,14 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		finally:
 			self.lock.release()
 
-	def _connect(self,addr,port,to=None):
+	def _connect(self,addr,port,service=None,to=None):
 		if to is None:
 			to=str(addr)
-		if (type(addr) in (StringType,UnicodeType) 
-				and type(port) in (StringType,UnicodeType)):
-			self.state_change("resolving srv",(addr,port))
-			addrs=resolver.resolve_srv(addr,port)
+		if service is not None:
+			self.state_change("resolving srv",(addr,service))
+			addrs=resolver.resolve_srv(addr,service)
 			if not addrs:
-				addrs=[(addr,standard_ports[port])]
+				addrs=[(addr,port)]
 		else:
 			addrs=[(addr,port)]
 		for addr,port in addrs:

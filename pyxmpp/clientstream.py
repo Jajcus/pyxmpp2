@@ -37,7 +37,7 @@ class LegacyAuthenticationError(StreamAuthenticationError):
 	pass
 
 class ClientStream(Stream):
-	def __init__(self,jid,password=None,server=None,port=5222,
+	def __init__(self,jid,password=None,server=None,port=None,
 			auth_methods=["sasl:DIGEST-MD5"],
 			tls_settings=None,keepalive=0):
 		sasl_mechanisms=[]
@@ -73,11 +73,18 @@ class ClientStream(Stream):
 	def _connect(self,server=None,port=None):
 		if not self.jid.node or not self.jid.resource:
 			raise ClientStreamError,"Client JID must have username and resource"
-		if server:
-			self.server=server
-		if port:
-			self.port=port
-		Stream._connect(self,self.server,"xmpp-client",self.jid.domain) # FIXME!
+		if not server:
+			server=self.server
+		if not port:
+			port=self.port
+		if server is None:
+			server=self.jid.domain
+		if port is None:
+			service="xmpp-client"
+			port=5222
+		else:
+			service=None
+		Stream._connect(self,server,port,"xmpp-client",self.jid.domain)
 
 	def accept(self,sock):
 		Stream.accept(self,sock,self.jid)
