@@ -112,16 +112,9 @@ ignore that: W0613:488:DigestMD5ServerAuthenticator.start: Unused argument 'resp
 W0511:550: TODO: kicks
 ignore that: W0613:380:MucRoomState.set_stream: Unused argument 'stream'
 ************* Module pyxmpp.jabber.muccore
-W0511:141: FIXME: set/get password/history
-W0511:304: FIXME: alt,decline,invite,password
-W0511:336: FIXME: implement
-W0141:176:MucItem.__init: Missing docstring
-W0141:198:MucItem.__from_node: Missing docstring
-W0141:258:MucStatus.__init: Missing docstring
-W0141:264:MucStatus.__from_node: Missing docstring
-W0141:322:MucUserX.add_item: Missing docstring
-W0141:482:MucPresence.free: Missing docstring
-W0141:518:MucIq.free: Missing docstring
+W0511:155: FIXME: set/get password/history
+W0511:396: FIXME: alt,decline,invite,password
+W0511:437: FIXME: implement
 ************* Module pyxmpp.jabber.clientstream
 W0311:194: Bad indentation. Found 24 spaces, expected 16
 W0311:196: Bad indentation. Found 24 spaces, expected 16
@@ -320,7 +313,7 @@ type     number old number difference %documented %badname
 module   38     38         =          97.37       0.00     
 class    115    115        =          78.26       0.00     
 method   0      0          =          0.00        0.00     
-function 642    642        =          86.76       0.00     
+function 642    642        =          87.85       0.00     
 
 
 Raw metrics
@@ -328,10 +321,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6578   54.68 6578     =          
-docstring 4109   34.16 4109     =          
-comment   608    5.05  608      =          
-empty     734    6.10  734      =          
+code      6578   53.96 6578     =          
+docstring 4267   35.00 4109     +158       
+comment   608    4.99  608      =          
+empty     738    6.05  734      +4         
 
 
 External dependencies
@@ -366,7 +359,7 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0141      111        
+W0141      104        
 W0613      41         
 W0201      39         
 E0201      27         
@@ -392,7 +385,7 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 248    248      =          
+warnings 241    248      -7         
 errors   37     37       =          
 
 
@@ -401,32 +394,32 @@ errors   37     37       =
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            40.54 33.87   
-pyxmpp.jid                     35.14 0.40    
-pyxmpp.jabber.disco            10.81 13.31   
-pyxmpp.jabber.client           8.11  4.03    
-pyxmpp.jabber.clientstream     5.41  11.69   
-pyxmpp.streambase              0.00  8.87    
-pyxmpp.sasl.core               0.00  4.03    
-pyxmpp.jabber.muccore          0.00  4.03    
-pyxmpp.dns                     0.00  3.23    
-pyxmpp.streamsasl              0.00  2.82    
-pyxmpp.clientstream            0.00  2.82    
-pyxmpp.jabberd.componentstream 0.00  2.42    
-pyxmpp.xmlextra                0.00  1.61    
-pyxmpp.streamtls               0.00  1.61    
-pyxmpp.version                 0.00  1.21    
-pyxmpp.sasl.plain              0.00  0.81    
-pyxmpp.jabber.muc              0.00  0.81    
-pyxmpp._xmlextra               0.00  0.81    
-pyxmpp.xmppstringprep          0.00  0.40    
-pyxmpp.sasl.digest_md5         0.00  0.40    
-pyxmpp.resolver                0.00  0.40    
-pyxmpp.client                  0.00  0.40    
+pyxmpp.jabber.vcard            40.54 34.85   
+pyxmpp.jid                     35.14 0.41    
+pyxmpp.jabber.disco            10.81 13.69   
+pyxmpp.jabber.client           8.11  4.15    
+pyxmpp.jabber.clientstream     5.41  12.03   
+pyxmpp.streambase              0.00  9.13    
+pyxmpp.sasl.core               0.00  4.15    
+pyxmpp.dns                     0.00  3.32    
+pyxmpp.streamsasl              0.00  2.90    
+pyxmpp.clientstream            0.00  2.90    
+pyxmpp.jabberd.componentstream 0.00  2.49    
+pyxmpp.xmlextra                0.00  1.66    
+pyxmpp.streamtls               0.00  1.66    
+pyxmpp.version                 0.00  1.24    
+pyxmpp.jabber.muccore          0.00  1.24    
+pyxmpp.sasl.plain              0.00  0.83    
+pyxmpp.jabber.muc              0.00  0.83    
+pyxmpp._xmlextra               0.00  0.83    
+pyxmpp.xmppstringprep          0.00  0.41    
+pyxmpp.sasl.digest_md5         0.00  0.41    
+pyxmpp.resolver                0.00  0.41    
+pyxmpp.client                  0.00  0.41    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 9.28/10 (previous run: 9.28/10)
+Your code has been rated at 9.29/10 (previous run: 9.28/10)
 So close to being perfect...
 
