@@ -20,7 +20,12 @@ except:
 	print >>sys.stderr,"Normalization test data not available - trying to download"
 	os.system("wget http://www.unicode.org/Public/3.2-Update/NormalizationTest-3.2.0.txt")
 	f=open("NormalizationTest-3.2.0.txt","r")
-	
+
+passed=0
+failed=0
+skipped=0
+exceptions=0
+
 for l in f.readlines():
 	if l.startswith("#"):
 		continue
@@ -52,6 +57,7 @@ for l in f.readlines():
 			c[i]=num2uni(t[i-1])
 	except ValueError:
 		print "!!! Skipping as the code seems too big for this python"
+		skipped+=1
 		continue
 
 	for i in range(1,6):
@@ -60,12 +66,20 @@ for l in f.readlines():
 			nc=NFKC(c[i])
 			if nc==c[4]:
 				print "********* Passed"
+				passed+=1
 			else:
 				print "********* Failed"
 				print "!!!!!! %r != %r " % (nc,c[4])
+				failed+=1
 		except (KeyboardInterrupt,SystemExit),e:
 			raise
 		except:
 			print "!!!!!! Exception"
+			exceptions+=1
+			failed+=1
 			traceback.print_exc(file=sys.stdout)
 
+print
+print "Passed tests:",passed
+print "Failed tests: %i (%i exceptions)" % (failed,exceptions)
+print "Skipped tests (python limitations):",skipped
