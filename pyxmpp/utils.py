@@ -18,6 +18,7 @@
 """ Utility functions for pyxmpp package. """
 
 from types import UnicodeType,StringType
+import re
 
 def to_utf8(s):
 	""" to_utf8(string_or_unicode) -> string
@@ -48,3 +49,16 @@ def from_utf8(s):
 		return unicode(s,"utf-8")
 	else:
 		return unicode(s)
+
+evil_characters_re=re.compile(r"[\000-\010\013\014\016-\037]",re.UNICODE)
+utf8_replacement_char=u"\ufffd".encode("utf-8")
+def remove_evil_characters(s):
+	""" remove_evil_characters(unicode) -> unicode
+	    remove_evil_characters(utf8_string) -> utf8_string
+
+	Remove control characters (not allowed in XML) from a string.
+	"""
+	if type(s) is UnicodeType:
+		return evil_characters_re.sub(u"\ufffd",s)
+	else:
+		return evil_characters_re.sub(utf8_replacement_char,s)

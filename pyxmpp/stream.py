@@ -31,7 +31,7 @@ import errno
 from types import StringType,UnicodeType
 
 from expdict import ExpiringDictionary
-from utils import from_utf8,to_utf8
+from utils import from_utf8,to_utf8,remove_evil_characters
 from stanza import Stanza,common_doc,StanzaError
 from error import StreamErrorNode
 from iq import Iq
@@ -457,7 +457,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		node=node.docCopyNode(self.doc_out,1)
 		self.doc_out.addChild(node)
 		#node.reconciliateNs(self.doc_out)
-		self._write_raw(node.serialize(encoding="UTF-8"))
+		s=node.serialize(encoding="UTF-8")
+		s=remove_evil_characters(s)
+		self._write_raw(s)
 		node.unlinkNode()
 		node.freeNode()
 		
