@@ -17,7 +17,6 @@ version:
 		SNAPSHOT=.`find . -name "*.py" '!' -name "version.py" -printf '%TY%Tm%Td\n' | sort -r | head -1` ; \
 	fi ; \
 	echo "version='$(BASE_VERSION)$$SNAPSHOT'" > pyxmpp/version.py ; \
-	echo "version='$(BASE_VERSION)$$SNAPSHOT'" > examples/cjc/version.py ; \
 
 snapshot: version dist
 
