@@ -61,6 +61,9 @@ class JID(object):
         JID objects are immutable
         """
    
+        if isinstance(node,JID):
+            return node
+
         if domain is None and resource is None:
             obj=cls.cache.get(node)
         else:
@@ -68,11 +71,7 @@ class JID(object):
         if obj is None:
             obj=object.__new__(cls)
         
-        if isinstance(node,JID):
-            object.__setattr__(obj,"node",node.node)
-            object.__setattr__(obj,"domain",node.domain)
-            object.__setattr__(obj,"resource",node.resource)
-        elif node and ((u"@" in node) or (u"/" in node)):
+        if node and ((u"@" in node) or (u"/" in node)):
             obj.__from_string(node)
             cls.cache[node]=obj
         else:
