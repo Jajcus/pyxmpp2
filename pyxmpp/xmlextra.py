@@ -62,8 +62,6 @@ class StreamHandler:
 class StreamReader:
 	def __init__(self,handler):
 		self.reader=_xmlextra.reader_new(handler)
-	def __del__(self):
-		del self.reader
 	def doc(self):
 		ret=self.reader.doc()
 		if ret:
