@@ -19,6 +19,7 @@
 
 from types import UnicodeType,StringType
 import re
+import libxml2
 
 def to_utf8(s):
     """
