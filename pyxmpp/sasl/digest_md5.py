@@ -90,6 +90,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 		self.nonce_count=0
 		self.response_auth=None
 		self.rspauth_checked=0
+		self.realm=None
 		return Response()
 
 	def challenge(self,challenge):
@@ -169,6 +170,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 					self.debug("Couldn't encode realm from utf-8 to %r"
 										% (charset,))
 					return Failure("incompatible-charset")
+			self.realm=realm
 			realm=quote(realm)
 			params.append('realm="%s"' % (realm,))
 
@@ -264,7 +266,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 
 	def finish(self,data):
 		if self.rspauth_checked:
-			return Success(self.authzid)
+			return Success(self.username,self.realm,self.authzid)
 		else:
 			self.final_challenge(data)
 
@@ -291,11 +293,12 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 		params.append('charset=utf-8')
 		params.append('algorithm=md5-sess')
 		self.authzid=None
+		self.done=0
 		return Challenge(string.join(params,","))	
 		
 	def response(self,response):
-		if self.authzid is not None:
-			return Success(self.authzid)
+		if self.done:
+			return Success(self.username,self.realm,self.authzid)
 	
 		response=response.split('\x00')[0]
 		if not response:
@@ -364,6 +367,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 			self.debug("Required 'nc' parameter not given")
 			return Failure("not-authorized")
 
+
 		username_uq=from_utf8(username.replace('\\',''))
 		if authzid:
 			authzid_uq=from_utf8(authzid.replace('\\',''))
@@ -374,6 +378,9 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 		else:
 			realm_uq=None
 		digest_uri_uq=digest_uri.replace('\\','')
+		
+		self.username=username_uq
+		self.realm=realm_uq
 
 		password,pformat=self.password_manager.get_password(
 					username_uq,realm_uq,("plain","md5:user:realm:pass"))
@@ -412,6 +419,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 			rspauth=compute_response_auth(username,realm,urp_hash,self.nonce,
 							cnonce,nonce_count,authzid,digest_uri)
 			self.authzid=authzid
+			self.done=1
 			return Challenge("rspauth="+rspauth)
 		else:
 			self.debug("Authzid check failed")

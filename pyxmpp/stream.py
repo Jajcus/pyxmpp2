@@ -721,8 +721,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		return self.__try_handlers(self.presence_handlers,typ,stanza)
 
 	def route_stanza(self,stanza):
-		r=stanza.make_error_response("recipient-unavailable")
-		self.send(r)
+		if stanza.get_type() not in ("error","result"):
+			r=stanza.make_error_response("recipient-unavailable")
+			self.send(r)
 		return 1
 		
 	def process_stanza(self,stanza):
@@ -967,7 +968,10 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		node.freeNode()
 
 		if isinstance(r,sasl.Success):
-			self.peer=JID(r.authzid)
+			if r.authzid:
+				self.peer=JID(r.authzid)
+			else:
+				self.peer=JID(r.username,self.me.domain)
 			self.peer_authenticated=1
 			self.state_change("authenticated",self.peer)
 			self._post_auth()
@@ -1036,8 +1040,13 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		node.freeNode()
 		
 		if isinstance(r,sasl.Success):
-			self.peer=JID(r.authzid)
+			authzid=r.authzid
+			if authzid:
+				self.peer=JID(r.authzid)
+			else:
+				self.peer=JID(r.username,self.me.domain)
 			self.peer_authenticated=1
+			self._restart_stream()
 			self.state_change("authenticated",self.peer)
 			self._post_auth()
 
@@ -1055,7 +1064,10 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		if isinstance(r,sasl.Success):
 			el_name="success"
 			self.debug("SASL authentication succeeded")
-			self.me=JID(r.authzid)
+			if r.authzid:
+				self.me=JID(r.authzid)
+			else:
+				self.me=self.jid
 			self.authenticated=1
 			self._restart_stream()
 			self.state_change("authenticated",self.me)

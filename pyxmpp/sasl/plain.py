@@ -65,7 +65,7 @@ class PlainServerAuthenticator(ServerAuthenticator):
 		
 		info={"mechanism":"PLAIN","username":username}
 		if self.password_manager.check_authzid(authzid,info):
-			return Success(authzid)
+			return Success(username,None,authzid)
 		else:
 			self.debug("Authzid verification failed.")
 			return Failure("invalid-authzid")

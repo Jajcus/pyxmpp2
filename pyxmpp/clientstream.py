@@ -21,7 +21,7 @@ import time
 from types import UnicodeType
 
 from stream import Stream,StreamError,FatalStreamError,SASLNotAvailable,SASLMechanismNotAvailable
-from stream import StreamAuthenticationError
+from stream import StreamAuthenticationError,BIND_NS
 from iq import Iq
 from stanza import common_doc
 from jid import JID
@@ -94,11 +94,6 @@ class ClientStream(Stream):
 			self.auth_methods_left=list(self.auth_methods)
 			self._try_auth()
 
-	def _post_auth(self):
-		if not self.initiator:
-			self.unset_iq_get_handler("query","jabber:iq:auth")
-			self.unset_iq_set_handler("query","jabber:iq:auth")
-
 	def _try_auth(self):
 		if self.authenticated:
 			self.debug("try_auth: already authenticated")
@@ -125,6 +120,41 @@ class ClientStream(Stream):
 			self.debug("Skipping unknown auth method: %s" % method)
 			return self._try_auth()
 
+	def _get_stream_features(self):
+		features=Stream._get_stream_features(self)
+		if self.peer_authenticated:
+			bind=features.newChild(None,"bind",None)
+			ns=bind.newNs(BIND_NS,None)
+			bind.setNs(ns)
+			self.set_iq_set_handler("bind",BIND_NS,self.do_bind)
+		return features
+
+	def do_bind(self,stanza):
+		fr=stanza.get_from()
+		if fr and fr!=self.peer:
+			r=stanza.make_error_response("forbidden")
+			self.send(r)
+			r.free()
+			return
+
+		resource_n=stanza.xpath_eval("bind:bind/bind:resource",{"bind":BIND_NS})
+		if resource_n:
+			resource=resource_n[0].getContent()
+		else:
+			resource="auto"
+		if not resource:
+			r=stanza.make_error_response("bad-request")
+		else:
+			self.unset_iq_set_handler("bind",BIND_NS)
+			r=stanza.make_result_response()
+			self.peer.set_resource(resource)
+			q=r.new_query(BIND_NS,"bind")
+			q.newTextChild(q.ns(),"jid",to_utf8(self.peer.as_unicode()))
+			self.state_change("authorized",self.peer)
+		r.set_to(None)
+		self.send(r)
+		r.free()
+
 	def get_password(self,username,realm=None,acceptable_formats=("plain",)):
 		if self.initiator and self.jid.node==username and "plain" in acceptable_formats:
 			return self.password,"plain"
@@ -142,6 +172,8 @@ class ClientStream(Stream):
 		return realm_list[0]
 			
 	def check_authzid(self,authzid,extra_info={}):
+		if not authzid:
+			return 1
 		if not self.initiator:
 			jid=JID(authzid)
 			if not extra_info.has_key("username"):

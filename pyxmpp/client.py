@@ -18,6 +18,7 @@
 import libxml2
 import sys
 import threading
+import traceback
 
 from clientstream import ClientStream
 from jid import JID

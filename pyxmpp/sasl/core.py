@@ -33,7 +33,7 @@ class PasswordManager:
 	def choose_realm(self,realm_list):
 		return realm_list[0]
 	def check_authzid(self,authzid,extra_info={}):
-		return extra_info.has_key("username") and username==authzid
+		return not authzid or extra_info.has_key("username") and username==authzid
 
 	def get_serv_type(self):
 		return "unknown"
@@ -75,7 +75,9 @@ class Failure(Reply):
 		return "<sasl.Failure: %r>" % (self.reason,)
 
 class Success(Reply):
-	def __init__(self,authzid,data=None):
+	def __init__(self,username,realm=None,authzid=None,data=None):
+		self.username=username
+		self.realm=realm
 		self.authzid=authzid
 		self.data=data
 	def __repr__(self):
