@@ -56,6 +56,28 @@ class TestForm(unittest.TestCase):
         self.check_form_info(form, jep4_example2_info)
         self.check_form_iter(form, jep4_example2_fields)
 
+    def test_jep4_example2_make_submit(self):
+        form = self.parse_form(jep4_example2)
+        form['public'].value = True
+        sform = form.make_submit()
+        self.check_form_info(sform, ("submit", None, None))
+        submitted_fields = [ 
+                    (f[0], None, f[2], None, [], False, None) for f in jep4_example2_fields 
+                ]
+        sform['public'].value = None
+        self.check_form_iter(sform, submitted_fields)
+
+    def test_jep4_example2_make_submit_with_types(self):
+        form = self.parse_form(jep4_example2)
+        form['public'].value = True
+        sform = form.make_submit( keep_types = True )
+        self.check_form_info(sform, ("submit", None, None))
+        submitted_fields = [ 
+                    (f[0], f[1], f[2], None, [], False, None) for f in jep4_example2_fields 
+                ]
+        sform['public'].value = None
+        self.check_form_iter(sform, submitted_fields)
+
     def test_jep4_example3_basic(self):
         form = self.parse_form(jep4_example3)
         self.check_form_info(form, jep4_example3_info)
