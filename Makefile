@@ -3,7 +3,7 @@ SNAPSHOT=
 
 DESTDIR="/"
 
-.PHONY: all version snapshot dist doc ChangeLog cosmetics TODO.pylint pylint
+.PHONY: all version snapshot dist doc cosmetics TODO.pylint pylint
 
 all: version
 	umask 022 ; python setup.py build
@@ -15,8 +15,8 @@ all: version
 doc:
 	$(MAKE) -C doc
 
-ChangeLog: 
-	TZ=UTC svn log -v --xml | svn2log.py -p '/(branches/[^/]+|trunk)' -x ChangeLog -u aux/users
+ChangeLog: .svn/entries
+	TZ=UTC svn log -v --xml | aux/svn2log.py -p '/(branches/[^/]+|trunk)' -x ChangeLog -u aux/users
 
 pylint:	TODO.pylint
 
