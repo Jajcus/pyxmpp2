@@ -30,7 +30,7 @@ class JIDError(ValueError):
 	pass
 
 class JID:
-	def __init__(self,node=None,domain=None,resource=None):
+	def __init__(self,node=None,domain=None,resource=None,check=1):
 		if isinstance(node,JID):
 			self.node=node.node
 			self.domain=node.domain
@@ -44,9 +44,15 @@ class JID:
 			self.node=None
 			self.resource=None
 			return
-		self.set_node(node)
-		self.set_domain(domain)
-		self.set_resource(resource)
+		
+		if check:
+			self.set_node(node)
+			self.set_domain(domain)
+			self.set_resource(resource)
+		else:
+			self.node=node
+			self.domain=domain
+			self.resource=resource
 	
 	def from_string(self,s):
 		return self.from_unicode(from_utf8(s))
@@ -110,7 +116,7 @@ class JID:
 		else:
 			return "%s@%s/%s" % (self.node,self.domain,self.resource)
 	def bare(self):
-		return JID(self.node,self.domain)
+		return JID(self.node,self.domain,check=0)
 
 	def __eq__(self,other):
 		if other is None:
