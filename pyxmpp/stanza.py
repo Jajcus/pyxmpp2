@@ -101,7 +101,7 @@ class Stanza:
         return self.node.serialize()
 
     def get_node(self):
-        return node
+        return self.node
     def get_from(self):
         if self.node.hasProp("from"):
             return JID(self.node.prop("from"))
