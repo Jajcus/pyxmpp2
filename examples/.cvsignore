@@ -1,4 +1,6 @@
 .cjcrc
 .memdump
 *.pyc
+*.log
+log
 pyxmpp
