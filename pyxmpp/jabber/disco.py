@@ -169,7 +169,9 @@ class DiscoIdentity:
 		var=self.xmlnode.prop("name")
 		return unicode(var,"utf-8")
 	def set_name(self,name):
-		self.xmlnode.setProp("name",var.encode("utf-8"))
+		if not name:
+			raise ValueError,"name is required in DiscoIdentity"
+		self.xmlnode.setProp("name",name.encode("utf-8"))
 	def category(self):
 		var=self.xmlnode.prop("category")
 		return unicode(var,"utf-8")
