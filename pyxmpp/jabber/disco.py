@@ -45,9 +45,9 @@ class DiscoItem:
             self.xmlnode.setProp("jid",xmlnode_or_jid.as_string())
         else:
             if disco is None:
-                self.xmlnode=node_or_jid.copyNode(1)
+                self.xmlnode=xmlnode_or_jid.copyNode(1)
             else:
-                self.xmlnode=node_or_jid
+                self.xmlnode=xmlnode_or_jid
         self.xpath_ctxt=common_doc.xpathNewContext()
         self.xpath_ctxt.setContextNode(self.xmlnode)
         self.xpath_ctxt.xpathRegisterNs("d",DISCO_ITEMS_NS)
