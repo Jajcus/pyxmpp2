@@ -59,33 +59,40 @@ class ClientStream(Stream):
 		self.password=password
 		self.auth_methods=auth_methods
 	
-	def reset(self):
-		Stream.reset(self)
+	def _reset(self):
+		Stream._reset(self)
 		self.auth_methods_left=[]
 
 	def connect(self,server=None,port=None):
+		self.lock.acquire()
+		try:
+			self._connect(server,port)
+		finally:
+			self.lock.release()
+		
+	def _connect(self,server=None,port=None):
 		if not self.jid.node or not self.jid.resource:
 			raise ClientStreamError,"Client JID must have username and resource"
 		if server:
 			self.server=server
 		if port:
 			self.port=port
-		Stream.connect(self,self.server,self.port,self.jid.domain)
+		Stream._connect(self,self.server,self.port,self.jid.domain)
 
 	def accept(self,sock):
 		Stream.accept(self,sock,self.jid)
 
-	def post_connect(self):
+	def _post_connect(self):
 		if self.initiator:
 			self.auth_methods_left=list(self.auth_methods)
-			self.try_auth()
+			self._try_auth()
 
-	def post_auth(self):
+	def _post_auth(self):
 		if not self.initiator:
 			self.unset_iq_get_handler("query","jabber:iq:auth")
 			self.unset_iq_set_handler("query","jabber:iq:auth")
 
-	def try_auth(self):
+	def _try_auth(self):
 		if self.authenticated:
 			self.debug("try_auth: already authenticated")
 			return
@@ -97,19 +104,19 @@ class ClientStream(Stream):
 			if self.version:
 				self.auth_methods_left.pop(0)
 				try:
-					self.sasl_authenticate(self.jid.node,self.jid.as_unicode(),
+					self._sasl_authenticate(self.jid.node,self.jid.as_unicode(),
 								mechanism=method[5:].upper())
 				except (SASLMechanismNotAvailable,SASLNotAvailable),e:
 					self.debug("Skipping unavailable auth method: %s" % (method,) )
-					return self.try_auth()
+					return self._try_auth()
 			else:
 				self.auth_methods_left.pop(0)
 				self.debug("Skipping auth method %s as legacy protocol is in use" % (method,) )
-				return self.try_auth()
+				return self._try_auth()
 		else:
 			self.auth_methods_left.pop(0)
 			self.debug("Skipping unknown auth method: %s" % method)
-			return self.try_auth()
+			return self._try_auth()
 
 	def get_password(self,username,realm=None,acceptable_formats=("plain",)):
 		if self.initiator and self.jid.node==username and "plain" in acceptable_formats:

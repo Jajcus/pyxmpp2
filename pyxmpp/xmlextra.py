@@ -1,6 +1,7 @@
 import sys
 import libxml2
 import _xmlextra
+import threading
 
 """Extension to libxml2 for XMPP stream and stanza processing"""
 
@@ -62,6 +63,8 @@ class StreamHandler:
 class StreamReader:
 	def __init__(self,handler):
 		self.reader=_xmlextra.reader_new(handler)
+		self.lock=threading.RLock()
+		self.in_use=0
 	def doc(self):
 		ret=self.reader.doc()
 		if ret:
@@ -69,7 +72,16 @@ class StreamReader:
 		else:
 			return None
 	def feed(self,s):
-		return self.reader.feed(s)
+		self.lock.acquire()
+		if self.in_use:
+			self.lock.release()
+			raise StreamParseError,"StreamReader.feed() is not reentrant!"
+		self.in_use=1
+		try:
+			return self.reader.feed(s)
+		finally:
+			self.in_use=0
+			self.lock.release()
 		
 def remove_ns(node, ns):
 	"""This function removes namespace declaration from a node. It
