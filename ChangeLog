@@ -1,3 +1,8 @@
+2004-06-07  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/jabber/muc.py:
+	- nick, role and affiliation change notification and nick changing in the MUC client
+
 2004-06-04  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/jabber/muc.py:
