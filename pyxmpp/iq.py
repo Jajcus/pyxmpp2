@@ -17,7 +17,7 @@
 
 import libxml2
 
-from utils import from_utf8,to_utf8
+from utils import from_utf8,to_utf8,get_node_ns_uri
 from stanza import Stanza,StanzaError,gen_id
 
 class Iq(Stanza):
@@ -54,8 +54,10 @@ class Iq(Stanza):
 
         iq=Iq(type="error",fr=self.get_to(),to=self.get_from(),
             id=self.get_id(),error_cond=cond)
-        n=self.get_query().copyNode(1)
-        iq.node.children.addPrevSibling(n)
+        n=self.get_query()
+        if n:
+            n=n.copyNode(1)
+            iq.node.children.addPrevSibling(n)
         return iq
 
     def make_result_response(self):
@@ -75,8 +77,12 @@ class Iq(Stanza):
                     return c
             except libxml2.treeError:
                 pass
-        raise StanzaError,"This iq stanza doesn't contain any query"
+        return None
 
     def get_query_ns(self):
-        return self.get_query().ns().getContent()
+        q=self.get_query()
+        if q:
+            return get_node_ns_uri(q)
+        else:
+            return None
 # vi: sts=4 et sw=4
