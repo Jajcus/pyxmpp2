@@ -21,7 +21,7 @@ __revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import libxml2
-from pyxmpp.stanza import common_doc, common_root
+from pyxmpp.xmlextra import common_doc, common_root
 
 class StanzaPayloadObject(object):
     """Base class for objects that may be used as XMPP stanza payload and don't keep
