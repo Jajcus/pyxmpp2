@@ -27,7 +27,7 @@ import traceback
 
 from expdict import ExpiringDictionary
 from utils import from_utf8,to_utf8
-from stanza import Stanza,common_doc
+from stanza import Stanza,common_doc,StanzaError
 from error import ErrorNode
 from iq import Iq
 from presence import Presence
@@ -297,6 +297,14 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def send(self,stanza):
 		if self.require_tls and not self.tls:
 			raise StreamEncryptionRequired,"TLS encryption required and not started yet"
+			
+		if not self.version:
+			try:
+				err=stanza.get_error()
+			except StanzaError:
+				err=None
+			if err:
+				err.downgrade()
 		self.fix_out_stanza(stanza)
 		self.write_node(stanza.node)
 
@@ -380,9 +388,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		else:
 			pre_auth=0
 			
-		self.fix_in_stanza(stanza)
 		id=stanza.get_id()
 		fr=stanza.get_from()
+
 		typ=stanza.get_type()
 		if typ in ("result","error"):
 			if self.iq_reply_handlers.has_key((id,fr.as_unicode())):
@@ -398,7 +406,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
 		q=stanza.get_query()
 		if not q:
-			return 0
+			r=stanza.make_error_reply("format","bad-request")
+			self.send(r)
+			return 1
 		el=q.name
 		ns=q.ns().getContent()
 
@@ -409,7 +419,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			self.iq_set_handlers[(el,ns,pre_auth)](stanza)
 			return 1
 		else:
-			return 0
+			r=stanza.make_error_reply("recipient","feature-not-implemented")
+			self.send(r)
+			return 1
 
 	def process_message(self,stanza):
 		if not self.initiator and not self.peer_authenticated:
@@ -439,8 +451,19 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			self.presence_handlers[typ](stanza)
 			return 1
 		return 0
+
+	def route_stanza(self,stanza):
+		r=stanza.make_error_reply("recipient","recipient-unavailable")
+		self.send(r)
+		return 1
 		
 	def process_stanza(self,stanza):
+		self.fix_in_stanza(stanza)
+		to=stanza.get_to()
+
+		if to!=self.me and to!=self.me.bare():
+			return self.route_stanza(stanza)
+
 		if stanza.stanza_type=="iq":
 			if self.process_iq(stanza):
 				return

@@ -39,7 +39,7 @@ stream_errors_conditions={
 stanza_errors={
 			("bad-request","format"):			400,
 			("conflict","access"):				409,
-			("feature-not-implementes","recipient"):	501,
+			("feature-not-implemented","recipient"):	501,
 			("forbidden","access"):				403,
 			("internal-server-error","server"):		500,
 			("item-not-found","address"):			404,
@@ -213,14 +213,26 @@ class ErrorNode:
 			c.setNs(ns)
 
 	def downgrade(self):
+		print "error.downgrade()"
 		if self.node.hasProp("code"):
+			print "error.downgrade(): no need to downgrade - code present"
 			return
 		if not self.node.hasProp("class"):
+			print "error.downgrade(): cannot downgrade - class not present"
 			return
-		clas=self.node.prop("clas")
-		cond=self.node.xpathEval("condition")
+		clas=self.node.prop("class")
+		ctxt = common_doc.xpathNewContext()
+		ctxt.setContextNode(self.node)
+		ctxt.xpathRegisterNs("se","urn:ietf:params:xml:ns:xmpp-stanzas")
+		ctxt.xpathRegisterNs("re","urn:ietf:params:xml:ns:xmpp-streams")
+		cond=ctxt.xpathEval("se:condition")
 		if not cond:
+			cond=ctxt.xpathEval("re:condition")
+		ctxt.xpathFreeContext()
+		if not cond:
+			print "error.downgrade(): cannot downgrade - condition not present"
 			return
+		cond=cond[0]
 		child=cond.xpathEval("*")
 		if not child:
 			return
@@ -228,9 +240,9 @@ class ErrorNode:
 		if child.ns().getContent()!=cond.ns().getContent():
 			return
 		if stanza_errors.has_key( (str(child.name),str(clas)) ):
-			self.node.setProp("code",stanza_errors[(str(child.name),str(clas))])
+			self.node.setProp("code",str(stanza_errors[(str(child.name),str(clas))]))
 		elif stream_errors.has_key( (str(child.name),str(clas)) ):
-			self.node.setProp("code",stream_errors[(str(child.name),str(clas))])
+			self.node.setProp("code",str(stream_errors[(str(child.name),str(clas))]))
 
 	def serialize(self):
 		return self.node.serialize()
