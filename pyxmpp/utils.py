@@ -17,6 +17,11 @@
 
 """Utility functions for the pyxmpp package."""
 
+import sys
+
+if sys.hexversion<0x02030000:
+    raise ImportError,"Python 2.3 or newer is required"
+
 from types import UnicodeType,StringType
 import re
 import libxml2
