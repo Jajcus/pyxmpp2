@@ -1,3 +1,11 @@
+2004-09-01  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/clientstream.py:
+	- compute SASL authentication realm (use JID domain) when server gives no realm list. This is a 'SHOULD' in RFC2831 (containing DIGEST-MD5 mechanism specification) and fixes compatibility problem with ejabberd
+
+	* pyxmpp/sasl/digest_md5.py:
+	- small bug in digest-uri computation fixed
+
 2004-08-29  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/jabber/delay.py, pyxmpp/__init__.py, pyxmpp/error.py, pyxmpp/iq.py, pyxmpp/jid.py, pyxmpp/message.py, pyxmpp/presence.py, pyxmpp/resolver.py, pyxmpp/roster.py, pyxmpp/stanza.py, pyxmpp/stream.py, pyxmpp/xmlextra.py:
