@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: disco.py,v 1.13 2004/09/24 08:17:24 jajcus Exp $"
+__revision__="$Id: disco.py,v 1.14 2004/09/24 09:47:06 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import sys
@@ -206,7 +206,7 @@ class DiscoItems:
             ns=xmlnode_or_node.ns()
             if ns.getContent() != DISCO_ITEMS_NS:
                 raise RosterError,"Bad disco-items namespace"
-            self.xmlnode=xmlnode_node_or_node.docCopyNode(common_doc,1)
+            self.xmlnode=xmlnode_or_node.docCopyNode(common_doc,1)
             common_root.addChild(self.xmlnode)
             self.ns=self.xmlnode.ns()
         else:
