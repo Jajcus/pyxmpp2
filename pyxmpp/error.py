@@ -86,6 +86,9 @@ stanza_errors={
 			u"forbidden":
 				("You are forbidden to perform requested action",
 				"auth",403),
+			u"gone":
+				("Recipient or server can no longer be contacted at this address",
+				"modify",501),
 			u"internal-server-error":
 				("Internal server error",
 				"wait",500),
@@ -95,12 +98,24 @@ stanza_errors={
 			u"jid-malformed":
 				("JID malformed",
 				"modify",400),
+			u"not-acceptable":
+				("Requested action is not acceptable",
+				"modify",405),
 			u"not-allowed":
 				("Requested action is not allowed",
 				"cancel",405),
+			u"not-authorized":
+				("Not authorized",
+				"auth",405),
+			u"payment-required":
+				("Payment required",
+				"auth",405),
 			u"recipient-unavailable":
 				("Recipient is not available",
 				"wait",404),
+			u"redirect":
+				("Redirection",
+				"modify",404),
 			u"registration-required":
 				("Registration required",
 				"auth",407),
