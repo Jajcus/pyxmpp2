@@ -516,6 +516,7 @@ class MucRoomHandler:
         `stanza` the stanza received.
         """
         pass
+        
     def user_left(self,user,stanza):
         """
         Called when a participant leaves the room.
@@ -524,6 +525,7 @@ class MucRoomHandler:
         `stanza` the stanza received.
         """
         pass
+        
     def role_changed(self,user,old_role,new_role,stanza):
         """
         Called when a role of an user has been changed.
@@ -534,6 +536,7 @@ class MucRoomHandler:
         `stanza` the stanza received.
         """
         pass
+        
     def affiliation_changed(self,user,old_aff,new_aff,stanza):
         """
         Called when a affiliation of an user has been changed.
@@ -544,6 +547,27 @@ class MucRoomHandler:
         `stanza` the stanza received.
         """
         pass
+        
+    def nick_change(self,user,new_nick,stanza):
+        """
+        Called when user nick change is started.
+
+        `user` MucRoomUser object describing the user (before update).
+        `new_nick` is the new nick.
+        `stanza` the stanza received.
+        """
+        pass
+    
+    def nick_changed(self,user,old_nick,stanza):
+        """
+        Called after a user nick has been changed.
+
+        `user` MucRoomUser object describing the user (after update).
+        `old_nick` is the old nick.
+        `stanza` the stanza received.
+        """
+        pass
+        
     def subject_changed(self,user,stanza):
         """
         Called when the room subject has been changed.
@@ -552,6 +576,7 @@ class MucRoomHandler:
         `stanza` is the stanza used to change the subject.
         """
         pass
+        
     def message_received(self,user,stanza):
         """
         Called when groupchat message has been received.
@@ -560,10 +585,12 @@ class MucRoomHandler:
         `stanza` is the message stanza received.
         """
         pass
+        
     def error(self,stanza):
         err=stanza.get_error()
         self.debug("Error from: %r Condition: %r" 
                 % (stanza.get_from(),err.get_condition)) 
+        
     def debug(self,s):
         self.room_state.stream.debug(s)
 
@@ -593,10 +620,12 @@ class MucRoomUser:
             self.room_jid=presence_or_user_or_jid.room_jid
             self.real_jid=presence_or_user_or_jid.real_jid
             self.nick=presence_or_user_or_jid.nick
+            self.new_nick=None
         else:
             self.affiliation="none"
             self.presence=None
             self.real_jid=None
+            self.new_nick=None
             if isinstance(presence_or_user_or_jid,JID):
                 self.nick=presence_or_user_or_jid.resource
                 self.room_jid=presence_or_user_or_jid
@@ -623,14 +652,18 @@ class MucRoomUser:
         mc=self.presence.get_muc_child()
         if isinstance(mc,MucUserX):
             items=mc.get_items()
-            if items:
-                item=items[0]
+            for item in items:
+                if not isinstance(item,MucItem):
+                    continue
                 if item.role:
                     self.role=item.role
                 if item.affiliation:
                     self.affiliation=item.affiliation
                 if item.jid:
                     self.real_jid=item.jid
+                if item.nick:
+                    self.new_nick=item.nick
+                break
     def same_as(self,other):
         return self.room_jid==other.room_jid
         
@@ -723,6 +756,14 @@ class MucRoomState:
         """
         m=Message(to=self.room_jid.bare(),type="groupchat",subject=subject)
         self.manager.stream.send(m)
+
+    def change_nick(self,new_nick):
+        """
+        Send a nick change request to the room.
+        """
+        new_room_jid=JID(self.room_jid.node,self.room_jid.domain,new_nick)
+        p=Presence(to=new_room_jid)
+        self.manager.stream.send(p)
         
     def get_room_jid(self,nick=None):
         """
@@ -750,6 +791,7 @@ class MucRoomState:
         if user:
             old_user=MucRoomUser(user)
             user.update_presence(stanza)
+            user.nick=nick
         else:
             old_user=None
             user=MucRoomUser(stanza)
@@ -757,8 +799,17 @@ class MucRoomState:
         if fr==self.room_jid and not self.joined:
             self.joined=True
             self.me=user
-        self.handler.user_joined(user,stanza)
-        # TODO: role changes, affiliation changes, nick changes
+        if not old_user or old_user.role=="none":
+            self.handler.user_joined(user,stanza)
+        else:
+            if old_user.nick!=user.nick:
+                self.handler.nick_changed(user,old_user.nick,stanza)
+                if old_user.room_jid==self.room_jid:
+                    self.room_jid=fr
+            if old_user.role!=user.role:
+                self.handler.role_changed(user,old_user.role,user.role,stanza)
+            if old_user.affiliation!=user.affiliation:
+                self.handler.affiliation_changed(user,old_user.affiliation,user.affiliation,stanza)
         
     def process_unavailable_presence(self,stanza):
         """
@@ -772,6 +823,14 @@ class MucRoomState:
         if user:
             old_user=MucRoomUser(stanza)
             user.update_presence(stanza)
+            if user.new_nick:
+                mc=stanza.get_muc_child()
+                if isinstance(mc,MucUserX):
+                    renames=[i for i in mc.get_items() if isinstance(i,MucStatus) and i.code==303]
+                    if renames:
+                        self.users[user.new_nick]=user
+                        del self.users[nick]
+                        return
         else:
             old_user=None
             user=MucRoomUser(stanza)
@@ -783,7 +842,7 @@ class MucRoomState:
             self.me=user
         elif old_user:
             self.handler.user_left(user,stanza)
-        # TODO: kicks, nick changes
+        # TODO: kicks
         
     def process_groupchat_message(self,stanza):
         """
