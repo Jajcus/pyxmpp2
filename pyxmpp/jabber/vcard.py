@@ -1533,15 +1533,15 @@ class VCard(StanzaPayloadObject):
     def complete_xml_element(self, xmlnode, _unused):
         """Complete the XML node with `self` content.
 
-        Should be overriden in classes derived from `StanzaPayloadElement`.
+        Should be overriden in classes derived from `StanzaPayloadObject`.
 
         :Parameters:
             - `xmlnode`: XML node with the element being built. It has already
               right name and namespace, but no attributes or content.
-            - `doc`: document to which the element belongs.
+            - `_unused`: document to which the element belongs.
         :Types:
-            - `_unused`: `libxml.xmlNode`
-            - `_unused`: `libxml.xmlDoc"""
+            - `xmlnode`: `libxml2.xmlNode`
+            - `_unused`: `libxml2.xmlDoc`"""
         for _unused1, value in self.content.items():
             if value is None:
                 continue

@@ -108,15 +108,15 @@ class RosterItem(StanzaPayloadObject):
     def complete_xml_element(self, xmlnode, _unused):
         """Complete the XML node with `self` content.
 
-        Should be overriden in classes derived from `StanzaPayloadElement`.
+        Should be overriden in classes derived from `StanzaPayloadObject`.
 
         :Parameters:
             - `xmlnode`: XML node with the element being built. It has already
               right name and namespace, but no attributes or content.
             - `_unused`: document to which the element belongs.
         :Types:
-            - `xmlnode`: `libxml.xmlNode`
-            - `_unused`: `libxml.xmlDoc"""
+            - `xmlnode`: `libxml2.xmlNode`
+            - `_unused`: `libxml2.xmlDoc`"""
         xmlnode.setProp("jid",self.jid.as_utf8())
         if self.name:
             xmlnode.setProp("name",to_utf8(self.name))
@@ -204,15 +204,15 @@ class Roster(StanzaPayloadObject):
     def complete_xml_element(self, xmlnode, doc):
         """Complete the XML node with `self` content.
 
-        Should be overriden in classes derived from `StanzaPayloadElement`.
+        Should be overriden in classes derived from `StanzaPayloadObject`.
 
         :Parameters:
             - `xmlnode`: XML node with the element being built. It has already
               right name and namespace, but no attributes or content.
             - `doc`: document to which the element belongs.
         :Types:
-            - `xmlnode`: `libxml.xmlNode`
-            - `doc`: `libxml.xmlDoc"""
+            - `xmlnode`: `libxml2.xmlNode`
+            - `doc`: `libxml2.xmlDoc`"""
         for it in self.items_dict.values():
             it.as_xml(parent=xmlnode, doc=doc)
 

@@ -58,6 +58,49 @@ class MucRoomHandler:
             - `state_obj`: `MucRoomState`"""
         self.room_state=state_obj
 
+    def room_created(self,stanza):
+        """
+        Called when the room has been created.
+
+        Default action is to request an "instant room" by accepting the default
+        configuration. Instead the application may want to request a
+        configuration form and submit it.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+
+        :Types:
+            - `stanza`: `pyxmpp.stanza.Stanza`
+        """
+        # TODO: self.room_state.request_instant_room() 
+
+    def configuration_form_received(self,form):
+        """
+        Called when a requested configuration form is received.
+
+        The form, after filling-in shoul be passed to TODO: `self.room_state.configure_room`.
+
+        :Parameters:
+            - `form`: the configuration form.
+
+        :Types:
+            - `form`: `pyxmpp.jabber.dataforms.Form`
+        """
+        pass
+
+    def room_configured(self, form):
+        """
+        Called after a successfull room configuration.
+
+        :Parameters:
+            - `form`: current configuration (the last received configuration
+              form updated with the submitted data).
+
+        :Types:
+            - `form`: `pyxmpp.jabber.dataforms.Form`
+        """
+        pass
+
     def user_joined(self,user,stanza):
         """
         Called when a new participant joins the room.
@@ -498,6 +541,10 @@ class MucRoomState:
         if fr==self.room_jid and not self.joined:
             self.joined=True
             self.me=user
+            if isinstance(mc,MucUserX):
+                status = [i for i in mc.get_items() if isinstance(i,MucStatus) and i.code==201]
+                if status:
+                    self.handler.room_created(user,stanza)
         if not old_user or old_user.role=="none":
             self.handler.user_joined(user,stanza)
         else:

@@ -78,7 +78,7 @@ Download
 
 Latest releases of PyXMPP may be downloaded from `the files section of the project page
 <http://jabberstudio.org/projects/pyxmpp/releases/>`__. There are also
-some `SVN snapshots <http://pyxmpp.jabberstudio.org/snapshots/>` available.
+some `SVN snapshots <http://pyxmpp.jabberstudio.org/snapshots/>`__ available.
 
 You can also checkout latest sources directly from the SVN repository::
 svn checkout svn://jabberstudio.org/pyxmpp/svn/trunk pyxmpp

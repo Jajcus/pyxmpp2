@@ -58,7 +58,7 @@ class StanzaPayloadObject(object):
         :Types:
             - `parent`: `libxml2.xmlNode`
             - `doc`: `libxml2.xmlDoc`
-xmlnode     :return: the new XML element or document created.
+        :return: the new XML element or document created.
         :returntype: `libxml2.xmlNode` or `libxml2.xmlDoc`"""
         if parent:
             if not doc:
@@ -98,15 +98,15 @@ xmlnode     :return: the new XML element or document created.
     def complete_xml_element(self, xmlnode, doc):
         """Complete the XML node with `self` content.
 
-        Should be overriden in classes derived from `StanzaPayloadElement`.
+        Should be overriden in classes derived from `StanzaPayloadObject`.
 
         :Parameters:
             - `xmlnode`: XML node with the element being built. It has already
               right name and namespace, but no attributes or content.
             - `doc`: document to which the element belongs.
         :Types:
-            - `xmlnode`: `libxml.xmlNode`
-            - `doc`: `libxml.xmlDoc"""
+            - `xmlnode`: `libxml2.xmlNode`
+            - `doc`: `libxml2.xmlDoc`"""
         pass
 
 class StanzaPayloadWrapperObject(object):
@@ -121,6 +121,7 @@ class StanzaPayloadWrapperObject(object):
     :Ivariables:
         - `xmlnode`: XML node of the object.
     :Types:
+        - `xmlnode`: `libxml2.xmlNode`
     """
     
     def as_xml(self, parent = None, doc = None):

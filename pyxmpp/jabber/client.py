@@ -72,7 +72,7 @@ class JabberClient(Client):
               replies. The default of u'client' should be the right choice in
               most cases.
             - `disco_type`: type of the client identity in the disco#info
-              replies. Use `the types registered by Jabber Registrar http://www.jabber.org/registrar/disco-categories.html`__ 
+              replies. Use `the types registered by Jabber Registrar <http://www.jabber.org/registrar/disco-categories.html>`__ 
         :Types:
             - `jid`: `pyxmpp.JID`
             - `password`: `unicode`
