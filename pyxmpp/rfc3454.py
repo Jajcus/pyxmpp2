@@ -27,7 +27,7 @@ try:
         if stringprep.in_table_b1(uc):
             return u""
         else:
-            return uc
+            return None
 
     B_1=LookupFunction(b1_mapping)
     B_2=LookupFunction(stringprep.map_table_b2)
