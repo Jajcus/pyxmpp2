@@ -15,7 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: muc.py,v 1.19 2004/09/10 13:18:40 jajcus Exp $"
+__revision__="$Id: muc.py,v 1.20 2004/09/10 14:01:01 jajcus Exp $"
+__docformat__="restructuredtext en"
 
 import libxml2
 import logging

@@ -17,7 +17,8 @@
 
 """ Nodeprep and resourceprep stringprep profiles."""
 
-__revision__="$Id: xmppstringprep.py,v 1.11 2004/09/10 13:18:32 jajcus Exp $"
+__revision__="$Id: xmppstringprep.py,v 1.12 2004/09/10 14:00:54 jajcus Exp $"
+__docformat__="restructuredtext en"
 
 from types import ListType
 import string

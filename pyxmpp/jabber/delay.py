@@ -17,7 +17,8 @@
 
 """Delayed delivery mark (jabber:x:delay) handling"""
 
-__revision__="$Id: delay.py,v 1.6 2004/09/10 13:18:40 jajcus Exp $"
+__revision__="$Id: delay.py,v 1.7 2004/09/10 14:01:01 jajcus Exp $"
+__docformat__="restructuredtext en"
 
 import sys
 import libxml2

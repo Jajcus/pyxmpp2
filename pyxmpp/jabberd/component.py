@@ -15,7 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: component.py,v 1.7 2004/09/10 13:18:47 jajcus Exp $"
+__revision__="$Id: component.py,v 1.8 2004/09/10 14:01:10 jajcus Exp $"
+__docformat__="restructuredtext en"
 
 import libxml2
 import sys

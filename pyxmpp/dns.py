@@ -15,7 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: dns.py,v 1.7 2004/09/10 13:18:32 jajcus Exp $"
+__revision__="$Id: dns.py,v 1.8 2004/09/10 14:00:53 jajcus Exp $"
+__docformat__="restructuredtext en"
 
 import random
 import struct

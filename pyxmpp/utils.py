@@ -17,7 +17,8 @@
 
 """Utility functions for the pyxmpp package."""
 
-__revision__="$Id: utils.py,v 1.14 2004/09/10 13:18:32 jajcus Exp $"
+__revision__="$Id: utils.py,v 1.15 2004/09/10 14:00:54 jajcus Exp $"
+__docformat__="restructuredtext en"
 
 import sys
 

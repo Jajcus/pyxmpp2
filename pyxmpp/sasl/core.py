@@ -15,7 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: core.py,v 1.9 2004/09/10 13:18:55 jajcus Exp $"
+__revision__="$Id: core.py,v 1.10 2004/09/10 14:01:17 jajcus Exp $"
+__docformat__="restructuredtext en"
 
 import random
 import string

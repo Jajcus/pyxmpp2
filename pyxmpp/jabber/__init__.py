@@ -17,7 +17,8 @@
 
 """JSF defined XMPP extension and legacy Jabber protocol elements"""
 
-__revision__="$Id: __init__.py,v 1.5 2004/09/10 13:18:40 jajcus Exp $"
+__revision__="$Id: __init__.py,v 1.6 2004/09/10 14:01:01 jajcus Exp $"
+__docformat__="restructuredtext en"
 
 from pyxmpp.jabber.clientstream import LegacyClientStream
 from pyxmpp.jabber.client import JabberClient as Client

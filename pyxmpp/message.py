@@ -15,7 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: message.py,v 1.15 2004/09/10 13:18:32 jajcus Exp $"
+__revision__="$Id: message.py,v 1.16 2004/09/10 14:00:54 jajcus Exp $"
+__docformat__="restructuredtext en"
 
 import libxml2
 from pyxmpp.stanza import Stanza,StanzaError

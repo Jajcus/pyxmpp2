@@ -15,7 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: expdict.py,v 1.4 2004/09/10 13:18:32 jajcus Exp $"
+__revision__="$Id: expdict.py,v 1.5 2004/09/10 14:00:54 jajcus Exp $"
+__docformat__="restructuredtext en"
 
 import time
 from types import TupleType,IntType,FloatType

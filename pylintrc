@@ -60,7 +60,7 @@ max-branchs=12
 max-statements=50
 
 # Required attributes for module, separated by a comma
-required-attributes=__revision__
+required-attributes=__revision__,__docformat__
 
 # Regular expression which should only match functions or classes name which do
 # not require a docstring
