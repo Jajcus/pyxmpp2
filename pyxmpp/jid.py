@@ -18,6 +18,7 @@
 import re
 
 from utils import to_utf8,from_utf8
+from stringprep import nodeprep,resourceprep
 
 node_invalid_re=re.compile(ur"[" u'"' ur"&'/:<>@\s\x00-\x19]",re.UNICODE)
 resource_invalid_re=re.compile(ur"[\s\x00-\x19]",re.UNICODE)
@@ -64,9 +65,11 @@ class JID:
 			self.resource=None
 
 	def set_node(self,s):
-		if s: s=from_utf8(s)
-		if s is not None and node_invalid_re.match(s):
-			raise JIDError,"Invalid characters in node"
+		if s: 
+			s=from_utf8(s)
+			s=nodeprep.prepare(s)
+			if len(s)>1023:
+				raise JIDError,"Node name too long"
 		self.node=s
 		
 	def set_domain(self,s):
@@ -75,12 +78,16 @@ class JID:
 			raise JIDError,"Domain must be given"
 		if domain_invalid_re.match(s):
 			raise JIDError,"Invalid characters in domain"
+		if len(s)>1023:
+			raise JIDError,"Domain name too long"
 		self.domain=s
 	
 	def set_resource(self,s):
-		if s: s=from_utf8(s)
-		if s is not None and resource_invalid_re.match(s):
-			raise JIDError,"Invalid characters in domain"
+		if s: 
+			s=from_utf8(s)
+			s=resourceprep.prepare(s)
+			if len(s)>1023:
+				raise JIDError,"Resource name too long"
 		self.resource=s
 	
 	def __str__(self):
