@@ -1,3 +1,8 @@
+2004-10-04  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* ext/xmlextra.c:
+	- a fix for 64-bit architectures by Stefan Grundmann
+
 2004-10-03  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* doc/Makefile:
