@@ -7,7 +7,6 @@ xmpp-base:
 - jabber:server stream support
 
 xmpp-im:
-- roster updates
 - privacy lists
 
 other:
