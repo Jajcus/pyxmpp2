@@ -1,5 +1,13 @@
 This file should describe the bigest and most important API changes.
 
+2005-06-02
+
+	Python 2.2 support is gone. Compliant XMPP implementation
+	requires stringprep and IDN support. Python 2.3 provides both,
+	Python 2.2 none. Maintaining separete stringprep and IDN
+	implementations for use with Python 2.2 is IMHO not worth the effort
+	needed.
+
 2005-05-28
 
 	Roster and RosterItems classes rewritten. Now they are not wrapper

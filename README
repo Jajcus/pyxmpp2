@@ -6,10 +6,14 @@ This is PyXMPP - a python XMPP module. It is based on libxml2 - fast and
 fully-featured XML parser, so it has features like full namespace support,
 XPath queries etc. 
 
-The goal is to make full-fetured library for core XMPP/Jabber protocol support
-(higher level protocols may be implemented in applications) for Jabber/XMPP clients,
-servers and services. Currently it is mainly developed for CJC (Console Jabber Client),
-so the client-side of protocol implementation is most complete.
+The goal is to make full-featured library for core XMPP/Jabber protocol support
+(higher level protocols may be implemented in applications) for Jabber/XMPP
+clients, servers and services. Currently it is mainly developed for CJC
+(Console Jabber Client) and Jajcu's Jabber to IRC Gateway, so the client-side
+of protocol and basic component interface are the most complete.
+
+For PyXMPP you will need Python 2.3 (maybe it will work in 2.4 too) and recent
+libxml2 release (2.6.x) with python bindings.
 
 To build the package just invoke:
 
@@ -18,5 +22,9 @@ To build the package just invoke:
 To install it:
 
 	python setup.py install
+
+If you had some older version of PyXMPP it is better to uninstall it (delete
+pyxmpp subdirectory os your site-packages directory) before installing this one
+or things may not work correctly.
 
 API documentation and more examples are coming soon (I hope)...
