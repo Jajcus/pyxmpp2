@@ -57,6 +57,28 @@ invalid_jids=[
     u"%s@%s/%só" % (u"x"*1023,u"x"*1023,u"x"*1022),
 ]
 
+comparisions_true=[
+    'JID(u"a@b.c") == JID(u"a@b.c")', 
+    'JID(u"a@b.c") == JID(u"A@b.c")', 
+    'JID(u"a@b.c") != JID(u"b@b.c")', 
+    'JID(u"a@b.c") < JID(u"b@b.c")', 
+    'JID(u"b@b.c") > JID(u"a@b.c")', 
+    'JID(u"a@b.c") > None', 
+    'JID(u"1@b.c") > None', 
+    'None < JID(u"1@b.c")',
+]
+
+comparisions_false=[
+    'JID(u"a@b.c") != JID(u"a@b.c")', 
+    'JID(u"a@b.c") != JID(u"A@b.c")', 
+    'JID(u"a@b.c") == JID(u"b@b.c")', 
+    'JID(u"a@b.c") > JID(u"b@b.c")', 
+    'JID(u"b@b.c") < JID(u"a@b.c")', 
+    'JID(u"a@b.c") < None', 
+    'JID(u"1@b.c") < None', 
+    'None > JID(u"1@b.c")',
+]
+
 class TestJID(unittest.TestCase):
     def test_jid_from_string(self):
         for jid,tuple in valid_jids:
@@ -76,6 +98,13 @@ class TestJID(unittest.TestCase):
             except Exception,e:
                 raise
             self.fail("Invalid JID passed: %r -> %r" % (jid,j))
+    def test_comparision(self):
+        for e in comparisions_true:
+            result=eval(e)
+            self.failUnless(result,'Expression %r gave: %r' % (e,result))
+        for e in comparisions_false:
+            result=eval(e)
+            self.failIf(result,'Expression %r gave: %r' % (e,result))
 
 class TestUncachedJID(TestJID):
     def setUp(self):

@@ -254,7 +254,7 @@ class JID(object):
             except:
                 return False
         elif not isinstance(other,JID):
-            raise TypeError,"Can't compare JID with %r" % (type(other),)
+            return False
 
         return (self.node==other.node
             and are_domains_equal(self.domain,other.domain)
@@ -265,8 +265,7 @@ class JID(object):
 
     def __cmp__(self,other):
         a=self.as_unicode()
-        b=unicode(other)
-        return cmp(a,b)
+        return cmp(a,other)
 
     def __hash__(self):
         return hash(self.node)^hash(self.domain)^hash(self.resource)
