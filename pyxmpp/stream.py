@@ -422,6 +422,13 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			raise FatalStreamError("IO Error: "+str(e))
 		except SSLError,e:
 			raise TLSError("TLS Error: "+str(e))
+	
+	def write_raw(self,str):
+		self.lock.acquire()
+		try:
+			return self._write_raw(str)
+		finally:
+			self.lock.release()
 
 	def _write_node(self,node):
 		if self.eof or not self.socket or not self.doc_out:
