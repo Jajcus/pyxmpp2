@@ -1,3 +1,8 @@
+2004-10-01  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/sasl/digest_md5.py, pyxmpp/sasl/plain.py, TODO.pylint, pylint.sh, pylintrc:
+	- cleaning up... and something has been broken :-(
+
 2004-09-29  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/sasl/core.py, pyxmpp/sasl/plain.py, TODO.pylint, pylint.sh:
