@@ -6,7 +6,6 @@
 		- DIGEST-MD5
 
 - XMPP error handling including translations for backward compatibility
-	(probably not quite up-to-date)
 
 - basic stanza (iq,presence,message) creation
 	- IQ requests, results and error handling 
@@ -22,6 +21,10 @@
 	- roster management (only initial retrieval now)
 
 - basic Service Discovery (JEP-30) support
+
+- basic vCard support - both vcard-temp and RFC2426
+
+- MUC (very) basics, for server-side implementations
 
 - jabber:component:accept stream (without <log/>, <route/> and <xdb/> support)
 
