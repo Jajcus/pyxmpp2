@@ -16,49 +16,56 @@
 #
 
 import libxml2
+from types import StringType,UnicodeType
 
 from pyxmpp.utils import to_utf8,from_utf8
 from pyxmpp.stanza import common_doc,common_root
 from pyxmpp.presence import Presence
 from pyxmpp.message import Message
 from pyxmpp.iq import Iq
+from pyxmpp.jid import JID
+from pyxmpp import xmlextra
 
 MUC_NS="http://jabber.org/protocol/muc"
 MUC_USER_NS=MUC_NS+"#user"
 MUC_ADMIN_NS=MUC_NS+"#admin"
 MUC_OWNER_NS=MUC_NS+"#owner"
 
+affiliations=("admin","member","none","outcast","owner")
+roles=("moderator","none","participant","visitor")
+
 class MucXBase:
-	def __init__(self,node_or_ns,copy=1,parent=None):
-		if type(node_or_ns) is StringType:
-			node_or_ns=unicode(node_or_ns,"utf-8")
+	ns=None
+	def __init__(self,node=None,copy=1,parent=None):
+		if self.ns==None:
+			raise RuntimeError,"Pure virtual class called"
 		self.node=None
 		self.borrowed=0
-		if isinstance(node_or_ns,libxml2.xmlNode):
+		if isinstance(node,libxml2.xmlNode):
 			if copy:
-				self.node=node_or_ns.docCopyNode(common_doc,1)
+				self.node=node.docCopyNode(common_doc,1)
 				common_root.addChild(self.node)
 			else:
-				self.node=node_or_ns
+				self.node=node
 				self.borrowed=1
 			if copy:
-				ns=node_or_ns.ns()
+				ns=node.ns()
 				xmlextra.replace_ns(self.node,ns,None)
 				xmlextra.remove_ns(self.node,ns)
-		elif isinstance(node_or_ns,MucXBase):
+		elif isinstance(node,MucXBase):
 			if not copy:
 				raise ErrorNodeError,"MucXBase may only be copied"
-			self.node=node_or_ns.node.docCopyNode(common_doc,1)
+			self.node=node.node.docCopyNode(common_doc,1)
 			common_root.addChild(self.node)
-		elif node_or_ns is None:
-			raise ErrorNodeError,"Muc X node namespace not given"
+		elif node is not None:
+			raise ErrorNodeError,"Bad MucX constructor argument"
 		else:
 			if parent:
 				self.node=parent.newChild(None,"x",None)
 				self.borrowed=1
 			else:
 				self.node=common_root.newChild(None,"x",None)
-			ns=self.node.newNs(ns,None)
+			ns=self.node.newNs(self.ns,None)
 			self.node.setNs(ns)
 		
 	def __del__(self):
@@ -77,7 +84,7 @@ class MucXBase:
 	def xpath_eval(self,expr):
 		ctxt = common_doc.xpathNewContext()
 		ctxt.setContextNode(self.node)
-		ctxt.xpathRegisterNs("muc",self.node.ns().getContent())
+		ctxt.xpathRegisterNs("muc",self.ns.getContent())
 		ret=ctxt.xpathEval(expr)
 		ctxt.xpathFreeContext()
 		return ret
@@ -87,18 +94,18 @@ class MucXBase:
 
 class MucX(MucXBase):
 	ns=MUC_NS
-	def __init__(self,node_or_ns,copy=1,parent=None):
-		MucXBase.__init__(self,node_or_ns,copy=copy,parent=parent)
+	def __init__(self,node=None,copy=1,parent=None):
+		MucXBase.__init__(self,node=None,copy=copy,parent=parent)
 	# FIXME: set/get password/history
 
 class MucItem:
-	def __init__(self,node_or_affiliation,jid=None,nick=None,role=None,actor=None,reason=None):
+	def __init__(self,node_or_affiliation,role=None,jid=None,nick=None,actor=None,reason=None):
 		if isinstance(node_or_affiliation,libxml2.xmlNode):
 			self.__from_node(node_or_affiliation)
 		else:
-			self.__init(node_or_affiliation,jid,nick,role,actor,reason)
+			self.__init(node_or_affiliation,role,jid,nick,actor,reason)
 
-	def __init(self,affiliation,jid=None,nick=None,role=None,actor=None,reason=None):
+	def __init(self,affiliation,role,jid=None,nick=None,actor=None,reason=None):
 		if affiliation not in affiliations:
 			raise ValueError,"Bad affiliation"
 		self.affiliation=affiliation
@@ -129,9 +136,9 @@ class MucItem:
 				reason=n.getContent()
 		self.__init(
 			from_utf8(node.prop("affiliation")),
+			from_utf8(node.prop("role")),
 			from_utf8(node.prop("jid")),
 			from_utf8(node.prop("nick")),
-			from_utf8(node.prop("role")),
 			from_utf8(actor),
 			from_utf8(reason),
 			);
@@ -147,14 +154,16 @@ class MucItem:
 		if self.jid:
 			n.setProp("jid",to_utf8(self.jid.as_unicode()))
 		if self.nick:
-			n.setProp("nick",to_utf8(self.nick.as_unicode()))
+			n.setProp("nick",to_utf8(self.nick))
 		return n
 
-class MucXUser(MucXBase):
-	ns=MUC_NS_USER
-	def __init__(self,node_or_ns,copy=1,parent=None):
-		MucXBase.__init__(self,node_or_ns,copy=copy,parent=parent)
+class MucUserX(MucXBase):
+	ns=MUC_USER_NS
+	def __init__(self,node=None,copy=1,parent=None):
+		MucXBase.__init__(self,node,copy=copy,parent=parent)
 	def get_items(self):
+		if not self.node.children:
+			return []
 		ret=[]
 		for n in self.children:
 			n=n.ns()
@@ -165,6 +174,8 @@ class MucXUser(MucXBase):
 			# FIXME: alt,decline,invite,password,status
 		return ret
 	def clear(self):
+		if not self.node.children:
+			return
 		for n in list(self.children):
 			n=n.ns()
 			if ns and ns.getContent()!=MUC_USER_NS:
@@ -172,18 +183,21 @@ class MucXUser(MucXBase):
 			n.unlinkNode()
 			n.freeNode()
 	def add_item(self,item):
-		if item.__class__ not in (MucItem,):
+		if not isinstance(item,MucItem):
 			raise TypeError,"Bad item type for muc#user"
-		item.make_node(self)
+		item.make_node(self.node)
 
 class MucStanzaExt:
 	def __init__(self):
-		if not has_attr("node"):
+		if not hasattr(self,"node"):
 			raise RuntimeError,"Abstract class called"
 		self.muc_x=None
 
 	def get_muc_x(self):
-		x=None
+		if self.muc_x:
+			return self.muc_x
+		if not self.node.children:
+			return None
 		for n in self.node.children:
 			if n.name!="x":
 				continue
@@ -192,19 +206,24 @@ class MucStanzaExt:
 				continue
 			ns_uri=ns.getContent()
 			if ns_uri==MUC_NS:
-				return MucX(n)
+				self.muc_x=MucX(n)
+				return self.muc_x
 			if ns_uri==MUC_USER_NS:
-				return MucUserX(n)
+				self.muc_x=MucUserX(n)
+				return self.muc_x
 			if ns_uri==MUC_ADMIN_NS:
-				return MucAdminX(n)
+				self.muc_x=MucAdminX(n)
+				return self.muc_x
 			if ns_uri==MUC_OWNER_NS:
-				return MucOwnerX(n)
+				self.muc_x=MucOwnerX(n)
+				return self.muc_x
 
 	def clear_muc_x(self):
 		if self.muc_x:
 			self.muc_x.free_borrowed()
 			self.muc_x=None
-		x=None
+		if not self.node.children:
+			return
 		for n in list(self.node.children):
 			if n.name!="x":
 				continue
@@ -215,6 +234,11 @@ class MucStanzaExt:
 			if ns_uri in (MUC_NS,MUC_USER_NS,MUC_ADMIN_NS,MUC_OWNER_NS):
 				n.unlinkNode()
 				n.freeNode()
+
+	def make_muc_userinfo(self):
+		self.clear_muc_x()
+		self.muc_x=MucUserX(parent=self.node)
+		return self.muc_x
 				
 	def muc_free(self):
 		if self.muc_x:
@@ -227,11 +251,19 @@ class MucPresence(Presence,MucStanzaExt):
 		apply(Presence.__init__,[self,node],kw)
 
 	def copy(self):
-		return MUCPresence(self)
+		return MucPresence(self)
 
 	def make_join_request(self):
 		self.clear_muc_x()
-		self.muc_x=MucX(MUC_NS,parent=self.node)
+		self.muc_x=MucX(parent=self.node)
+
+	def get_join_info(self):
+		x=self.get_muc_x()
+		if not x:
+			return None
+		if not isinstance(x,MucX):
+			return None
+		return x
 
 	def free(self):
 		self.muc_free()

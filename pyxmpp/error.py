@@ -165,7 +165,7 @@ class ErrorNode:
 			
 			if copy:
 				self.node=node_or_cond.docCopyNode(common_doc,1)
-				common_doc.addChild(self.node)
+				common_root.addChild(self.node)
 			else:
 				self.node=node_or_cond
 				self.borrowed=1
@@ -179,7 +179,7 @@ class ErrorNode:
 				raise ErrorNodeError,"ErrorNodes may only be copied"
 			self.ns=node_or_cond.ns.getContent()
 			self.node=node_or_cond.node.docCopyNode(common_doc,1)
-			common_doc.addChild(self.node)
+			common_root.addChild(self.node)
 		elif ns is None:
 			raise ErrorNodeError,"Condition namespace not given"
 		else:
