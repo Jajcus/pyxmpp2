@@ -43,15 +43,14 @@ def rfc2425encode(name,value,parameters={},charset="utf-8"):
 		value=value.replace(u"\r",u"\\n")
 		value=value.encode(charset,"replace")
 	elif type(value) is not types.StringType:
-		print `value`
 		raise TypeError,"Bad type for rfc2425 value"
 	elif not valid_string_re.match(value):
 		parameters["encoding"]="b"
 		value=binascii.b2a_base64(value)
 	
-	ret=name.lower()
+	ret=str(name).lower()
 	for k,v in parameters.items():
-		ret+=";%s=%s" % (k,v)
+		ret+=";%s=%s" % (str(k),str(v))
 	ret+=":"
 	while(len(value)>70):
 		ret+=value[:70]+"\r\n "
@@ -71,7 +70,8 @@ class VCardString:
 	def rfc2426(self):
 		return rfc2425encode(self.name,self.value)
 	def xml(self,parent):
-		return parent.newTextChild(get_node_ns(parent),to_utf8(self.name.upper()),value)
+		return parent.newTextChild(get_node_ns(parent),
+				to_utf8(self.name.upper()),to_utf8(self.value))
 
 class VCardXString(VCardString):
 	def rfc2426(self):
@@ -468,10 +468,17 @@ class VCardOrg:
 			if not self.name:
 				raise Empty,"Bad vcard ORG value"
 		else:
-			self.name,self.unit=value.split(";")
+			sp=value.split(";",1)
+			if len(sp)>1:
+				self.name,self.unit=sp
+			else:
+				self.name=sp[0]
+				self.unit=None
 	def rfc2426(self):
-		return rfc2425encode("org",u"%s;%s" % 
-				(self.name,self.unit))
+		if self.unit:
+			return rfc2425encode("org",u"%s;%s" % (self.name,self.unit))
+		else:
+			return rfc2425encode("org",u"%s" % (self.name,))
 	def xml(self,parent):
 		ns=get_node_ns(parent)
 		n=parent.newChild(ns,"ORG",None)
@@ -481,6 +488,7 @@ class VCardOrg:
 
 class VCardCategories:
 	def __init__(self,name,value,rfc2425parameters={}):
+		self.name=name
 		if self.name.upper()!="CATEGORIES":
 			raise RuntimeError,"VCardName handles only 'CATEGORIES' type"
 		if isinstance(value,libxml2.xmlNode):
@@ -637,7 +645,7 @@ class VCardKey:
 		n=parent.newChild(ns,self.name.upper(),None)
 		if self.type:
 			n.newTextChild(ns,"TYPE",self.type)
-		n.newTextChild(ns,"CRED",binascii.b2a_base64(self.key))
+		n.newTextChild(ns,"CRED",binascii.b2a_base64(self.cred))
 		return n
 
 class VCard:
@@ -687,12 +695,7 @@ class VCard:
 				if n.type!='element':
 					n=n.next
 					continue
-				print "element:",`n.name`
 				ns=get_node_ns(n)
-				if ns:
-					print "namespace:",`ns.getContent()`
-				else:
-					print "no namespace"
 				if (ns and dns and ns.getContent()!=dns.getContent()):
 					n=n.next
 					continue
@@ -725,6 +728,8 @@ class VCard:
 					continue
 				if l[-1]=="\r":
 					l=l[:-1]
+				if not l:
+					continue
 				if l[0] in " \t":
 					if current is None:
 						continue
@@ -754,6 +759,7 @@ class VCard:
 
 	def process_rfc2425_record(self,data):
 		label,value=data.split(":",1)
+		value=value.replace("\\n","\n").replace("\\N","\n")
 		psplit=label.split(";")
 		name=psplit[0]
 		params=psplit[1:]
@@ -795,5 +801,40 @@ class VCard:
 				for v in value:
 					ret+=v.rfc2426()
 			else:
-				ret+=value.rfc2426()
+				v=value.rfc2426()
+				ret+=v
 		return ret+"end:VCARD\r\n"
+	def xml(self,doc=None,parent=None):
+		if parent:
+			if doc:
+				try:
+					ns=parent.searchNsByHref(doc,"vcard-temp")
+				except libxml2.treeError:
+					ns=None
+			else:
+				ns=None
+			root=parent.newChild(ns,"vCard",None)
+			if not ns:
+				ns=root.newNs("vcard-temp",None)
+				root.setNs(ns)
+		else:
+			doc=libxml2.newDoc("1.0")
+			root=doc.newChild(None,"vCard",None)
+			ns=root.newNs("vcard-temp",None)
+			root.setNs(ns)
+		for name,value in self.content.items():
+			if value is None:
+				continue
+			if type(value) is types.ListType:
+				for v in value:
+					v.xml(root)
+			else:
+				value.xml(root)
+		if parent:
+			return root
+		else:
+			return doc
+	def __getattr__(self,name):
+		if self.content.has_key(name.upper()):
+			return self.content[name.upper()]
+		raise AttributeError,"Attribute %r not found" % (name,)
