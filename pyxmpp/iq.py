@@ -17,7 +17,7 @@
 
 """Iq XMPP stanza handling"""
 
-__revision__="$Id: iq.py,v 1.14 2004/09/13 21:26:36 jajcus Exp $"
+__revision__="$Id: iq.py,v 1.15 2004/09/14 19:57:58 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -78,8 +78,8 @@ class Iq(Stanza):
             - `cond`: error condition name, as defined in XMPP specification.
 
         :return: new `Iq` object with the same "id" as self, "from" and "to"
-        attributes swapped, type="error" and containing <error /> element
-        plus payload of `self`."""
+            attributes swapped, type="error" and containing <error /> element
+            plus payload of `self`."""
 
         if self.get_type() not in ("set","get"):
             raise StanzaError,"Errors may only be generated for 'set' or 'get' iq"
@@ -96,7 +96,7 @@ class Iq(Stanza):
         """Create result response for the a "get" or "set" iq stanza.
 
         :return: new `Iq` object with the same "id" as self, "from" and "to"
-        attributes replaced and type="result"."""
+            attributes replaced and type="result"."""
 
         if self.get_type() not in ("set","get"):
             raise StanzaError,"Results may only be generated for 'set' or 'get' iq"

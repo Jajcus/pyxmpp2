@@ -17,7 +17,7 @@
 
 """Message XMPP stanza handling"""
 
-__revision__="$Id: message.py,v 1.17 2004/09/13 21:14:53 jajcus Exp $"
+__revision__="$Id: message.py,v 1.18 2004/09/14 19:57:58 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -111,8 +111,8 @@ class Message(Stanza):
             - `cond`: error condition name, as defined in XMPP specification.
 
         :return: new `Message` object with the same "id" as self, "from" and
-        "to" attributes swapped, type="error" and containing <error /> element
-        plus payload of `self`."""
+            "to" attributes swapped, type="error" and containing <error />
+            element plus payload of `self`."""
 
         if self.get_type() == "error":
             raise StanzaError,"Errors may not be generated in response to errors"

@@ -17,7 +17,7 @@
 
 """jid --- Jabber ID handling"""
 
-__revision__="$Id: jid.py,v 1.28 2004/09/13 21:14:53 jajcus Exp $"
+__revision__="$Id: jid.py,v 1.29 2004/09/14 19:57:58 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import re
@@ -152,8 +152,8 @@ class JID(object):
         :Parameters:
             - `s`: Unicode or UTF-8 node part of the JID
 
-        :raise: `JIDError` if the node name is too long.
-        :raise: `pyxmpp.xmppstringprep.StringprepError` if the
+        :raise JIDError: if the node name is too long.
+        :raise pyxmpp.xmppstringprep.StringprepError: if the
             node name fails Nodeprep preparation."""
         if s:
             s=from_utf8(s)
@@ -170,7 +170,7 @@ class JID(object):
         :Parameters:
             - `s`: Unicode or UTF-8 domain part of the JID
 
-        :raise: `JIDError` if the domain name is too long."""
+        :raise JIDError: if the domain name is too long."""
 
         if s: 
             s=from_utf8(s)
@@ -187,8 +187,8 @@ class JID(object):
         :Parameters:
             - `s`: Unicode or UTF-8 resource part of the JID
 
-        :raise: `JIDError` if the resource name is too long.
-        :raise: `pyxmpp.xmppstringprep.StringprepError` if the
+        :raise JIDError: if the resource name is too long.
+        :raise pyxmpp.xmppstringprep.StringprepError: if the
             node name fails Resourceprep preparation."""
         if s:
             s=from_utf8(s)

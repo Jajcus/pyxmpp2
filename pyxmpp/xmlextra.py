@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: xmlextra.py,v 1.11 2004/09/10 14:00:54 jajcus Exp $"
+__revision__="$Id: xmlextra.py,v 1.12 2004/09/14 19:57:58 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import sys
@@ -91,7 +91,7 @@ class StreamHandler:
         and freed after this method returns. If it is needed after
         that a copy must be made before the method returns."""
         print >>sys.stderr,"Unhandled stanza",`node.serialize()`
-    def error(self,descr):
+    def error(self,desc):
         """Called when an error is encountered in the stream."""
         raise StreamParseError,descr
 

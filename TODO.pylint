@@ -26,6 +26,7 @@ W0141: 48:StreamHandler._stanza: Missing docstring
 W0613: 65:StreamHandler.stanza_start: Unused argument 'doc'
 W0613: 72:StreamHandler.stanza_end: Unused argument 'doc'
 W0613: 83:StreamHandler.stanza: Unused argument 'doc'
+E0602: 96:StreamHandler.error: Undefined variable 'descr'
 W0141: 98:StreamReader: Missing docstring
 W0141:103:StreamReader.doc: Missing docstring
 W0321:131:remove_ns: More than one statement on a single line
@@ -110,12 +111,7 @@ W0141:  0: Missing docstring
 W0103:  0: Missing required attribute "__revision__"
 W0103:  0: Missing required attribute "__docformat__"
 ************* Module pyxmpp.stanza
-W0613: 58:Stanza.__init__: Unused argument 'error'
-W0622:204:Stanza.set_type: Redefining built-in 'type'
-W0622:214:Stanza.set_id: Redefining built-in 'id'
-E0602:285:Stanza.xpath_eval: Undefined variable 'COMMON_NS'
-W0611: 25: Unused import StringType
-W0611: 25: Unused import UnicodeType
+W0613: 57:Stanza.__init__: Unused argument 'error'
 ************* Module pyxmpp.resolver
 W0141:  0: Missing docstring
 W0403: 28: Uses of a deprecated module 'string'
@@ -229,48 +225,48 @@ W0611: 31: Unused import from_utf8
 W0611: 22: Unused import sys
 W0611: 24: Unused import traceback
 ************* Module pyxmpp.stream
-W0302:  0: Too many lines in module (1752)
-W0612:288:Stream._connect: Unused variable 'canonname'
-W0112:271:Stream._connect: Too many branches (13/12)
-W0112:400:Stream.stream_start: Too many branches (13/12)
-W0613:455:Stream.stream_end: Unused argument 'doc'
-W0613:481:Stream.stanza_end: Unused argument 'doc'
-W0613:490:Stream.stanza: Unused argument 'doc'
-W0612:712:Stream._loop_iter: Unused variable 'ofd'
-W0612:940:Stream.__try_handlers: Unused variable 'prio'
-W0112:1234:Stream._got_features: Too many branches (15/12)
-W0111:1326:Stream._process_sasl_node: Too many return statements (9/6)
-W0201:226:Stream._reset: Attribute 'features' defined outside __init__
-W0201:222:Stream._reset: Attribute 'message_handlers' defined outside __init__
-W0201:220:Stream._reset: Attribute 'iq_get_handlers' defined outside __init__
-W0201:208:Stream._reset: Attribute 'port' defined outside __init__
-W0201:210:Stream._reset: Attribute 'peer_sasl_mechanisms' defined outside __init__
-W0201:212:Stream._reset: Attribute 'stream_ns' defined outside __init__
-W0201:230:Stream._reset: Attribute 'authenticated' defined outside __init__
-W0201:207:Stream._reset: Attribute 'addr' defined outside __init__
-W0201:209:Stream._reset: Attribute 'default_ns' defined outside __init__
-W0201:233:Stream._reset: Attribute 'version' defined outside __init__
-W0201:206:Stream._reset: Attribute 'reader' defined outside __init__
-W0201:232:Stream._reset: Attribute 'auth_method_used' defined outside __init__
-W0201:204:Stream._reset: Attribute 'doc_out' defined outside __init__
-W0201:227:Stream._reset: Attribute 'tls' defined outside __init__
-W0201:234:Stream._reset: Attribute 'last_keepalive' defined outside __init__
-W0201:231:Stream._reset: Attribute 'peer_authenticated' defined outside __init__
-W0201:228:Stream._reset: Attribute 'tls_requested' defined outside __init__
-W0201:219:Stream._reset: Attribute 'iq_response_handlers' defined outside __init__
-W0201:229:Stream._reset: Attribute 'authenticator' defined outside __init__
-W0201:211:Stream._reset: Attribute 'extra_ns' defined outside __init__
-W0201:214:Stream._reset: Attribute 'ioreader' defined outside __init__
-W0201:217:Stream._reset: Attribute 'skip' defined outside __init__
-W0201:216:Stream._reset: Attribute 'peer' defined outside __init__
-W0201:224:Stream._reset: Attribute 'eof' defined outside __init__
-W0201:215:Stream._reset: Attribute 'me' defined outside __init__
-W0201:225:Stream._reset: Attribute 'initiator' defined outside __init__
-W0201:223:Stream._reset: Attribute 'presence_handlers' defined outside __init__
-W0201:205:Stream._reset: Attribute 'socket' defined outside __init__
-W0201:218:Stream._reset: Attribute 'stream_id' defined outside __init__
-W0201:203:Stream._reset: Attribute 'doc_in' defined outside __init__
-W0201:221:Stream._reset: Attribute 'iq_set_handlers' defined outside __init__
+W0302:  0: Too many lines in module (1763)
+W0612:299:Stream._connect: Unused variable 'canonname'
+W0112:282:Stream._connect: Too many branches (13/12)
+W0112:411:Stream.stream_start: Too many branches (13/12)
+W0613:466:Stream.stream_end: Unused argument 'doc'
+W0613:492:Stream.stanza_end: Unused argument 'doc'
+W0613:501:Stream.stanza: Unused argument 'doc'
+W0612:723:Stream._loop_iter: Unused variable 'ofd'
+W0612:951:Stream.__try_handlers: Unused variable 'prio'
+W0112:1245:Stream._got_features: Too many branches (15/12)
+W0111:1337:Stream._process_sasl_node: Too many return statements (9/6)
+W0201:237:Stream._reset: Attribute 'features' defined outside __init__
+W0201:233:Stream._reset: Attribute 'message_handlers' defined outside __init__
+W0201:231:Stream._reset: Attribute 'iq_get_handlers' defined outside __init__
+W0201:219:Stream._reset: Attribute 'port' defined outside __init__
+W0201:221:Stream._reset: Attribute 'peer_sasl_mechanisms' defined outside __init__
+W0201:223:Stream._reset: Attribute 'stream_ns' defined outside __init__
+W0201:241:Stream._reset: Attribute 'authenticated' defined outside __init__
+W0201:218:Stream._reset: Attribute 'addr' defined outside __init__
+W0201:220:Stream._reset: Attribute 'default_ns' defined outside __init__
+W0201:244:Stream._reset: Attribute 'version' defined outside __init__
+W0201:228:Stream._reset: Attribute 'skip' defined outside __init__
+W0201:243:Stream._reset: Attribute 'auth_method_used' defined outside __init__
+W0201:215:Stream._reset: Attribute 'doc_out' defined outside __init__
+W0201:238:Stream._reset: Attribute 'tls' defined outside __init__
+W0201:245:Stream._reset: Attribute 'last_keepalive' defined outside __init__
+W0201:242:Stream._reset: Attribute 'peer_authenticated' defined outside __init__
+W0201:239:Stream._reset: Attribute 'tls_requested' defined outside __init__
+W0201:230:Stream._reset: Attribute 'iq_response_handlers' defined outside __init__
+W0201:217:Stream._reset: Attribute '_reader' defined outside __init__
+W0201:240:Stream._reset: Attribute 'authenticator' defined outside __init__
+W0201:222:Stream._reset: Attribute 'extra_ns' defined outside __init__
+W0201:225:Stream._reset: Attribute 'ioreader' defined outside __init__
+W0201:227:Stream._reset: Attribute 'peer' defined outside __init__
+W0201:235:Stream._reset: Attribute 'eof' defined outside __init__
+W0201:226:Stream._reset: Attribute 'me' defined outside __init__
+W0201:236:Stream._reset: Attribute 'initiator' defined outside __init__
+W0201:234:Stream._reset: Attribute 'presence_handlers' defined outside __init__
+W0201:216:Stream._reset: Attribute 'socket' defined outside __init__
+W0201:229:Stream._reset: Attribute 'stream_id' defined outside __init__
+W0201:214:Stream._reset: Attribute 'doc_in' defined outside __init__
+W0201:232:Stream._reset: Attribute 'iq_set_handlers' defined outside __init__
 ************* Module pyxmpp.expdict
 W0141:  0: Missing docstring
 W0141: 24:ExpiringDictionary: Missing docstring
@@ -285,24 +281,23 @@ W0141:238:ErrorNode.free: Missing docstring
 W0141:244:ErrorNode.free_borrowed: Missing docstring
 W0141:247:ErrorNode.is_legacy: Missing docstring
 W0141:250:ErrorNode.xpath_eval: Missing docstring
-E0602:257:ErrorNode.xpath_eval: Undefined variable 'COMMON_NS'
-W0141:263:ErrorNode.get_condition: Missing docstring
-W0141:278:ErrorNode.get_text: Missing docstring
-W0141:287:ErrorNode.add_custom_condition: Missing docstring
-W0141:293:ErrorNode.upgrade: Missing docstring
-W0133:299:ErrorNode.upgrade: Invalid name "KeyError" (should match [a-z_][a-z0-9_]*$)
-W0622:299:ErrorNode.upgrade: Redefining built-in 'KeyError'
-W0612:299:ErrorNode.upgrade: Unused variable 'KeyError'
-W0141:327:ErrorNode.downgrade: Missing docstring
-W0612:332:ErrorNode.downgrade: Unused variable 'typ'
-W0141:340:ErrorNode.serialize: Missing docstring
-W0141:343:StreamErrorNode: Missing docstring
-W0613:344:StreamErrorNode.__init__: Unused argument 'ns'
-W0141:358:StreamErrorNode.get_message: Missing docstring
-W0141:370:StanzaErrorNode: Missing docstring
-W0141:391:StanzaErrorNode.get_type: Missing docstring
-W0141:396:StanzaErrorNode.upgrade: Missing docstring
-W0141:406:StanzaErrorNode.get_message: Missing docstring
+W0141:261:ErrorNode.get_condition: Missing docstring
+W0141:276:ErrorNode.get_text: Missing docstring
+W0141:285:ErrorNode.add_custom_condition: Missing docstring
+W0141:291:ErrorNode.upgrade: Missing docstring
+W0133:297:ErrorNode.upgrade: Invalid name "KeyError" (should match [a-z_][a-z0-9_]*$)
+W0622:297:ErrorNode.upgrade: Redefining built-in 'KeyError'
+W0612:297:ErrorNode.upgrade: Unused variable 'KeyError'
+W0141:325:ErrorNode.downgrade: Missing docstring
+W0612:330:ErrorNode.downgrade: Unused variable 'typ'
+W0141:338:ErrorNode.serialize: Missing docstring
+W0141:341:StreamErrorNode: Missing docstring
+W0613:342:StreamErrorNode.__init__: Unused argument 'ns'
+W0141:356:StreamErrorNode.get_message: Missing docstring
+W0141:368:StanzaErrorNode: Missing docstring
+W0141:389:StanzaErrorNode.get_type: Missing docstring
+W0141:394:StanzaErrorNode.upgrade: Missing docstring
+W0141:404:StanzaErrorNode.get_message: Missing docstring
 W0611: 24: Unused import from_utf8
 ************* Module pyxmpp.version
 W0141:  0: Missing docstring
@@ -503,8 +498,8 @@ W0611: 26: Unused import sys
 ************* Module pyxmpp.jabber.muc
 W0511:140: FIXME: set/get password/history
 W0511:298: FIXME: alt,decline,invite,password
-W0511:862: TODO: kicks
-W0302:  0: Too many lines in module (1001)
+W0511:906: TODO: kicks
+W0302:  0: Too many lines in module (1045)
 W0141:  0: Missing docstring
 E0602: 82:MucXBase.__init__: Undefined variable 'ErrorNodeError'
 W0613:138:MucX.__init__: Unused argument 'node'
@@ -536,17 +531,17 @@ W0141:460:MucPresence.free: Missing docstring
 W0231:468:MucIq.__init__: __init__ method from base class 'Iq' is not called
 W0151:  0:MucIq.__init__: Used builtin function 'apply'
 W0141:494:MucIq.free: Missing docstring
-W0141:605:MucRoomHandler.error: Missing docstring
-W0141:680:MucRoomUser.same_as: Missing docstring
-W0613:733:MucRoomState.set_stream: Unused argument 'stream'
-W0141:942:MucRoomManager.get_room_state: Missing docstring
-W0141:954:MucRoomManager.__groupchat_message: Missing docstring
-W0141:964:MucRoomManager.__error_message: Missing docstring
-W0141:973:MucRoomManager.__presence_error: Missing docstring
-W0141:982:MucRoomManager.__presence_available: Missing docstring
-W0141:991:MucRoomManager.__presence_unavailable: Missing docstring
-W0201:911:MucRoomManager.set_stream: Attribute 'stream' defined outside __init__
-W0201:910:MucRoomManager.set_stream: Attribute 'jid' defined outside __init__
+W0141:649:MucRoomHandler.error: Missing docstring
+W0141:724:MucRoomUser.same_as: Missing docstring
+W0613:777:MucRoomState.set_stream: Unused argument 'stream'
+W0141:986:MucRoomManager.get_room_state: Missing docstring
+W0141:998:MucRoomManager.__groupchat_message: Missing docstring
+W0141:1008:MucRoomManager.__error_message: Missing docstring
+W0141:1017:MucRoomManager.__presence_error: Missing docstring
+W0141:1026:MucRoomManager.__presence_available: Missing docstring
+W0141:1035:MucRoomManager.__presence_unavailable: Missing docstring
+W0201:955:MucRoomManager.set_stream: Attribute 'stream' defined outside __init__
+W0201:954:MucRoomManager.set_stream: Attribute 'jid' defined outside __init__
 W0611: 23: Unused import StringType
 W0611: 23: Unused import UnicodeType
 ************* Module pyxmpp.jabber.clientstream
@@ -784,7 +779,7 @@ W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 Report
 ======
-5823 statements analysed.
+5818 statements analysed.
 
 Statistics by type
 ------------------
@@ -802,10 +797,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6372   72.62 6367     +5         
-docstring 1489   16.97 1417     +72        
-comment   509    5.80  509      =          
-empty     405    4.62  391      +14        
+code      6367   72.15 6369     -2         
+docstring 1544   17.50 1489     +55        
+comment   509    5.77  509      =          
+empty     405    4.59  405      =          
 
 
 External dependencies
@@ -835,7 +830,7 @@ External dependencies
       \-m2 (pyxmpp.stream)
     threading (pyxmpp.xmlextra,pyxmpp.client,pyxmpp.stream,pyxmpp.jabberd.component)
     os (pyxmpp.stream)
-    types (pyxmpp.xmppstringprep,pyxmpp.roster,pyxmpp.jid,pyxmpp.dns,pyxmpp.utils,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.clientstream,pyxmpp.stream,pyxmpp.expdict,pyxmpp.error,pyxmpp.jabberd.componentstream,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    types (pyxmpp.xmppstringprep,pyxmpp.roster,pyxmpp.jid,pyxmpp.dns,pyxmpp.utils,pyxmpp.resolver,pyxmpp.clientstream,pyxmpp.stream,pyxmpp.expdict,pyxmpp.error,pyxmpp.jabberd.componentstream,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
     socket (pyxmpp.resolver,pyxmpp.stream)
 
 
@@ -846,14 +841,14 @@ Messages
 message id occurences 
 ::::::::::::::::::::::
 W0141      345        
-W0611      74         
+W0611      72         
 W0201      69         
 W0613      46         
 E0201      37         
-E0602      22         
-W0622      20         
+E0602      21         
 W0102      20         
 W0133      19         
+W0622      18         
 W0612      14         
 W0112      13         
 W0311      8          
@@ -880,8 +875,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 696    725      -29        
-errors   59     60       -1         
+warnings 692    692      =          
+errors   58     57       +1         
 
 
 % errors / warnings by module
@@ -889,36 +884,36 @@ errors   59     60       -1
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            25.42 12.64   
-pyxmpp.jid                     22.03 0.14    
-pyxmpp.jabber.muc              15.25 5.60    
-pyxmpp.jabber.disco            11.86 5.60    
-pyxmpp.sasl.core               10.17 5.60    
-pyxmpp.jabber.client           5.08  2.16    
-pyxmpp.jabber.delay            3.39  1.72    
-pyxmpp.sasl.digest_md5         1.69  8.05    
-pyxmpp.jabberd.component       1.69  4.17    
-pyxmpp.error                   1.69  3.74    
-pyxmpp.stanza                  1.69  0.72    
-pyxmpp.dns                     0.00  10.06   
-pyxmpp.jabber.clientstream     0.00  6.47    
-pyxmpp.stream                  0.00  6.03    
-pyxmpp.clientstream            0.00  5.60    
-pyxmpp.client                  0.00  5.46    
-pyxmpp.resolver                0.00  4.60    
-pyxmpp.jabberd.componentstream 0.00  4.31    
-pyxmpp.xmlextra                0.00  2.44    
-pyxmpp.sasl.plain              0.00  1.87    
-pyxmpp.sasl                    0.00  1.29    
-pyxmpp.expdict                 0.00  0.57    
+pyxmpp.jabber.vcard            25.86 12.72   
+pyxmpp.jid                     22.41 0.14    
+pyxmpp.jabber.muc              15.52 5.64    
+pyxmpp.jabber.disco            12.07 5.64    
+pyxmpp.sasl.core               10.34 5.64    
+pyxmpp.jabber.client           5.17  2.17    
+pyxmpp.jabber.delay            3.45  1.73    
+pyxmpp.sasl.digest_md5         1.72  8.09    
+pyxmpp.jabberd.component       1.72  4.19    
+pyxmpp.xmlextra                1.72  2.46    
+pyxmpp.dns                     0.00  10.12   
+pyxmpp.jabber.clientstream     0.00  6.50    
+pyxmpp.stream                  0.00  6.07    
+pyxmpp.clientstream            0.00  5.64    
+pyxmpp.client                  0.00  5.49    
+pyxmpp.resolver                0.00  4.62    
+pyxmpp.jabberd.componentstream 0.00  4.34    
+pyxmpp.error                   0.00  3.76    
+pyxmpp.sasl.plain              0.00  1.88    
+pyxmpp.sasl                    0.00  1.30    
+pyxmpp.expdict                 0.00  0.58    
 pyxmpp.version                 0.00  0.43    
 pyxmpp._xmlextra               0.00  0.43    
 pyxmpp.xmppstringprep          0.00  0.14    
+pyxmpp.stanza                  0.00  0.14    
 pyxmpp.jabberd                 0.00  0.14    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 8.30/10 (previous run: 8.24/10)
+Your code has been rated at 8.31/10 (previous run: 8.32/10)
 That's pretty good. Good work mate.
 

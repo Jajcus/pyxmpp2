@@ -17,7 +17,7 @@
 
 """General XMPP Stanza handling."""
 
-__revision__="$Id: stanza.py,v 1.17 2004/09/13 21:14:53 jajcus Exp $"
+__revision__="$Id: stanza.py,v 1.18 2004/09/14 19:57:58 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -50,7 +50,7 @@ class Stanza:
     
     :Ivariables:
         - `node`: stanza XML node.
-        - `_error`: `StanzaErrorNode` describing the error associated with
+        - `_error`: `pyxmpp.error.StanzaErrorNode` describing the error associated with
           the stanza of type "error"."""
     stanza_type="Unknown"
 
@@ -59,7 +59,7 @@ class Stanza:
         """Initialize a Stanza object.
 
         :Parameters:
-            - `node`: XML node to be wrapped into the Stanza object
+            - `name_or_node`: XML node to be wrapped into the Stanza object
               or other Presence object to be copied. If not given then new
               presence stanza is created using following parameters.
             - `fr`: sender JID.
@@ -170,7 +170,7 @@ class Stanza:
     def get_error(self):
         """Get stanza error information.
 
-        :return: `StanzaErrorNode` object describing the error."""
+        :return: `pyxmpp.error.StanzaErrorNode` object describing the error."""
         if self._error:
             return self._error
         n=self.node.xpathEval(u"error")

@@ -17,7 +17,7 @@
 
 """ Nodeprep and resourceprep stringprep profiles."""
 
-__revision__="$Id: xmppstringprep.py,v 1.13 2004/09/12 10:02:34 jajcus Exp $"
+__revision__="$Id: xmppstringprep.py,v 1.14 2004/09/14 19:57:58 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 from types import ListType
@@ -34,7 +34,7 @@ class LookupFunction:
 
         :Parameters:
             - `function`: function taking character code as input and returning
-                `bool` value or the mapped for `code`."""
+              `bool` value or the mapped for `code`."""
         self.lookup=function
 
 class LookupTable:
@@ -44,8 +44,8 @@ class LookupTable:
 
         :Parameters:
             - `singles`: dictionary mapping Unicode characters into other Unicode characters.
-            - `ranges`: list of `((start,end),value)` tuples mapping codes in range (start,end)
-                to the value."""
+            - `ranges`: list of ``((start,end),value)`` tuples mapping codes in range (start,end)
+              to the value."""
         self.singles=singles
         self.ranges=ranges
         
@@ -74,7 +74,7 @@ def b1_mapping(uc):
     :Parameters:
         - `uc`: Unicode character to map.
         
-    :returns: `u""` if there is `uc` code in the table, `None` otherwise."""
+    :returns: u"" if there is `uc` code in the table, `None` otherwise."""
     if stringprep.in_table_b1(uc):
         return u""
     else:
@@ -141,7 +141,7 @@ class Profile:
             
         :return: prepared string
        
-        :raise: `StringprepError` if the preparation fails
+        :raise StringprepError: if the preparation fails
         """
         r=self.cache.get(data)
         if r is not None:
@@ -176,7 +176,7 @@ class Profile:
             
         :return: prepared string
        
-        :raise: `StringprepError` if the preparation fails
+        :raise StringprepError: if the preparation fails
         """
 
         s=self.map(s)

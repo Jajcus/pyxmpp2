@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: muc.py,v 1.23 2004/09/13 21:15:00 jajcus Exp $"
+__revision__="$Id: muc.py,v 1.24 2004/09/14 19:58:05 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -45,8 +45,8 @@ class MucXBase:
     Base class for MUC-specific stanza payload - wrapper around
     an XML node.
 
-    Public attributes:
-    - `node` - the wrapped XML node
+    :Ivariables:
+        - `node`: the wrapped XML node
     """
     element="x"
     ns=None
@@ -274,8 +274,8 @@ class MucUserX(MucXBase):
     stanza payload "x" elements and usually containing information
     about a room user.
 
-    Public attributes:
-    - node - wrapped XML node
+    :Ivariables:
+        - `node`: wrapped XML node
     """
     ns=MUC_USER_NS
     def get_items(self):
@@ -518,8 +518,13 @@ class MucRoomHandler:
         """
         Called when a new participant joins the room.
 
-        `user` MucRoomUser object describing the user joining.
-        `stanza` the stanza received.
+        :Parameters:
+            - `user`: the user joining.
+            - `stanza`: the stanza received.
+        
+        :Types:
+            - `user`: `MucRoomUser`
+            - `stanza`: `pyxmpp.stanza.Stanza`
         """
         pass
 
@@ -527,8 +532,13 @@ class MucRoomHandler:
         """
         Called when a participant leaves the room.
 
-        `user` MucRoomUser object describing the user leaving.
-        `stanza` the stanza received.
+        :Parameters:
+            - `user`: the user leaving.
+            - `stanza`: the stanza received.
+        
+        :Types:
+            - `user`: `MucRoomUser`
+            - `stanza`: `pyxmpp.stanza.Stanza`
         """
         pass
 
@@ -536,10 +546,17 @@ class MucRoomHandler:
         """
         Called when a role of an user has been changed.
 
-        `user` MucRoomUser object describing the user (after update).
-        `old_role` is user's role before update.
-        `new_role` is user's role after update.
-        `stanza` the stanza received.
+        :Parameters:
+            - `user`: the user (after update).
+            - `old_role`: user's role before update.
+            - `new_role`: user's role after update.
+            - `stanza`: the stanza received.
+        
+        :Types:
+            - `user`: `MucRoomUser`
+            - `old_role`: `unicode`
+            - `new_role`: `unicode`
+            - `stanza`: `pyxmpp.stanza.Stanza`
         """
         pass
 
@@ -558,9 +575,15 @@ class MucRoomHandler:
         """
         Called when user nick change is started.
 
-        `user` MucRoomUser object describing the user (before update).
-        `new_nick` is the new nick.
-        `stanza` the stanza received.
+        :Parameters:
+            - `user`: the user (before update).
+            - `new_nick`: the new nick.
+            - `stanza`: the stanza received.
+
+        :Types:
+            - `user`: `MucRoomUser`
+            - `new_nick`: `unicode`
+            - `stanza`: `pyxmpp.stanza.Stanza`
         """
         pass
 
@@ -568,9 +591,15 @@ class MucRoomHandler:
         """
         Called after a user nick has been changed.
 
-        `user` MucRoomUser object describing the user (after update).
-        `old_nick` is the old nick.
-        `stanza` the stanza received.
+        :Parameters:
+            - `user`: the user (after update).
+            - `old_nick`: the old nick.
+            - `stanza`: the stanza received.
+        
+        :Types:
+            - `user`: `MucRoomUser`
+            - `old_nick`: `unicode`
+            - `stanza`: `pyxmpp.stanza.Stanza`
         """
         pass
 
@@ -579,8 +608,13 @@ class MucRoomHandler:
         Called whenever user's presence changes (includes nick, role or
         affiliation changes).
 
-        `user` MucRoomUser object describing the user.
-        `stanza` the stanza received.
+        :Parameters:
+            - `user`: MucRoomUser object describing the user.
+            - `stanza`: the stanza received.
+            
+        :Types:
+            - `user`: `MucRoomUser`
+            - `stanza`: `pyxmpp.stanza.Stanza`
         """
         pass
 
@@ -588,8 +622,13 @@ class MucRoomHandler:
         """
         Called when the room subject has been changed.
 
-        `nick` is a nick of the user changing the subject.
-        `stanza` is the stanza used to change the subject.
+        :Parameters:
+            - `user`: the user changing the subject.
+            - `stanza`: the stanza used to change the subject.
+            
+        :Types:
+            - `user`: `MucRoomUser`
+            - `stanza`: `pyxmpp.stanza.Stanza`
         """
         pass
 
@@ -597,8 +636,13 @@ class MucRoomHandler:
         """
         Called when groupchat message has been received.
 
-        `nick` is a nick of the sender.
-        `stanza` is the message stanza received.
+        :Parameters:
+            - `user`: the sender.
+            - `stanza`: is the message stanza received.
+            
+        :Types:
+            - `user`: `MucRoomUser`
+            - `stanza`: `pyxmpp.stanza.Stanza`
         """
         pass
 
@@ -685,15 +729,15 @@ class MucRoomState:
     Describes the state of a MUC room, handles room events
     and provides an interface for room actions.
 
-    Public attributes:
-    own_jid - real jid of the owner (client using this class).
-    room_jid - room jid of the owner.
-    handler - MucRoomHandler object containing callbacks to be called.
-    manager - MucRoomManager object managing this room.
-    joined - True if the channel is joined.
-    subject - current subject of the room.
-    users - dictionary of users in the room. Nicknames are the keys.
-    me - MucRoomUser instance of the owner
+    :Ivariables:
+        - `own_jid`: real jid of the owner (client using this class).
+        - `room_jid`: room jid of the owner.
+        - `handler`: MucRoomHandler object containing callbacks to be called.
+        - `manager`: MucRoomManager object managing this room.
+        - `joined`: True if the channel is joined.
+        - `subject`: current subject of the room.
+        - `users`: dictionary of users in the room. Nicknames are the keys.
+        - `me`: MucRoomUser instance of the owner.
     """
     def __init__(self,manager,own_jid,room_jid,handler):
         """
@@ -891,7 +935,7 @@ class MucRoomManager:
     Manage collection of MucRoomState objects and dispatch events.
 
     :Ivariables:
-      - rooms a dictionary containing known MUC rooms. Unicode room JIDs are the
+      - `rooms`: a dictionary containing known MUC rooms. Unicode room JIDs are the
         keys.
     
     """

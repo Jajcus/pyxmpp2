@@ -17,7 +17,7 @@
 
 """Presence XMPP stanza handling"""
 
-__revision__="$Id: presence.py,v 1.20 2004/09/13 21:14:53 jajcus Exp $"
+__revision__="$Id: presence.py,v 1.21 2004/09/14 19:57:58 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -155,8 +155,8 @@ class Presence(Stanza):
     def get_priority(self):
         """Get presence priority.
         
-        :return: value of stanza's priority. `0` if the stanza doesn't contain
-        <priority/> element"""
+        :return: value of stanza's priority. 0 if the stanza doesn't contain
+            <priority/> element"""
         n=self.xpath_eval("priority")
         if not n:
             return 0

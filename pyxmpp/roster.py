@@ -17,7 +17,7 @@
 
 """XMPP-IM roster handling"""
 
-__revision__="$Id: roster.py,v 1.20 2004/09/13 21:14:53 jajcus Exp $"
+__revision__="$Id: roster.py,v 1.21 2004/09/14 19:57:58 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 from types import StringType,UnicodeType
@@ -42,7 +42,7 @@ class RosterItem:
         Initialize a roster item from XML node or jid and optional attributes.
         
         :Parameters:
-            - `node_or_item`: XML node or JID
+            - `node_or_jid`: XML node or JID
             - `subscription`: subscription type ("none", "to", "from" or "both"
             - `name`: item visible name
             - `groups`: sequence of groups the item is member of
@@ -276,7 +276,7 @@ class Roster:
         """
         Return roster item with given `jid`.
 
-        :raise: `KeyError` if the item is not found.
+        :raise KeyError: if the item is not found.
         """
         if not jid:
             raise ValueError,"jid is None"

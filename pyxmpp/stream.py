@@ -17,7 +17,7 @@
 
 """Core XMPP stream functionality"""
 
-__revision__="$Id: stream.py,v 1.67 2004/09/13 21:28:00 jajcus Exp $"
+__revision__="$Id: stream.py,v 1.68 2004/09/14 19:57:58 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -76,7 +76,8 @@ class HostMismatch(StreamError):
 
 class FatalStreamError(StreamError):
     """Base class for all fatal Stream exceptions.
-    When `FatalScreamError` is raised the stream is no longer usable."""
+
+    When `FatalStreamError` is raised the stream is no longer usable."""
     pass
 
 class StreamParseError(FatalStreamError):
@@ -110,15 +111,15 @@ class TLSError(FatalStreamError):
 
 class TLSSettings:
     """Storage for TLS-related settings of an XMPP stream.
-        :Ivariables:
-            - `require`:  is TLS required
+
+       :Ivariables:
+            - `require`: is TLS required
             - `verify_peer`: should the peer's certificate be verified
             - `cert_file`: path to own X.509 certificate
             - `key_file`: path to the private key for own X.509 certificate
             - `cacert_file`: path to a file with trusted CA certificates
             - `verify_callback`: callback function for certificate
-              verification. See M2Crypto documentation for details.
-    """
+              verification. See M2Crypto documentation for details."""
 
     def __init__(self,
             require=False,verify_peer=True,
@@ -164,6 +165,16 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
     Whenever we say "stream" here we actually mean two streams 
     (incoming and outgoing) of one connections, as defined by the XMPP
     specification.
+
+    :Ivariables:
+        - `lock`: RLock object used to synchronize access to Stream object.
+        - `features`: stream features as annouced by the initiator.
+        - `me`: local stream endpoint JID.
+        - `peer`: remote stream endpoint JID.
+        - `process_all_stanzas`: when `True` then all stanzas received are
+          considered local.
+        - `tls`: TLS connection object.
+        - `_reader`: the stream reader object (push parser) for the stream.
     """
     def __init__(self,default_ns,extra_ns=(),sasl_mechanisms=(),
                     tls_settings=None,keepalive=0):
@@ -177,7 +188,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
           - `sasl_mechanisms`: sequence of SASL mechanisms allowed for
             authentication. Currently "PLAIN" and "DIGEST-MD5" are supported.
           - `tls_settings`: settings for StartTLS -- `TLSSettings` instance.
-          - `keepalive`: keepalive output interval. `0` to disable.
+          - `keepalive`: keepalive output interval. 0 to disable.
 
         """
         self.default_ns_uri=default_ns
@@ -192,8 +203,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         self.tls_settings=tls_settings
         self.keepalive=keepalive
         self.lock=threading.RLock()
-        self.reader_lock=threading.Lock()
-        self.process_all_stanzas=0
+        self._reader_lock=threading.Lock()
+        self.process_all_stanzas=False
         self._reset()
         self.__logger=logging.getLogger("pyxmpp.Stream")
 
@@ -203,14 +214,14 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         self.doc_in=None
         self.doc_out=None
         self.socket=None
-        self.reader=None
+        self._reader=None
         self.addr=None
         self.port=None
         self.default_ns=None
         self.peer_sasl_mechanisms=None
         self.extra_ns={}
         self.stream_ns=None
-        self.reader=None
+        self._reader=None
         self.ioreader=None
         self.me=None
         self.peer=None
@@ -240,7 +251,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         """Initialize stream on outgoing connection.
 
         :Parameters:
-          - `socket`: connected socket for the stream
+          - `sock`: connected socket for the stream
           - `to`: name of the remote host
         """
         self.eof=0
@@ -387,15 +398,15 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             self.doc_in=None
         if self.features:
             self.features=None
-        self.reader=None
+        self._reader=None
         self.stream_id=None
         if self.socket:
             self.socket.close()
         self._reset()
 
     def _make_reader(self):
-        """Create ne `xmlextra.StreamReader` instace as `self.reader`."""
-        self.reader=xmlextra.StreamReader(self)
+        """Create ne `xmlextra.StreamReader` instace as `self._reader`."""
+        self._reader=xmlextra.StreamReader(self)
 
     def stream_start(self,doc):
         """Process <stream:stream> (stream start) tag received from peer.
@@ -463,7 +474,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             self._send_stream_end()
         if self.doc_in:
             self.doc_in=None
-            self.reader=None
+            self._reader=None
             if self.features:
                 self.features=None
         self.state_change("disconnected",self.peer)
@@ -556,7 +567,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
     def _restart_stream(self):
         """Restart the stream as needed after SASL and StartTLS negotiation."""
-        self.reader=None
+        self._reader=None
         #self.doc_out.freeDoc()
         self.doc_out=None
         #self.doc_in.freeDoc() # memleak, but the node which caused the restart
@@ -767,9 +778,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         logging.getLogger("pyxmpp.Stream.in").debug("IN: %r",r)
         if r:
             try:
-                r=self.reader.feed(r)
+                r=self._reader.feed(r)
                 while r:
-                    r=self.reader.feed("")
+                    r=self._reader.feed("")
                 if r is None:
                     self.eof=1
                     self.disconnect()
@@ -923,7 +934,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             - `stanza`: the stanza to handle
         
         :return: result of the last handler or `False` if no
-        handler was found."""
+            handler was found."""
         namespaces=[]
         if stanza.node.children:
             c=stanza.node.children
@@ -1311,7 +1322,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
     def _bind_error(self,stanza):
         """Handle resource binding success.
 
-        :raise: `FatalStreamError`"""
+        :raise FatalStreamError:"""
         raise FatalStreamError,"Resource binding failed"
 
     def connected(self):
