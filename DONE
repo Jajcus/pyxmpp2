@@ -24,7 +24,9 @@
 
 - basic vCard support - both vcard-temp and RFC2426
 
-- MUC (very) basics, for server-side implementations
+- MUC basics
+
+- Delayed delivery timestamps (jabber:x:delay)
 
 - jabber:component:accept stream (without <log/>, <route/> and <xdb/> support)
 
