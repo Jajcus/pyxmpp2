@@ -128,9 +128,13 @@ class JID:
 	def __repr__(self):
 		return "<JID: %r>" % (self.as_string())
 	
-	def as_string(self):
+	def as_utf8(self):
 		"Returns UTF-8 encoded JID representation"
 		return self.as_unicode().encode("utf-8")
+
+	def as_string(self):
+		"Returns UTF-8 encoded JID representation"
+		return self.as_utf8()
 		
 	def as_unicode(self):
 		"Unicode JID representation"
