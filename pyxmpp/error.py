@@ -20,6 +20,7 @@ from types import StringType,UnicodeType
 
 from utils import from_utf8,to_utf8
 from stanza import common_doc,common_root
+import xmlextra
 
 stream_errors={
 			u"host-gone":
@@ -170,9 +171,9 @@ class ErrorNode:
 				self.borrowed=1
 				
 			if copy:
-				ns1=node_or_class.ns()
-				self.node.replaceNs(ns1,None)
-				self.node.removeNs(ns1)
+				ns1=node_or_cond.ns()
+				xmlextra.replace_ns(self.node,ns1,None)
+				xmlextra.remove_ns(self.node,ns1)
 		elif isinstance(node_or_cond,ErrorNode):
 			if not copy:
 				raise ErrorNodeError,"ErrorNodes may only be copied"
@@ -273,7 +274,7 @@ class ErrorNode:
 			ns=condition.newNs(self.ns,None)
 			condition.setNs(ns)
 			condition=self.node.newChild(None,"unknown-legacy-error",None)
-			ns=condition.newNs(PYXMPP_ERROR_NS.ns,None)
+			ns=condition.newNs(PYXMPP_ERROR_NS,None)
 			condition.setNs(ns)
 		else:
 			condition=self.node.newChild(None,cond,None)
