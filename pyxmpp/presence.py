@@ -63,6 +63,11 @@ class Presence(Stanza):
 			del kw["status"]
 		else:
 			status=None
+		if kw.has_key("priority"):
+			priority=kw["priority"]
+			del kw["priority"]
+		else:
+			priority=None
 	
 		if node is None:
 			node="presence"
@@ -71,6 +76,8 @@ class Presence(Stanza):
 			self.node.newChild(None,"show",to_utf8(show))
 		if status:
 			self.node.newChild(None,"status",to_utf8(status))
+		if priority and priority!=0:
+			self.node.newChild(None,"priority",to_utf8(str(priority)))
 
 	def copy(self):
 		return Presence(self)
