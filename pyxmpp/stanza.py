@@ -78,13 +78,9 @@ class Stanza:
 			if id:
 				self.node.setProp("id",kw["id"])
 
-		if (self.get_type()=="error"
-			and (kw.has_key("error_class") or kw.has_key("error_cond"))):
-			if not kw.has_key("error_class") or not kw.has_key("error_cond"):
-				raise StanzaError,("Both class and condition or"
-					" none of them are required for stanza type error")
-			from error import ErrorNode
-			self.error=ErrorNode(kw["error_class"],kw["error_cond"],parent=self.node)
+		if (self.get_type()=="error" and kw.has_key("error_cond")):
+			from error import StanzaErrorNode
+			self.error=StanzaErrorNode(kw["error_cond"],parent=self.node)
 			
 	def __del__(self):
 		if self.node:
@@ -126,8 +122,8 @@ class Stanza:
 		n=self.node.xpathEval(u"error")
 		if not n:
 			raise StanzaError,"This stanza contains no error"
-		from error import ErrorNode
-		self.error=ErrorNode(n[0],copy=0)
+		from error import StanzaErrorNode
+		self.error=StanzaErrorNode(n[0],copy=0)
 		return self.error
 	def set_from(self,fr):
 		if fr:

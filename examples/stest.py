@@ -24,7 +24,7 @@ class Stream(ClientStream):
 								self.set_session)
 	
 	def set_session(self,stanza):
-		iq=stanza.make_result_reply()
+		iq=stanza.make_result_response()
 		self.send(iq)
 		self.welcome()
 
@@ -83,27 +83,11 @@ while 1:
 
 	print "processing..."
 	try:
-		s.loop(1)
-	finally:
-		print "closing..."
-		s.close()
-				
-print "creating socket..."
-sock=socket.socket()
-sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
-sock.bind(("127.0.0.1",5222))
-sock.listen(1)
-
-print "creating stream..."
-s=Stream(JID("localhost"),auth_methods=("sasl:DIGEST-MD5","plain","digest"))
-
-while 1:
-	print "accepting..."
-	s.accept(sock)
-
-	print "processing..."
-	try:
-		s.loop(1)
-	finally:
-		print "closing..."
-		s.close()
+		try:
+			s.loop(1)
+		finally:
+			print "closing..."
+			s.close()
+	except StreamError:
+		traceback.print_exc(file=sys.stderr)
+		continue

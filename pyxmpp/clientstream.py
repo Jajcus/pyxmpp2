@@ -102,7 +102,7 @@ class ClientStream(Stream):
 		else:
 			iq=Iq(type="set")
 			iq.new_query("urn:ietf:params:xml:ns:xmpp-session","session")
-			self.set_reply_handlers(iq,self.session_result,self.session_error)
+			self.set_response_handlers(iq,self.session_result,self.session_error)
 			self.send(iq)
 		
 	def session_timeout(self,k,v):
@@ -178,11 +178,11 @@ class ClientStream(Stream):
 
 	def auth_in_stage1(self,stanza):
 		if "plain" not in self.auth_methods and "digest" not in self.auth_methods:
-			iq=stanza.make_error_reply("access","forbidden")
+			iq=stanza.make_error_response("not-allowed")
 			self.send(iq)
 			return
 
-		iq=stanza.make_result_reply()
+		iq=stanza.make_result_response()
 		q=iq.new_query("jabber:iq:auth")
 		q.newChild(q.ns(),"username",None)
 		q.newChild(q.ns(),"resource",None)
@@ -195,7 +195,7 @@ class ClientStream(Stream):
 
 	def auth_in_stage2(self,stanza):
 		if "plain" not in self.auth_methods and "digest" not in self.auth_methods:
-			iq=stanza.make_error_reply("access","forbidden")
+			iq=stanza.make_error_response("not-allowed")
 			self.send(iq)
 			return
 	
@@ -207,20 +207,20 @@ class ClientStream(Stream):
 			resource=from_utf8(resource[0].getContent())
 		if not username or not resource:
 			self.debug("No username or resource found in auth request")
-			iq=stanza.make_error_reply("format","bad-request")
+			iq=stanza.make_error_response("bad-request")
 			self.send(iq)
 			return
 
 		if stanza.xpath_eval("a:query/a:password",{"a":"jabber:iq:auth"}):
 			if "plain" not in self.auth_methods:
-				iq=stanza.make_error_reply("access","forbidden")
+				iq=stanza.make_error_response("not-allowed")
 				self.send(iq)
 				return
 			else:
 				return self.plain_auth_in_stage2(username,resource,stanza)
 		if stanza.xpath_eval("a:query/a:digest",{"a":"jabber:iq:auth"}):
 			if "plain" not in self.auth_methods:
-				iq=stanza.make_error_reply("access","forbidden")
+				iq=stanza.make_error_response("not-allowed")
 				self.send(iq)
 				return
 			else:
@@ -232,7 +232,7 @@ class ClientStream(Stream):
 		q.newChild(q.ns(),"username",to_utf8(self.jid.node))
 		q.newChild(q.ns(),"resource",to_utf8(self.jid.resource))
 		self.send(iq)
-		self.set_reply_handlers(iq,self.auth_stage2,self.auth_error,
+		self.set_response_handlers(iq,self.auth_stage2,self.auth_error,
 							self.features_timeout,timeout=60)
 		iq.free()
 		
@@ -247,7 +247,7 @@ class ClientStream(Stream):
 					% (err.get_class(), err.get_condition().serialize()))
 
 	def auth_stage2(self,stanza):
-		print "Procesing auth reply..."
+		print "Procesing auth response..."
 	
 		self.available_auth_methods=[]
 		if (stanza.xpath_eval("a:query/a:digest",{"a":"jabber:iq:auth"}) and self.stream_id):
@@ -264,7 +264,7 @@ class ClientStream(Stream):
 		q.newChild(None,"resource",to_utf8(self.jid.resource))
 		q.newChild(None,"password",to_utf8(self.password))
 		self.send(iq)
-		self.set_reply_handlers(iq,self.auth_finish,self.auth_error)
+		self.set_response_handlers(iq,self.auth_finish,self.auth_error)
 		iq.free()
 	
 	def plain_auth_in_stage2(self,username,resource,stanza):
@@ -273,20 +273,21 @@ class ClientStream(Stream):
 			password=from_utf8(password[0].getContent())
 		if not password:
 			self.debug("No password found in plain auth request")
-			iq=stanza.make_error_reply("format","bad-request")
+			iq=stanza.make_error_response("bad-request")
 			self.send(iq)
 			return
 
 		if self.check_password(username,password):
-			iq=stanza.make_result_reply()
+			iq=stanza.make_result_response()
 			self.send(iq)
 			self.peer_authenticated=1
 			self.auth_method_used="plain"
 			self.post_auth()
 		else:
 			self.debug("Plain auth failed")
-			iq=stanza.make_error_reply("access",
-				('jabber:iq:auth:error',"user-unauthorized",None))
+			iq=stanza.make_error_response("bad-request")
+			e=iq.get_error()
+			e.add_custom_condition('jabber:iq:auth:error',"user-unauthorized")
 			self.send(iq)
 	
 	def digest_auth_stage2(self,stanza):
@@ -297,7 +298,7 @@ class ClientStream(Stream):
 		digest=sha.new(to_utf8(self.stream_id)+to_utf8(self.password)).hexdigest()
 		q.newChild(None,"digest",digest)
 		self.send(iq)
-		self.set_reply_handlers(iq,self.auth_finish,self.auth_error)
+		self.set_response_handlers(iq,self.auth_finish,self.auth_error)
 		iq.free()
 	
 	def digest_auth_in_stage2(self,username,resource,stanza):
@@ -306,29 +307,31 @@ class ClientStream(Stream):
 			digest=digest[0].getContent()
 		if not digest:
 			self.debug("No digest found in digest auth request")
-			iq=stanza.make_error_reply("format","bad-request")
+			iq=stanza.make_error_response("bad-request")
 			self.send(iq)
 			return
 		
 		password,pwformat=self.get_password(username)
 		if not password or pwformat!="plain":
-			iq=stanza.make_error_reply("access",
-				('jabber:iq:auth:error',"user-unauthorized",None))
+			iq=stanza.make_error_response("bad-request")
+			e=iq.get_error()
+			e.add_custom_condition('jabber:iq:auth:error',"user-unauthorized")
 			self.send(iq)
 			return
 			
 		mydigest=sha.new(to_utf8(self.stream_id)+to_utf8(password)).hexdigest()
 
 		if mydigest==digest:
-			iq=stanza.make_result_reply()
+			iq=stanza.make_result_response()
 			self.send(iq)
 			self.peer_authenticated=1
 			self.auth_method_used="digest"
 			self.post_auth()
 		else:
 			self.debug("Digest auth failed: %r != %r" % (digest,mydigest))
-			iq=stanza.make_error_reply("access",
-				('jabber:iq:auth:error',"user-unauthorized",None))
+			iq=stanza.make_error_response("bad-request")
+			e=iq.get_error()
+			e.add_custom_condition('jabber:iq:auth:error',"user-unauthorized")
 			self.send(iq)
 	
 	def auth_finish(self,stanza):

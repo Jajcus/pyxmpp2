@@ -16,129 +16,130 @@
 #
 
 import libxml2
+from types import StringType,UnicodeType
 
 from utils import from_utf8,to_utf8
 from stanza import common_doc,common_root
 
-stream_errors_conditions={
-			("host-gone","address"):1,
-			("host-unknown","address"):1,
-			("internal-server-error","server"):1,
-			("invalid-id","format"):1,
-			("invalid-namespace","format"):1,
-			("nonmatching-hosts","address"):1,
-			("not-authorized","access"):1,
-			("remote-connection-failed","server"):1,
-			("resource-constraint","server"):1,
-			("see-other-host","redirect"):1,
-			("system-shutdown","server"):1,
-			("unsupported-stanza-type","format"):1,
-			("xml-not-well-formed","format"):1,
+stream_errors={
+			u"host-gone":			1,
+			u"host-unknown":		1,
+			u"internal-server-error":	1,
+			u"invalid-id":			1,
+			u"invalid-namespace":		1,
+			u"nonmatching-hosts":		1,
+			u"not-authorized":		1,
+			u"remote-connection-failed":	1,
+			u"resource-constraint":		1,
+			u"see-other-host":		1,
+			u"system-shutdown":		1,
+			u"unsupported-stanza-type":	1,
+			u"unsupported-version":		1,
+			u"xml-not-well-formed":		1,
 	}
 
 stanza_errors={
-			("bad-request","format"):			400,
-			("conflict","access"):				409,
-			("feature-not-implemented","recipient"):	501,
-			("forbidden","access"):				403,
-			("internal-server-error","server"):		500,
-			("item-not-found","address"):			404,
-			("jid-malformed","address"):			400,
-			("not-allowed","access"):			405,
-			("recipient-unavailable","recipient"):		404,
-			("registration-required","access"):		407,
-			("remote-server-not-found","address"):		404,
-			("remote-server-timeout","server"):		504,
-			("service-unavailable","server"):		503,
+			u"bad-request":			("modify",400),
+			u"conflict":			("cancel",409),
+			u"feature-not-implemented":	("cancel",501),
+			u"forbidden":			("auth",403),
+			u"internal-server-error":	("wait",500),
+			u"item-not-found":		("cancel",404),
+			u"jid-malformed":		("modify",400),
+			u"not-allowed":			("cancel",405),
+			u"recipient-unavailable":	("wait",404),
+			u"registration-required":	("auth",407),
+			u"remote-server-not-found":	("cancel",404),
+			u"remote-server-timeout":	("wait",504),
+			u"resource-constraint":		("wait",503),
+			u"service-unavailable":		("cancel",503),
+			u"subscription-required":	("auth",None),
+			u"unexpected-request":		("wait",None),
 	}
 
 legacy_codes={
-		400: ("bad-request","format"),
-		401: ("not-allowed","access"),
-		402: ("registration-required","access"),
-		403: ("forbidden","access"),
-		404: ("item-not-found","address"),
-		405: ("not-allowed","access"),
-		406: ("not-acceptable","bad-request"),
-		407: ("registration-required","access"),
-		408: ("remote-server-timeout","server"),
-		409: ("conflict","access"),
-		500: ("internal-server-error","server"),
-		501: ("feature-not-implemented","recipient"),
-		502: ("sevice-unavailable","server"),
-		504: ("remote-server-timeout","server"),
-		510: ("service-unavailable","server"),
+		400: "bad-request",
+		401: "not-allowed",
+		402: "registration-required",
+		403: "forbidden",
+		404: "item-not-found",
+		405: "not-allowed",
+		406: "not-acceptable",
+		407: "registration-required",
+		408: "remote-server-timeout",
+		409: "conflict",
+		500: "internal-server-error",
+		501: "feature-not-implemented",
+		502: "sevice-unavailable",
+		504: "remote-server-timeout",
+		510: "service-unavailable",
 	}
+
+STANZA_ERROR_NS='urn:ietf:params:xml:ns:xmpp-stanzas'
+STREAM_ERROR_NS='urn:ietf:params:xml:ns:xmpp-streams'
+PYXMPP_ERROR_NS='http://www.bnet.pl/~jajcus/pyxmpp/errors'
+STREAM_NS="http://etherx.jabber.org/streams"
 
 class ErrorNodeError(RuntimeError):
 	pass
 
-
 class ErrorNode:
-	def __init__(self,node_or_class,condition=None,typ="stanza",copy=1,parent=None):
+	def __init__(self,node_or_cond,ns=None,copy=1,parent=None):
 		""" 
 		Contructor:
 			ErrorNode(error_node[,copy=boolean]) -> ErrorNode
-			ErrorNode(xml_node[,copy=boolean]) -> ErrorNode
-			ErrorNode(class,cond_name[,parent=parent_node]) -> ErrorNode
-			ErrorNode(class,
-				(cond_name,cond_ns_uri,cond_content)
-				[,parent=parent_node]) -> ErrorNode
+			ErrorNode(xml_node,[,copy=boolean]) -> ErrorNode
+			ErrorNode(condition,ns,[,parent=parent_node]) -> ErrorNode
 		"""
 		
+		if type(node_or_cond) is StringType:
+			node_or_cond=unicode(node_or_cond,"utf-8")
 		self.node=None
 		self.borrowed=0
-		if isinstance(node_or_class,libxml2.xmlNode):
-			if condition is not None:
-				raise ErrorNodeError,"Both condition and node given"
-			clas=str(node_or_class)
+		if isinstance(node_or_cond,libxml2.xmlNode):
+			if ns is not None:
+				raise ErrorNodeError,"Both namespace and node given"
+		
+			ns=None
+			for c in node_or_cond.children:
+				ns=c.ns().getContent()
+				if ns in (STREAM_ERROR_NS,STANZA_ERROR_NS):
+					break
+				ns=None
+			
+			if ns==ns1:
+				raise ErrorNodeError,"Bad error namespace"
+			self.ns=ns
+			
 			if copy:
-				self.node=node_or_class.docCopyNode(common_doc,1)
+				self.node=node_or_cond.docCopyNode(common_doc,1)
+				common_doc.addChild(self.node)
 			else:
-				self.node=node_or_class
+				self.node=node_or_cond
+				self.borrowed=1
+				
+			if copy:
+				ns1=node_or_class.ns()
+				self.node.replaceNs(ns1,None)
+				self.node.removeNs(ns1)
+		elif isinstance(node_or_cond,ErrorNode):
+			if not copy:
+				raise ErrorNodeError,"ErrorNodes may only be copied"
+			self.ns=node_or_cond.ns
+			self.node=node_or_cond.node.docCopyNode(common_doc,1)
 			common_doc.addChild(self.node)
-			ns=node_or_class.ns()
-			if ns.getContent() == "http://etherx.jabber.org/streams":
-				self.type="stream"
-			else:
-				self.type="stanza"
-			if copy:
-				self.node.replaceNs(ns,None)
-				self.node.removeNs(ns)
-		elif condition is None:
-			raise ErrorNodeError,"Condition not given"
-		elif typ not in ("stream","stanza"):
-			raise ErrorNodeError,"Bad error type"
+		elif ns is None:
+			raise ErrorNodeError,"Condition namespace not given"
 		else:
 			if parent:
 				self.node=parent.newChild(None,"error",None)
 				self.borrowed=1
 			else:
 				self.node=common_root.newChild(None,"error",None)
-			self.node.setProp("class",node_or_class)
-			cond=self.node.newChild(None,"condition",None)
-			if typ=="stream":
-				ns=cond.newNs("urn:ietf:params:xml:ns:xmpp-streams",None)
-			else:
-				ns=cond.newNs("urn:ietf:params:xml:ns:xmpp-stanzas",None)
+			cond=self.node.newChild(None,to_utf8(node_or_cond),None)
+			ns=cond.newNs(ns,None)
 			cond.setNs(ns)
-			if isinstance(condition,libxml2.xmlNode):
-				cond.addChild(condition.docCopyNode(common_doc,1))
-			if type(condition) in (type([]),type(())):
-				if len(condition)!=3:
-					raise ErrorNodeError,"Condition tuple must have 3 elements"
-				e=cond.newChild(None,condition[1],to_utf8(condition[2]))
-				ns=e.newNs(condition[0],None)
-				e.setNs(ns)
-			else:
-				if typ=="stream":
-					d=stream_errors
-				else:
-					d=stanza_errors
-				if not d.has_key( (str(condition),str(node_or_class)) ):
-					raise ErrorNodeError,"Bad class/condition pair"
-				cond.newChild(ns,condition,None)
-		self.type=typ
+			self.ns=ns
 		
 	def __del__(self):
 		if self.node:
@@ -148,31 +149,40 @@ class ErrorNode:
 		if not self.borrowed:
 			self.node.unlinkNode()
 			self.node.freeNode()
-			self.node=None
+		self.node=None
 
 	def free_borrowed(self):
 		self.node=None
 
 	def is_legacy(self):
-		return not self.node.hasProp("class")
+		return not self.node.hasProp("type")
 
-	def get_class(self):
-		if not self.node.hasProp("class"):
-			self.upgrade()
-		return self.node.prop("class")
+	def xpath_eval(self,expr,namespaces=None):
+		if not namespaces:
+			return self.node.xpathEval(expr)
+		ctxt = common_doc.xpathNewContext()
+		ctxt.setContextNode(self.node)
+		for prefix,uri in namespaces.items():
+			if uri==None:
+				uri=COMMON_NS
+			ctxt.xpathRegisterNs(prefix,uri)
+		ret=ctxt.xpathEval(expr)
+		ctxt.xpathFreeContext()
+		return ret
 
 	def get_condition(self):
-		common_xpath_ctxt.setContextNode(self.node)
-		cond=common_xpath_ctxt.xpathEval('*[local-name()="condition"]/*')
-		if not cond:
+		c=self.xpath_eval("ns:*",{'ns':self.ns})
+		if not c:
 			self.upgrade()
-			cond=common_xpath_ctxt.xpathEval('*[local-name()="condition"]/*')
-			if cond:
-				return cond[0]
-			else:
-				return None
-		else:
-			return cond[0]
+			c=self.xpath_eval("ns:*",{'ns':self.ns})
+		if not c:
+			return None
+		return c[0]
+
+	def add_custom_codition(self,ns,cond,content=None):
+		self.node.newChild(none,cond,content)
+		ns=self.node.newNs(ns,None)
+		self.node.setNs(ns)
 		
 	def upgrade(self):
 		if not self.node.hasProp("code"):
@@ -184,65 +194,81 @@ class ErrorNode:
 				code=None
 		
 		if code and legacy_codes.has_key(code):
-			cond,clas=legacy_codes[code]
+			cond,typ=legacy_codes[code]
 		else:
 			cond=None
-			clas="server"
+			typ="cancel"
 		
-		if not self.node.hasProp("class"):
-			self.node.setProp("class",clas)
-		
-		condition=self.node.xpathEval("condition")
+		if not self.node.hasProp("type"):
+			self.node.setProp("type",typ)
+	
+		condition=self.xpath_eval("ns:*",{'ns':self.ns})
 		if condition:
-			condition=condition[0]
-			if condition.xpathEval("*"):
-				return
-		else:
-			condition=self.node.newChild(None,"condition",None)
-			if type=="stream":
-				ns=condition.newNs("urn:ietf:params:xml:ns:xmpp-streams",None)
-			else:
-				ns=condition.newNs("urn:ietf:params:xml:ns:xmpp-stanzas",None)
+			return
+		elif cond is None:
+			condition=self.node.newChild(None,"internal-server-error",None)
+			ns=condition.newNs(self.ns,None)
 			condition.setNs(ns)
-		if cond:
-			condition.newChild(condition.ns(),cond,None)
+			condition=self.node.newChild(None,"unknown-legacy-error",None)
+			ns=condition.newNs(PYXMPP_ERROR_NS.ns,None)
+			condition.setNs(ns)
 		else:
-			content=self.node.getContent()
-			c=condition.newChild(None,"unknow-legacy-error",content)
-			ns=c.newNs("http://www.bnet.pl/~jajcus/pyxmpp/errors",None)
-			c.setNs(ns)
+			condition=self.node.newChild(None,cond,None)
+			ns=condition.newNs(self.ns,None)
+			condition.setNs(ns)
 
 	def downgrade(self):
-		print "error.downgrade()"
 		if self.node.hasProp("code"):
-			print "error.downgrade(): no need to downgrade - code present"
 			return
-		if not self.node.hasProp("class"):
-			print "error.downgrade(): cannot downgrade - class not present"
+		if not self.node.hasProp("type"):
 			return
-		clas=self.node.prop("class")
-		ctxt = common_doc.xpathNewContext()
-		ctxt.setContextNode(self.node)
-		ctxt.xpathRegisterNs("se","urn:ietf:params:xml:ns:xmpp-stanzas")
-		ctxt.xpathRegisterNs("re","urn:ietf:params:xml:ns:xmpp-streams")
-		cond=ctxt.xpathEval("se:condition")
+		typ=self.node.prop("type")
+		cond=self.get_condition()
 		if not cond:
-			cond=ctxt.xpathEval("re:condition")
-		ctxt.xpathFreeContext()
-		if not cond:
-			print "error.downgrade(): cannot downgrade - condition not present"
 			return
-		cond=cond[0]
-		child=cond.xpathEval("*")
-		if not child:
-			return
-		child=child[0]
-		if child.ns().getContent()!=cond.ns().getContent():
-			return
-		if stanza_errors.has_key( (str(child.name),str(clas)) ):
-			self.node.setProp("code",str(stanza_errors[(str(child.name),str(clas))]))
-		elif stream_errors.has_key( (str(child.name),str(clas)) ):
-			self.node.setProp("code",str(stream_errors[(str(child.name),str(clas))]))
+		cond=cond.name
+		if stanza_errors.has_key(cond) and stanza_errors[cond][1]:
+			self.node.setProp("code",str(stanza_errors[cond][1]))
 
 	def serialize(self):
 		return self.node.serialize()
+
+class StreamErrorNode(ErrorNode):
+	def __init__(self,node_or_cond,ns=None,copy=1,parent=None):
+		""" 
+		Contructor:
+			ErrorNode(error_node[,copy=boolean]) -> ErrorNode
+			ErrorNode(xml_node,[,copy=boolean]) -> ErrorNode
+			ErrorNode(condition,ns,[,parent=parent_node]) -> ErrorNode
+		"""
+		if type(node_or_cond) is StringType:
+			node_or_cond=unicode(node_or_cond,"utf-8")
+		if type(node_or_cond) is UnicodeType:
+			if not stream_errors.has_key(node_or_cond):
+				raise ErrorNodeError,"Bad error condition"
+		ErrorNode.__init__(self,node_or_cond,STREAM_ERROR_NS,copy=copy,parent=parent)
+
+class StanzaErrorNode(ErrorNode):
+	def __init__(self,node_or_cond,ns=None,copy=1,parent=None):
+		""" 
+		Contructor:
+			ErrorNode(error_node[,copy=boolean]) -> ErrorNode
+			ErrorNode(xml_node,[,copy=boolean]) -> ErrorNode
+			ErrorNode(condition,ns,[,parent=parent_node]) -> ErrorNode
+		"""
+		if type(node_or_cond) is StringType:
+			node_or_cond=unicode(node_or_cond,"utf-8")
+		if type(node_or_cond) is UnicodeType:
+			if not stanza_errors.has_key(node_or_cond):
+				raise ErrorNodeError,"Bad error condition"
+			
+		ErrorNode.__init__(self,node_or_cond,STREAM_ERROR_NS,copy=copy,parent=parent)
+
+		typ=stanza_errors[node_or_cond][0]
+		self.node.setProp("type",typ)
+
+	def get_type(self):
+		if not self.node.hasProp("type"):
+			self.upgrade()
+		return self.node.prop("type")
+

@@ -28,7 +28,7 @@ import traceback
 from expdict import ExpiringDictionary
 from utils import from_utf8,to_utf8
 from stanza import Stanza,common_doc,StanzaError
-from error import ErrorNode
+from error import StreamErrorNode
 from iq import Iq
 from presence import Presence
 from message import Message
@@ -42,13 +42,16 @@ SASL_NS="urn:ietf:params:xml:ns:xmpp-sasl"
 class StreamError(StandardError):
 	pass
 
-class StreamEncryptionRequired(StandardError):
+class StreamEncryptionRequired(StreamError):
 	pass
 
 class HostMismatch(StreamError):
 	pass
 
 class FatalStreamError(StreamError):
+	pass
+
+class StreamParseError(FatalStreamError):
 	pass
 
 class StreamAuthenticationError(FatalStreamError):
@@ -100,7 +103,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.peer=None
 		self.skip=0
 		self.stream_id=None
-		self.iq_reply_handlers=ExpiringDictionary()
+		self.iq_response_handlers=ExpiringDictionary()
 		self.iq_get_handlers={}
 		self.iq_set_handlers={}
 		self.message_handlers={}
@@ -171,17 +174,20 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def stream_start(self,doc):
 		self.doc_in=doc
 		self.debug("input document: %r" % (self.doc_in.serialize(),))
-		
-		r=self.doc_in.getRootElement()
-		if r.ns().getContent() != STREAM_NS:
-			e=ErrorNode("format","invalid-namespace","stream")
-			self.send_stream_error(e)
-			raise FatalStreamError,"Invalid namespace."
+	
+		try:
+			r=self.doc_in.getRootElement()
+			if r.ns().getContent() != STREAM_NS:
+				self.send_stream_error("invalid-namespace")
+				raise FatalStreamError,"Invalid namespace."
+		except libxml2.treeError:
+			self.send_stream_error("invalid-namespace")
+			raise FatalStreamError,"Couldn't get the namespace."
+			
 
 		self.version=r.prop("version")
 		if self.version and self.version!="1.0":
-			e=ErrorNode("format","unsupported-version","stream")
-			self.send_stream_error(e)
+			self.send_stream_error("unsupported-version")
 			raise FatalStreamError,"Unsupported protocol version."
 		
 		to_from_mismatch=0
@@ -224,7 +230,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.process_node(node)
 
 	def error(self,desc):
-		raise FatalStreamError,desc
+		raise StreamParseError,desc
 				
 	def send_stream_end(self):
 		self.doc_out.getRootElement().addContent(" ")
@@ -254,6 +260,15 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			self.stream_id=id
 		sr=self.doc_out.serialize(encoding="UTF-8")
 		self.write_raw(sr[:sr.find("/>")]+">")
+	
+	def send_stream_error(self,condition):
+		if not self.doc_out:
+			self.send_stream_start()
+		e=StreamErrorNode(condition)
+		e.node.setNs(self.stream_ns)
+		self.write_raw(e.serialize())
+		e.free()
+		self.send_stream_end()
 
 	def get_stream_features(self):
 		root=self.doc_out.getRootElement()
@@ -312,7 +327,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.eof=1
 
 	def idle(self):
-		self.iq_reply_handlers.expire()
+		self.iq_response_handlers.expire()
 
 	def loop(self,timeout):
 		import select
@@ -337,7 +352,11 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		r=os.read(fd,1024)
 		self.debug("IN: %r" % (r,))
 		if r:
-			self.reader.feed(r)
+			try:
+				self.reader.feed(r)
+			except StreamParseError:
+				self.send_stream_error("xml-not-well-formed")
+				raise
 		else:
 			self.eof=1
 			self.disconnect()
@@ -362,7 +381,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
 	def process_stream_node(self,node):
 		if node.name=="error":
-			e=ErrorNode(node)
+			e=StreamErrorNode(node)
 			self.process_stream_error(e)
 			e.free()
 			return
@@ -379,8 +398,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.debug("Unhandled stream node: %r" % (node.serialize(),))
 	
 	def process_stream_error(self,err):
-		self.debug("Unhandled stream error: class: %s condition: %s %r" 
-				% (err.get_class(),err.get_condition().name,err.serialize()))
+		self.debug("Unhandled stream error: condition: %s %r" 
+				% (err.get_condition().name,err.serialize()))
 
 	def process_iq(self,stanza):
 		id=stanza.get_id()
@@ -388,20 +407,20 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
 		typ=stanza.get_type()
 		if typ in ("result","error"):
-			if self.iq_reply_handlers.has_key((id,fr.as_unicode())):
-				res_handler,err_handler=self.iq_reply_handlers[(id,fr.as_unicode())]
+			if self.iq_response_handlers.has_key((id,fr.as_unicode())):
+				res_handler,err_handler=self.iq_response_handlers[(id,fr.as_unicode())]
 				if stanza.get_type()=="result":
 					res_handler(stanza)
 				else:
 					err_handler(stanza)
-				del self.iq_reply_handlers[(id,fr.as_unicode())]
+				del self.iq_response_handlers[(id,fr.as_unicode())]
 				return 1
 			else:
 				return 0
 
 		q=stanza.get_query()
 		if not q:
-			r=stanza.make_error_reply("format","bad-request")
+			r=stanza.make_error_response("bad-request")
 			self.send(r)
 			return 1
 		el=q.name
@@ -414,7 +433,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			self.iq_set_handlers[(el,ns)](stanza)
 			return 1
 		else:
-			r=stanza.make_error_reply("recipient","feature-not-implemented")
+			r=stanza.make_error_response("feature-not-implemented")
 			self.send(r)
 			return 1
 
@@ -448,7 +467,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		return 0
 
 	def route_stanza(self,stanza):
-		r=stanza.make_error_reply("recipient","recipient-unavailable")
+		r=stanza.make_error_response("recipient-unavailable")
 		self.send(r)
 		return 1
 		
@@ -491,13 +510,13 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		if not stanza.get_to() and self.peer:
 			stanza.set_to(self.peer)
 		
-	def set_reply_handlers(self,iq,res_handler,err_handler,timeout_handler=None,timeout=300):
+	def set_response_handlers(self,iq,res_handler,err_handler,timeout_handler=None,timeout=300):
 		self.fix_out_stanza(iq)
 		if timeout_handler:
-			self.iq_reply_handlers[(iq.get_id(),iq.get_to().as_unicode()),timeout,timeout_handler]=(
+			self.iq_response_handlers[(iq.get_id(),iq.get_to().as_unicode()),timeout,timeout_handler]=(
 								res_handler,err_handler)
 		else:
-			self.iq_reply_handlers[(iq.get_id(),iq.get_to().as_unicode()),timeout]=(
+			self.iq_response_handlers[(iq.get_id(),iq.get_to().as_unicode()),timeout]=(
 								res_handler,err_handler)
 
 	def set_iq_get_handler(self,element,namespace,handler):
@@ -566,7 +585,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def process_sasl_node(self,node):
 		if self.initiator:
 			if not self.authenticator:
-				self.debug("Unexpected SASL reply: %r" % (node.serialize()))
+				self.debug("Unexpected SASL response: %r" % (node.serialize()))
 				return 0
 			if node.name=="challenge":
 				return self.process_sasl_challenge(node.getContent())

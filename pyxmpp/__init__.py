@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-from stream import Stream,StreamError
+from stream import Stream,StreamError,FatalStreamError,StreamParseError
 from client import ClientStream
 from iq import Iq
 from presence import Presence

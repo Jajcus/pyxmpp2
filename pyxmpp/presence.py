@@ -72,12 +72,12 @@ class Presence(Stanza):
 		else:
 			return None
 
-	def make_error_reply(self,clas,cond):
+	def make_error_response(self,cond):
 		if self.get_type() == "error":
 			raise StanzaError,"Errors may not be generated in response to errors"
 		
 		p=Presence(type="error",fr=self.get_to(),to=self.get_from(),
-			id=self.get_id(),error_class=clas,error_cond=cond)
+			id=self.get_id(),error_cond=cond)
 		
 		if self.node.children:
 			for n in list(self.node.children):

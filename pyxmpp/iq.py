@@ -45,18 +45,18 @@ class Iq(Stanza):
 			node="iq"
 		apply(Stanza.__init__,[self,node],kw)
 
-	def make_error_reply(self,clas,cond):
+	def make_error_response(self,cond):
 		if self.get_type() not in ("set","get"):
 			raise StanzaError,"Errors may only be generated for 'set' or 'get' iq"
 		
 		iq=Iq(type="error",fr=self.get_to(),to=self.get_from(),
-			id=self.get_id(),error_class=clas,error_cond=cond)
+			id=self.get_id(),error_cond=cond)
 		n=self.get_query().copyNode(1)
 		print iq.serialize()
 		iq.node.children.addPrevSibling(n)
 		return iq
 	
-	def make_result_reply(self):
+	def make_result_response(self):
 		if self.get_type() not in ("set","get"):
 			raise StanzaError,"Results may only be generated for 'set' or 'get' iq"
 		
