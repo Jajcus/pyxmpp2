@@ -51,6 +51,7 @@ version:
 	fi
 
 dist: build ChangeLog
+	rm MANIFEST
 	echo "version='$(VERSION)$(SNAPSHOT)'" > pyxmpp/version.py
 	python setup.py sdist
 
