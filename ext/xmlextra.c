@@ -138,6 +138,7 @@ xmlNsPtr ns;
 			/* exit condition */
 			if (node == tree) node = NULL;
 		} else break;
+		if (node == tree) break; /* should not happen... but happens somehow */
 	}
 
 	/* there is no such namespace declared here */
@@ -219,6 +220,7 @@ xmlNsPtr new_ns,old_ns;
 			/* exit condition */
 			if (node == tree) node = NULL;
 		} else break;
+		if (node == tree) break; /* should not happen... but happens somehow */
 	}
 	
 	Py_INCREF(Py_None);
