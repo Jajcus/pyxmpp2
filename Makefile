@@ -47,7 +47,8 @@ cosmetics:
 	
 version:
 	if test -d ".svn" ; then \
-		echo "version='$(VERSION)+svn'" > pyxmpp/version.py ; \
+		echo "# pylint: disable-msg=W0103,W0131" > pyxmpp/version.py ; \
+		echo "version='$(VERSION)+svn'" >> pyxmpp/version.py ; \
 	fi
 
 dist: build ChangeLog
