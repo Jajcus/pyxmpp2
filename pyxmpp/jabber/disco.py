@@ -209,7 +209,7 @@ class DiscoItems:
             self.ns=self.xmlnode.newNs(DISCO_ITEMS_NS,None)
             self.xmlnode.setNs(self.ns)
             if xmlnode_or_node:
-                slef.xmlnode.setProp("node",to_utf8(xmlnode_or_node))
+                self.xmlnode.setProp("node",to_utf8(xmlnode_or_node))
         self.xpath_ctxt=common_doc.xpathNewContext()
         self.xpath_ctxt.setContextNode(self.xmlnode)
         self.xpath_ctxt.xpathRegisterNs("d",DISCO_ITEMS_NS)
@@ -273,7 +273,7 @@ class DiscoInfo:
             self.ns=self.xmlnode.newNs(DISCO_INFO_NS,None)
             self.xmlnode.setNs(self.ns)
             if xmlnode_or_node:
-                slef.xmlnode.setProp("node",to_utf8(xmlnode_or_node))
+                self.xmlnode.setProp("node",to_utf8(xmlnode_or_node))
 
         self.xpath_ctxt=common_doc.xpathNewContext()
         self.xpath_ctxt.setContextNode(self.xmlnode)
