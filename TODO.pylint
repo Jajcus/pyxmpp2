@@ -1,24 +1,5 @@
 ************* Module pyxmpp.xmppstringprep
-W0403: 24: Uses of a deprecated module 'string'
-W0403: 25: Uses of a deprecated module 'stringprep'
-W0141: 29:LookupFunction: Missing docstring
-W0141: 33:LookupTable: Missing docstring
-W0622: 41:LookupTable.lookup: Redefining built-in 'max'
-W0622: 41:LookupTable.lookup: Redefining built-in 'min'
-W0141: 37:LookupTable.lookup: Missing docstring
-W0141: 50:b1_mapping: Missing docstring
-W0622: 73:NFKC: Redefining built-in 'input'
-W0133: 73:NFKC: Invalid name "NFKC" (should match [a-z_][a-z0-9_]*$)
-W0141: 73:NFKC: Missing docstring
-W0622:103:Profile.prepare: Redefining built-in 'input'
-W0704:123:Profile.prepare: Except doesn't do anything
-W0133:176:Profile.check_bidi: Invalid name "has_L" (should match [a-z_][a-z0-9_]*$)
-W0133:177:Profile.check_bidi: Invalid name "has_RAL" (should match [a-z_][a-z0-9_]*$)
-W0201:125:Profile.prepare: Attribute 'cache_items' defined outside __init__
-W0141:205:set_stringprep_cache_size: Missing docstring
-W0121:206:set_stringprep_cache_size: Use of the global statement
-W0704:213:set_stringprep_cache_size: Except doesn't do anything
-W0611: 27: Unused import weakref
+W0403: 24: Uses of a deprecated module 'stringprep'
 ************* Module pyxmpp.roster
 W0102: 40:RosterItem.__init__: Dangerous default value [] as argument
 W0141:138:Roster: Missing docstring
@@ -160,18 +141,6 @@ W0114:474:parse_message: Too many local variables (22/15)
 W0622:477:parse_message: Redefining built-in 'id'
 W0612:492:parse_message: Unused variable 'i'
 W0611: 23: Unused import sys
-************* Module pyxmpp.rfc3454
-W0302:  0: Too many lines in module (2377)
-W0141:  0: Missing docstring
-W0103:  0: Missing required attribute "__revision__"
-W0103:  0: Missing required attribute "__docformat__"
-W0141:  3:LookupFunction: Missing docstring
-W0141:  7:LookupTable: Missing docstring
-W0141: 11:LookupTable.lookup: Missing docstring
-W0622: 15:LookupTable.lookup: Redefining built-in 'max'
-W0622: 15:LookupTable.lookup: Redefining built-in 'min'
-W0403: 23: Uses of a deprecated module 'stringprep'
-W0141: 26:b1_mapping: Missing docstring
 ************* Module pyxmpp._xmlextra
 I0001:  0: Unable to run raw checkers on built-in module pyxmpp._xmlextra
 W0141:  0: Missing docstring
@@ -188,10 +157,8 @@ W0311:126: Bad indentation. Found 8 spaces, expected 4
 W0141:  0: Missing docstring
 W0141: 32:StanzaError: Missing docstring
 W0141: 38:gen_id: Missing docstring
-W0121: 39:gen_id: Use of the global statement
 W0141: 43:Stanza: Missing docstring
 W0622: 80:Stanza.__init__: Redefining built-in 'id'
-W0121: 46:Stanza.__init__: Use of the global statement
 W0404: 85:Stanza.__init__: Relative import 'error'
 W0112: 45:Stanza.__init__: Too many branches (15/12)
 W0141: 92:Stanza.free: Missing docstring
@@ -438,7 +405,6 @@ W0141: 54:Iq.make_error_response: Missing docstring
 W0141: 66:Iq.make_result_response: Missing docstring
 W0141: 73:Iq.new_query: Missing docstring
 W0141: 76:Iq.get_query: Missing docstring
-W0704: 81:Iq.get_query: Except doesn't do anything
 W0141: 85:Iq.get_query_ns: Missing docstring
 W0611: 23: Unused import to_utf8
 W0611: 23: Unused import from_utf8
@@ -493,7 +459,6 @@ W0221: 66:ComponentStream._connect: Arguments number differs from overriden meth
 W0141: 77:ComponentStream.accept: Missing docstring
 W0221: 77:ComponentStream.accept: Arguments number differs from overriden method
 W0141: 80:ComponentStream.stream_start: Missing docstring
-W0704: 83:ComponentStream.stream_start: Except doesn't do anything
 W0141: 86:ComponentStream._post_connect: Missing docstring
 W0141: 90:ComponentStream._compute_handshake: Missing docstring
 W0622: 98:ComponentStream._auth: Redefining built-in 'hash'
@@ -510,59 +475,6 @@ W0611: 27: Unused import SASLNotAvailable
 W0611: 25: Unused import UnicodeType
 W0611: 23: Unused import time
 W0611: 27: Unused import SASLMechanismNotAvailable
-************* Module pyxmpp.unicode
-W0141:  0: Missing docstring
-W0103:  0: Missing required attribute "__revision__"
-W0103:  0: Missing required attribute "__docformat__"
-************* Module pyxmpp.unicode.ud_3_2_0
-W0141:  0: Missing docstring
-W0103:  0: Missing required attribute "__revision__"
-W0103:  0: Missing required attribute "__docformat__"
-************* Module pyxmpp.unicode.nfkc
-W0141:  0: Missing docstring
-W0103:  0: Missing required attribute "__revision__"
-W0103:  0: Missing required attribute "__docformat__"
-W0403:  2: Uses of a deprecated module 'string'
-W0403:  8: Uses of a deprecated module 'string'
-W0405:  8: Reimport 'string' (imported line 2)
-W0622: 10:NFKC: Redefining built-in 'input'
-W0133: 10:NFKC: Invalid name "NFKC" (should match [a-z_][a-z0-9_]*$)
-W0141: 10:NFKC: Missing docstring
-W0404: 16: Relative import 'cexc'
-W0404: 17: Relative import 'ccomp'
-W0404: 18: Relative import 'ud_3_2_0'
-W0141: 30:hangul_decompose: Missing docstring
-W0133: 32:hangul_decompose: Invalid name "SIndex" (should match [a-z_][a-z0-9_]*$)
-W0133: 37:hangul_decompose: Invalid name "L" (should match [a-z_][a-z0-9_]*$)
-W0133: 39:hangul_decompose: Invalid name "T" (should match [a-z_][a-z0-9_]*$)
-W0133: 38:hangul_decompose: Invalid name "V" (should match [a-z_][a-z0-9_]*$)
-W0321:  0:hangul_decompose: More than one statement on a single line
-W0141: 45:decompose: Missing docstring
-W0141: 64:hangul_compose: Missing docstring
-W0133: 85:hangul_compose: Invalid name "TIndex" (should match [a-z_][a-z0-9_]*$)
-W0133: 83:hangul_compose: Invalid name "SIndex" (should match [a-z_][a-z0-9_]*$)
-W0133: 75:hangul_compose: Invalid name "LIndex" (should match [a-z_][a-z0-9_]*$)
-W0133: 77:hangul_compose: Invalid name "VIndex" (should match [a-z_][a-z0-9_]*$)
-W0141: 95:composetwo: Missing docstring
-W0141:105:compose: Missing docstring
-W0133:110:compose: Invalid name "C" (should match [a-z_][a-z0-9_]*$)
-W0133:113:compose: Invalid name "LC" (should match [a-z_][a-z0-9_]*$)
-W0133:112:compose: Invalid name "L" (should match [a-z_][a-z0-9_]*$)
-W0133:107:compose: Invalid name "Li" (should match [a-z_][a-z0-9_]*$)
-W0612:127:compose: Unused variable 'a'
-W0612:127:compose: Unused variable 'b'
-W0133:130:NFKC: Invalid name "NFKC" (should match [a-z_][a-z0-9_]*$)
-W0141:130:NFKC: Missing docstring
-W0622:130:NFKC: Redefining built-in 'input'
-W0611:  3: Unused import sys
-************* Module pyxmpp.unicode.ccomp
-W0141:  0: Missing docstring
-W0103:  0: Missing required attribute "__revision__"
-W0103:  0: Missing required attribute "__docformat__"
-************* Module pyxmpp.unicode.cexc
-W0141:  0: Missing docstring
-W0103:  0: Missing required attribute "__revision__"
-W0103:  0: Missing required attribute "__docformat__"
 ************* Module pyxmpp.sasl
 W0141:  0: Missing docstring
 W0403: 22: Uses of a deprecated module 'string'
@@ -731,7 +643,6 @@ W0141:605:MucRoomHandler.error: Missing docstring
 W0141:680:MucRoomUser.same_as: Missing docstring
 W0613:733:MucRoomState.set_stream: Unused argument 'stream'
 W0141:942:MucRoomManager.get_room_state: Missing docstring
-W0704:951:MucRoomManager.forget: Except doesn't do anything
 W0141:954:MucRoomManager.__groupchat_message: Missing docstring
 W0141:964:MucRoomManager.__error_message: Missing docstring
 W0141:973:MucRoomManager.__presence_error: Missing docstring
@@ -769,7 +680,6 @@ W0141:245:LegacyClientStream._digest_auth_in_stage2: Missing docstring
 W0613:245:LegacyClientStream._digest_auth_in_stage2: Unused argument 'resource'
 W0141:279:LegacyClientStream.auth_finish: Missing docstring
 W0613:279:LegacyClientStream.auth_finish: Unused argument 'stanza'
-W0201:283:LegacyClientStream.auth_finish: Attribute 'me' defined outside __init__
 W0201: 48:LegacyClientStream._reset: Attribute 'available_auth_methods' defined outside __init__
 W0201:284:LegacyClientStream.auth_finish: Attribute 'authenticated' defined outside __init__
 W0201:223:LegacyClientStream._plain_auth_in_stage2: Attribute 'peer_authenticated' defined outside __init__
@@ -952,13 +862,9 @@ W0102:663:VCardKey.__init__: Dangerous default value {} as argument
 W0141:687:VCardKey.rfc2426: Missing docstring
 W0141:693:VCardKey.xml: Missing docstring
 W0141:701:VCard: Missing docstring
-W0704:761:VCard.__init__: Except doesn't do anything
-W0704:768:VCard.__init__: Except doesn't do anything
 W0112:734:VCard.__init__: Too many branches (40/12)
 W0115:734:VCard.__init__: Too many statements (94/50)
 W0141:834:VCard.process_rfc2425_record: Missing docstring
-W0704:855:VCard.process_rfc2425_record: Except doesn't do anything
-W0704:862:VCard.process_rfc2425_record: Except doesn't do anything
 W0612:841:VCard.process_rfc2425_record: Unused variable 'group'
 W0141:868:VCard.rfc2426: Missing docstring
 W0612:871:VCard.rfc2426: Unused variable 'name'
@@ -981,17 +887,17 @@ W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 Report
 ======
-5890 statements analysed.
+5703 statements analysed.
 
 Statistics by type
 ------------------
 
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-module   37     37         =          21.62       0.00     
-class    111    111        =          31.53       4.50     
+module   31     37         -6         25.81       0.00     
+class    109    111        -2         33.94       4.59     
 method   0      0          =          0.00        0.00     
-function 591    591        =          44.16       2.03     
+function 580    591        -11        45.34       1.55     
 
 
 Raw metrics
@@ -999,30 +905,30 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      7033   60.38 7034     -1         
-docstring 3305   28.37 3305     =          
-comment   995    8.54  995      =          
-empty     315    2.70  315      =          
+code      6224   77.66 7031     -807       
+docstring 994    12.40 3359     -2365      
+comment   488    6.09  995      -507       
+empty     308    3.84  323      -15        
 
 
 External dependencies
 ---------------------
 ::
 
-    weakref (pyxmpp.xmppstringprep,pyxmpp.jid,pyxmpp.jabber.muc)
+    weakref (pyxmpp.jid,pyxmpp.jabber.muc)
     pyxmpp 
       \-core (pyxmpp.sasl)
       \-digest_md5 (pyxmpp.sasl)
       \-plain (pyxmpp.sasl)
     base64 (pyxmpp.stream,pyxmpp.jabber.vcard)
     logging (pyxmpp.clientstream,pyxmpp.client,pyxmpp.stream,pyxmpp.jabberd.componentstream,pyxmpp.sasl.plain,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.client)
-    string (pyxmpp.xmppstringprep,pyxmpp.dns,pyxmpp.resolver,pyxmpp.unicode.nfkc,pyxmpp.sasl,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
+    string (pyxmpp.dns,pyxmpp.resolver,pyxmpp.sasl,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
     traceback (pyxmpp.client)
     libxml2 (pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.utils,pyxmpp.stanza,pyxmpp.clientstream,pyxmpp.message,pyxmpp.client,pyxmpp.stream,pyxmpp.iq,pyxmpp.error,pyxmpp.jabberd.componentstream,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
     random (pyxmpp.dns,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.stream,pyxmpp.sasl,pyxmpp.sasl.core)
     encodings 
       \-idna (pyxmpp.jid,pyxmpp.dns)
-    stringprep (pyxmpp.xmppstringprep,pyxmpp.rfc3454)
+    stringprep (pyxmpp.xmppstringprep)
     re (pyxmpp.jid,pyxmpp.utils,pyxmpp.resolver,pyxmpp.sasl.digest_md5,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
     M2Crypto 
       \-X509 (pyxmpp.stream)
@@ -1032,7 +938,7 @@ External dependencies
       \-m2 (pyxmpp.stream)
     threading (pyxmpp.xmlextra,pyxmpp.client,pyxmpp.stream)
     os (pyxmpp.stream)
-    types (pyxmpp.xmppstringprep,pyxmpp.roster,pyxmpp.jid,pyxmpp.dns,pyxmpp.utils,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.clientstream,pyxmpp.stream,pyxmpp.expdict,pyxmpp.error,pyxmpp.jabberd.componentstream,pyxmpp.unicode.nfkc,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    types (pyxmpp.xmppstringprep,pyxmpp.roster,pyxmpp.jid,pyxmpp.dns,pyxmpp.utils,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.clientstream,pyxmpp.stream,pyxmpp.expdict,pyxmpp.error,pyxmpp.jabberd.componentstream,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
     socket (pyxmpp.resolver,pyxmpp.stream)
 
 
@@ -1042,39 +948,36 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0141      435        
-W0611      76         
-W0201      70         
+W0141      412        
+W0611      74         
+W0201      68         
 W0613      46         
 E0201      37         
-W0133      36         
-W0622      28         
 E0602      24         
 W0102      22         
-W0612      19         
+W0622      20         
+W0133      19         
+W0612      17         
 W0112      16         
-W0103      16         
 W0311      14         
-W0403      11         
-W0704      9          
-W0404      8          
 W0231      8          
 W0221      8          
-W0321      7          
+W0403      7          
 W0301      7          
+W0321      6          
 W0111      6          
+W0404      5          
 W0232      5          
 W0151      5          
 W0511      4          
 W0114      4          
+W0103      4          
 W0702      3          
-W0302      3          
-W0121      3          
 W0115      3          
 W0621      2          
+W0302      2          
 W0101      2          
 F0001      2          
-W0405      1          
 W0401      1          
 
 
@@ -1083,8 +986,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 878    887      -9         
-errors   61     68       -7         
+warnings 790    849      -59        
+errors   61     61       =          
 
 
 % errors / warnings by module
@@ -1092,45 +995,39 @@ errors   61     68       -7
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            24.59 10.48   
-pyxmpp.jid                     21.31 1.48    
-pyxmpp.jabber.muc              14.75 4.56    
-pyxmpp.jabber.disco            11.48 4.44    
-pyxmpp.sasl.core               9.84  4.44    
-pyxmpp.jabber.client           4.92  1.71    
-pyxmpp.jabber.delay            3.28  1.37    
-pyxmpp.roster                  3.28  0.68    
-pyxmpp.stream                  1.64  8.88    
-pyxmpp.sasl.digest_md5         1.64  6.38    
-pyxmpp.stanza                  1.64  3.87    
-pyxmpp.error                   1.64  2.96    
-pyxmpp.dns                     0.00  7.97    
-pyxmpp.jabber.clientstream     0.00  5.24    
-pyxmpp.clientstream            0.00  4.44    
-pyxmpp.client                  0.00  4.33    
-pyxmpp.unicode.nfkc            0.00  4.10    
-pyxmpp.resolver                0.00  3.64    
-pyxmpp.jabberd.componentstream 0.00  3.53    
-pyxmpp.xmppstringprep          0.00  2.28    
-pyxmpp.xmlextra                0.00  1.94    
-pyxmpp.presence                0.00  1.71    
-pyxmpp.sasl.plain              0.00  1.48    
-pyxmpp.iq                      0.00  1.48    
-pyxmpp.rfc3454                 0.00  1.25    
-pyxmpp.message                 0.00  1.14    
-pyxmpp.sasl                    0.00  1.03    
-pyxmpp.utils                   0.00  0.68    
-pyxmpp.expdict                 0.00  0.46    
-pyxmpp.version                 0.00  0.34    
-pyxmpp.unicode.ud_3_2_0        0.00  0.34    
-pyxmpp.unicode.cexc            0.00  0.34    
-pyxmpp.unicode.ccomp           0.00  0.34    
-pyxmpp.unicode                 0.00  0.34    
-pyxmpp._xmlextra               0.00  0.34    
+pyxmpp.jabber.vcard            24.59 11.14   
+pyxmpp.jid                     21.31 1.65    
+pyxmpp.jabber.muc              14.75 4.94    
+pyxmpp.jabber.disco            11.48 4.94    
+pyxmpp.sasl.core               9.84  4.94    
+pyxmpp.jabber.client           4.92  1.90    
+pyxmpp.jabber.delay            3.28  1.52    
+pyxmpp.roster                  3.28  0.76    
+pyxmpp.stream                  1.64  9.87    
+pyxmpp.sasl.digest_md5         1.64  7.09    
+pyxmpp.stanza                  1.64  4.05    
+pyxmpp.error                   1.64  3.29    
+pyxmpp.dns                     0.00  8.86    
+pyxmpp.jabber.clientstream     0.00  5.70    
+pyxmpp.clientstream            0.00  4.94    
+pyxmpp.client                  0.00  4.81    
+pyxmpp.resolver                0.00  4.05    
+pyxmpp.jabberd.componentstream 0.00  3.80    
+pyxmpp.xmlextra                0.00  2.15    
+pyxmpp.presence                0.00  1.90    
+pyxmpp.sasl.plain              0.00  1.65    
+pyxmpp.iq                      0.00  1.52    
+pyxmpp.message                 0.00  1.27    
+pyxmpp.sasl                    0.00  1.14    
+pyxmpp.utils                   0.00  0.76    
+pyxmpp.expdict                 0.00  0.51    
+pyxmpp.version                 0.00  0.38    
+pyxmpp._xmlextra               0.00  0.38    
+pyxmpp.xmppstringprep          0.00  0.13    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 7.99/10 (previous run: 7.92/10)
-If you commit now, people should not be making nasty comments about you on c.l.py
+Your code has been rated at 8.08/10 (previous run: 8.04/10)
+That's pretty good. Good work mate.
 
