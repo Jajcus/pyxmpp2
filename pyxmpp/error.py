@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003 Jacek Konieczny <jajcus@bnet.pl>
+# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -22,7 +22,7 @@ Normative reference:
   - `JEP 86 <http://www.jabber.org/jeps/jep-0086.html>`__
 """
 
-__revision__="$Id: error.py,v 1.26 2004/10/07 22:28:04 jajcus Exp $"
+__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -174,7 +174,7 @@ legacy_codes={
 
 STANZA_ERROR_NS='urn:ietf:params:xml:ns:xmpp-stanzas'
 STREAM_ERROR_NS='urn:ietf:params:xml:ns:xmpp-streams'
-PYXMPP_ERROR_NS='http://www.bnet.pl/~jajcus/pyxmpp/errors'
+PYXMPP_ERROR_NS='http://pyxmpp.jabberstudio.org/xmlns/errors'
 STREAM_NS="http://etherx.jabber.org/streams"
 
 class ErrorNodeError(RuntimeError):
