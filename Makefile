@@ -13,7 +13,7 @@ all: version
 	
 version:
 	if test -f "CVS/Entries" ; then \
-		echo "version='$(VERSION)cvs'" > pyxmpp/version.py ; \
+		echo "version='$(VERSION)+cvs'" > pyxmpp/version.py ; \
 	fi
 
 dist: all
