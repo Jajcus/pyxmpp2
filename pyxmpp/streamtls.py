@@ -149,7 +149,7 @@ class StreamTLSMixIn:
         """Read data pending on the stream socket and pass it to the parser."""
         if self.eof:
             return
-        while True:
+        while self.socket:
             try:
                 try:
                     r=self.socket.read()
