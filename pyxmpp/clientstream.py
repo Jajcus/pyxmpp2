@@ -20,7 +20,8 @@ import sha
 import time
 from types import UnicodeType
 
-import stream
+from stream import Stream,StreamError,FatalStreamError,SASLNotAvailable,SASLMechanismNotAvailable
+from stream import StreamAuthenticationError
 from iq import Iq
 from stanza import common_doc
 from jid import JID
@@ -29,10 +30,10 @@ from utils import to_utf8,from_utf8
 class ClientError(RuntimeError):
 	pass
 
-class AuthenticationError(ClientError):
+class LegacyAuthenticationError(StreamAuthenticationError):
 	pass
 
-class ClientStream(stream.Stream):
+class ClientStream(Stream):
 	def __init__(self,jid,password=None,server=None,port=5222,
 			auth_methods=["sasl:DIGEST-MD5","digest"],
 			enable_tls=0,require_tls=0):
@@ -42,7 +43,7 @@ class ClientStream(stream.Stream):
 				continue
 			m=m[5:].upper()
 			sasl_mechanisms.append(m)
-		stream.Stream.__init__(self,"jabber:client",
+		Stream.__init__(self,"jabber:client",
 					sasl_mechanisms=sasl_mechanisms,
 					enable_tls=enable_tls,
 					require_tls=require_tls)
@@ -58,6 +59,7 @@ class ClientStream(stream.Stream):
 		self.available_auth_methods=None
 		self.features_timeout=None
 		self.auth_stanza=None
+		self.auth_method_used=None
 
 	def connect(self,server=None,port=None):
 		if not self.jid.node or not self.jid.resource:
@@ -66,10 +68,10 @@ class ClientStream(stream.Stream):
 			self.server=server
 		if port:
 			self.port=port
-		stream.Stream.connect(self,self.server,self.port,self.jid.domain)
+		Stream.connect(self,self.server,self.port,self.jid.domain)
 
 	def accept(self,sock):
-		stream.Stream.accept(self,sock,self.jid)
+		Stream.accept(self,sock,self.jid)
 
 	def post_connect(self):
 		if self.initiator:
@@ -83,7 +85,7 @@ class ClientStream(stream.Stream):
 							self.auth_in_stage2, pre_auth=1)
 
 	def idle(self):
-		stream.Stream.idle(self)
+		Stream.idle(self)
 		if self.features_timeout and self.features_timeout<=time.time():
 			self.debug("Timout while waiting for <features/>")
 			self.features_timeout=None
@@ -93,7 +95,7 @@ class ClientStream(stream.Stream):
 
 	def got_features(self):
 		self.debug("Got <features/>")
-		stream.Stream.got_features(self)
+		Stream.got_features(self)
 		self.try_auth()
 
 	def try_auth(self):
@@ -111,9 +113,10 @@ class ClientStream(stream.Stream):
 				try:
 					self.sasl_authenticate(self.jid.node,self.jid.as_unicode(),
 								mechanism=method[5:].upper())
-				except stream.SASLMechanismNotAvailable:
+				except (SASLMechanismNotAvailable,SASLNotAvailable),e:
 					self.debug("Skipping unavailable auth method: %s" % method)
 					return self.try_auth()
+				self.auth_method_used=method
 			else:
 				self.features_timeout=time.time()+60
 				self.debug("Must wait for <features/>")
@@ -128,6 +131,7 @@ class ClientStream(stream.Stream):
 					self.digest_auth_stage2(self.auth_stanza)
 				else:
 					self.plain_auth_stage2(self.auth_stanza)
+				self.auth_method_used=method
 				self.auth_stanza=None
 				return
 			else:
@@ -339,6 +343,6 @@ class ClientStream(stream.Stream):
 			if not stanza.get_to() and self.peer:
 				stanza.set_to(self.peer)
 		else:
-			stream.Stream.fix_out_stanza(self,stanza)
+			Stream.fix_out_stanza(self,stanza)
 	
 		

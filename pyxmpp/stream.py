@@ -23,6 +23,7 @@ import sys
 import time
 import random
 import base64
+import traceback
 
 from expdict import ExpiringDictionary
 from utils import from_utf8,to_utf8
@@ -37,6 +38,31 @@ import sasl
 STREAM_NS="http://etherx.jabber.org/streams"
 TLS_NS="urn:ietf:params:xml:ns:xmpp-tls"
 SASL_NS="urn:ietf:params:xml:ns:xmpp-sasl"
+
+class StreamError(StandardError):
+	pass
+
+class StreamEncryptionRequired(StandardError):
+	pass
+
+class HostMismatch(StreamError):
+	pass
+
+class FatalStreamError(StreamError):
+	pass
+
+class StreamAuthenticationError(FatalStreamError):
+	pass
+
+class SASLNotAvailable(StreamAuthenticationError):
+	pass
+
+class SASLMechanismNotAvailable(StreamAuthenticationError):
+	pass
+
+class SASLAuthenticationFailed(StreamAuthenticationError):
+	pass
+
 
 def StanzaFactory(node):
 	if node.name=="iq":
@@ -54,6 +80,7 @@ class StreamReader:
 		self.fd=stream.socket.fileno()
 		self.left=None
 	def pending_input(self):
+		self.stream.debug("pending input: %r" % (self.left,))
 		return self.left is not None
 		
 	def read(self,l):
@@ -70,15 +97,6 @@ class StreamReader:
 			self.left=r[i:]
 			r=r[:i]
 		return r
-
-class StreamError(RuntimeError):
-	pass
-
-class HostMismatch(StreamError):
-	pass
-
-class SASLMechanismNotAvailable(StreamError):
-	pass
 
 class Stream(sasl.PasswordManager):
 	def __init__(self,default_ns,extra_ns=[],sasl_mechanisms=[],enable_tls=0,require_tls=0):
@@ -245,7 +263,7 @@ class Stream(sasl.PasswordManager):
 		
 	def send(self,stanza):
 		if self.require_tls and not self.tls:
-			raise StreamError,"TLS encryption required and not started yet"
+			raise StreamEncryptionRequired,"TLS encryption required and not started yet"
 		self.fix_out_stanza(stanza)
 		self.write_node(stanza.node)
 
@@ -257,12 +275,20 @@ class Stream(sasl.PasswordManager):
 
 	def loop(self,timeout):
 		import select
-		while not self.eof:
+		while not self.eof and self.socket is not None:
 			id,od,ed=select.select([self.socket],[],[self.socket],timeout)
-			if self.socket in id or self.socket in ed:
-				self.read()
-			else:
-				self.idle()
+			try:
+				if self.socket in id or self.socket in ed:
+					self.debug("data on input")
+					self.read()
+				else:
+					self.debug("input timeout")
+					self.idle()
+			except (FatalStreamError,KeyboardInterrupt,SystemExit),e:
+				traceback.print_exc(file=sys.stderr)
+			except:
+				self.close()
+				raise
 
 	def read(self):
 		self.read1()
@@ -281,9 +307,13 @@ class Stream(sasl.PasswordManager):
 			self.debug("reading current node")
 			ret=self.reader.Read()
 			
+		if ret==0:
+			self.eof=1
+			return	
+		
 		if ret!=1 and not self.eof:
 			self.debug("reader failed")
-			raise StreamError,"Read error."
+			raise FatalStreamError,"Read error."
 
 		self.debug("node type: %i" % (self.reader.NodeType(),))
 		if self.eof or self.reader.NodeType()==15:
@@ -316,12 +346,12 @@ class Stream(sasl.PasswordManager):
 		if r.ns().getContent() != STREAM_NS:
 			e=ErrorNode("format","invalid-namespace","stream")
 			self.send_stream_error(e)
-			raise StreamError,"Read error."
+			raise FatalStreamError,"Invalid namespace."
 		self.version=r.prop("version")
 		if self.version and self.version!="1.0":
 			e=ErrorNode("format","unsupported-version","stream")
 			self.send_stream_error(e)
-			raise StreamError,"Read error."
+			raise FatalStreamError,"Unsupported protocol version."
 		
 		to_from_mismatch=0
 		if not self.doc_out:
@@ -350,7 +380,7 @@ class Stream(sasl.PasswordManager):
 			return
 
 		if self.require_tls and not self.tls:
-			raise StreamError,"TLS encryption required and not started yet"
+			raise StreamEncryptionRequired,"TLS encryption required and not started yet"
 		
 		if ns_uri==self.default_ns_uri:
 			stanza=StanzaFactory(node)
@@ -375,7 +405,7 @@ class Stream(sasl.PasswordManager):
 			return
 
 		if self.require_tls and not self.tls:
-			raise StreamError,"TLS encryption required and not started yet"
+			raise StreamEncryptionRequired,"TLS encryption required and not started yet"
 		
 		self.debug("Unhandled stream node: %r" % (node.serialize(),))
 	
@@ -467,7 +497,7 @@ class Stream(sasl.PasswordManager):
 	def post_auth(self):
 		pass
 		
-	def post_disconnect(self,node):
+	def post_disconnect(self):
 		pass
 
 	def fix_in_stanza(self,stanza):
@@ -527,12 +557,12 @@ class Stream(sasl.PasswordManager):
 			ctxt.xpathFreeContext()
 			
 		if tls_required_n and not self.enable_tls:
-			raise StreamError,"StartTLS support disabled, but required by peer"
+			raise FatalStreamError,"StartTLS support disabled, but required by peer"
 		if self.require_tls and not tls_n:
-			raise StreamError,"StartTLS required, but not supported by peer"
+			raise FatalStreamError,"StartTLS required, but not supported by peer"
 		if self.enable_tls and tls_n:
 			self.debug("StartTLS negotiated")
-			raise StreamError,"StartTLS negotiated, but not implemented yet"
+			raise FatalStreamError,"StartTLS negotiated, but not implemented yet"
 		self.debug("StartTLS not negotiated")
 		if sasl_mechanisms_n:
 			self.debug("SASL support found")
@@ -577,7 +607,6 @@ class Stream(sasl.PasswordManager):
 		self.authenticator=sasl.ServerAuthenticator(mechanism,self)
 		
 		r=self.authenticator.start(base64.decodestring(content))
-		print "R:",`r`
 	
 		if isinstance(r,sasl.Success):
 			el_name="success"
@@ -603,10 +632,13 @@ class Stream(sasl.PasswordManager):
 		node.freeNode()
 
 		if isinstance(r,sasl.Success):
-			self.peer=JID(r.get_authzid())
+			self.peer=JID(r.authzid)
 			self.peer_authenticated=1
 			self.post_auth()
 			
+		if isinstance(r,sasl.Failure):
+			raise SASLAuthenticationFailed,"SASL authentication failed"
+
 		return 1
 		
 	def process_sasl_challenge(self,content):
@@ -632,6 +664,9 @@ class Stream(sasl.PasswordManager):
 		self.write_raw(node.serialize(encoding="UTF-8"))
 		node.unlinkNode()
 		node.freeNode()
+
+		if isinstance(r,sasl.Failure):
+			raise SASLAuthenticationFailed,"SASL authentication failed"
 
 		return 1
 	
@@ -665,9 +700,12 @@ class Stream(sasl.PasswordManager):
 		node.freeNode()
 		
 		if isinstance(r,sasl.Success):
-			self.peer=JID(r.get_authzid())
+			self.peer=JID(r.authzid)
 			self.peer_authenticated=1
 			self.post_auth()
+
+		if isinstance(r,sasl.Failure):
+			raise SASLAuthenticationFailed,"SASL authentication failed"
 
 		return 1
 
@@ -680,12 +718,12 @@ class Stream(sasl.PasswordManager):
 		if isinstance(r,sasl.Success):
 			el_name="success"
 			self.debug("SASL authentication succeeded")
-			self.me=r.get_authzid()
+			self.me=r.authzid
 			self.authenticated=1
 			self.post_auth()
 		else:
 			self.debug("SASL authentication failed")
-			self.authenticated=0
+			raise SASLAuthenticationFailed,"Additional success data procesing failed"
 		return 1
 
 	def process_sasl_failure(self,node):
@@ -694,20 +732,25 @@ class Stream(sasl.PasswordManager):
 			return 0
 
 		self.debug("SASL authentication failed: %r" % (node.serialize(),))
-		return 1
+		raise SASLAuthenticationFailed,"SASL authentication failed"
 
 	def process_sasl_abort(self):
+		if not self.authenticator:
+			self.debug("Unexpected SASL response")
+			return 0
+
+		self.authenticator=None
 		self.debug("SASL authentication aborted")
 		return 1
 
 	def sasl_authenticate(self,username,authzid,mechanism=None):
 		if not self.initiator:
-			raise StreamError,"Only initiating entity start SASL authentication"
+			raise SASLAuthenticationError,"Only initiating entity start SASL authentication"
 		while not self.features:
 			self.debug("Waiting for features")
 			self.read()
 		if not self.peer_sasl_mechanisms:
-			raise SASLMechanismNotAvailable,"Peer doesn't support SASL"
+			raise SASLNotAvailable,"Peer doesn't support SASL"
 
 		if not mechanism:
 			mechanism=None
@@ -726,7 +769,7 @@ class Stream(sasl.PasswordManager):
 	
 		initial_response=self.authenticator.start(username,authzid)
 		if not isinstance(initial_response,sasl.Response):
-			raise StreamError,"SASL initiation failed"
+			raise SASLAuthenticationFailed,"SASL initiation failed"
 	
 		root=self.doc_out.getRootElement()
 		node=root.newChild(None,"auth",None)
