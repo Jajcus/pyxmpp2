@@ -1,3 +1,8 @@
+2004-07-28  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/stanza.py:
+	- convert stanza attributes (from, to, type) from UTF-8 to Unicode
+
 2004-07-21  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* Makefile: *** Version: 0.5 ***
