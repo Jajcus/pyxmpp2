@@ -1,6 +1,6 @@
 2004-09-19  Jacek Konieczny  <jajcus@bnet.pl>
 
-	* pyxmpp/dns.py, pyxmpp/presence.py:
+	* pyxmpp/dns.py, pyxmpp/error.py, pyxmpp/iq.py, pyxmpp/message.py, pyxmpp/presence.py, pyxmpp/stanza.py, pyxmpp/stream.py, ext/xmlextra.c, TODO.pylint, pylint.sh, pylintrc:
 	- cleaning up...
 
 2004-09-18  Jacek Konieczny  <jajcus@bnet.pl>
