@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# $Id: setup.py,v 1.8 2003/10/02 09:35:00 jajcus Exp $
+# $Id: setup.py,v 1.9 2003/11/30 17:06:15 jajcus Exp $
 
 import os.path
 import sys
@@ -29,7 +29,7 @@ setup(
 			'ext/xmlextra.c',
 		    ],
 		    libraries =		['xml2'],
-		    include_dirs =	['libxml2addon','/usr/include/libxml2'],
+		    include_dirs =	['libxml2addon','/usr/include/libxml2','/usr/local/include/libxml2'],
 		    extra_compile_args = ['-g2'],
 		),
 
