@@ -30,7 +30,7 @@ from pyxmpp.utils import to_utf8,from_utf8
 def unquote(s):
 	if s[0]!='"':
 		return s
-	return s[1:-1].replace('\\','')
+	return s[1:-1].replace('\\','') #FIXME
 
 def quote(s):
 	s=s.replace('\\','\\\\')
