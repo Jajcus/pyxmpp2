@@ -15,9 +15,13 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""Core XMPP stream functionality"""
+"""SASL support XMPP streams.
 
-__revision__="$Id: streamsasl.py,v 1.2 2004/09/28 21:31:00 jajcus Exp $"
+Normative reference: 
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+"""
+
+__revision__="$Id: streamsasl.py,v 1.3 2004/10/07 22:22:36 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import base64

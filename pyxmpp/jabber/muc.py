@@ -14,8 +14,13 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+"""Jabber Multi-User Chat implementation.
 
-__revision__="$Id: muc.py,v 1.25 2004/09/16 19:57:46 jajcus Exp $"
+Normative reference: 
+  - `JEP 45 <http://www.jabber.org/jeps/jep-0045.html>`__ 
+"""
+
+__revision__="$Id: muc.py,v 1.26 2004/10/07 22:22:43 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2

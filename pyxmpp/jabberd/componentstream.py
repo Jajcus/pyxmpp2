@@ -14,9 +14,13 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-"""Component (jabber:component:accept) stream handling."""
+"""Component (jabber:component:accept) stream handling.
 
-__revision__="$Id: componentstream.py,v 1.13 2004/09/28 21:31:10 jajcus Exp $"
+Normative reference: 
+  - `JEP 114 <http://www.jabber.org/jeps/jep-0114.html>`__ 
+"""
+
+__revision__="$Id: componentstream.py,v 1.14 2004/10/07 22:22:50 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import sha

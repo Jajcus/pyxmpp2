@@ -17,10 +17,11 @@
 
 """Basic XHTML-IM client implementation.
 
-Normative reference: "RFC 3921":http://www.ietf.org/rfc/rfc3921.txt 
+Normative reference: 
+  - `RFC 3921 <http://www.ietf.org/rfc/rfc3921.txt>`__ 
 """
 
-__revision__="$Id: client.py,v 1.31 2004/10/07 21:07:56 jajcus Exp $"
+__revision__="$Id: client.py,v 1.32 2004/10/07 22:22:34 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import threading
@@ -47,7 +48,7 @@ class Client:
 
     :Ivariables:
         - `jid`: configured JID of the client (current actual JID
-          is avialable as `stream.jid`).
+          is avialable as `self.stream.jid`).
         - `password`: authentication password.
         - `server`: server to use if non-standard and not discoverable
           by SRV lookups.

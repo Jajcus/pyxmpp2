@@ -15,9 +15,14 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""XMPP error handling."""
+"""XMPP error handling.
 
-__revision__="$Id: error.py,v 1.24 2004/09/25 21:41:39 jajcus Exp $"
+Normative reference: 
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+  - `JEP 86 <http://www.jabber.org/jeps/jep-0086.html>`__ 
+"""
+
+__revision__="$Id: error.py,v 1.25 2004/10/07 22:22:34 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2

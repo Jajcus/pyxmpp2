@@ -14,9 +14,13 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-"""SASL authentication implementaion for PyXMPP."""
+"""SASL authentication implementaion for PyXMPP.
 
-__revision__="$Id: __init__.py,v 1.8 2004/09/28 21:31:19 jajcus Exp $"
+Normative reference:
+  - `RFC 2222 <http://www.ietf.org/rfc/rfc2222.txt>`__ 
+"""
+
+__revision__="$Id: __init__.py,v 1.9 2004/10/07 22:22:56 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import random

@@ -14,8 +14,14 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+"""Jabber Service Discovery support.
 
-__revision__="$Id: disco.py,v 1.14 2004/09/24 09:47:06 jajcus Exp $"
+Normative reference: 
+  - `JEP 30 <http://www.jabber.org/jeps/jep-0030.html>`__ 
+"""
+
+
+__revision__="$Id: disco.py,v 1.15 2004/10/07 22:22:43 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import sys

@@ -15,9 +15,13 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""Presence XMPP stanza handling"""
+"""Presence XMPP stanza handling
 
-__revision__="$Id: presence.py,v 1.25 2004/09/19 16:06:28 jajcus Exp $"
+Normative reference: 
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+"""
+
+__revision__="$Id: presence.py,v 1.26 2004/10/07 22:22:34 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2

@@ -14,9 +14,13 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-"""DIGEST-MD5 authentication mechanism for PyXMPP SASL implementation."""
+"""DIGEST-MD5 authentication mechanism for PyXMPP SASL implementation.
 
-__revision__="$Id: digest_md5.py,v 1.21 2004/10/03 20:49:05 jajcus Exp $"
+Normative reference:
+  - `RFC 2831 <http://www.ietf.org/rfc/rfc2831.txt>`__ 
+"""
+
+__revision__="$Id: digest_md5.py,v 1.22 2004/10/07 22:22:56 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 from binascii import b2a_hex
@@ -97,11 +101,11 @@ def _make_urp_hash(username,realm,passwd):
     :Parameters:
         - `username`: a username.
         - `realm`: a realm.
-        - `password`: a password.
+        - `passwd`: a password.
     :Types:
         - `username`: `str`
         - `realm`: `str`
-        - `password`: `str`
+        - `passwd`: `str`
 
     :return: the MD5 sum of the parameters joined with ':'.
     :returntype: `str`"""
@@ -171,7 +175,13 @@ _param_re=re.compile(r'^(?P<var>[^=]+)\=(?P<val>(\"(([^"\\]+)|(\\\")'
         r'|(\\\\))+\")|([^",]+))(\,(?P<rest>.*))?$')
 
 class DigestMD5ClientAuthenticator(ClientAuthenticator):
-    """Provides PLAIN SASL authentication for a client."""
+    """Provides PLAIN SASL authentication for a client.
+    
+    :Ivariables:
+        - `password`: current authentication password
+        - `pformat`: current authentication password format
+        - `realm`: current authentication realm
+    """
     
     def __init__(self,password_manager):
         """Initialize a `DigestMD5ClientAuthenticator` object.
@@ -371,7 +381,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
             - `realms`: the realm list.
             - `charset`: encoding of realms on the list.
         :Types:
-            - `realms`: `list` of `str
+            - `realms`: `list` of `str`
             - `charset`: `str`
 
         :return: the realm chosen or a failure indicator.

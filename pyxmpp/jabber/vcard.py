@@ -14,8 +14,16 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+"""Jabber vCard and MIME (RFC 2426) vCard implementation.
 
-__revision__="$Id: vcard.py,v 1.16 2004/09/10 14:01:01 jajcus Exp $"
+Normative reference: 
+  - `JEP 54 <http://www.jabber.org/jeps/jep-0054.html>`__ 
+  - `RFC 2425 <http://www.ietf.org/rfc/rfc2425.txt>`__ 
+  - `RFC 2426 <http://www.ietf.org/rfc/rfc2426.txt>`__ 
+"""
+
+
+__revision__="$Id: vcard.py,v 1.17 2004/10/07 22:22:43 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import base64

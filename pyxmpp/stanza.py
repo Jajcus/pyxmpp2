@@ -15,9 +15,13 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""General XMPP Stanza handling."""
+"""General XMPP Stanza handling.
 
-__revision__="$Id: stanza.py,v 1.22 2004/09/20 21:07:19 jajcus Exp $"
+Normative reference: 
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+"""
+
+__revision__="$Id: stanza.py,v 1.23 2004/10/07 22:22:35 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2

@@ -15,9 +15,13 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""Core XMPP stream functionality"""
+"""Generic XMPP stream implementation.
 
-__revision__="$Id: stream.py,v 1.74 2004/09/22 21:32:26 jajcus Exp $"
+Normative reference: 
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+"""
+
+__revision__="$Id: stream.py,v 1.75 2004/10/07 22:22:35 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import logging

@@ -14,8 +14,13 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+"""XMPP stream support with fallback to legacy non-SASL Jabber authentication.
 
-__revision__="$Id: clientstream.py,v 1.18 2004/09/25 15:42:26 jajcus Exp $"
+Normative reference: 
+  - `JEP 78 <http://www.jabber.org/jeps/jep-0078.html>`__ 
+"""
+
+__revision__="$Id: clientstream.py,v 1.19 2004/10/07 22:22:43 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -290,4 +295,5 @@ class LegacyClientStream(ClientStream):
             self._post_auth()
         finally:
             self.lock.release()
+
 # vi: sts=4 et sw=4

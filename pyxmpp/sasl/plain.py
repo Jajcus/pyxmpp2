@@ -14,9 +14,13 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-"""PLAIN authentication mechanism for PyXMPP SASL implementation."""
+"""PLAIN authentication mechanism for PyXMPP SASL implementation.
 
-__revision__="$Id: plain.py,v 1.12 2004/10/01 22:05:17 jajcus Exp $"
+Normative reference:
+  - `RFC 2595 <http://www.ietf.org/rfc/rfc2595.txt>`__ 
+"""
+
+__revision__="$Id: plain.py,v 1.13 2004/10/07 22:22:57 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import logging
@@ -95,7 +99,7 @@ class PlainClientAuthenticator(ClientAuthenticator):
             - `data`: `str`
             
         :return: a success indicator.
-        :returntype: `Succes`"""
+        :returntype: `Success`"""
         return Success(self.username,None,self.authzid)
 
 class PlainServerAuthenticator(ServerAuthenticator):

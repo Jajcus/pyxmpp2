@@ -15,9 +15,13 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""Handling of XMPP stanzas."""
+"""Handling of XMPP stanzas.
 
-__revision__="$Id: stanzaprocessor.py,v 1.4 2004/09/27 20:49:31 jajcus Exp $"
+Normative reference: 
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+"""
+
+__revision__="$Id: stanzaprocessor.py,v 1.5 2004/10/07 22:22:35 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2

@@ -15,9 +15,14 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""DNS resolever with SRV record support."""
+"""DNS resolever with SRV record support.
 
-__revision__="$Id: resolver.py,v 1.15 2004/09/20 21:07:19 jajcus Exp $"
+Normative reference:
+  - `RFC 1035 <http://www.ietf.org/rfc/rfc1035.txt>`__ 
+  - `RFC 2782 <http://www.ietf.org/rfc/rfc2782.txt>`__ 
+"""
+
+__revision__="$Id: resolver.py,v 1.16 2004/10/07 22:22:34 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import socket

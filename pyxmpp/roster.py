@@ -15,9 +15,13 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""XMPP-IM roster handling"""
+"""XMPP-IM roster handling.
 
-__revision__="$Id: roster.py,v 1.22 2004/09/16 19:57:26 jajcus Exp $"
+Normative reference:
+  - `RFC 3921 <http://www.ietf.org/rfc/rfc3921.txt>`__ 
+"""
+
+__revision__="$Id: roster.py,v 1.23 2004/10/07 22:22:35 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 from types import StringType,UnicodeType

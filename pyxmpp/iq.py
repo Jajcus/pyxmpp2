@@ -15,9 +15,13 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""Iq XMPP stanza handling"""
+"""Iq XMPP stanza handling
 
-__revision__="$Id: iq.py,v 1.19 2004/09/25 21:41:39 jajcus Exp $"
+Normative reference: 
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+"""
+
+__revision__="$Id: iq.py,v 1.20 2004/10/07 22:22:34 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2

@@ -15,9 +15,13 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-""" Nodeprep and resourceprep stringprep profiles."""
+"""Nodeprep and resourceprep stringprep profiles.
 
-__revision__="$Id: xmppstringprep.py,v 1.14 2004/09/14 19:57:58 jajcus Exp $"
+Normative reference: 
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+"""
+
+__revision__="$Id: xmppstringprep.py,v 1.15 2004/10/07 22:22:36 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 from types import ListType

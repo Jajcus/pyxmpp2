@@ -15,9 +15,13 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""Jabberd external component interface (jabber:component:accept)"""
+"""Jabberd external component interface (jabber:component:accept).
 
-__revision__="$Id: component.py,v 1.9 2004/09/27 20:49:39 jajcus Exp $"
+Normative reference: 
+  - `JEP 114 <http://www.jabber.org/jeps/jep-0114.html>`__ 
+"""
+
+__revision__="$Id: component.py,v 1.10 2004/10/07 22:22:50 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import threading
@@ -41,6 +45,9 @@ class Component:
     :Ivariables:
         - `jid`: component JID (should contain only the domain part).
         - `secret`: the authentication secret.
+        - `server`: server to which the commonent will connect.
+        - `port`: port number on the server to which the commonent will
+          connect.
         - `keepalive`: keepalive interval for the stream.
         - `stream`: the XMPP stream object for the active connection
           or `None` if no connection is active.
@@ -57,6 +64,8 @@ class Component:
     :Types:
         - `jid`:  `pyxmpp.JID`
         - `secret`: `unicode`
+        - `server`: `unicode`
+        - `port`: `int`
         - `keepalive`: `int`
         - `stream`: `pyxmpp.jabberd.ComponentStream`
         - `disco_items`: `pyxmpp.jabber.DiscoItems`
@@ -112,7 +121,7 @@ class Component:
         initial connection succeeds.
         
         :raise ComponentError: when some of the component properties
-        (`self.jid`, `sefl.secret`,`self.server` or `self.port`) are wrong."""
+          (`self.jid`, `self.secret`,`self.server` or `self.port`) are wrong."""
         if not self.jid or self.jid.node or self.jid.resource:
             raise ComponentError,"Cannot connect: no or bad JID given"
         if not self.secret:
@@ -156,7 +165,7 @@ class Component:
         """Get the stream of the component in a safe way.
         
         :return: Stream object for the component or `None` if no connection is
-        active.
+            active.
         :returntype: `pyxmpp.jabberd.ComponentStream`"""
         self.lock.acquire()
         stream=self.stream
@@ -218,6 +227,7 @@ class Component:
 
         :Parameters:
             - `iq`: the stanza received.
+
         Types:
             - `iq`: `pyxmpp.Iq`"""
         q=iq.get_query()
@@ -243,6 +253,7 @@ class Component:
 
         :Parameters:
             - `iq`: the stanza received.
+
         Types:
             - `iq`: `pyxmpp.Iq`"""
         q=iq.get_query()
@@ -357,7 +368,7 @@ class Component:
 
         [may be overriden in derived classes]
 
-        By default: return `self.disc_info` if no specific node name
+        By default: return `self.disco_info` if no specific node name
         is provided.
 
         :Parameters:
@@ -378,7 +389,7 @@ class Component:
 
         [may be overriden in derived classes]
 
-        By default: return `self.disc_items` if no specific node name
+        By default: return `self.disco_items` if no specific node name
         is provided.
 
         :Parameters:

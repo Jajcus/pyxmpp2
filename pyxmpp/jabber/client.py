@@ -14,8 +14,17 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+"""Basic Jabber client functionality implementation.
 
-__revision__="$Id: client.py,v 1.10 2004/09/10 14:01:01 jajcus Exp $"
+Extends `pyxmpp.client` interface with legacy authentication
+and basic Service Discovery handling.
+
+Normative reference: 
+  - `JEP 78 <http://www.jabber.org/jeps/jep-0078.html>`__ 
+  - `JEP 30 <http://www.jabber.org/jeps/jep-0030.html>`__ 
+"""
+
+__revision__="$Id: client.py,v 1.11 2004/10/07 22:22:42 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import logging

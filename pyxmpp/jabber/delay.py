@@ -15,9 +15,13 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""Delayed delivery mark (jabber:x:delay) handling"""
+"""Delayed delivery mark (jabber:x:delay) handling.
 
-__revision__="$Id: delay.py,v 1.8 2004/10/03 20:37:18 jajcus Exp $"
+Normative reference: 
+  - `JEP 91 <http://www.jabber.org/jeps/jep-0091.html>`__ 
+"""
+
+__revision__="$Id: delay.py,v 1.9 2004/10/07 22:22:43 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -108,7 +112,7 @@ class Delay:
             - `parent`: `libxml2.xmlNode`
 
         If the `parent` is not given then the element will be standalone node
-        in `pyxmpp.Stanza.common_doc` context.
+        in `pyxmpp.stanza.common_doc` context.
 
         :return: the XML element.
         :returntype: `libxml2.xmlNode`"""
@@ -157,7 +161,7 @@ def get_delays(stanza):
     :Parameters:
         - `stanza`: a, probably delayed, stanza.
     :Types:
-        - `stanza`: `pyxmpp.Stanza`
+        - `stanza`: `pyxmpp.stanza.Stanza`
 
     :return: list of delay tags sorted by the timestamp.
     :returntype: `list` of `Delay`"""
@@ -176,7 +180,7 @@ def get_delay(stanza):
     :Parameters:
         - `stanza`: a, probably delayed, stanza.
     :Types:
-        - `stanza`: `pyxmpp.Stanza`
+        - `stanza`: `pyxmpp.stanza.Stanza`
 
     The return value, if not `None`, contains a quite reliable
     timestamp of a delayed (e.g. from offline storage) message.

@@ -14,9 +14,12 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-"""Base classes for PyXMPP SASL implementation."""
+"""Base classes for PyXMPP SASL implementation.
 
-__revision__="$Id: core.py,v 1.12 2004/09/29 21:23:24 jajcus Exp $"
+Normative reference:
+  - `RFC 2222 <http://www.ietf.org/rfc/rfc2222.txt>`__ 
+"""
+__revision__="$Id: core.py,v 1.13 2004/10/07 22:22:56 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import random
@@ -327,7 +330,7 @@ class ClientAuthenticator:
             - `data`: `str`
             
         :return: success or failure indicator.
-        :returntype: `Succes` or `Failure`"""
+        :returntype: `Success` or `Failure`"""
         return Failure("Not implemented")
 
 class ServerAuthenticator:
@@ -352,8 +355,9 @@ class ServerAuthenticator:
         """Start the authentication process.
 
         :Parameters:
-            - `inital_response`: the initial response send by the client with
+            - `initial_response`: the initial response send by the client with
               the authentication request.
+
         :Types:
             - `initial_response`: `str`
 
