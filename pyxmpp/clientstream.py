@@ -113,15 +113,19 @@ class ClientStream(Stream):
 					self.sasl_authenticate(self.jid.node,self.jid.as_unicode(),
 								mechanism=method[5:].upper())
 				except (SASLMechanismNotAvailable,SASLNotAvailable),e:
-					self.debug("Skipping unavailable auth method: %s" % method)
+					self.debug("Skipping unavailable auth method: %s" % (method,) )
 					return self.try_auth()
+			elif not self.version:
+				self.auth_methods_left.pop(0)
+				self.debug("Skipping auth method %s as legacy protocol is in use" % (method,) )
+				return self.try_auth()
 			else:
 				self.features_timeout=time.time()+60
 				self.debug("Must wait for <features/>")
 				return
 		elif method not in ("plain","digest"):
 			self.debug("Skipping unknown auth method: %s" % method)
-			return try_auth()
+			return self.try_auth()
 		elif self.available_auth_methods is not None:
 			if method in self.available_auth_methods:
 				self.auth_methods_left.pop(0)
