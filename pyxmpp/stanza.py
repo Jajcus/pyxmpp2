@@ -92,7 +92,7 @@ class Stanza:
             self.xmlnode=name_or_xmlnode.docCopyNode(common_doc,1)
             common_doc.addChild(self.xmlnode)
             ns=self.xmlnode.ns()
-            if not ns.name:
+            if not ns or not ns.name:
                 xmlextra.replace_ns(self.xmlnode, ns, common_ns)
         else:
             self.xmlnode=common_doc.newChild(common_ns,name_or_xmlnode,None)

@@ -138,7 +138,8 @@ try:
         else:
             node__o = node._o
         _xmlextra.replace_ns(node__o,old_ns__o,new_ns__o)
-        _xmlextra.remove_ns(node__o,old_ns__o)
+        if old_ns__o:
+            _xmlextra.remove_ns(node__o,old_ns__o)
 
     pure_python = False
 
