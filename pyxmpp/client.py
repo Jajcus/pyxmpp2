@@ -59,6 +59,7 @@ class Client:
 		self.stream=ClientStream(self.jid,self.password,self.server,
 			self.port,self.auth_methods,self.enable_tls,self.require_tls)
 		self.stream.debug=self.debug
+		self.stream.print_exception=self.print_exception
 		self.stream.connect()
 		self.stream.post_auth=self.__post_auth
 
@@ -140,3 +141,8 @@ class Client:
 	def debug(self,str):
 		print >>sys.stderr,"DEBUG:",str
 
+	def print_exception(self):
+		for s in traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback):
+			if s[-1]=='\n':
+				s=s[:-1]
+			self.debug(s)

@@ -357,7 +357,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			self.close()
 			raise
 		except:
-			self.debug_exception()
+			self.print_exception()
 
 	def read(self):
 		if self.eof:
@@ -572,7 +572,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def debug(self,str):
 		print >>sys.stderr,"DEBUG:",str
 
-	def debug_exception(self):
+	def print_exception(self):
 		for s in traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback):
 			if s[-1]=='\n':
 				s=s[:-1]
