@@ -200,7 +200,10 @@ class CacheFetcher:
         self._object_handler = object_handler
         self._error_handler = error_handler
         self._timeout_handler = timeout_handler
-        self.timeout_time = datetime.utcnow()+timeout_period
+        if timeout_period:
+            self.timeout_time = datetime.utcnow()+timeout_period
+        else:
+            self.timeout_time = datetime.max
         self._backup_state = backup_state
         self.active = True
 
@@ -635,6 +638,14 @@ class CacheSuite:
         finally:
             self._lock.release()
 
+    def tick(self):
+        self._lock.acquire()
+        try:
+            for cache in self._caches.values():
+                cache.tick()
+        finally:
+            self._lock.release()
+
     def register_fetcher(self, object_class, fetcher_class):
         """Register a fetcher class for an object class.
 
@@ -650,7 +661,7 @@ class CacheSuite:
             cache = self._caches.get(object_class)
             if not cache:
                 cache = Cache(self.max_items, self.default_freshness_period,
-                        self.default_expiration_period, self.defaut_purge_period)
+                        self.default_expiration_period, self.default_purge_period)
                 self._caches[object_class] = cache
             cache.set_fetcher(fetcher_class)
         finally:
