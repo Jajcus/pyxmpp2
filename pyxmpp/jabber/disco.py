@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: disco.py,v 1.11 2004/09/10 14:01:01 jajcus Exp $"
+__revision__="$Id: disco.py,v 1.12 2004/09/19 17:25:41 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import sys
@@ -123,7 +123,7 @@ class DiscoItem:
         self.xmlnode.setProp("jid",jid.encode("utf-8"))
 
 class DiscoIdentity:
-    def __init__(self,disco,xmlnode_or_name,category,type=None,replace=0):
+    def __init__(self,disco,xmlnode_or_name,category=None,type=None,replace=0):
         self.disco=disco
         if disco and replace:
             old=disco.xpath_ctxt.xpathEval("d:identity")
@@ -136,6 +136,8 @@ class DiscoIdentity:
                 self.xmlnode=xmlnode_or_name.copyNode(1)
             else:
                 self.xmlnode=xmlnode_or_name
+        elif not category:
+            raise ValueError,"DiscoInfo requires category"
         else:
             if disco:
                 self.xmlnode=disco.xmlnode.newChild(disco.xmlnode.ns(),"identity",None)
@@ -265,10 +267,10 @@ class DiscoInfo:
         self.xmlnode=None
         self.xpath_ctxt=None
         if isinstance(xmlnode_or_node,libxml2.xmlNode):
-            ns=xmlnode.ns()
+            ns=xmlnode_or_node.ns()
             if ns.getContent() != DISCO_INFO_NS:
                 raise RosterError,"Bad disco-info namespace"
-            self.xmlnode=xmlnode.docCopyNode(common_doc,1)
+            self.xmlnode=xmlnode_or_node.docCopyNode(common_doc,1)
             common_root.addChild(self.xmlnode)
             self.ns=self.xmlnode.ns()
         else:
@@ -297,7 +299,7 @@ class DiscoInfo:
         for f in l:
             if f.hasProp("var"):
                 ret.append(unicode(f.prop("var"),"utf-8"))
-        return reta
+        return ret
 
     def has_feature(self,var):
         if not var:
@@ -344,7 +346,7 @@ class DiscoInfo:
         l=self.xpath_ctxt.xpathEval("d:identity")
         if l is not None:
             for i in l:
-                ret.append(DiscoIdentity(i))
+                ret.append(DiscoIdentity(self,i))
         return ret
 
     def identity_is(self,category,type=None):
