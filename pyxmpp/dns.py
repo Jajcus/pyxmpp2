@@ -17,7 +17,7 @@
 
 """A simple implementation of a part of the DNS protocol."""
 
-__revision__="$Id: dns.py,v 1.9 2004/09/15 21:23:13 jajcus Exp $"
+__revision__="$Id: dns.py,v 1.10 2004/09/18 21:33:00 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import random
@@ -224,16 +224,15 @@ class RR:
             return None,offset+rdl
         if not RR._record_types_by_code.has_key(typ):
             return None,offset+rdl
-        cls_name=classes_by_code.get(cls)
         rr_type=RR._record_types_by_code[typ]
-        rr,roffset=rr_type.parse_bin_data(name,ttl,cls,packet,offset,len)
+        rr,roffset=rr_type.parse_bin_data(name,ttl,cls,packet,offset,len(packet))
         if roffset!=offset+rdl:
             raise BadPacket,"Record length mismatch"
         return rr,roffset
     
     parse_bin=staticmethod(parse_bin)
 
-    def parse_bin_data(name,ttl,cls,packet,offset,len):
+    def parse_bin_data(name,ttl,cls,packet,offset,length):
         """Parse binary representation of the RR data.
 
         :Parameters:
@@ -278,7 +277,7 @@ class RR_A(RR):
         ip1,ip2,ip3,ip4=self.ip.split(".")
         return struct.pack("!BBBB",int(ip1),int(ip2),int(ip3),int(ip4))
 
-    def parse_bin_data(name,ttl,cls,packet,offset,len):
+    def parse_bin_data(name,ttl,cls,packet,offset,length):
         ""
         if offset+4>len(packet):
             raise DataTruncated
@@ -304,7 +303,7 @@ class RR_NS(RR):
     def bin_format_data(self):
         return domain_str2bin(self.target)
 
-    def parse_bin_data(name,ttl,cls,packet,offset,len):
+    def parse_bin_data(name,ttl,cls,packet,offset,length):
         target,offset=domain_bin2str(packet,offset)
         return RR_CNAME(name,ttl,cls,target),offset
         
@@ -325,7 +324,7 @@ class RR_CNAME(RR):
     def bin_format_data(self):
         return domain_str2bin(self.target)
 
-    def parse_bin_data(name,ttl,cls,packet,offset,len):
+    def parse_bin_data(name,ttl,cls,packet,offset,length):
         target,offset=domain_bin2str(packet,offset)
         return RR_CNAME(name,ttl,cls,target),offset
         
@@ -356,7 +355,7 @@ class RR_SOA(RR):
                 +struct.pack("!IIIII",self.serial,self.refresh,self.retry,
                 self.expire,self.minimum))
 
-    def parse_bin_data(name,ttl,cls,packet,offset,len):
+    def parse_bin_data(name,ttl,cls,packet,offset,length):
         pri_master,offset=domain_bin2str(packet,offset)
         mailbox,offset=domain_bin2str(packet,offset)
         if offset+20>len(packet):
@@ -444,7 +443,7 @@ class RR_SRV(RR):
     def __ge__(self,other):
         return not self.__lt__(other)
 
-    def parse_bin_data(name,ttl,cls,packet,offset,len):
+    def parse_bin_data(name,ttl,cls,packet,offset,length):
         if offset+7>len(packet):
             raise DataTruncated
         priority,weight,port=struct.unpack("!HHH",packet[offset:offset+6])
@@ -460,12 +459,12 @@ _add_query_type("AXFR",252)
 
 
 class Message:
-    def __init__(self,id,qr,opcode=0,aa=0,tc=0,rd=0,ra=0,rcode=0,
+    def __init__(self,msg_id,qr,opcode=0,aa=0,tc=0,rd=0,ra=0,rcode=0,
             questions=None,answers=None,authorities=None,additionals=None):
-        if id is None:
+        if msg_id is None:
             self.id=random.randrange(0,65536)
         else:
-            self.id=id
+            self.id=msg_id
         self.qr=qr
         self.opcode=opcode
         self.aa=aa
@@ -507,8 +506,8 @@ class Message:
             ret+=" RA"
         ret+=" rcode: "+`self.rcode`
         ret+="\n  Question section:\n"
-        for name,type,cls in self.questions:
-            ret+="    %20s %s %s\n" % (name,cls,type)
+        for name,qtype,cls in self.questions:
+            ret+="    %20s %s %s\n" % (name,cls,qtype)
         if not self.qr:
             return ret
         ret+="  Answer section:\n"
@@ -531,10 +530,10 @@ class Message:
     def bin_format(self,maxsize=512):
         payload=""
         qdcount=0
-        for name,type,cls in self.questions:
-            type=query_types_by_name[type]
+        for name,qtype,cls in self.questions:
+            qtype=query_types_by_name[qtype]
             cls=classes_by_name[cls]
-            data=domain_str2bin(name)+struct.pack("!HH",type,cls)
+            data=domain_str2bin(name)+struct.pack("!HH",qtype,cls)
             if maxsize and len(data)+len(payload)+12>maxsize:
                 self.tc=1
                 break
@@ -592,7 +591,8 @@ def parse_question(packet,offset):
 def parse_message(packet):
     if len(packet)<12:
         raise DataTruncated
-    id,flags,qdcount,ancount,nscount,arcount=struct.unpack("!HHHHHH",packet[:12])
+    msg_id,flags,qdcount,ancount,nscount,arcount=struct.unpack(
+            "!HHHHHH",packet[:12])
     qr=(flags&0x8000)==0x8000
     opcode=flags&0x7800>>11;
     aa=(flags&0x0400)==0x0400;
@@ -629,6 +629,7 @@ def parse_message(packet):
         if not tc:
             raise
 
-    return Message(id,qr,opcode,aa,tc,rd,ra,rcode,questions,answers,authorities,additionals)
+    return Message(msg_id,qr,opcode,aa,tc,rd,ra,rcode,
+            questions,answers,authorities,additionals)
 
 # vi: sts=4 et sw=4
