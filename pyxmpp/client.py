@@ -69,6 +69,7 @@ class Client:
 				self.port,self.auth_methods,self.enable_tls,self.require_tls)
 			stream.debug=self.debug
 			stream.print_exception=self.print_exception
+			self.stream_created(stream)
 			stream.connect()
 			stream.post_auth=self.__post_auth
 			stream.post_disconnect=self.__post_disconnect
@@ -184,11 +185,14 @@ class Client:
 	
 	def __post_disconnect(self):
 		self.state_changed.acquire()
-		if self.stream:
-			self.stream.close()
-		self.stream=None
-		self.state_changed.notify()
-		self.state_changed.release()
+		try:
+			if self.stream:
+				self.stream.close()
+			self.stream_closed(self.stream)
+			self.stream=None
+			self.state_changed.notify()
+		finally:
+			self.state_changed.release()
 		self.disconnected()
 
 	def __disco_info(self,iq):
@@ -212,6 +216,12 @@ class Client:
 		stream=self.get_stream()
 		if stream:
 			stream.idle()
+
+	def stream_created(self,stream):
+		pass
+
+	def stream_closed(self,stream):
+		pass
 
 	def session_started(self):
 		p=Presence()
