@@ -87,12 +87,16 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 			self.pformat=None
 		self.nonce_count=0
 		self.response_auth=None
+		self.rspauth_checked=0
 		return Response()
 
 	def challenge(self,challenge):
 		if not challenge:
 			self.debug("Empty challenge")
 			return Failure("bad-challenge")
+
+		if self.response_auth:
+			return self.final_challenge(challenge)
 	
 		realms=[]
 		nonce=None
@@ -224,21 +228,17 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 	
 		return Response(string.join(params,","))
 
-	def finish(self,data):
-		if not data:
-			self.debug("Success extra data missing")
-			return Failure("bad-success")
-		if not self.response_auth:
-			self.debug("Got success too early")
-			return Failure("bad-success")
-
+	def final_challenge(self,challenge):
+		if self.rspauth_checked:
+			return Failure("extra-challenge")
+	
 		rspauth=None
-		while data:
-			m=param_re.match(data)
+		while challenge:
+			m=param_re.match(challenge)
 			if not m:
-				self.debug("Challenge syntax error: %r" % (data,))
+				self.debug("Challenge syntax error: %r" % (challenge,))
 				return Failure("bad-challenge")
-			data=m.group("rest")
+			challenge=m.group("rest")
 			var=m.group("var")
 			val=m.group("val")
 			self.debug("%r: %r" % (var,val))
@@ -246,13 +246,24 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 				rspauth=val
 		
 		if not rspauth:
-			self.debug("Success data without rspauth")
+			self.debug("Final challenge without rspauth")
 			return Failure("bad-success")
 
 		if rspauth==self.response_auth:
-			return Success(self.authzid)
+			self.rspauth_checked=1
+			return Response("")
 		else:
 			self.debug("Wrong rspauth value - peer is cheating?")
+			return Failure("bad-success")
+
+	def finish(self,data):
+		if self.rspauth_checked:
+			return Success(self.authzid)
+		else:
+			self.final_challenge(data)
+
+		if not self.response_auth:
+			self.debug("Got success too early")
 			return Failure("bad-success")
 
 class DigestMD5ServerAuthenticator(ServerAuthenticator):
@@ -273,9 +284,13 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 		params.append('qop="auth"')
 		params.append('charset=utf-8')
 		params.append('algorithm=md5-sess')
+		self.authzid=None
 		return Challenge(string.join(params,","))	
 		
 	def response(self,response):
+		if self.authzid is not None:
+			return Success(self.authzid)
+	
 		if not response:
 			return Failure("not-authorized")
 	
@@ -389,7 +404,8 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 		if self.password_manager.check_authzid(authzid_uq,info):
 			rspauth=compute_response_auth(username,realm,urp_hash,self.nonce,
 							cnonce,nonce_count,authzid,digest_uri)
-			return Success(authzid,"rspauth="+rspauth)
+			self.authzid=authzid
+			return Challenge("rspauth="+rspauth)
 		else:
 			self.debug("Authzid check failed")
 			return Failure("not-authorized")
