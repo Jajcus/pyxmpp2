@@ -189,15 +189,25 @@ def resolve_srv(domain,service,proto="tcp"):
 		r=query(name,"SRV")
 		if not r:
 			continue
-		return [(rr.target,rr.port) for rr in reorder_srv(r)]
+		if r and r[0].type=="CNAME":
+			cname=r[0].target
+			r=query(cname)
+		return [(rr.target,rr.port) for rr in reorder_srv(r) if rr.type=="SRV"]
 	return None
 
 def getaddrinfo(host,port):
 	ret=[]
 	r=query(host,"A")
+	if r and r[0].type=="CNAME":
+		cname=r[0].target
+		r=query(cname)
+	else:
+		cname=host
 	for rr in r:
+		if rr.type!="A":
+			continue
 		ret.append((socket.AF_INET,socket.SOCK_STREAM,
-				socket.getprotobyname("tcp"),host,(rr.ip,port)))
+				socket.getprotobyname("tcp"),cname,(rr.ip,port)))
 	return ret	
 
 load_resolv_conf()
