@@ -26,7 +26,7 @@ __docformat__="restructuredtext en"
 
 import libxml2
 
-from pyxmpp.utils import get_node_ns_uri
+from pyxmpp.xmlextra import get_node_ns_uri
 from pyxmpp.stanza import Stanza,StanzaError,gen_id
 
 class Iq(Stanza):

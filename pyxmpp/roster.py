@@ -26,11 +26,11 @@ __docformat__="restructuredtext en"
 
 import libxml2
 
-from pyxmpp.xmlextra import common_doc
+from pyxmpp.xmlextra import common_doc, get_node_ns_uri
 from pyxmpp.iq import Iq
 from pyxmpp.jid import JID
 
-from pyxmpp.utils import to_utf8,from_utf8,get_node_ns_uri
+from pyxmpp.utils import to_utf8,from_utf8
 from pyxmpp.objects import StanzaPayloadObject
 
 ROSTER_NS="jabber:iq:roster"
