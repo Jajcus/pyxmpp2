@@ -7,7 +7,7 @@ import traceback
 import socket
 import logging
 
-from pyxmpp import ClientStream,JID,Iq,Presence,Message,StreamError
+from pyxmpp.all import ClientStream,JID,Iq,Presence,Message,StreamError
 
 accounts={
         u'test': '123',
