@@ -1,4 +1,15 @@
+general:
 - better error handling
 - documentation
+
+
+xmpp-base:
 - full StartTLS support
-- jabber:component streams support
+- jabber:server stream support
+
+xmpp-im:
+- roster management
+- privacy lists
+
+other:
+- jabber:component stream support
