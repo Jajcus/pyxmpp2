@@ -1,6 +1,8 @@
 general:
 - better error handling
 - documentation
+- use Python 2.3 features for IDN, stringprep and Unicode normalization 
+  (drop python 2.2 support?)
 
 xmpp-base:
 - jabber:server stream support (including diallback)
