@@ -105,7 +105,7 @@ class ErrorNode:
 						break
 					ns=None
 				
-				if ns==ns1:
+				if ns==None:
 					raise ErrorNodeError,"Bad error namespace"
 			self.ns=ns
 			
@@ -123,7 +123,7 @@ class ErrorNode:
 		elif isinstance(node_or_cond,ErrorNode):
 			if not copy:
 				raise ErrorNodeError,"ErrorNodes may only be copied"
-			self.ns=node_or_cond.ns
+			self.ns=node_or_cond.ns.getContent()
 			self.node=node_or_cond.node.docCopyNode(common_doc,1)
 			common_doc.addChild(self.node)
 		elif ns is None:
@@ -137,7 +137,7 @@ class ErrorNode:
 			cond=self.node.newChild(None,to_utf8(node_or_cond),None)
 			ns=cond.newNs(ns,None)
 			cond.setNs(ns)
-			self.ns=ns
+			self.ns=ns.getContent()
 		
 	def __del__(self):
 		if self.node:
@@ -169,10 +169,10 @@ class ErrorNode:
 		return ret
 
 	def get_condition(self):
-		c=self.xpath_eval("ns:*",{'ns':self.ns.getContent()})
+		c=self.xpath_eval("ns:*",{'ns':self.ns})
 		if not c:
 			self.upgrade()
-			c=self.xpath_eval("ns:*",{'ns':self.ns.getContent()})
+			c=self.xpath_eval("ns:*",{'ns':self.ns})
 		if not c:
 			return None
 		return c[0]
@@ -193,7 +193,8 @@ class ErrorNode:
 				code=None
 		
 		if code and legacy_codes.has_key(code):
-			cond,typ=legacy_codes[code]
+			cond=legacy_codes[code]
+			typ,x=stanza_errors[cond]
 		else:
 			cond=None
 			typ="cancel"
