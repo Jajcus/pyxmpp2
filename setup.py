@@ -20,10 +20,22 @@ setup(
     #-- Package description
     name =      'pyxmpp',
     version =   version,
-    description =   'XMPP implementation for Python',
+    description =   'XMPP/Jabber implementation for Python',
     author =    'Jacek Konieczny',
     author_email =  'jajcus@bnet.pl',
     url =       'http://pyxmpp.jabberstudio.org/',
+    classifiers = [
+            "Development Status :: 4 - Beta",
+            "Intended Audience :: Developers",
+            "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
+            "Operating System :: POSIX",
+            "Programming Language :: Python",
+            "Programming Language :: C",
+            "Topic :: Communications",
+            "Topic :: Communications :: Chat",
+            "Topic :: Internet",
+            "Topic :: Software Development :: Libraries :: Python Modules",
+        ],
     license =   'LGPL',
     ext_modules = [
         Extension(
