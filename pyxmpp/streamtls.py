@@ -149,19 +149,20 @@ class StreamTLSMixIn:
         """Read data pending on the stream socket and pass it to the parser."""
         if self.eof:
             return
-        try:
+        while True:
             try:
-                r=self.socket.read()
-            except TypeError:
-                # workarund for M2Crypto 0.13.1 'feature'
-                r=self.socket.read(self.socket)
-            if r is None:
+                try:
+                    r=self.socket.read()
+                except TypeError:
+                    # workarund for M2Crypto 0.13.1 'feature'
+                    r=self.socket.read(self.socket)
+                if r is None:
+                    return
+            except socket.error,e:
+                if e.args[0]!=errno.EINTR:
+                    raise
                 return
-        except socket.error,e:
-            if e.args[0]!=errno.EINTR:
-                raise
-            return
-        self._feed_reader(r)
+            self._feed_reader(r)
 
     def _read(self):
         """Read data pending on the stream socket and pass it to the parser."""
