@@ -1,5 +1,8 @@
 2004-05-09  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/jabber/disco.py:
+	- DiscoItem constructor fixed
+
 	* pyxmpp/rfc3454.py:
 	- case mapping (B.2 table) fixed in stringprep profiles
 
