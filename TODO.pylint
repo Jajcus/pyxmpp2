@@ -4,8 +4,8 @@ fi
 umask 022 ; python setup.py build
 running build
 running build_py
-copying pyxmpp/error.py -> build/lib.linux-i686-2.3/pyxmpp
 copying pyxmpp/version.py -> build/lib.linux-i686-2.3/pyxmpp
+copying pyxmpp/jabberd/component.py -> build/lib.linux-i686-2.3/pyxmpp/jabberd
 running build_ext
 cd examples ; rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp .
 cd examples ; chmod a+x *.py
@@ -93,45 +93,12 @@ ignore that: W0201:106:StreamTLSMixIn._reset_tls: Attribute 'tls' defined outsid
 ignore that: W0201:247:StreamTLSMixIn._process_tls_node: Attribute 'socket' defined outside __init__
 ignore that: W0201:107:StreamTLSMixIn._reset_tls: Attribute 'tls_requested' defined outside __init__
 ignore that: W0201:220:StreamTLSMixIn._request_tls: Attribute 'features' defined outside __init__
-************* Module pyxmpp.error
-W0141:223:ErrorNode.__from_node: Missing docstring
 ************* Module pyxmpp.version
 W0141:  0: Missing docstring
 W0103:  0: Missing required attribute "__revision__"
 W0103:  0: Missing required attribute "__docformat__"
 ************* Module pyxmpp.jabberd
 W0141:  0: Missing docstring
-************* Module pyxmpp.jabberd.component
-W0141:  0: Missing docstring
-W0141: 32:ComponentError: Missing docstring
-W0141: 35:FatalComponentError: Missing docstring
-W0141: 38:Component: Missing docstring
-W0622: 39:Component.__init__: Redefining built-in 'type'
-W0141: 58:Component.connect: Missing docstring
-E0602: 60:Component.connect: Undefined variable 'ClientError'
-W0141: 98:Component.get_stream: Missing docstring
-W0141:104:Component.disconnect: Missing docstring
-W0141:109:Component.socket: Missing docstring
-W0141:112:Component.loop: Missing docstring
-W0141:117:Component.__stream_state_change: Missing docstring
-W0141:137:Component.__disco_info: Missing docstring
-W0141:156:Component.__disco_items: Missing docstring
-W0141:176:Component.idle: Missing docstring
-W0141:181:Component.stream_created: Missing docstring
-W0141:184:Component.stream_closed: Missing docstring
-W0141:187:Component.stream_error: Missing docstring
-W0141:191:Component.stream_state_changed: Missing docstring
-W0141:194:Component.connected: Missing docstring
-W0141:197:Component.authenticated: Missing docstring
-W0141:204:Component.authorized: Missing docstring
-W0141:207:Component.disco_get_info: Missing docstring
-W0141:215:Component.disco_get_items: Missing docstring
-W0141:223:Component.disconnected: Missing docstring
-W0201: 94:Component.connect: Attribute 'disco_identity' defined outside __init__
-W0611: 21: Unused import libxml2
-W0611: 28: Unused import to_utf8
-W0611: 22: Unused import sys
-W0611: 24: Unused import traceback
 ************* Module pyxmpp.jabberd.componentstream
 W0141:  0: Missing docstring
 W0141: 36:ComponentStreamError: Missing docstring
@@ -566,17 +533,17 @@ W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 Report
 ======
-5947 statements analysed.
+5943 statements analysed.
 
 Statistics by type
 ------------------
 
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-module   37     0          +37        64.86       0.00     
-class    116    0          +116       62.07       0.00     
+module   37     37         =          67.57       0.00     
+class    115    116        -1         64.35       0.00     
 method   0      0          =          0.00        0.00     
-function 631    0          +631       75.12       0.63     
+function 631    631        =          78.29       0.63     
 
 
 Raw metrics
@@ -584,41 +551,40 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6521   61.92 0        +6521      
-docstring 2856   27.12 0        +2856      
-comment   583    5.54  0        +583       
-empty     571    5.42  0        +571       
+code      6515   60.62 6521     -6         
+docstring 3055   28.43 2871     +184       
+comment   583    5.42  583      =          
+empty     594    5.53  572      +22        
 
 
 External dependencies
 ---------------------
 ::
 
-    weakref (pyxmpp.jid,pyxmpp.jabber.muc)
+    stringprep (pyxmpp.xmppstringprep)
     pyxmpp 
-      \-core (pyxmpp.sasl)
-      \-digest_md5 (pyxmpp.sasl)
       \-plain (pyxmpp.sasl)
+      \-digest_md5 (pyxmpp.sasl)
+      \-core (pyxmpp.sasl)
     base64 (pyxmpp.streamsasl,pyxmpp.jabber.vcard)
     logging (pyxmpp.streamsasl,pyxmpp.streambase,pyxmpp.clientstream,pyxmpp.client,pyxmpp.stream,pyxmpp.streamtls,pyxmpp.stanzaprocessor,pyxmpp.jabberd.component,pyxmpp.jabberd.componentstream,pyxmpp.sasl.plain,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.client)
-    string (pyxmpp.sasl,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
-    traceback (pyxmpp.jabberd.component)
-    libxml2 (pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.utils,pyxmpp.stanza,pyxmpp.message,pyxmpp.stanzaprocessor,pyxmpp.iq,pyxmpp.error,pyxmpp.jabberd.component,pyxmpp.jabberd.componentstream,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
-    random (pyxmpp.dns,pyxmpp.streambase,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.sasl,pyxmpp.sasl.core)
-    encodings 
-      \-idna (pyxmpp.jid,pyxmpp.dns)
-    stringprep (pyxmpp.xmppstringprep)
+    socket (pyxmpp.streambase,pyxmpp.resolver,pyxmpp.streamtls)
     re (pyxmpp.jid,pyxmpp.utils,pyxmpp.resolver,pyxmpp.sasl.digest_md5,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    libxml2 (pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.utils,pyxmpp.stanza,pyxmpp.message,pyxmpp.stanzaprocessor,pyxmpp.iq,pyxmpp.error,pyxmpp.jabberd.componentstream,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    random (pyxmpp.dns,pyxmpp.streambase,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.sasl,pyxmpp.sasl.core)
+    weakref (pyxmpp.jid,pyxmpp.jabber.muc)
+    threading (pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.client,pyxmpp.expdict,pyxmpp.stanzaprocessor,pyxmpp.jabberd.component)
     M2Crypto 
       \-X509 (pyxmpp.streamtls)
       \-SSL (pyxmpp.streamtls)
       | \-cb (pyxmpp.streamtls)
       | \-Context (pyxmpp.streamtls)
       \-m2 (pyxmpp.streamtls)
-    threading (pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.client,pyxmpp.expdict,pyxmpp.stanzaprocessor,pyxmpp.jabberd.component)
+    encodings 
+      \-idna (pyxmpp.jid,pyxmpp.dns)
     os (pyxmpp.streambase)
     types (pyxmpp.xmppstringprep,pyxmpp.roster,pyxmpp.jid,pyxmpp.dns,pyxmpp.streambase,pyxmpp.utils,pyxmpp.error,pyxmpp.jabberd.componentstream,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
-    socket (pyxmpp.streambase,pyxmpp.resolver,pyxmpp.streamtls)
+    string (pyxmpp.sasl,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
 
 
 
@@ -627,18 +593,18 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0141      214        
-W0201      67         
+W0141      190        
+W0201      66         
 W0613      45         
-W0611      45         
+W0611      41         
 E0201      37         
-E0602      19         
 W0102      18         
+E0602      18         
 W0311      8          
 W0221      8          
 W0133      8          
 W0612      7          
-W0622      6          
+W0622      5          
 W0511      5          
 W0403      5          
 W0232      4          
@@ -660,8 +626,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 468    0        +468       
-errors   56     0        +56        
+warnings 438    467      -29        
+errors   55     56       -1         
 
 
 % errors / warnings by module
@@ -669,36 +635,34 @@ errors   56     0        +56
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            26.79 18.16   
-pyxmpp.jid                     23.21 0.21    
-pyxmpp.jabber.muc              16.07 8.33    
-pyxmpp.sasl.core               10.71 8.33    
-pyxmpp.jabber.disco            7.14  8.33    
-pyxmpp.jabber.client           5.36  3.21    
-pyxmpp.jabber.clientstream     3.57  8.97    
-pyxmpp.jabber.delay            3.57  2.56    
-pyxmpp.sasl.digest_md5         1.79  11.75   
-pyxmpp.jabberd.component       1.79  6.20    
-pyxmpp.jabberd.componentstream 0.00  6.20    
-pyxmpp.streambase              0.00  4.70    
-pyxmpp.sasl.plain              0.00  2.78    
-pyxmpp.sasl                    0.00  1.92    
-pyxmpp.dns                     0.00  1.71    
-pyxmpp.streamsasl              0.00  1.50    
-pyxmpp.clientstream            0.00  1.50    
-pyxmpp.streamtls               0.00  0.85    
-pyxmpp.xmlextra                0.00  0.64    
-pyxmpp.version                 0.00  0.64    
-pyxmpp._xmlextra               0.00  0.43    
-pyxmpp.xmppstringprep          0.00  0.21    
-pyxmpp.resolver                0.00  0.21    
-pyxmpp.jabberd                 0.00  0.21    
-pyxmpp.error                   0.00  0.21    
-pyxmpp.client                  0.00  0.21    
+pyxmpp.jabber.vcard            27.27 19.41   
+pyxmpp.jid                     23.64 0.23    
+pyxmpp.jabber.muc              16.36 8.90    
+pyxmpp.sasl.core               10.91 8.90    
+pyxmpp.jabber.disco            7.27  8.90    
+pyxmpp.jabber.client           5.45  3.42    
+pyxmpp.jabber.clientstream     3.64  9.59    
+pyxmpp.jabber.delay            3.64  2.74    
+pyxmpp.sasl.digest_md5         1.82  12.56   
+pyxmpp.jabberd.componentstream 0.00  6.62    
+pyxmpp.streambase              0.00  5.02    
+pyxmpp.sasl.plain              0.00  2.97    
+pyxmpp.sasl                    0.00  2.05    
+pyxmpp.dns                     0.00  1.83    
+pyxmpp.streamsasl              0.00  1.60    
+pyxmpp.clientstream            0.00  1.60    
+pyxmpp.streamtls               0.00  0.91    
+pyxmpp.xmlextra                0.00  0.68    
+pyxmpp.version                 0.00  0.68    
+pyxmpp._xmlextra               0.00  0.46    
+pyxmpp.xmppstringprep          0.00  0.23    
+pyxmpp.resolver                0.00  0.23    
+pyxmpp.jabberd                 0.00  0.23    
+pyxmpp.client                  0.00  0.23    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 8.74/10
+Your code has been rated at 8.80/10 (previous run: 8.74/10)
 That's pretty good. Good work mate.
 

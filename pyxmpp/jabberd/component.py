@@ -15,29 +15,78 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: component.py,v 1.8 2004/09/10 14:01:10 jajcus Exp $"
+"""Jabberd external component interface (jabber:component:accept)"""
+
+__revision__="$Id: component.py,v 1.9 2004/09/27 20:49:39 jajcus Exp $"
 __docformat__="restructuredtext en"
 
-import libxml2
-import sys
 import threading
-import traceback
 import logging
 
 from pyxmpp.jabberd.componentstream import ComponentStream
-from pyxmpp.utils import to_utf8,from_utf8
+from pyxmpp.utils import from_utf8
 from pyxmpp.jabber import DiscoItems,DiscoInfo,DiscoIdentity
 from pyxmpp.stanza import Stanza
 
-class ComponentError(StandardError):
-    pass
-
-class FatalComponentError(ComponentError):
+class ComponentError(Exception):
+    """Raised on component error."""
     pass
 
 class Component:
+    """Jabber external component ("jabber:component:accept" protocol) interface
+    implementation.
+
+    Override this class to build your components.
+    
+    :Ivariables:
+        - `jid`: component JID (should contain only the domain part).
+        - `secret`: the authentication secret.
+        - `keepalive`: keepalive interval for the stream.
+        - `stream`: the XMPP stream object for the active connection
+          or `None` if no connection is active.
+        - `disco_items`: disco items announced by the component. Created
+          when a stream is connected.
+        - `disco_info`: disco info announced by the component. Created
+          when a stream is connected.
+        - `disco_identity`: disco identity (part of disco info) announced by
+          the component. Created when a stream is connected.
+        - `disco_category`: disco category to be used to create
+          `disco_identity`.
+        - `disco_type`: disco type to be used to create `disco_identity`.
+
+    :Types:
+        - `jid`:  `pyxmpp.JID`
+        - `secret`: `unicode`
+        - `keepalive`: `int`
+        - `stream`: `pyxmpp.jabberd.ComponentStream`
+        - `disco_items`: `pyxmpp.jabber.DiscoItems`
+        - `disco_info`: `pyxmpp.jabber.DiscoInfo`
+        - `disco_identity`: `pyxmpp.jabber.DiscoIdentity`
+        - `disco_category`: `str`
+        - `disco_type`: `str`"""
     def __init__(self,jid=None,secret=None,server=None,port=5347,
-            category="x-service",type="x-unknown",keepalive=0):
+            disco_category="x-service",disco_type="x-unknown",keepalive=0):
+        """Initialize a `Component` object.
+
+        :Ivariables:
+            - `jid`: component JID (should contain only the domain part).
+            - `secret`: the authentication secret.
+            - `server`: server name or address the component should connect.
+            - `port`: port number on the server where the component should connect.
+            - `disco_category`: disco item category to be used in the
+              component's 'disco info' responses.
+            - `disco_category`: disco item type to be used in the component's
+              'disco info' responses.
+            - `keepalive`: keepalive interval for the stream.
+
+        :Types:
+            - `jid`:  `pyxmpp.JID`
+            - `secret`: `unicode`
+            - `server`: `str` or `unicode`
+            - `port`: `int`
+            - `disco_category`: `str`
+            - `disco_type`: `str`
+            - `keepalive`: `int`"""
         self.jid=jid
         self.secret=secret
         self.server=server
@@ -49,21 +98,29 @@ class Component:
         self.stream_class=ComponentStream
         self.disco_items=None
         self.disco_info=None
-        self.category=category
-        self.type=type
+        self.disco_identity=None
+        self.disco_category=disco_category
+        self.disco_type=disco_type
         self.__logger=logging.getLogger("pyxmpp.jabberd.Component")
 
 # public methods
 
     def connect(self):
+        """Establish a connection with the server.
+
+        Set `self.stream` to the `pyxmpp.jabberd.ComponentStream` when
+        initial connection succeeds.
+        
+        :raise ComponentError: when some of the component properties
+        (`self.jid`, `sefl.secret`,`self.server` or `self.port`) are wrong."""
         if not self.jid or self.jid.node or self.jid.resource:
-            raise ClientError,"Cannot connect: no or bad JID given"
+            raise ComponentError,"Cannot connect: no or bad JID given"
         if not self.secret:
-            raise ClientError,"Cannot connect: no secret given"
+            raise ComponentError,"Cannot connect: no secret given"
         if not self.server:
-            raise ClientError,"Cannot connect: no server given"
+            raise ComponentError,"Cannot connect: no server given"
         if not self.port:
-            raise ClientError,"Cannot connect: no port given"
+            raise ComponentError,"Cannot connect: no port given"
 
         self.lock.acquire()
         try:
@@ -93,28 +150,50 @@ class Component:
         self.disco_info=DiscoInfo()
         self.disco_identity=DiscoIdentity(self.disco_info,
                             "PyXMPP based jabberd component",
-                            self.category,self.type)
+                            self.disco_category,self.disco_type)
 
     def get_stream(self):
+        """Get the stream of the component in a safe way.
+        
+        :return: Stream object for the component or `None` if no connection is
+        active.
+        :returntype: `pyxmpp.jabberd.ComponentStream`"""
         self.lock.acquire()
         stream=self.stream
         self.lock.release()
         return stream
 
     def disconnect(self):
+        """Disconnect from the server."""
         stream=self.get_stream()
         if stream:
             stream.disconnect()
 
     def socket(self):
+        """Get the socket of the connection to the server.
+        
+        :return: the socket.
+        :returntype: `socket.socket`"""
         return self.stream.socket
 
     def loop(self,timeout=1):
-        self.stream.loop(timeout)
+        """Simple 'main loop' for a component.
 
+        This usually will be replaced by something more sophisticated. E.g.
+        handling of other input sources."""
+        self.stream.loop(timeout)
 
 # private methods
     def __stream_state_change(self,state,arg):
+        """Handle various stream state changes and call right
+        methods of `self`.
+
+        :Parameters:
+            - `state`: state name.
+            - `arg`: state parameter.
+        :Types:
+            - `state`: `string`
+            - `arg`: any object"""
         self.stream_state_changed(state,arg)
         if state=="fully connected":
             self.connected()
@@ -135,6 +214,12 @@ class Component:
             self.disconnected()
 
     def __disco_info(self,iq):
+        """Handle a disco-info query.
+
+        :Parameters:
+            - `iq`: the stanza received.
+        Types:
+            - `iq`: `pyxmpp.Iq`"""
         q=iq.get_query()
         if q.hasProp("node"):
             node=from_utf8(q.prop("node"))
@@ -154,6 +239,12 @@ class Component:
         self.stream.send(resp)
 
     def __disco_items(self,iq):
+        """Handle a disco-items query.
+
+        :Parameters:
+            - `iq`: the stanza received.
+        Types:
+            - `iq`: `pyxmpp.Iq`"""
         q=iq.get_query()
         if q.hasProp("node"):
             node=from_utf8(q.prop("node"))
@@ -174,27 +265,83 @@ class Component:
 
 # Method to override
     def idle(self):
+        """Do some "housekeeping" work like <iq/> result expiration. Should be
+        called on a regular basis, usually when the component is idle."""
         stream=self.get_stream()
         if stream:
             stream.idle()
 
     def stream_created(self,stream):
+        """Handle stream creation event.
+
+        [may be overriden in derived classes]
+        
+        By default: do nothing.
+        
+        :Parameters:
+            - `stream`: the stream just created.
+        :Types:
+            - `stream`: `pyxmpp.jabberd.ComponentStream`"""
         pass
 
     def stream_closed(self,stream):
+        """Handle stream closure event.
+
+        [may be overriden in derived classes]
+        
+        By default: do nothing.
+        
+        :Parameters:
+            - `stream`: the stream just created.
+        :Types:
+            - `stream`: `pyxmpp.jabberd.ComponentStream`"""
         pass
 
     def stream_error(self,err):
+        """Handle a stream error received.
+
+        [may be overriden in derived classes]
+
+        By default: just log it. The stream will be closed anyway.
+        
+        :Parameters:
+            - `err`: the error element received.
+        :Types:
+            - `err`: `pyxmpp.error.StreamErrorNode`"""
         self.__logger.debug("Stream error: condition: %s %r"
                 % (err.get_condition().name,err.serialize()))
 
     def stream_state_changed(self,state,arg):
+        """Handle a stream state change.
+
+        [may be overriden in derived classes]
+        
+        By default: do nothing.
+        
+        :Parameters:
+            - `state`: state name.
+            - `arg`: state parameter.
+        :Types:
+            - `state`: `string`
+            - `arg`: any object"""
         pass
 
     def connected(self):
+        """Handle stream connection event.
+
+        [may be overriden in derived classes]
+        
+        By default: do nothing."""
         pass
 
     def authenticated(self):
+        """Handle successful authentication event.
+
+        A good place to register stanza handlers and disco features.
+        
+        [should be overriden in derived classes]
+
+        By default: set disco#info and disco#items handlers."""
         self.__logger.debug("Setting up Disco handlers...")
         self.stream.set_iq_get_handler("query","http://jabber.org/protocol/disco#items",
                                     self.__disco_items)
@@ -202,9 +349,23 @@ class Component:
                                     self.__disco_info)
 
     def authorized(self):
+        """Handle successful authorization event."""
         pass
 
     def disco_get_info(self,node,iq):
+        """Get disco#info data for a node.
+
+        [may be overriden in derived classes]
+
+        By default: return `self.disc_info` if no specific node name
+        is provided.
+
+        :Parameters:
+            - `node`: name of the node queried.
+            - `iq`: the stanza received.
+        :Types:
+            - `node`: `unicode`
+            - `iq`: `pyxmpp.Iq`"""
         to=iq.get_to()
         if to and to!=self.jid:
             return iq.make_error_response("recipient-unavailable")
@@ -213,6 +374,19 @@ class Component:
         return None
 
     def disco_get_items(self,node,iq):
+        """Get disco#items data for a node.
+
+        [may be overriden in derived classes]
+
+        By default: return `self.disc_items` if no specific node name
+        is provided.
+
+        :Parameters:
+            - `node`: name of the node queried.
+            - `iq`: the stanza received.
+        :Types:
+            - `node`: `unicode`
+            - `iq`: `pyxmpp.Iq`"""
         to=iq.get_to()
         if to and to!=self.jid:
             return iq.make_error_response("recipient-unavailable")
@@ -221,6 +395,11 @@ class Component:
         return None
 
     def disconnected(self):
+        """Handle stream disconnection (connection closed by peer) event.
+
+        [may be overriden in derived classes]
+        
+        By default: do nothing."""
         pass
 
 # vi: sts=4 et sw=4

@@ -17,7 +17,7 @@
 
 """Handling of XMPP stanzas."""
 
-__revision__="$Id: stanzaprocessor.py,v 1.3 2004/09/25 15:42:19 jajcus Exp $"
+__revision__="$Id: stanzaprocessor.py,v 1.4 2004/09/27 20:49:31 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -33,7 +33,7 @@ class StanzaProcessor:
     
     :Ivariables:
         - `lock`: lock object used to synchronize access to the
-          `StreamProcessor` object.
+          `StanzaProcessor` object.
         - `me`: local JID.
         - `peer`: remote stream endpoint JID.
         - `process_all_stanzas`: when `True` then all stanzas received are
@@ -434,7 +434,7 @@ class StanzaProcessor:
         :Parameters:
             - `stanza`: the stanza to send.
         :Types:
-            - `stanza`: `pyxmpp.Stanza`"""
+            - `stanza`: `pyxmpp.stanza.Stanza`"""
         raise NotImplementedError,"This method must be overriden in derived classes."""
 
 

@@ -17,7 +17,7 @@
 
 """TLS support for XMPP streams."""
 
-__revision__="$Id: streamtls.py,v 1.1 2004/09/24 08:12:27 jajcus Exp $"
+__revision__="$Id: streamtls.py,v 1.2 2004/09/27 20:49:31 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import socket
@@ -167,8 +167,8 @@ class StreamTLSMixIn:
         if it is in TLS namespace. 
 
         :raise StreamEncryptionRequired: if encryption is required by current
-        configuration, it is not active and the element is not in the TLS namespace
-        nor in the stream namespace.
+          configuration, it is not active and the element is not in the TLS
+          namespace nor in the stream namespace.
         
         :return: `True` when the node was recognized as TLS element.
         :returntype: `bool`"""
