@@ -449,9 +449,9 @@ class DiscoItems:
         if not node:
             node_expr=""
         elif '"' not in node:
-            expr=' and @node="%s"' % (node,)
+            node_expr=' and @node="%s"' % (node,)
         elif "'" not in node:
-            expr=" and @node='%s'" % (node,)
+            node_expr=" and @node='%s'" % (node,)
         else:
             raise ValueError,"Invalid node name"
         if '"' not in jid:
