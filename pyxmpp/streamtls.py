@@ -21,7 +21,7 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: streamtls.py,v 1.5 2004/10/11 18:44:08 jajcus Exp $"
+__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import socket
@@ -299,7 +299,10 @@ class StreamTLSMixIn:
                 ctx.use_PrivateKey_file(self.tls_settings.cert_file)
             ctx.check_private_key()
         if self.tls_settings.cacert_file:
-            ctx.load_verify_location(self.tls_settings.cacert_file)
+            try:
+                ctx.load_verify_location(self.tls_settings.cacert_file)
+            except AttributeError:
+                ctx.load_verify_locations(self.tls_settings.cacert_file)
         self.__logger.debug("Creating TLS connection")
         self.tls=SSL.Connection(ctx,self.socket)
         self.__logger.debug("Setting up TLS connection")
