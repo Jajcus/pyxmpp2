@@ -1,3 +1,8 @@
+2004-09-14  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/jabber/muc.py, pyxmpp/iq.py, pyxmpp/jid.py, pyxmpp/message.py, pyxmpp/presence.py, pyxmpp/roster.py, pyxmpp/stanza.py, pyxmpp/stream.py, pyxmpp/xmlextra.py, pyxmpp/xmppstringprep.py, doc/Makefile, TODO.pylint:
+	- documentation cleanup
+
 2004-09-13  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/stream.py:
