@@ -22,7 +22,7 @@ class MyClient(Client):
         Client.idle(self)
         if self.session_established:
             target=JID("jajcus",s.jid.domain)
-            self.stream.send(Message(to=target,body=unicode("Teścik","utf-8")))
+            self.stream.send(Message(to_jid=target,body=unicode("Teścik","utf-8")))
 
     def post_disconnect(self):
         print "Disconnected"
