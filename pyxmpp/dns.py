@@ -17,7 +17,7 @@
 
 """A simple implementation of a part of the DNS protocol."""
 
-__revision__="$Id: dns.py,v 1.10 2004/09/18 21:33:00 jajcus Exp $"
+__revision__="$Id: dns.py,v 1.11 2004/09/19 08:38:29 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import random
@@ -264,21 +264,55 @@ class RR:
 
 
 class RR_A(RR):
+    """'A' resource record.
+    
+    :Ivariables:
+        - `ip`: the IP address contained in the record."""
     type="A"
     code=1
     def __init__(self,name,ttl,ip):
+        """Initialize RR_A object.
+
+        :Parameters:
+            - `name`: domain name of the record.
+            - `ttl`: TTL value of the record.
+            - `ip`: IP address of the record."""
         RR.__init__(self,name,ttl,classes_by_name["IN"])
         self.ip=ip
 
     def format_data(self):
+        """Format A RR data as a string.
+        
+        :return: formatted data.
+        :returntype: `str`"""
         return self.ip
 
     def bin_format_data(self):
+        """Create binary representation of the A RR data.
+
+        :return: binary representation of the A RR data.
+        :returntype: `str`"""
         ip1,ip2,ip3,ip4=self.ip.split(".")
         return struct.pack("!BBBB",int(ip1),int(ip2),int(ip3),int(ip4))
 
     def parse_bin_data(name,ttl,cls,packet,offset,length):
-        ""
+        """Parse binary representation of the A RR data.
+
+        :Parameters:
+            - `name`: domain name of the RR.
+            - `ttl`: TTL value of the RR.
+            - `cls`: class code or name of the RR.
+            - `packet`: the packet containing the RR.
+            - `offset`: offset of the first byte of the RR data in the packet.
+        :Types:
+            - `name`: `str`
+            - `ttl`: `int`
+            - `cls`: `int`
+            - `packet`: `int`
+            - `offset`: `int`
+
+        :return: parsed RR.
+        :returntype: `RR_A`"""
         if offset+4>len(packet):
             raise DataTruncated
         data=packet[offset:offset+4]
@@ -291,19 +325,55 @@ class RR_A(RR):
 RR._add_record_type(RR_A)
 
 class RR_NS(RR):
+    """'NS' resource record.
+    
+    :Ivariables:
+        - `target`: the nameserver name contained in the record."""
     type="NS"
     code=2
     def __init__(self,name,ttl,cls,target):
+        """Initialize RR_NS object.
+
+        :Parameters:
+            - `name`: domain name of the record.
+            - `ttl`: TTL value of the record.
+            - `cls`: class name or code of the record.
+            - `target`: the nameserver name contained in the record."""
         RR.__init__(self,name,ttl,cls)
         self.target=target
 
     def format_data(self):
+        """Format NS RR data as a string.
+        
+        :return: formatted data.
+        :returntype: `str`"""
         return self.target
 
     def bin_format_data(self):
+        """Create binary representation of the NS RR data.
+
+        :return: binary representation of the NS RR data.
+        :returntype: `str`"""
         return domain_str2bin(self.target)
 
     def parse_bin_data(name,ttl,cls,packet,offset,length):
+        """Parse binary representation of the NS RR data.
+
+        :Parameters:
+            - `name`: domain name of the RR.
+            - `ttl`: TTL value of the RR.
+            - `cls`: class code or name of the RR.
+            - `packet`: the packet containing the RR.
+            - `offset`: offset of the first byte of the RR data in the packet.
+        :Types:
+            - `name`: `str`
+            - `ttl`: `int`
+            - `cls`: `int`
+            - `packet`: `int`
+            - `offset`: `int`
+
+        :return: parsed RR.
+        :returntype: `RR_NS`"""
         target,offset=domain_bin2str(packet,offset)
         return RR_CNAME(name,ttl,cls,target),offset
         
@@ -312,19 +382,55 @@ class RR_NS(RR):
 RR._add_record_type(RR_NS)
 
 class RR_CNAME(RR):
+    """'CNAME' resource record.
+    
+    :Ivariables:
+        - `target`: the name contained in the record."""
     type="CNAME"
     code=5
     def __init__(self,name,ttl,cls,target):
+        """Initialize RR_CNAME object.
+
+        :Parameters:
+            - `name`: domain name of the record.
+            - `ttl`: TTL value of the record.
+            - `cls`: class name or code of the record.
+            - `target`: the contained in the record."""
         RR.__init__(self,name,ttl,cls)
         self.target=target
 
     def format_data(self):
+        """Format CNAME RR data as a string.
+        
+        :return: formatted data.
+        :returntype: `str`"""
         return self.target
 
     def bin_format_data(self):
+        """Create binary representation of the CNAME RR data.
+
+        :return: binary representation of the CNAME RR data.
+        :returntype: `str`"""
         return domain_str2bin(self.target)
 
     def parse_bin_data(name,ttl,cls,packet,offset,length):
+        """Parse binary representation of the CNAME RR data.
+
+        :Parameters:
+            - `name`: domain name of the RR.
+            - `ttl`: TTL value of the RR.
+            - `cls`: class code or name of the RR.
+            - `packet`: the packet containing the RR.
+            - `offset`: offset of the first byte of the RR data in the packet.
+        :Types:
+            - `name`: `str`
+            - `ttl`: `int`
+            - `cls`: `int`
+            - `packet`: `int`
+            - `offset`: `int`
+
+        :return: parsed RR.
+        :returntype: `RR_CNAME`"""
         target,offset=domain_bin2str(packet,offset)
         return RR_CNAME(name,ttl,cls,target),offset
         
@@ -333,9 +439,32 @@ class RR_CNAME(RR):
 RR._add_record_type(RR_CNAME)
 
 class RR_SOA(RR):
+    """'SOA' resource record.
+    
+    :Ivariables:
+        - `pri_master`: primary master nameserver for a zone.
+        - `mailbox`: contact mailbox for a zone.
+        - `serial`: serial number of a zone data.
+        - `refresh`: refresh time for a zone.
+        - `retry`: retry time for a zone.
+        - `expire`: expire time for a zone.
+        - `minimum`: minimum TTL time for a zone data."""
     type="SOA"
     code=6
     def __init__(self,name,ttl,cls,pri_master,mailbox,serial,refresh,retry,expire,minimum):
+        """Initialize RR_SOA object.
+
+        :Parameters:
+            - `name`: domain name of the record.
+            - `ttl`: TTL value of the record.
+            - `cls`: class name or code of the record.
+            - `pri_master`: primary master nameserver for a zone.
+            - `mailbox`: contact mailbox for a zone.
+            - `serial`: serial number of a zone data.
+            - `refresh`: refresh time for a zone.
+            - `retry`: retry time for a zone.
+            - `expire`: expire time for a zone.
+            - `minimum`: minimum TTL time for a zone data."""
         RR.__init__(self,name,ttl,cls)
         self.pri_master=pri_master
         self.mailbox=mailbox
@@ -346,16 +475,41 @@ class RR_SOA(RR):
         self.minimum=minimum
 
     def format_data(self):
+        """Format SOA RR data as a string.
+        
+        :return: formatted data.
+        :returntype: `str`"""
         return "%s %s %i %i %i %i %i" % (self.pri_master,self.mailbox,self.serial,
                 self.refresh,self.retry,self.expire,self.minimum)
 
     def bin_format_data(self):
+        """Create binary representation of the SOA RR data.
+
+        :return: binary representation of the SOA RR data.
+        :returntype: `str`"""
         return (domain_str2bin(self.pri_master)
                 +domain_str2bin(self.mailbox)
                 +struct.pack("!IIIII",self.serial,self.refresh,self.retry,
                 self.expire,self.minimum))
 
     def parse_bin_data(name,ttl,cls,packet,offset,length):
+        """Parse binary representation of the SOA RR data.
+
+        :Parameters:
+            - `name`: domain name of the RR.
+            - `ttl`: TTL value of the RR.
+            - `cls`: class code or name of the RR.
+            - `packet`: the packet containing the RR.
+            - `offset`: offset of the first byte of the RR data in the packet.
+        :Types:
+            - `name`: `str`
+            - `ttl`: `int`
+            - `cls`: `int`
+            - `packet`: `int`
+            - `offset`: `int`
+
+        :return: parsed RR.
+        :returntype: `RR_SOA`"""
         pri_master,offset=domain_bin2str(packet,offset)
         mailbox,offset=domain_bin2str(packet,offset)
         if offset+20>len(packet):
@@ -369,9 +523,26 @@ class RR_SOA(RR):
 RR._add_record_type(RR_SOA)
 
 class RR_SRV(RR):
+    """'SRV' resource record.
+    
+    :Ivariables:
+        - `priority`: priority value of the SRV record.
+        - `weight`: weight value of the SRV record.
+        - `port`: port number value of the SRV record.
+        - `target`: server name value of the SRV record."""
     type="SRV"
     code=33
     def __init__(self,name,ttl,priority,weight,port,target):
+        """Initialize RR_SOA object.
+
+        :Parameters:
+            - `name`: domain name of the record.
+            - `ttl`: TTL value of the record.
+            - `cls`: class name or code of the record.
+            - `priority`: priority value of the SRV record.
+            - `weight`: weight value of the SRV record.
+            - `port`: port number value of the SRV record.
+            - `target`: server name value of the SRV record."""
         RR.__init__(self,name,ttl,"IN")
         self.priority=priority
         self.weight=weight
@@ -379,9 +550,17 @@ class RR_SRV(RR):
         self.target=target
 
     def format_data(self):
+        """Format SRV RR data as a string.
+        
+        :return: formatted data.
+        :returntype: `str`"""
         return "%i %i %i %s" % (self.priority,self.weight,self.port,self.target)
 
     def bin_format_data(self):
+        """Create binary representation of the SRV RR data.
+
+        :return: binary representation of the SRV RR data.
+        :returntype: `str`"""
         return struct.pack("!HHH",self.priority,self.weight,self.port)+domain_str2bin(self.target)
 
     def __eq__(self,other):
@@ -444,6 +623,23 @@ class RR_SRV(RR):
         return not self.__lt__(other)
 
     def parse_bin_data(name,ttl,cls,packet,offset,length):
+        """Parse binary representation of the SRV RR data.
+
+        :Parameters:
+            - `name`: domain name of the RR.
+            - `ttl`: TTL value of the RR.
+            - `cls`: class code or name of the RR.
+            - `packet`: the packet containing the RR.
+            - `offset`: offset of the first byte of the RR data in the packet.
+        :Types:
+            - `name`: `str`
+            - `ttl`: `int`
+            - `cls`: `int`
+            - `packet`: `int`
+            - `offset`: `int`
+
+        :return: parsed RR.
+        :returntype: `RR_SRV`"""
         if offset+7>len(packet):
             raise DataTruncated
         priority,weight,port=struct.unpack("!HHH",packet[offset:offset+6])

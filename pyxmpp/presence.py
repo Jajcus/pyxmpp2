@@ -17,7 +17,7 @@
 
 """Presence XMPP stanza handling"""
 
-__revision__="$Id: presence.py,v 1.23 2004/09/16 19:57:26 jajcus Exp $"
+__revision__="$Id: presence.py,v 1.24 2004/09/19 08:38:29 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -93,8 +93,8 @@ class Presence(Stanza):
         if node is None:
             node="presence"
             
-        Stanza.__init__(self, node, from_jid=from_jid, to_jid=to_jid, stanza_type=stanza_type, stanza_id=stanza_id,
-                error=error, error_cond=error_cond)
+        Stanza.__init__(self, node, from_jid=from_jid, to_jid=to_jid, stanza_type=stanza_type, 
+                stanza_id=stanza_id, error=error, error_cond=error_cond)
        
         if show:
             self.node.newTextChild(None,"show",to_utf8(show))
