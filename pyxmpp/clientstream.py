@@ -167,7 +167,7 @@ class ClientStream(Stream):
 
     def choose_realm(self,realm_list):
         if not realm_list:
-            return realm_list
+            return self.jid.domain
         if self.jid.domain in realm_list:
             return self.jid.domain
         return realm_list[0]
