@@ -25,216 +25,14 @@ Normative reference:
 __revision__="$Id: resolver.py,v 1.18 2004/10/22 12:20:31 jajcus Exp $"
 __docformat__="restructuredtext en"
 
-import socket
-import select
-import random
-import time
 import re
-
-from pyxmpp import dns
-from pyxmpp.dns import DNSError
-
-nameservers=[]
-search_list=[]
-cache={}
+import socket
+import dns.resolver
+import dns.name
+from encodings import idna
 
 service_aliases={"xmpp-server": ("jabber-server","jabber")}
-
 ip_re=re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
-
-def load_resolv_conf():
-    """Get the list of nameservers to use and domain to search from local configuration."""
-    search=[]
-    domain=None
-    nameservers[:]=[]
-    try:
-        f=file("/etc/resolv.conf","r")
-        nameservers[:]=[]
-        search=[]
-        domain=None
-        for l in f.xreadlines():
-            l=l.strip()
-            if not l or l.startswith("#"):
-                continue
-            sp=l.split()
-            if len(sp)<2:
-                continue
-            if sp[0]=="nameserver":
-                nameservers.append(sp[1])
-            elif sp[0]=="domain":
-                domain=sp[1]
-            elif sp[0]=="search":
-                search=sp[1:]
-    except IOError:
-        pass
-
-    if not nameservers:
-        nameservers[:]=['127.0.0.1']
-                
-    if search:
-        search_list[:]=search
-    elif domain:
-        search_list[:]=[domain]
-    else:
-        search_list[:]=[]
-
-def query(name,rr_type):
-    """Query the local cache and the configured nameservers for a DNS record using
-    a search list if configured.
-
-    :Parameters:
-        - `name`: domain name to lookup.
-        - `rr_type`: record type to lookup.
-    :Types:
-        - `name`: `unicode`
-        - `rr_type`: `string`
-
-    :raise DNSError: on error.
-
-    :return: Records found.
-    :returntype: `list` of `dns.RR`"""
-    if search_list:
-        e=None
-        for d in search_list:
-            try:
-                r=do_query(u"%s.%s" % (name,d),rr_type)
-                if r:
-                    return r
-            except DNSError,e:
-                continue
-        if e:
-            raise e
-    return do_query(name,rr_type)
-
-def check_cache(name,rr_type):
-    """Check the local cache for given DNS record.
-
-    :Parameters:
-        - `name`: domain name to lookup.
-        - `rr_type`: record type to lookup.
-    :Types:
-        - `name`: `unicode`
-        - `rr_type`: `string`
-
-    :return: Records found or `None`.
-    :returntype: `list` of `dns.RR`"""
-    if not cache.has_key((name,rr_type)):
-        return None
-    ret=[]
-    newvals=[]
-    now=time.time()
-    for exp,val in cache[name,rr_type]:
-        if exp>now:
-            ret.append(val)
-            newvals.append((exp,val))
-    if newvals:
-        cache[name,rr_type]=newvals
-    else:
-        del cache[name,rr_type]
-    return ret
-
-def update_cache(records):
-    """Update local cache with given records.
-
-    :Parameters:
-        - `records`: records to cache.
-    :Types:
-        - `records`: `dns.RR`"""
-    now=time.time()
-    cache_update={}
-    for rr in records:
-        if cache_update.has_key((rr.name,rr.type)):
-            cache_update[rr.name,rr.type].append((now+rr.ttl,rr))
-        else:
-            cache_update[rr.name,rr.type]=[(now+rr.ttl,rr)]
-    cache.update(cache_update)
-
-def do_query(name,rr_type):
-    """Query the local cache and the configured nameservers for a DNS record.
-
-    :Parameters:
-        - `name`: domain name to lookup.
-        - `rr_type`: record type to lookup.
-    :Types:
-        - `name`: `unicode`
-        - `rr_type`: `string`
-
-    :raise DNSError: on error.
-
-    :return: Records found.
-    :returntype: `list` of `dns.RR`"""
-    ret=check_cache(name,rr_type)
-    if ret:
-        return ret
-    if not nameservers:
-        return None
-    sockets=[]
-    for ns in nameservers:
-        for res in socket.getaddrinfo(ns,"domain",0,socket.SOCK_DGRAM):
-            family,socktype,proto,canonname,sockaddr=res
-            try:
-                s=socket.socket(family,socktype,proto)
-                s.connect(sockaddr)
-            except socket.error, exc:
-                if s:
-                    s.close()
-                continue
-            sockets.append(s)
-    if not sockets:
-        if exc:
-            raise socket.error,exc
-        else:
-            return None
-    result=None
-    try:
-        query_msg=dns.Message(None,0,rd=1,questions=[(name,rr_type,"IN")])
-        result=query_ns(sockets,query_msg)
-    finally:
-        for s in sockets:
-            s.close()
-    if not result:
-        return None
-    ret=[]
-    for record in result.answers:
-        ret.append(record)
-    update_cache(result.answers+result.authorities+result.additionals)
-    return ret
-
-def query_ns(sockets,query_msg):
-    """Send a DNS query to nameservers.
-
-    :Parameters:
-        - `sockets`: UDP sockets "connected" to nameservers.
-        - `query_msg`: DNS query to send.
-    :Types:
-        - `sockets`: `list` of `socket.socket`
-        - `query_msg`: `dns.Message`
-
-    :return: result of the query or `None`.
-    :returntype: `list` of `dns.RR`"""
-    next_socket=0
-    next_time=0
-    interval=1
-    retries=0
-    while retries<3 and sockets:
-        now=time.time()
-        if now>next_time:
-            if next_socket<len(sockets):
-                s=sockets[next_socket]
-                s.send(query_msg.bin_format())
-                next_socket+=1
-            if next_socket>=len(sockets):
-                next_socket=0
-                retries+=1
-                interval*=2
-            next_time=now+interval
-        ifd=select.select(sockets,[],[],0.5)[0]
-        for s in ifd:
-            res=s.recv(1024)
-            res=dns.parse_message(res)
-            if res.id==query_msg.id:
-                return res
-    return None
 
 def shuffle_srv(records):
     """Randomly reorder SRV records using their weights.
@@ -242,10 +40,10 @@ def shuffle_srv(records):
     :Parameters:
         - `records`: SRV records to shuffle.
     :Types:
-        - `records`: `list` of `dns.RR_SRV`
+        - `records`: sequence of `dns.rdtypes.IN.SRV`
 
     :return: reordered records.
-    :returntype: `list` of `dns.RR_SRV`"""
+    :returntype: `list` of `dns.rdtypes.IN.SRV`"""
     if not records:
         return []
     ret=[]
@@ -270,10 +68,10 @@ def reorder_srv(records):
     :Parameters:
         - `records`: SRV records to shuffle.
     :Types:
-        - `records`: `list` of `dns.RR_SRV`
+        - `records`: `list` of `dns.rdtypes.IN.SRV`
 
     :return: reordered records.
-    :returntype: `list` of `dns.RR_SRV`"""
+    :returntype: `list` of `dns.rdtypes.IN.SRV`"""
     records=list(records)
     records.sort()
     ret=[]
@@ -309,16 +107,14 @@ def resolve_srv(domain,service,proto="tcp"):
         for a in service_aliases[service]:
             names_to_try.append(u"_%s._%s.%s" % (a,proto,domain))
     for name in names_to_try:
-        r=query(name,"SRV")
+        name=idna.ToASCII(name)
+        r=dns.resolver.query(name, 'SRV')
         if not r:
             continue
-        if r and r[0].type=="CNAME":
-            cname=r[0].target
-            r=query(cname,"SRV")
-        return [(rr.target,rr.port) for rr in reorder_srv(r) if rr.type=="SRV"]
+        return [(rr.target.to_text(),rr.port) for rr in reorder_srv(r)]
     return None
 
-def getaddrinfo(host,port,family=0,socktype=socket.SOCK_STREAM,proto=0):
+def getaddrinfo(host,port,family=0,socktype=socket.SOCK_STREAM,proto=0,allow_cname=True):
     """Resolve host and port into addrinfo struct.
 
     Does the same thing as socket.getaddrinfo, but using `pyxmpp.resolver`. This
@@ -331,12 +127,14 @@ def getaddrinfo(host,port,family=0,socktype=socket.SOCK_STREAM,proto=0):
         - `family`: address family.
         - `socktype`: socket type.
         - `proto`: protocol number or name.
+        - `allow_cname`: when False CNAME responses are not allowed.
     :Types:
         - `host`: `unicode` or `str`
         - `port`: `int` or `str`
         - `family`: `int`
         - `socktype`: `int`
         - `proto`: `int` or `str`
+        - `allow_cname`: `bool`
 
     :return: list of (family, socktype, proto, canonname, sockaddr).
     :returntype: `list` of (`int`, `int`, `int`, `str`, (`str`, `int`))"""
@@ -351,19 +149,13 @@ def getaddrinfo(host,port,family=0,socktype=socket.SOCK_STREAM,proto=0):
         raise NotImplementedError,"Protocol family other than AF_INET not supported, yet"
     if ip_re.match(host):
         return [(socket.AF_INET,socktype,proto,host,(host,port))]
-    r=query(host,"A")
-    if r and r[0].type=="CNAME":
-        cname=r[0].target
-        r=query(cname,"A")
-    else:
-        cname=host
+    host=idna.ToASCII(host)
+    r=dns.resolver.query(host, 'A')
+    if not allow_cname and r.rrset.name!=dns.name.from_text(host):
+        raise ValueError,"Unexpected CNAME record found for %s" % (host,)
     if r:
         for rr in r:
-            if rr.type!="A":
-                continue
-            ret.append((socket.AF_INET,socktype,proto,cname,(rr.ip,port)))
+            ret.append((socket.AF_INET,socktype,proto,r.rrset.name,(rr.to_text(),port)))
     return ret
-
-load_resolv_conf()
 
 # vi: sts=4 et sw=4
