@@ -207,10 +207,11 @@ def getaddrinfo(host,port,family=0,socktype=socket.SOCK_STREAM,proto=0):
         r=query(cname,"A")
     else:
         cname=host
-    for rr in r:
-        if rr.type!="A":
-            continue
-        ret.append((socket.AF_INET,socktype,proto,cname,(rr.ip,port)))
+    if r:
+        for rr in r:
+            if rr.type!="A":
+                continue
+            ret.append((socket.AF_INET,socktype,proto,cname,(rr.ip,port)))
     return ret
 
 load_resolv_conf()
