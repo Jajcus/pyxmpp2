@@ -21,7 +21,7 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: streamtls.py,v 1.4 2004/10/07 22:28:04 jajcus Exp $"
+__revision__="$Id: streamtls.py,v 1.5 2004/10/11 18:44:08 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import socket
@@ -153,6 +153,7 @@ class StreamTLSMixIn:
 
     def _read(self):
         """Read data pending on the stream socket and pass it to the parser."""
+        self.__logger.debug("StreamTLSMixIn._read(), socket: %r",self.socket)
         if self.tls:
             self._read_tls()
         else:

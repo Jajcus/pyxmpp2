@@ -21,7 +21,7 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: streambase.py,v 1.4 2004/10/11 18:33:51 jajcus Exp $"
+__revision__="$Id: streambase.py,v 1.5 2004/10/11 18:44:08 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -675,6 +675,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
     def _read(self):
         """Read data pending on the stream socket and pass it to the parser."""
+        self.__logger.debug("StreamBase._read(), socket: %r",self.socket)
         if self.eof:
             return
         try:

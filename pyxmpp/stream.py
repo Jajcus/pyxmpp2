@@ -21,7 +21,7 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: stream.py,v 1.76 2004/10/07 22:28:04 jajcus Exp $"
+__revision__="$Id: stream.py,v 1.77 2004/10/11 18:44:08 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import logging
@@ -30,7 +30,7 @@ from pyxmpp.streambase import StreamBase
 from pyxmpp.streamtls import StreamTLSMixIn
 from pyxmpp.streamsasl import StreamSASLMixIn
 
-class Stream(StreamBase,StreamTLSMixIn,StreamSASLMixIn):
+class Stream(StreamTLSMixIn,StreamSASLMixIn,StreamBase):
     """Generic XMPP stream class.
 
     Responsible for establishing connection, parsing the stream,
