@@ -1,3 +1,8 @@
+2004-05-31  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/jabber/muc.py:
+	- basic MUC client functionality (NFY, but works somehow)
+
 2004-05-28  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/utils.py:
