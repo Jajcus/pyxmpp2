@@ -20,6 +20,7 @@ IGNORE="${IGNORE}\\|W0613:[^:]*:PlainClientAuthenticator.*\\('challenge'\\|'data
 IGNORE="${IGNORE}\\|W0613:[^:]*:PasswordManager.*\\('username'\\|'realm'\\|'acceptable_formats'\\)"
 IGNORE="${IGNORE}\\|W0613:[^:]*:ClientAuthenticator.*\\('username'\\|'authzid'\\|'challenge'\\|'data'\\)"
 IGNORE="${IGNORE}\\|W0613:[^:]*:ServerAuthenticator.*\\('initial_response'\\|'response'\\)"
+IGNORE="${IGNORE}\\|W0613:[^:]*:DigestMD5ServerAuthenticator.start.*'response'"
 IGNORE="${IGNORE}\\|W0612:[^:]*:\\(StreamBase._connect.*'canonname'\\|StreamBase._loop_iter.*'ofd'\\)"
 IGNORE="${IGNORE}\\|W0612:[^:]*:\\(parse_message:.*'i'\\|do_query:.*'canonname'\\)"
 IGNORE="${IGNORE}\\|W0201:[^:]*:\\([^.]*\\._reset\\|ClientStream.*'me'\\)"

@@ -1,16 +1,3 @@
-if test -f "CVS/Entries" ; then \
-	echo "version='0.5+cvs'" > pyxmpp/version.py ; \
-fi
-umask 022 ; python setup.py build
-running build
-running build_py
-copying pyxmpp/version.py -> build/lib.linux-i686-2.3/pyxmpp
-copying pyxmpp/sasl/core.py -> build/lib.linux-i686-2.3/pyxmpp/sasl
-running build_ext
-cd examples ; rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp .
-cd examples ; chmod a+x *.py
-cd tests ; rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp .
-cd tests ; chmod a+x *.py
 ************* Module pyxmpp.xmppstringprep
 ignore that: W0403: 24: Uses of a deprecated module 'stringprep'
 ************* Module pyxmpp.streamsasl
@@ -120,62 +107,7 @@ ignore that: W0613:321:ClientAuthenticator.finish: Unused argument 'data'
 ignore that: W0613:351:ServerAuthenticator.start: Unused argument 'initial_response'
 ignore that: W0613:364:ServerAuthenticator.response: Unused argument 'response'
 ************* Module pyxmpp.sasl.digest_md5
-W0301: 79: Line too long (108/100)
-W0141:  0: Missing docstring
-W0403: 23: Uses of a deprecated module 'string'
-W0141: 36:unquote: Missing docstring
-W0141: 41:quote: Missing docstring
-W0133: 46:H: Invalid name "H" (should match [a-z_][a-z0-9_]*$)
-W0141: 46:H: Missing docstring
-W0133: 49:KD: Invalid name "KD" (should match [a-z_][a-z0-9_]*$)
-W0141: 49:KD: Missing docstring
-W0141: 52:make_urp_hash: Missing docstring
-W0141: 59:compute_response: Missing docstring
-W0133: 61:compute_response: Invalid name "A1" (should match [a-z_][a-z0-9_]*$)
-W0133: 64:compute_response: Invalid name "A2" (should match [a-z_][a-z0-9_]*$)
-W0613: 59:compute_response: Unused argument 'username'
-W0613: 59:compute_response: Unused argument 'realm'
-W0141: 69:compute_response_auth: Missing docstring
-W0133: 71:compute_response_auth: Invalid name "A1" (should match [a-z_][a-z0-9_]*$)
-W0133: 74:compute_response_auth: Invalid name "A2" (should match [a-z_][a-z0-9_]*$)
-W0613: 69:compute_response_auth: Unused argument 'username'
-W0613: 69:compute_response_auth: Unused argument 'realm'
-W0141: 81:DigestMD5ClientAuthenticator: Missing docstring
-W0221: 85:DigestMD5ClientAuthenticator.start: Arguments number differs from overriden method
-W0141: 85:DigestMD5ClientAuthenticator.start: Missing docstring
-W0141:103:DigestMD5ClientAuthenticator.challenge: Missing docstring
-E0602:175:DigestMD5ClientAuthenticator.challenge: Undefined variable 'charser'
-W0111:103:DigestMD5ClientAuthenticator.challenge: Too many return statements (14/6)
-W0112:103:DigestMD5ClientAuthenticator.challenge: Too many branches (32/15)
-W0115:103:DigestMD5ClientAuthenticator.challenge: Too many statements (109/50)
-W0141:244:DigestMD5ClientAuthenticator.final_challenge: Missing docstring
-W0141:274:DigestMD5ClientAuthenticator.finish: Missing docstring
-W0201: 86:DigestMD5ClientAuthenticator.start: Attribute 'username' defined outside __init__
-W0201: 99:DigestMD5ClientAuthenticator.start: Attribute 'rspauth_checked' defined outside __init__
-W0201: 98:DigestMD5ClientAuthenticator.start: Attribute 'response_auth' defined outside __init__
-W0201: 88:DigestMD5ClientAuthenticator.start: Attribute 'authzid' defined outside __init__
-W0201: 93:DigestMD5ClientAuthenticator.start: Attribute 'pformat' defined outside __init__
-W0201:100:DigestMD5ClientAuthenticator.start: Attribute 'realm' defined outside __init__
-W0201: 92:DigestMD5ClientAuthenticator.start: Attribute 'password' defined outside __init__
-W0201: 97:DigestMD5ClientAuthenticator.start: Attribute 'nonce_count' defined outside __init__
-W0141:284:DigestMD5ServerAuthenticator: Missing docstring
-W0141:288:DigestMD5ServerAuthenticator.start: Missing docstring
-W0613:288:DigestMD5ServerAuthenticator.start: Unused argument 'response'
-W0141:309:DigestMD5ServerAuthenticator.response: Missing docstring
-W0114:309:DigestMD5ServerAuthenticator.response: Too many local variables (26/25)
-W0111:309:DigestMD5ServerAuthenticator.response: Too many return statements (16/6)
-W0112:309:DigestMD5ServerAuthenticator.response: Too many branches (35/15)
-W0115:309:DigestMD5ServerAuthenticator.response: Too many statements (112/50)
-W0201:300:DigestMD5ServerAuthenticator.start: Attribute 'nonce' defined outside __init__
-W0201:392:DigestMD5ServerAuthenticator.response: Attribute 'username' defined outside __init__
-W0201:293:DigestMD5ServerAuthenticator.start: Attribute 'realm' defined outside __init__
-W0201:305:DigestMD5ServerAuthenticator.start: Attribute 'authzid' defined outside __init__
-W0201:306:DigestMD5ServerAuthenticator.start: Attribute 'done' defined outside __init__
-W0201:289:DigestMD5ServerAuthenticator.start: Attribute 'last_nonce_count' defined outside __init__
-W0611: 21: Unused import unHEX
-W0611: 30: Unused import PasswordManager
-W0611: 30: Unused import Reply
-W0611: 26: Unused import sys
+ignore that: W0613:475:DigestMD5ServerAuthenticator.start: Unused argument 'response'
 ************* Module pyxmpp.jabber.muc
 W0511:140: FIXME: set/get password/history
 W0511:298: FIXME: alt,decline,invite,password
@@ -453,17 +385,17 @@ W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 Report
 ======
-5946 statements analysed.
+5967 statements analysed.
 
 Statistics by type
 ------------------
 
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-module   37     37         =          81.08       0.00     
-class    114    114        =          76.32       0.00     
+module   37     37         =          83.78       0.00     
+class    114    114        =          78.07       0.00     
 method   0      0          =          0.00        0.00     
-function 634    634        =          83.12       0.32     
+function 640    640        =          85.31       0.00     
 
 
 Raw metrics
@@ -471,10 +403,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6518   58.17 6517     +1         
-docstring 3456   30.84 3456     =          
-comment   588    5.25  588      =          
-empty     644    5.75  644      =          
+code      6542   56.89 6542     =          
+docstring 3706   32.23 3706     =          
+comment   589    5.12  589      =          
+empty     663    5.77  663      =          
 
 
 External dependencies
@@ -500,7 +432,7 @@ External dependencies
       \-idna (pyxmpp.jid,pyxmpp.dns)
     os (pyxmpp.streambase)
     types (pyxmpp.xmppstringprep,pyxmpp.roster,pyxmpp.jid,pyxmpp.dns,pyxmpp.streambase,pyxmpp.utils,pyxmpp.error,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
-    string (pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
+    string (pyxmpp.jabber.vcard)
 
 
 
@@ -509,31 +441,28 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0141      141        
-W0201      62         
-W0613      46         
+W0141      125        
+W0201      48         
+W0613      42         
 E0201      34         
-W0611      31         
+W0611      27         
 W0102      17         
-E0602      15         
+E0602      14         
 W0311      8          
 W0612      7          
-W0221      7          
 W0511      6          
-W0133      6          
+W0221      6          
 W0231      5          
 W0622      4          
-W0112      4          
 W0103      4          
-W0403      3          
-W0301      3          
-W0115      3          
+W0403      2          
+W0301      2          
 W0232      2          
 W0151      2          
-W0111      2          
+W0112      2          
 W0401      1          
 W0302      1          
-W0114      1          
+W0115      1          
 
 
 Total errors / warnings
@@ -541,8 +470,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 366    366      =          
-errors   49     51       -2         
+warnings 312    312      =          
+errors   48     48       =          
 
 
 % errors / warnings by module
@@ -550,32 +479,32 @@ errors   49     51       -2
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            30.61 23.22   
-pyxmpp.jid                     26.53 0.27    
-pyxmpp.jabber.muc              18.37 10.66   
-pyxmpp.jabber.disco            8.16  10.66   
-pyxmpp.jabber.client           6.12  4.10    
-pyxmpp.jabber.clientstream     4.08  11.48   
-pyxmpp.jabber.delay            4.08  3.28    
-pyxmpp.sasl.digest_md5         2.04  15.03   
-pyxmpp.streambase              0.00  6.01    
-pyxmpp.sasl.core               0.00  2.73    
-pyxmpp.streamsasl              0.00  2.19    
-pyxmpp.dns                     0.00  2.19    
-pyxmpp.clientstream            0.00  1.91    
-pyxmpp.jabberd.componentstream 0.00  1.64    
-pyxmpp.streamtls               0.00  1.09    
-pyxmpp.xmlextra                0.00  0.82    
-pyxmpp.version                 0.00  0.82    
-pyxmpp.sasl.plain              0.00  0.55    
-pyxmpp._xmlextra               0.00  0.55    
-pyxmpp.xmppstringprep          0.00  0.27    
-pyxmpp.resolver                0.00  0.27    
-pyxmpp.client                  0.00  0.27    
+pyxmpp.jabber.vcard            31.25 27.24   
+pyxmpp.jid                     27.08 0.32    
+pyxmpp.jabber.muc              18.75 12.50   
+pyxmpp.jabber.disco            8.33  12.50   
+pyxmpp.jabber.client           6.25  4.81    
+pyxmpp.jabber.clientstream     4.17  13.46   
+pyxmpp.jabber.delay            4.17  3.85    
+pyxmpp.streambase              0.00  7.05    
+pyxmpp.sasl.core               0.00  3.21    
+pyxmpp.streamsasl              0.00  2.56    
+pyxmpp.dns                     0.00  2.56    
+pyxmpp.clientstream            0.00  2.24    
+pyxmpp.jabberd.componentstream 0.00  1.92    
+pyxmpp.streamtls               0.00  1.28    
+pyxmpp.xmlextra                0.00  0.96    
+pyxmpp.version                 0.00  0.96    
+pyxmpp.sasl.plain              0.00  0.64    
+pyxmpp._xmlextra               0.00  0.64    
+pyxmpp.xmppstringprep          0.00  0.32    
+pyxmpp.sasl.digest_md5         0.00  0.32    
+pyxmpp.resolver                0.00  0.32    
+pyxmpp.client                  0.00  0.32    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 8.97/10 (previous run: 8.96/10)
-That's pretty good. Good work mate.
+Your code has been rated at 9.07/10 (previous run: 9.07/10)
+So close to being perfect...
 

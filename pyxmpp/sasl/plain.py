@@ -16,7 +16,7 @@
 #
 """PLAIN authentication mechanism for PyXMPP SASL implementation."""
 
-__revision__="$Id: plain.py,v 1.11 2004/09/29 21:23:24 jajcus Exp $"
+__revision__="$Id: plain.py,v 1.12 2004/10/01 22:05:17 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import logging
@@ -67,7 +67,7 @@ class PlainClientAuthenticator(ClientAuthenticator):
         """Process the challenge and return the response.
         
         :Parameters:
-            - `challenge`: username (authentication id).
+            - `challenge`: the challenge.
         :Types:
             - `challenge`: `str`
        

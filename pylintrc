@@ -52,7 +52,9 @@ max-args=15
 max-locals=25
 
 # Maximum number of return / yield for function / method body
-max-returns=6
+# J: limiting number of exit points sometimes complicates the code and makes it
+# less readable IMHO
+max-returns=100
 
 # Maximum number of branch for function / method body
 max-branchs=15
