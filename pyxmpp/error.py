@@ -22,39 +22,92 @@ from utils import from_utf8,to_utf8
 from stanza import common_doc,common_root
 
 stream_errors={
-			u"host-gone":			1,
-			u"host-unknown":		1,
-			u"internal-server-error":	1,
-			u"invalid-id":			1,
-			u"invalid-namespace":		1,
-			u"nonmatching-hosts":		1,
-			u"not-authorized":		1,
-			u"remote-connection-failed":	1,
-			u"resource-constraint":		1,
-			u"see-other-host":		1,
-			u"system-shutdown":		1,
-			u"unsupported-stanza-type":	1,
-			u"unsupported-version":		1,
-			u"xml-not-well-formed":		1,
+			u"host-gone":
+				("Hostname is no longer hosted on the server",),
+			u"host-unknown":
+				("Hostname requested is not known to the server",),
+			u"improper-addressing":
+				("Improper addressing",),
+			u"internal-server-error":
+				("Internal server error",),
+			u"invalid-id":
+				("Invalid stream ID",),
+			u"invalid-namespace":
+				("Invalid namespace",),
+			u"nonmatching-hosts":
+				("Nonmatching hosts",),
+			u"not-authorized":
+				("Not authorized",),
+			u"remote-connection-failed":
+				("Remote connection failed",),
+			u"resource-constraint":
+				("Remote connection failed",),
+			u"see-other-host":
+				("Redirection required",),
+			u"system-shutdown":
+				("The server is being shut down",),
+			u"undefined-condition":
+				("Unknown error",),
+			u"unsupported-stanza-type":
+				("Unsupported stanza type",),
+			u"unsupported-version":
+				("Unsupported protocol version",),
+			u"xml-not-well-formed":
+				("XML sent by client is not well formed",),
 	}
 
 stanza_errors={
-			u"bad-request":			("modify",400),
-			u"conflict":			("cancel",409),
-			u"feature-not-implemented":	("cancel",501),
-			u"forbidden":			("auth",403),
-			u"internal-server-error":	("wait",500),
-			u"item-not-found":		("cancel",404),
-			u"jid-malformed":		("modify",400),
-			u"not-allowed":			("cancel",405),
-			u"recipient-unavailable":	("wait",404),
-			u"registration-required":	("auth",407),
-			u"remote-server-not-found":	("cancel",404),
-			u"remote-server-timeout":	("wait",504),
-			u"resource-constraint":		("wait",503),
-			u"service-unavailable":		("cancel",503),
-			u"subscription-required":	("auth",None),
-			u"unexpected-request":		("wait",None),
+			u"bad-request":
+				("Bad request",
+				"modify",400),
+			u"conflict":
+				("Named session or resource already exists",
+				"cancel",409),
+			u"feature-not-implemented":
+				("Feature requested is not implemented",
+				"cancel",501),
+			u"forbidden":
+				("You are forbidden to perform requested action",
+				"auth",403),
+			u"internal-server-error":
+				("Internal server error",
+				"wait",500),
+			u"item-not-found":
+				("Item not found"
+				,"cancel",404),
+			u"jid-malformed":
+				("JID malformed",
+				"modify",400),
+			u"not-allowed":
+				("Requested action is not allowed",
+				"cancel",405),
+			u"recipient-unavailable":
+				("Recipient is not available",
+				"wait",404),
+			u"registration-required":
+				("Registration required",
+				"auth",407),
+			u"remote-server-not-found":
+				("Remote server not found",
+				"cancel",404),
+			u"remote-server-timeout":
+				("Remote server timeout",
+				"wait",504),
+			u"resource-constraint":
+				("Resource constraint",
+				"wait",503),
+			u"service-unavailable":
+				("Service is not available",
+				"cancel",503),
+			u"subscription-required":
+				("Subscription is required",
+				"auth",None),
+			u"undefined-condition":
+				("Unknown error",
+				"cancel",None),
+			u"unexpected-request":
+				("Unexpected request",
+				"wait",None),
 	}
 
 legacy_codes={
@@ -70,7 +123,7 @@ legacy_codes={
 		409: "conflict",
 		500: "internal-server-error",
 		501: "feature-not-implemented",
-		502: "sevice-unavailable",
+		502: "service-unavailable",
 		504: "remote-server-timeout",
 		510: "service-unavailable",
 	}
@@ -168,14 +221,29 @@ class ErrorNode:
 		ctxt.xpathFreeContext()
 		return ret
 
-	def get_condition(self):
+	def get_condition(self,ns=None):
+		if ns is None:
+			ns=self.ns
+		c=self.xpath_eval("ns:*",{'ns':ns})
+		if not c:
+			self.upgrade()
+			c=self.xpath_eval("ns:*",{'ns':ns})
+		if not c:
+			return None
+		if ns==self.ns and c[0].name=="text":
+			if len(c)==1:
+				return None
+			c=c[1:]
+		return c[0]
+
+	def get_text(self):
 		c=self.xpath_eval("ns:*",{'ns':self.ns})
 		if not c:
 			self.upgrade()
-			c=self.xpath_eval("ns:*",{'ns':self.ns})
-		if not c:
+		t=self.xpath_eval("ns:text",{'ns':self.ns})
+		if not t:
 			return None
-		return c[0]
+		return t[0].getContent()
 
 	def add_custom_condition(self,ns,cond,content=None):
 		c=self.node.newChild(None,cond,content)
@@ -194,19 +262,14 @@ class ErrorNode:
 		
 		if code and legacy_codes.has_key(code):
 			cond=legacy_codes[code]
-			typ,x=stanza_errors[cond]
 		else:
 			cond=None
-			typ="cancel"
 		
-		if not self.node.hasProp("type"):
-			self.node.setProp("type",typ)
-	
 		condition=self.xpath_eval("ns:*",{'ns':self.ns})
 		if condition:
 			return
 		elif cond is None:
-			condition=self.node.newChild(None,"internal-server-error",None)
+			condition=self.node.newChild(None,"undefined-condition",None)
 			ns=condition.newNs(self.ns,None)
 			condition.setNs(ns)
 			condition=self.node.newChild(None,"unknown-legacy-error",None)
@@ -216,6 +279,11 @@ class ErrorNode:
 			condition=self.node.newChild(None,cond,None)
 			ns=condition.newNs(self.ns,None)
 			condition.setNs(ns)
+		txt=self.node.getContent()
+		if txt:
+			text=self.node.newChild(None,"text",txt)
+			ns=text.newNs(self.ns,None)
+			text.setNs(ns)
 
 	def downgrade(self):
 		if self.node.hasProp("code"):
@@ -227,8 +295,8 @@ class ErrorNode:
 		if not cond:
 			return
 		cond=cond.name
-		if stanza_errors.has_key(cond) and stanza_errors[cond][1]:
-			self.node.setProp("code",str(stanza_errors[cond][1]))
+		if stanza_errors.has_key(cond) and stanza_errors[cond][2]:
+			self.node.setProp("code",str(stanza_errors[cond][2]))
 
 	def serialize(self):
 		return self.node.serialize()
@@ -248,8 +316,20 @@ class StreamErrorNode(ErrorNode):
 				raise ErrorNodeError,"Bad error condition"
 		ErrorNode.__init__(self,node_or_cond,STREAM_ERROR_NS,copy=copy,parent=parent)
 
+	def get_message(self):
+		cond=self.get_condition()
+		if not cond:
+			self.upgrade()
+			cond=self.get_condition()
+			if not cond:
+				return None
+		cond=cond.name
+		if not stream_errors.has_key(cond):
+			return None
+		return stream_errors[cond][0]
+
 class StanzaErrorNode(ErrorNode):
-	def __init__(self,node_or_cond,ns=None,copy=1,parent=None):
+	def __init__(self,node_or_cond,typ=None,copy=1,parent=None):
 		""" 
 		Contructor:
 			ErrorNode(error_node[,copy=boolean]) -> ErrorNode
@@ -265,7 +345,8 @@ class StanzaErrorNode(ErrorNode):
 		ErrorNode.__init__(self,node_or_cond,STANZA_ERROR_NS,copy=copy,parent=parent)
 
 		if type(node_or_cond) is UnicodeType:
-			typ=stanza_errors[node_or_cond][0]
+			if typ is None:
+				typ=stanza_errors[node_or_cond][1]
 			self.node.setProp("type",typ)
 
 	def get_type(self):
@@ -273,3 +354,24 @@ class StanzaErrorNode(ErrorNode):
 			self.upgrade()
 		return self.node.prop("type")
 
+	def upgrade(self):
+		ErrorNode.upgrade(self)
+		if self.node.hasProp("type"):
+			return
+		
+		cond=self.get_condition().name
+		if stanza_errors.has_key(cond):
+			typ=stanza_errors[cond][1]
+			self.node.setProp("type",typ)
+
+	def get_message(self):
+		cond=self.get_condition()
+		if not cond:
+			self.upgrade()
+			cond=self.get_condition()
+			if not cond:
+				return None
+		cond=cond.name
+		if not stanza_errors.has_key(cond):
+			return None
+		return stanza_errors[cond][0]
