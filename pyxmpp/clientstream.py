@@ -38,7 +38,7 @@ class LegacyAuthenticationError(StreamAuthenticationError):
 
 class ClientStream(Stream):
 	def __init__(self,jid,password=None,server=None,port=5222,
-			auth_methods=["sasl:DIGEST-MD5","digest"],
+			auth_methods=["sasl:DIGEST-MD5"],
 			tls_settings=None,keepalive=0):
 		sasl_mechanisms=[]
 		for m in auth_methods:
@@ -62,9 +62,6 @@ class ClientStream(Stream):
 	def reset(self):
 		Stream.reset(self)
 		self.auth_methods_left=[]
-		self.available_auth_methods=None
-		self.features_timeout=None
-		self.auth_stanza=None
 
 	def connect(self,server=None,port=None):
 		if not self.jid.node or not self.jid.resource:
@@ -82,44 +79,22 @@ class ClientStream(Stream):
 		if self.initiator:
 			self.auth_methods_left=list(self.auth_methods)
 			self.try_auth()
-		else:
-			if "plain" in self.auth_methods or "digest" in self.auth_methods:
-				self.set_iq_get_handler("query","jabber:iq:auth",
-							self.auth_in_stage1)
-				self.set_iq_set_handler("query","jabber:iq:auth",
-							self.auth_in_stage2)
 
 	def post_auth(self):
 		if not self.initiator:
 			self.unset_iq_get_handler("query","jabber:iq:auth")
 			self.unset_iq_set_handler("query","jabber:iq:auth")
 
-	def idle(self):
-		Stream.idle(self)
-		if self.features_timeout and self.features_timeout<=time.time():
-			self.debug("Timout while waiting for <features/>")
-			self.features_timeout=None
-			if self.auth_methods_left:
-				self.auth_methods_left.pop(0)
-			self.try_auth()
-
-	def got_features(self):
-		self.debug("Got <features/>")
-		Stream.got_features(self)
-		if self.features_timeout:
-			self.try_auth()
-
 	def try_auth(self):
 		if self.authenticated:
 			self.debug("try_auth: already authenticated")
 			return
-		self.features_timeout=None
 		self.debug("trying auth: %r" % (self.auth_methods_left,))
 		if not self.auth_methods_left:
 			raise LegacyAuthenticationError,"No allowed authentication methods available"
 		method=self.auth_methods_left[0]
 		if method.startswith("sasl:"):
-			if self.features:
+			if self.version:
 				self.auth_methods_left.pop(0)
 				try:
 					self.sasl_authenticate(self.jid.node,self.jid.as_unicode(),
@@ -127,200 +102,14 @@ class ClientStream(Stream):
 				except (SASLMechanismNotAvailable,SASLNotAvailable),e:
 					self.debug("Skipping unavailable auth method: %s" % (method,) )
 					return self.try_auth()
-			elif not self.version:
+			else:
 				self.auth_methods_left.pop(0)
 				self.debug("Skipping auth method %s as legacy protocol is in use" % (method,) )
 				return self.try_auth()
-			else:
-				self.features_timeout=time.time()+60
-				self.debug("Must wait for <features/>")
-				return
-		elif method not in ("plain","digest"):
+		else:
 			self.auth_methods_left.pop(0)
 			self.debug("Skipping unknown auth method: %s" % method)
 			return self.try_auth()
-		elif self.available_auth_methods is not None:
-			if method in self.available_auth_methods:
-				self.auth_methods_left.pop(0)
-				self.auth_method_used=method
-				if method=="digest":
-					self.digest_auth_stage2(self.auth_stanza)
-				else:
-					self.plain_auth_stage2(self.auth_stanza)
-				self.auth_stanza=None
-				return
-			else:
-				self.debug("Skipping unavailable auth method: %s" % method)
-		else:
-			self.auth_stage1()
-
-	def auth_in_stage1(self,stanza):
-		if "plain" not in self.auth_methods and "digest" not in self.auth_methods:
-			iq=stanza.make_error_response("not-allowed")
-			self.send(iq)
-			return
-
-		iq=stanza.make_result_response()
-		q=iq.new_query("jabber:iq:auth")
-		q.newChild(q.ns(),"username",None)
-		q.newChild(q.ns(),"resource",None)
-		if "plain" in self.auth_methods:
-			q.newChild(q.ns(),"password",None)
-		if "digest" in self.auth_methods:
-			q.newChild(q.ns(),"digest",None)
-		self.send(iq)
-		iq.free()
-
-	def auth_in_stage2(self,stanza):
-		if "plain" not in self.auth_methods and "digest" not in self.auth_methods:
-			iq=stanza.make_error_response("not-allowed")
-			self.send(iq)
-			return
-	
-		username=stanza.xpath_eval("a:query/a:username",{"a":"jabber:iq:auth"})
-		if username:
-			username=from_utf8(username[0].getContent())
-		resource=stanza.xpath_eval("a:query/a:resource",{"a":"jabber:iq:auth"})
-		if resource:
-			resource=from_utf8(resource[0].getContent())
-		if not username or not resource:
-			self.debug("No username or resource found in auth request")
-			iq=stanza.make_error_response("bad-request")
-			self.send(iq)
-			return
-
-		if stanza.xpath_eval("a:query/a:password",{"a":"jabber:iq:auth"}):
-			if "plain" not in self.auth_methods:
-				iq=stanza.make_error_response("not-allowed")
-				self.send(iq)
-				return
-			else:
-				return self.plain_auth_in_stage2(username,resource,stanza)
-		if stanza.xpath_eval("a:query/a:digest",{"a":"jabber:iq:auth"}):
-			if "plain" not in self.auth_methods:
-				iq=stanza.make_error_response("not-allowed")
-				self.send(iq)
-				return
-			else:
-				return self.digest_auth_in_stage2(username,resource,stanza)
-
-	def auth_stage1(self):
-		iq=Iq(type="get")
-		q=iq.new_query("jabber:iq:auth")
-		q.newChild(q.ns(),"username",to_utf8(self.jid.node))
-		q.newChild(q.ns(),"resource",to_utf8(self.jid.resource))
-		self.send(iq)
-		self.set_response_handlers(iq,self.auth_stage2,self.auth_error,
-							self.features_timeout,timeout=60)
-		iq.free()
-		
-	def features_timeout(self,*args):
-		self.debug("Timeout while waiting for jabber:iq:auth result")
-		if self.auth_methods_left:
-			self.auth_methods_left.pop(0)
-	
-	def auth_error(self,stanza):
-		err=stanza.get_error()
-		ae=err.xpath_eval("e:*",{"e":"jabber:iq:auth:error"})
-		if ae:
-			ae=ae[0].name
-		else:
-			ae=err.get_condition().name
-		raise LegacyAuthenticationError,("Athentication error condition: %s" 
-					% (ae,))
-
-	def auth_stage2(self,stanza):
-		self.debug("Procesing auth response...")
-		self.available_auth_methods=[]
-		if (stanza.xpath_eval("a:query/a:digest",{"a":"jabber:iq:auth"}) and self.stream_id):
-					self.available_auth_methods.append("digest")
-		if (stanza.xpath_eval("a:query/a:password",{"a":"jabber:iq:auth"})):
-					self.available_auth_methods.append("plain")
-		self.auth_stanza=stanza.copy()
-		self.try_auth()
-	
-	def plain_auth_stage2(self,stanza):
-		iq=Iq(type="set")
-		q=iq.new_query("jabber:iq:auth")
-		q.newChild(None,"username",to_utf8(self.jid.node))
-		q.newChild(None,"resource",to_utf8(self.jid.resource))
-		q.newChild(None,"password",to_utf8(self.password))
-		self.send(iq)
-		self.set_response_handlers(iq,self.auth_finish,self.auth_error)
-		iq.free()
-	
-	def plain_auth_in_stage2(self,username,resource,stanza):
-		password=stanza.xpath_eval("a:query/a:password",{"a":"jabber:iq:auth"})
-		if password:
-			password=from_utf8(password[0].getContent())
-		if not password:
-			self.debug("No password found in plain auth request")
-			iq=stanza.make_error_response("bad-request")
-			self.send(iq)
-			return
-
-		if self.check_password(username,password):
-			iq=stanza.make_result_response()
-			self.send(iq)
-			self.peer_authenticated=1
-			self.auth_method_used="plain"
-			self.post_auth()
-		else:
-			self.debug("Plain auth failed")
-			iq=stanza.make_error_response("bad-request")
-			e=iq.get_error()
-			e.add_custom_condition('jabber:iq:auth:error',"user-unauthorized")
-			self.send(iq)
-	
-	def digest_auth_stage2(self,stanza):
-		iq=Iq(type="set")
-		q=iq.new_query("jabber:iq:auth")
-		q.newChild(None,"username",to_utf8(self.jid.node))
-		q.newChild(None,"resource",to_utf8(self.jid.resource))
-		digest=sha.new(to_utf8(self.stream_id)+to_utf8(self.password)).hexdigest()
-		q.newChild(None,"digest",digest)
-		self.send(iq)
-		self.set_response_handlers(iq,self.auth_finish,self.auth_error)
-		iq.free()
-	
-	def digest_auth_in_stage2(self,username,resource,stanza):
-		digest=stanza.xpath_eval("a:query/a:digest",{"a":"jabber:iq:auth"})
-		if digest:
-			digest=digest[0].getContent()
-		if not digest:
-			self.debug("No digest found in digest auth request")
-			iq=stanza.make_error_response("bad-request")
-			self.send(iq)
-			return
-		
-		password,pwformat=self.get_password(username)
-		if not password or pwformat!="plain":
-			iq=stanza.make_error_response("bad-request")
-			e=iq.get_error()
-			e.add_custom_condition('jabber:iq:auth:error',"user-unauthorized")
-			self.send(iq)
-			return
-			
-		mydigest=sha.new(to_utf8(self.stream_id)+to_utf8(password)).hexdigest()
-
-		if mydigest==digest:
-			iq=stanza.make_result_response()
-			self.send(iq)
-			self.peer_authenticated=1
-			self.auth_method_used="digest"
-			self.post_auth()
-		else:
-			self.debug("Digest auth failed: %r != %r" % (digest,mydigest))
-			iq=stanza.make_error_response("bad-request")
-			e=iq.get_error()
-			e.add_custom_condition('jabber:iq:auth:error',"user-unauthorized")
-			self.send(iq)
-	
-	def auth_finish(self,stanza):
-		self.debug("Authenticated")
-		self.me=self.jid
-		self.authenticated=1
-		self.post_auth()
 
 	def get_password(self,username,realm=None,acceptable_formats=("plain",)):
 		if self.initiator and self.jid.node==username and "plain" in acceptable_formats:

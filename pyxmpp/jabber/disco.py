@@ -18,12 +18,12 @@
 import sys
 import re
 import libxml2
-
 from types import StringType,UnicodeType
-from stanza import common_doc,common_root
-from jid import JID
 
-from utils import to_utf8,from_utf8
+from pyxmpp.stanza import common_doc,common_root
+from pyxmpp.jid import JID
+
+from pyxmpp.utils import to_utf8,from_utf8
 
 class DiscoError(StandardError):
 	pass

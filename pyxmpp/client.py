@@ -25,7 +25,6 @@ from iq import Iq
 from presence import Presence
 from utils import to_utf8,from_utf8
 from roster import Roster
-from disco import DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
 
 class ClientError(StandardError):
 	pass
@@ -35,7 +34,7 @@ class FatalClientError(ClientError):
 
 class Client:
 	def __init__(self,jid=None,password=None,server=None,port=5222,
-			auth_methods=["sasl:DIGEST-MD5","digest"],
+			auth_methods=["sasl:DIGEST-MD5"],
 			tls_settings=None,keepalive=0):
 
 		self.jid=jid
@@ -50,6 +49,7 @@ class Client:
 		self.state_changed=threading.Condition(self.lock)
 		self.session_established=0
 		self.roster=None
+		self.stream_class=ClientStream
 
 # public methods
 
@@ -67,8 +67,13 @@ class Client:
 			self.stream=None
 			if stream:
 				stream.close()
+
+			if self.server:
+				server=self.server
+			else:
+				server=self.jid.domain
 				
-			stream=ClientStream(self.jid,self.password,self.server,
+			stream=self.stream_class(self.jid,self.password,server,
 						self.port,self.auth_methods,
 						self.tls_settings,self.keepalive)
 			stream.debug=self.debug
@@ -76,15 +81,10 @@ class Client:
 			stream.process_stream_error=self.stream_error
 			self.stream_created(stream)
 			stream.connect()
-			stream.post_auth=self.__post_auth
+			stream.post_auth=self._post_auth
 			stream.post_disconnect=self.__post_disconnect
+			stream.post_connect=self.__post_connect
 			self.stream=stream
-			self.disco_items=DiscoItems()
-			self.disco_info=DiscoInfo()
-			self.disco_info.add_feature("iq")
-			self.disco_identity=DiscoIdentity(self.disco_info,
-								"libxml2 based Jabber client",
-								"client","pc")
 			self.state_changed.notify()
 			self.state_changed.release()
 		except:
@@ -179,13 +179,13 @@ class Client:
 			self.roster_updated(item)
 		resp=iq.make_result_response()
 		self.stream.send(resp)
+
+	def __post_connect(self):
+		self.stream_class.post_connect(self.stream)
+		self.connected()
 	
-	def __post_auth(self):
-		ClientStream.post_auth(self.stream)
-		self.stream.set_iq_get_handler("query","http://jabber.org/protocol/disco#items",
-									self.__disco_items)
-		self.stream.set_iq_get_handler("query","http://jabber.org/protocol/disco#info",
-									self.__disco_info)
+	def _post_auth(self):
+		self.stream_class.post_auth(self.stream)
 		self.authenticated()
 	
 	def __post_disconnect(self):
@@ -200,22 +200,6 @@ class Client:
 			self.state_changed.release()
 		self.disconnected()
 
-	def __disco_info(self,iq):
-		resp=iq.make_result_response()
-		self.debug("Disco-info query: %s preparing response: %s with reply: %s" 
-			% (iq.serialize(),resp.serialize(),self.disco_info.xmlnode.serialize()))
-		resp.set_content(self.disco_info.xmlnode.copyNode(1))
-		self.debug("Disco-info response: %s" % (resp.serialize(),))
-		self.stream.send(resp)
-
-	def __disco_items(self,iq):
-		resp=iq.make_result_response()
-		self.debug("Disco-items query: %s preparing response: %s with reply: %s" 
-			% (iq.serialize(),resp.serialize(),self.disco_info.xmlnode.serialize()))
-		resp.set_content(self.disco_items.xmlnode.copyNode(1))
-		self.debug("Disco-items response: %s" % (resp.serialize(),))
-		self.stream.send(resp)
-		
 # Method to override
 	def idle(self):
 		stream=self.get_stream()
@@ -238,6 +222,9 @@ class Client:
 				% (err.get_condition().name,err.serialize()))
 
 	def roster_updated(self):
+		pass
+
+	def connected(self):
 		pass
 
 	def authenticated(self):

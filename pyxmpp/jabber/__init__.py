@@ -15,13 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""PyXMPP - Jabber/XMPP protocol implementation"""
+"""JSF defined XMPP extension and legacy Jabber protocol elements"""
 
-from stream import Stream,StreamError,FatalStreamError,StreamParseError,tls_available,TLSSettings
-from clientstream import ClientStream,ClientStreamError
-from client import Client,ClientError
-from iq import Iq
-from presence import Presence
-from message import Message
-from jid import JID,JIDError
-from stanza import StanzaError
+from clientstream import LegacyClientStream
+from client import JabberClient as Client
+from disco import DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
