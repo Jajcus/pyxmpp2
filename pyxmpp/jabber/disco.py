@@ -176,18 +176,18 @@ class DiscoIdentity:
 		var=self.xmlnode.prop("category")
 		return unicode(var,"utf-8")
 	def set_category(self,category):
-		self.xmlnode.setProp("category",var.encode("utf-8"))
+		self.xmlnode.setProp("category",category.encode("utf-8"))
 	def type(self):
-		type=self.xmltype.prop("type")
+		type=self.xmlnode.prop("type")
 		if type is None:
 			return None
 		return unicode(type,"utf-8")
 	def set_type(self,type):
 		if type is None:
-			if self.xmltype.hasProp("type"):
-				self.xmltype.unsetProp("type")
+			if self.xmlnode.hasProp("type"):
+				self.xmlnode.unsetProp("type")
 			return
-		self.xmltype.setProp("type",type.encode("utf-8"))
+		self.xmlnode.setProp("type",type.encode("utf-8"))
 
 class DiscoItems:
 	def __init__(self,xmlnode_or_node=None):
