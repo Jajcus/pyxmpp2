@@ -233,6 +233,9 @@ class Client:
 	def connected(self):
 		pass
 
+	def authenticated(self):
+		pass
+
 	def authorized(self):
 		self.request_session()
 

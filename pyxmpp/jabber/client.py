@@ -37,18 +37,9 @@ class JabberClient(Client):
 		self.disco_info=DiscoInfo()
 		self.disco_info.add_feature("iq")
 		self.disco_identity=DiscoIdentity(self.disco_info,
-							"libxml2 based Jabber client",
+							"pyxmpp based Jabber client",
 							"client","pc")
 
-# protected methods
-
-	def _post_auth(self):
-		self.stream.set_iq_get_handler("query","http://jabber.org/protocol/disco#items",
-									self.__disco_items)
-		self.stream.set_iq_get_handler("query","http://jabber.org/protocol/disco#info",
-									self.__disco_info)
-		Client._post_auth(self)
-	
 # private methods
 	def __disco_info(self,iq):
 		resp=iq.make_result_response()
@@ -65,3 +56,10 @@ class JabberClient(Client):
 		resp.set_content(self.disco_items.xmlnode.copyNode(1))
 		self.debug("Disco-items response: %s" % (resp.serialize(),))
 		self.stream.send(resp)
+
+	def authorized(self):
+		Client.authorized(self)
+		self.stream.set_iq_get_handler("query","http://jabber.org/protocol/disco#items",
+									self.__disco_items)
+		self.stream.set_iq_get_handler("query","http://jabber.org/protocol/disco#info",
+									self.__disco_info)

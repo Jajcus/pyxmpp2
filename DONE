@@ -22,3 +22,10 @@
 	- roster management (only initial retrieval now)
 
 - basic Service Discovery (JEP-30) support
+
+- jabber:component:accept stream (without <log/>, <route/> and <xdb/> support)
+
+- base Component class
+	- jabber:component:accept stream support (compatible with jabberd 1.4 
+	  and jabberd 2.0)
+	- disco support

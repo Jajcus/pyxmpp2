@@ -106,10 +106,14 @@ class ComponentStream(Stream):
 				self._write_node(n)
 				n.unlinkNode()
 				n.freeNode()
+				self.peer_authenticated=1
+				self.state_change("authenticated",self.peer)
+				self._post_auth()
 				return
 			else:
 				self._send_stream_error("not-authorized")
 				raise FatalComponentStreamError,"Hanshake error."
+
 		if ns_uri in ("jabber:component:accept","jabber:client","jabber:server"):
 			stanza=StanzaFactory(node)
 			self.lock.release()
