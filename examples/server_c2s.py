@@ -7,13 +7,14 @@ import traceback
 import socket
 import logging
 
-from pyxmpp.all import ClientStream,JID,Iq,Presence,Message,StreamError
+from pyxmpp.all import JID,Iq,Presence,Message,StreamError
+from pyxmpp.jabber.all import LegacyClientStream
 
 accounts={
         u'test': '123',
     };
 
-class Stream(ClientStream):
+class Stream(LegacyClientStream):
     def state_change(self,state,arg):
         print "*** State changed: %s %r ***" % (state,arg)
         if state=="authorized":
