@@ -17,13 +17,14 @@
 
 """Client stream handling."""
 
-__revision__="$Id: clientstream.py,v 1.35 2004/09/20 21:07:19 jajcus Exp $"
+__revision__="$Id: clientstream.py,v 1.36 2004/09/22 21:32:26 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import logging
 
-from pyxmpp.stream import Stream,StreamError,StreamAuthenticationError,BIND_NS
-from pyxmpp.stream import FatalStreamError,SASLNotAvailable,SASLMechanismNotAvailable
+from pyxmpp.stream import Stream
+from pyxmpp.streambase import StreamError,StreamAuthenticationError,BIND_NS,FatalStreamError
+from pyxmpp.streamsasl import SASLNotAvailable,SASLMechanismNotAvailable
 from pyxmpp.jid import JID
 from pyxmpp.utils import to_utf8
 

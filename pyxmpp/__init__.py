@@ -17,11 +17,12 @@
 
 """PyXMPP - Jabber/XMPP protocol implementation"""
 
-__revision__="$Id: __init__.py,v 1.15 2004/09/20 21:07:19 jajcus Exp $"
+__revision__="$Id: __init__.py,v 1.16 2004/09/22 21:32:26 jajcus Exp $"
 __docformat__="restructuredtext en"
 
-from pyxmpp.stream import Stream,StreamError,FatalStreamError,StreamParseError
-from pyxmpp.stream import StreamEncryptionRequired,tls_available,TLSSettings
+from pyxmpp.stream import Stream
+from pyxmpp.streambase import StreamError,FatalStreamError,StreamParseError
+from pyxmpp.streamtls import StreamEncryptionRequired,tls_available,TLSSettings
 from pyxmpp.clientstream import ClientStream,ClientStreamError
 from pyxmpp.client import Client,ClientError
 from pyxmpp.iq import Iq

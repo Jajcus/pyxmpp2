@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: clientstream.py,v 1.16 2004/09/19 21:34:18 jajcus Exp $"
+__revision__="$Id: clientstream.py,v 1.17 2004/09/22 21:32:32 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -24,8 +24,9 @@ import time
 import logging
 from types import UnicodeType
 
-from pyxmpp.stream import Stream,StreamError,FatalStreamError,SASLNotAvailable,SASLMechanismNotAvailable
-from pyxmpp.stream import StreamAuthenticationError
+from pyxmpp.stream import Stream
+from pyxmpp.streambase import StreamError,FatalStreamError,StreamAuthenticationError
+from pyxmpp.streamsasl import SASLNotAvailable,SASLMechanismNotAvailable
 from pyxmpp.iq import Iq
 from pyxmpp.stanza import common_doc
 from pyxmpp.jid import JID
