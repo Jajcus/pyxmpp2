@@ -1,5 +1,14 @@
 2004-05-28  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/utils.py:
+	- docstrings updated
+
+	* pyxmpp/roster.py, CHANGES:
+	- roster module rewritten and documented. It is much simpler now, and should be much faster and much more standard-compliant.
+
+	* pyxmpp/jabber/vcard.py, pyxmpp/utils.py:
+	- get_node_ns() and get_node_ns_uri() helper functions added to utils module
+
 	* pyxmpp/jid.py:
 	- more Unicode
 
