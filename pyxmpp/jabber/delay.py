@@ -82,7 +82,11 @@ class Delay:
         tm=time.strptime(stamp,"%Y%m%dT%H:%M:%S")
         tm=tm[0:8]+(0,)
         self.timestamp=datetime.datetime.fromtimestamp(time.mktime(tm))
-        self.fr=JID(node.prop("from"))
+        fr=node.prop("from")
+        if fr:
+            self.fr=JID(fr)
+        else:
+            self.fr=None
         self.reason=from_utf8(node.getContent())
 
     def as_xml(self,parent=None):
