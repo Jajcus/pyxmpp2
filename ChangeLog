@@ -1,3 +1,8 @@
+2004-06-04  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/iq.py:
+	- return None from get_query() if no query is contained in the Iq stanza. The same for get_query_ns()
+
 2004-06-03  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* CHANGES, README:
