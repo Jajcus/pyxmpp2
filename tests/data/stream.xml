@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stream:stream xmlns:stream="http://etherx.jabber.org/streams" 
+	xmlns="jabber:client" to="pyxmpp.jabberstudio.org" 
+	version="1.0">
+<stream:features/>
+<iq id="1"><test xmlns="http://pyxmpp.jabberstudio.org/test"/></iq>
+<presence id="2"/>
+<message id="3">
+<test xmlns="http://pyxmpp.jabberstudio.org/test"
+/></message>
+</stream:stream>

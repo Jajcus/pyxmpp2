@@ -1,0 +1,7 @@
+#event offset element,attributes nested_element,attributes
+start 171 '<stream:stream xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client" to="pyxmpp.jabberstudio.org" version="1.0"/>'
+node 190 '<stream:features xmlns:stream="http://etherx.jabber.org/streams"/>'
+node 258 '<iq xmlns="jabber:client" id="1"><test xmlns="http://pyxmpp.jabberstudio.org/test"/></iq>'
+node 277 '<presence xmlns="jabber:client" id="2"/>'
+node 356 '<message xmlns="jabber:client" id="3">\n<test xmlns="http://pyxmpp.jabberstudio.org/test"/></message>'
+end 374 '<stream:stream xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client" to="pyxmpp.jabberstudio.org" version="1.0"/>'
