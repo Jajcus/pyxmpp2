@@ -1,6 +1,8 @@
+============================================
+PyXMPP -- Python Jabber/XMPPP implementation
+============================================
 
-				     PyXMPP 
-		   (c) 2003-2004 Jacek Konieczny <jajcus@bnet.pl>
+\(c) 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
 
 This is PyXMPP - a python XMPP (RFC 3920,3921) and Jabber
 (http://www.jabber.org/protocol/) implementation. It is based on libxml2 -
@@ -16,12 +18,13 @@ For PyXMPP you will need:
   - Python 2.3 (maybe it will work in 2.4 too)
   - recent libxml2 release (2.6.x) with python bindings. (http://xmlsoft.org/)
   - dnspython (http://www.pythondns.org/). PyXMPP is tested with version 1.3.2.
+  - M2Crypto (http://sandbox.rulemaker.net/ngps/m2/) for TLS support.
 
-To build the package just invoke:
+To build the package just invoke::
 
 	python setup.py build
 
-To install it:
+To install it::
 
 	python setup.py install
 
@@ -29,4 +32,4 @@ If you had some older version of PyXMPP it is better to uninstall it (delete
 pyxmpp subdirectory os your site-packages directory) before installing this one
 or things may not work correctly.
 
-Complete API documentation and more examples are coming soon (I hope)...
+:Status: $Id$
