@@ -1,3 +1,8 @@
+2004-09-28  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/sasl/__init__.py, pyxmpp/sasl/core.py, pyxmpp/sasl/plain.py, pyxmpp/jabberd/componentstream.py, pyxmpp/clientstream.py, pyxmpp/streamsasl.py, TODO.pylint, pylint.sh:
+	- cleaning up...
+
 2004-09-27  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/jabberd/__init__.py, pyxmpp/jabberd/component.py, pyxmpp/stanzaprocessor.py, pyxmpp/streamtls.py, TODO.pylint:
