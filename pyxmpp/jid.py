@@ -25,7 +25,7 @@ from stringprep import nodeprep,resourceprep
 
 node_invalid_re=re.compile(ur"[" u'"' ur"&'/:<>@\s\x00-\x19]",re.UNICODE)
 resource_invalid_re=re.compile(ur"[\s\x00-\x19]",re.UNICODE)
-domain_invalid_re=re.compile(r"[^-a-zA-Z]")
+domain_invalid_re=re.compile(r"[^-a-zA-Z0-9]")
 
 
 class JIDError(ValueError):
