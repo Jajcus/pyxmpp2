@@ -1,3 +1,11 @@
+2004-05-09  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/rfc3454.py:
+	- case mapping (B.2 table) fixed in stringprep profiles
+
+	* pyxmpp/jid.py:
+	- cosmetics
+
 2004-05-05  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* tests/unorm.py, pyxmpp/unicode/utils/makeccomp.py, pyxmpp/unicode/utils/makecexc.py, pyxmpp/unicode/utils/makediff.py, pyxmpp/unicode/ccomp.py, pyxmpp/unicode/cexc.py, pyxmpp/unicode/nfkc.py, pyxmpp/unicode/ud_3_2_0.py, pyxmpp/sasl/__init__.py, pyxmpp/sasl/core.py, pyxmpp/sasl/digest_md5.py, pyxmpp/sasl/plain.py, pyxmpp/jabberd/component.py, pyxmpp/jabberd/componentstream.py, pyxmpp/jabber/client.py, pyxmpp/jabber/clientstream.py, pyxmpp/jabber/disco.py, pyxmpp/jabber/muc.py, pyxmpp/jabber/vcard.py, pyxmpp/client.py, pyxmpp/clientstream.py, pyxmpp/dns.py, pyxmpp/error.py, pyxmpp/expdict.py, pyxmpp/iq.py, pyxmpp/jid.py, pyxmpp/message.py, pyxmpp/presence.py, pyxmpp/resolver.py, pyxmpp/rfc3454.py, pyxmpp/roster.py, pyxmpp/stanza.py, pyxmpp/stream.py, pyxmpp/utils.py, pyxmpp/xmlextra.py, pyxmpp/xmppstringprep.py, examples/componentstreamtest.py, examples/echocomponent.py, examples/stest.py, examples/streamtest.py, examples/test.py, setup.py:
