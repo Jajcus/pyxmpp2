@@ -26,7 +26,6 @@ if sys.hexversion<0x02030000:
     raise ImportError,"Python 2.3 or newer is required"
 
 import re
-import libxml2
 import time
 import datetime
 
@@ -56,47 +55,6 @@ def from_utf8(s):
         return unicode(s,"utf-8")
     else:
         return unicode(s)
-
-evil_characters_re=re.compile(r"[\000-\010\013\014\016-\037]",re.UNICODE)
-utf8_replacement_char=u"\ufffd".encode("utf-8")
-def remove_evil_characters(s):
-    """Remove control characters (not allowed in XML) from a string."""
-    if type(s) is unicode:
-        return evil_characters_re.sub(u"\ufffd",s)
-    else:
-        return evil_characters_re.sub(utf8_replacement_char,s)
-
-def get_node_ns(xmlnode):
-    """Namespace of an XML node.
-    
-    :Parameters:
-        - `xmlnode`: the XML node to query.
-    :Types:
-        - `xmlnode`: `libxml2.xmlNode`
-        
-    :return: namespace of the node or `None`
-    :returntype: `libxml2.xmlNs`"""
-    try:
-        return xmlnode.ns()
-    except libxml2.treeError:
-        return None
-
-
-def get_node_ns_uri(xmlnode):
-    """Return namespace URI of an XML node.
-    
-    :Parameters:
-        - `xmlnode`: the XML node to query.
-    :Types:
-        - `xmlnode`: `libxml2.xmlNode`
-        
-    :return: namespace URI of the node or `None`
-    :returntype: `unicode`"""
-    ns=get_node_ns(xmlnode)
-    if ns:
-        return unicode(ns.getContent(),"utf-8")
-    else:
-        return None
 
 minute=datetime.timedelta(minutes=1)
 nulldelta=datetime.timedelta()
