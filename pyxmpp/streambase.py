@@ -32,6 +32,7 @@ import random
 import threading
 import errno
 import logging
+import re
 
 
 from types import StringType,UnicodeType
@@ -50,6 +51,7 @@ from pyxmpp.stanzaprocessor import StanzaProcessor
 
 STREAM_NS="http://etherx.jabber.org/streams"
 BIND_NS="urn:ietf:params:xml:ns:xmpp-bind"
+bad_nsdef_replace_re=re.compile(r"^([^<]*\<[^><]*\s+)(xmlns=((\"[^\"]*\")|(\'[^\']*\')))")
 
 class StreamError(StandardError):
     """Base class for all stream errors."""
@@ -539,8 +541,29 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
             return
         xmlnode=xmlnode.docCopyNode(self.doc_out,1)
         self.doc_out.addChild(xmlnode)
-        xmlextra.replace_ns(xmlnode, xmlextra.common_ns, self.default_ns)
+        try:
+            ns = xmlnode.ns()
+        except libxml2.treeError:
+            ns = None
+        self.__logger.debug("Stanza NS: %r (%s)", ns, ns)
+        if ns and ns.content == xmlextra.COMMON_NS:
+            self.__logger.debug("Changing to: %r (%s)", self.default_ns, self.default_ns)
+            xmlextra.replace_ns(xmlnode, ns, self.default_ns)
+        try:
+            ns = xmlnode.ns()
+        except libxml2.treeError:
+            ns = None
+        self.__logger.debug("New NS: %r (%s)", ns, ns)
+        try:
+            nsdef = xmlnode.nsDefs()
+        except libxml2.treeError:
+            nsdef = None
         s=xmlnode.serialize(encoding="UTF-8")
+        while nsdef:
+            if nsdef.name is None and (not ns or (nsdef.name, nsdef.content)!=(ns.name, ns.content)):
+                s = bad_nsdef_replace_re.sub("\\1",s,1)
+                break
+            nsdef = nsdef.next
         s=remove_evil_characters(s)
         self._write_raw(s)
         xmlnode.unlinkNode()
