@@ -1,3 +1,8 @@
+2004-09-21  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/stanzaprocessor.py:
+	- cleaned up a bit too much ;-)
+
 2004-09-20  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/__init__.py, pyxmpp/client.py, pyxmpp/clientstream.py, pyxmpp/dns.py, pyxmpp/resolver.py, pyxmpp/stanza.py, TODO.pylint:
