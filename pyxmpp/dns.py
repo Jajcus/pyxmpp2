@@ -449,7 +449,6 @@ class Message:
 		if self.ra:
 			flags|=0x0080
 		flags|=(self.rcode&0x0f)
-		print >>file("debug.log","a"),`("!HHHHHH",self.id,flags,qdcount,ancount,nscount,arcount)`,`payload`
 		return struct.pack("!HHHHHH",self.id,flags,qdcount,ancount,nscount,arcount)+payload
 
 def parse_question(packet,offset):
