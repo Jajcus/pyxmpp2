@@ -1,5 +1,8 @@
 2004-09-25  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/error.py, pyxmpp/iq.py, TODO.pylint:
+	- cleaning up...
+
 	* pyxmpp/expdict.py, TODO.pylint, pylint.sh:
 	- expdict fixes
 
