@@ -48,12 +48,12 @@ class MucXBase:
     ns=None
     def __init__(self,node=None,copy=True,parent=None):
         """
-        Copy MucXBase object or create a new one, possibly 
+        Copy MucXBase object or create a new one, possibly
         based on or wrappin an XML node.
-        
+
         `node` is a MucXBase instance to compy or an XML node
         When `copy` is False this MucXBase will wrap existing
-        XML node (e.g. part of a stanza), the XML node will be 
+        XML node (e.g. part of a stanza), the XML node will be
         copied otherwise.
         If `parent` is not `None` it will be the parent of newly created node
         node
@@ -127,7 +127,7 @@ class MucXBase:
 
 class MucX(MucXBase):
     """
-    Wrapper for http://www.jabber.org/protocol/muc namespaced 
+    Wrapper for http://www.jabber.org/protocol/muc namespaced
     stanza payload "x" elements.
     """
     ns=MUC_NS
@@ -212,7 +212,7 @@ class MucItem(MucItemBase):
     def as_xml(self,parent):
         """
         Create `libxml2.xmlNode` representation of `self`.
-        
+
         `parent` is the element to which the created node should be linked to.
         """
         n=parent.newChild(parent.ns(),"item",None)
@@ -266,7 +266,7 @@ class MucStatus(MucItemBase):
 
 class MucUserX(MucXBase):
     """
-    Wrapper for http://www.jabber.org/protocol/muc#user namespaced 
+    Wrapper for http://www.jabber.org/protocol/muc#user namespaced
     stanza payload "x" elements and usually containing information
     about a room user.
 
@@ -316,7 +316,7 @@ class MucUserX(MucXBase):
 
 class MucAdminQuery(MucUserX):
     """
-    Wrapper for http://www.jabber.org/protocol/muc#admin namespaced 
+    Wrapper for http://www.jabber.org/protocol/muc#admin namespaced
     IQ stanza payload "query" elements and usually describing
     administrative actions or their results.
 
@@ -494,7 +494,7 @@ class MucIq(Iq,MucStanzaExt):
 class MucRoomHandler:
     """
     Base class for MUC room handlers.
-    
+
     Methods of this class will be called for various events in the room.
 
     Public attributes:
@@ -503,29 +503,29 @@ class MucRoomHandler:
     """
     def __init__(self):
         self.room_state=None
-        
+
     def assign_state(self,state_obj):
         """Called to assign a `MucRoomState` object to this `MucRoomHandler` instance."""
         self.room_state=state_obj
-        
+
     def user_joined(self,user,stanza):
         """
         Called when a new participant joins the room.
-        
+
         `user` MucRoomUser object describing the user joining.
         `stanza` the stanza received.
         """
         pass
-        
+
     def user_left(self,user,stanza):
         """
         Called when a participant leaves the room.
-        
+
         `user` MucRoomUser object describing the user leaving.
         `stanza` the stanza received.
         """
         pass
-        
+
     def role_changed(self,user,old_role,new_role,stanza):
         """
         Called when a role of an user has been changed.
@@ -536,7 +536,7 @@ class MucRoomHandler:
         `stanza` the stanza received.
         """
         pass
-        
+
     def affiliation_changed(self,user,old_aff,new_aff,stanza):
         """
         Called when a affiliation of an user has been changed.
@@ -547,7 +547,7 @@ class MucRoomHandler:
         `stanza` the stanza received.
         """
         pass
-        
+
     def nick_change(self,user,new_nick,stanza):
         """
         Called when user nick change is started.
@@ -557,7 +557,7 @@ class MucRoomHandler:
         `stanza` the stanza received.
         """
         pass
-    
+
     def nick_changed(self,user,old_nick,stanza):
         """
         Called after a user nick has been changed.
@@ -567,7 +567,17 @@ class MucRoomHandler:
         `stanza` the stanza received.
         """
         pass
-        
+
+    def presence_changed(self,user,stanza):
+        """
+        Called whenever user's presence changes (includes nick, role or
+        affiliation changes).
+
+        `user` MucRoomUser object describing the user.
+        `stanza` the stanza received.
+        """
+        pass
+
     def subject_changed(self,user,stanza):
         """
         Called when the room subject has been changed.
@@ -576,7 +586,7 @@ class MucRoomHandler:
         `stanza` is the stanza used to change the subject.
         """
         pass
-        
+
     def message_received(self,user,stanza):
         """
         Called when groupchat message has been received.
@@ -585,14 +595,14 @@ class MucRoomHandler:
         `stanza` is the message stanza received.
         """
         pass
-        
+
     def error(self,stanza):
         err=stanza.get_error()
-        self.debug("Error from: %r Condition: %r" 
-                % (stanza.get_from(),err.get_condition)) 
-        
+        self.debug("Error from: %r Condition: %r"
+                % (stanza.get_from(),err.get_condition))
+
     def debug(self,s):
-        self.room_state.stream.debug(s)
+        self.room_state.manager.stream.debug(s)
 
 class MucRoomUser:
     """
@@ -637,7 +647,7 @@ class MucRoomUser:
                 self.update_presence(presence_or_user_or_jid)
             else:
                 raise TypeError,"Bad argument type for MucRoomUser constructor"
-        
+
     def update_presence(self,presence):
         """
         Update user information using the presence stanza provided.
@@ -666,7 +676,7 @@ class MucRoomUser:
                 break
     def same_as(self,other):
         return self.room_jid==other.room_jid
-        
+
 class MucRoomState:
     """
     Describes the state of a MUC room, handles room events
@@ -700,7 +710,7 @@ class MucRoomState:
         """
         Return room user with given nick or JID.
 
-        If JID is given with non-empty resource and user is not known, then 
+        If JID is given with non-empty resource and user is not known, then
         create a new MucRoomUser object. Otherwise return None if the user is
         not known.
         """
@@ -719,8 +729,8 @@ class MucRoomState:
     def set_stream(self,stream):
         """
         Mark the room not joined and inform `self.handler` that it was left.
-        
-        Called when current stream changes. 
+
+        Called when current stream changes.
         """
         if self.joined and self.handler:
             self.handler.user_left(self.me,None)
@@ -735,7 +745,7 @@ class MucRoomState:
         p=MucPresence(to=self.room_jid)
         p.make_join_request()
         self.manager.stream.send(p)
-        
+
     def leave(self):
         """
         Send a leave request for the room.
@@ -764,7 +774,7 @@ class MucRoomState:
         new_room_jid=JID(self.room_jid.node,self.room_jid.domain,new_nick)
         p=Presence(to=new_room_jid)
         self.manager.stream.send(p)
-        
+
     def get_room_jid(self,nick=None):
         """
         Return the room jid or a room jid for given `nick`.
@@ -772,13 +782,13 @@ class MucRoomState:
         if nick is None:
             return self.room_jid
         return JID(self.room_jid.node,self.room_jid.domain,nick)
-            
+
     def get_nick(self):
         """
         Return own nick.
         """
         return self.room_jid.resource
-       
+
     def process_available_presence(self,stanza):
         """
         Process <presence/> received from the room.
@@ -796,6 +806,7 @@ class MucRoomState:
             old_user=None
             user=MucRoomUser(stanza)
             self.users[user.nick]=user
+        self.handler.presence_changed(user,stanza)
         if fr==self.room_jid and not self.joined:
             self.joined=True
             self.me=user
@@ -810,7 +821,7 @@ class MucRoomState:
                 self.handler.role_changed(user,old_user.role,user.role,stanza)
             if old_user.affiliation!=user.affiliation:
                 self.handler.affiliation_changed(user,old_user.affiliation,user.affiliation,stanza)
-        
+
     def process_unavailable_presence(self,stanza):
         """
         Process <presence type="unavailable"/> received from the room.
@@ -821,8 +832,9 @@ class MucRoomState:
         nick=fr.resource
         user=self.users.get(nick)
         if user:
-            old_user=MucRoomUser(stanza)
+            old_user=MucRoomUser(user)
             user.update_presence(stanza)
+            self.handler.presence_changed(user,stanza)
             if user.new_nick:
                 mc=stanza.get_muc_child()
                 if isinstance(mc,MucUserX):
@@ -835,6 +847,7 @@ class MucRoomState:
             old_user=None
             user=MucRoomUser(stanza)
             self.users[user.nick]=user
+            self.handler.presence_changed(user,stanza)
         if fr==self.room_jid and self.joined:
             self.joined=False
             self.handler.user_left(user,stanza)
@@ -843,7 +856,7 @@ class MucRoomState:
         elif old_user:
             self.handler.user_left(user,stanza)
         # TODO: kicks
-        
+
     def process_groupchat_message(self,stanza):
         """
         Process <message type="groupchat"/> received from the room.
@@ -856,7 +869,7 @@ class MucRoomState:
             self.handler.subject_changed(user,stanza)
         else:
             self.handler.message_received(user,stanza)
-    
+
     def process_error_message(self,stanza):
         """
         Process <message type="error"/> received from the room.
@@ -868,6 +881,9 @@ class MucRoomState:
         Process <presence type="error"/> received from the room.
         """
         self.handler.error(stanza)
+
+    def debug(self,s):
+        self.manager.stream.debug(s)
 
 class MucRoomManager:
     """
@@ -883,7 +899,7 @@ class MucRoomManager:
         """
         self.rooms={}
         self.set_stream(stream)
-        
+
     def set_stream(self,stream):
         """
         Change the stream assigned to `self`.
@@ -907,7 +923,7 @@ class MucRoomManager:
         """
         Create and return a new RoomState object and request joining
         to a MUC room.
-        
+
         `room` is the name of a room to be joined
         `nick` is the nickname to be used in the room
         `handler` is a MucRoomHandler object which will handle room events
@@ -931,7 +947,7 @@ class MucRoomManager:
             del self.rooms[rs.room_jid.bare().as_unicode()]
         except KeyError:
             pass
-            
+
     def __groupchat_message(self,stanza):
         fr=stanza.get_from()
         key=fr.bare().as_unicode()
@@ -941,7 +957,7 @@ class MucRoomManager:
             return False
         rs.process_groupchat_message(stanza)
         return True
- 
+
     def __error_message(self,stanza):
         fr=stanza.get_from()
         key=fr.bare().as_unicode()
@@ -950,7 +966,7 @@ class MucRoomManager:
             return False
         rs.process_error_message(stanza)
         return True
- 
+
     def __presence_error(self,stanza):
         fr=stanza.get_from()
         key=fr.bare().as_unicode()
@@ -959,7 +975,7 @@ class MucRoomManager:
             return False
         rs.process_error_presence(stanza)
         return True
-        
+
     def __presence_available(self,stanza):
         fr=stanza.get_from()
         key=fr.bare().as_unicode()
@@ -968,7 +984,7 @@ class MucRoomManager:
             return False
         rs.process_available_presence(MucPresence(stanza))
         return True
- 
+
     def __presence_unavailable(self,stanza):
         fr=stanza.get_from()
         key=fr.bare().as_unicode()
@@ -977,5 +993,8 @@ class MucRoomManager:
             return False
         rs.process_unavailable_presence(MucPresence(stanza))
         return True
+
+    def debug(self,s):
+        self.stream.debug(s)
 
 # vi: sts=4 et sw=4
