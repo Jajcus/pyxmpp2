@@ -62,7 +62,7 @@ class ClientStream(Stream):
 	def reset(self):
 		Stream.reset(self)
 		self.auth_methods_left=[]
-		self.session_established=1
+		self.session_established=0
 		self.available_auth_methods=None
 		self.features_timeout=None
 		self.auth_stanza=None
@@ -387,9 +387,12 @@ class ClientStream(Stream):
 	def fix_out_stanza(self,stanza):
 		if self.initiator:
 			stanza.set_from(None)
-			if not stanza.get_to() and self.peer:
-				stanza.set_to(self.peer)
 		else:
-			Stream.fix_out_stanza(self,stanza)
+			if not stanza.get_from():
+				stanza.set_from(self.me)
 	
-		
+	def fix_in_stanza(self,stanza):
+		if self.initiator:
+			Stream.fix_in_stanza(self,stanza)
+		else:
+			stanza.set_from(self.peer)

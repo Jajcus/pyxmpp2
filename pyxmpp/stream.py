@@ -191,9 +191,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			raise FatalStreamError,"Unsupported protocol version."
 		
 		to_from_mismatch=0
-		if not self.doc_out:
-			self.send_stream_start(self.generate_id())
-		else:
+		if self.initiator:
 			self.stream_id=r.prop("id")
 			peer=r.prop("from")
 			if peer:
@@ -203,9 +201,17 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 					to_from_mismatch=1
 			else:
 				self.peer=peer
-
-		if not self.initiator:
+		else:
+			to=r.prop("to")
+			if to:
+				to=self.check_to(to)
+				if not to:
+					self.send_stream_error("host-unknown")
+					raise FatalStreamError,'Bad "to"'
+				self.me=JID(to)
+			self.send_stream_start(self.generate_id())
 			self.send_stream_features()
+
 		self.post_connect()
 		if to_from_mismatch:
 			raise HostMismatch
@@ -410,15 +416,18 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		typ=stanza.get_type()
 		if typ in ("result","error"):
 			if self.iq_response_handlers.has_key((id,fr.as_unicode())):
-				res_handler,err_handler=self.iq_response_handlers[(id,fr.as_unicode())]
-				if stanza.get_type()=="result":
-					res_handler(stanza)
-				else:
-					err_handler(stanza)
-				del self.iq_response_handlers[(id,fr.as_unicode())]
-				return 1
+				key=(id,fr.as_unicode())
+			elif fr==self.peer and self.iq_response_handlers.has_key((id,None)):
+				key=(id,None)
 			else:
 				return 0
+			res_handler,err_handler=self.iq_response_handlers[key]
+			if stanza.get_type()=="result":
+				res_handler(stanza)
+			else:
+				err_handler(stanza)
+			del self.iq_response_handlers[key]
+			return 1
 
 		q=stanza.get_query()
 		if not q:
@@ -477,7 +486,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.fix_in_stanza(stanza)
 		to=stanza.get_to()
 
-		if to!=self.me and to!=self.me.bare():
+		if to and to!=self.me and to!=self.me.bare():
 			return self.route_stanza(stanza)
 
 		if stanza.stanza_type=="iq":
@@ -500,25 +509,27 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def post_disconnect(self):
 		pass
 
+	def check_to(self,to):
+		if to!=self.me:
+			return None
+		return to
+
 	def fix_in_stanza(self,stanza):
-		if not stanza.get_from() and self.peer:
-			stanza.set_from(self.peer)
-		if not stanza.get_to() and self.me:
-			stanza.set_to(self.me)
+		pass
 		
 	def fix_out_stanza(self,stanza):
-		if not stanza.get_from() and self.me:
-			stanza.set_from(self.me)
-		if not stanza.get_to() and self.peer:
-			stanza.set_to(self.peer)
+		pass
 		
 	def set_response_handlers(self,iq,res_handler,err_handler,timeout_handler=None,timeout=300):
 		self.fix_out_stanza(iq)
+		to=iq.get_to()
+		if to:
+			to=to.as_unicode()
 		if timeout_handler:
-			self.iq_response_handlers[(iq.get_id(),iq.get_to().as_unicode()),timeout,timeout_handler]=(
+			self.iq_response_handlers[(iq.get_id(),to),timeout,timeout_handler]=(
 								res_handler,err_handler)
 		else:
-			self.iq_response_handlers[(iq.get_id(),iq.get_to().as_unicode()),timeout]=(
+			self.iq_response_handlers[(iq.get_id(),to),timeout]=(
 								res_handler,err_handler)
 
 	def set_iq_get_handler(self,element,namespace,handler):

@@ -16,6 +16,7 @@
 #
 
 import re
+from types import StringType,UnicodeType
 
 from utils import to_utf8,from_utf8
 from stringprep import nodeprep,resourceprep
@@ -112,9 +113,19 @@ class JID:
 		return JID(self.node,self.domain)
 
 	def __eq__(self,other):
+		if type(other) in (StringType,UnicodeType):
+			other=JID(other)
+		elif not isinstance(other,JID):
+			raise TypeError,"Can't compare JID with %r" % (type(other),)
+			
 		return (self.node==other.node
 			and self.domain==other.domain
 			and self.resource==other.resource)
 	
 	def __ne__(self,other):
+		if type(other) in (StringType,UnicodeType):
+			other=JID(other)
+		elif not isinstance(other,JID):
+			raise TypeError,"Can't compare JID with %r" % (type(other),)
+			
 		return not self.__eq__(other)

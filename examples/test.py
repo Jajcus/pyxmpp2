@@ -26,6 +26,7 @@ class Stream(ClientStream):
 		if self.session_established:
 			target=JID("jajcus",s.jid.domain)
 			self.send(Message(to=target,body=unicode("Te¶cik","iso-8859-2")))
+
 	def post_disconnect(self):
 		print "Disconnected"
 		raise Disconnected
@@ -33,7 +34,7 @@ class Stream(ClientStream):
 libxml2.debugMemory(1)
 
 print "creating stream..."
-s=Stream(JID("test@localhost/Test"),u"1234",auth_methods=["digest"])
+s=Stream(JID("test@localhost/Test"),u"123",auth_methods=["digest"])
 #s=Stream(JID(unicode("¿ó³tek","iso-8859-2"),"localhost","Test"),unicode("zieleñ","iso-8859-2"))
 #s=Stream(JID("pyxmpp","jabberd.jabberstudio.org","Test"),"123",port=15222,auth_methods=["sasl:DIGEST-MD5","digest","plain"])
 

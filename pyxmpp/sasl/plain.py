@@ -68,4 +68,4 @@ class PlainServerAuthenticator(ServerAuthenticator):
 			return Success(authzid)
 		else:
 			self.debug("Authzid verification failed.")
-			return Failure("not-authorized")
+			return Failure("invalid-authzid")

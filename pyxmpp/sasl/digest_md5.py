@@ -408,4 +408,4 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 			return Challenge("rspauth="+rspauth)
 		else:
 			self.debug("Authzid check failed")
-			return Failure("not-authorized")
+			return Failure("invalid_authzid")
