@@ -173,7 +173,7 @@ class LegacyClientStream(ClientStream):
 				ae=ae[0].name
 			else:
 				ae=err.get_condition().name
-			raise LegacyAuthenticationError,("Athentication error condition: %s" 
+			raise LegacyAuthenticationError,("Authentication error condition: %s" 
 						% (ae,))
 		finally:
 			self.lock.release()
