@@ -18,7 +18,7 @@
 import random
 import string
 import sys
-import base64
+from binascii import b2a_base64
 
 class PasswordManager:
 	def get_password(self,username,realm=None,acceptable_format=("plain",)):
@@ -50,7 +50,7 @@ class PasswordManager:
 class Reply:
 	def base64(self):
 		if self.data is not None:
-			return base64.encodestring(self.data)
+			return b2a_base64(self.data)
 		else:
 			return None
 class Response(Reply):

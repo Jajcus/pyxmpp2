@@ -179,7 +179,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 		nonce_count="%08x" % (self.nonce_count,)
 		params.append('nc=%s' % (nonce_count,))
 		
-		params.append('qop="auth"')
+		params.append('qop=auth')
 	
 		serv_type=self.password_manager.get_serv_type().encode("us-ascii")
 		host=self.password_manager.get_serv_host().encode("us-ascii")
@@ -262,7 +262,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 				r=quote(r)
 				params.append('realm="%s"' % (r,))
 		else:
-			realm=None
+			self.realm=None
 		nonce=quote(self.password_manager.generate_nonce())
 		self.nonce=nonce
 		params.append('nonce="%s"' % (nonce,))
@@ -274,9 +274,12 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 	def response(self,response):
 		if not response:
 			return Failure("not-authorized")
-		
-		realm=to_utf8(self.realm)
-		realm=quote(realm)
+	
+		if self.realm:
+			realm=to_utf8(self.realm)
+			realm=quote(realm)
+		else:
+			realm=None
 		username=None
 		cnonce=None
 		digest_uri=None
@@ -293,14 +296,14 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 			val=m.group("val")
 			self.debug("%r: %r" % (var,val))
 			if var=="realm":
-				realms=val[1:-1]
+				realm=val[1:-1]
 			elif var=="cnonce":
 				if cnonce:
 					self.debug("Duplicate cnonce")
 					return Failure("not-authorized")
 				cnonce=val[1:-1]
 			elif var=="qop":
-				if val!='"auth"':
+				if val!='auth':
 					self.debug("qop other then 'auth'")
 					return Failure("not-authorized")
 			elif var=="digest-uri":
@@ -343,7 +346,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 		if realm:
 			realm_uq=from_utf8(realm.replace('\\',''))
 		else:
-			realm=None
+			realm_uq=None
 		digest_uri_uq=digest_uri.replace('\\','')
 
 		password,pformat=self.password_manager.get_password(
