@@ -221,21 +221,6 @@ W0201: 45:JabberClient.connect: Attribute 'disco_identity' defined outside __ini
 W0611: 24: Unused import DiscoItem
 W0611: 25: Unused import ClientError
 W0611: 25: Unused import FatalClientError
-************* Module pyxmpp.jabber.delay
-W0311:136: Bad indentation. Found 8 spaces, expected 4
-W0311:137: Bad indentation. Found 8 spaces, expected 4
-W0311:138: Bad indentation. Found 12 spaces, expected 8
-W0311:139: Bad indentation. Found 16 spaces, expected 12
-W0311:140: Bad indentation. Found 12 spaces, expected 8
-W0311:141: Bad indentation. Found 8 spaces, expected 4
-E0602:106:Delay.as_xml: Undefined variable 'ROSTER_NS'
-E0602:111:Delay.as_xml: Undefined variable 'fr'
-W0141:135:get_delay: Missing docstring
-W0611: 23: Unused import sys
-W0611: 27: Unused import StringType
-W0611: 32: Unused import get_node_ns
-W0611: 27: Unused import UnicodeType
-W0611: 29: Unused import common_root
 ************* Module pyxmpp.jabber.disco
 W0141:  0: Missing docstring
 W0141: 35:DiscoError: Missing docstring
@@ -385,7 +370,7 @@ W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 Report
 ======
-5967 statements analysed.
+5974 statements analysed.
 
 Statistics by type
 ------------------
@@ -395,7 +380,7 @@ type     number old number difference %documented %badname
 module   37     37         =          83.78       0.00     
 class    114    114        =          78.07       0.00     
 method   0      0          =          0.00        0.00     
-function 640    640        =          85.31       0.00     
+function 642    642        =          85.51       0.00     
 
 
 Raw metrics
@@ -403,10 +388,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6542   56.89 6542     =          
-docstring 3706   32.23 3706     =          
-comment   589    5.12  589      =          
-empty     663    5.77  663      =          
+code      6549   56.71 6551     -2         
+docstring 3745   32.43 3745     =          
+comment   589    5.10  589      =          
+empty     666    5.77  666      =          
 
 
 External dependencies
@@ -431,7 +416,7 @@ External dependencies
     encodings 
       \-idna (pyxmpp.jid,pyxmpp.dns)
     os (pyxmpp.streambase)
-    types (pyxmpp.xmppstringprep,pyxmpp.roster,pyxmpp.jid,pyxmpp.dns,pyxmpp.streambase,pyxmpp.utils,pyxmpp.error,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    types (pyxmpp.xmppstringprep,pyxmpp.roster,pyxmpp.jid,pyxmpp.dns,pyxmpp.streambase,pyxmpp.utils,pyxmpp.error,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
     string (pyxmpp.jabber.vcard)
 
 
@@ -441,14 +426,13 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0141      125        
+W0141      124        
 W0201      48         
 W0613      42         
 E0201      34         
-W0611      27         
+W0611      22         
 W0102      17         
-E0602      14         
-W0311      8          
+E0602      12         
 W0612      7          
 W0511      6          
 W0221      6          
@@ -456,6 +440,7 @@ W0231      5
 W0622      4          
 W0103      4          
 W0403      2          
+W0311      2          
 W0301      2          
 W0232      2          
 W0151      2          
@@ -470,8 +455,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 312    312      =          
-errors   48     48       =          
+warnings 300    305      -5         
+errors   46     46       =          
 
 
 % errors / warnings by module
@@ -479,32 +464,31 @@ errors   48     48       =
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            31.25 27.24   
-pyxmpp.jid                     27.08 0.32    
-pyxmpp.jabber.muc              18.75 12.50   
-pyxmpp.jabber.disco            8.33  12.50   
-pyxmpp.jabber.client           6.25  4.81    
-pyxmpp.jabber.clientstream     4.17  13.46   
-pyxmpp.jabber.delay            4.17  3.85    
-pyxmpp.streambase              0.00  7.05    
-pyxmpp.sasl.core               0.00  3.21    
-pyxmpp.streamsasl              0.00  2.56    
-pyxmpp.dns                     0.00  2.56    
-pyxmpp.clientstream            0.00  2.24    
-pyxmpp.jabberd.componentstream 0.00  1.92    
-pyxmpp.streamtls               0.00  1.28    
-pyxmpp.xmlextra                0.00  0.96    
-pyxmpp.version                 0.00  0.96    
-pyxmpp.sasl.plain              0.00  0.64    
-pyxmpp._xmlextra               0.00  0.64    
-pyxmpp.xmppstringprep          0.00  0.32    
-pyxmpp.sasl.digest_md5         0.00  0.32    
-pyxmpp.resolver                0.00  0.32    
-pyxmpp.client                  0.00  0.32    
+pyxmpp.jabber.vcard            32.61 28.33   
+pyxmpp.jid                     28.26 0.33    
+pyxmpp.jabber.muc              19.57 13.00   
+pyxmpp.jabber.disco            8.70  13.00   
+pyxmpp.jabber.client           6.52  5.00    
+pyxmpp.jabber.clientstream     4.35  14.00   
+pyxmpp.streambase              0.00  7.33    
+pyxmpp.sasl.core               0.00  3.33    
+pyxmpp.streamsasl              0.00  2.67    
+pyxmpp.dns                     0.00  2.67    
+pyxmpp.clientstream            0.00  2.33    
+pyxmpp.jabberd.componentstream 0.00  2.00    
+pyxmpp.streamtls               0.00  1.33    
+pyxmpp.xmlextra                0.00  1.00    
+pyxmpp.version                 0.00  1.00    
+pyxmpp.sasl.plain              0.00  0.67    
+pyxmpp._xmlextra               0.00  0.67    
+pyxmpp.xmppstringprep          0.00  0.33    
+pyxmpp.sasl.digest_md5         0.00  0.33    
+pyxmpp.resolver                0.00  0.33    
+pyxmpp.client                  0.00  0.33    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 9.07/10 (previous run: 9.07/10)
+Your code has been rated at 9.11/10 (previous run: 9.10/10)
 So close to being perfect...
 
