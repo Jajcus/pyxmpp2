@@ -25,7 +25,11 @@ class StreamHandler:
 		doc=libxml2.xmlDoc(_doc)
 		node=libxml2.xmlNode(_node)
 		self.stanza_end(doc,node)
-	
+	def _stanza(self,_doc,_node):
+		doc=libxml2.xmlDoc(_doc)
+		node=libxml2.xmlNode(_node)
+		self.stanza(doc,node)
+
 	def stream_start(self,doc):
 		"""Called when the start tag of root element is encountered 
 		in the stream. 
@@ -56,13 +60,24 @@ class StreamHandler:
 		and freed after this method returns. If it is needed after
 		that a copy must be made before the method returns."""
 		print >>sys.stderr,"Unhandled stanza end",`node.serialize()`
+	def stanza(self,doc,node):
+		"""Called when the end tag of a direct child of the root
+		element is encountered in the stream. 
+		
+		doc is the document being parsed
+		node is the (complete) element parsed
+		
+		Please note, that node will be removed from the document
+		and freed after this method returns. If it is needed after
+		that a copy must be made before the method returns."""
+		print >>sys.stderr,"Unhandled stanza",`node.serialize()`
 	def error(self,descr):
 		"""Called when an error is encountered in the stream."""
 		raise StreamParseError,descr
 
 class StreamReader:
 	def __init__(self,handler):
-		self.reader=_xmlextra.reader_new(handler)
+		self.reader=_xmlextra.preparsing_reader_new(handler)
 		self.lock=threading.RLock()
 		self.in_use=0
 	def doc(self):
@@ -72,6 +87,9 @@ class StreamReader:
 		else:
 			return None
 	def feed(self,s):
+		"""Passes string s to the stream parser. Returns None on EOF,
+		   0 when whole input was parsed and 1 if there is something still left
+		   in the buffer"""
 		self.lock.acquire()
 		if self.in_use:
 			self.lock.release()

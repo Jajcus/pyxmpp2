@@ -354,6 +354,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def stanza_end(self,doc,node):
 		self._process_node(node)
 
+	def stanza(self,doc,node):
+		self._process_node(node)
+
 	def error(self,desc):
 		raise StreamParseError,desc
 				
@@ -580,7 +583,12 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.data_in(r)
 		if r:
 			try:
-				self.reader.feed(r)
+				r=self.reader.feed(r)
+				while r:
+					r=self.reader.feed("")
+				if r is None:
+					self.eof=1
+					self.disconnect()
 			except StreamParseError:
 				self._send_stream_error("xml-not-well-formed")
 				raise
