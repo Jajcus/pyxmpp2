@@ -17,7 +17,7 @@
 
 """Core XMPP stream functionality"""
 
-__revision__="$Id: stream.py,v 1.70 2004/09/19 16:06:28 jajcus Exp $"
+__revision__="$Id: stream.py,v 1.71 2004/09/19 21:34:11 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -174,6 +174,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         - `process_all_stanzas`: when `True` then all stanzas received are
           considered local.
         - `tls`: TLS connection object.
+        - `initiator`: `True` if local stream endpoint is the initiating entity.
         - `_reader`: the stream reader object (push parser) for the stream.
     """
     def __init__(self,default_ns,extra_ns=(),sasl_mechanisms=(),
@@ -205,18 +206,18 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         self.lock=threading.RLock()
         self._reader_lock=threading.Lock()
         self.process_all_stanzas=False
+        self.port=None
         self._reset()
         self.__logger=logging.getLogger("pyxmpp.Stream")
 
     def _reset(self):
-        """Reset Stream object state making it ready to handle new
+        """Reset `Stream` object state making it ready to handle new
         connections."""
         self.doc_in=None
         self.doc_out=None
         self.socket=None
         self._reader=None
         self.addr=None
-        self.port=None
         self.default_ns=None
         self.peer_sasl_mechanisms=None
         self.extra_ns={}
@@ -265,7 +266,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         self._make_reader()
 
     def connect(self,addr,port,service=None,to=None):
-        """Establish XMPP connection with given address
+        """Establish XMPP connection with given address.
+
+        [initiating entity only]
         
         :Parameters:
             - `addr`: peer name or IP address
@@ -325,10 +328,11 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
     def accept(self,sock,myname):
         """Accept incoming connection.
 
+        [receiving entity only]
+
         :Parameters:
-            - `sock`: a listening socket
-            - `myname`: local stream endpoint name
-        """
+            - `sock`: a listening socket.
+            - `myname`: local stream endpoint name."""
         self.lock.acquire()
         try:
             return self._accept(sock,myname)
@@ -580,6 +584,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
     def _make_stream_features(self):
         """Create the <features/> element for the stream.
+
+        [receving entity only]
         
         :returns: new <features/> element node."""
         root=self.doc_out.getRootElement()
@@ -600,7 +606,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         return features
 
     def _send_stream_features(self):
-        """Send stream <features/>."""
+        """Send stream <features/>.
+        
+        [receiving entity only]"""
         self.features=self._make_stream_features()
         self._write_raw(self.features.serialize(encoding="UTF-8"))
 
@@ -1245,6 +1253,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
     def _got_features(self):
         """Process incoming <stream:features/> element.
 
+        [initiating entity only]
+
         The received features node is available in `self.features`."""
         ctxt = self.doc_in.xpathNewContext()
         ctxt.setContextNode(self.features)
@@ -1291,6 +1301,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
     def bind(self,resource):
         """Bind to a resource.
+
+        [initiating entity only]
         
         :Parameters:
             - `resource`: the resource name to bind to.
@@ -1310,6 +1322,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
     def _bind_success(self,stanza):
         """Handle resource binding success.
 
+        [initiating entity only]
+
         :Parameters:
             - `stanza`: <iq type="result"/> stanza received.
         
@@ -1321,6 +1335,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
     def _bind_error(self,stanza):
         """Handle resource binding success.
+
+        [initiating entity only]
 
         :raise FatalStreamError:"""
         raise FatalStreamError,"Resource binding failed"
@@ -1365,6 +1381,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
     def _process_sasl_auth(self,mechanism,content):
         """Process incoming <sasl:auth/> element.
+
+        [receiving entity only]
 
         :Parameters:
             - `mechanism`: mechanism choosen by the peer.
@@ -1419,6 +1437,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
     def _process_sasl_challenge(self,content):
         """Process incoming <sasl:challenge/> element.
 
+        [initiating entity only]
+
         :Parameters:
             - `content`: the challenge data received (Base64-encoded).
         """
@@ -1452,6 +1472,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
     def _process_sasl_response(self,content):
         """Process incoming <sasl:response/> element.
+
+        [receiving entity only]
 
         :Parameters:
             - `content`: the response data received (Base64-encoded).
@@ -1503,6 +1525,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
     def _process_sasl_success(self,content):
         """Process incoming <sasl:success/> element.
 
+        [initiating entity only]
+
         :Parameters:
             - `content`: the "additional data with success" received (Base64-encoded).
         """
@@ -1529,6 +1553,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
     def _process_sasl_failure(self,node):
         """Process incoming <sasl:failure/> element.
 
+        [initiating entity only]
+
         :Parameters:
             - `node`: the XML node received.
         """
@@ -1540,7 +1566,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         raise SASLAuthenticationFailed,"SASL authentication failed"
 
     def _process_sasl_abort(self):
-        """Process incoming <sasl:abort/> element."""
+        """Process incoming <sasl:abort/> element.
+
+        [receiving entity only]"""
         if not self.authenticator:
             self.__logger.debug("Unexpected SASL response")
             return False
@@ -1551,6 +1579,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
     def _sasl_authenticate(self,username,authzid,mechanism=None):
         """Start SASL authentication process.
+
+        [initiating entity only]
         
         :Parameters:
             - `username`: user name.
@@ -1598,7 +1628,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         node.freeNode()
 
     def _request_tls(self):
-        """Request a TLS-encrypted connection."""
+        """Request a TLS-encrypted connection.
+
+        [initiating entity only]"""
         self.tls_requested=1
         self.features=None
         root=self.doc_out.getRootElement()
@@ -1638,7 +1670,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             raise FatalStreamError,"TLS not implemented for the receiving side yet"
 
     def _make_tls_connection(self):
-        """Initiate TLS connection."""
+        """Initiate TLS connection.
+
+        [initiating entity only]"""
         if not tls_available or not self.tls_settings:
             raise TLSError,"TLS is not available"
 

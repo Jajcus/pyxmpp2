@@ -17,7 +17,7 @@
 
 """A simple implementation of a part of the DNS protocol."""
 
-__revision__="$Id: dns.py,v 1.12 2004/09/19 16:06:28 jajcus Exp $"
+__revision__="$Id: dns.py,v 1.13 2004/09/19 21:34:11 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import random
@@ -54,7 +54,7 @@ def domain_str2bin(name):
     """Convert domain name from a string to a binary representation.
 
     :param name: domain name.
-    :type name: `str`
+    :type name: `unicode`
 
     :return: binary representation of the domain name.
     :returntype: `str`"""

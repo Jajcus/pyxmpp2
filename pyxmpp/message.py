@@ -17,7 +17,7 @@
 
 """Message XMPP stanza handling"""
 
-__revision__="$Id: message.py,v 1.21 2004/09/19 16:06:28 jajcus Exp $"
+__revision__="$Id: message.py,v 1.22 2004/09/19 21:34:11 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -73,8 +73,8 @@ class Message(Stanza):
         if node is None:
             node="message"
 
-        Stanza.__init__(self,node,from_jid=from_jid,to_jid=to_jid,stanza_type=stanza_type,stanza_id=stanza_id,
-                error=error, error_cond=error_cond)
+        Stanza.__init__(self, node, from_jid=from_jid, to_jid=to_jid,
+                stanza_type=stanza_type,stanza_id=stanza_id, error=error, error_cond=error_cond)
         
         if subject is not None:
             self.node.newTextChild(None,"subject",to_utf8(subject))

@@ -33,79 +33,15 @@ I0001:  0: Unable to run raw checkers on built-in module pyxmpp._xmlextra
 W0103:  0: Missing required attribute "__revision__"
 W0103:  0: Missing required attribute "__docformat__"
 ************* Module pyxmpp.resolver
-W0141:  0: Missing docstring
-W0403: 28: Uses of a deprecated module 'string'
-W0141: 43:load_resolv_conf: Missing docstring
-W0141: 68:query: Missing docstring
-W0141: 82:do_query: Missing docstring
-W0621:119:do_query: Redefining name 'query' from outer scope (line 68)
-W0112: 82:do_query: Too many branches (22/15)
-W0612:102:do_query: Unused variable 'canonname'
-W0141:144:query_ns: Missing docstring
-W0622:161:query_ns: Redefining built-in 'id'
-W0621:144:query_ns: Redefining name 'query' from outer scope (line 68)
-W0612:163:query_ns: Unused variable 'addr'
-W0612:161:query_ns: Unused variable 'ed'
-W0612:161:query_ns: Unused variable 'od'
-W0622:174:shuffle_srv: Redefining built-in 'sum'
-W0141:169:shuffle_srv: Missing docstring
-W0141:188:reorder_srv: Missing docstring
-W0141:202:resolve_srv: Missing docstring
-W0141:217:getaddrinfo: Missing docstring
-W0613:217:getaddrinfo: Unused argument 'family'
-W0611: 33: Unused import DataTruncated
-W0611: 30: Unused import IntType
-W0611: 33: Unused import resolve_errors
-W0611: 30: Unused import StringType
-W0611: 24: Unused import struct
-W0611: 26: Unused import binascii
-W0611: 28: Unused import string
-W0611: 25: Unused import sys
-W0611: 30: Unused import UnicodeType
-W0611: 33: Unused import InvalidDomainName
-W0611: 33: Unused import BadPacket
+ignore that: W0612:159:do_query: Unused variable 'canonname'
 ************* Module pyxmpp.clientstream
-W0301: 27: Line too long (103/100)
-W0301:120: Line too long (103/100)
-W0141:  0: Missing docstring
-W0141: 34:ClientStreamError: Missing docstring
-W0141: 37:FatalClientStreamError: Missing docstring
-W0141: 40:LegacyAuthenticationError: Missing docstring
-W0141: 43:ClientStream: Missing docstring
-W0141: 64:ClientStream._reset: Missing docstring
-W0141: 68:ClientStream.connect: Missing docstring
-W0221: 68:ClientStream.connect: Arguments number differs from overriden method
-W0221: 75:ClientStream._connect: Arguments number differs from overriden method
-W0141: 75:ClientStream._connect: Missing docstring
-W0221: 93:ClientStream.accept: Arguments number differs from overriden method
-W0141: 93:ClientStream.accept: Missing docstring
-W0141: 96:ClientStream._post_connect: Missing docstring
-W0141:101:ClientStream._try_auth: Missing docstring
-W0612:115:ClientStream._try_auth: Unused variable 'e'
-W0141:127:ClientStream._get_stream_features: Missing docstring
-W0141:136:ClientStream.do_bind: Missing docstring
-W0141:162:ClientStream.get_password: Missing docstring
-W0613:162:ClientStream.get_password: Unused argument 'realm'
-W0141:168:ClientStream.get_realms: Missing docstring
-W0141:171:ClientStream.choose_realm: Missing docstring
-W0141:178:ClientStream.check_authzid: Missing docstring
-W0102:178:ClientStream.check_authzid: Dangerous default value {} as argument
-W0111:178:ClientStream.check_authzid: Too many return statements (7/6)
-W0141:194:ClientStream.get_serv_type: Missing docstring
-W0141:197:ClientStream.get_serv_name: Missing docstring
-W0141:200:ClientStream.get_serv_host: Missing docstring
-W0141:203:ClientStream.fix_out_stanza: Missing docstring
-W0141:210:ClientStream.fix_in_stanza: Missing docstring
-W0201: 66:ClientStream._reset: Attribute 'auth_methods_left' defined outside __init__
-W0611: 21: Unused import libxml2
-W0611: 30: Unused import common_doc
-W0611: 32: Unused import from_utf8
-W0611: 29: Unused import Iq
-W0611: 25: Unused import UnicodeType
-W0611: 22: Unused import sha
-W0611: 23: Unused import time
-************* Module pyxmpp.message
-W0301: 76: Line too long (109/100)
+W0511:338: FIXME: that should be the hostname choosen from SRV records found.
+ignore that: W0221:107:ClientStream.connect: Arguments number differs from overriden method
+ignore that: W0221:126:ClientStream._connect: Arguments number differs from overriden method
+ignore that: W0221:146:ClientStream.accept: Arguments number differs from overriden method
+ignore that: W0613:237:ClientStream.get_password: Unused argument 'realm'
+ignore that: W0201:143:ClientStream._connect: Attribute 'me' defined outside __init__
+ignore that: W0201:105:ClientStream._reset: Attribute '_auth_methods_left' defined outside __init__
 ************* Module pyxmpp.client
 W0141:  0: Missing docstring
 W0141: 34:ClientError: Missing docstring
@@ -146,46 +82,45 @@ W0611: 31: Unused import from_utf8
 W0611: 22: Unused import sys
 W0611: 24: Unused import traceback
 ************* Module pyxmpp.stream
-W0302:  0: Too many lines in module (1763)
-W0231:179:Stream.__init__: __init__ method from base class 'xmlextra.StreamHandler' is not called
-W0612:299:Stream._connect: Unused variable 'canonname'
-W0613:466:Stream.stream_end: Unused argument 'doc'
-W0613:492:Stream.stanza_end: Unused argument 'doc'
-W0613:501:Stream.stanza: Unused argument 'doc'
-W0612:723:Stream._loop_iter: Unused variable 'ofd'
-W0612:951:Stream.__try_handlers: Unused variable 'prio'
-W0111:1337:Stream._process_sasl_node: Too many return statements (9/6)
-W0201:237:Stream._reset: Attribute 'features' defined outside __init__
-W0201:233:Stream._reset: Attribute 'message_handlers' defined outside __init__
-W0201:231:Stream._reset: Attribute 'iq_get_handlers' defined outside __init__
-W0201:219:Stream._reset: Attribute 'port' defined outside __init__
-W0201:221:Stream._reset: Attribute 'peer_sasl_mechanisms' defined outside __init__
-W0201:223:Stream._reset: Attribute 'stream_ns' defined outside __init__
-W0201:241:Stream._reset: Attribute 'authenticated' defined outside __init__
-W0201:218:Stream._reset: Attribute 'addr' defined outside __init__
-W0201:220:Stream._reset: Attribute 'default_ns' defined outside __init__
-W0201:244:Stream._reset: Attribute 'version' defined outside __init__
-W0201:228:Stream._reset: Attribute 'skip' defined outside __init__
-W0201:243:Stream._reset: Attribute 'auth_method_used' defined outside __init__
-W0201:215:Stream._reset: Attribute 'doc_out' defined outside __init__
-W0201:238:Stream._reset: Attribute 'tls' defined outside __init__
-W0201:245:Stream._reset: Attribute 'last_keepalive' defined outside __init__
-W0201:242:Stream._reset: Attribute 'peer_authenticated' defined outside __init__
-W0201:239:Stream._reset: Attribute 'tls_requested' defined outside __init__
-W0201:230:Stream._reset: Attribute 'iq_response_handlers' defined outside __init__
-W0201:217:Stream._reset: Attribute '_reader' defined outside __init__
-W0201:240:Stream._reset: Attribute 'authenticator' defined outside __init__
-W0201:222:Stream._reset: Attribute 'extra_ns' defined outside __init__
-W0201:225:Stream._reset: Attribute 'ioreader' defined outside __init__
-W0201:227:Stream._reset: Attribute 'peer' defined outside __init__
-W0201:235:Stream._reset: Attribute 'eof' defined outside __init__
-W0201:226:Stream._reset: Attribute 'me' defined outside __init__
-W0201:236:Stream._reset: Attribute 'initiator' defined outside __init__
-W0201:234:Stream._reset: Attribute 'presence_handlers' defined outside __init__
-W0201:216:Stream._reset: Attribute 'socket' defined outside __init__
-W0201:229:Stream._reset: Attribute 'stream_id' defined outside __init__
-W0201:214:Stream._reset: Attribute 'doc_in' defined outside __init__
-W0201:232:Stream._reset: Attribute 'iq_set_handlers' defined outside __init__
+W0302:  0: Too many lines in module (1797)
+W0231:180:Stream.__init__: __init__ method from base class 'xmlextra.StreamHandler' is not called
+W0612:302:Stream._connect: Unused variable 'canonname'
+W0613:470:Stream.stream_end: Unused argument 'doc'
+W0613:496:Stream.stanza_end: Unused argument 'doc'
+W0613:505:Stream.stanza: Unused argument 'doc'
+W0612:731:Stream._loop_iter: Unused variable 'ofd'
+W0612:959:Stream.__try_handlers: Unused variable 'prio'
+W0111:1353:Stream._process_sasl_node: Too many return statements (9/6)
+ignore that: W0201:238:Stream._reset: Attribute 'features' defined outside __init__
+ignore that: W0201:234:Stream._reset: Attribute 'message_handlers' defined outside __init__
+ignore that: W0201:232:Stream._reset: Attribute 'iq_get_handlers' defined outside __init__
+ignore that: W0201:222:Stream._reset: Attribute 'peer_sasl_mechanisms' defined outside __init__
+ignore that: W0201:224:Stream._reset: Attribute 'stream_ns' defined outside __init__
+ignore that: W0201:242:Stream._reset: Attribute 'authenticated' defined outside __init__
+ignore that: W0201:220:Stream._reset: Attribute 'addr' defined outside __init__
+ignore that: W0201:221:Stream._reset: Attribute 'default_ns' defined outside __init__
+ignore that: W0201:245:Stream._reset: Attribute 'version' defined outside __init__
+ignore that: W0201:229:Stream._reset: Attribute 'skip' defined outside __init__
+ignore that: W0201:244:Stream._reset: Attribute 'auth_method_used' defined outside __init__
+ignore that: W0201:217:Stream._reset: Attribute 'doc_out' defined outside __init__
+ignore that: W0201:239:Stream._reset: Attribute 'tls' defined outside __init__
+ignore that: W0201:246:Stream._reset: Attribute 'last_keepalive' defined outside __init__
+ignore that: W0201:243:Stream._reset: Attribute 'peer_authenticated' defined outside __init__
+ignore that: W0201:240:Stream._reset: Attribute 'tls_requested' defined outside __init__
+ignore that: W0201:231:Stream._reset: Attribute 'iq_response_handlers' defined outside __init__
+ignore that: W0201:219:Stream._reset: Attribute '_reader' defined outside __init__
+ignore that: W0201:241:Stream._reset: Attribute 'authenticator' defined outside __init__
+ignore that: W0201:223:Stream._reset: Attribute 'extra_ns' defined outside __init__
+ignore that: W0201:226:Stream._reset: Attribute 'ioreader' defined outside __init__
+ignore that: W0201:228:Stream._reset: Attribute 'peer' defined outside __init__
+ignore that: W0201:236:Stream._reset: Attribute 'eof' defined outside __init__
+ignore that: W0201:227:Stream._reset: Attribute 'me' defined outside __init__
+ignore that: W0201:237:Stream._reset: Attribute 'initiator' defined outside __init__
+ignore that: W0201:235:Stream._reset: Attribute 'presence_handlers' defined outside __init__
+ignore that: W0201:218:Stream._reset: Attribute 'socket' defined outside __init__
+ignore that: W0201:230:Stream._reset: Attribute 'stream_id' defined outside __init__
+ignore that: W0201:216:Stream._reset: Attribute 'doc_in' defined outside __init__
+ignore that: W0201:233:Stream._reset: Attribute 'iq_set_handlers' defined outside __init__
 ************* Module pyxmpp.expdict
 W0141:  0: Missing docstring
 W0141: 24:ExpiringDictionary: Missing docstring
@@ -466,48 +401,49 @@ W0611: 23: Unused import StringType
 W0611: 23: Unused import UnicodeType
 ************* Module pyxmpp.jabber.clientstream
 W0301: 27: Line too long (103/100)
-W0311:192: Bad indentation. Found 24 spaces, expected 16
-W0311:194: Bad indentation. Found 24 spaces, expected 16
+W0311:196: Bad indentation. Found 24 spaces, expected 16
+W0311:198: Bad indentation. Found 24 spaces, expected 16
 W0141:  0: Missing docstring
-W0141: 37:LegacyClientStream: Missing docstring
-W0102: 38:LegacyClientStream.__init__: Dangerous default value ['sasl:DIGEST-MD5', 'digest'] as argument
-W0141: 46:LegacyClientStream._reset: Missing docstring
-W0141: 51:LegacyClientStream._post_connect: Missing docstring
-W0141: 60:LegacyClientStream._post_auth: Missing docstring
-W0141: 66:LegacyClientStream._try_auth: Missing docstring
-W0141: 95:LegacyClientStream.auth_in_stage1: Missing docstring
-W0141:116:LegacyClientStream.auth_in_stage2: Missing docstring
-W0141:153:LegacyClientStream._auth_stage1: Missing docstring
-W0141:163:LegacyClientStream.auth_timeout: Missing docstring
-W0613:163:LegacyClientStream.auth_timeout: Unused argument 'args'
-W0141:172:LegacyClientStream.auth_error: Missing docstring
-W0141:186:LegacyClientStream.auth_stage2: Missing docstring
-W0141:200:LegacyClientStream._plain_auth_stage2: Missing docstring
-W0613:200:LegacyClientStream._plain_auth_stage2: Unused argument 'stanza'
-W0141:210:LegacyClientStream._plain_auth_in_stage2: Missing docstring
-W0613:210:LegacyClientStream._plain_auth_in_stage2: Unused argument 'resource'
-W0141:234:LegacyClientStream._digest_auth_stage2: Missing docstring
-W0613:234:LegacyClientStream._digest_auth_stage2: Unused argument 'stanza'
-W0141:245:LegacyClientStream._digest_auth_in_stage2: Missing docstring
-W0613:245:LegacyClientStream._digest_auth_in_stage2: Unused argument 'resource'
-W0141:279:LegacyClientStream.auth_finish: Missing docstring
-W0613:279:LegacyClientStream.auth_finish: Unused argument 'stanza'
-W0201: 48:LegacyClientStream._reset: Attribute 'available_auth_methods' defined outside __init__
-W0201:284:LegacyClientStream.auth_finish: Attribute 'authenticated' defined outside __init__
-W0201:223:LegacyClientStream._plain_auth_in_stage2: Attribute 'peer_authenticated' defined outside __init__
-W0201: 49:LegacyClientStream._reset: Attribute 'auth_stanza' defined outside __init__
-W0201: 83:LegacyClientStream._try_auth: Attribute 'auth_method_used' defined outside __init__
+W0141: 41:LegacyClientStream: Missing docstring
+W0102: 42:LegacyClientStream.__init__: Dangerous default value ['sasl:DIGEST-MD5', 'digest'] as argument
+W0141: 50:LegacyClientStream._reset: Missing docstring
+W0141: 55:LegacyClientStream._post_connect: Missing docstring
+W0141: 64:LegacyClientStream._post_auth: Missing docstring
+W0141: 70:LegacyClientStream._try_auth: Missing docstring
+E0602: 76:LegacyClientStream._try_auth: Undefined variable 'LegacyAuthenticationError'
+W0141: 99:LegacyClientStream.auth_in_stage1: Missing docstring
+W0141:120:LegacyClientStream.auth_in_stage2: Missing docstring
+W0141:157:LegacyClientStream._auth_stage1: Missing docstring
+W0141:167:LegacyClientStream.auth_timeout: Missing docstring
+W0613:167:LegacyClientStream.auth_timeout: Unused argument 'args'
+W0141:176:LegacyClientStream.auth_error: Missing docstring
+E0602:185:LegacyClientStream.auth_error: Undefined variable 'LegacyAuthenticationError'
+W0141:190:LegacyClientStream.auth_stage2: Missing docstring
+W0141:204:LegacyClientStream._plain_auth_stage2: Missing docstring
+W0613:204:LegacyClientStream._plain_auth_stage2: Unused argument 'stanza'
+W0141:214:LegacyClientStream._plain_auth_in_stage2: Missing docstring
+W0613:214:LegacyClientStream._plain_auth_in_stage2: Unused argument 'resource'
+W0141:238:LegacyClientStream._digest_auth_stage2: Missing docstring
+W0613:238:LegacyClientStream._digest_auth_stage2: Unused argument 'stanza'
+W0141:249:LegacyClientStream._digest_auth_in_stage2: Missing docstring
+W0613:249:LegacyClientStream._digest_auth_in_stage2: Unused argument 'resource'
+W0141:283:LegacyClientStream.auth_finish: Missing docstring
+W0613:283:LegacyClientStream.auth_finish: Unused argument 'stanza'
+ignore that: W0201: 52:LegacyClientStream._reset: Attribute 'available_auth_methods' defined outside __init__
+W0201:287:LegacyClientStream.auth_finish: Attribute 'authenticated' defined outside __init__
+W0201:227:LegacyClientStream._plain_auth_in_stage2: Attribute 'peer_authenticated' defined outside __init__
+ignore that: W0201: 53:LegacyClientStream._reset: Attribute 'auth_stanza' defined outside __init__
+W0201: 87:LegacyClientStream._try_auth: Attribute 'auth_method_used' defined outside __init__
 W0611: 31: Unused import JID
 W0611: 21: Unused import libxml2
 W0611: 27: Unused import FatalStreamError
-W0611: 30: Unused import common_doc
 W0611: 27: Unused import Stream
 W0611: 27: Unused import SASLNotAvailable
 W0611: 34: Unused import FatalClientStreamError
 W0611: 25: Unused import UnicodeType
-W0611: 34: Unused import ClientStreamError
 W0611: 23: Unused import time
 W0611: 27: Unused import StreamError
+W0611: 30: Unused import common_doc
 W0611: 27: Unused import SASLMechanismNotAvailable
 W0611: 28: Unused import StreamAuthenticationError
 ************* Module pyxmpp.jabber.client
@@ -559,33 +495,31 @@ W0141:120:DiscoItem.jid: Missing docstring
 W0141:122:DiscoItem.set_jid: Missing docstring
 W0141:125:DiscoIdentity: Missing docstring
 W0622:126:DiscoIdentity.__init__: Redefining built-in 'type'
-W0141:165:DiscoIdentity.remove: Missing docstring
-W0141:175:DiscoIdentity.name: Missing docstring
-W0141:178:DiscoIdentity.set_name: Missing docstring
-W0141:182:DiscoIdentity.category: Missing docstring
-W0141:185:DiscoIdentity.set_category: Missing docstring
-W0622:188:DiscoIdentity.type: Redefining built-in 'type'
-W0141:187:DiscoIdentity.type: Missing docstring
-W0141:192:DiscoIdentity.set_type: Missing docstring
-W0622:192:DiscoIdentity.set_type: Redefining built-in 'type'
-W0141:199:DiscoItems: Missing docstring
-E0602:204:DiscoItems.__init__: Undefined variable 'xmlnode'
-E0602:206:DiscoItems.__init__: Undefined variable 'RosterError'
-W0141:229:DiscoItems.identities: Missing docstring
-W0141:237:DiscoItems.has_item: Missing docstring
-W0141:263:DiscoInfo: Missing docstring
-E0602:268:DiscoInfo.__init__: Undefined variable 'xmlnode'
-E0602:270:DiscoInfo.__init__: Undefined variable 'RosterError'
-W0141:294:DiscoInfo.features: Missing docstring
-E0602:300:DiscoInfo.features: Undefined variable 'reta'
-W0141:302:DiscoInfo.has_feature: Missing docstring
-E0602:310:DiscoInfo.has_feature: Undefined variable 'RosterError'
-W0141:318:DiscoInfo.add_feature: Missing docstring
-W0141:324:DiscoInfo.remove_feature: Missing docstring
-E0602:332:DiscoInfo.remove_feature: Undefined variable 'RosterError'
-W0141:342:DiscoInfo.identities: Missing docstring
-W0622:350:DiscoInfo.identity_is: Redefining built-in 'type'
-W0141:350:DiscoInfo.identity_is: Missing docstring
+W0141:167:DiscoIdentity.remove: Missing docstring
+W0141:177:DiscoIdentity.name: Missing docstring
+W0141:180:DiscoIdentity.set_name: Missing docstring
+W0141:184:DiscoIdentity.category: Missing docstring
+W0141:187:DiscoIdentity.set_category: Missing docstring
+W0141:189:DiscoIdentity.type: Missing docstring
+W0622:190:DiscoIdentity.type: Redefining built-in 'type'
+W0622:194:DiscoIdentity.set_type: Redefining built-in 'type'
+W0141:194:DiscoIdentity.set_type: Missing docstring
+W0141:201:DiscoItems: Missing docstring
+E0602:206:DiscoItems.__init__: Undefined variable 'xmlnode'
+E0602:208:DiscoItems.__init__: Undefined variable 'RosterError'
+W0141:231:DiscoItems.identities: Missing docstring
+W0141:239:DiscoItems.has_item: Missing docstring
+W0141:265:DiscoInfo: Missing docstring
+E0602:272:DiscoInfo.__init__: Undefined variable 'RosterError'
+W0141:296:DiscoInfo.features: Missing docstring
+W0141:304:DiscoInfo.has_feature: Missing docstring
+E0602:312:DiscoInfo.has_feature: Undefined variable 'RosterError'
+W0141:320:DiscoInfo.add_feature: Missing docstring
+W0141:326:DiscoInfo.remove_feature: Missing docstring
+E0602:334:DiscoInfo.remove_feature: Undefined variable 'RosterError'
+W0141:344:DiscoInfo.identities: Missing docstring
+W0622:352:DiscoInfo.identity_is: Redefining built-in 'type'
+W0141:352:DiscoInfo.identity_is: Missing docstring
 W0611: 21: Unused import sys
 W0611: 29: Unused import from_utf8
 W0611: 24: Unused import StringType
@@ -696,17 +630,17 @@ W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 Report
 ======
-5798 statements analysed.
+5799 statements analysed.
 
 Statistics by type
 ------------------
 
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-module   33     33         =          45.45       0.00     
-class    112    112        =          50.00       0.00     
+module   33     33         =          51.52       0.00     
+class    112    112        =          53.57       0.00     
 method   0      0          =          0.00        0.00     
-function 602    602        =          63.12       0.66     
+function 604    604        =          67.38       0.66     
 
 
 Raw metrics
@@ -714,10 +648,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6354   67.45 6354     =          
-docstring 2094   22.23 2094     =          
-comment   510    5.41  510      =          
-empty     462    4.90  462      =          
+code      6360   65.19 6360     =          
+docstring 2387   24.47 2387     =          
+comment   512    5.25  512      =          
+empty     497    5.09  497      =          
 
 
 External dependencies
@@ -731,9 +665,9 @@ External dependencies
       \-plain (pyxmpp.sasl)
     base64 (pyxmpp.stream,pyxmpp.jabber.vcard)
     logging (pyxmpp.clientstream,pyxmpp.client,pyxmpp.stream,pyxmpp.jabberd.component,pyxmpp.jabberd.componentstream,pyxmpp.sasl.plain,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.client)
-    string (pyxmpp.resolver,pyxmpp.sasl,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
+    string (pyxmpp.sasl,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
     traceback (pyxmpp.client,pyxmpp.jabberd.component)
-    libxml2 (pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.utils,pyxmpp.stanza,pyxmpp.clientstream,pyxmpp.message,pyxmpp.client,pyxmpp.stream,pyxmpp.iq,pyxmpp.error,pyxmpp.jabberd.component,pyxmpp.jabberd.componentstream,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    libxml2 (pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.utils,pyxmpp.stanza,pyxmpp.message,pyxmpp.client,pyxmpp.stream,pyxmpp.iq,pyxmpp.error,pyxmpp.jabberd.component,pyxmpp.jabberd.componentstream,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
     random (pyxmpp.dns,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.stream,pyxmpp.sasl,pyxmpp.sasl.core)
     encodings 
       \-idna (pyxmpp.jid,pyxmpp.dns)
@@ -747,7 +681,7 @@ External dependencies
       \-m2 (pyxmpp.stream)
     threading (pyxmpp.xmlextra,pyxmpp.client,pyxmpp.stream,pyxmpp.jabberd.component)
     os (pyxmpp.stream)
-    types (pyxmpp.xmppstringprep,pyxmpp.roster,pyxmpp.jid,pyxmpp.dns,pyxmpp.utils,pyxmpp.resolver,pyxmpp.clientstream,pyxmpp.stream,pyxmpp.expdict,pyxmpp.error,pyxmpp.jabberd.componentstream,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    types (pyxmpp.xmppstringprep,pyxmpp.roster,pyxmpp.jid,pyxmpp.dns,pyxmpp.utils,pyxmpp.stream,pyxmpp.expdict,pyxmpp.error,pyxmpp.jabberd.componentstream,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
     socket (pyxmpp.resolver,pyxmpp.stream)
 
 
@@ -757,29 +691,28 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0141      296        
-W0611      71         
+W0141      265        
 W0201      69         
-W0613      48         
+W0611      52         
+W0613      47         
 E0201      37         
-W0102      20         
 E0602      20         
-W0612      14         
-W0622      9          
-W0301      9          
+W0102      19         
+W0612      10         
 W0133      9          
 W0311      8          
 W0221      8          
-W0403      6          
+W0622      7          
+W0301      6          
 W0231      6          
-W0112      6          
-W0511      4          
+W0511      5          
+W0403      5          
+W0112      5          
 W0232      4          
-W0111      4          
 W0103      4          
 W0404      3          
 W0115      3          
-W0621      2          
+W0111      3          
 W0302      2          
 W0151      2          
 W0401      1          
@@ -791,8 +724,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 609    609      =          
-errors   57     58       -1         
+warnings 544    544      =          
+errors   57     57       =          
 
 
 % errors / warnings by module
@@ -800,37 +733,36 @@ errors   57     58       -1
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            26.32 13.96   
-pyxmpp.jid                     22.81 0.16    
-pyxmpp.jabber.muc              15.79 6.40    
-pyxmpp.jabber.disco            12.28 6.40    
-pyxmpp.sasl.core               10.53 6.40    
-pyxmpp.jabber.client           5.26  2.46    
-pyxmpp.jabber.delay            3.51  1.97    
-pyxmpp.sasl.digest_md5         1.75  9.03    
-pyxmpp.jabberd.component       1.75  4.76    
-pyxmpp.jabber.clientstream     0.00  7.39    
-pyxmpp.stream                  0.00  6.57    
-pyxmpp.clientstream            0.00  6.40    
-pyxmpp.client                  0.00  6.24    
-pyxmpp.resolver                0.00  5.09    
-pyxmpp.jabberd.componentstream 0.00  4.93    
-pyxmpp.error                   0.00  4.27    
-pyxmpp.sasl.plain              0.00  2.13    
-pyxmpp.sasl                    0.00  1.48    
-pyxmpp.dns                     0.00  1.31    
-pyxmpp.expdict                 0.00  0.66    
-pyxmpp.xmlextra                0.00  0.49    
-pyxmpp.version                 0.00  0.49    
-pyxmpp._xmlextra               0.00  0.33    
-pyxmpp.xmppstringprep          0.00  0.16    
-pyxmpp.message                 0.00  0.16    
-pyxmpp.jabberd                 0.00  0.16    
-pyxmpp.iq                      0.00  0.16    
+pyxmpp.jabber.vcard            26.32 15.62   
+pyxmpp.jid                     22.81 0.18    
+pyxmpp.jabber.muc              15.79 7.17    
+pyxmpp.sasl.core               10.53 7.17    
+pyxmpp.jabber.disco            8.77  7.17    
+pyxmpp.jabber.client           5.26  2.76    
+pyxmpp.jabber.clientstream     3.51  8.09    
+pyxmpp.jabber.delay            3.51  2.21    
+pyxmpp.sasl.digest_md5         1.75  10.11   
+pyxmpp.jabberd.component       1.75  5.33    
+pyxmpp.stream                  0.00  7.17    
+pyxmpp.client                  0.00  6.99    
+pyxmpp.jabberd.componentstream 0.00  5.51    
+pyxmpp.error                   0.00  4.78    
+pyxmpp.sasl.plain              0.00  2.39    
+pyxmpp.sasl                    0.00  1.65    
+pyxmpp.dns                     0.00  1.47    
+pyxmpp.clientstream            0.00  1.29    
+pyxmpp.expdict                 0.00  0.74    
+pyxmpp.xmlextra                0.00  0.55    
+pyxmpp.version                 0.00  0.55    
+pyxmpp._xmlextra               0.00  0.37    
+pyxmpp.xmppstringprep          0.00  0.18    
+pyxmpp.resolver                0.00  0.18    
+pyxmpp.jabberd                 0.00  0.18    
+pyxmpp.iq                      0.00  0.18    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 8.46/10 (previous run: 8.45/10)
+Your code has been rated at 8.57/10 (previous run: 8.57/10)
 That's pretty good. Good work mate.
 

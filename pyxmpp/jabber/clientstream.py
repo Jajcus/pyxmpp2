@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: clientstream.py,v 1.15 2004/09/16 19:57:46 jajcus Exp $"
+__revision__="$Id: clientstream.py,v 1.16 2004/09/19 21:34:18 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -31,8 +31,12 @@ from pyxmpp.stanza import common_doc
 from pyxmpp.jid import JID
 from pyxmpp.utils import to_utf8,from_utf8
 
-from pyxmpp.clientstream import ClientStreamError,FatalClientStreamError,LegacyAuthenticationError
+from pyxmpp.clientstream import ClientStreamError,FatalClientStreamError
 from pyxmpp.clientstream import ClientStream
+
+class LegacyAuthentication(ClientStreamError):
+    """Raised on a legacy authentication error."""
+    pass
 
 class LegacyClientStream(ClientStream):
     def __init__(self,jid,password=None,server=None,port=5222,
@@ -67,19 +71,19 @@ class LegacyClientStream(ClientStream):
         if self.authenticated:
             self.__logger.debug("try_auth: already authenticated")
             return
-        self.__logger.debug("trying auth: %r" % (self.auth_methods_left,))
-        if not self.auth_methods_left:
+        self.__logger.debug("trying auth: %r" % (self._auth_methods_left,))
+        if not self._auth_methods_left:
             raise LegacyAuthenticationError,"No allowed authentication methods available"
-        method=self.auth_methods_left[0]
+        method=self._auth_methods_left[0]
         if method.startswith("sasl:"):
             return ClientStream._try_auth(self)
         elif method not in ("plain","digest"):
-            self.auth_methods_left.pop(0)
+            self._auth_methods_left.pop(0)
             self.__logger.debug("Skipping unknown auth method: %s" % method)
             return self._try_auth()
         elif self.available_auth_methods is not None:
             if method in self.available_auth_methods:
-                self.auth_methods_left.pop(0)
+                self._auth_methods_left.pop(0)
                 self.auth_method_used=method
                 if method=="digest":
                     self._digest_auth_stage2(self.auth_stanza)
@@ -153,8 +157,8 @@ class LegacyClientStream(ClientStream):
     def _auth_stage1(self):
         iq=Iq(stanza_type="get")
         q=iq.new_query("jabber:iq:auth")
-        q.newTextChild(q.ns(),"username",to_utf8(self.me.node))
-        q.newTextChild(q.ns(),"resource",to_utf8(self.me.resource))
+        q.newTextChild(q.ns(),"username",to_utf8(self.my_jid.node))
+        q.newTextChild(q.ns(),"resource",to_utf8(self.my_jid.resource))
         self.send(iq)
         self.set_response_handlers(iq,self.auth_stage2,self.auth_error,
                             self.auth_timeout,timeout=60)
@@ -164,8 +168,8 @@ class LegacyClientStream(ClientStream):
         self.lock.acquire()
         try:
             self.__logger.debug("Timeout while waiting for jabber:iq:auth result")
-            if self.auth_methods_left:
-                self.auth_methods_left.pop(0)
+            if self._auth_methods_left:
+                self._auth_methods_left.pop(0)
         finally:
             self.lock.release()
 
@@ -200,8 +204,8 @@ class LegacyClientStream(ClientStream):
     def _plain_auth_stage2(self,stanza):
         iq=Iq(stanza_type="set")
         q=iq.new_query("jabber:iq:auth")
-        q.newTextChild(None,"username",to_utf8(self.me.node))
-        q.newTextChild(None,"resource",to_utf8(self.me.resource))
+        q.newTextChild(None,"username",to_utf8(self.my_jid.node))
+        q.newTextChild(None,"resource",to_utf8(self.my_jid.resource))
         q.newTextChild(None,"password",to_utf8(self.password))
         self.send(iq)
         self.set_response_handlers(iq,self.auth_finish,self.auth_error)
@@ -234,8 +238,8 @@ class LegacyClientStream(ClientStream):
     def _digest_auth_stage2(self,stanza):
         iq=Iq(stanza_type="set")
         q=iq.new_query("jabber:iq:auth")
-        q.newTextChild(None,"username",to_utf8(self.me.node))
-        q.newTextChild(None,"resource",to_utf8(self.me.resource))
+        q.newTextChild(None,"username",to_utf8(self.my_jid.node))
+        q.newTextChild(None,"resource",to_utf8(self.my_jid.resource))
         digest=sha.new(to_utf8(self.stream_id)+to_utf8(self.password)).hexdigest()
         q.newTextChild(None,"digest",digest)
         self.send(iq)
@@ -280,9 +284,8 @@ class LegacyClientStream(ClientStream):
         self.lock.acquire()
         try:
             self.__logger.debug("Authenticated")
-            self.me=self.me
             self.authenticated=1
-            self.state_change("authorized",self.me)
+            self.state_change("authorized",self.my_jid)
             self._post_auth()
         finally:
             self.lock.release()
