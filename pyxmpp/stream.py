@@ -563,8 +563,6 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         except (FatalStreamError,KeyboardInterrupt,SystemExit),e:
             self.close()
             raise
-        except:
-            self.print_exception()
 
     def _read(self):
         if self.eof:
