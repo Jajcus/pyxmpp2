@@ -8,7 +8,6 @@ from rfc3454 import A_1,B_1,B_2,C_1_1,C_1_2,C_2_1,C_2_2,C_3,C_4,C_5,C_6,C_7,C_8,
 
 """ Stringprep (RFC3454) implementation with nodeprep and resourceprep profiles."""
 
-
 class StringprepError(StandardError):
 	"""Exception raised when string preparation results in error."""
 	pass

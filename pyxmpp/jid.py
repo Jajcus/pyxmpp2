@@ -21,7 +21,7 @@ import re
 from types import StringType,UnicodeType
 
 from utils import to_utf8,from_utf8
-from stringprep import nodeprep,resourceprep
+from xmppstringprep import nodeprep,resourceprep
 
 node_invalid_re=re.compile(ur"[" u'"' ur"&'/:<>@\s\x00-\x19]",re.UNICODE)
 resource_invalid_re=re.compile(ur"[\s\x00-\x19]",re.UNICODE)
