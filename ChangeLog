@@ -1,5 +1,17 @@
 2004-06-02  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/utils.py, setup.py:
+	- raise error if the Python used is too old
+
+	* pyxmpp/xmppstringprep.py:
+	- fixed after removing python 2.2 support
+
+	* setup.py, pyxmpp/dns.py, pyxmpp/jid.py, pyxmpp/rfc3454.py, pyxmpp/xmppstringprep.py, pyxmpp/unicode/.cvsignore, pyxmpp/unicode/__init__.py, pyxmpp/unicode/ccomp.py, pyxmpp/unicode/cexc.py, pyxmpp/unicode/nfkc.py, pyxmpp/unicode/ud_3_2_0.py:
+	- Removing Python 2.2 support
+
+	* pyxmpp/unicode/utils/.cvsignore, pyxmpp/unicode/utils/makeccomp.py, pyxmpp/unicode/utils/makecexc.py, pyxmpp/unicode/utils/makediff.py:
+	- removing Python 2.2 support
+
 	* pyxmpp/jabber/muc.py:
 	- documentation
 	- s/make_node/as_xml/ (for consistency with other pyxmpp modules)
