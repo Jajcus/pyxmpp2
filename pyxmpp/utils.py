@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003 Jacek Konieczny <jajcus@bnet.pl>
+# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -17,7 +17,7 @@
 
 """Utility functions for the pyxmpp package."""
 
-__revision__="$Id: utils.py,v 1.17 2004/09/13 21:14:53 jajcus Exp $"
+__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import sys

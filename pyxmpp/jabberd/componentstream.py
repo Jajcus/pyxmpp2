@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003 Jacek Konieczny <jajcus@bnet.pl>
+# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -20,7 +20,7 @@ Normative reference:
   - `JEP 114 <http://www.jabber.org/jeps/jep-0114.html>`__
 """
 
-__revision__="$Id: componentstream.py,v 1.15 2004/10/07 22:28:45 jajcus Exp $"
+__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import sha

@@ -22,7 +22,7 @@ setup(
     version =   version,
     description =   'XMPP/Jabber implementation for Python',
     author =    'Jacek Konieczny',
-    author_email =  'jajcus@bnet.pl',
+    author_email =  'jajcus@jajcus.net',
     url =       'http://pyxmpp.jabberstudio.org/',
     classifiers = [
             "Development Status :: 4 - Beta",

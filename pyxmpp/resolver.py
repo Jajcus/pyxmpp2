@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003 Jacek Konieczny <jajcus@bnet.pl>
+# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -22,7 +22,7 @@ Normative reference:
   - `RFC 2782 <http://www.ietf.org/rfc/rfc2782.txt>`__
 """
 
-__revision__="$Id: resolver.py,v 1.18 2004/10/22 12:20:31 jajcus Exp $"
+__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import re

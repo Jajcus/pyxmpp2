@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003 Jacek Konieczny <jajcus@bnet.pl>
+# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -17,7 +17,7 @@
 
 """Dictionary with item expiration."""
 
-__revision__="$Id: expdict.py,v 1.8 2004/10/07 22:28:04 jajcus Exp $"
+__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import time

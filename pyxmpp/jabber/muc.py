@@ -20,7 +20,7 @@ Normative reference:
   - `JEP 45 <http://www.jabber.org/jeps/jep-0045.html>`__
 """
 
-__revision__="$Id: muc.py,v 1.27 2004/10/07 22:28:11 jajcus Exp $"
+__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import logging
