@@ -144,7 +144,7 @@ class VCardString(VCardField):
         :return: the field in the RFC 2426 format.
         :returntype: `str`"""
         return rfc2425encode(self.name,self.value)
-    def xml(self,parent):
+    def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
         :Parameters:
@@ -211,7 +211,7 @@ class VCardJID(VCardField):
         :return: the field in the RFC 2426 format.
         :returntype: `str`"""
         return rfc2425encode("x-jabberid",self.value.as_unicode())
-    def xml(self,parent):
+    def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
         :Parameters:
@@ -302,7 +302,7 @@ class VCardName(VCardField):
         :returntype: `str`"""
         return rfc2425encode("n",u"%s;%s;%s;%s;%s" %
                 (self.family,self.given,self.middle,self.prefix,self.suffix))
-    def xml(self,parent):
+    def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
         :Parameters:
@@ -404,7 +404,7 @@ class VCardImage(VCardField):
             else:
                 p={}
             return rfc2425encode(self.name,self.image,p)
-    def xml(self,parent):
+    def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
         :Parameters:
@@ -537,7 +537,7 @@ class VCardAdr(VCardField):
                         self.region,self.pcode,self.ctry),
                 {"type":",".join(self.type)})
 
-    def xml(self,parent):
+    def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
         :Parameters:
@@ -629,7 +629,7 @@ class VCardLabel(VCardField):
         :returntype: `str`"""
         return rfc2425encode("label",u"\n".join(self.lines),
                 {"type":",".join(self.type)})
-    def xml(self,parent):
+    def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
         :Parameters:
@@ -711,7 +711,7 @@ class VCardTel(VCardField):
         :return: the field in the RFC 2426 format.
         :returntype: `str`"""
         return rfc2425encode("tel",self.number,{"type":",".join(self.type)})
-    def xml(self,parent):
+    def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
         :Parameters:
@@ -791,7 +791,7 @@ class VCardEmail(VCardField):
         :return: the field in the RFC 2426 format.
         :returntype: `str`"""
         return rfc2425encode("email",self.address,{"type":",".join(self.type)})
-    def xml(self,parent):
+    def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
         :Parameters:
@@ -861,7 +861,7 @@ class VCardGeo(VCardField):
         :returntype: `str`"""
         return rfc2425encode("geo",u"%s;%s" %
                 (self.lat,self.lon))
-    def xml(self,parent):
+    def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
         :Parameters:
@@ -936,7 +936,7 @@ class VCardOrg(VCardField):
             return rfc2425encode("org",u"%s;%s" % (self.name,self.unit))
         else:
             return rfc2425encode("org",u"%s" % (self.name,))
-    def xml(self,parent):
+    def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
         :Parameters:
@@ -1000,7 +1000,7 @@ class VCardCategories(VCardField):
         :return: the field in the RFC 2426 format.
         :returntype: `str`"""
         return rfc2425encode("keywords",u",".join(self.keywords))
-    def xml(self,parent):
+    def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
         :Parameters:
@@ -1086,7 +1086,7 @@ class VCardSound(VCardField):
             return rfc2425encode(self.name,self.uri,{"value":"uri"})
         elif self.sound:
             return rfc2425encode(self.name,self.sound)
-    def xml(self,parent):
+    def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
         :Parameters:
@@ -1155,7 +1155,7 @@ class VCardPrivacy(VCardField):
         :return: the field in the RFC 2426 format.
         :returntype: `str`"""
         return rfc2425encode(self.name,self.value)
-    def xml(self,parent):
+    def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
         :Parameters:
@@ -1227,7 +1227,7 @@ class VCardKey(VCardField):
         else:
             p={}
         return rfc2425encode(self.name,self.cred,p)
-    def xml(self,parent):
+    def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
         :Parameters:
@@ -1526,10 +1526,10 @@ class VCard:
                 v=value.rfc2426()
                 ret+=v
         return ret+"end:VCARD\r\n"
-    def xml(self,doc=None,parent=None):
+    def as_xml(self,doc=None,parent=None):
         """Get the XML representation of `self`.
 
-        New document will be created if not `parent` and no `doc` is given. 
+        New document will be created if no `parent` and no `doc` is given. 
 
         :Parameters:
             - `doc`: the document where the element should be created.
@@ -1553,8 +1553,13 @@ class VCard:
                 ns=root.newNs(VCARD_NS,None)
                 root.setNs(ns)
         else:
-            doc=libxml2.newDoc("1.0")
-            root=doc.newChild(None,"vCard",None)
+            if doc:
+                doc1=doc
+            else:
+                doc1=libxml2.newDoc("1.0")
+            root=doc1.newChild(None,"vCard",None)
+            if not doc:
+                doc1.setRootElement(root)
             ns=root.newNs(VCARD_NS,None)
             root.setNs(ns)
         for name,value in self.content.items():
@@ -1562,13 +1567,14 @@ class VCard:
                 continue
             if type(value) is types.ListType:
                 for v in value:
-                    v.xml(root)
+                    v.as_xml(root)
             else:
-                value.xml(root)
-        if parent:
+                value.as_xml(root)
+        if doc:
             return root
         else:
             return doc
+
     def __getattr__(self,name):
         try:
             return self.content[name.upper().replace("_","-")]
