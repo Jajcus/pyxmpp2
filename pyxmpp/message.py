@@ -81,11 +81,11 @@ class Message(Stanza):
                 stanza_type=stanza_type,stanza_id=stanza_id, error=error, error_cond=error_cond)
 
         if subject is not None:
-            self.xmlnode.newTextChild(None,"subject",to_utf8(subject))
+            self.xmlnode.newTextChild(common_ns,"subject",to_utf8(subject))
         if body is not None:
-            self.xmlnode.newTextChild(None,"body",to_utf8(body))
+            self.xmlnode.newTextChild(common_ns,"body",to_utf8(body))
         if thread is not None:
-            self.xmlnode.newTextChild(None,"thread",to_utf8(thread))
+            self.xmlnode.newTextChild(common_ns,"thread",to_utf8(thread))
 
     def get_subject(self):
         """Get the message subject.

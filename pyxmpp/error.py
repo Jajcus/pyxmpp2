@@ -217,10 +217,10 @@ class ErrorNode:
             raise ErrorNodeError,"Condition namespace not given"
         else:
             if parent:
-                self.xmlnode=parent.newChild(None,"error",None)
+                self.xmlnode=parent.newChild(common_ns,"error",None)
                 self.borrowed=1
             else:
-                self.xmlnode=common_root.newChild(None,"error",None)
+                self.xmlnode=common_root.newChild(common_ns,"error",None)
             cond=self.xmlnode.newChild(None,to_utf8(xmlnode_or_cond),None)
             ns=cond.newNs(ns,None)
             cond.setNs(ns)

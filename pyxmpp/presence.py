@@ -101,11 +101,11 @@ class Presence(Stanza):
                 stanza_id=stanza_id, error=error, error_cond=error_cond)
 
         if show:
-            self.xmlnode.newTextChild(None,"show",to_utf8(show))
+            self.xmlnode.newTextChild(common_ns,"show",to_utf8(show))
         if status:
-            self.xmlnode.newTextChild(None,"status",to_utf8(status))
+            self.xmlnode.newTextChild(common_ns,"status",to_utf8(status))
         if priority and priority!=0:
-            self.xmlnode.newTextChild(None,"priority",to_utf8(str(priority)))
+            self.xmlnode.newTextChild(common_ns,"priority",to_utf8(str(priority)))
 
     def copy(self):
         """Create a deep copy of the presence stanza.
@@ -130,7 +130,7 @@ class Presence(Stanza):
         if n:
             n[0].setContent(to_utf8(status))
         else:
-            self.xmlnode.newTextChild(None,"status",to_utf8(status))
+            self.xmlnode.newTextChild(common_ns,"status",to_utf8(status))
 
     def get_status(self):
         """Get presence status description.
@@ -172,7 +172,7 @@ class Presence(Stanza):
         if n:
             n[0].setContent(to_utf8(show))
         else:
-            self.xmlnode.newTextChild(None,"show",to_utf8(show))
+            self.xmlnode.newTextChild(common_ns,"show",to_utf8(show))
 
     def get_priority(self):
         """Get presence priority.
@@ -210,7 +210,7 @@ class Presence(Stanza):
         if n:
             n[0].setContent(priority)
         else:
-            self.xmlnode.newTextChild(None,"priority",priority)
+            self.xmlnode.newTextChild(common_ns,"priority",priority)
 
     def make_accept_response(self):
         """Create "accept" response for the "subscribe"/"subscribed"/"unsubscribe"/"unsubscribed"
