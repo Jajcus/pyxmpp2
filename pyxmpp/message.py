@@ -42,22 +42,38 @@ class Message(Stanza):
 			del kw["body"]
 		else:
 			body=None
+			
 		if kw.has_key("subject"):
 			subject=kw["subject"]
 			del kw["subject"]
 		else:
 			subject=None
 	
+		if kw.has_key("thread"):
+			thread=kw["thread"]
+			del kw["thread"]
+		else:
+			thread=None
+
 		if node is None:
 			node="message"
 		apply(Stanza.__init__,[self,node],kw)
-		if subject:
+		if subject is not None:
 			self.node.newChild(None,"subject",to_utf8(subject))
-		if body:
+		if body is not None:
 			self.node.newChild(None,"body",to_utf8(body))
+		if thread is not None:
+			self.node.newChild(None,"thread",to_utf8(thread))
 
 	def get_subject(self):
 		n=self.xpath_eval("subject")
+		if n:
+			return from_utf8(n[0].getContent())
+		else:
+			return None
+			
+	def get_thread(self):
+		n=self.xpath_eval("thread")
 		if n:
 			return from_utf8(n[0].getContent())
 		else:
