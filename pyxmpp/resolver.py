@@ -7,6 +7,7 @@ import sys
 import binascii
 import time
 import string
+import re
 from types import StringType,UnicodeType,IntType
 
 import dns
@@ -17,6 +18,8 @@ search_list=[]
 cache={}
 
 service_aliases={"xmpp-server": ("jabber-server","jabber")}
+
+ip_re=re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
 
 def load_resolv_conf():
 	f=file("/etc/resolv.conf","r")
@@ -196,6 +199,8 @@ def getaddrinfo(host,port,family=0,socktype=socket.SOCK_STREAM,proto=0):
 	ret=[]
 	if proto==0:
 		proto=socket.getprotobyname("tcp")
+	if ip_re.match(host):
+		return [(socket.AF_INET,socktype,proto,host,(host,port))]
 	r=query(host,"A")
 	if r and r[0].type=="CNAME":
 		cname=r[0].target
