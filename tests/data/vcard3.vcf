@@ -1,0 +1,20 @@
+BEGIN:VCARD
+BDAY:1977-02-07T00:00:00Z
+CATEGORIES:Friend
+CLASS:PUBLIC
+EMAIL;TYPE=PREF:mis.uszatek@example.com
+FN:Miś Uszatek
+N:Uszatek;Miś;;;
+NICKNAME:Misio
+ORG:Wieczorynka
+ROLE:Nudziarz
+TEL;TYPE=HOME:+99 12 3456789
+TEL;TYPE=WORK:+99 98 7654321
+TEL;TYPE=CELL:+99 123123123
+UID:Favdn6ur8U
+URL:http://example.com/
+VERSION:3.0
+X-KADDRESSBOOK-X-IMAddress:miś@jabber.example.com
+X-KADDRESSBOOK-X-SpousesName:Misia
+END:VCARD
+
