@@ -17,7 +17,7 @@
 
 """Iq XMPP stanza handling"""
 
-__revision__="$Id: iq.py,v 1.13 2004/09/13 21:14:53 jajcus Exp $"
+__revision__="$Id: iq.py,v 1.14 2004/09/13 21:26:36 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -55,11 +55,11 @@ class Iq(Stanza):
         elif not typ:
             raise StanzaError,"type is required for Iq"
         else:
-            if sid:
+            if not sid:
                 sid=gen_id()
 
-        if typ not in ("get","set","result","error"):
-            raise StanzaError,"Invalid Iq type: %r" % (type,)
+        if not node and typ not in ("get","set","result","error"):
+            raise StanzaError,"Invalid Iq type: %r" % (typ,)
 
         if node is None:
             node="iq"
