@@ -426,7 +426,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 				ufr=None
 			if self.iq_response_handlers.has_key((id,ufr)):
 				key=(id,ufr)
-			elif fr==self.peer and self.iq_response_handlers.has_key((id,None)):
+			elif ( (fr==self.peer or fr==self.me) 
+					and self.iq_response_handlers.has_key((id,None))):
 				key=(id,None)
 			else:
 				return 0
