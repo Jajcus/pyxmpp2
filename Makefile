@@ -8,10 +8,6 @@ all: version
 	umask 022 ; python setup.py build
 	-cd examples ; rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp .
 	-cd examples ; chmod a+x *.py
-	-test -d examples/jjigw && cd examples/jjigw \
-		&& rm -f pyxmpp 2>/dev/null \
-		&& ln -s ../../build/lib*/pyxmpp .\
-		&& chmod a+x jjigw.py
 	-cd tests ; rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp .
 	-cd tests ; chmod a+x *.py
 	
