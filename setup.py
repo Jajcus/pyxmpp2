@@ -8,7 +8,7 @@ if sys.hexversion<0x02030000:
     raise ImportError,"Python 2.3 or newer is required"
 
 if not os.path.exists(os.path.join("pyxmpp","version.py")):
-    print >>sys.stderr,"You need to run 'make' to use pyxmpp from CVS"
+    print >>sys.stderr,"You need to run 'make' to use pyxmpp from SVN"
     sys.exit(1)
 
 execfile(os.path.join("pyxmpp","version.py"))
