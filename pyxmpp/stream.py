@@ -35,6 +35,16 @@ from message import Message
 from jid import JID
 import sasl
 
+try:
+	try:
+		from M2Crypto import SSL
+		tls_available="M2Crypto"
+	except ImportError:
+		from OpenSSL import SSL
+		tls_available="OpenSSL"
+except ImportError:
+	tls_available=None
+
 STREAM_NS="http://etherx.jabber.org/streams"
 TLS_NS="urn:ietf:params:xml:ns:xmpp-tls"
 SASL_NS="urn:ietf:params:xml:ns:xmpp-sasl"
@@ -66,6 +76,9 @@ class SASLMechanismNotAvailable(StreamAuthenticationError):
 class SASLAuthenticationFailed(StreamAuthenticationError):
 	pass
 
+class TLSHanshakeFailed(FatalStreamError):
+	pass
+
 
 def StanzaFactory(node):
 	if node.name=="iq":
@@ -79,11 +92,11 @@ def StanzaFactory(node):
 
 class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def __init__(self,default_ns,extra_ns=[],sasl_mechanisms=[],
-					enable_tls=0,require_tls=0,keepalive=0):
+					tls_settings=None,require_tls=0,keepalive=0):
 		self.default_ns_uri=default_ns
 		self.extra_ns_uris=extra_ns
 		self.sasl_mechanisms=sasl_mechanisms
-		self.enable_tls=enable_tls
+		self.tls_settings=tls_settings
 		self.require_tls=require_tls
 		self.keepalive=keepalive
 		self.reset()
@@ -92,6 +105,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.doc_in=None
 		self.doc_out=None
 		self.socket=None
+		self.io=None
 		self.reader=None
 		self.addr=None
 		self.port=None
@@ -114,6 +128,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.initiator=None
 		self.features=None
 		self.tls=0
+		self.tls_requested=0
 		self.authenticator=None
 		self.authenticated=0
 		self.peer_authenticated=0
@@ -127,6 +142,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def connect_socket(self,sock,to=None):
 		self.eof=0
 		self.socket=sock
+		self.io=sock
 		if to:
 			self.peer=JID(to)
 		else:
@@ -148,6 +164,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def accept(self,sock,myname):
 		self.eof=0
 		self.socket,addr=sock.accept()
+		self.io=self.socket
 		self.debug("Connection from: %r" % (addr,))
 		self.addr,self.port=addr
 		if myname:
@@ -170,6 +187,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			self.features=None
 		self.reader=None
 		self.stream_id=None
+		if self.io:
+			self.io.close()
 		if self.socket:
 			self.socket.close()
 		self.reset()
@@ -306,7 +325,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			for m in self.sasl_mechanisms:
 				if m in sasl.all_mechanisms:
 					ml.newChild(ns,"mechanism",m)
-		if self.enable_tls and not self.tls:
+		if self.tls_settings and not self.tls:
 			tls=features.newChild(None,"starttls",None)
 			ns=tls.newNs(TLS_NS,None)
 			tls.setNs(ns)
@@ -325,7 +344,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
 	def write_raw(self,str):
 		self.data_out(str)
-		self.socket.send(str)
+		self.io.send(str)
 
 	def write_node(self,node):
 		node=node.docCopyNode(self.doc_out,1)
@@ -354,7 +373,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
 	def idle(self):
 		self.iq_response_handlers.expire()
-		if not self.socket or self.eof:
+		if not self.io or self.eof:
 			return
 		now=time.time()
 		if self.keepalive and now-self.last_keepalive>=self.keepalive:
@@ -365,15 +384,16 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		return self.socket.fileno()
 
 	def loop(self,timeout):
-		while not self.eof and self.socket is not None:
+		while not self.eof and self.io is not None:
 			self.loop_iter(timeout)
 
 	def loop_iter(self,timeout):
 		import select
 		id,od,ed=select.select([self.socket],[],[self.socket],timeout)
 		if self.socket in id or self.socket in ed:
-			self.debug("data on input")
-			self.process()
+			if self.socket==self.io or self.io.pending():
+				self.debug("data on input")
+				self.process()
 			return 1
 		else:
 			self.debug("input timeout")
@@ -392,7 +412,10 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def read(self):
 		if self.eof:
 			return
-		r=os.read(self.socket.fileno(),1024)
+		if self.socket==self.io:
+			r=os.read(self.socket.fileno(),1024)
+		else:
+			r=self.io.read()
 		self.data_in(r)
 		if r:
 			try:
@@ -417,6 +440,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		if ns_uri=="http://etherx.jabber.org/streams":
 			self.process_stream_node(node)
 			return
+		elif ns_uri==TLS_NS:
+			self.process_tls_node(node)
+			return
 
 		if self.require_tls and not self.tls:
 			raise StreamEncryptionRequired,"TLS encryption required and not started yet"
@@ -438,6 +464,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			return
 		elif node.name=="features":
 			self.debug("Got stream features")
+			self.debug("Node: %r" % (node,))
 			self.features=node.copyNode(1)
 			self.doc_in.addChild(self.features)
 			self.got_features()
@@ -648,14 +675,19 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		finally:
 			ctxt.xpathFreeContext()
 			
-		if tls_required_n and not self.enable_tls:
+		if tls_required_n and not self.tls_settings:
 			raise FatalStreamError,"StartTLS support disabled, but required by peer"
 		if self.require_tls and not tls_n:
 			raise FatalStreamError,"StartTLS required, but not supported by peer"
-		if self.enable_tls and tls_n:
+		if self.tls_settings and tls_n:
 			self.debug("StartTLS negotiated")
-			raise FatalStreamError,"StartTLS negotiated, but not implemented yet"
-		self.debug("StartTLS not negotiated")
+			if not tls_available:
+				raise FatalStreamError,("StartTLS negotiated, but not available"
+						" (M2Crypto or pyOpenSSL module required)")
+			if self.initiator:
+				self.request_tls()
+		else:
+			self.debug("StartTLS not negotiated")
 		if sasl_mechanisms_n:
 			self.debug("SASL support found")
 			self.peer_sasl_mechanisms=[]
@@ -881,3 +913,46 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.write_raw(node.serialize(encoding="UTF-8"))
 		node.unlinkNode()
 		node.freeNode()
+
+	def request_tls(self):
+		self.tls_requested=1
+		root=self.doc_out.getRootElement()
+		node=root.newChild(None,"starttls",None)
+		ns=node.newNs(TLS_NS,None)
+		node.setNs(ns)
+		self.write_raw(node.serialize(encoding="UTF-8"))
+		node.unlinkNode()
+		node.freeNode()
+
+	def process_tls_node(self,node):
+		if not self.tls_settings or not tls_available:
+			self.debug("Unexpected TLS node: %r" % (node.serialize()))
+			return 0
+		if self.initiator:
+			if node.name=="failure":
+				raise TLSHanshakeFailed,"Peer failed to initialize TLS connection"
+			elif node.name!="proceed" or not self.tls_requested:
+				self.debug("Unexpected TLS node: %r" % (node.serialize()))
+				return 0
+			self.tls_requested=1
+			self.debug("Creating TLS context")
+			if tls_available=="OpenSSL":
+				ctx=SSL.Context(SSL.TLSv1_METHOD)
+			else:
+				ctx=SSL.Context('sslv23')#('tlsv1')
+			self.debug("Creating TLS connection")
+			conn=SSL.Connection(ctx,self.socket)
+			self.debug("Setting up TLS connection")
+			conn.setup_ssl()
+			self.debug("Setting TLS connect state")
+			conn.set_connect_state()
+			self.debug("Starting TLS handshake")
+			conn.connect_ssl()
+			self.io=conn
+			self.tls=1
+			self.debug("Restarting XMPP stream")
+			self.restart_stream()
+			return 0
+		else:
+			raise FatalStreamError,"TLS not implemented for the receiving side yet"
+
