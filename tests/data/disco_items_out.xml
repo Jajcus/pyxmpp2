@@ -1,1 +1,1 @@
-<query xmlns="http://jabber.org/protocol/disco#items"><item jid="a@b.c"/><item jid="a@b.c" node="d"/><item jid="f@b.c" name="e"/><item jid="f@b.c" name="e" node="d"/></query>
+<query xmlns="http://jabber.org/protocol/disco#items"><item jid="a@b.c"/><item jid="a@b.c" node="d"/><item jid="f@b.c" name="e"/><item jid="f@b.c" name="e" node="d"/><item jid="u&#x17C;ytkownik@d&#x17C;abber" name="Te&#x15B;cik" node="w&#x119;ze&#x142;"/></query>
