@@ -23,6 +23,20 @@ from stanza import Stanza,StanzaError
 presence_types=("available","unavailable","subscribe","unsubscribe","subscribed",
 		"unsubscribed","invisible","error")
 
+accept_responses={
+		"subscribe": "subscribed",
+		"subscribed": "subscribe",
+		"unsubscribe": "unsubscribed",
+		"unsubscribed": "unsubscribe",
+		}
+
+deny_responses={
+		"subscribe": "unsubscribed",
+		"subscribed": "unsubscribe",
+		"unsubscribe": "subscribed",
+		"unsubscribed": "subscribe",
+		}
+
 class Presence(Stanza):
 	stanza_type="presence"
 	def __init__(self,node=None,**kw):
@@ -85,6 +99,21 @@ class Presence(Stanza):
 			return 0
 		return prio
 			
+	def make_accept_response(self):
+		if self.get_type() not in ("subscribe","subscribed","unsubscribe","unsubscribed"):
+			raise StanzaError,"Results may only be generated for 'set' or 'get' iq"
+		
+		pr=Presence(type=accept_responses[self.get_type()],
+			fr=self.get_to(),to=self.get_from(),id=self.get_id())
+		return pr
+
+	def make_deny_response(self):
+		if self.get_type() not in ("subscribe","subscribed","unsubscribe","unsubscribed"):
+			raise StanzaError,"Results may only be generated for 'set' or 'get' iq"
+		
+		pr=Presence(type=accept_responses[self.get_type()],
+			fr=self.get_to(),to=self.get_from(),id=self.get_id())
+		return pr
 
 	def make_error_response(self,cond):
 		if self.get_type() == "error":
