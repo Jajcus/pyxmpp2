@@ -1,3 +1,14 @@
+2004-09-13  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/stream.py:
+	- small fixes
+
+	* pyxmpp/iq.py:
+	- fixed what broken
+
+	* pyxmpp/jabberd/componentstream.py, pyxmpp/jabber/clientstream.py, pyxmpp/jabber/muc.py, pyxmpp/client.py, pyxmpp/error.py, pyxmpp/iq.py, pyxmpp/jid.py, pyxmpp/message.py, pyxmpp/presence.py, pyxmpp/roster.py, pyxmpp/stanza.py, pyxmpp/stream.py, pyxmpp/utils.py, CHANGES, TODO.pylint, pylint.sh:
+	- cleaning up... (and breaking things)
+
 2004-09-12  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/presence.py, pyxmpp/roster.py, TODO.pylint, pyxmpp/xmppstringprep.py, pylint.sh:
