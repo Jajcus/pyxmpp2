@@ -17,7 +17,7 @@ version:
 		if test -n "$(RELEASE)" ; then \
 			SNAPSHOT="" ; \
 		else \
-			SNAPSHOT=.`find . -name "*.py" '!' -name "version.py" -printf '%TY%Tm%Td_%TH%TM\n' | sort -r | head -1` ; \
+			SNAPSHOT=.`find . -name "*.py" '!' -name "version.py" -printf '%TY%Tm%Td_%TH%TM\n' | sort -r | head -1 2>/dev/null || echo unknown` ; \
 		fi ; \
 		echo "version='$(BASE_VERSION)$$SNAPSHOT'" > pyxmpp/version.py ; \
 	fi
