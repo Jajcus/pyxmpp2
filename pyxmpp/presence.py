@@ -75,6 +75,17 @@ class Presence(Stanza):
 		else:
 			return None
 
+	def get_priority(self):
+		n=self.xpath_eval("priority")
+		if not n:
+			return 0
+		try:
+			prio=int(n[0].getContent())
+		except ValueError:
+			return 0
+		return prio
+			
+
 	def make_error_response(self,cond):
 		if self.get_type() == "error":
 			raise StanzaError,"Errors may not be generated in response to errors"
