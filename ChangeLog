@@ -1,5 +1,12 @@
 2004-10-07  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/sasl/__init__.py, pyxmpp/sasl/core.py, pyxmpp/sasl/digest_md5.py, pyxmpp/sasl/plain.py, pyxmpp/jabberd/component.py, pyxmpp/jabberd/componentstream.py, pyxmpp/jabber/client.py, pyxmpp/jabber/clientstream.py, pyxmpp/jabber/delay.py, pyxmpp/jabber/disco.py, pyxmpp/jabber/muc.py, pyxmpp/jabber/vcard.py, pyxmpp/client.py, pyxmpp/clientstream.py, pyxmpp/dns.py, pyxmpp/error.py, pyxmpp/expdict.py, pyxmpp/iq.py, pyxmpp/jid.py, pyxmpp/message.py, pyxmpp/presence.py, pyxmpp/resolver.py, pyxmpp/roster.py, pyxmpp/stanza.py, pyxmpp/stanzaprocessor.py, pyxmpp/stream.py, pyxmpp/streambase.py, pyxmpp/streamsasl.py, pyxmpp/streamtls.py, pyxmpp/xmlextra.py, pyxmpp/xmppstringprep.py, migrate-0_5-0_6.py:
+	- cosmetics
+
+	* pyxmpp/sasl/plain.py, pyxmpp/sasl/__init__.py, pyxmpp/sasl/core.py, pyxmpp/sasl/digest_md5.py, pyxmpp/jabberd/component.py, pyxmpp/jabberd/componentstream.py, pyxmpp/jabber/clientstream.py, pyxmpp/jabber/delay.py, pyxmpp/jabber/disco.py, pyxmpp/jabber/muc.py, pyxmpp/jabber/vcard.py, pyxmpp/jabber/client.py, pyxmpp/streambase.py, pyxmpp/streamsasl.py, pyxmpp/streamtls.py, pyxmpp/xmppstringprep.py, pyxmpp/roster.py, pyxmpp/stanza.py, pyxmpp/stanzaprocessor.py, pyxmpp/stream.py, pyxmpp/client.py, pyxmpp/clientstream.py, pyxmpp/dns.py, pyxmpp/error.py, pyxmpp/iq.py, pyxmpp/jid.py, pyxmpp/message.py, pyxmpp/presence.py, pyxmpp/resolver.py, doc/Makefile:
+	- documentation cleanup
+	- references to RFC and JEP documents added to module docstrings
+
 	* pyxmpp/client.py, pyxmpp/clientstream.py, README:
 	- reference the XMPP RFCs :-)
 
