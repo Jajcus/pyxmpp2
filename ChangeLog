@@ -1,3 +1,8 @@
+2004-06-09  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/jabber/muc.py:
+	- return True from __presence_unavailable()
+
 2004-06-07  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/jabber/muc.py:
