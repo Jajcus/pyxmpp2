@@ -388,6 +388,17 @@ class DiscoItems:
             self.xpath_ctxt.xpathFreeContext()
             self.xpath_ctxt=None
 
+    def node(self):
+        """Get the node address of the `DiscoItems` object.
+
+        :return: the node name.
+        :returntype: `unicode`"""
+        
+        node=self.xmlnode.prop("node")
+        if not node:
+            return None
+        return unicode(node,"utf-8")
+
     def items(self):
         """Get the items contained in `self`.
 
@@ -502,6 +513,17 @@ class DiscoInfo:
         if self.xpath_ctxt:
             self.xpath_ctxt.xpathFreeContext()
             self.xpath_ctxt=None
+
+    def node(self):
+        """Get the node address of the `DiscoInfo` object.
+
+        :return: the node name.
+        :returntype: `unicode`"""
+        
+        node=self.xmlnode.prop("node")
+        if not node:
+            return None
+        return unicode(node,"utf-8")
 
     def features(self):
         """Get the features contained in `self`.
