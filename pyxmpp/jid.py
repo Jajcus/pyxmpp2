@@ -54,20 +54,30 @@ class JID:
 			self.domain=domain
 			self.resource=resource
 	
-	def from_string(self,s):
-		return self.from_unicode(from_utf8(s))
+	def from_string(self,s,check=1):
+		return self.from_unicode(from_utf8(s),check)
 	
-	def from_unicode(self,s):
+	def from_unicode(self,s,check=1):
 		s1=s.split("/",1)
 		s2=s1[0].split("@",1)
 		if len(s2)==2:
-			self.set_node(s2[0])
-			self.set_domain(s2[1])
+			if check:
+				self.set_node(s2[0])
+				self.set_domain(s2[1])
+			else:
+				self.node=s2[0]
+				self.domain=s2[1]
 		else:
-			self.set_domain(s2[0])
+			if check:
+				self.set_domain(s2[0])
+			else:
+				self.domain=s2[0]
 			self.node=None
 		if len(s1)==2:
-			self.set_resource(s1[1])
+			if check:
+				self.set_resource(s1[1])
+			else:
+				self.resource=s1[1]
 		else:
 			self.resource=None
 
