@@ -247,7 +247,10 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.doc_out.getRootElement().addContent(" ")
 		str=self.doc_out.getRootElement().serialize(encoding="UTF-8")
 		end=str.rindex("<")
-		self.write_raw(str[end:])
+		try:
+			self.write_raw(str[end:])
+		except (IOError,SystemError),e:
+			self.debug("Sending stream closing tag failed:"+str(e))
 		self.doc_out.freeDoc()
 		self.doc_out=None
 		if self.features:
