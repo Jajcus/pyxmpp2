@@ -15,7 +15,7 @@ all: version
 doc:
 	$(MAKE) -C doc
 
-ChangeLog: .svn/entries
+ChangeLog:
 	TZ=UTC svn log -v --xml | aux/svn2log.py -p '/(branches/[^/]+|trunk)' -x ChangeLog -u aux/users
 
 pylint:	TODO.pylint
