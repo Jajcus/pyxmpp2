@@ -1,3 +1,8 @@
+2004-09-27  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/jabberd/__init__.py, pyxmpp/jabberd/component.py, pyxmpp/stanzaprocessor.py, pyxmpp/streamtls.py, TODO.pylint:
+	- cleaning up...
+
 2004-09-25  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/error.py, pyxmpp/iq.py, TODO.pylint:
