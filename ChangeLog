@@ -1,3 +1,8 @@
+2004-10-07  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/client.py, pyxmpp/clientstream.py, README:
+	- reference the XMPP RFCs :-)
+
 2004-10-04  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* ext/xmlextra.c:
