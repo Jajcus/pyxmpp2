@@ -62,7 +62,9 @@ class TestForm(unittest.TestCase):
         sform = form.make_submit()
         self.check_form_info(sform, ("submit", None, None))
         submitted_fields = [ 
-                    (f[0], None, f[2], None, [], False, None) for f in jep4_example2_fields 
+                    (f[0], None, f[2], None, [], False, None) 
+                        for f in jep4_example2_fields 
+                            if f[1]!="fixed" and (f[5] or f[2])
                 ]
         sform['public'].value = None
         self.check_form_iter(sform, submitted_fields)
@@ -73,7 +75,9 @@ class TestForm(unittest.TestCase):
         sform = form.make_submit( keep_types = True )
         self.check_form_info(sform, ("submit", None, None))
         submitted_fields = [ 
-                    (f[0], f[1], f[2], None, [], False, None) for f in jep4_example2_fields 
+                    (f[0], f[1], f[2], None, [], False, None) 
+                        for f in jep4_example2_fields 
+                            if f[1]!="fixed" and (f[5] or f[2])
                 ]
         sform['public'].value = None
         self.check_form_iter(sform, submitted_fields)
@@ -113,6 +117,116 @@ class TestForm(unittest.TestCase):
         self.check_form_iter(form, jep4_example8_fields)
         self.check_form_reported(form, jep4_example8_reported)
         self.check_form_items(form, jep4_example8_items)
+
+    def test_field_text_hidden(self):
+        field = Field(field_type="hidden", value=u"bleble")
+        self.failUnlessEqual(field.value,u"bleble")
+        self.failUnlessEqual(field.values,[u"bleble"])
+        field = Field(field_type="hidden", values=[u"abcd"])
+        self.failUnlessEqual(field.value,u"abcd")
+        self.failUnlessEqual(field.values,[u"abcd"])
+        field.value = u"zażółć gęślą jaźń"
+        self.failUnlessEqual(field.value, u"zażółć gęślą jaźń")
+        self.failUnlessEqual(field.values,[u"zażółć gęślą jaźń"])
+
+    def test_field_text_fixed(self):
+        field = Field(field_type="fixed", value=u"bleble")
+        self.failUnlessEqual(field.value,u"bleble")
+        self.failUnlessEqual(field.values,[u"bleble"])
+        field = Field(field_type="fixed", values=[u"abcd"])
+        self.failUnlessEqual(field.value,u"abcd")
+        self.failUnlessEqual(field.values,[u"abcd"])
+        field.value = u"zażółć gęślą jaźń"
+        self.failUnlessEqual(field.value, u"zażółć gęślą jaźń")
+        self.failUnlessEqual(field.values,[u"zażółć gęślą jaźń"])
+
+    def test_field_text_private(self):
+        field = Field(field_type="text-private", value=u"bleble")
+        self.failUnlessEqual(field.value,u"bleble")
+        self.failUnlessEqual(field.values,[u"bleble"])
+        field = Field(field_type="text-private", values=[u"abcd"])
+        self.failUnlessEqual(field.value,u"abcd")
+        self.failUnlessEqual(field.values,[u"abcd"])
+        field.value = u"zażółć gęślą jaźń"
+        self.failUnlessEqual(field.value, u"zażółć gęślą jaźń")
+        self.failUnlessEqual(field.values,[u"zażółć gęślą jaźń"])
+
+    def test_field_text_single(self):
+        field = Field(field_type="text-single", value=u"bleble")
+        self.failUnlessEqual(field.value,u"bleble")
+        self.failUnlessEqual(field.values,[u"bleble"])
+        field = Field(field_type="text-single", values=[u"abcd"])
+        self.failUnlessEqual(field.value,u"abcd")
+        self.failUnlessEqual(field.values,[u"abcd"])
+        field.value = u"zażółć gęślą jaźń"
+        self.failUnlessEqual(field.value, u"zażółć gęślą jaźń")
+        self.failUnlessEqual(field.values,[u"zażółć gęślą jaźń"])
+
+    def test_field_text_multi(self):
+        field = Field(field_type="text-multi", value=[u"item1", u"item2"])
+        self.failUnlessEqual(field.value, [u"item1", u"item2"])
+        self.failUnlessEqual(field.values, [u"item1", u"item2"])
+        field = Field(field_type="text-multi", values=[u"item", u""])
+        self.failUnlessEqual(field.value, [u"item", u""])
+        self.failUnlessEqual(field.values, [u"item", u""])
+        field.value = [u"a", u"b"]
+        self.failUnlessEqual(field.value, [u"a", u"b"])
+        self.failUnlessEqual(field.values, [u"a", u"b"])
+
+    def test_field_list_single(self):
+        field = Field(field_type="list-single", value=u"bleble")
+        self.failUnlessEqual(field.value,u"bleble")
+        self.failUnlessEqual(field.values,[u"bleble"])
+        field = Field(field_type="list-single", values=[u"abcd"])
+        self.failUnlessEqual(field.value,u"abcd")
+        self.failUnlessEqual(field.values,[u"abcd"])
+        field.value = u"zażółć gęślą jaźń"
+        self.failUnlessEqual(field.value, u"zażółć gęślą jaźń")
+        self.failUnlessEqual(field.values,[u"zażółć gęślą jaźń"])
+
+    def test_field_list_multi(self):
+        field = Field(field_type="list-multi", value=[u"item1", u"item2"])
+        self.failUnlessEqual(field.value, [u"item1", u"item2"])
+        self.failUnlessEqual(field.values, [u"item1", u"item2"])
+        field = Field(field_type="list-multi", values=[u"item", u""])
+        self.failUnlessEqual(field.value, [u"item", u""])
+        self.failUnlessEqual(field.values, [u"item", u""])
+        field.value = [u"a", u"b"]
+        self.failUnlessEqual(field.value, [u"a", u"b"])
+        self.failUnlessEqual(field.values, [u"a", u"b"])
+
+    def test_field_jid_single(self):
+        field = Field(field_type="jid-single", value=JID(u"user@example.com"))
+        self.failUnlessEqual(field.value, JID(u"user@example.com"))
+        self.failUnlessEqual(field.values, [u"user@example.com"])
+        field = Field(field_type="jid-single", values=[u"user@example.com"])
+        self.failUnlessEqual(field.value, JID(u"user@example.com"))
+        self.failUnlessEqual(field.values, [u"user@example.com"])
+        field.value = JID(u"example.com")
+        self.failUnlessEqual(field.value, JID(u"example.com"))
+        self.failUnlessEqual(field.values, [u"example.com"])
+
+    def test_field_jid_multi(self):
+        field = Field(field_type="jid-multi", value=[JID(u"user1@example.com"), JID(u"user2@example.com")])
+        self.failUnlessEqual(field.value, [JID(u"user1@example.com"), JID(u"user2@example.com")])
+        self.failUnlessEqual(field.values, [u"user1@example.com", u"user2@example.com"])
+        field = Field(field_type="jid-multi", values=[u"user@example.com", u"example.com"])
+        self.failUnlessEqual(field.value, [JID(u"user@example.com"), JID(u"example.com")])
+        self.failUnlessEqual(field.values, [u"user@example.com", u"example.com"])
+        field.value = [u"user3@example.com"]
+        self.failUnlessEqual(field.value, [JID(u"user3@example.com")])
+        self.failUnlessEqual(field.values, [u"user3@example.com"])
+
+    def test_field_boolean(self):
+        field = Field(field_type="boolean", value=True)
+        self.failUnlessEqual(field.value, True)
+        self.failUnlessEqual(field.values, [u"1"])
+        field = Field(field_type="boolean", values=[u"0"])
+        self.failUnlessEqual(field.value, False)
+        self.failUnlessEqual(field.values, [u"0"])
+        field.value = True
+        self.failUnlessEqual(field.value, True)
+        self.failUnlessEqual(field.values, [u"1"])
 
     def build_form_inc(self, form_type, title, instructions, field_data):
         form = Form(form_type)
