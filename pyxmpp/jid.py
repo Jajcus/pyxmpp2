@@ -67,7 +67,7 @@ class JID:
             self.domain=node.domain
             self.resource=node.resource
             return
-        if node and (node.find(u"@")>=0 or node.find(u"/")>=0):
+        if node and ((u"@" in node) or ("/" in node)):
             self.from_string(node)
             return
         if domain is None and resource is None:
@@ -89,8 +89,8 @@ class JID:
         return self.from_unicode(from_utf8(s),check)
 
     def from_unicode(self,s,check=1):
-        s1=s.split("/",1)
-        s2=s1[0].split("@",1)
+        s1=s.split(u"/",1)
+        s2=s1[0].split(u"@",1)
         if len(s2)==2:
             if check:
                 self.set_node(s2[0])
