@@ -33,7 +33,8 @@ import libxml2
 import re
 
 import pyxmpp.jid
-from pyxmpp.utils import to_utf8,from_utf8,get_node_ns
+from pyxmpp.utils import to_utf8,from_utf8
+from pyxmpp.xmlextra import get_node_ns
 from pyxmpp.objects import StanzaPayloadObject
 
 VCARD_NS="vcard-temp"

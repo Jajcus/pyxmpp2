@@ -30,7 +30,8 @@ import datetime
 
 from pyxmpp.jid import JID
 
-from pyxmpp.utils import to_utf8,from_utf8,get_node_ns_uri
+from pyxmpp.utils import to_utf8,from_utf8
+from pyxmpp.xmlextra import get_node_ns_uri
 from pyxmpp.utils import datetime_utc_to_local,datetime_local_to_utc
 from pyxmpp.objects import StanzaPayloadObject
 
