@@ -72,12 +72,12 @@ class Component(pyxmpp.jabberd.Component):
             return 1
         remove=iq.xpath_eval("r:query/r:remove",{"r":"jabber:iq:register"})
         if remove:
-            m=Message(fr=iq.get_to(),to=iq.get_from(),type="chat",
+            m=Message(from_jid=iq.get_to(),to_jid=iq.get_from(),stanza_type="chat",
                     body=u"Unregistered")
             self.stream.send(m)
-            p=Presence(fr=iq.get_to(),to=iq.get_from(),type="unsubscribe")
+            p=Presence(from_jid=iq.get_to(),to_jid=iq.get_from(),stanza_type="unsubscribe")
             self.stream.send(p)
-            p=Presence(fr=iq.get_to(),to=iq.get_from(),type="unsubscribed")
+            p=Presence(from_jid=iq.get_to(),to_jid=iq.get_from(),stanza_type="unsubscribed")
             self.stream.send(p)
             return 1
         username=iq.xpath_eval("r:query/r:username",{"r":"jabber:iq:register"})
@@ -90,11 +90,11 @@ class Component(pyxmpp.jabberd.Component):
             password=password[0].getContent()
         else:
             password=u""
-        m=Message(fr=iq.get_to(),to=iq.get_from(),type="chat",
+        m=Message(from_jid=iq.get_to(),to_jid=iq.get_from(),stanza_type="chat",
                 body=u"Registered with username '%s' and password '%s'"
                 " (both ignored)" % (username,password))
         self.stream.send(m)
-        p=Presence(fr=iq.get_to(),to=iq.get_from(),type="subscribe")
+        p=Presence(from_jid=iq.get_to(),to_jid=iq.get_from(),stanza_type="subscribe")
         self.stream.send(p)
         iq=iq.make_result_response()
         self.stream.send(iq)
@@ -105,9 +105,9 @@ class Component(pyxmpp.jabberd.Component):
         if subject:
             subject=u"Re: "+subject
         m=Message(
-            to=stanza.get_from(),
-            fr=stanza.get_to(),
-            type=stanza.get_type(),
+            to_jid=stanza.get_from(),
+            from_jid=stanza.get_to(),
+            stanza_type=stanza.get_type(),
             subject=subject,
             body=stanza.get_body())
         self.stream.send(m)
@@ -115,9 +115,9 @@ class Component(pyxmpp.jabberd.Component):
 
     def presence(self,stanza):
         p=Presence(
-            type=stanza.get_type(),
-            to=stanza.get_from(),
-            fr=stanza.get_to(),
+            stanza_type=stanza.get_type(),
+            to_jid=stanza.get_from(),
+            from_jid=stanza.get_to(),
             show=stanza.get_show(),
             status=stanza.get_status()
             );
@@ -141,7 +141,7 @@ if len(sys.argv)<5:
     sys.exit(1)
 
 print "creating component..."
-c=Component(JID(sys.argv[1]),sys.argv[2],sys.argv[3],int(sys.argv[4]),type="x-echo")
+c=Component(JID(sys.argv[1]),sys.argv[2],sys.argv[3],int(sys.argv[4]),disco_type="x-echo")
 
 print "connecting..."
 c.connect()
