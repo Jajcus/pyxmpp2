@@ -1,6 +1,9 @@
 2004-06-04  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/jabber/muc.py:
+	- <status/> attribute named changed from 'status' to 'code'
+
+	* pyxmpp/jabber/muc.py:
 	- MucRoomManager.get_room_state() method added and MucRoomState object me attribute initialized from room_jid
 
 	* pyxmpp/stream.py:
