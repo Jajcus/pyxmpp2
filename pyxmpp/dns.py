@@ -17,7 +17,7 @@
 
 """A simple implementation of a part of the DNS protocol."""
 
-__revision__="$Id: dns.py,v 1.13 2004/09/19 21:34:11 jajcus Exp $"
+__revision__="$Id: dns.py,v 1.14 2004/09/20 21:07:19 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import random
@@ -659,7 +659,7 @@ class Message:
             questions=None,answers=None,authorities=None,additionals=None):
         """Initialize the `Message` object.
 
-        :Patameters:
+        :Parameters:
             - `msg_id`: a message id.
             - `qr`: query/response flag.
             - `opcode`: opcode value.
@@ -840,6 +840,7 @@ def parse_question(packet,offset):
 
 def parse_message(packet):
     """Parse a DNS message packet.
+
     :Parameters:
         - `packet`: the message packet.
         

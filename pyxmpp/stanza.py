@@ -17,7 +17,7 @@
 
 """General XMPP Stanza handling."""
 
-__revision__="$Id: stanza.py,v 1.21 2004/09/19 16:06:28 jajcus Exp $"
+__revision__="$Id: stanza.py,v 1.22 2004/09/20 21:07:19 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -79,7 +79,7 @@ class Stanza:
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
             - `stanza_id`: `unicode`
-            - `error`: `StanzaErrorNode`
+            - `error`: `pyxmpp.error.StanzaErrorNode`
             - `error_cond`: `unicode`"""
         self._error=None
         self.node=None

@@ -17,7 +17,7 @@
 
 """PyXMPP - Jabber/XMPP protocol implementation"""
 
-__revision__="$Id: __init__.py,v 1.14 2004/09/10 14:00:53 jajcus Exp $"
+__revision__="$Id: __init__.py,v 1.15 2004/09/20 21:07:19 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 from pyxmpp.stream import Stream,StreamError,FatalStreamError,StreamParseError
@@ -29,5 +29,6 @@ from pyxmpp.presence import Presence
 from pyxmpp.message import Message
 from pyxmpp.jid import JID,JIDError
 from pyxmpp.stanza import StanzaError
+from pyxmpp.roster import Roster,RosterItem
 
 # vi: sts=4 et sw=4

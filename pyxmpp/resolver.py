@@ -17,7 +17,7 @@
 
 """DNS resolever with SRV record support."""
 
-__revision__="$Id: resolver.py,v 1.14 2004/09/19 21:34:11 jajcus Exp $"
+__revision__="$Id: resolver.py,v 1.15 2004/09/20 21:07:19 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import socket
@@ -230,7 +230,7 @@ def shuffle_srv(records):
         - `records`: `list` of `dns.RR_SRV`
 
     :return: reordered records.
-    :recordtype: `list` of `dns.RR_SRV`"""
+    :returntype: `list` of `dns.RR_SRV`"""
     if not records:
         return []
     ret=[]
@@ -258,7 +258,7 @@ def reorder_srv(records):
         - `records`: `list` of `dns.RR_SRV`
 
     :return: reordered records.
-    :recordtype: `list` of `dns.RR_SRV`"""
+    :returntype: `list` of `dns.RR_SRV`"""
     records=list(records)
     records.sort()
     ret=[]

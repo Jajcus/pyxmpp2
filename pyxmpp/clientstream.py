@@ -17,7 +17,7 @@
 
 """Client stream handling."""
 
-__revision__="$Id: clientstream.py,v 1.34 2004/09/19 21:34:11 jajcus Exp $"
+__revision__="$Id: clientstream.py,v 1.35 2004/09/20 21:07:19 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import logging
@@ -111,9 +111,10 @@ class ClientStream(Stream):
 
         :Parameters:
             - `server`: name or address of the server to use. Not recommended -- proper value
-               should be derived automatically from the JID.
+              should be derived automatically from the JID.
             - `port`: port number of the server to use. Not recommended --
               proper value should be derived automatically from the JID.
+              
         :Types:
             - `server`: `unicode` or `str`
             - `port`: `int`"""

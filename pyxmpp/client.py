@@ -17,7 +17,7 @@
 
 """Basic XHTML-IM client implementation."""
 
-__revision__="$Id: client.py,v 1.28 2004/09/20 19:57:58 jajcus Exp $"
+__revision__="$Id: client.py,v 1.29 2004/09/20 21:07:19 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import threading
@@ -72,7 +72,7 @@ class Client:
         - `roster`: `pyxmpp.Roster`
         - `session_established`: `bool`
         - `lock`: `threading.RLock`
-        - `state_changed`: `threding.Condition`
+        - `state_changed`: `threading.Condition`
     """
     def __init__(self,jid=None,password=None,server=None,port=5222,
             auth_methods=("sasl:DIGEST-MD5",),
@@ -186,9 +186,9 @@ class Client:
     def loop(self,timeout=1):
         """Simple "main loop" for the client.
 
-        By default just call the `self.stream.loop_iter` method, which
-        handles stream input and `self.idle` for some "housekeeping" work
-        until the stream is closed.
+        By default just call the `pyxmpp.Stream.loop_iter` method of
+        `self.stream`, which handles stream input and `self.idle` for some
+        "housekeeping" work until the stream is closed.
 
         This usually will be replaced by something more sophisticated. E.g. 
         handling of other input sources."""
@@ -339,7 +339,7 @@ class Client:
         """Handle stream creation event. May be overriden in derived classes.
         This one does nothing.
 
-        :Patameters:
+        :Parameters:
             - `stream`: the new stream.
         :Types:
             - `stream`: `pyxmpp.ClientStream`"""
@@ -349,7 +349,7 @@ class Client:
         """Handle stream closure event. May be overriden in derived classes.
         This one does nothing.
 
-        :Patameters:
+        :Parameters:
             - `stream`: the new stream.
         :Types:
             - `stream`: `pyxmpp.ClientStream`"""
@@ -369,7 +369,7 @@ class Client:
         :Parameters:
             - `err`: the error element received.
         :Types:
-            - `err`: `pyxmpp.StreamErrorNode`"""
+            - `err`: `pyxmpp.error.StreamErrorNode`"""
         self.__logger.error("Stream error: condition: %s %r"
                 % (err.get_condition().name,err.serialize()))
 
