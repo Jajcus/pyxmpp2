@@ -22,7 +22,7 @@ Normative reference:
   - `RFC 2782 <http://www.ietf.org/rfc/rfc2782.txt>`__
 """
 
-__revision__="$Id: resolver.py,v 1.17 2004/10/07 22:28:04 jajcus Exp $"
+__revision__="$Id: resolver.py,v 1.18 2004/10/22 12:20:31 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import socket
@@ -44,23 +44,33 @@ ip_re=re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
 
 def load_resolv_conf():
     """Get the list of nameservers to use and domain to search from local configuration."""
-    f=file("/etc/resolv.conf","r")
-    nameservers[:]=[]
     search=[]
     domain=None
-    for l in f.xreadlines():
-        l=l.strip()
-        if not l or l.startswith("#"):
-            continue
-        sp=l.split()
-        if len(sp)<2:
-            continue
-        if sp[0]=="nameserver":
-            nameservers.append(sp[1])
-        elif sp[0]=="domain":
-            domain=sp[1]
-        elif sp[0]=="search":
-            search=sp[1:]
+    nameservers[:]=[]
+    try:
+        f=file("/etc/resolv.conf","r")
+        nameservers[:]=[]
+        search=[]
+        domain=None
+        for l in f.xreadlines():
+            l=l.strip()
+            if not l or l.startswith("#"):
+                continue
+            sp=l.split()
+            if len(sp)<2:
+                continue
+            if sp[0]=="nameserver":
+                nameservers.append(sp[1])
+            elif sp[0]=="domain":
+                domain=sp[1]
+            elif sp[0]=="search":
+                search=sp[1:]
+    except IOError:
+        pass
+
+    if not nameservers:
+        nameservers[:]=['127.0.0.1']
+                
     if search:
         search_list[:]=search
     elif domain:
