@@ -45,6 +45,9 @@ class Iq(Stanza):
 			node="iq"
 		apply(Stanza.__init__,[self,node],kw)
 
+	def copy(self):
+		return Iq(self)
+
 	def make_error_response(self,cond):
 		if self.get_type() not in ("set","get"):
 			raise StanzaError,"Errors may only be generated for 'set' or 'get' iq"

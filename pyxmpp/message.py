@@ -63,6 +63,9 @@ class Message(Stanza):
 		else:
 			return None
 	
+	def copy(self):
+		return Message(self)
+
 	def get_body(self):
 		n=self.xpath_eval("body")
 		if n:

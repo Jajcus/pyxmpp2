@@ -58,6 +58,9 @@ class Presence(Stanza):
 		if status:
 			self.node.newChild(None,"status",to_utf8(status))
 
+	def copy(self):
+		return Presence(self)
+
 	def get_status(self):
 		n=self.xpath_eval("status")
 		if n:
