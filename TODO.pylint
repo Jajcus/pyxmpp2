@@ -124,43 +124,7 @@ ignore that: W0613:355:LegacyClientStream.auth_finish: Unused argument 'stanza'
 ************* Module pyxmpp.jabber.client
 ignore that: W0613: 83:JabberClient.connect: Unused argument 'register'
 ************* Module pyxmpp.jabber.disco
-W0141: 38:DiscoError: Missing docstring
-W0141: 41:DiscoItem: Missing docstring
-W0141: 78:DiscoItem.remove: Missing docstring
-W0141: 88:DiscoItem.name: Missing docstring
-W0141: 93:DiscoItem.set_name: Missing docstring
-W0141: 99:DiscoItem.node: Missing docstring
-W0141:104:DiscoItem.set_node: Missing docstring
-W0141:110:DiscoItem.action: Missing docstring
-W0141:115:DiscoItem.set_action: Missing docstring
-W0141:123:DiscoItem.jid: Missing docstring
-W0141:125:DiscoItem.set_jid: Missing docstring
-W0141:128:DiscoIdentity: Missing docstring
-W0622:129:DiscoIdentity.__init__: Redefining built-in 'type'
-W0141:170:DiscoIdentity.remove: Missing docstring
-W0141:180:DiscoIdentity.name: Missing docstring
-W0141:183:DiscoIdentity.set_name: Missing docstring
-W0141:187:DiscoIdentity.category: Missing docstring
-W0141:190:DiscoIdentity.set_category: Missing docstring
-W0141:192:DiscoIdentity.type: Missing docstring
-W0622:193:DiscoIdentity.type: Redefining built-in 'type'
-W0622:197:DiscoIdentity.set_type: Redefining built-in 'type'
-W0141:197:DiscoIdentity.set_type: Missing docstring
-W0141:204:DiscoItems: Missing docstring
-E0602:211:DiscoItems.__init__: Undefined variable 'RosterError'
-W0141:234:DiscoItems.items: Missing docstring
-W0141:242:DiscoItems.has_item: Missing docstring
-W0141:268:DiscoInfo: Missing docstring
-E0602:275:DiscoInfo.__init__: Undefined variable 'RosterError'
-W0141:299:DiscoInfo.features: Missing docstring
-W0141:307:DiscoInfo.has_feature: Missing docstring
-E0602:315:DiscoInfo.has_feature: Undefined variable 'RosterError'
-W0141:323:DiscoInfo.add_feature: Missing docstring
-W0141:329:DiscoInfo.remove_feature: Missing docstring
-E0602:337:DiscoInfo.remove_feature: Undefined variable 'RosterError'
-W0141:347:DiscoInfo.identities: Missing docstring
-W0141:355:DiscoInfo.identity_is: Missing docstring
-W0622:355:DiscoInfo.identity_is: Redefining built-in 'type'
+W0511:415: FIXME: stringprep!
 ************* Module pyxmpp.jabber.vcard
 W0511:728: FIXME#
 W0301:111: Line too long (102/100)
@@ -273,9 +237,9 @@ Statistics by type
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 module   38     38         =          97.37       0.00     
-class    115    115        =          80.00       0.00     
+class    115    115        =          84.35       0.00     
 method   0      0          =          0.00        0.00     
-function 642    642        =          91.12       0.00     
+function 642    642        =          94.86       0.00     
 
 
 Raw metrics
@@ -283,10 +247,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6582   53.12 6582     =          
-docstring 4437   35.81 4437     =          
-comment   608    4.91  608      =          
-empty     764    6.17  764      =          
+code      6581   52.06 6581     =          
+docstring 4656   36.83 4656     =          
+comment   610    4.83  610      =          
+empty     795    6.29  795      =          
 
 
 External dependencies
@@ -321,16 +285,14 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0141      81         
+W0141      52         
 W0613      41         
 W0201      33         
 E0201      27         
 W0102      15         
+W0511      8          
 W0612      7          
-W0511      7          
 W0221      6          
-E0602      5          
-W0622      4          
 W0103      4          
 W0403      2          
 W0232      2          
@@ -339,6 +301,7 @@ W0611      1
 W0401      1          
 W0301      1          
 W0115      1          
+E0602      1          
 
 
 Total errors / warnings
@@ -346,8 +309,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 208    208      =          
-errors   32     32       =          
+warnings 176    176      =          
+errors   28     28       =          
 
 
 % errors / warnings by module
@@ -355,32 +318,32 @@ errors   32     32       =
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            46.88 40.38   
-pyxmpp.jid                     40.62 0.48    
-pyxmpp.jabber.disco            12.50 15.87   
-pyxmpp.streambase              0.00  10.58   
-pyxmpp.sasl.core               0.00  4.81    
-pyxmpp.dns                     0.00  3.85    
-pyxmpp.streamsasl              0.00  3.37    
-pyxmpp.clientstream            0.00  3.37    
-pyxmpp.jabberd.componentstream 0.00  2.88    
-pyxmpp.jabber.clientstream     0.00  2.40    
-pyxmpp.xmlextra                0.00  1.92    
-pyxmpp.streamtls               0.00  1.92    
-pyxmpp.version                 0.00  1.44    
-pyxmpp.jabber.muccore          0.00  1.44    
-pyxmpp.sasl.plain              0.00  0.96    
-pyxmpp.jabber.muc              0.00  0.96    
-pyxmpp._xmlextra               0.00  0.96    
-pyxmpp.xmppstringprep          0.00  0.48    
-pyxmpp.sasl.digest_md5         0.00  0.48    
-pyxmpp.resolver                0.00  0.48    
-pyxmpp.jabber.client           0.00  0.48    
-pyxmpp.client                  0.00  0.48    
+pyxmpp.jabber.vcard            53.57 47.73   
+pyxmpp.jid                     46.43 0.57    
+pyxmpp.streambase              0.00  12.50   
+pyxmpp.sasl.core               0.00  5.68    
+pyxmpp.dns                     0.00  4.55    
+pyxmpp.streamsasl              0.00  3.98    
+pyxmpp.clientstream            0.00  3.98    
+pyxmpp.jabberd.componentstream 0.00  3.41    
+pyxmpp.jabber.clientstream     0.00  2.84    
+pyxmpp.xmlextra                0.00  2.27    
+pyxmpp.streamtls               0.00  2.27    
+pyxmpp.version                 0.00  1.70    
+pyxmpp.jabber.muccore          0.00  1.70    
+pyxmpp.sasl.plain              0.00  1.14    
+pyxmpp.jabber.muc              0.00  1.14    
+pyxmpp._xmlextra               0.00  1.14    
+pyxmpp.xmppstringprep          0.00  0.57    
+pyxmpp.sasl.digest_md5         0.00  0.57    
+pyxmpp.resolver                0.00  0.57    
+pyxmpp.jabber.disco            0.00  0.57    
+pyxmpp.jabber.client           0.00  0.57    
+pyxmpp.client                  0.00  0.57    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 9.39/10 (previous run: 9.39/10)
+Your code has been rated at 9.47/10 (previous run: 9.47/10)
 So close to being perfect...
 
