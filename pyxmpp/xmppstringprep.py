@@ -1,12 +1,55 @@
 
 from types import ListType
 import string
+import stringprep
 
 from pyxmpp.unicode.nfkc import NFKC
-from rfc3454 import LookupTable
-from rfc3454 import A_1,B_1,B_2,C_1_1,C_1_2,C_2_1,C_2_2,C_3,C_4,C_5,C_6,C_7,C_8,C_9,D_1,D_2
 
 """ Stringprep (RFC3454) implementation with nodeprep and resourceprep profiles."""
+
+class LookupFunction:
+    def __init__(self,function):
+        self.lookup=function
+
+class LookupTable:
+    def __init__(self,singles,ranges):
+        self.singles=singles
+        self.ranges=ranges
+    def lookup(self,c):
+        if self.singles.has_key(c):
+            return self.singles[c]
+        c=ord(c)
+        for (min,max),value in self.ranges:
+            if c<min:
+                return None
+            if c<=max:
+                return value
+        return None
+
+A_1=LookupFunction(stringprep.in_table_a1)
+
+def b1_mapping(uc):
+    if stringprep.in_table_b1(uc):
+        return u""
+    else:
+        return None
+
+B_1=LookupFunction(b1_mapping)
+B_2=LookupFunction(stringprep.map_table_b2)
+B_3=LookupFunction(stringprep.map_table_b3)
+C_1_1=LookupFunction(stringprep.in_table_c11)
+C_1_2=LookupFunction(stringprep.in_table_c12)
+C_2_1=LookupFunction(stringprep.in_table_c21)
+C_2_2=LookupFunction(stringprep.in_table_c22)
+C_3=LookupFunction(stringprep.in_table_c3)
+C_4=LookupFunction(stringprep.in_table_c4)
+C_5=LookupFunction(stringprep.in_table_c5)
+C_6=LookupFunction(stringprep.in_table_c6)
+C_7=LookupFunction(stringprep.in_table_c7)
+C_8=LookupFunction(stringprep.in_table_c8)
+C_9=LookupFunction(stringprep.in_table_c9)
+D_1=LookupFunction(stringprep.in_table_d1)
+D_2=LookupFunction(stringprep.in_table_d2)
 
 class StringprepError(StandardError):
     """Exception raised when string preparation results in error."""

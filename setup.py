@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# $Id: setup.py,v 1.12 2004/05/05 19:58:23 jajcus Exp $
+# $Id: setup.py,v 1.13 2004/06/02 21:11:06 jajcus Exp $
 
 import os.path
 import sys
@@ -39,7 +39,6 @@ setup(
         'pyxmpp.jabber',
         'pyxmpp.jabberd',
         'pyxmpp.sasl',
-        'pyxmpp.unicode',
     ],
 )
 

@@ -19,6 +19,7 @@
 
 import re
 from types import StringType,UnicodeType
+from encodings import idna
 
 from utils import to_utf8,from_utf8
 from xmppstringprep import nodeprep,resourceprep
@@ -26,26 +27,16 @@ from xmppstringprep import nodeprep,resourceprep
 node_invalid_re=re.compile(ur"[" u'"' ur"&'/:<>@\s\x00-\x19]",re.UNICODE)
 resource_invalid_re=re.compile(ur"[\s\x00-\x19]",re.UNICODE)
 
-try:
-    from encodings import idna
-    def is_domain_valid(domain):
-        try:
-            idna.ToASCII(domain)
-        except:
-            return 0
-        return 1
-    def are_domains_equal(a,b):
-        a=idna.ToASCII(a)
-        b=idna.ToASCII(b)
-        return a.lower()==b.lower()
-except ImportError:
-    domain_invalid_re=re.compile(r"[^-a-zA-Z0-9]")
-    def is_domain_valid(domain):
-        if domain_invalid_re.match(domain):
-            return 0
-        return 1
-    def are_domains_equal(a,b):
-        return a.lower()==b.lower()
+def is_domain_valid(domain):
+    try:
+        idna.ToASCII(domain)
+    except:
+        return 0
+    return 1
+def are_domains_equal(a,b):
+    a=idna.ToASCII(a)
+    b=idna.ToASCII(b)
+    return a.lower()==b.lower()
 
 class JIDError(ValueError):
     "Exception raised when invalid JID is used"
@@ -186,4 +177,5 @@ class JID:
 
     def __ne__(self,other):
         return not self.__eq__(other)
+
 # vi: sts=4 et sw=4

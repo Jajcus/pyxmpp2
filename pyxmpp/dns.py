@@ -3,13 +3,8 @@ import random
 import struct
 import sys
 import string
+from encodings import idna
 from types import StringType,UnicodeType
-
-try:
-    from encodings import idna
-    IDNA_AVAILABLE=1
-except:
-    IDNA_AVAILABLE=0
 
 class ResolverError(Exception):
     pass
@@ -34,10 +29,7 @@ resolve_errors={
 
 def domain_str2bin(name):
     if type(name) is UnicodeType:
-        if IDNA_AVAILABLE:
-            name=idna.ToASCII(name)
-        else:
-            name=str(name)
+        name=idna.ToASCII(name)
     ret=""
     for label in name.split("."):
         if not label:
