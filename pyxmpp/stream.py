@@ -81,23 +81,24 @@ class TLSHanshakeFailed(FatalStreamError):
 class TLSSettings:
 	def __init__(self,require=0,verify_peer=0,cert_file=None,key_file=None,
 				cacert_file=None,ctx=None):
-		if not ctx:
-			ctx=SSL.Context('tlsv1')
 		self.require=require
-		if verify_peer:
-			ctx.set_verify(SSL.verify_peer,10)
-		else:
-			ctx.set_verify(SSL.verify_none,10)
-		if cert_file:
-			ctx.use_certificate_chain_file(cert_file)
-			if key_file:
-				ctx.use_PrivateKey_file(key_file)
+		if tls_avaliable:
+			if not ctx:
+				ctx=SSL.Context('tlsv1')
+			if verify_peer:
+				ctx.set_verify(SSL.verify_peer,10)
 			else:
-				ctx.use_PrivateKey_file(cert_file)
-			ctx.check_private_key()
-		if cacert_file:
-			ctx.load_verify_locations(cacert_file)
-		self.ctx=ctx
+				ctx.set_verify(SSL.verify_none,10)
+			if cert_file:
+				ctx.use_certificate_chain_file(cert_file)
+				if key_file:
+					ctx.use_PrivateKey_file(key_file)
+				else:
+					ctx.use_PrivateKey_file(cert_file)
+				ctx.check_private_key()
+			if cacert_file:
+				ctx.load_verify_locations(cacert_file)
+			self.ctx=ctx
 
 def StanzaFactory(node):
 	if node.name=="iq":
