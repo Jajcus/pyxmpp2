@@ -25,8 +25,21 @@ from xmppstringprep import nodeprep,resourceprep
 
 node_invalid_re=re.compile(ur"[" u'"' ur"&'/:<>@\s\x00-\x19]",re.UNICODE)
 resource_invalid_re=re.compile(ur"[\s\x00-\x19]",re.UNICODE)
-domain_invalid_re=re.compile(r"[^-a-zA-Z0-9]")
 
+try:
+        from encodings import idna
+	def is_domain_valid(domain):
+		try:
+			idna.ToASCII(domain)
+		except:
+			return 0
+		return 1
+except ImportError:
+	domain_invalid_re=re.compile(r"[^-a-zA-Z0-9]")
+	def is_domain_valid(domain):
+		if domain_invalid_re.match(domain):
+			return 0
+		return 1
 
 class JIDError(ValueError):
 	"Exception raised when invalid JID is used"
@@ -105,8 +118,8 @@ class JID:
 		if s: s=from_utf8(s)
 		if s is None:
 			raise JIDError,"Domain must be given"
-		if domain_invalid_re.match(s):
-			raise JIDError,"Invalid characters in domain"
+		if not is_domain_valid(s):
+			raise JIDError,"Invalid domain"
 		if len(s)>1023:
 			raise JIDError,"Domain name too long"
 		self.domain=s
