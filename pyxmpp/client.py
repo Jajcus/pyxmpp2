@@ -30,18 +30,20 @@ from disco import DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
 class ClientError(StandardError):
 	pass
 
+class FatalClientError(ClientError):
+	pass
+
 class Client:
 	def __init__(self,jid=None,password=None,server=None,port=5222,
 			auth_methods=["sasl:DIGEST-MD5","digest"],
-			enable_tls=0,require_tls=0,keepalive=0):
+			tls_settings=None,keepalive=0):
 
 		self.jid=jid
 		self.password=password
 		self.server=server
 		self.port=port
 		self.auth_methods=auth_methods
-		self.enable_tls=enable_tls
-		self.require_tls=require_tls
+		self.tls_settings=tls_settings
 		self.keepalive=keepalive
 		self.stream=None
 		self.lock=threading.RLock()
@@ -68,8 +70,7 @@ class Client:
 				
 			stream=ClientStream(self.jid,self.password,self.server,
 						self.port,self.auth_methods,
-						self.enable_tls,self.require_tls,
-						self.keepalive)
+						self.tls_settings,self.keepalive)
 			stream.debug=self.debug
 			stream.print_exception=self.print_exception
 			stream.process_stream_error=self.stream_error
@@ -138,7 +139,7 @@ class Client:
 		raise FatalClientError("Timeout while tryin to establish a session")
 		
 	def __session_error(self,iq):
-		raise FatalClientError("Failed establish session")
+		raise FatalClientError("Failed to establish a session")
 	
 	def __session_result(self,iq):
 		self.state_changed.acquire()
