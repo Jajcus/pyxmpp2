@@ -1,0 +1,2 @@
+[(u'ejabberd', u'server', u'im')]
+[u'ejabberd:config', u'http://ejabberd.jabberstudio.org/protocol/configure', u'http://jabber.org/protocol/disco#info', u'http://jabber.org/protocol/disco#items', u'http://jabber.org/protocol/stats', u'iq', u'jabber:iq:last', u'jabber:iq:register', u'jabber:iq:time', u'jabber:iq:version', u'presence', u'presence-invisible', u'vcard-temp']

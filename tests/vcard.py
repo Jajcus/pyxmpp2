@@ -118,13 +118,11 @@ class TestVCard(unittest.TestCase):
         xmldata=libxml2.parseFile("data/vcard_without_n.xml")
         vc=vcard.VCard(xmldata.getRootElement())
         should_be=file("data/vcard_without_n.txt").read()
-        file("data/vcard_without_n.out","w").write(vcard2txt(vc))
         self.failUnlessEqual(vcard2txt(vc),should_be)
     def test_xml_without_fn(self):
         xmldata=libxml2.parseFile("data/vcard_without_n.xml")
         vc=vcard.VCard(xmldata.getRootElement())
         should_be=file("data/vcard_without_n.txt").read()
-        file("data/vcard_without_n.out","w").write(vcard2txt(vc))
         self.failUnlessEqual(vcard2txt(vc),should_be)
     def test_vcf_input1(self):
         input=file("data/vcard2.vcf").read()
