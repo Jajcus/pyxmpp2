@@ -14,7 +14,7 @@ all: version
 	
 version:
 	if test -f "CVS/Entries" ; then \
-		if test -n "$(RELEASE)" ; then \
+		if [ "x$(RELEASE)" != "x" ]; then \
 			SNAPSHOT="" ; \
 		else \
 			SNAPSHOT=.`find . -name "*.py" '!' -name "version.py" -printf '%TY%Tm%Td_%TH%TM\n' | sort -r | head -1 2>/dev/null || echo unknown` ; \
