@@ -1,11 +1,12 @@
 
 - generic XMPP stream creation, reading, writting
-	- StartTLS negotiation (but no real TLS support)
+	- StartTLS
 	- SASL authentication
 		- PLAIN
 		- DIGEST-MD5
 
 - XMPP error handling including translations for backward compatibility
+	(probably not quite up-to-date)
 
 - basic stanza (iq,presence,message) creation
 	- IQ requests, results and error handling 
@@ -16,6 +17,8 @@
 
 - roster object
 
-- base Client class
+- base Client class (both plain XMPP and legacy-compatible-Jabber)
 	- establishing of session
 	- roster management (only initial retrieval now)
+
+- basic Service Discovery (JEP-30) support

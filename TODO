@@ -3,7 +3,7 @@ general:
 - documentation
 
 xmpp-base:
-- jabber:server stream support
+- jabber:server stream support (including diallback)
 
 xmpp-im:
 - privacy lists
