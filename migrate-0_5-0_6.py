@@ -20,10 +20,10 @@ in_par=r"(?:\([^)]*\)|[^()])"
 
 
 updates=[
-    (r"((?:Stanza|Message|Iq|Presence)\("+in_par+r"*)\bfr=("+in_par+r"+\))",r"\1from_jid=\2"),
-    (r"((?:Stanza|Message|Iq|Presence)\("+in_par+r"*)\bto=("+in_par+r"+\))",r"\1to_jid=\2"),
-    (r"((?:Stanza|Message|Iq|Presence)\("+in_par+r"*)\btype?=("+in_par+r"+\))",r"\1stanza_type=\2"),
-    (r"((?:Stanza|Message|Iq|Presence)\("+in_par+r"*)\bs?id=("+in_par+r"+\))",r"\1stanza_id=\2"),
+    (r"(\b(?:Muc)?(?:Stanza|Message|Iq|Presence)\("+in_par+r"*)\bfr=("+in_par+r"+\))",r"\1from_jid=\2"),
+    (r"(\b(?:Muc)?(?:Stanza|Message|Iq|Presence)\("+in_par+r"*)\bto=("+in_par+r"+\))",r"\1to_jid=\2"),
+    (r"(\b(?:Muc)?(?:Stanza|Message|Iq|Presence)\("+in_par+r"*)\btype?=("+in_par+r"+\))",r"\1stanza_type=\2"),
+    (r"(\b(?:Muc)?(?:Stanza|Message|Iq|Presence)\("+in_par+r"*)\bs?id=("+in_par+r"+\))",r"\1stanza_id=\2"),
     ]
 
 updates=[(re.compile(u_re,re.MULTILINE|re.DOTALL),u_repl) 
