@@ -18,11 +18,11 @@ class StreamHandler:
 		self.stream_end(doc)
 	def _stanza_start(self,_doc,_node):
 		doc=libxml2.xmlDoc(_doc)
-		node=libxml2.xmlDoc(_node)
+		node=libxml2.xmlNode(_node)
 		self.stanza_start(doc,node)
 	def _stanza_end(self,_doc,_node):
 		doc=libxml2.xmlDoc(_doc)
-		node=libxml2.xmlDoc(_node)
+		node=libxml2.xmlNode(_node)
 		self.stanza_end(doc,node)
 	
 	def stream_start(self,doc):
