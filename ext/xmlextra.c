@@ -673,7 +673,7 @@ char c;
 			if (c=='<') {
 				new_state=LS_TSTART;
 				if (reader->buffer_pos>1) {
-					current_markup=MT_IGNORE;
+					current_markup=MT_CDATA;
 					*len=reader->buffer_pos-1;
 				}
 			}
@@ -1241,6 +1241,7 @@ size_t len;
 int tmp_len;
 MarkupType mtype;
 int depth_change;
+size_t i;
 
 	if (reader->eof){
 		Py_INCREF(Py_None);
@@ -1310,6 +1311,14 @@ int depth_change;
 				break;
 			case MT_IGNORE:
 				break;
+			case MT_CDATA:
+				for(i=0;i<len;i++){
+					if (reader->buffer[i]!=' '
+						&& reader->buffer[i]!='\t'
+						&& reader->buffer[i]!='\r'
+						&& reader->buffer[i]!='\n') break;
+				}
+				if (i==len) break;
 			default:
 				preparsing_reader_clear(reader);
 				PyErr_SetString(MyError,"XML not well-formed "
