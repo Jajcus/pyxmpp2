@@ -29,7 +29,7 @@ class RosterError(StandardError):
 	pass
 
 class RosterItem:
-	def __init__(self,roster,node_or_jid,subscription="none"):
+	def __init__(self,roster,node_or_jid,subscription="none",name=None):
 		self.roster=roster
 		if isinstance(node_or_jid,JID):
 			if roster:
@@ -48,6 +48,8 @@ class RosterItem:
 		self.xpath_ctxt=common_doc.xpathNewContext()
 		self.xpath_ctxt.setContextNode(self.node)
 		self.xpath_ctxt.xpathRegisterNs("r","jabber:iq:roster")
+		if name is not None:
+			self.set_name(name)
 	def __del__(self):
 		if self.roster is None:
 			if self.node:
@@ -56,6 +58,8 @@ class RosterItem:
 				self.node=None
 		if self.xpath_ctxt:
 			self.xpath_ctxt.xpathFreeContext()
+	def __str__(self):
+		return self.node.serialize()
 	def name(self):
 		name=self.node.prop("name")
 		if name is None:
@@ -94,18 +98,11 @@ class RosterItem:
 		for g in l:
 			gname=g.getContent()
 			if gname:
-				ret.append(gname)
+				ret.append(unicode(gname,"utf-8","replace"))
 		return ret
 	def add_group(self,group):
-		group=to_utf8(group)
-		if '"' not in group:
-			expr='[r:group="%s"]' % (group,)
-		elif "'" not in group:
-			expr="[r:group='%s']" % (group,)
-		else:
-			raise RosterError,"Unsupported roster group name format"
-		g=self.xpath_ctxt.xpathEval(expr)
-		if g:
+		groups=self.groups()
+		if group in self.groups():
 			return
 		self.node.newChild(self.node.ns(),"group",group)
 	def clear_groups(self):
@@ -118,19 +115,20 @@ class RosterItem:
 	def rm_group(self,group):
 		if group is None:
 			return
-		group=to_utf8(group)
-		if '"' not in group:
-			expr='[r:group="%s"]' % (group,)
-		elif "'" not in group:
-			expr="[r:group='%s']" % (group,)
-		else:
-			raise RosterError,"Unsupported roster group name format"
-		groups=self.xpath_ctxt.xpathEval(expr)
-		if not groups:
-			return
-		for g in groups:
-			g.unlinkNode()
-			g.freeNode()
+		l=self.xpath_ctxt.xpathEval("r:group")
+		if not l:
+			return []
+		ret=[]
+		for g in l:
+			gname=unicode(g.getContent(),"utf-8","replace")
+			if gname==group:
+				g.unlinkNode()
+				g.freeNode()
+	def make_roster_push(self):
+		iq=Iq(type="set")
+		q=iq.new_query("jabber:iq:roster")
+		q.addChild(self.node.copyNode(1))
+		return iq
 
 class Roster:
 	def __init__(self,node=None,server=0):
@@ -234,7 +232,7 @@ class Roster:
 			raise KeyError,str(jid)
 		return RosterItem(self,l[0])
 
-	def add_item(self,jid,subscription="none"):
+	def add_item(self,jid,subscription="none",name=None):
 		try:
 			item=self.item_by_jid(jid)
 			raise RosterError,"Item already exists"
@@ -242,7 +240,7 @@ class Roster:
 			pass
 		if not self.server or subscription not in ("none","from","to","both"):
 			subscription="none"
-		item=RosterItem(self,jid,subscription)
+		item=RosterItem(self,jid,subscription,name)
 		return item
 
 	def rm_item(self,jid):
@@ -259,7 +257,7 @@ class Roster:
 		item=ctxt.xpathEval("r:item")
 		ctxt.xpathFreeContext()
 		if not item:
-			raise RosterError,"Not item to update"
+			raise RosterError,"No item to update"
 		item=item[0]
 		item=RosterItem(None,item)
 		jid=item.jid()
@@ -269,7 +267,7 @@ class Roster:
 			local_item.set_subscription(subscription)
 		except KeyError:
 			if subscription=="remove":
-				return None
+				return RosterItem(None,jid,"remove")
 			if self.server or subscription not in ("none","from","to","both"):
 				subscription="none"
 			local_item=RosterItem(self,jid,subscription)
