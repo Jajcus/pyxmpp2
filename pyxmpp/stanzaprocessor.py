@@ -132,6 +132,8 @@ class StanzaProcessor:
                 try:
                     ns=c.ns()
                 except libxml2.treeError:
+                    ns=None
+                if ns is None:
                     c=c.next
                     continue
                 ns_uri=ns.getContent()
