@@ -37,6 +37,7 @@ import sasl
 
 try:
 	from M2Crypto import SSL
+	import M2Crypto.SSL.cb
 	tls_available=1
 except ImportError:
 	tls_available=0
@@ -75,31 +76,21 @@ class SASLAuthenticationFailed(StreamAuthenticationError):
 class TLSNegotiationFailed(FatalStreamError):
 	pass
 
-class TLSHanshakeFailed(FatalStreamError):
+class TLSError(FatalStreamError):
 	pass
 
 class TLSSettings:
-	def __init__(self,require=0,verify_peer=0,cert_file=None,key_file=None,
-				cacert_file=None,ctx=None):
+	def __init__(self,require=0,verify_peer=1,cert_file=None,key_file=None,
+			cacert_file=None,verify_callback=None,
+			ctx=None):
 		self.require=require
-		if tls_avaliable:
-			if not ctx:
-				ctx=SSL.Context('tlsv1')
-			if verify_peer:
-				ctx.set_verify(SSL.verify_peer,10)
-			else:
-				ctx.set_verify(SSL.verify_none,10)
-			if cert_file:
-				ctx.use_certificate_chain_file(cert_file)
-				if key_file:
-					ctx.use_PrivateKey_file(key_file)
-				else:
-					ctx.use_PrivateKey_file(cert_file)
-				ctx.check_private_key()
-			if cacert_file:
-				ctx.load_verify_locations(cacert_file)
-			self.ctx=ctx
-
+		self.ctx=ctx
+		self.verify_peer=verify_peer
+		self.cert_file=cert_file
+		self.cacert_file=cacert_file
+		self.key_file=key_file
+		self.verify_callback=verify_callback
+		
 def StanzaFactory(node):
 	if node.name=="iq":
 		return Iq(node)
@@ -145,7 +136,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.eof=0
 		self.initiator=None
 		self.features=None
-		self.tls=0
+		self.tls=None
 		self.tls_requested=0
 		self.authenticator=None
 		self.authenticated=0
@@ -363,7 +354,10 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
 	def write_raw(self,str):
 		self.data_out(str)
-		self.socket.send(str)
+		try:
+			self.socket.send(str)
+		except SSL.SSLError,e:
+			raise TLSError(e)
 
 	def write_node(self,node):
 		if self.eof or not self.socket or not self.doc_out:
@@ -414,8 +408,6 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		id,od,ed=select.select([self.socket],[],[self.socket],timeout)
 		if self.socket in id or self.socket in ed:
 			self.debug("data on input")
-			if self.tls:
-				self.debug("%i bytes pending" % (self.socket.pending(),))
 			self.process()
 			return 1
 		else:
@@ -438,7 +430,12 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		if not self.tls:
 			r=os.read(self.socket.fileno(),1024)
 		else:
-			r=self.socket.read()
+			try:
+				r=self.socket.read()
+			except SSL.SSLError,e:
+				raise TLSError(e)
+			if r is None:
+				return
 		self.data_in(r)
 		if r:
 			try:
@@ -717,7 +714,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			self.peer_sasl_mechanisms=[]
 			for n in sasl_mechanisms_n:
 				self.peer_sasl_mechanisms.append(n.getContent())
-		if not self.tls_requested:
+		if not self.tls_requested and not self.authenticated:
 			self.post_connect()
 
 	def connected(self):
@@ -961,19 +958,110 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			elif node.name!="proceed" or not self.tls_requested:
 				self.debug("Unexpected TLS node: %r" % (node.serialize()))
 				return 0
-			self.tls_requested=0
-			self.debug("Creating TLS connection")
-			conn=SSL.Connection(self.tls_settings.ctx,self.socket)
-			self.debug("Setting up TLS connection")
-			conn.setup_ssl()
-			self.debug("Setting TLS connect state")
-			conn.set_connect_state()
-			self.debug("Starting TLS handshake")
-			conn.connect_ssl()
-			self.socket=conn
-			self.tls=1
+			try:
+				self.tls_requested=0
+				self.make_tls_connection()
+				self.socket=self.tls
+			except SSL.SSLError,e:
+				self.tls=0
+				raise TLSError(e)
 			self.debug("Restarting XMPP stream")
 			self.restart_stream()
 			return 0
 		else:
 			raise FatalStreamError,"TLS not implemented for the receiving side yet"
+
+	def make_tls_connection(self,mode="connect"):
+		if not tls_available or not self.tls_settings:
+			raise TLSError,"TLS is not available"
+			
+		self.debug("Creating TLS context")
+		if self.tls_settings.ctx:
+			ctx=self.tls_settings.ctx
+		else:
+			ctx=SSL.Context('tlsv1')
+
+		ctx._pyxmpp_stream=self
+			
+		if self.tls_settings.verify_peer:
+			ctx.set_verify(SSL.verify_peer,10,cert_verify_callback)
+		else:
+			ctx.set_verify(SSL.verify_none,10)
+			
+		if self.tls_settings.cert_file:
+			ctx.use_certificate_chain_file(self.tls_settings.cert_file)
+			if key_file:
+				ctx.use_PrivateKey_file(self.tls_settings.key_file)
+			else:
+				ctx.use_PrivateKey_file(self.tls_settings.cert_file)
+			ctx.check_private_key()
+		if self.tls_settings.cacert_file:
+			ctx.load_verify_location(self.tls_settings.cacert_file)
+		self.debug("Creating TLS connection")
+		self.tls=SSL.Connection(ctx,self.socket)
+		self.debug("Setting up TLS connection")
+		self.tls.setup_ssl()
+		self.debug("Setting TLS connect state")
+		self.tls.set_connect_state()
+		self.debug("Starting TLS handshake")
+		self.tls.connect_ssl()
+		self.tls.setblocking(0)
+		
+		# clear any exception state left by some M2Crypto broken code
+		try:
+			raise Exception
+		except:
+			pass
+
+	def tls_verify_callback(self,ssl_ctx_ptr, x509_ptr, errnum, depth, ok):
+		try:
+			self.debug("tls_verify_callback(depth=%i,ok=%i)" % (depth,ok))
+			from M2Crypto.SSL.Context import map as context_map
+			from M2Crypto import X509,m2
+			ctx=context_map()[ssl_ctx_ptr]
+			cert=X509.X509(x509_ptr)
+			cb=self.tls_settings.verify_callback
+			
+			if ctx.get_verify_depth() < depth:
+				self.debug("Certificate chain is too long (%i>%i)"
+						% (depth,ctx.get_verify_depth()))
+				if cb:
+					ok=cb(self,ctx,cert,m2.X509_V_ERR_CERT_CHAIN_TOO_LONG,depth,0)
+					if not ok:
+						return 0
+				else:
+					return 0
+					
+			if ok and depth==0:
+				cn=cert.get_subject().CN
+				if str(cn)!=str(self.peer):
+					self.debug(u"Common name does not match peer name (%s != %s)"
+							% (cn,self.peer))
+					if cb:
+						ok=cb(self,ctx,cert,TLS_ERR_BAD_CN,depth,0)
+						if not ok:
+							return 0
+					else:
+						return 0
+			ok=cb(self, ctx,cert,errnum,depth,ok)
+			return ok
+		except:
+			self.print_exception()
+			raise
+							       
+	def get_tls_connection(self):
+		return self.tls
+
+TLS_ERR_BAD_CN=1001
+	
+def cert_verify_callback(ssl_ctx_ptr, x509_ptr, errnum, depth, ok):
+	from M2Crypto.SSL.Context import map as context_map
+	ctx=context_map()[ssl_ctx_ptr]
+	if hasattr(ctx,"_pyxmpp_stream"):
+		stream=ctx._pyxmpp_stream
+		if stream:
+			return stream.tls_verify_callback(ssl_ctx_ptr, 
+						x509_ptr, errnum, depth, ok)
+	print >>sys.stderr,"Falling back to M2Crypto default verify callback"
+	return M2Crypto.SSL.cb.ssl_verify_callback(ssl_ctx_ptr, 
+						x509_ptr, errnum, depth, ok)
