@@ -21,7 +21,7 @@ dist: all
 	python setup.py sdist
 
 clean:
-	python setup.py clean
+	python setup.py clean --all
 
 install: all
 	umask 022 ; python setup.py install --root $(DESTDIR)
