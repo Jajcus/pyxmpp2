@@ -1,5 +1,8 @@
 2004-08-29  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/jabber/delay.py, pyxmpp/__init__.py, pyxmpp/error.py, pyxmpp/iq.py, pyxmpp/jid.py, pyxmpp/message.py, pyxmpp/presence.py, pyxmpp/resolver.py, pyxmpp/roster.py, pyxmpp/stanza.py, pyxmpp/stream.py, pyxmpp/xmlextra.py:
+	- got rid of those evil relative imports
+
 	* pyxmpp/sasl/core.py, pyxmpp/sasl/digest_md5.py, pyxmpp/sasl/plain.py, pyxmpp/jabberd/__init__.py, pyxmpp/jabberd/component.py, pyxmpp/jabberd/componentstream.py, pyxmpp/jabber/__init__.py, pyxmpp/jabber/client.py, pyxmpp/jabber/clientstream.py, pyxmpp/jabber/muc.py, pyxmpp/client.py, pyxmpp/clientstream.py, pyxmpp/stream.py, examples/componentstreamtest.py, examples/echocomponent.py, examples/stest.py, examples/test.py:
 	- switched to logging module for debug messages
 
