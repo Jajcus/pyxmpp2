@@ -536,13 +536,13 @@ class DiscoInfo:
         if not var:
             raise ValueError,"var is None"
         if '"' not in var:
-            expr='d:feature[@var="%s"]' % (var,)
+            expr=u'd:feature[@var="%s"]' % (var,)
         elif "'" not in var:
-            expr="d:feature[@var='%s']" % (var,)
+            expr=u"d:feature[@var='%s']" % (var,)
         else:
             raise DiscoError,"Invalid feature name"
 
-        l=self.xpath_ctxt.xpathEval(expr)
+        l=self.xpath_ctxt.xpathEval(to_utf8(expr))
         if l:
             return True
         else:
@@ -558,7 +558,7 @@ class DiscoInfo:
         if self.has_feature(var):
             return
         n=self.xmlnode.newChild(self.ns,"feature",None)
-        n.setProp("var",var)
+        n.setProp("var",to_utf8(var))
 
     def remove_feature(self,var):
         """Remove a feature from `self`.
@@ -614,21 +614,21 @@ class DiscoInfo:
         if not item_category:
             raise ValueError,"bad category"
         if not item_type:
-            type_expr=""
+            type_expr=u""
         elif '"' not in item_type:
-            expr=' and @type="%s"' % (item_type,)
+            type_expr=u' and @type="%s"' % (item_type,)
         elif "'" not in type:
-            expr=" and @type='%s'" % (item_type,)
+            type_expr=u" and @type='%s'" % (item_type,)
         else:
             raise ValueError,"Invalid type name"
         if '"' not in item_category:
-            expr='d:feature[@category="%s"%s]' % (item_category,type_expr)
+            expr=u'd:identity[@category="%s"%s]' % (item_category,type_expr)
         elif "'" not in item_category:
-            expr="d:feature[@category='%s'%s]" % (item_category,type_expr)
+            expr=u"d:identity[@category='%s'%s]" % (item_category,type_expr)
         else:
             raise ValueError,"Invalid category name"
 
-        l=self.xpath_ctxt.xpathEval(expr)
+        l=self.xpath_ctxt.xpathEval(to_utf8(expr))
         if l:
             return True
         else:
