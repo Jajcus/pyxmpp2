@@ -976,5 +976,6 @@ class MucRoomManager:
         if not rs:
             return False
         rs.process_unavailable_presence(MucPresence(stanza))
+        return True
 
 # vi: sts=4 et sw=4
