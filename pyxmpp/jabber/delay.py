@@ -17,14 +17,17 @@
 
 """Delayed delivery mark (jabber:x:delay) handling"""
 
+import sys
 import libxml2
 import time
+import datetime
 
 from types import StringType,UnicodeType
 from pyxmpp.stanza import common_doc,common_root
 from pyxmpp.jid import JID
 
 from pyxmpp.utils import to_utf8,from_utf8,get_node_ns_uri,get_node_ns
+from pyxmpp.utils import datetime_utc_to_local,datetime_local_to_utc
 
 DELAY_NS="jabber:x:delay"
 
@@ -33,23 +36,34 @@ class Delay:
     Delayed delivery tag.
 
     Represents 'jabber:x:delay' (JEP-0091) element of a Jabber stanza.
+
+    Public attributes:
+    fr - the "from" value of the delay element
+    reason - the "reason" (content) of the delay element
+    timestamp - the UTC timestamp as naive datetime object
     """
     
-    def __init__(self,node_or_timestamp,fr=None,reason=None):
+    def __init__(self,node_or_datetime,fr=None,reason=None,utc=True):
         """
         Initialize the Delay object.
         
-        If `node_or_timestamp` is an XML node it will be parsed,
-        otherwise it should be the timestamp value as a number of seconds
-        from Epoch (like time.time() returns).
+        If `node_or_datetime` is an XML node it will be parsed,
+        otherwise it should be a i`datetime.datetime` object containing the
+        timestamp.
 
-        When `node_or_timestamp` is the timestamp value `fr` could be set
+        When `node_or_datetime` is the timestamp value `fr` could be set
         to the "from" value of the Delay tag, and `reason` to an optional reason.
+
+        The the timestamp is treated as UTC when `utc` is `True` or as a local time
+        otherwise.
         """
-        if isinstance(node_or_timestamp,libxml2.xmlNode):
-            self.from_xml(node_or_timestamp)
+        if isinstance(node_or_datetime,libxml2.xmlNode):
+            self.from_xml(node_or_datetime)
         else:
-            self.timestamp=int(node_or_timestamp)
+            if utc:
+                self.timestamp=node_or_datetime
+            else:
+                self.timestamp=datetime_local_to_utc(node_or_datetime)
             self.fr=JID(fr)
             self.reason=unicode(reason)
 
@@ -63,13 +77,13 @@ class Delay:
         stamp=node.prop("stamp")
         if stamp.endswith("Z"):
             stamp=stamp[:-1]
-        if not "-" in stamp:
-            stamp+="UTC"
-        tm=time.strptime(stamp,"%Y%m%dT%H:%M:%S%Z")
-        self.timestamp=time.mktime(tm)
-        # parse
-        self.fr=node.prop("from")
-        self.reason=node.getContent()
+        if "-" in stamp:
+            stamp=stamp.split("-",1)[0]
+        tm=time.strptime(stamp,"%Y%m%dT%H:%M:%S")
+        tm=tm[0:8]+(0,)
+        self.timestamp=datetime.datetime.fromtimestamp(time.mktime(tm))
+        self.fr=JID(node.prop("from"))
+        self.reason=from_utf8(node.getContent())
 
     def as_xml(self,parent=None):
         """
@@ -84,14 +98,26 @@ class Delay:
             node=common_doc.newDocNode(None,"x",None)
         ns=node.newNs(ROSTER_NS,None)
         node.setNs(ns)
-        tm=time.gmtime(self.timestamp)
-        tm=time.strftime("%Y%m%dT%H:%M:%S",tm)
+        tm=self.timestamp.strftime("%Y%m%dT%H:%M:%S")
         node.setProp("stamp",tm)
         if self.fr:
             node.setProp("from",fr.as_utf8())
         if self.reason:
-            node.setContent(self.reason)
+            node.setContent(to_utf8(self.reason))
         return node
+
+    def datetime_local(self):
+        """
+        Returns datetime object representing the timestamp in local time.
+        """
+        r=datetime_utc_to_local(self.timestamp)
+        return r
+
+    def datetime_utc(self):
+        """
+        Returns datetime object representing the timestamp in UTC time.
+        """
+        return self.timestamp
 
     def __str__(self):
         n=self.as_xml()

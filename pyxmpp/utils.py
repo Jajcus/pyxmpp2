@@ -25,6 +25,8 @@ if sys.hexversion<0x02030000:
 from types import UnicodeType,StringType
 import re
 import libxml2
+import time
+import datetime
 
 def to_utf8(s):
     """
@@ -77,5 +79,47 @@ def get_node_ns_uri(node):
         return ns.getContent()
     else:
         return None
+
+minute=datetime.timedelta(minutes=1)
+nulldelta=datetime.timedelta()
+
+def datetime_utc_to_local(utc):
+        """
+        An ugly hack to convert naive `datetime.datetime` object containing
+        UTC time to a naive `datetime.datetime` object with local time.
+        It seems standard Python 2.3 library doesn't provide any better way to
+        do that.
+        """
+	ts=time.time()
+	cur=datetime.datetime.fromtimestamp(ts)
+	cur_utc=datetime.datetime.utcfromtimestamp(ts)
+
+	offset=cur-cur_utc
+	t=utc
+
+	d=datetime.timedelta(hours=2)
+	while d>minute:
+		local=t+offset
+                tm=local.timetuple()
+                tm=tm[0:8]+(0,)
+		ts=time.mktime(tm)
+		u=datetime.datetime.utcfromtimestamp(ts)
+		diff=u-utc
+		if diff<minute and diff>-minute:
+			break
+		if diff>nulldelta:
+			offset-=d
+		else:
+			offset+=d
+		d/=2
+	return local
+
+def datetime_local_to_utc(local):
+        """
+        Simple function to convert naive `datetime.datetime` object containing
+        local time to a naive `datetime.datetime` object with UTC time.
+        """
+	ts=time.mktime(local.timetuple())
+	return datetime.datetime.utcfromtimestamp(ts)
     
 # vi: sts=4 et sw=4
