@@ -98,7 +98,11 @@ class MucX(MucXBase):
 		MucXBase.__init__(self,node=None,copy=copy,parent=parent)
 	# FIXME: set/get password/history
 
-class MucItem:
+class MucItemBase:
+	def __init__(self):
+		raise RuntimeError,"Abstract class called"
+
+class MucItem(MucItemBase):
 	def __init__(self,node_or_affiliation,role=None,jid=None,nick=None,actor=None,reason=None):
 		if isinstance(node_or_affiliation,libxml2.xmlNode):
 			self.__from_node(node_or_affiliation)
@@ -159,13 +163,31 @@ class MucItem:
 			n.setProp("nick",to_utf8(self.nick))
 		return n
 
+class MucStatus(MucItemBase):
+	def __init__(self,node_or_code):
+		if isinstance(node_or_code,libxml2.xmlNode):
+			self.__from_node(node_or_code)
+		else:
+			self.__init(node_or_code)
+
+	def __init(self,code):
+		code=int(code)
+		if code<0 or code>999:
+			raise ValueError,"Bad status code"
+		self.code=code
+
+	def __from_node(self,node):
+		self.code=int(node.prop("code"))
+
+	def make_node(self,parent):
+		n=parent.newChild(parent.ns(),"status",None)
+		n.setProp("status","%03i" % (self.code,))
+		return n
+
 class MucUserX(MucXBase):
 	ns=MUC_USER_NS
-	def __init__(self,node=None,copy=1,parent=None,status=None):
+	def __init__(self,node=None,copy=1,parent=None):
 		MucXBase.__init__(self,node,copy=copy,parent=parent)
-		if status:
-			sn=self.node.newChild(self.node.ns(),"status",None)
-			sn.setProp("code",str(status))
 	def get_items(self):
 		if not self.node.children:
 			return []
@@ -177,7 +199,9 @@ class MucUserX(MucXBase):
 				pass
 			elif n.name=="item":
 				ret.append(MucItem(n))
-			# FIXME: alt,decline,invite,password,status
+			elif n.name=="status":
+				ret.append(MucStatus(n))
+			# FIXME: alt,decline,invite,password
 			n=n.next
 		return ret
 	def clear(self):
@@ -193,7 +217,7 @@ class MucUserX(MucXBase):
 				n.freeNode()
 			n=n.next
 	def add_item(self,item):
-		if not isinstance(item,MucItem):
+		if not isinstance(item,MucItemBase):
 			raise TypeError,"Bad item type for muc#user"
 		item.make_node(self.node)
 
@@ -253,9 +277,9 @@ class MucStanzaExt:
 				n.freeNode()
 			n=n.next
 
-	def make_muc_userinfo(self,status=None):
+	def make_muc_userinfo(self):
 		self.clear_muc_x()
-		self.muc_x=MucUserX(parent=self.node,status=status)
+		self.muc_x=MucUserX(parent=self.node)
 		return self.muc_x
 				
 	def muc_free(self):
