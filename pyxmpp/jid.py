@@ -34,12 +34,18 @@ try:
 		except:
 			return 0
 		return 1
+	def are_domains_equal(a,b):
+		a=idna.ToASCII(a)
+		b=idna.ToASCII(b)
+		return a.lower()==b.lower()
 except ImportError:
 	domain_invalid_re=re.compile(r"[^-a-zA-Z0-9]")
 	def is_domain_valid(domain):
 		if domain_invalid_re.match(domain):
 			return 0
 		return 1
+	def are_domains_equal(a,b):
+		return a.lower()==b.lower()
 
 class JIDError(ValueError):
 	"Exception raised when invalid JID is used"
@@ -175,7 +181,7 @@ class JID:
 			raise TypeError,"Can't compare JID with %r" % (type(other),)
 			
 		return (self.node==other.node
-			and self.domain==other.domain
+			and are_domains_equal(self.domain)
 			and self.resource==other.resource)
 	
 	def __ne__(self,other):
