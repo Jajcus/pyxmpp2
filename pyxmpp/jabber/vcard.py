@@ -31,7 +31,6 @@ import binascii
 import libxml2
 import re
 import types
-import string
 
 import pyxmpp.jid
 from pyxmpp.utils import to_utf8,from_utf8,get_node_ns
@@ -39,11 +38,31 @@ from pyxmpp.utils import to_utf8,from_utf8,get_node_ns
 VCARD_NS="vcard-temp"
 
 class Empty(Exception):
+    """Exception raised when parsing empty vcard element. Such element will
+    be ignored."""
     pass
 
 valid_string_re=re.compile(r"^[\w\d \t]*$")
 
-def rfc2425encode(name,value,parameters={},charset="utf-8"):
+def rfc2425encode(name,value,parameters=None,charset="utf-8"):
+    """Encodes a vCard field into an RFC2425 line.
+    
+    :Parameters:
+        - `name`: field type name
+        - `value`: field value
+        - `parameters`: optional parameters
+        - `charset`: encoding of the output and of the `value` (if not
+          `unicode`)
+    :Types:
+        - `name`: `str`
+        - `value`: `unicode` or `str`
+        - `parameters`: `dict` of `str` -> `str`
+        - `charset`: `str`
+
+    :return: the encoded RFC2425 line (possibly folded)
+    :returntype: `str`"""
+    if not parameters:
+        parameters={}
     if type(value) is types.UnicodeType:
         value=value.replace(u"\r\n",u"\\n")
         value=value.replace(u"\n",u"\\n")
@@ -66,12 +85,33 @@ def rfc2425encode(name,value,parameters={},charset="utf-8"):
     return ret
 
 class VCardField:
+    """Base class for vCard fields.
+
+    :Ivariables:
+        - `name`: name of the field.
+    """
+    def __init__(self,name):
+        """Initialize the `VCardField` object.
+
+        Set its name.
+
+        :Parameters:
+            - `name`: field name
+        :Types:
+            - `name`: `str`"""
+        self.name=name
     def __repr__(self):
         return "<%s %r>" % (self.__class__,self.rfc2426())
+    def rfc2426(self):
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
+        return ""
 
 class VCardString(VCardField):
-    def __init__(self,name,value,rfc2425parameters={}):
-        self.name=name
+    def __init__(self,name,value,rfc2425parameters=None):
+        VCardField.__init__(self,name)
         if isinstance(value,libxml2.xmlNode):
             value=value.getContent()
             if value:
@@ -83,8 +123,21 @@ class VCardString(VCardField):
         if not self.value:
             raise Empty,"Empty string value"
     def rfc2426(self):
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
         return rfc2425encode(self.name,self.value)
     def xml(self,parent):
+        """Create vcard-tmp XML representation of the field.
+
+        :Parameters:
+            - `parent`: parent node for the element
+        :Types:
+            - `parent`: `libxml2.xmlNode`
+
+        :return: xml node with the field data.
+        :returntype: `libxml2.xmlNode`"""
         return parent.newTextChild(get_node_ns(parent),
                 to_utf8(self.name.upper()),to_utf8(self.value))
     def __unicode__(self):
@@ -94,11 +147,15 @@ class VCardString(VCardField):
 
 class VCardXString(VCardString):
     def rfc2426(self):
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
         return rfc2425encode("x-"+self.name,self.value)
 
 class VCardJID(VCardField):
-    def __init__(self,name,value,rfc2425parameters={}):
-        self.name=name
+    def __init__(self,name,value,rfc2425parameters=None):
+        VCardField.__init__(self,name)
         if isinstance(value,libxml2.xmlNode):
             self.value=pyxmpp.jid.JID(value.getContent())
         else:
@@ -106,17 +163,33 @@ class VCardJID(VCardField):
         if not self.value:
             raise Empty,"Empty JID value"
     def rfc2426(self):
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
         return rfc2425encode("x-jabberid",self.value.as_unicode())
     def xml(self,parent):
-        return parent.newTextChild(get_node_ns(parent),to_utf8(self.name.upper()),self.value.as_utf8())
+        """Create vcard-tmp XML representation of the field.
+
+        :Parameters:
+            - `parent`: parent node for the element
+        :Types:
+            - `parent`: `libxml2.xmlNode`
+
+        :return: xml node with the field data.
+        :returntype: `libxml2.xmlNode`"""
+        ns=get_node_ns(parent)
+        name=to_utf8(self.name.upper())
+        content=self.value.as_utf8()
+        return parent.newTextChild(ns,name,content)
     def __unicode__(self):
         return self.value.as_unicode()
     def __str__(self):
         return self.value.as_string()
 
 class VCardName(VCardField):
-    def __init__(self,name,value,rfc2425parameters={}):
-        self.name=name
+    def __init__(self,name,value,rfc2425parameters=None):
+        VCardField.__init__(self,name)
         if self.name.upper()!="N":
             raise RuntimeError,"VCardName handles only 'N' type"
         if isinstance(value,libxml2.xmlNode):
@@ -156,9 +229,22 @@ class VCardName(VCardField):
             value[:len(v)]=v
             self.family,self.given,self.middle,self.prefix,self.suffix=value
     def rfc2426(self):
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
         return rfc2425encode("n",u"%s;%s;%s;%s;%s" %
                 (self.family,self.given,self.middle,self.prefix,self.suffix))
     def xml(self,parent):
+        """Create vcard-tmp XML representation of the field.
+
+        :Parameters:
+            - `parent`: parent node for the element
+        :Types:
+            - `parent`: `libxml2.xmlNode`
+
+        :return: xml node with the field data.
+        :returntype: `libxml2.xmlNode`"""
         ns=get_node_ns(parent)
         n=parent.newChild(ns,"N",None)
         n.newTextChild(ns,"FAMILY",to_utf8(self.family))
@@ -179,13 +265,15 @@ class VCardName(VCardField):
             r.append(self.family.replace(u",",u" "))
         if self.suffix:
             r.append(self.suffix.replace(u",",u" "))
-        return string.join(r,u" ")
+        return u" ".join(r)
     def __str__(self):
         return self.__unicode__().encode("utf-8")
 
 class VCardImage(VCardField):
-    def __init__(self,name,value,rfc2425parameters={}):
-        self.name=name
+    def __init__(self,name,value,rfc2425parameters=None):
+        VCardField.__init__(self,name)
+        if not rfc2425parameters:
+            rfc2425parameters={}
         if isinstance(value,libxml2.xmlNode):
             self.uri,self.type,self.image=[None]*3
             n=value.children
@@ -217,6 +305,10 @@ class VCardImage(VCardField):
                 self.type=rfc2425parameters.get("type")
                 self.image=value
     def rfc2426(self):
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
         if self.uri:
             return rfc2425encode(self.name,self.uri,{"value":"uri"})
         elif self.image:
@@ -226,6 +318,15 @@ class VCardImage(VCardField):
                 p={}
             return rfc2425encode(self.name,self.image,p)
     def xml(self,parent):
+        """Create vcard-tmp XML representation of the field.
+
+        :Parameters:
+            - `parent`: parent node for the element
+        :Types:
+            - `parent`: `libxml2.xmlNode`
+
+        :return: xml node with the field data.
+        :returntype: `libxml2.xmlNode`"""
         ns=get_node_ns(parent)
         n=parent.newChild(ns,self.name.upper(),None)
         if self.uri:
@@ -246,8 +347,10 @@ class VCardImage(VCardField):
 
 
 class VCardAdr(VCardField):
-    def __init__(self,name,value,rfc2425parameters={}):
-        self.name=name
+    def __init__(self,name,value,rfc2425parameters=None):
+        VCardField.__init__(self,name)
+        if not rfc2425parameters:
+            rfc2425parameters={}
         if self.name.upper()!="ADR":
             raise RuntimeError,"VCardAdr handles only 'ADR' type"
         if isinstance(value,libxml2.xmlNode):
@@ -299,11 +402,24 @@ class VCardAdr(VCardField):
                     self.region,self.pcode,self.ctry)=value
 
     def rfc2426(self):
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
         return rfc2425encode("adr",u"%s;%s;%s;%s;%s;%s;%s" %
                 (self.pobox,self.extadr,self.street,self.locality,
                         self.region,self.pcode,self.ctry),
-                {"type":string.join(self.type,",")})
+                {"type":",".join(self.type)})
     def xml(self,parent):
+        """Create vcard-tmp XML representation of the field.
+
+        :Parameters:
+            - `parent`: parent node for the element
+        :Types:
+            - `parent`: `libxml2.xmlNode`
+
+        :return: xml node with the field data.
+        :returntype: `libxml2.xmlNode`"""
         ns=get_node_ns(parent)
         n=parent.newChild(ns,"ADR",None)
         for t in ("home","work","postal","parcel","dom","intl","pref"):
@@ -319,8 +435,10 @@ class VCardAdr(VCardField):
         return n
 
 class VCardLabel(VCardField):
-    def __init__(self,name,value,rfc2425parameters={}):
-        self.name=name
+    def __init__(self,name,value,rfc2425parameters=None):
+        VCardField.__init__(self,name)
+        if not rfc2425parameters:
+            rfc2425parameters={}
         if self.name.upper()!="LABEL":
             raise RuntimeError,"VCardAdr handles only 'LABEL' type"
         if isinstance(value,libxml2.xmlNode):
@@ -359,9 +477,22 @@ class VCardLabel(VCardField):
             self.lines=value.split("\\n")
 
     def rfc2426(self):
-        return rfc2425encode("label",string.join(self.lines,u"\n"),
-                {"type":string.join(self.type,",")})
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
+        return rfc2425encode("label",u"\n".join(self.lines),
+                {"type":",".join(self.type)})
     def xml(self,parent):
+        """Create vcard-tmp XML representation of the field.
+
+        :Parameters:
+            - `parent`: parent node for the element
+        :Types:
+            - `parent`: `libxml2.xmlNode`
+
+        :return: xml node with the field data.
+        :returntype: `libxml2.xmlNode`"""
         ns=get_node_ns(parent)
         n=parent.newChild(ns,"ADR",None)
         for t in ("home","work","postal","parcel","dom","intl","pref"):
@@ -372,8 +503,10 @@ class VCardLabel(VCardField):
         return n
 
 class VCardTel(VCardField):
-    def __init__(self,name,value,rfc2425parameters={}):
-        self.name=name
+    def __init__(self,name,value,rfc2425parameters=None):
+        VCardField.__init__(self,name)
+        if not rfc2425parameters:
+            rfc2425parameters={}
         if self.name.upper()!="TEL":
             raise RuntimeError,"VCardTel handles only 'TEL' type"
         if isinstance(value,libxml2.xmlNode):
@@ -408,8 +541,21 @@ class VCardTel(VCardField):
                 self.type=["voice"]
             self.number=value
     def rfc2426(self):
-        return rfc2425encode("tel",self.number,{"type":string.join(self.type,",")})
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
+        return rfc2425encode("tel",self.number,{"type":",".join(self.type)})
     def xml(self,parent):
+        """Create vcard-tmp XML representation of the field.
+
+        :Parameters:
+            - `parent`: parent node for the element
+        :Types:
+            - `parent`: `libxml2.xmlNode`
+
+        :return: xml node with the field data.
+        :returntype: `libxml2.xmlNode`"""
         ns=get_node_ns(parent)
         n=parent.newChild(ns,"TEL",None)
         for t in ("home","work","voice","fax","pager","msg","cell","video",
@@ -420,8 +566,10 @@ class VCardTel(VCardField):
         return n
 
 class VCardEmail(VCardField):
-    def __init__(self,name,value,rfc2425parameters={}):
-        self.name=name
+    def __init__(self,name,value,rfc2425parameters=None):
+        VCardField.__init__(self,name)
+        if not rfc2425parameters:
+            rfc2425parameters={}
         if self.name.upper()!="EMAIL":
             raise RuntimeError,"VCardEmail handles only 'EMAIL' type"
         if isinstance(value,libxml2.xmlNode):
@@ -454,8 +602,21 @@ class VCardEmail(VCardField):
                 self.type=["internet"]
             self.address=value
     def rfc2426(self):
-        return rfc2425encode("email",self.address,{"type":string.join(self.type,",")})
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
+        return rfc2425encode("email",self.address,{"type":",".join(self.type)})
     def xml(self,parent):
+        """Create vcard-tmp XML representation of the field.
+
+        :Parameters:
+            - `parent`: parent node for the element
+        :Types:
+            - `parent`: `libxml2.xmlNode`
+
+        :return: xml node with the field data.
+        :returntype: `libxml2.xmlNode`"""
         ns=get_node_ns(parent)
         n=parent.newChild(ns,"EMAIL",None)
         for t in ("home","work","internet","x400"):
@@ -465,8 +626,8 @@ class VCardEmail(VCardField):
         return n
 
 class VCardGeo(VCardField):
-    def __init__(self,name,value,rfc2425parameters={}):
-        self.name=name
+    def __init__(self,name,value,rfc2425parameters=None):
+        VCardField.__init__(self,name)
         if self.name.upper()!="GEO":
             raise RuntimeError,"VCardName handles only 'GEO' type"
         if isinstance(value,libxml2.xmlNode):
@@ -491,9 +652,22 @@ class VCardGeo(VCardField):
         else:
             self.lat,self.lon=value.split(";")
     def rfc2426(self):
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
         return rfc2425encode("geo",u"%s;%s" %
                 (self.lat,self.lon))
     def xml(self,parent):
+        """Create vcard-tmp XML representation of the field.
+
+        :Parameters:
+            - `parent`: parent node for the element
+        :Types:
+            - `parent`: `libxml2.xmlNode`
+
+        :return: xml node with the field data.
+        :returntype: `libxml2.xmlNode`"""
         ns=get_node_ns(parent)
         n=parent.newChild(ns,"GEO",None)
         n.newTextChild(ns,"LAT",to_utf8(self.lat))
@@ -501,8 +675,8 @@ class VCardGeo(VCardField):
         return n
 
 class VCardOrg(VCardField):
-    def __init__(self,name,value,rfc2425parameters={}):
-        self.name=name
+    def __init__(self,name,value,rfc2425parameters=None):
+        VCardField.__init__(self,name)
         if self.name.upper()!="ORG":
             raise RuntimeError,"VCardName handles only 'ORG' type"
         if isinstance(value,libxml2.xmlNode):
@@ -532,11 +706,24 @@ class VCardOrg(VCardField):
                 self.name=sp[0]
                 self.unit=None
     def rfc2426(self):
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
         if self.unit:
             return rfc2425encode("org",u"%s;%s" % (self.name,self.unit))
         else:
             return rfc2425encode("org",u"%s" % (self.name,))
     def xml(self,parent):
+        """Create vcard-tmp XML representation of the field.
+
+        :Parameters:
+            - `parent`: parent node for the element
+        :Types:
+            - `parent`: `libxml2.xmlNode`
+
+        :return: xml node with the field data.
+        :returntype: `libxml2.xmlNode`"""
         ns=get_node_ns(parent)
         n=parent.newChild(ns,"ORG",None)
         n.newTextChild(ns,"ORGNAME",to_utf8(self.name))
@@ -544,7 +731,8 @@ class VCardOrg(VCardField):
         return n
 
 class VCardCategories(VCardField):
-    def __init__(self,name,value,rfc2425parameters={}):
+    def __init__(self,name,value,rfc2425parameters=None):
+        VCardField.__init__(self,name)
         self.name=name
         if self.name.upper()!="CATEGORIES":
             raise RuntimeError,"VCardName handles only 'CATEGORIES' type"
@@ -568,8 +756,21 @@ class VCardCategories(VCardField):
         else:
             self.keywords=value.split(",")
     def rfc2426(self):
-        return rfc2425encode("keywords",string.join(self.keywords,u","))
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
+        return rfc2425encode("keywords",u",".join(self.keywords))
     def xml(self,parent):
+        """Create vcard-tmp XML representation of the field.
+
+        :Parameters:
+            - `parent`: parent node for the element
+        :Types:
+            - `parent`: `libxml2.xmlNode`
+
+        :return: xml node with the field data.
+        :returntype: `libxml2.xmlNode`"""
         ns=get_node_ns(parent)
         n=parent.newChild(ns,"CATEGORIES",None)
         for k in self.keywords:
@@ -577,8 +778,10 @@ class VCardCategories(VCardField):
         return n
 
 class VCardSound(VCardField):
-    def __init__(self,name,value,rfc2425parameters={}):
-        self.name=name
+    def __init__(self,name,value,rfc2425parameters=None):
+        VCardField.__init__(self,name)
+        if not rfc2425parameters:
+            rfc2425parameters={}
         if isinstance(value,libxml2.xmlNode):
             self.uri,self.sound,self.phonetic=[None]*3
             n=value.children
@@ -593,18 +796,18 @@ class VCardSound(VCardField):
                     continue
                 if n.name=='BINVAL':
                     if (self.phonetic or self.uri):
-                        raise Value,"Bad SOUND value in vcard"
+                        raise ValueError,"Bad SOUND value in vcard"
                     self.sound=base64.decodestring(n.getContent())
                 if n.name=='PHONETIC':
                     if (self.sound or self.uri):
-                        raise Value,"Bad SOUND value in vcard"
+                        raise ValueError,"Bad SOUND value in vcard"
                     self.phonetic=unicode(n.getContent(),"utf-8","replace")
                 if n.name=='EXTVAL':
                     if (self.phonetic or self.sound):
-                        raise Value,"Bad SOUND value in vcard"
+                        raise ValueError,"Bad SOUND value in vcard"
                     self.uri=unicode(n.getContent(),"utf-8","replace")
                 n=n.next
-            if (not self.phonetic and not self.image and not self.sound):
+            if (not self.phonetic and not self.uri and not self.sound):
                 raise Empty,"Bad SOUND value in vcard"
         else:
             if rfc2425parameters.get("value").lower()=="uri":
@@ -616,11 +819,24 @@ class VCardSound(VCardField):
                 self.uri=None
                 self.phonetic=None
     def rfc2426(self):
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
         if self.uri:
             return rfc2425encode(self.name,self.uri,{"value":"uri"})
         elif self.sound:
             return rfc2425encode(self.name,self.sound)
     def xml(self,parent):
+        """Create vcard-tmp XML representation of the field.
+
+        :Parameters:
+            - `parent`: parent node for the element
+        :Types:
+            - `parent`: `libxml2.xmlNode`
+
+        :return: xml node with the field data.
+        :returntype: `libxml2.xmlNode`"""
         ns=get_node_ns(parent)
         n=parent.newChild(ns,self.name.upper(),None)
         if self.uri:
@@ -628,12 +844,12 @@ class VCardSound(VCardField):
         elif self.phonetic:
             n.newTextChild(ns,"PHONETIC",to_utf8(self.phonetic))
         else:
-            n.newTextChild(ns,"BINVAL",binascii.b2a_base64(self.image))
+            n.newTextChild(ns,"BINVAL",binascii.b2a_base64(self.sound))
         return n
 
 class VCardPrivacy(VCardField):
-    def __init__(self,name,value,rfc2425parameters={}):
-        self.name=name
+    def __init__(self,name,value,rfc2425parameters=None):
+        VCardField.__init__(self,name)
         if isinstance(value,libxml2.xmlNode):
             self.value=None
             n=value.children
@@ -658,8 +874,21 @@ class VCardPrivacy(VCardField):
         else:
             self.value=value
     def rfc2426(self):
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
         return rfc2425encode(self.name,self.value)
     def xml(self,parent):
+        """Create vcard-tmp XML representation of the field.
+
+        :Parameters:
+            - `parent`: parent node for the element
+        :Types:
+            - `parent`: `libxml2.xmlNode`
+
+        :return: xml node with the field data.
+        :returntype: `libxml2.xmlNode`"""
         ns=get_node_ns(parent)
         if self.value in ("public","private","confidental"):
             n=parent.newChild(ns,self.name.upper(),None)
@@ -668,8 +897,10 @@ class VCardPrivacy(VCardField):
         return None
 
 class VCardKey(VCardField):
-    def __init__(self,name,value,rfc2425parameters={}):
-        self.name=name
+    def __init__(self,name,value,rfc2425parameters=None):
+        VCardField.__init__(self,name)
+        if not rfc2425parameters:
+            rfc2425parameters={}
         if isinstance(value,libxml2.xmlNode):
             self.type,self.cred=None,None
             n=value.children
@@ -693,12 +924,25 @@ class VCardKey(VCardField):
             self.type=rfc2425parameters.get("type")
             self.cred=value
     def rfc2426(self):
+        """RFC2426-encode the field content.
+
+        :return: the field in the RFC 2426 format.
+        :returntype: `str`"""
         if self.type:
             p={"type":self.type}
         else:
             p={}
         return rfc2425encode(self.name,self.cred,p)
     def xml(self,parent):
+        """Create vcard-tmp XML representation of the field.
+
+        :Parameters:
+            - `parent`: parent node for the element
+        :Types:
+            - `parent`: `libxml2.xmlNode`
+
+        :return: xml node with the field data.
+        :returntype: `libxml2.xmlNode`"""
         ns=get_node_ns(parent)
         n=parent.newChild(ns,self.name.upper(),None)
         if self.type:
@@ -741,6 +985,7 @@ class VCard:
         };
     def __init__(self,data):
         self.content={}
+        self.n,self.fn=None,None # dummy attributes
         if isinstance(data,libxml2.xmlNode):
             ns=get_node_ns(data)
             if ns and ns.getContent()!=VCARD_NS:
@@ -825,7 +1070,7 @@ class VCard:
                 s.append(self.n.family)
             if self.n.suffix:
                 s.append(self.n.suffix)
-            s=string.join(s," ")
+            s=" ".join(s)
             self.content["FN"]=VCardString("FN",s)
         for c,(cl,tp) in self.components.items():
             if self.content.has_key(c):
@@ -846,7 +1091,7 @@ class VCard:
         name=psplit[0]
         params=psplit[1:]
         if u"." in name:
-            group,name=name.split(".",1)
+            name=name.split(".",1)[1]
         name=name.upper()
         if name in (u"X-DESC",u"X-JABBERID"):
             name=name[2:]

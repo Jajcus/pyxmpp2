@@ -126,110 +126,45 @@ ignore that: W0613: 83:JabberClient.connect: Unused argument 'register'
 ************* Module pyxmpp.jabber.disco
 W0511:415: FIXME: stringprep!
 ************* Module pyxmpp.jabber.vcard
-W0511:728: FIXME#
-W0301:111: Line too long (102/100)
-W0403: 34: Uses of a deprecated module 'string'
-W0141: 41:Empty: Missing docstring
-W0141: 46:rfc2425encode: Missing docstring
-W0102: 46:rfc2425encode: Dangerous default value {} as argument
-W0232: 68:VCardField: Class has no __init__ method
-W0141: 68:VCardField: Missing docstring
-E0201: 70:VCardField.__repr__: Access to undefined member 'rfc2426'
-W0141: 72:VCardString: Missing docstring
-W0102: 73:VCardString.__init__: Dangerous default value {} as argument
-W0613: 73:VCardString.__init__: Unused argument 'rfc2425parameters'
-W0141: 85:VCardString.rfc2426: Missing docstring
-W0141: 87:VCardString.xml: Missing docstring
-W0141: 95:VCardXString: Missing docstring
-W0141: 96:VCardXString.rfc2426: Missing docstring
-W0141: 99:VCardJID: Missing docstring
-W0102:100:VCardJID.__init__: Dangerous default value {} as argument
-W0613:100:VCardJID.__init__: Unused argument 'rfc2425parameters'
-W0141:108:VCardJID.rfc2426: Missing docstring
-W0141:110:VCardJID.xml: Missing docstring
-W0141:117:VCardName: Missing docstring
-W0102:118:VCardName.__init__: Dangerous default value {} as argument
-W0613:118:VCardName.__init__: Unused argument 'rfc2425parameters'
-W0141:158:VCardName.rfc2426: Missing docstring
-W0141:161:VCardName.xml: Missing docstring
-W0141:186:VCardImage: Missing docstring
-W0102:187:VCardImage.__init__: Dangerous default value {} as argument
-W0141:219:VCardImage.rfc2426: Missing docstring
-W0141:228:VCardImage.xml: Missing docstring
-W0141:248:VCardAdr: Missing docstring
-W0102:249:VCardAdr.__init__: Dangerous default value {} as argument
-W0112:249:VCardAdr.__init__: Too many branches (18/15)
-W0141:301:VCardAdr.rfc2426: Missing docstring
-W0141:306:VCardAdr.xml: Missing docstring
-W0141:321:VCardLabel: Missing docstring
-W0102:322:VCardLabel.__init__: Dangerous default value {} as argument
-W0141:361:VCardLabel.rfc2426: Missing docstring
-W0141:364:VCardLabel.xml: Missing docstring
-W0141:374:VCardTel: Missing docstring
-W0102:375:VCardTel.__init__: Dangerous default value {} as argument
-W0141:410:VCardTel.rfc2426: Missing docstring
-W0141:412:VCardTel.xml: Missing docstring
-W0141:422:VCardEmail: Missing docstring
-W0102:423:VCardEmail.__init__: Dangerous default value {} as argument
-W0141:456:VCardEmail.rfc2426: Missing docstring
-W0141:458:VCardEmail.xml: Missing docstring
-W0141:467:VCardGeo: Missing docstring
-W0102:468:VCardGeo.__init__: Dangerous default value {} as argument
-W0613:468:VCardGeo.__init__: Unused argument 'rfc2425parameters'
-W0141:493:VCardGeo.rfc2426: Missing docstring
-W0141:496:VCardGeo.xml: Missing docstring
-W0141:503:VCardOrg: Missing docstring
-W0102:504:VCardOrg.__init__: Dangerous default value {} as argument
-W0613:504:VCardOrg.__init__: Unused argument 'rfc2425parameters'
-W0141:534:VCardOrg.rfc2426: Missing docstring
-W0141:539:VCardOrg.xml: Missing docstring
-W0141:546:VCardCategories: Missing docstring
-W0102:547:VCardCategories.__init__: Dangerous default value {} as argument
-W0613:547:VCardCategories.__init__: Unused argument 'rfc2425parameters'
-W0141:570:VCardCategories.rfc2426: Missing docstring
-W0141:572:VCardCategories.xml: Missing docstring
-W0141:579:VCardSound: Missing docstring
-W0102:580:VCardSound.__init__: Dangerous default value {} as argument
-E0602:596:VCardSound.__init__: Undefined variable 'Value'
-W0141:618:VCardSound.rfc2426: Missing docstring
-W0141:623:VCardSound.xml: Missing docstring
-E0201:607:VCardSound.__init__: Access to undefined member 'image'
-E0201:631:VCardSound.xml: Access to undefined member 'image'
-W0141:634:VCardPrivacy: Missing docstring
-W0102:635:VCardPrivacy.__init__: Dangerous default value {} as argument
-W0613:635:VCardPrivacy.__init__: Unused argument 'rfc2425parameters'
-W0141:660:VCardPrivacy.rfc2426: Missing docstring
-W0141:662:VCardPrivacy.xml: Missing docstring
-W0141:670:VCardKey: Missing docstring
-W0102:671:VCardKey.__init__: Dangerous default value {} as argument
-W0141:695:VCardKey.rfc2426: Missing docstring
-W0141:701:VCardKey.xml: Missing docstring
-W0141:709:VCard: Missing docstring
-W0112:742:VCard.__init__: Too many branches (40/15)
-W0115:742:VCard.__init__: Too many statements (94/50)
-W0141:842:VCard.process_rfc2425_record: Missing docstring
-W0612:849:VCard.process_rfc2425_record: Unused variable 'group'
-W0141:876:VCard.rfc2426: Missing docstring
-W0612:879:VCard.rfc2426: Unused variable 'name'
-W0141:889:VCard.xml: Missing docstring
-W0612:907:VCard.xml: Unused variable 'name'
-E0201:818:VCard.__init__: Access to undefined member 'n'
-E0201:819:VCard.__init__: Access to undefined member 'n'
-E0201:820:VCard.__init__: Access to undefined member 'n'
-E0201:821:VCard.__init__: Access to undefined member 'n'
-E0201:822:VCard.__init__: Access to undefined member 'n'
-E0201:823:VCard.__init__: Access to undefined member 'n'
-E0201:824:VCard.__init__: Access to undefined member 'n'
-E0201:825:VCard.__init__: Access to undefined member 'n'
-E0201:826:VCard.__init__: Access to undefined member 'n'
-E0201:827:VCard.__init__: Access to undefined member 'n'
-E0201:807:VCard.__init__: Access to undefined member 'fn'
+W0511:972: FIXME#
+W0302:  0: Too many lines in module (1169)
+W0141:112:VCardString: Missing docstring
+ignore that: W0613:113:VCardString.__init__: Unused argument 'rfc2425parameters'
+W0141:148:VCardXString: Missing docstring
+W0141:156:VCardJID: Missing docstring
+ignore that: W0613:157:VCardJID.__init__: Unused argument 'rfc2425parameters'
+W0141:190:VCardName: Missing docstring
+ignore that: W0613:191:VCardName.__init__: Unused argument 'rfc2425parameters'
+W0141:272:VCardImage: Missing docstring
+W0141:349:VCardAdr: Missing docstring
+W0112:350:VCardAdr.__init__: Too many branches (19/15)
+W0141:437:VCardLabel: Missing docstring
+W0141:505:VCardTel: Missing docstring
+W0141:568:VCardEmail: Missing docstring
+W0141:628:VCardGeo: Missing docstring
+ignore that: W0613:629:VCardGeo.__init__: Unused argument 'rfc2425parameters'
+W0141:677:VCardOrg: Missing docstring
+ignore that: W0613:678:VCardOrg.__init__: Unused argument 'rfc2425parameters'
+W0141:733:VCardCategories: Missing docstring
+ignore that: W0613:734:VCardCategories.__init__: Unused argument 'rfc2425parameters'
+W0141:780:VCardSound: Missing docstring
+W0141:850:VCardPrivacy: Missing docstring
+ignore that: W0613:851:VCardPrivacy.__init__: Unused argument 'rfc2425parameters'
+W0141:899:VCardKey: Missing docstring
+W0141:953:VCard: Missing docstring
+W0112:986:VCard.__init__: Too many branches (40/15)
+W0115:986:VCard.__init__: Too many statements (95/50)
+W0141:1087:VCard.process_rfc2425_record: Missing docstring
+W0141:1121:VCard.rfc2426: Missing docstring
+W0612:1124:VCard.rfc2426: Unused variable 'name'
+W0141:1134:VCard.xml: Missing docstring
+W0612:1152:VCard.xml: Unused variable 'name'
 W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 
 Report
 ======
-5994 statements analysed.
+6018 statements analysed.
 
 Statistics by type
 ------------------
@@ -237,9 +172,9 @@ Statistics by type
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 module   38     38         =          97.37       0.00     
-class    115    115        =          84.35       0.00     
+class    115    115        =          86.09       0.00     
 method   0      0          =          0.00        0.00     
-function 642    642        =          94.86       0.00     
+function 644    644        =          99.53       0.00     
 
 
 Raw metrics
@@ -247,10 +182,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6581   52.06 6581     =          
-docstring 4656   36.83 4656     =          
-comment   610    4.83  610      =          
-empty     795    6.29  795      =          
+code      6605   51.12 6605     =          
+docstring 4877   37.74 4877     =          
+comment   610    4.72  610      =          
+empty     829    6.42  829      =          
 
 
 External dependencies
@@ -276,7 +211,6 @@ External dependencies
       \-idna (pyxmpp.jid,pyxmpp.dns)
     os (pyxmpp.streambase)
     types (pyxmpp.xmppstringprep,pyxmpp.roster,pyxmpp.jid,pyxmpp.dns,pyxmpp.streambase,pyxmpp.utils,pyxmpp.error,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
-    string (pyxmpp.jabber.vcard)
 
 
 
@@ -285,23 +219,21 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0141      52         
 W0613      41         
 W0201      33         
-E0201      27         
-W0102      15         
+W0141      20         
+E0201      13         
 W0511      8          
-W0612      7          
+W0612      6          
 W0221      6          
 W0103      4          
-W0403      2          
-W0232      2          
 W0112      2          
 W0611      1          
+W0403      1          
 W0401      1          
-W0301      1          
+W0302      1          
+W0232      1          
 W0115      1          
-E0602      1          
 
 
 Total errors / warnings
@@ -309,41 +241,41 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 176    176      =          
-errors   28     28       =          
+warnings 126    126      =          
+errors   13     13       =          
 
 
 % errors / warnings by module
 -----------------------------
 
-module                         error warning 
-:::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            53.57 47.73   
-pyxmpp.jid                     46.43 0.57    
-pyxmpp.streambase              0.00  12.50   
-pyxmpp.sasl.core               0.00  5.68    
-pyxmpp.dns                     0.00  4.55    
-pyxmpp.streamsasl              0.00  3.98    
-pyxmpp.clientstream            0.00  3.98    
-pyxmpp.jabberd.componentstream 0.00  3.41    
-pyxmpp.jabber.clientstream     0.00  2.84    
-pyxmpp.xmlextra                0.00  2.27    
-pyxmpp.streamtls               0.00  2.27    
-pyxmpp.version                 0.00  1.70    
-pyxmpp.jabber.muccore          0.00  1.70    
-pyxmpp.sasl.plain              0.00  1.14    
-pyxmpp.jabber.muc              0.00  1.14    
-pyxmpp._xmlextra               0.00  1.14    
-pyxmpp.xmppstringprep          0.00  0.57    
-pyxmpp.sasl.digest_md5         0.00  0.57    
-pyxmpp.resolver                0.00  0.57    
-pyxmpp.jabber.disco            0.00  0.57    
-pyxmpp.jabber.client           0.00  0.57    
-pyxmpp.client                  0.00  0.57    
+module                         error  warning 
+::::::::::::::::::::::::::::::::::::::::::::::
+pyxmpp.jid                     100.00 0.79    
+pyxmpp.jabber.vcard            0.00   26.98   
+pyxmpp.streambase              0.00   17.46   
+pyxmpp.sasl.core               0.00   7.94    
+pyxmpp.dns                     0.00   6.35    
+pyxmpp.streamsasl              0.00   5.56    
+pyxmpp.clientstream            0.00   5.56    
+pyxmpp.jabberd.componentstream 0.00   4.76    
+pyxmpp.jabber.clientstream     0.00   3.97    
+pyxmpp.xmlextra                0.00   3.17    
+pyxmpp.streamtls               0.00   3.17    
+pyxmpp.version                 0.00   2.38    
+pyxmpp.jabber.muccore          0.00   2.38    
+pyxmpp.sasl.plain              0.00   1.59    
+pyxmpp.jabber.muc              0.00   1.59    
+pyxmpp._xmlextra               0.00   1.59    
+pyxmpp.xmppstringprep          0.00   0.79    
+pyxmpp.sasl.digest_md5         0.00   0.79    
+pyxmpp.resolver                0.00   0.79    
+pyxmpp.jabber.disco            0.00   0.79    
+pyxmpp.jabber.client           0.00   0.79    
+pyxmpp.client                  0.00   0.79    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 9.47/10 (previous run: 9.47/10)
+Your code has been rated at 9.68/10 (previous run: 9.68/10)
 So close to being perfect...
 
