@@ -169,10 +169,10 @@ class ErrorNode:
 		return ret
 
 	def get_condition(self):
-		c=self.xpath_eval("ns:*",{'ns':self.ns})
+		c=self.xpath_eval("ns:*",{'ns':self.ns.getContent()})
 		if not c:
 			self.upgrade()
-			c=self.xpath_eval("ns:*",{'ns':self.ns})
+			c=self.xpath_eval("ns:*",{'ns':self.ns.getContent()})
 		if not c:
 			return None
 		return c[0]
