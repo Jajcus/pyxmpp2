@@ -121,6 +121,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.keepalive=keepalive
 		self.lock=threading.RLock()
 		self.reader_lock=threading.Lock()
+		self.process_all_stanzas=0
 		self._reset()
 
 	def _reset(self):
@@ -730,7 +731,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.fix_in_stanza(stanza)
 		to=stanza.get_to()
 
-		if to and to!=self.me and to!=self.me.bare():
+		if not self.process_all_stanzas and to and to!=self.me and to!=self.me.bare():
 			return self.route_stanza(stanza)
 
 		if stanza.stanza_type=="iq":
