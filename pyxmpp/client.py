@@ -21,7 +21,9 @@ import sys
 from clientstream import ClientStream
 from jid import JID
 from iq import Iq
+from presence import Presence
 from utils import to_utf8,from_utf8
+from roster import Roster
 
 class ClientError(StandardError):
 	pass
@@ -40,6 +42,7 @@ class Client:
 		self.require_tls=0
 		self.stream=None
 		self.session_established=0
+		self.roster=None
 
 # public methods
 
@@ -73,6 +76,14 @@ class Client:
 			self.stream.set_response_handlers(iq,
 				self.__session_result,self.__session_error,self.__session_timeout)
 			self.stream.send(iq)
+	
+	def request_roster(self):
+		iq=Iq(type="get")
+		iq.new_query("jabber:iq:roster")
+		self.stream.set_response_handlers(iq,
+			self.__roster_result,self.__roster_error,self.__roster_timeout)
+		self.stream.send(iq)
+
 
 	def socket(self):
 		return self.stream.socket
@@ -92,6 +103,20 @@ class Client:
 		self.session_established=1
 		self.session_started()
 	
+	def __roster_timeout(self,k,v):
+		raise ClientError("Timeout while tryin to retrieve roster")
+		
+	def __roster_error(self,iq):
+		raise ClientError("Roster retrieval failed")
+	
+	def __roster_result(self,iq):
+		q=iq.get_query()
+		if q:
+			self.roster=Roster(q)
+			self.roster_updated()
+		else:
+			raise ClientError("Roster retrieval failed")
+	
 	def __post_auth(self):
 		ClientStream.post_auth(self.stream)
 		self.post_auth()
@@ -102,6 +127,11 @@ class Client:
 			self.stream.idle()
 
 	def session_started(self):
+		p=Presence()
+		self.stream.send(p)
+		self.request_roster()
+
+	def roster_updated(self):
 		pass
 
 	def post_auth(self):
