@@ -224,7 +224,7 @@ class Client:
 		self.debug("Stream error: condition: %s %r" 
 				% (err.get_condition().name,err.serialize()))
 
-	def roster_updated(self):
+	def roster_updated(self,item=None):
 		pass
 
 	def stream_state_changed(self,state,arg):
