@@ -217,7 +217,7 @@ class LegacyClientStream(ClientStream):
 			self.send(iq)
 			self.peer_authenticated=1
 			self.auth_method_used="plain"
-			self.state_change("authenticated",self.peer)
+			self.state_change("authorized",self.peer)
 			self._post_auth()
 		else:
 			self.debug("Plain auth failed")
@@ -262,7 +262,7 @@ class LegacyClientStream(ClientStream):
 			self.send(iq)
 			self.peer_authenticated=1
 			self.auth_method_used="digest"
-			self.state_change("authenticated",self.peer)
+			self.state_change("authorized",self.peer)
 			self._post_auth()
 		else:
 			self.debug("Digest auth failed: %r != %r" % (digest,mydigest))
@@ -277,7 +277,7 @@ class LegacyClientStream(ClientStream):
 			self.debug("Authenticated")
 			self.me=self.jid
 			self.authenticated=1
-			self.state_change("authenticated",self.me)
+			self.state_change("authorized",self.me)
 			self._post_auth()
 		finally:
 			self.lock.release()

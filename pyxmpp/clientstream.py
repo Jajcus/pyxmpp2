@@ -111,8 +111,8 @@ class ClientStream(Stream):
 			if self.version:
 				self.auth_methods_left.pop(0)
 				try:
-					self._sasl_authenticate(self.jid.node,self.jid.as_unicode(),
-								mechanism=method[5:].upper())
+					self._sasl_authenticate(self.jid.node, None,
+							mechanism=method[5:].upper())
 				except (SASLMechanismNotAvailable,SASLNotAvailable),e:
 					self.debug("Skipping unavailable auth method: %s" % (method,) )
 					return self._try_auth()

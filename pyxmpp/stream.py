@@ -54,6 +54,7 @@ except ImportError:
 STREAM_NS="http://etherx.jabber.org/streams"
 TLS_NS="urn:ietf:params:xml:ns:xmpp-tls"
 SASL_NS="urn:ietf:params:xml:ns:xmpp-sasl"
+BIND_NS="urn:ietf:params:xml:ns:xmpp-bind"
 
 class StreamError(StandardError):
 	pass
@@ -187,7 +188,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 				addrs=[(addr,port)]
 		else:
 			addrs=[(addr,port)]
-		msg="The host name is not known"
+		msg=None
 		for addr,port in addrs:
 			if type(addr) in (StringType,UnicodeType):
 				self.state_change("resolving",addr)
@@ -209,7 +210,10 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			if s:
 				break
 		if not s:
-			raise socket.error, msg
+			if msg:
+				raise socket.error, msg
+			else:
+				raise FatalStreamError,"Cannot connect"
 
 		self.addr=addr
 		self.port=port
@@ -841,10 +845,12 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		ctxt.xpathRegisterNs("stream",STREAM_NS)
 		ctxt.xpathRegisterNs("tls",TLS_NS)
 		ctxt.xpathRegisterNs("sasl",SASL_NS)
+		ctxt.xpathRegisterNs("bind",BIND_NS)
 		try:
 			tls_n=ctxt.xpathEval("tls:starttls")
 			tls_required_n=ctxt.xpathEval("tls:starttls/tls:required")
 			sasl_mechanisms_n=ctxt.xpathEval("sasl:mechanisms/sasl:mechanism")
+			bind_n=ctxt.xpathEval("bind:bind")
 		finally:
 			ctxt.xpathFreeContext()
 		
@@ -870,6 +876,31 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		if not self.tls_requested and not self.authenticated:
 			self.state_change("fully connected",self.peer)
 			self._post_connect()
+			
+		if self.authenticated:
+			if bind_n:
+				self.bind(self.jid.resource)
+			else:
+				self.state_change("authorized",self.jid)
+
+	def bind(self,resource):
+		iq=Iq(type="set")
+		q=iq.new_query(BIND_NS,"bind")
+		if resource:
+			q.newChild(q.ns(),"resource",to_utf8(resource))
+		self.state_change("binding",resource)
+		self.send(iq)
+		self.set_response_handlers(iq,self._bind_success,self._bind_error)
+		iq.free()
+
+	def _bind_success(self,stanza):
+		jid_n=stanza.xpath_eval("bind:bind/bind:jid",{"bind":BIND_NS})
+		if jid_n:
+			self.jid=JID(jid_n[0].getContent())
+		self.state_change("authorized",self.jid)
+	
+	def _bind_error(self,stanza):
+		raise FatalStreamError,"Resource binding failed"
 
 	def connected(self):
 		if self.doc_in and self.doc_out and not self.eof:

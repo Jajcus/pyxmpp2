@@ -72,10 +72,16 @@ class Client:
 				server=self.server
 			else:
 				server=self.jid.domain
-				
-			stream=self.stream_class(self.jid,self.password,server,
-						self.port,self.auth_methods,
-						self.tls_settings,self.keepalive)
+			
+			self.debug("Creating client stream: %r, auth_methods=%r"
+					% (self.stream_class,self.auth_methods))
+			stream=self.stream_class(jid=self.jid,
+					password=self.password,
+					server=server,
+					port=self.port,
+					auth_methods=self.auth_methods,
+					tls_settings=self.tls_settings,
+					keepalive=self.keepalive)
 			stream.debug=self.debug
 			stream.print_exception=self.print_exception
 			stream.process_stream_error=self.stream_error
@@ -182,8 +188,8 @@ class Client:
 		self.stream_state_changed(state,arg)
 		if state=="fully connected":
 			self.connected()
-		elif state=="authenticated":
-			self.authenticated()
+		elif state=="authorized":
+			self.authorized()
 		elif state=="disconnected":
 			self.state_changed.acquire()
 			try:
@@ -226,7 +232,7 @@ class Client:
 	def connected(self):
 		pass
 
-	def authenticated(self):
+	def authorized(self):
 		self.request_session()
 
 	def disconnected(self):
