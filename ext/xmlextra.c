@@ -1153,8 +1153,10 @@ char *buf;
 	if (reader->doc) xmlFreeDoc(reader->doc);
 	reader->doc=NULL;
 	buf=PyMem_New(char,len+reader->document_start_len);
-	if (buf==NULL) 
+	if (buf==NULL) {
+		PyErr_Format(MyError,"Out of memory? Couldn't allocate %d bytes in stream_end()",(int)(len+reader->document_start_len));
 		return -1;
+	}
 	memcpy(buf,reader->document_start,reader->document_start_len);
 	memcpy(buf+reader->document_start_len,reader->buffer,len);
 	reader->doc=xmlParseMemory(buf,len+reader->document_start_len);
@@ -1180,6 +1182,7 @@ static int append_to_current_stanza(PreparsingReaderObject *reader,int len){
 				reader->current_stanza_len);
 		if (reader->current_stanza==NULL) {
 			preparsing_reader_clear(reader);
+			PyErr_Format(MyError,"Out of memory? Couldn't allocate %d bytes in append_to_current_stanza()",(int)reader->current_stanza_len);
 			return -1;
 		}
 	}
@@ -1232,7 +1235,7 @@ xmlNodePtr stanza;
 static PyObject * preparsing_reader_feed(PyObject *self, PyObject *args) {
 PreparsingReaderObject *reader=(PreparsingReaderObject *)self;
 char *str;
-size_t len;
+int len;
 MarkupType mtype;
 int depth_change;
 
@@ -1250,6 +1253,7 @@ int depth_change;
 		if (reader->buffer==NULL) {
 			/* out of memory */
 			preparsing_reader_clear(reader);
+			PyErr_Format(MyError,"Out of memory? Couldn't allocate %d bytes in preparsing_reader_feed()",(int)reader->buffer_len);
 			return NULL;
 		}
 	}
