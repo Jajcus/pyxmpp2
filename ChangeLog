@@ -1,3 +1,8 @@
+2004-03-22  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* tests/.cvsignore, tests/vcard.py, tests/vcard1.xml, tests/vcard2.txt:
+	- vcard test suite
+
 2004-03-15  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/stream.py, pyxmpp/xmlextra.py, ext/xmlextra.c, examples/streamtest.py:
