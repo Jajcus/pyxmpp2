@@ -134,6 +134,7 @@ class TestVCard(unittest.TestCase):
         vc=vcard.VCard(input)
         should_be=file("data/vcard3.txt").read()
         self.failUnlessEqual(vcard2txt(vc),should_be)
+    #TODO: test_xml_output
 
 def suite():
      suite = unittest.TestSuite()
