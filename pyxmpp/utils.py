@@ -17,7 +17,7 @@
 
 """ Utility functions for pyxmpp package. """
 
-from types import UnicodeType
+from types import UnicodeType,StringType
 
 def to_utf8(s):
 	""" to_utf8(string_or_unicode) -> string
