@@ -80,7 +80,7 @@ class ClientStream(Stream):
 
 	def post_connect(self):
 		if self.initiator:
-			self.auth_methods_left=self.auth_methods
+			self.auth_methods_left=list(self.auth_methods)
 			self.try_auth()
 		else:
 			if "plain" in self.auth_methods or "digest" in self.auth_methods:
