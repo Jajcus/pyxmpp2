@@ -440,7 +440,7 @@ class MucRoomHandler:
         `new_item` is MucItem object describing the event and user's new affiliation.
         """
         pass
-    def subject_changed(self,nick,stanza):
+    def subject_changed(self,user,stanza):
         """
         Called when the room subject has been changed.
 
@@ -448,7 +448,7 @@ class MucRoomHandler:
         `stanza` is the stanza used to change the subject.
         """
         pass
-    def message_received(self,nick,stanza):
+    def message_received(self,user,stanza):
         """
         Called when groupchat message has been received.
 
@@ -464,22 +464,29 @@ class MucRoomHandler:
         self.room_state.stream.debug(s)
 
 class MucRoomUser:
-    def __init__(self,presence_or_user):
-        if isinstance(presence_or_user,MucRoomUser):
-            self.presence=presence_or_user.presence
-            self.role=presence_or_user.role
-            self.affiliation=presence_or_user.affiliation
-            self.room_jid=presence_or_user.room_jid
-            self.real_jid=presence_or_user.real_jid
-            self.nick=presence_or_user.nick
+    def __init__(self,presence_or_user_or_jid):
+        if isinstance(presence_or_user_or_jid,MucRoomUser):
+            self.presence=presence_or_user_or_jid.presence
+            self.role=presence_or_user_or_jid.role
+            self.affiliation=presence_or_user_or_jid.affiliation
+            self.room_jid=presence_or_user_or_jid.room_jid
+            self.real_jid=presence_or_user_or_jid.real_jid
+            self.nick=presence_or_user_or_jid.nick
         else:
-            self.presence=None
-            self.role="participant"
             self.affiliation="none"
-            self.room_jid=None
+            self.presence=None
             self.real_jid=None
-            self.nick=None
-            self.update_presence(presence_or_user)
+            if isinstance(presence_or_user_or_jid,JID):
+                self.nick=presence_or_user_or_jid.resource
+                self.room_jid=presence_or_user_or_jid
+                self.role="none"
+            elif isinstance(presence_or_user_or_jid,Presence):
+                self.nick=None
+                self.room_jid=None
+                self.role="participant"
+                self.update_presence(presence_or_user_or_jid)
+            else:
+                raise TypeError,"Bad argument type for MucRoomUser constructor"
         
     def update_presence(self,presence):
         self.presence=MucPresence(presence)
@@ -512,12 +519,17 @@ class MucRoomState:
         self.users={}
         handler.assign_state(self)
 
-    def get_user(self,nick_or_jid):
+    def get_user(self,nick_or_jid,create=False):
         if isinstance(nick_or_jid,JID):
+            if not nick_or_jid.resource:
+                return None
             for u in self.users.values():
                 if nick_or_jid in (u.room_jid,u.real_jid):
                     return u
-            return None
+            if create:
+                return MucRoomUser(nick_or_jid)
+            else:
+                return None
         return self.users.get(nick_or_jid)
 
     def set_stream(self,stream):
@@ -592,12 +604,14 @@ class MucRoomState:
         # TODO: kicks, nick changes
         
     def process_groupchat_message(self,stanza):
+        fr=stanza.get_from()
+        user=self.get_user(fr,True)
         s=stanza.get_subject()
         if s:
             self.subject=s
-            self.handler.subject_changed(stanza.get_from().resource,stanza)
+            self.handler.subject_changed(user,stanza)
         else:
-            self.handler.message_received(stanza.get_from().resource,stanza)
+            self.handler.message_received(user,stanza)
     
     def process_error_message(self,stanza):
         self.handler.error(stanza)
