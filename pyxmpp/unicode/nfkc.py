@@ -38,7 +38,7 @@ def hangul_decompose(c):
 def decompose(c):
 	s=ord(c)
 	if s>=SBase and s-SBase<SCount:
-		return hangul_decompose[c]
+		return hangul_decompose(c)
 
 	d=decompositions_3_2_0.get(c,unicodedata.decomposition(c))
 	
@@ -73,7 +73,7 @@ def hangul_compose(l):
 			VIndex=ch-VBase
 			if 0<=VIndex and VIndex<VCount:
 				last=(SBase+(LIndex*VCount+VIndex)*TCount)
-				result[-1:]=(0,lch[1],unichr(last))
+				result[-1]=(0,lch[1],unichr(last))
 				continue
 
 		SIndex=last-SBase
@@ -81,7 +81,7 @@ def hangul_compose(l):
 			TIndex=ch-TBase
 			if 0<=TIndex and TIndex<=TCount:
 				last+=TIndex
-				result[-1:]=(0,lch[1],unichr(last))
+				result[-1]=(0,lch[1],unichr(last))
 				continue
 
 		last=ch
