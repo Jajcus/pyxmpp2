@@ -30,6 +30,7 @@ import socket
 import dns.resolver
 import dns.name
 import dns.exception
+import random
 from encodings import idna
 
 service_aliases={"xmpp-server": ("jabber-server","jabber")}

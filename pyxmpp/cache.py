@@ -25,7 +25,6 @@ __revision__ = "$Id$"
 __docformat__ = "restructuredtext en"
 
 import threading
-import logging
 from datetime import datetime, timedelta
 
 _state_values = {
@@ -33,7 +32,7 @@ _state_values = {
         'fresh': 1,
         'old': 2,
         'stale': 3,
-        'purged': 3
+        'purged': 4
     };
 
 # locking order (anti-deadlock):
@@ -46,7 +45,7 @@ class CacheItem(object):
         - `value`: item value (cached object).
         - `address`: item address.
         - `state`: current state.
-        - `value`: numerical value of the current state (lower number means
+        - `state_value`: numerical value of the current state (lower number means
           fresher item).
         - `timestamp`: time when the object was created.
         - `freshness_time`: time when the object stops being fresh.
@@ -70,7 +69,7 @@ class CacheItem(object):
             purge_period, state = "new"):
         """Initialize an CacheItem object.
 
-        :Ivariables:
+        :Parameters:
             - `address`: item address.
             - `value`: item value (cached object).
             - `freshness_period`: time interval after which the object stops being fresh.
@@ -81,14 +80,14 @@ class CacheItem(object):
         :Types:
             - `address`: any hashable
             - `value`: `instance`
-            - `freshness_time`: `timedelta`
-            - `expire_time`: `timedelta`
-            - `purge_time`: `timedelta`
+            - `freshness_period`: `timedelta`
+            - `expiration_period`: `timedelta`
+            - `purge_period`: `timedelta`
             - `state`: `str`"""
         if freshness_period>expiration_period:
-            return ValueError, "freshness_period greater then expiration_period"
+            raise ValueError, "freshness_period greater then expiration_period"
         if expiration_period>purge_period:
-            return ValueError, "expiration_period greater then purge_period"
+            raise ValueError, "expiration_period greater then purge_period"
         self.address = address
         self.value = value
         now = datetime.utcnow()
@@ -325,7 +324,7 @@ class Cache:
         - `_items`: dictionary of stored items.
         - `_items_list`: list of stored items with the most suitable for 
           purging first.
-        - `_fetchers`: dictionary of registered object fetchers.
+        - `_fetcher`: fetcher class for this cache.
         - `_active_fetchers`: list of active fetchers sorted by the time of
           its expiration time.
         - `_lock`: lock for thread safety.
@@ -335,8 +334,8 @@ class Cache:
         - `default_purge_period`: timedelta
         - `max_items`: `int`
         - `_items`: `dict` of (`classobj`, addr) -> `CacheItem`
-        - `_items_list`: `list` of (`int`, `timestamp`, `CacheItem`)
-        - `_fetchers`: `dict` of `classobj` -> `CacheFetcher` based class
+        - `_items_list`: `list` of (`int`, `datetime`, `CacheItem`)
+        - `_fetcher`: `CacheFetcher` based class
         - `_active_fetchers`: `list` of (`int`, `CacheFetcher`)
         - `_lock`: `threading.RLock`
     """
@@ -362,7 +361,7 @@ class Cache:
         self.max_items = max_items
         self._items = {}
         self._items_list = []
-        self._fetcher_class = None
+        self._fetcher = None
         self._active_fetchers = []
         self._purged = 0
         self._lock = threading.RLock()
@@ -370,10 +369,62 @@ class Cache:
     def request_object(self, address, state, object_handler, 
             error_handler = None, timeout_handler = None,
             backup_state = None, timeout = timedelta(minutes=60),
-            freshness_period = None, expiration_period = None, purge_period = None):
+            freshness_period = None, expiration_period = None, 
+            purge_period = None):
+        """Request an object with given address and state not worse than
+        `state`. The object will be taken from cache if available, and
+        created/fetched otherwise. The request is asynchronous -- this metod
+        doesn't return the object directly, but the `object_handler` is called
+        as soon as the object is available (this may be before `request_object`
+        returns and may happen in other thread). On error the `error_handler`
+        will be called, and on timeout -- the `timeout_handler`.
 
+        :Parameters:
+            - `address`: address of the object requested.
+            - `state`: the worst acceptable object state. When 'new' then always
+              a new object will be created/fetched. 'stale' will select any
+              item available in cache.
+            - `object_handler`: function to be called when object is available.
+              It will be called with the following arguments: address, object
+              and its state.
+            - `error_handler`: function to be called on object retrieval error.
+              It will be called with two arguments: requested address and
+              additional error information (fetcher-specific, may be
+              StanzaError for XMPP objects).  If not given, then the object
+              handler will be called with object set to `None` and state
+              "error".
+            - `timeout_handler`: function to be called on object retrieval
+              timeout.  It will be called with only one argument: the requested
+              address. If not given, then the `error_handler` will be called
+              instead, with error details set to `None`.
+            - `backup_state`: when set and object in state `state` is not
+              available in the cache and object retrieval failed then object
+              with this state will also be looked-up in the cache and provided
+              if available.
+            - `timeout`: time interval after which retrieval of the object
+              should be given up.
+            - `freshness_period`: time interval after which the item created
+              should become 'old'.
+            - `expiration_period`: time interval after which the item created
+              should become 'stale'.
+            - `purge_period`: time interval after which the item created
+              shuld be removed from the cache.
+        :Types:
+            - `address`: any hashable
+            - `state`: "new", "fresh", "old" or "stale"
+            - `object_handler`: callable(address, value, state)
+            - `error_handler`: callable(address, error_data)
+            - `timeout_handler`: callable(address)
+            - `backup_state`: "new", "fresh", "old" or "stale"
+            - `timeout`: `timedelta`
+            - `freshness_period`: `timedelta`
+            - `expiration_period`: `timedelta`
+            - `purge_period`: `timedelta`
+        """
         self._lock.acquire()
         try:
+            if state == 'stale':
+                state = 'purged'
             item = self.get_item(address, state)
             if item:
                 object_handler(item.address, item.value, item.state)
@@ -382,6 +433,9 @@ class Cache:
             if not error_handler:
                 def error_handler(address, data):
                     return object_handler(address, None, 'error')
+            if not timeout_handler:
+                def timeout_handler(address):
+                    return error_handler(address, None)
             if freshness_period is None:
                 freshness_period = self.default_freshness_period
             if expiration_period is None:
@@ -399,6 +453,12 @@ class Cache:
             self._lock.release()
 
     def invalidate_object(self, address, state = 'stale'):
+        """Force cache item state change (to 'worse' state only).
+
+        :Parameters:
+            - `state`: the new state requested.
+        :Types:
+            - `state`: `str`"""
         self._lock.acquire()
         try:
             item = self.get_item(address)
@@ -439,11 +499,9 @@ class Cache:
         """Get an item from the cache.
 
         :Parameters:
-            - `object_class`: class of the requested item.
             - `address`: its address.
             - `state`: the worst state that is acceptable.
         :Types:
-            - `object_class`: `classobj`
             - `address`: any hashable
             - `state`: `str`
            
@@ -454,7 +512,7 @@ class Cache:
             item = self._items.get(address)
             if not item:
                 return None
-            new_state = self.update_item(item)
+            self.update_item(item)
             if _state_values[state] >= item.state_value:
                 return item
             return None
@@ -488,6 +546,10 @@ class Cache:
             self._lock.release()
 
     def num_items(self):
+        """Get the number of items in the cache.
+
+        :return: number of items.
+        :returntype: `int`"""
         return len(self._items_list)
 
     def purge_items(self):
@@ -519,6 +581,10 @@ class Cache:
             self._lock.release()
 
     def tick(self):
+        """Do the regular cache maintenance.
+
+        Must be called from time to time for timeouts and cache old items
+        purging to work."""
         self._lock.acquire()
         try:
             now = datetime.utcnow()
@@ -570,7 +636,8 @@ class CacheSuite:
     or is not fresh enough.
 
     Objects are addressed using their class and a class dependant address.
-    Eg. `DiscoInfo` objects are addressed using (`DiscoInfo`,(jid, node)) tuple.
+    Eg. `pyxmpp.jabber.disco.DiscoInfo` objects are addressed using
+    (`pyxmpp.jabber.disco.DiscoInfo`,(jid, node)) tuple.
 
     Additionaly a state (freshness level) name may be provided when requesting
     an object. When the cached item state is "less fresh" then requested, then
@@ -626,6 +693,59 @@ class CacheSuite:
             error_handler = None, timeout_handler = None,
             backup_state = None, timeout = None,
             freshness_period = None, expiration_period = None, purge_period = None):
+        """Request an object of given class, with given address and state not
+        worse than `state`. The object will be taken from cache if available,
+        and created/fetched otherwise. The request is asynchronous -- this
+        metod doesn't return the object directly, but the `object_handler` is
+        called as soon as the object is available (this may be before
+        `request_object` returns and may happen in other thread). On error the
+        `error_handler` will be called, and on timeout -- the
+        `timeout_handler`.
+
+        :Parameters:
+            - `object_class`: class (type) of the object requested.
+            - `address`: address of the object requested.
+            - `state`: the worst acceptable object state. When 'new' then always
+              a new object will be created/fetched. 'stale' will select any
+              item available in cache.
+            - `object_handler`: function to be called when object is available.
+              It will be called with the following arguments: address, object
+              and its state.
+            - `error_handler`: function to be called on object retrieval error.
+              It will be called with two arguments: requested address and
+              additional error information (fetcher-specific, may be
+              StanzaError for XMPP objects).  If not given, then the object
+              handler will be called with object set to `None` and state
+              "error".
+            - `timeout_handler`: function to be called on object retrieval
+              timeout.  It will be called with only one argument: the requested
+              address. If not given, then the `error_handler` will be called
+              instead, with error details set to `None`.
+            - `backup_state`: when set and object in state `state` is not
+              available in the cache and object retrieval failed then object
+              with this state will also be looked-up in the cache and provided
+              if available.
+            - `timeout`: time interval after which retrieval of the object
+              should be given up.
+            - `freshness_period`: time interval after which the item created
+              should become 'old'.
+            - `expiration_period`: time interval after which the item created
+              should become 'stale'.
+            - `purge_period`: time interval after which the item created
+              shuld be removed from the cache.
+        :Types:
+            - `object_class`: `classobj`
+            - `address`: any hashable
+            - `state`: "new", "fresh", "old" or "stale"
+            - `object_handler`: callable(address, value, state)
+            - `error_handler`: callable(address, error_data)
+            - `timeout_handler`: callable(address)
+            - `backup_state`: "new", "fresh", "old" or "stale"
+            - `timeout`: `timedelta`
+            - `freshness_period`: `timedelta`
+            - `expiration_period`: `timedelta`
+            - `purge_period`: `timedelta`
+        """
 
         self._lock.acquire()
         try:
@@ -639,6 +759,10 @@ class CacheSuite:
             self._lock.release()
 
     def tick(self):
+        """Do the regular cache maintenance.
+
+        Must be called from time to time for timeouts and cache old items
+        purging to work."""
         self._lock.acquire()
         try:
             for cache in self._caches.values():

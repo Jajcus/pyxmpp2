@@ -426,7 +426,7 @@ class DiscoItems:
             - `jid`: `pyxmpp.JID`
             - `node`: `unicode`
             - `name`: `unicode`
-            - `actions`: `unicode`
+            - `action`: `unicode`
             
         :returns: the item created.
         :returntype: `DiscoItem`."""

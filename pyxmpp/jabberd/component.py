@@ -29,7 +29,7 @@ import logging
 
 from pyxmpp.jabberd.componentstream import ComponentStream
 from pyxmpp.utils import from_utf8
-from pyxmpp.jabber import DiscoItems,DiscoInfo,DiscoIdentity
+from pyxmpp.jabber.disco import DiscoItems,DiscoInfo,DiscoIdentity
 from pyxmpp.stanza import Stanza
 
 class ComponentError(Exception):
