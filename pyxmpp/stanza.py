@@ -185,3 +185,13 @@ class Stanza:
 		ctxt.xpathFreeContext()
 		return ret
 
+	def __eq__(self,other):
+		if not isinstance(other,Stanza): 
+			return 0
+		return self.node.serialize()==other.node.serialize();
+
+	def __ne__(self,other):
+		if not isinstance(other,Stanza): 
+			return 1
+		return self.node.serialize()!=other.node.serialize();
+
