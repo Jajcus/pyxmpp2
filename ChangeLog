@@ -1,3 +1,10 @@
+2004-07-21  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* Makefile: *** Version: 0.5 ***
+
+	* DONE:
+	- updated
+
 2004-07-19  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/stream.py:
