@@ -1,3 +1,14 @@
+2004-10-03  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* doc/Makefile:
+	- use $(EPYDOC) everywhere
+
+	* pyxmpp/sasl/digest_md5.py:
+	- DIGEST-MD5 fixed after it was broken during 'cleanup'
+
+	* pyxmpp/jabber/delay.py, TODO.pylint:
+	- cleaning up...
+
 2004-10-01  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/sasl/digest_md5.py, pyxmpp/sasl/plain.py, TODO.pylint, pylint.sh, pylintrc:
