@@ -437,6 +437,7 @@ class VCardAdr(VCardField):
     """Address vCard field.
 
     :Ivariables:
+        - `type`: type of the address.
         - `pobox`: the post office box.
         - `extadr`: the extended address.
         - `street`: the street address.
@@ -445,6 +446,7 @@ class VCardAdr(VCardField):
         - `pcode`: the postal code.
         - `ctry`: the country.
     :Types:
+        - `type`: `list` of "home","work","postal","parcel","dom","intl" or "pref"
         - `pobox`: `unicode`
         - `extadr`: `unicode`
         - `street`: `unicode`
@@ -954,11 +956,9 @@ class VCardCategories(VCardField):
     """Categories vCard field.
 
     :Ivariables:
-        - `name`: organization name.
-        - `unit`: organizational unit.
+        - `keywords`: category keywords.
     :Types:
-        - `name`: `unicode`
-        - `unit`: `unicode`
+        - `keywords`: `list` of `unicode`
     """
     def __init__(self,name,value,rfc2425parameters=None):
         """Initialize a `VCardCategories` object.
@@ -1478,7 +1478,7 @@ class VCard:
             - `data`: `unicode`"""
         label,value=data.split(":",1)
         value=value.replace("\\n","\n").replace("\\N","\n")
-        psplit=label.split(";")
+        psplit=label.lower().split(";")
         name=psplit[0]
         params=psplit[1:]
         if u"." in name:
@@ -1571,8 +1571,10 @@ class VCard:
             return doc
     def __getattr__(self,name):
         try:
-            return self.content[name.upper()]
+            return self.content[name.upper().replace("_","-")]
         except KeyError:
             raise AttributeError,"Attribute %r not found" % (name,)
+    def __getitem__(self,name):
+        return self.content[name.upper()]
 
 # vi: sts=4 et sw=4
