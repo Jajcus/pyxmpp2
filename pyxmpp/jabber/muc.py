@@ -261,7 +261,7 @@ class MucStatus(MucItemBase):
         `parent` is the element to which the created node should be linked to.
         """
         n=parent.newChild(parent.ns(),"status",None)
-        n.setProp("status","%03i" % (self.code,))
+        n.setProp("code","%03i" % (self.code,))
         return n
 
 class MucUserX(MucXBase):
