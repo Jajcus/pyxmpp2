@@ -25,7 +25,7 @@ ChangeLog:
 	
 cl-stamp: .svn/entries
 	TZ=UTC svn log -v --xml \
-		| aux/svn2log.py -p '/(branches/[^/]+|trunk)' -x ChangeLog -u aux/users
+		| aux/svn2log.py -p '/(branches/[^/]+|trunk)' -x ChangeLog -u aux/users -F
 	touch cl-stamp
 
 cosmetics:
