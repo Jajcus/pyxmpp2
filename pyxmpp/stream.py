@@ -525,11 +525,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		finally:
 			self.lock.acquire()
 		if self.socket in id or self.socket in ed:
-			self.debug("data on input")
 			self._process()
 			return 1
 		else:
-			self.debug("input timeout")
 			self._idle()
 			return 0
 
