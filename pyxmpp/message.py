@@ -27,6 +27,7 @@ __docformat__="restructuredtext en"
 import libxml2
 from pyxmpp.stanza import Stanza,StanzaError
 from pyxmpp.utils import to_utf8,from_utf8
+from pyxmpp.xmlextra import common_ns
 
 message_types=("normal","chat","headline","error","groupchat")
 

@@ -28,6 +28,7 @@ import libxml2
 
 from pyxmpp.utils import to_utf8,from_utf8
 from pyxmpp.stanza import Stanza,StanzaError
+from pyxmpp.xmlextra import common_ns
 
 presence_types=("available","unavailable","probe","subscribe","unsubscribe","subscribed",
         "unsubscribed","invisible","error")

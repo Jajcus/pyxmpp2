@@ -28,6 +28,7 @@ import libxml2
 
 from pyxmpp.utils import get_node_ns_uri
 from pyxmpp.stanza import Stanza,StanzaError,gen_id
+from pyxmpp.xmlextra import common_ns
 
 class Iq(Stanza):
     """Wraper object for <iq /> stanzas."""
