@@ -97,6 +97,8 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 			self.debug("Empty challenge")
 			return Failure("bad-challenge")
 
+		challenge=challenge.split('\x00')[0]
+
 		if self.response_auth:
 			return self.final_challenge(challenge)
 	
@@ -234,6 +236,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 		if self.rspauth_checked:
 			return Failure("extra-challenge")
 	
+		challenge=challenge.split('\x00')[0]
 		rspauth=None
 		while challenge:
 			m=param_re.match(challenge)
@@ -293,6 +296,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 		if self.authzid is not None:
 			return Success(self.authzid)
 	
+		response=response.split('\x00')[0]
 		if not response:
 			return Failure("not-authorized")
 	
