@@ -663,6 +663,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
             try:
                 self._read()
             except (xmlextra.error,),e:
+                self.__logger.exception("Exception during read()")
                 raise StreamParseError(unicode(e))
             except:
                 raise
@@ -807,6 +808,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         ctxt.setContextNode(self.features)
         ctxt.xpathRegisterNs("stream",STREAM_NS)
         ctxt.xpathRegisterNs("bind",BIND_NS)
+        bind_n=None
         try:
             bind_n=ctxt.xpathEval("bind:bind")
         finally:
