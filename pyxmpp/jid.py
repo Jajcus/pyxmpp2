@@ -103,4 +103,11 @@ class JID:
 			return "%s@%s/%s" % (self.node,self.domain,self.resource)
 	def bare(self):
 		return JID(self.node,self.domain)
+
+	def __eq__(self,other):
+		return (self.node==other.node
+			and self.domain==other.domain
+			and self.resource==other.resource)
 	
+	def __ne__(self,other):
+		return not self.__eq__(other)
