@@ -116,6 +116,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.authenticated=0
 		self.peer_authenticated=0
 		self.auth_method_used=None
+		self.version=None
 
 	def __del__(self):
 		self.close()
