@@ -698,6 +698,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 				try:
 					ns=c.ns()
 				except libxml2.treeError:
+					c=c.next
 					continue
 				ns_uri=ns.getContent()
 				if ns_uri not in namespaces:
