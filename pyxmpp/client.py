@@ -17,11 +17,11 @@
 
 """Basic XHTML-IM client implementation.
 
-Normative reference: 
-  - `RFC 3921 <http://www.ietf.org/rfc/rfc3921.txt>`__ 
+Normative reference:
+  - `RFC 3921 <http://www.ietf.org/rfc/rfc3921.txt>`__
 """
 
-__revision__="$Id: client.py,v 1.32 2004/10/07 22:22:34 jajcus Exp $"
+__revision__="$Id: client.py,v 1.33 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import threading
@@ -101,7 +101,7 @@ class Client:
 
     def connect(self,register=False):
         """Connect to the server and set up the stream.
-        
+
         Set `self.stream` and notify `self.state_changed` when connection
         succeeds."""
         if not self.jid:
@@ -194,7 +194,7 @@ class Client:
         `self.stream`, which handles stream input and `self.idle` for some
         "housekeeping" work until the stream is closed.
 
-        This usually will be replaced by something more sophisticated. E.g. 
+        This usually will be replaced by something more sophisticated. E.g.
         handling of other input sources."""
         while 1:
             stream=self.get_stream()
@@ -207,19 +207,19 @@ class Client:
 # private methods
 
     def __session_timeout(self):
-        """Process session request time out. 
+        """Process session request time out.
 
         :raise FatalClientError:"""
         raise FatalClientError("Timeout while tryin to establish a session")
 
     def __session_error(self,iq):
         """Process session request failure.
-        
+
         :Parameters:
             - `iq`: IQ error stanza received as result of the session request.
         :Types:
             - `iq`: `pyxmpp.Iq`
-        
+
         :raise FatalClientError:"""
         err=iq.get_error()
         msg=err.get_message()
@@ -227,7 +227,7 @@ class Client:
 
     def __session_result(self,iq):
         """Process session request success.
-         
+
         :Parameters:
             - `iq`: IQ result stanza received in reply to the session request.
         :Types:
@@ -239,19 +239,19 @@ class Client:
         self.session_started()
 
     def __roster_timeout(self):
-        """Process roster request time out. 
+        """Process roster request time out.
 
         :raise ClientError:"""
         raise ClientError("Timeout while tryin to retrieve roster")
 
     def __roster_error(self,iq):
         """Process roster request failure.
-        
+
         :Parameters:
             - `iq`: IQ error stanza received as result of the roster request.
         :Types:
             - `iq`: `pyxmpp.Iq`
-        
+
         :raise ClientError:"""
         err=iq.get_error()
         msg=err.get_message()
@@ -259,7 +259,7 @@ class Client:
 
     def __roster_result(self,iq):
         """Process roster request success.
-         
+
         :Parameters:
             - `iq`: IQ result stanza received in reply to the roster request.
         :Types:
@@ -276,7 +276,7 @@ class Client:
 
     def __roster_push(self,iq):
         """Process a "roster push" (change notification) received.
-         
+
         :Parameters:
             - `iq`: IQ result stanza received.
         :Types:

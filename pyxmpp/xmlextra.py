@@ -17,7 +17,7 @@
 
 """Extension to libxml2 for XMPP stream and stanza processing"""
 
-__revision__="$Id: xmlextra.py,v 1.13 2004/09/15 21:23:13 jajcus Exp $"
+__revision__="$Id: xmlextra.py,v 1.14 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import sys
@@ -93,7 +93,7 @@ class StreamHandler:
         Please note, that node will be removed from the document
         and freed after this method returns. If it is needed after
         that a copy must be made before the method returns.
-        
+
         :Parameters:
             - `doc`: the document being parsed.
             - `node`: the (complete) element being processed
@@ -104,11 +104,11 @@ class StreamHandler:
     def stanza(self,doc,node):
         """Called when the end tag of a direct child of the root
         element is encountered in the stream.
-        
+
         Please note, that node will be removed from the document
         and freed after this method returns. If it is needed after
         that a copy must be made before the method returns.
-        
+
         :Parameters:
             - `doc`: the document being parsed.
             - `node`: the (complete) element being processed
@@ -118,7 +118,7 @@ class StreamHandler:
         print >>sys.stderr,"Unhandled stanza",`node.serialize()`
     def error(self,descr):
         """Called when an error is encountered in the stream.
-        
+
         :Parameters:
             - `descr`: description of the error
         :Types:
@@ -150,12 +150,12 @@ class StreamReader:
             return None
     def feed(self,s):
         """Pass a string to the stream parser.
-        
+
         Parameters:
             - `s`: string to parse.
         Types:
             - `s`: `str`
-        
+
         :return: `None` on EOF, `False` when whole input was parsed and `True`
             if there is something still left in the buffer."""
         self.lock.acquire()
@@ -170,8 +170,8 @@ class StreamReader:
             self.lock.release()
 
 def remove_ns(node, ns):
-    """Remove a namespace declaration from a node. 
-    
+    """Remove a namespace declaration from a node.
+
     Refuse to do so if the namespace is used somwhere in the subtree.
 
     :Parameters:
@@ -180,13 +180,13 @@ def remove_ns(node, ns):
     :Types:
         - `node`: `libxml2.xmlNode`
         - `ns`: `libxml2.xmlNs`"""
-    if ns is None: 
+    if ns is None:
         ns__o = None
-    else: 
+    else:
         ns__o = ns._o
-    if node is None: 
+    if node is None:
         node__o = None
-    else: 
+    else:
         node__o = node._o
     return _xmlextra.remove_ns(node__o,ns__o)
 
@@ -203,17 +203,17 @@ def replace_ns(node, old_ns,new_ns):
         - `new_ns`: `libxml2.xmlNs`
 
     Both old_ns and new_ns may be None meaning no namespace set."""
-    if old_ns is None: 
+    if old_ns is None:
         old_ns__o = None
-    else: 
+    else:
         old_ns__o = old_ns._o
-    if new_ns is None: 
+    if new_ns is None:
         new_ns__o = None
-    else: 
+    else:
         new_ns__o = new_ns._o
-    if node is None: 
+    if node is None:
         node__o = None
-    else: 
+    else:
         node__o = node._o
     return _xmlextra.replace_ns(node__o,old_ns__o,new_ns__o)
 

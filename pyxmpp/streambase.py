@@ -17,11 +17,11 @@
 
 """Core XMPP stream functionality.
 
-Normative reference: 
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+Normative reference:
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: streambase.py,v 1.2 2004/10/07 22:22:36 jajcus Exp $"
+__revision__="$Id: streambase.py,v 1.3 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -90,13 +90,13 @@ def stanza_factory(node):
 
 class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
     """Base class for a generic XMPP stream.
-    
+
     Responsible for establishing connection, parsing the stream, dispatching
     received stanzas to apopriate handlers and sending application's stanzas.
     This doesn't provide any authentication or encryption (both required by
     the XMPP specification) and is not usable on its own.
-    
-    Whenever we say "stream" here we actually mean two streams 
+
+    Whenever we say "stream" here we actually mean two streams
     (incoming and outgoing) of one connections, as defined by the XMPP
     specification.
 
@@ -189,7 +189,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         """Establish XMPP connection with given address.
 
         [initiating entity only]
-        
+
         :Parameters:
             - `addr`: peer name or IP address
             - `port`: port number to connect to
@@ -303,7 +303,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
         This method is supposed to be overriden in derived classes
         or replaced by an application.
-        
+
         It may be used to display the connection progress."""
         self.__logger.debug("State: %s: %r" % (state,arg))
 
@@ -334,7 +334,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
     def stream_start(self,doc):
         """Process <stream:stream> (stream start) tag received from peer.
-        
+
         :Parameters:
             - `doc`: document created by the parser"""
         self.doc_in=doc
@@ -389,7 +389,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
     def stream_end(self,doc):
         """Process </stream:stream> (stream end) tag received from peer.
-        
+
         :Parameters:
             - `doc`: document created by the parser"""
         self.__logger.debug("Stream ended")
@@ -406,7 +406,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
     def stanza_start(self,doc,node):
         """Process stanza (first level child element of the stream) start tag
         -- do nothing.
-        
+
         :Parameters:
             - `doc`: parsed document
             - `node`: stanza's full XML
@@ -415,7 +415,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
     def stanza_end(self,doc,node):
         """Process stanza (first level child element of the stream) end tag.
-        
+
         :Parameters:
             - `doc`: parsed document
             - `node`: stanza's full XML
@@ -424,7 +424,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
     def stanza(self,doc,node):
         """Process stanza (first level child element of the stream).
-        
+
         :Parameters:
             - `doc`: parsed document
             - `node`: stanza's full XML
@@ -433,7 +433,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
     def error(self,descr):
         """Handle stream XML parse error.
-        
+
         :Parameters:
             - `descr`: error description
         """
@@ -477,7 +477,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
     def _send_stream_error(self,condition):
         """Send stream error element.
-        
+
         :Parameters:
             - `condition`: stream error condition name, as defined in the
               XMPP specification."""
@@ -506,7 +506,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         """Create the <features/> element for the stream.
 
         [receving entity only]
-        
+
         :returns: new <features/> element node."""
         root=self.doc_out.getRootElement()
         features=root.newChild(root.ns(),"features",None)
@@ -514,14 +514,14 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
     def _send_stream_features(self):
         """Send stream <features/>.
-        
+
         [receiving entity only]"""
         self.features=self._make_stream_features()
         self._write_raw(self.features.serialize(encoding="UTF-8"))
 
     def write_raw(self,data):
         """Write raw data to the stream socket.
-        
+
         :Parameters:
             - `data`: data to send"""
         self.lock.acquire()
@@ -540,7 +540,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
     def _write_node(self,node):
         """Write XML `node` to the stream.
-        
+
         :Parameters:
             - `node`: XML node to send."""
         if self.eof or not self.socket or not self.doc_out:
@@ -557,7 +557,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
     def send(self,stanza):
         """Write stanza to the stream.
-        
+
         :Parameters:
             - `stanza`: XMPP stanza to send."""
         self.lock.acquire()
@@ -580,7 +580,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
     def idle(self):
         """Do some housekeeping (cache expiration, timeout handling).
-        
+
         This method should be called periodically from the application's
         main loop."""
         self.lock.acquire()
@@ -679,7 +679,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
                 raise
             return
         self._feed_reader(r)
-        
+
     def _feed_reader(self,data):
         """Feed the stream reader with data received.
 
@@ -722,7 +722,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         if ns_uri=="http://etherx.jabber.org/streams":
             self._process_stream_node(node)
             return
-        
+
         if ns_uri==self.default_ns_uri:
             stanza=stanza_factory(node)
             self.lock.release()
@@ -787,7 +787,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
     def generate_id(self):
         """Generate a random and unique stream ID.
-        
+
         :return: the id string generated."""
         return "%i-%i-%s" % (os.getpid(),time.time(),str(random.random())[2:])
 
@@ -816,10 +816,10 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         """Bind to a resource.
 
         [initiating entity only]
-        
+
         :Parameters:
             - `resource`: the resource name to bind to.
-        
+
         XMPP stream is authenticated for bare JID only. To use
         the full JID it must be bound to a resource.
         """
@@ -839,7 +839,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
         :Parameters:
             - `stanza`: <iq type="result"/> stanza received.
-        
+
         Set `self.me` to the full JID negotiated."""
         jid_n=stanza.xpath_eval("bind:bind/bind:jid",{"bind":BIND_NS})
         if jid_n:

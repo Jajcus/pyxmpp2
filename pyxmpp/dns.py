@@ -18,11 +18,11 @@
 """A simple implementation of a part of the DNS protocol.
 
 Normative reference:
-  - `RFC 1035 <http://www.ietf.org/rfc/rfc1035.txt>`__ 
-  - `RFC 2782 <http://www.ietf.org/rfc/rfc2782.txt>`__ 
+  - `RFC 1035 <http://www.ietf.org/rfc/rfc1035.txt>`__
+  - `RFC 2782 <http://www.ietf.org/rfc/rfc2782.txt>`__
 """
 
-__revision__="$Id: dns.py,v 1.15 2004/10/07 22:22:34 jajcus Exp $"
+__revision__="$Id: dns.py,v 1.16 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import random
@@ -181,7 +181,7 @@ class RR:
 
     def format_data(self):
         """Format RR data as a string.
-        
+
         :return: formatted data.
         :returntype: `str`"""
         return ""
@@ -234,7 +234,7 @@ class RR:
         if roffset!=offset+rdl:
             raise BadPacket,"Record length mismatch"
         return rr,roffset
-    
+
     parse_bin=staticmethod(parse_bin)
 
     def parse_bin_data(name,ttl,cls,packet,offset,length):
@@ -264,13 +264,13 @@ class RR:
         _add_query_type(py_class.type,py_class.code)
         RR._record_types_by_code[py_class.code]=py_class
         RR._record_types_by_name[py_class.type]=py_class
-    
+
     _add_record_type=staticmethod(_add_record_type)
 
 
 class RR_A(RR):
     """'A' resource record.
-    
+
     :Ivariables:
         - `ip`: the IP address contained in the record."""
     type="A"
@@ -287,7 +287,7 @@ class RR_A(RR):
 
     def format_data(self):
         """Format A RR data as a string.
-        
+
         :return: formatted data.
         :returntype: `str`"""
         return self.ip
@@ -324,14 +324,14 @@ class RR_A(RR):
         data=[ord(b) for b in data]
         ip="%i.%i.%i.%i" % tuple(data)
         return RR_A(name,ttl,ip),offset+4
-    
+
     parse_bin_data=staticmethod(parse_bin_data)
 
 RR._add_record_type(RR_A)
 
 class RR_NS(RR):
     """'NS' resource record.
-    
+
     :Ivariables:
         - `target`: the nameserver name contained in the record."""
     type="NS"
@@ -349,7 +349,7 @@ class RR_NS(RR):
 
     def format_data(self):
         """Format NS RR data as a string.
-        
+
         :return: formatted data.
         :returntype: `str`"""
         return self.target
@@ -381,14 +381,14 @@ class RR_NS(RR):
         :returntype: `RR_NS`"""
         target,offset=domain_bin2str(packet,offset)
         return RR_CNAME(name,ttl,cls,target),offset
-        
+
     parse_bin_data=staticmethod(parse_bin_data)
 
 RR._add_record_type(RR_NS)
 
 class RR_CNAME(RR):
     """'CNAME' resource record.
-    
+
     :Ivariables:
         - `target`: the name contained in the record."""
     type="CNAME"
@@ -406,7 +406,7 @@ class RR_CNAME(RR):
 
     def format_data(self):
         """Format CNAME RR data as a string.
-        
+
         :return: formatted data.
         :returntype: `str`"""
         return self.target
@@ -438,14 +438,14 @@ class RR_CNAME(RR):
         :returntype: `RR_CNAME`"""
         target,offset=domain_bin2str(packet,offset)
         return RR_CNAME(name,ttl,cls,target),offset
-        
+
     parse_bin_data=staticmethod(parse_bin_data)
 
 RR._add_record_type(RR_CNAME)
 
 class RR_SOA(RR):
     """'SOA' resource record.
-    
+
     :Ivariables:
         - `pri_master`: primary master nameserver for a zone.
         - `mailbox`: contact mailbox for a zone.
@@ -481,7 +481,7 @@ class RR_SOA(RR):
 
     def format_data(self):
         """Format SOA RR data as a string.
-        
+
         :return: formatted data.
         :returntype: `str`"""
         return "%s %s %i %i %i %i %i" % (self.pri_master,self.mailbox,self.serial,
@@ -522,14 +522,14 @@ class RR_SOA(RR):
         serial,refresh,retry,expire,minimum=struct.unpack("!IIIII",packet[offset:offset+20])
         offset+=20
         return RR_SOA(name,ttl,cls,pri_master,mailbox,serial,refresh,retry,expire,minimum),offset
-        
+
     parse_bin_data=staticmethod(parse_bin_data)
 
 RR._add_record_type(RR_SOA)
 
 class RR_SRV(RR):
     """'SRV' resource record.
-    
+
     :Ivariables:
         - `priority`: priority value of the SRV record.
         - `weight`: weight value of the SRV record.
@@ -555,7 +555,7 @@ class RR_SRV(RR):
 
     def format_data(self):
         """Format SRV RR data as a string.
-        
+
         :return: formatted data.
         :returntype: `str`"""
         return "%i %i %i %s" % (self.priority,self.weight,self.port,self.target)
@@ -621,7 +621,7 @@ class RR_SRV(RR):
         priority,weight,port=struct.unpack("!HHH",packet[offset:offset+6])
         target,offset=domain_bin2str(packet,offset+6)
         return RR_SRV(name,ttl,priority,weight,port,target),offset
-        
+
     parse_bin_data=staticmethod(parse_bin_data)
 
 RR._add_record_type(RR_SRV)
@@ -632,7 +632,7 @@ _add_query_type("AXFR",252)
 
 class Message:
     """DNS protocol message.
-    
+
     :Ivariables:
         - `id`: a message id.
         - `qr`: query/response flag.
@@ -828,7 +828,7 @@ def parse_question(packet,offset):
     :Parameters:
         - `packet`: the message packet.
         - `offset`: offset of the first byte of the field.
-        
+
     :Types:
         - `packet`: `str`
         - `offset`: `int`
@@ -848,7 +848,7 @@ def parse_message(packet):
 
     :Parameters:
         - `packet`: the message packet.
-        
+
     :return: new message object.
     :returntype: `Message`"""
     if len(packet)<12:

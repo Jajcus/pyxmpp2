@@ -17,9 +17,9 @@
 """Base classes for PyXMPP SASL implementation.
 
 Normative reference:
-  - `RFC 2222 <http://www.ietf.org/rfc/rfc2222.txt>`__ 
+  - `RFC 2222 <http://www.ietf.org/rfc/rfc2222.txt>`__
 """
-__revision__="$Id: core.py,v 1.13 2004/10/07 22:22:56 jajcus Exp $"
+__revision__="$Id: core.py,v 1.14 2004/10/07 22:28:51 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import random
@@ -31,13 +31,13 @@ class PasswordManager:
 
     Password manager is an object responsible for providing or verification
     of authentication credentials.
-    
+
     All the methods of `PasswordManager` class may be overriden in derived
     classes for specific authentication and authorization policy."""
     def __init__(self):
         """Initialize a `PasswordManager` object."""
         pass
-        
+
     def get_password(self,username,realm=None,acceptable_formats=("plain",)):
         """Get the password for user authentication.
 
@@ -53,7 +53,7 @@ class PasswordManager:
             - `acceptable_formats`: a sequence of acceptable formats of the
               password data. Could be "plain", "md5:user:realm:password" or any
               other mechanism-specific encoding. This allows non-plain-text
-              storage of passwords. But only "plain" format will work with 
+              storage of passwords. But only "plain" format will work with
               all password authentication mechanisms.
         :Types:
             - `username`: `unicode`
@@ -63,7 +63,7 @@ class PasswordManager:
         :return: the password and its encoding (format).
         :returntype: `unicode`,`str` tuple."""
         return None,None
-        
+
     def check_password(self,username,password,realm=None):
         """Check the password validity.
 
@@ -76,7 +76,7 @@ class PasswordManager:
 
         May be overrided e.g. to check the password against some external
         authentication mechanism (PAM, LDAP, etc.).
-        
+
         :Parameters:
             - `username`: the username for which the password verification is
               requested.
@@ -104,15 +104,15 @@ class PasswordManager:
             the client may choose its own realm then or use no realm at all.
         :returntype: `list` of `unicode`"""
         return []
-        
+
     def choose_realm(self,realm_list):
         """Choose an authentication realm from the list provided by the server.
 
         [client only]
 
         By default return the first realm from the list or `None` if the list
-        is empty. 
-        
+        is empty.
+
         :Parameters:
             - `realm_list`: the list of realms provided by a server.
         :Types:
@@ -133,7 +133,7 @@ class PasswordManager:
 
         By default return `True` if the `authzid` is `None` or empty or it is
         equal to extra_info["username"] (if the latter is present).
-        
+
         :Parameters:
             - `authzid`: an authorization id.
             - `extra_info`: information about an entity got during the
@@ -143,21 +143,21 @@ class PasswordManager:
         :Types:
             - `authzid`: `unicode`
             - `extra_info`: mapping
-            
+
         :return: `True` if the authenticated entity is authorized to use
             the provided authorization id.
         :returntype: `bool`"""
         if not extra_info:
             extra_info={}
-        return (not authzid 
-                or extra_info.has_key("username") 
+        return (not authzid
+                or extra_info.has_key("username")
                         and extra_info["username"]==authzid)
 
     def get_serv_type(self):
         """Return the service type for DIGEST-MD5 'digest-uri' field.
 
         Should be overriden in derived classes.
-        
+
         :return: the service type ("unknown" by default)"""
         return "unknown"
 
@@ -165,7 +165,7 @@ class PasswordManager:
         """Return the host name for DIGEST-MD5 'digest-uri' field.
 
         Should be overriden in derived classes.
-        
+
         :return: the host name ("unknown" by default)"""
         return "unknown"
 
@@ -173,7 +173,7 @@ class PasswordManager:
         """Return the service name for DIGEST-MD5 'digest-uri' field.
 
         Should be overriden in derived classes.
-        
+
         :return: the service name or `None` (which is the default)."""
         return None
 
@@ -191,7 +191,7 @@ class PasswordManager:
 
 class Reply:
     """Base class for SASL authentication reply objects.
-    
+
     :Ivariables:
         - `data`: optional reply data.
     :Types:
@@ -204,9 +204,9 @@ class Reply:
         :Types:
             - `data`: `str`"""
         self.data=data
-        
+
     def base64(self):
-        """Base64-encode the data contained in the reply. 
+        """Base64-encode the data contained in the reply.
 
         :return: base64-encoded data.
         :returntype: `str`"""
@@ -243,7 +243,7 @@ class Failure(Reply):
         - `reason`: unicode."""
     def __init__(self,reason):
         """Initialize the `Failure` object.
-        
+
         :Parameters:
             - `reason`: the failure reason.
         :Types:
@@ -257,7 +257,7 @@ class Success(Reply):
     """The success SASL message (sent by the server on authentication success)."""
     def __init__(self,username,realm=None,authzid=None,data=None):
         """Initialize the `Success` object.
-        
+
         :Parameters:
             - `username`: authenticated username (authentication id).
             - `realm`: authentication realm used.
@@ -293,7 +293,7 @@ class ClientAuthenticator:
             - `password_manager`: `PasswordManager`"""
         self.password_manager=password_manager
         self.__logger=logging.getLogger("pyxmpp.sasl.ClientAuthenticator")
-        
+
     def start(self,username,authzid):
         """Start the authentication process.
 
@@ -308,7 +308,7 @@ class ClientAuthenticator:
             indicator.
         :returntype: `Response` or `Failure`"""
         return Failure("Not implemented")
-        
+
     def challenge(self,challenge):
         """Process the server's challenge.
 
@@ -320,7 +320,7 @@ class ClientAuthenticator:
         :return: the response or a failure indicator.
         :returntype: `Response` or `Failure`"""
         return Failure("Not implemented")
-        
+
     def finish(self,data):
         """Handle authentication succes information from the server.
 
@@ -328,7 +328,7 @@ class ClientAuthenticator:
             - `data`: the optional additional data returned with the success.
         :Types:
             - `data`: `str`
-            
+
         :return: success or failure indicator.
         :returntype: `Success` or `Failure`"""
         return Failure("Not implemented")
@@ -350,7 +350,7 @@ class ServerAuthenticator:
             - `password_manager`: `PasswordManager`"""
         self.password_manager=password_manager
         self.__logger=logging.getLogger("pyxmpp.sasl.ServerAuthenticator")
-        
+
     def start(self,initial_response):
         """Start the authentication process.
 
@@ -364,7 +364,7 @@ class ServerAuthenticator:
         :return: a challenge, a success or a failure indicator.
         :returntype: `Challenge` or `Failure` or `Success`"""
         return Failure("not-authorized")
-        
+
     def response(self,response):
         """Process a response from a client.
 

@@ -17,11 +17,11 @@
 
 """Jabberd external component interface (jabber:component:accept).
 
-Normative reference: 
-  - `JEP 114 <http://www.jabber.org/jeps/jep-0114.html>`__ 
+Normative reference:
+  - `JEP 114 <http://www.jabber.org/jeps/jep-0114.html>`__
 """
 
-__revision__="$Id: component.py,v 1.10 2004/10/07 22:22:50 jajcus Exp $"
+__revision__="$Id: component.py,v 1.11 2004/10/07 22:28:45 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import threading
@@ -41,7 +41,7 @@ class Component:
     implementation.
 
     Override this class to build your components.
-    
+
     :Ivariables:
         - `jid`: component JID (should contain only the domain part).
         - `secret`: the authentication secret.
@@ -119,7 +119,7 @@ class Component:
 
         Set `self.stream` to the `pyxmpp.jabberd.ComponentStream` when
         initial connection succeeds.
-        
+
         :raise ComponentError: when some of the component properties
           (`self.jid`, `self.secret`,`self.server` or `self.port`) are wrong."""
         if not self.jid or self.jid.node or self.jid.resource:
@@ -163,7 +163,7 @@ class Component:
 
     def get_stream(self):
         """Get the stream of the component in a safe way.
-        
+
         :return: Stream object for the component or `None` if no connection is
             active.
         :returntype: `pyxmpp.jabberd.ComponentStream`"""
@@ -180,7 +180,7 @@ class Component:
 
     def socket(self):
         """Get the socket of the connection to the server.
-        
+
         :return: the socket.
         :returntype: `socket.socket`"""
         return self.stream.socket
@@ -286,9 +286,9 @@ class Component:
         """Handle stream creation event.
 
         [may be overriden in derived classes]
-        
+
         By default: do nothing.
-        
+
         :Parameters:
             - `stream`: the stream just created.
         :Types:
@@ -299,9 +299,9 @@ class Component:
         """Handle stream closure event.
 
         [may be overriden in derived classes]
-        
+
         By default: do nothing.
-        
+
         :Parameters:
             - `stream`: the stream just created.
         :Types:
@@ -314,7 +314,7 @@ class Component:
         [may be overriden in derived classes]
 
         By default: just log it. The stream will be closed anyway.
-        
+
         :Parameters:
             - `err`: the error element received.
         :Types:
@@ -326,9 +326,9 @@ class Component:
         """Handle a stream state change.
 
         [may be overriden in derived classes]
-        
+
         By default: do nothing.
-        
+
         :Parameters:
             - `state`: state name.
             - `arg`: state parameter.
@@ -341,7 +341,7 @@ class Component:
         """Handle stream connection event.
 
         [may be overriden in derived classes]
-        
+
         By default: do nothing."""
         pass
 
@@ -349,7 +349,7 @@ class Component:
         """Handle successful authentication event.
 
         A good place to register stanza handlers and disco features.
-        
+
         [should be overriden in derived classes]
 
         By default: set disco#info and disco#items handlers."""
@@ -409,7 +409,7 @@ class Component:
         """Handle stream disconnection (connection closed by peer) event.
 
         [may be overriden in derived classes]
-        
+
         By default: do nothing."""
         pass
 

@@ -17,10 +17,10 @@
 """DIGEST-MD5 authentication mechanism for PyXMPP SASL implementation.
 
 Normative reference:
-  - `RFC 2831 <http://www.ietf.org/rfc/rfc2831.txt>`__ 
+  - `RFC 2831 <http://www.ietf.org/rfc/rfc2831.txt>`__
 """
 
-__revision__="$Id: digest_md5.py,v 1.22 2004/10/07 22:22:56 jajcus Exp $"
+__revision__="$Id: digest_md5.py,v 1.23 2004/10/07 22:28:51 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 from binascii import b2a_hex
@@ -57,12 +57,12 @@ def _quote(s):
     """Prepare a string for quoting for DIGEST-MD5 challenge or response.
 
     Don't add the quotes, only escape '"' and "\\" with backslashes.
-    
+
     :Parameters:
         - `s`: a raw string.
     :Types:
         - `s`: `str`
-        
+
     :return: `s` with '"' and "\\" escaped using "\\".
     :returntype: `str`"""
     s=s.replace('\\','\\\\')
@@ -71,26 +71,26 @@ def _quote(s):
 
 def _h_value(s):
     """H function of the DIGEST-MD5 algorithm (MD5 sum).
-    
+
     :Parameters:
         - `s`: a string.
     :Types:
         - `s`: `str`
-        
+
     :return: MD5 sum of the string.
     :returntype: `str`"""
     return md5.new(s).digest()
 
 def _kd_value(k,s):
     """KD function of the DIGEST-MD5 algorithm.
- 
+
     :Parameters:
         - `k`: a string.
         - `s`: a string.
     :Types:
         - `k`: `str`
         - `s`: `str`
-        
+
     :return: MD5 sum of the strings joined with ':'.
     :returntype: `str`"""
     return _h_value("%s:%s" % (k,s))
@@ -176,13 +176,13 @@ _param_re=re.compile(r'^(?P<var>[^=]+)\=(?P<val>(\"(([^"\\]+)|(\\\")'
 
 class DigestMD5ClientAuthenticator(ClientAuthenticator):
     """Provides PLAIN SASL authentication for a client.
-    
+
     :Ivariables:
         - `password`: current authentication password
         - `pformat`: current authentication password format
         - `realm`: current authentication realm
     """
-    
+
     def __init__(self,password_manager):
         """Initialize a `DigestMD5ClientAuthenticator` object.
 
@@ -204,14 +204,14 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 
     def start(self,username,authzid):
         """Start the authentication process initializing client state.
-        
+
         :Parameters:
             - `username`: username (authentication id).
             - `authzid`: authorization id.
         :Types:
             - `username`: `unicode`
             - `authzid`: `unicode`
-        
+
         :return: the (empty) initial response
         :returntype: `sasl.Response` or `sasl.Failure`"""
         self.username=from_utf8(username)
@@ -229,12 +229,12 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 
     def challenge(self,challenge):
         """Process a challenge and return the response.
-        
+
         :Parameters:
-            - `challenge`: the challenge from server. 
+            - `challenge`: the challenge from server.
         :Types:
             - `challenge`: `str`
-       
+
         :return: the response or a failure indicator.
         :returntype: `sasl.Response` or `sasl.Failure`"""
         if not challenge:
@@ -306,7 +306,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
             - `charset`: `str`
             - `realms`: `str`
             - `nonce`: `str`
-       
+
         :return: the response or a failure indicator.
         :returntype: `sasl.Response` or `sasl.Failure`"""
         params=[]
@@ -410,12 +410,12 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 
     def _final_challenge(self,challenge):
         """Process the second challenge from the server and return the response.
-        
+
         :Parameters:
-            - `challenge`: the challenge from server. 
+            - `challenge`: the challenge from server.
         :Types:
             - `challenge`: `str`
-       
+
         :return: the response or a failure indicator.
         :returntype: `sasl.Response` or `sasl.Failure`"""
         if self.rspauth_checked:
@@ -449,12 +449,12 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 
         Process any addicional data passed with the success.
         Fail if the server was not authenticated.
-        
+
         :Parameters:
             - `data`: an optional additional data with success.
         :Types:
             - `data`: `str`
-            
+
         :return: success or failure indicator.
         :returntype: `sasl.Success` or `sasl.Failure`"""
         if self.rspauth_checked:
@@ -467,7 +467,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 
 class DigestMD5ServerAuthenticator(ServerAuthenticator):
     """Provides DIGEST-MD5 SASL authentication for a server."""
-    
+
     def __init__(self,password_manager):
         """Initialize a `DigestMD5ServerAuthenticator` object.
 
@@ -487,13 +487,13 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 
     def start(self,response):
         """Start the authentication process.
-        
+
         :Parameters:
             - `response`: the initial response from the client (empty for
               DIGEST-MD5).
         :Types:
             - `response`: `str`
-        
+
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
         self.last_nonce_count=0
@@ -518,12 +518,12 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 
     def response(self,response):
         """Process a client reponse.
-        
+
         :Parameters:
             - `response`: the response from the client.
         :Types:
             - `response`: `str`
-        
+
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
         if self.done:
@@ -534,12 +534,12 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 
     def _parse_response(self,response):
         """Parse a client reponse and pass to further processing.
-        
+
         :Parameters:
             - `response`: the response from the client.
         :Types:
             - `response`: `str`
-        
+
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
         response=response.split('\x00')[0] # workaround for some SASL implementations
@@ -591,12 +591,12 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
                     return Failure("not-authorized")
         return self._check_params(username,realm,cnonce,digest_uri,
                 response_val,authzid,nonce_count)
-                
+
     def _check_params(self,username,realm,cnonce,digest_uri,
             response_val,authzid,nonce_count):
         """Check parameters of a client reponse and pass them to further
         processing.
-        
+
         :Parameters:
             - `username`: user name.
             - `realm`: realm.
@@ -613,7 +613,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
             - `response_val`: `str`
             - `authzid`: `str`
             - `nonce_count`: `int`
-        
+
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
         if not cnonce:
@@ -633,11 +633,11 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
             return Failure("not-authorized")
         return self._make_final_challenge(username,realm,cnonce,digest_uri,
                 response_val,authzid,nonce_count)
-                
+
     def _make_final_challenge(self,username,realm,cnonce,digest_uri,
             response_val,authzid,nonce_count):
         """Send the second challenge in reply to the client response.
-        
+
         :Parameters:
             - `username`: user name.
             - `realm`: realm.
@@ -654,7 +654,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
             - `response_val`: `str`
             - `authzid`: `str`
             - `nonce_count`: `int`
-        
+
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
         username_uq=from_utf8(username.replace('\\',''))

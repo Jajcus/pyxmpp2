@@ -17,11 +17,11 @@
 
 """Delayed delivery mark (jabber:x:delay) handling.
 
-Normative reference: 
-  - `JEP 91 <http://www.jabber.org/jeps/jep-0091.html>`__ 
+Normative reference:
+  - `JEP 91 <http://www.jabber.org/jeps/jep-0091.html>`__
 """
 
-__revision__="$Id: delay.py,v 1.9 2004/10/07 22:22:43 jajcus Exp $"
+__revision__="$Id: delay.py,v 1.10 2004/10/07 22:28:11 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -77,7 +77,7 @@ class Delay:
 
     def from_xml(self,node):
         """Initialize Delay object from an XML node.
-        
+
         :Parameters:
             - `node`: the jabber:x:delay XML element.
         :Types:

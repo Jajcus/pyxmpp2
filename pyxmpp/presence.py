@@ -17,11 +17,11 @@
 
 """Presence XMPP stanza handling
 
-Normative reference: 
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+Normative reference:
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: presence.py,v 1.26 2004/10/07 22:22:34 jajcus Exp $"
+__revision__="$Id: presence.py,v 1.27 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -96,10 +96,10 @@ class Presence(Stanza):
 
         if node is None:
             node="presence"
-            
-        Stanza.__init__(self, node, from_jid=from_jid, to_jid=to_jid, stanza_type=stanza_type, 
+
+        Stanza.__init__(self, node, from_jid=from_jid, to_jid=to_jid, stanza_type=stanza_type,
                 stanza_id=stanza_id, error=error, error_cond=error_cond)
-       
+
         if show:
             self.node.newTextChild(None,"show",to_utf8(show))
         if status:
@@ -109,13 +109,13 @@ class Presence(Stanza):
 
     def copy(self):
         """Create a deep copy of the presence stanza.
-        
+
         :returntype: `Presence`"""
         return Presence(self)
 
     def set_status(self,status):
         """Change presence status description.
-        
+
         :Parameters:
             - `status`: descriptive text for the presence stanza.
         :Types:
@@ -134,7 +134,7 @@ class Presence(Stanza):
 
     def get_status(self):
         """Get presence status description.
-        
+
         :return: value of stanza's <status/> field.
         :returntype: `unicode`"""
         n=self.xpath_eval("status")
@@ -145,7 +145,7 @@ class Presence(Stanza):
 
     def get_show(self):
         """Get presence "show" field.
-        
+
         :return: value of stanza's <show/> field.
         :returntype: `unicode`"""
         n=self.xpath_eval("show")
@@ -156,7 +156,7 @@ class Presence(Stanza):
 
     def set_show(self,show):
         """Change presence "show" field.
-        
+
         :Parameters:
             - `show`: new value for the "show" field of presence stanza. One
               of: None, "away", "xa", "dnd", "chat".
@@ -176,7 +176,7 @@ class Presence(Stanza):
 
     def get_priority(self):
         """Get presence priority.
-        
+
         :return: value of stanza's priority. 0 if the stanza doesn't contain
             <priority/> element.
         :returntype: `int`"""
@@ -191,7 +191,7 @@ class Presence(Stanza):
 
     def set_priority(self,priority):
         """Change presence priority.
-        
+
         :Parameters:
             - `priority`: new presence priority.
         :Types:
@@ -251,7 +251,7 @@ class Presence(Stanza):
 
         :return: new presence stanza.
         :returntype: `Presence`"""
-        
+
         if self.get_type() == "error":
             raise StanzaError,"Errors may not be generated in response to errors"
 

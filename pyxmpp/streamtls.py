@@ -17,11 +17,11 @@
 
 """TLS support for XMPP streams.
 
-Normative reference: 
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+Normative reference:
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: streamtls.py,v 1.3 2004/10/07 22:22:36 jajcus Exp $"
+__revision__="$Id: streamtls.py,v 1.4 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import socket
@@ -70,7 +70,7 @@ class TLSSettings:
             cert_file=None,key_file=None,cacert_file=None,
             verify_callback=None,ctx=None):
         """Initialize the TLSSettings object.
-        
+
         :Parameters:
             - `require`:  is TLS required
             - `verify_peer`: should the peer's certificate be verified
@@ -89,7 +89,7 @@ class TLSSettings:
 
 class StreamTLSMixIn:
     """Mix-in class providing TLS support for an XMPP stream.
-    
+
     :Ivariables:
         - `tls`: TLS connection object.
     """
@@ -119,7 +119,7 @@ class StreamTLSMixIn:
             - `features`: the <features/> element of the stream.
         :Types:
             - `features`: `libxml2.xmlNode`
-        
+
         :returns: updated <features/> element node.
         :returntype: `libxml2.xmlNode`"""
         if self.tls_settings and not self.tls:
@@ -168,12 +168,12 @@ class StreamTLSMixIn:
 
     def _process_node_tls(self,node):
         """Process incoming stream element. Pass it to _process_tls_node
-        if it is in TLS namespace. 
+        if it is in TLS namespace.
 
         :raise StreamEncryptionRequired: if encryption is required by current
           configuration, it is not active and the element is not in the TLS
           namespace nor in the stream namespace.
-        
+
         :return: `True` when the node was recognized as TLS element.
         :returntype: `bool`"""
         ns_uri=node.ns().getContent()
@@ -215,7 +215,7 @@ class StreamTLSMixIn:
                     self._request_tls()
             else:
                 self.__logger.debug("StartTLS not negotiated")
-        
+
     def _request_tls(self):
         """Request a TLS-encrypted connection.
 
@@ -232,7 +232,7 @@ class StreamTLSMixIn:
 
     def _process_tls_node(self,node):
         """Process stream element in the TLS namespace.
-        
+
         :Parameters:
             - `node`: the XML node received
         """
@@ -307,14 +307,14 @@ class StreamTLSMixIn:
 
     def _tls_verify_callback(self,ssl_ctx_ptr, x509_ptr, errnum, depth, ok):
         """Certificate verification callback for TLS connections.
-        
+
         :Parameters:
             - `ssl_ctx_ptr`: TLS context pointer.
             - `x509_ptr`: X.509 certificate pointer.
             - `errnum`: error number.
             - `depth`: verification depth.
             - `ok`: current verification result.
-            
+
         :return: computed verification result."""
         try:
             self.__logger.debug("tls_verify_callback(depth=%i,ok=%i)" % (depth,ok))

@@ -17,11 +17,11 @@
 
 """jid -- Jabber ID handling
 
-Normative reference: 
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+Normative reference:
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: jid.py,v 1.30 2004/10/07 22:22:34 jajcus Exp $"
+__revision__="$Id: jid.py,v 1.31 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import re
@@ -59,14 +59,14 @@ class JID(object):
         - `node`: node part of the JID
         - `domain`: domain part of the JID
         - `resource`: resource part of the JID
-    
+
     JID objects are immutable. They are also cached for better performance.
     """
     cache=weakref.WeakValueDictionary()
     __slots__=["node","domain","resource","__weakref__"]
     def __new__(cls,node_or_jid=None,domain=None,resource=None,check=True):
         """Create a new JID object or take one from the cache.
-        
+
         :Parameters:
             - `node_or_jid`: node part of the JID, JID object to copy or
               Unicode representation of the JID.
@@ -113,7 +113,7 @@ class JID(object):
 
     def __from_string(self,s,check=True):
         """Initialize JID object from UTF-8 string.
-        
+
         :Parameters:
             - `s`: the JID string
             - `check`: when `False` then the JID is not checked for
@@ -122,7 +122,7 @@ class JID(object):
 
     def __from_unicode(self,s,check=True):
         """Initialize JID object from Unicode string.
-        
+
         :Parameters:
             - `s`: the JID string
             - `check`: when `False` then the JID is not checked for
@@ -176,7 +176,7 @@ class JID(object):
 
         :raise JIDError: if the domain name is too long."""
 
-        if s: 
+        if s:
             s=from_utf8(s)
         if s is None:
             raise JIDError,"Domain must be given"
@@ -214,19 +214,19 @@ class JID(object):
 
     def as_utf8(self):
         """UTF-8 encoded JID representation.
-        
+
         :return: UTF-8 encoded JID."""
         return self.as_unicode().encode("utf-8")
 
     def as_string(self):
         """UTF-8 encoded JID representation.
-        
+
         :return: UTF-8 encoded JID."""
         return self.as_utf8()
 
     def as_unicode(self):
         """Unicode string JID representation.
-        
+
         :return: JID as Unicode string."""
         r=self.domain
         if self.node:
@@ -239,7 +239,7 @@ class JID(object):
 
     def bare(self):
         """Make bare JID made by removing resource from current `self`.
-        
+
         :return: new JID object without resource part."""
         return JID(self.node,self.domain,check=False)
 

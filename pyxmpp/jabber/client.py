@@ -19,12 +19,12 @@
 Extends `pyxmpp.client` interface with legacy authentication
 and basic Service Discovery handling.
 
-Normative reference: 
-  - `JEP 78 <http://www.jabber.org/jeps/jep-0078.html>`__ 
-  - `JEP 30 <http://www.jabber.org/jeps/jep-0030.html>`__ 
+Normative reference:
+  - `JEP 78 <http://www.jabber.org/jeps/jep-0078.html>`__
+  - `JEP 30 <http://www.jabber.org/jeps/jep-0030.html>`__
 """
 
-__revision__="$Id: client.py,v 1.11 2004/10/07 22:22:42 jajcus Exp $"
+__revision__="$Id: client.py,v 1.12 2004/10/07 22:28:11 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import logging

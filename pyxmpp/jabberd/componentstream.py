@@ -16,11 +16,11 @@
 #
 """Component (jabber:component:accept) stream handling.
 
-Normative reference: 
-  - `JEP 114 <http://www.jabber.org/jeps/jep-0114.html>`__ 
+Normative reference:
+  - `JEP 114 <http://www.jabber.org/jeps/jep-0114.html>`__
 """
 
-__revision__="$Id: componentstream.py,v 1.14 2004/10/07 22:22:50 jajcus Exp $"
+__revision__="$Id: componentstream.py,v 1.15 2004/10/07 22:28:45 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import sha
@@ -51,10 +51,10 @@ class ComponentStream(Stream):
         - `server`: `unicode`
         - `port`: `int`
         - `secret`: `unicode`"""
-        
+
     def __init__(self,jid,secret,server,port,keepalive=0):
         """Initialize a `ComponentStream` object.
-        
+
         :Parameters:
             - `jid`: JID of the component.
             - `secret`: authentication secret.
@@ -87,7 +87,7 @@ class ComponentStream(Stream):
               then use the one specified when creating the object.
             - `port`: port number of the server to use.  If not given then use
               the one specified when creating the object.
-              
+
         :Types:
             - `server`: `unicode`
             - `port`: `int`"""
@@ -122,7 +122,7 @@ class ComponentStream(Stream):
         """Process <stream:stream> (stream start) tag received from peer.
 
         Call `Stream.stream_start`, but ignore any `HostMismatch` error.
-        
+
         :Parameters:
             - `doc`: document created by the parser"""
         try:
@@ -164,7 +164,7 @@ class ComponentStream(Stream):
         Handle component handshake (authentication) element, and
         treat elements in "jabber:component:accept", "jabber:client"
         and "jabber:server" equally (pass to `self.process_stanza`).
-        All other elements are passed to `Stream._process_node`. 
+        All other elements are passed to `Stream._process_node`.
 
         :Parameters:
             - `node`: XML node describing the element

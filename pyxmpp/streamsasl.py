@@ -17,11 +17,11 @@
 
 """SASL support XMPP streams.
 
-Normative reference: 
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+Normative reference:
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: streamsasl.py,v 1.3 2004/10/07 22:22:36 jajcus Exp $"
+__revision__="$Id: streamsasl.py,v 1.4 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import base64
@@ -71,7 +71,7 @@ class StreamSASLMixIn(sasl.PasswordManager):
         """Add SASL features to the <features/> element of the stream.
 
         [receving entity only]
-        
+
         :returns: update <features/> element node."""
         if self.sasl_mechanisms and not self.authenticated:
             ml=features.newChild(None,"mechanisms",None)
@@ -104,7 +104,7 @@ class StreamSASLMixIn(sasl.PasswordManager):
 
     def _process_node_sasl(self,node):
         """Process incoming stream element. Pass it to _process_sasl_node
-        if it is in the SASL namespace. 
+        if it is in the SASL namespace.
 
         :return: `True` when the node was recognized as a SASL element.
         :returntype: `bool`"""
@@ -116,7 +116,7 @@ class StreamSASLMixIn(sasl.PasswordManager):
 
     def _process_sasl_node(self,node):
         """Process stream element in the SASL namespace.
-        
+
         :Parameters:
             - `node`: the XML node received
         """
@@ -348,7 +348,7 @@ class StreamSASLMixIn(sasl.PasswordManager):
         """Start SASL authentication process.
 
         [initiating entity only]
-        
+
         :Parameters:
             - `username`: user name.
             - `authzid`: authorization ID.

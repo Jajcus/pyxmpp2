@@ -17,11 +17,11 @@
 
 """Message XMPP stanza handling
 
-Normative reference: 
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+Normative reference:
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: message.py,v 1.23 2004/10/07 22:22:34 jajcus Exp $"
+__revision__="$Id: message.py,v 1.24 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -79,7 +79,7 @@ class Message(Stanza):
 
         Stanza.__init__(self, node, from_jid=from_jid, to_jid=to_jid,
                 stanza_type=stanza_type,stanza_id=stanza_id, error=error, error_cond=error_cond)
-        
+
         if subject is not None:
             self.node.newTextChild(None,"subject",to_utf8(subject))
         if body is not None:
@@ -89,7 +89,7 @@ class Message(Stanza):
 
     def get_subject(self):
         """Get the message subject.
-        
+
         :return: the message subject or `None` if there is no subject.
         :returntype: `unicode`"""
         n=self.xpath_eval("subject")
@@ -100,7 +100,7 @@ class Message(Stanza):
 
     def get_thread(self):
         """Get the thread-id subject.
-        
+
         :return: the thread-id or `None` if there is no thread-id.
         :returntype: `unicode`"""
         n=self.xpath_eval("thread")
@@ -111,13 +111,13 @@ class Message(Stanza):
 
     def copy(self):
         """Create a deep copy of the message stanza.
-        
+
         :returntype: `Message`"""
         return Message(self)
 
     def get_body(self):
         """Get the body of the message.
-        
+
         :return: the body of the message or `None` if there is no body.
         :returntype: `unicode`"""
         n=self.xpath_eval("body")

@@ -16,11 +16,11 @@
 #
 """Jabber Multi-User Chat implementation.
 
-Normative reference: 
-  - `JEP 45 <http://www.jabber.org/jeps/jep-0045.html>`__ 
+Normative reference:
+  - `JEP 45 <http://www.jabber.org/jeps/jep-0045.html>`__
 """
 
-__revision__="$Id: muc.py,v 1.26 2004/10/07 22:22:43 jajcus Exp $"
+__revision__="$Id: muc.py,v 1.27 2004/10/07 22:28:11 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -526,7 +526,7 @@ class MucRoomHandler:
         :Parameters:
             - `user`: the user joining.
             - `stanza`: the stanza received.
-        
+
         :Types:
             - `user`: `MucRoomUser`
             - `stanza`: `pyxmpp.stanza.Stanza`
@@ -540,7 +540,7 @@ class MucRoomHandler:
         :Parameters:
             - `user`: the user leaving.
             - `stanza`: the stanza received.
-        
+
         :Types:
             - `user`: `MucRoomUser`
             - `stanza`: `pyxmpp.stanza.Stanza`
@@ -556,7 +556,7 @@ class MucRoomHandler:
             - `old_role`: user's role before update.
             - `new_role`: user's role after update.
             - `stanza`: the stanza received.
-        
+
         :Types:
             - `user`: `MucRoomUser`
             - `old_role`: `unicode`
@@ -600,7 +600,7 @@ class MucRoomHandler:
             - `user`: the user (after update).
             - `old_nick`: the old nick.
             - `stanza`: the stanza received.
-        
+
         :Types:
             - `user`: `MucRoomUser`
             - `old_nick`: `unicode`
@@ -616,7 +616,7 @@ class MucRoomHandler:
         :Parameters:
             - `user`: MucRoomUser object describing the user.
             - `stanza`: the stanza received.
-            
+
         :Types:
             - `user`: `MucRoomUser`
             - `stanza`: `pyxmpp.stanza.Stanza`
@@ -630,7 +630,7 @@ class MucRoomHandler:
         :Parameters:
             - `user`: the user changing the subject.
             - `stanza`: the stanza used to change the subject.
-            
+
         :Types:
             - `user`: `MucRoomUser`
             - `stanza`: `pyxmpp.stanza.Stanza`
@@ -644,7 +644,7 @@ class MucRoomHandler:
         :Parameters:
             - `user`: the sender.
             - `stanza`: is the message stanza received.
-            
+
         :Types:
             - `user`: `MucRoomUser`
             - `stanza`: `pyxmpp.stanza.Stanza`
@@ -942,7 +942,7 @@ class MucRoomManager:
     :Ivariables:
       - `rooms`: a dictionary containing known MUC rooms. Unicode room JIDs are the
         keys.
-    
+
     """
     def __init__(self,stream):
         """

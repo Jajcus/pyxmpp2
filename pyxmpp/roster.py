@@ -18,10 +18,10 @@
 """XMPP-IM roster handling.
 
 Normative reference:
-  - `RFC 3921 <http://www.ietf.org/rfc/rfc3921.txt>`__ 
+  - `RFC 3921 <http://www.ietf.org/rfc/rfc3921.txt>`__
 """
 
-__revision__="$Id: roster.py,v 1.23 2004/10/07 22:22:35 jajcus Exp $"
+__revision__="$Id: roster.py,v 1.24 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 from types import StringType,UnicodeType
@@ -44,7 +44,7 @@ class RosterItem:
     def __init__(self,node_or_jid,subscription="none",name=None,groups=(),ask=None):
         """
         Initialize a roster item from XML node or jid and optional attributes.
-        
+
         :Parameters:
             - `node_or_jid`: XML node or JID
             - `subscription`: subscription type ("none", "to", "from" or "both"

@@ -17,12 +17,12 @@
 
 """XMPP error handling.
 
-Normative reference: 
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
-  - `JEP 86 <http://www.jabber.org/jeps/jep-0086.html>`__ 
+Normative reference:
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
+  - `JEP 86 <http://www.jabber.org/jeps/jep-0086.html>`__
 """
 
-__revision__="$Id: error.py,v 1.25 2004/10/07 22:22:34 jajcus Exp $"
+__revision__="$Id: error.py,v 1.26 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -284,7 +284,7 @@ class ErrorNode:
 
     def is_legacy(self):
         """Check if the error node is a legacy error element.
-        
+
         :return: `True` if it is a legacy error.
         :returntype: `bool`"""
         return not self.node.hasProp("type")
@@ -319,7 +319,7 @@ class ErrorNode:
               the XMPP namespace of the error element.
         :Types:
             - `ns`: `unicode`
-        
+
         :return: the condition element or `None`.
         :returntype: `libxml2.xmlNode`"""
         if ns is None:

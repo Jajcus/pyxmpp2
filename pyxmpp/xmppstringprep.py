@@ -17,11 +17,11 @@
 
 """Nodeprep and resourceprep stringprep profiles.
 
-Normative reference: 
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+Normative reference:
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: xmppstringprep.py,v 1.15 2004/10/07 22:22:36 jajcus Exp $"
+__revision__="$Id: xmppstringprep.py,v 1.16 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 from types import ListType
@@ -30,7 +30,7 @@ import unicodedata
 
 class LookupFunction:
     """Class for looking up RFC 3454 tables using function.
-    
+
     :Ivariables:
         - `lookup`: the lookup function."""
     def __init__(self,function):
@@ -52,13 +52,13 @@ class LookupTable:
               to the value."""
         self.singles=singles
         self.ranges=ranges
-        
+
     def lookup(self,c):
         """Do Unicode character lookup.
-        
+
         :Parameters:
             - `c`: Unicode character to look up.
-        
+
         :return: the mapped value."""
         if self.singles.has_key(c):
             return self.singles[c]
@@ -74,10 +74,10 @@ A_1=LookupFunction(stringprep.in_table_a1)
 
 def b1_mapping(uc):
     """Do RFC 3454 B.1 table mapping.
-    
+
     :Parameters:
         - `uc`: Unicode character to map.
-        
+
     :returns: u"" if there is `uc` code in the table, `None` otherwise."""
     if stringprep.in_table_b1(uc):
         return u""
@@ -139,12 +139,12 @@ class Profile:
     def prepare(self,data):
         """Complete string preparation procedure for 'stored' strings.
         (includes checks for unassigned codes)
-        
+
         :Parameters:
             - `data`: Unicode string to prepare.
-            
+
         :return: prepared string
-       
+
         :raise StringprepError: if the preparation fails
         """
         r=self.cache.get(data)
@@ -174,12 +174,12 @@ class Profile:
     def prepare_query(self,s):
         """Complete string preparation procedure for 'query' strings.
         (without checks for unassigned codes)
- 
+
         :Parameters:
             - `s`: Unicode string to prepare.
-            
+
         :return: prepared string
-       
+
         :raise StringprepError: if the preparation fails
         """
 

@@ -17,11 +17,11 @@
 
 """Handling of XMPP stanzas.
 
-Normative reference: 
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+Normative reference:
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: stanzaprocessor.py,v 1.5 2004/10/07 22:22:35 jajcus Exp $"
+__revision__="$Id: stanzaprocessor.py,v 1.6 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -34,7 +34,7 @@ class StanzaProcessor:
     """Universal stanza handler/router class.
 
     Provides facilities to set up custom handlers for various types of stanzas.
-    
+
     :Ivariables:
         - `lock`: lock object used to synchronize access to the
           `StanzaProcessor` object.
@@ -115,14 +115,14 @@ class StanzaProcessor:
     def __try_handlers(self,handler_list,typ,stanza):
         """ Search the handler list for handlers matching
         given stanza type and payload namespace. Run the
-        handlers found ordering them by priority until 
+        handlers found ordering them by priority until
         the first one which returns `True`.
 
         :Parameters:
             - `handler_list`: list of available handlers
             - `typ`: stanza type (value of its "type" attribute)
             - `stanza`: the stanza to handle
-        
+
         :return: result of the last handler or `False` if no
             handler was found."""
         namespaces=[]
@@ -216,11 +216,11 @@ class StanzaProcessor:
         to `self.me` and `self.process_all_stanzas` is not True. Otherwise
         stanza is passwd to `self.process_iq()`, `self.process_message()`
         or `self.process_presence()` appropriately.
-        
+
         :Parameters:
             - `stanza`: the stanza received.
         """
-        
+
         self.fix_in_stanza(stanza)
         to=stanza.get_to()
 
@@ -434,7 +434,7 @@ class StanzaProcessor:
     def send(self,stanza):
         """Send a stanza somwhere. This one does nothing. Should be overriden
         in derived classes.
-        
+
         :Parameters:
             - `stanza`: the stanza to send.
         :Types:

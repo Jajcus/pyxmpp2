@@ -18,11 +18,11 @@
 """DNS resolever with SRV record support.
 
 Normative reference:
-  - `RFC 1035 <http://www.ietf.org/rfc/rfc1035.txt>`__ 
-  - `RFC 2782 <http://www.ietf.org/rfc/rfc2782.txt>`__ 
+  - `RFC 1035 <http://www.ietf.org/rfc/rfc1035.txt>`__
+  - `RFC 2782 <http://www.ietf.org/rfc/rfc2782.txt>`__
 """
 
-__revision__="$Id: resolver.py,v 1.16 2004/10/07 22:22:34 jajcus Exp $"
+__revision__="$Id: resolver.py,v 1.17 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import socket
@@ -78,9 +78,9 @@ def query(name,rr_type):
     :Types:
         - `name`: `unicode`
         - `rr_type`: `string`
-    
+
     :raise DNSError: on error.
-        
+
     :return: Records found.
     :returntype: `list` of `dns.RR`"""
     if search_list:
@@ -105,7 +105,7 @@ def check_cache(name,rr_type):
     :Types:
         - `name`: `unicode`
         - `rr_type`: `string`
-        
+
     :return: Records found or `None`.
     :returntype: `list` of `dns.RR`"""
     if not cache.has_key((name,rr_type)):
@@ -148,9 +148,9 @@ def do_query(name,rr_type):
     :Types:
         - `name`: `unicode`
         - `rr_type`: `string`
-    
+
     :raise DNSError: on error.
-        
+
     :return: Records found.
     :returntype: `list` of `dns.RR`"""
     ret=check_cache(name,rr_type)
@@ -280,7 +280,7 @@ def reorder_srv(records):
 def resolve_srv(domain,service,proto="tcp"):
     """Resolve service domain to server name and port number using SRV records.
 
-    A built-in service alias table will be used to lookup also some obsolete 
+    A built-in service alias table will be used to lookup also some obsolete
     record names.
 
     :Parameters:
@@ -310,7 +310,7 @@ def resolve_srv(domain,service,proto="tcp"):
 
 def getaddrinfo(host,port,family=0,socktype=socket.SOCK_STREAM,proto=0):
     """Resolve host and port into addrinfo struct.
-    
+
     Does the same thing as socket.getaddrinfo, but using `pyxmpp.resolver`. This
     makes it possible to reuse data (A records from the additional section of
     DNS reply) returned with SRV records lookup done using this module.

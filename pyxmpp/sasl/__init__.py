@@ -17,10 +17,10 @@
 """SASL authentication implementaion for PyXMPP.
 
 Normative reference:
-  - `RFC 2222 <http://www.ietf.org/rfc/rfc2222.txt>`__ 
+  - `RFC 2222 <http://www.ietf.org/rfc/rfc2222.txt>`__
 """
 
-__revision__="$Id: __init__.py,v 1.9 2004/10/07 22:22:56 jajcus Exp $"
+__revision__="$Id: __init__.py,v 1.10 2004/10/07 22:28:51 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import random

@@ -17,10 +17,10 @@
 """PLAIN authentication mechanism for PyXMPP SASL implementation.
 
 Normative reference:
-  - `RFC 2595 <http://www.ietf.org/rfc/rfc2595.txt>`__ 
+  - `RFC 2595 <http://www.ietf.org/rfc/rfc2595.txt>`__
 """
 
-__revision__="$Id: plain.py,v 1.13 2004/10/07 22:22:57 jajcus Exp $"
+__revision__="$Id: plain.py,v 1.14 2004/10/07 22:28:51 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import logging
@@ -31,7 +31,7 @@ from pyxmpp.sasl.core import Success,Failure,Challenge,Response
 
 class PlainClientAuthenticator(ClientAuthenticator):
     """Provides PLAIN SASL authentication for a client."""
-    
+
     def __init__(self,password_manager):
         """Initialize a `PlainClientAuthenticator` object.
 
@@ -49,14 +49,14 @@ class PlainClientAuthenticator(ClientAuthenticator):
 
     def start(self,username,authzid):
         """Start the authentication process and return the initial response.
-        
+
         :Parameters:
             - `username`: username (authentication id).
             - `authzid`: authorization id.
         :Types:
             - `username`: `unicode`
             - `authzid`: `unicode`
-        
+
         :return: the initial response or a failure indicator.
         :returntype: `sasl.Response` or `sasl.Failure`"""
         self.username=username
@@ -69,12 +69,12 @@ class PlainClientAuthenticator(ClientAuthenticator):
 
     def challenge(self,challenge):
         """Process the challenge and return the response.
-        
+
         :Parameters:
             - `challenge`: the challenge.
         :Types:
             - `challenge`: `str`
-       
+
         :return: the response or a failure indicator.
         :returntype: `sasl.Response` or `sasl.Failure`"""
         if self.finished:
@@ -97,14 +97,14 @@ class PlainClientAuthenticator(ClientAuthenticator):
             - `data`: the optional additional data returned with the success.
         :Types:
             - `data`: `str`
-            
+
         :return: a success indicator.
         :returntype: `Success`"""
         return Success(self.username,None,self.authzid)
 
 class PlainServerAuthenticator(ServerAuthenticator):
     """Provides PLAIN SASL authentication for a server."""
-    
+
     def __init__(self,password_manager):
         """Initialize a `PlainServerAuthenticator` object.
 
@@ -118,26 +118,26 @@ class PlainServerAuthenticator(ServerAuthenticator):
 
     def start(self,response):
         """Start the authentication process.
-        
+
         :Parameters:
             - `response`: the initial response from the client.
         :Types:
             - `response`: `str`
-        
+
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
         if not response:
             return Challenge("")
         return self.response(response)
-        
+
     def response(self,response):
         """Process a client reponse.
-        
+
         :Parameters:
             - `response`: the response from the client.
         :Types:
             - `response`: `str`
-        
+
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
         s=response.split("\000")

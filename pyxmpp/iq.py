@@ -17,11 +17,11 @@
 
 """Iq XMPP stanza handling
 
-Normative reference: 
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+Normative reference:
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: iq.py,v 1.20 2004/10/07 22:22:34 jajcus Exp $"
+__revision__="$Id: iq.py,v 1.21 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -44,7 +44,7 @@ class Iq(Stanza):
             - `to_jid`: recipient JID.
             - `stanza_type`: staza type: one of: "get", "set", "result" or "error".
             - `stanza_id`: stanza id -- value of stanza's "id" attribute. If not
-              given, then unique for the session value is generated. 
+              given, then unique for the session value is generated.
             - `error_cond`: error condition name. Ignored if `stanza_type` is not "error".
         :Types:
             - `node`: `unicode` or `libxml2.xmlNode` or `Iq`
@@ -80,7 +80,7 @@ class Iq(Stanza):
 
     def copy(self):
         """Create a deep copy of the iq stanza.
-        
+
         :returntype: `Iq`"""
         return Iq(self)
 
@@ -116,7 +116,7 @@ class Iq(Stanza):
         if self.get_type() not in ("set","get"):
             raise StanzaError,"Results may only be generated for 'set' or 'get' iq"
 
-        iq=Iq(stanza_type="result", from_jid=self.get_to(), 
+        iq=Iq(stanza_type="result", from_jid=self.get_to(),
                 to_jid=self.get_from(), stanza_id=self.get_id())
         return iq
 
@@ -129,7 +129,7 @@ class Iq(Stanza):
         :Types:
             - `ns_uri`: `str`
             - `name`: `unicode`
-        
+
         :return: the new payload node.
         :returntype: `libxml2.xmlNode`"""
         return self.set_new_content(ns_uri,name)

@@ -17,11 +17,11 @@
 
 """Client stream handling.
 
-Normative reference: 
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+Normative reference:
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: clientstream.py,v 1.39 2004/10/07 22:22:34 jajcus Exp $"
+__revision__="$Id: clientstream.py,v 1.40 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import logging
@@ -69,7 +69,7 @@ class ClientStream(Stream):
         """Initialize the ClientStream object.
 
         :Parameters:
-            - `jid`: local JID. 
+            - `jid`: local JID.
             - `password`: user's password.
             - `server`: server to use. If not given then address will be derived form the JID.
             - `port`: port number to use. If not given then address will be derived form the JID.
@@ -119,7 +119,7 @@ class ClientStream(Stream):
               should be derived automatically from the JID.
             - `port`: port number of the server to use. Not recommended --
               proper value should be derived automatically from the JID.
-              
+
         :Types:
             - `server`: `unicode`
             - `port`: `int`"""
@@ -168,7 +168,7 @@ class ClientStream(Stream):
     def _try_auth(self):
         """Try to authenticate using the first one of allowed authentication
         methods left.
-        
+
         [client only]"""
         if self.authenticated:
             self.__logger.debug("try_auth: already authenticated")
@@ -198,7 +198,7 @@ class ClientStream(Stream):
 
     def _get_stream_features(self):
         """Include resource binding feature in the stream features list.
-        
+
         [server only]"""
         features=Stream._get_stream_features(self)
         if self.peer_authenticated:
@@ -212,7 +212,7 @@ class ClientStream(Stream):
         """Do the resource binding requested by a client connected.
 
         [server only]
-        
+
         :Parameters:
             - `stanza`: resource binding request stanza.
         :Types:
@@ -243,7 +243,7 @@ class ClientStream(Stream):
 
     def get_password(self,username,realm=None,acceptable_formats=("plain",)):
         """Get a user password for the SASL authentication.
-        
+
         :Parameters:
             - `username`: username used for authentication.
             - `realm`: realm used for authentication.
@@ -252,7 +252,7 @@ class ClientStream(Stream):
             - `username`: `unicode`
             - `realm`: `unicode`
             - `acceptable_formats`: `list` of `str`
-            
+
         :return: The password and the format name ('plain').
         :returntype: (`unicode`,`str`)"""
         if self.initiator and self.my_jid.node==username and "plain" in acceptable_formats:
@@ -264,7 +264,7 @@ class ClientStream(Stream):
         """Get realms available for client authentication.
 
         [server only]
-        
+
         :return: list of realms.
         :returntype: `list` of `unicode`"""
         return [self.my_jid.domain]
@@ -281,7 +281,7 @@ class ClientStream(Stream):
             - `realm_list`: realm list provided by the server.
         :Types:
             - `realm_list`: `list` of `unicode`
-            
+
         :return: the realm chosen.
         :returntype: `unicode`"""
         if not realm_list:
@@ -346,7 +346,7 @@ class ClientStream(Stream):
         return self.my_jid.domain
 
     def fix_out_stanza(self,stanza):
-        """Fix outgoing stanza. 
+        """Fix outgoing stanza.
 
         On a client clear the sender JID. On a server set the sender
         address to the own JID if the address is not set yet."""
@@ -357,7 +357,7 @@ class ClientStream(Stream):
                 stanza.set_from(self.my_jid)
 
     def fix_in_stanza(self,stanza):
-        """Fix an incoming stanza. 
+        """Fix an incoming stanza.
 
         Ona server replace the sender address with authorized client JID."""
         if self.initiator:

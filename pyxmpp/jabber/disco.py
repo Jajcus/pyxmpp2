@@ -16,12 +16,12 @@
 #
 """Jabber Service Discovery support.
 
-Normative reference: 
-  - `JEP 30 <http://www.jabber.org/jeps/jep-0030.html>`__ 
+Normative reference:
+  - `JEP 30 <http://www.jabber.org/jeps/jep-0030.html>`__
 """
 
 
-__revision__="$Id: disco.py,v 1.15 2004/10/07 22:22:43 jajcus Exp $"
+__revision__="$Id: disco.py,v 1.16 2004/10/07 22:28:11 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import sys

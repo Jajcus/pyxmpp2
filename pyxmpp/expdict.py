@@ -17,7 +17,7 @@
 
 """Dictionary with item expiration."""
 
-__revision__="$Id: expdict.py,v 1.7 2004/09/25 16:29:14 jajcus Exp $"
+__revision__="$Id: expdict.py,v 1.8 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import time
@@ -29,7 +29,7 @@ class ExpiringDictionary(dict):
 
     Each item in ExpiringDictionary has its expiration time assigned, after
     which the item is removed from the mapping.
-    
+
     :Ivariables:
         - `_timeouts`: a dictionary with timeout values and timeout callback for
           stored objects.
@@ -41,7 +41,7 @@ class ExpiringDictionary(dict):
         - `_lock`: `threading.RLock`"""
 
     __slots__=['_timeouts','_default_timeout','_lock']
-    
+
     def __init__(self,default_timeout=300):
         """Initialize an `ExpiringDictionary` object.
 
@@ -75,7 +75,7 @@ class ExpiringDictionary(dict):
 
     def set_item(self,key,value,timeout=None,timeout_callback=None):
         """Set item of the dictionary.
-        
+
         :Parameters:
             - `key`: the key.
             - `value`: the object to store.
@@ -99,7 +99,7 @@ class ExpiringDictionary(dict):
 
     def expire(self):
         """Do the expiration of dictionary items.
-        
+
         Remove items that expired by now from the dictionary."""
         self._lock.acquire()
         try:
@@ -110,11 +110,11 @@ class ExpiringDictionary(dict):
 
     def _expire_item(self,key):
         """Do the expiration of a dictionary item.
-        
+
         Remove the item if it has expired by now.
-        
+
         :Parameters:
-            - `key`: key to the object. 
+            - `key`: key to the object.
         :Types:
             - `key`: any hashable value"""
         (timeout,callback)=self._timeouts[key]

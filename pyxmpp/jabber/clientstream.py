@@ -16,11 +16,11 @@
 #
 """XMPP stream support with fallback to legacy non-SASL Jabber authentication.
 
-Normative reference: 
-  - `JEP 78 <http://www.jabber.org/jeps/jep-0078.html>`__ 
+Normative reference:
+  - `JEP 78 <http://www.jabber.org/jeps/jep-0078.html>`__
 """
 
-__revision__="$Id: clientstream.py,v 1.19 2004/10/07 22:22:43 jajcus Exp $"
+__revision__="$Id: clientstream.py,v 1.20 2004/10/07 22:28:11 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2

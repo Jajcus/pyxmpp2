@@ -17,11 +17,11 @@
 
 """General XMPP Stanza handling.
 
-Normative reference: 
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+Normative reference:
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: stanza.py,v 1.23 2004/10/07 22:22:35 jajcus Exp $"
+__revision__="$Id: stanza.py,v 1.24 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -51,7 +51,7 @@ def gen_id():
 
 class Stanza:
     """Base class for all XMPP stanzas.
-    
+
     :Ivariables:
         - `node`: stanza XML node.
         - `_error`: `pyxmpp.error.StanzaErrorNode` describing the error associated with
@@ -73,7 +73,7 @@ class Stanza:
             - `to_jid`: recipient JID.
             - `stanza_type`: staza type: one of: "get", "set", "result" or "error".
             - `stanza_id`: stanza id -- value of stanza's "id" attribute. If
-              not given, then unique for the session value is generated. 
+              not given, then unique for the session value is generated.
             - `error`: error object. Ignored if `stanza_type` is not "error".
             - `error_cond`: error condition name. Ignored if `stanza_type` is not
               "error" or `error` is not None.
@@ -104,15 +104,15 @@ class Stanza:
             if not isinstance(from_jid,JID):
                 from_jid=JID(from_jid)
             self.node.setProp("from",from_jid.as_utf8())
-        
+
         if to_jid is not None:
             if not isinstance(to_jid,JID):
                 to_jid=JID(to_jid)
             self.node.setProp("to",to_jid.as_utf8())
-            
+
         if stanza_type:
             self.node.setProp("type",stanza_type)
-            
+
         if stanza_id:
             self.node.setProp("id",stanza_id)
 
@@ -137,46 +137,46 @@ class Stanza:
 
     def copy(self):
         """Create a deep copy of the stanza.
-        
+
         :returntype: `Stanza`"""
         return Stanza(self)
 
     def serialize(self):
         """Serialize the stanza into an UTF-8 encoded XML string.
-        
+
         :return: serialized stanza.
         :returntype: `str`"""
         return self.node.serialize(encoding="utf-8")
 
     def get_node(self):
         """Return the XML node wrapped into `self`.
-        
+
         :returntype: `libxml2.xmlNode`"""
         return self.node
-        
+
     def get_from(self):
         """Get "from" attribute of the stanza.
-        
+
         :return: value of the "from" attribute (sender JID) or None.
         :returntype: `unicode`"""
         if self.node.hasProp("from"):
             return JID(from_utf8(self.node.prop("from")))
         else:
             return None
-            
+
     def get_to(self):
         """Get "to" attribute of the stanza.
-        
+
         :return: value of the "to" attribute (recipient JID) or None.
         :returntype: `unicode`"""
         if self.node.hasProp("to"):
             return JID(from_utf8(self.node.prop("to")))
         else:
             return None
-            
+
     def get_type(self):
         """Get "type" attribute of the stanza.
-        
+
         :return: value of the "type" attribute (stanza type) or None.
         :returntype: `unicode`"""
         if self.node.hasProp("type"):
@@ -186,14 +186,14 @@ class Stanza:
 
     def get_id(self):
         """Get "id" attribute of the stanza.
-        
+
         :return: value of the "id" attribute (stanza identifier) or None.
         :returntype: `unicode`"""
         if self.node.hasProp("id"):
             return from_utf8(self.node.prop("id"))
         else:
             return None
-        
+
     def get_error(self):
         """Get stanza error information.
 
@@ -207,10 +207,10 @@ class Stanza:
         from pyxmpp.error import StanzaErrorNode
         self._error=StanzaErrorNode(n[0],copy=0)
         return self._error
-        
+
     def set_from(self,from_jid):
         """Set "from" attribute of the stanza.
-        
+
         :Parameters:
             - `from_jid`: new value of the "from" attribute (sender JID).
         :Types:
@@ -222,7 +222,7 @@ class Stanza:
 
     def set_to(self,to_jid):
         """Set "to" attribute of the stanza.
-        
+
         :Parameters:
             - `to_jid`: new value of the "to" attribute (recipient JID).
         :Types:
@@ -231,10 +231,10 @@ class Stanza:
             return self.node.setProp("to",to_utf8(to_jid))
         else:
             return self.node.unsetProp("to")
-            
+
     def set_type(self,stanza_type):
         """Set "type" attribute of the stanza.
-        
+
         :Parameters:
             - `stanza_type`: new value of the "type" attribute (stanza type).
         :Types:
@@ -243,10 +243,10 @@ class Stanza:
             return self.node.setProp("type",to_utf8(stanza_type))
         else:
             return self.node.unsetProp("type")
-            
+
     def set_id(self,stanza_id):
         """Set "id" attribute of the stanza.
-        
+
         :Parameters:
             - `stanza_id`: new value of the "id" attribute (stanza identifier).
         :Types:

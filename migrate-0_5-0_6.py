@@ -26,7 +26,7 @@ updates=[
     (r"(\b(?:Muc)?(?:Stanza|Message|Iq|Presence)\("+in_par+r"*)\bs?id=("+in_par+r"+\))",r"\1stanza_id=\2"),
     ]
 
-updates=[(re.compile(u_re,re.MULTILINE|re.DOTALL),u_repl) 
+updates=[(re.compile(u_re,re.MULTILINE|re.DOTALL),u_repl)
             for u_re,u_repl in updates]
 
 for fn in args:
@@ -43,5 +43,6 @@ for fn in args:
         file(fn,"w").write(code)
     else:
         print "no changes"
-        
 
+
+# vi: sts=4 et sw=4

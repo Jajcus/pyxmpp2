@@ -17,11 +17,11 @@
 
 """Generic XMPP stream implementation.
 
-Normative reference: 
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__ 
+Normative reference:
+  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: stream.py,v 1.75 2004/10/07 22:22:35 jajcus Exp $"
+__revision__="$Id: stream.py,v 1.76 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import logging
@@ -32,13 +32,13 @@ from pyxmpp.streamsasl import StreamSASLMixIn
 
 class Stream(StreamBase,StreamTLSMixIn,StreamSASLMixIn):
     """Generic XMPP stream class.
-    
+
     Responsible for establishing connection, parsing the stream,
     StartTLS encryption and SASL authentication negotiation
     and usage, dispatching received stanzas to apopriate handlers
     and sending application's stanzas.
-    
-    Whenever we say "stream" here we actually mean two streams 
+
+    Whenever we say "stream" here we actually mean two streams
     (incoming and outgoing) of one connections, as defined by the XMPP
     specification.
 
@@ -84,7 +84,7 @@ class Stream(StreamBase,StreamTLSMixIn,StreamSASLMixIn):
         """Create the <features/> element for the stream.
 
         [receving entity only]
-        
+
         :returns: new <features/> element node."""
         features=StreamBase._make_stream_features(self)
         self._make_stream_tls_features(features)
@@ -105,7 +105,7 @@ class Stream(StreamBase,StreamTLSMixIn,StreamSASLMixIn):
         if self._process_node_sasl(node):
             return
         StreamBase._process_node(self,node)
-   
+
     def _got_features(self):
         """Process incoming <stream:features/> element.
 
