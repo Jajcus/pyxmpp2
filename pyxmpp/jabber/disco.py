@@ -400,6 +400,24 @@ class DiscoItems:
                 ret.append(DiscoItem(self,i))
         return ret
 
+    def add_item(self,jid,node=None,name=None,action=None):
+        """Add a new item to the `DiscoItems` object.
+
+        :Parameters:
+            - `jid`: item JID.
+            - `node`: item node name.
+            - `name`: item name.
+            - `action`: action for a "disco push".
+        :Types:
+            - `jid`: `pyxmpp.JID`
+            - `node`: `unicode`
+            - `name`: `unicode`
+            - `actions`: `unicode`
+            
+        :returns: the item created.
+        :returntype: `DiscoItem`."""
+        return DiscoItem(self,jid,node,name,action)
+
     def has_item(self,jid,node=None):
         """Check if `self` contains an item.
 
@@ -607,5 +625,21 @@ class DiscoInfo:
             return True
         else:
             return False
+
+    def add_identity(self,item_name,item_category=None,item_type=None):
+        """Add an identity to the `DiscoInfo` object.
+
+        :Parameters:
+            - `item_name`: name of the item.
+            - `item_category`: category of the item.
+            - `item_type`: type of the item.
+        :Types:
+            - `item_name`: `unicode`
+            - `item_category`: `unicode`
+            - `item_type`: `unicode`
+            
+        :returns: the identity created.
+        :returntype: `DiscoIdentity`"""
+        return DiscoIdentity(self,item_name,item_category,item_type)
 
 # vi: sts=4 et sw=4
