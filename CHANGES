@@ -5,6 +5,15 @@ Those are mentioned here as are not backward compatible.
 I want the api to be stable and consistent in the next release and later,
 so I do all the big changes now (I would have to do them at some time anyway).
 
+2005-01-20
+
+	Minor change: now "disco_info" and "disco_items" attributes
+	of pyxmpp.jabber.client and pyxmpp.jabberd.component are initialized
+	in the constructors of those classes. Those __init__() methods now
+	accept "disco_name", "disco_category" and "disco_type" arguments
+	to set up the entity identity. Also register_feature() and
+	unregister_feature() methods were added for managing the feature
+	list in .disco_info.
 
 2005-01-09
 

@@ -43,7 +43,7 @@ class JabberClient(Client):
     
     :Ivariables:
         - `disco_items`: default Disco#items reply for a query to an empty node.
-        - `disco_info`: default Disco#ifo reply for a query to an empty node --
+        - `disco_info`: default Disco#info reply for a query to an empty node --
           provides information about the client and its supported fetures.
         - `disco_identity`: default identity of the default `disco_info`.
     :Types:
@@ -52,7 +52,9 @@ class JabberClient(Client):
     """
     def __init__(self,jid=None, password=None, server=None, port=5222,
             auth_methods=("sasl:DIGEST-MD5","digest"),
-            tls_settings=None, keepalive=0):
+            tls_settings=None, keepalive=0,
+            disco_name=u"pyxmpp based Jabber client", disco_category=u"client",
+            disco_type=u"pc"):
         """Initialize a JabberClient object.
 
         :Parameters:
@@ -64,6 +66,13 @@ class JabberClient(Client):
               in the list should be prefixed with "sasl:" string.
             - `tls_settings`: settings for StartTLS -- `TLSSettings` instance.
             - `keepalive`: keepalive output interval. 0 to disable.
+            - `disco_name`: name of the client identity in the disco#info
+              replies.
+            - `disco_category`: category of the client identity in the disco#info
+              replies. The default of u'client' should be the right choice in
+              most cases.
+            - `disco_type`: type of the client identity in the disco#info
+              replies. Use `the types registered by Jabber Registrar http://www.jabber.org/registrar/disco-categories.html`__ 
         :Types:
             - `jid`: `pyxmpp.JID`
             - `password`: `unicode`
@@ -72,13 +81,20 @@ class JabberClient(Client):
             - `auth_methods`: sequence of `str`
             - `tls_settings`: `pyxmpp.TLSSettings`
             - `keepalive`: `int`
+            - `disco_name`: `unicode`
+            - `disco_category`: `unicode`
+            - `disco_type`: `unicode`
         """
 
         Client.__init__(self,jid,password,server,port,auth_methods,tls_settings,keepalive)
         self.stream_class = LegacyClientStream
-        self.disco_items = None
-        self.disco_info = None
-        self.disco_identity = None
+        self.disco_items=DiscoItems()
+        self.disco_info=DiscoInfo()
+        self.disco_identity=DiscoIdentity(self.disco_info,
+                            disco_name, disco_category, disco_type)
+        self.register_feature("dnssrv")
+        self.register_feature("stringprep")
+        self.register_feature("urn:ietf:params:xml:ns:xmpp-sasl#c2s")
         self.cache = CacheSuite(max_items = 1000)
         self.__logger = logging.getLogger("pyxmpp.jabber.JabberClient")
 
@@ -91,11 +107,24 @@ class JabberClient(Client):
         succeeds. Additionally, initialize Disco items and info of the client.
         """
         Client.connect(self)
-        self.disco_items=DiscoItems()
-        self.disco_info=DiscoInfo()
-        self.disco_identity=DiscoIdentity(self.disco_info,
-                            "pyxmpp based Jabber client",
-                            "client","pc")
+
+    def register_feature(self, feature_name):
+        """Register a feature to be announced by Service Discovery.
+
+        :Parameters:
+            - `feature_name`: feature namespace or name.
+        :Types:
+            - `feature_name`: `unicode`"""
+        self.disco_info.add_feature(feature_name)
+
+    def unregister_feature(self, feature_name):
+        """Unregister a feature to be announced by Service Discovery.
+
+        :Parameters:
+            - `feature_name`: feature namespace or name.
+        :Types:
+            - `feature_name`: `unicode`"""
+        self.disco_info.remove_feature(feature_name)
 
 # private methods
     def __disco_info(self,iq):

@@ -32,6 +32,18 @@ class Component(pyxmpp.jabberd.Component):
     as base. That class provides basic stream setup (including authentication)
     and Service Discovery server."""
 
+    def __init__(self, jid, secret, server, port):
+
+        # setup componet with provided connection information
+        # and identity data
+        pyxmpp.jabberd.Component.__init__(self, jid, secret, server, port,
+                disco_name="PyXMPP example: echo component",
+                disco_category="x-service", disco_type="x-echo")
+                
+        # register features to be announced via Service Discovery
+        self.disco_info.add_feature("jabber:iq:version")
+        self.disco_info.add_feature("jabber:iq:register")
+
     def stream_state_changed(self,state,arg):
         """This one is called when the state of stream connecting the component
         to a server changes. This will usually be used to let the administrator
@@ -50,10 +62,6 @@ class Component(pyxmpp.jabberd.Component):
         self.stream.set_iq_get_handler("query","jabber:iq:version",self.get_version)
         self.stream.set_iq_get_handler("query","jabber:iq:register",self.get_register)
         self.stream.set_iq_set_handler("query","jabber:iq:register",self.set_register)
-
-        # register features to be announced via Service Discovery
-        self.disco_info.add_feature("jabber:iq:version")
-        self.disco_info.add_feature("jabber:iq:register")
 
         # set up handlers for <presence/> stanzas
         self.stream.set_presence_handler("available",self.presence)
@@ -193,8 +201,7 @@ if len(sys.argv)<5:
     sys.exit(1)
 
 print "creating component..."
-c=Component(JID(sys.argv[1]),sys.argv[2],sys.argv[3],int(sys.argv[4]),
-    disco_type="x-echo")
+c=Component(JID(sys.argv[1]),sys.argv[2],sys.argv[3],int(sys.argv[4]))
 
 print "connecting..."
 c.connect()

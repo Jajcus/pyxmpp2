@@ -73,8 +73,9 @@ class Component:
         - `disco_identity`: `pyxmpp.jabber.DiscoIdentity`
         - `disco_category`: `str`
         - `disco_type`: `str`"""
-    def __init__(self,jid=None,secret=None,server=None,port=5347,
-            disco_category="x-service",disco_type="x-unknown",keepalive=0):
+    def __init__(self, jid=None, secret=None, server=None, port=5347,
+            disco_name=u"PyXMPP based component", disco_category=u"x-service",
+            disco_type=u"x-unknown", keepalive=0):
         """Initialize a `Component` object.
 
         :Parameters:
@@ -82,10 +83,12 @@ class Component:
             - `secret`: the authentication secret.
             - `server`: server name or address the component should connect.
             - `port`: port number on the server where the component should connect.
-            - `disco_category`: disco item category to be used in the
-              component's 'disco info' responses.
-            - `disco_type`: disco item type to be used in the component's
-              'disco info' responses.
+            - `disco_name`: disco identity name to be used in the
+                disco#info responses.
+            - `disco_category`: disco identity category to be used in the
+                disco#info responses.  Use `the categories registered by Jabber Registrar http://www.jabber.org/registrar/disco-categories.html`__ 
+            - `disco_type`: disco identity type to be used in the component's
+                disco#info responses.  Use `the types registered by Jabber Registrar http://www.jabber.org/registrar/disco-categories.html`__ 
             - `keepalive`: keepalive interval for the stream.
 
         :Types:
@@ -93,8 +96,9 @@ class Component:
             - `secret`: `unicode`
             - `server`: `str` or `unicode`
             - `port`: `int`
-            - `disco_category`: `str`
-            - `disco_type`: `str`
+            - `disco_name`: `unicode`
+            - `disco_category`: `unicode`
+            - `disco_type`: `unicode`
             - `keepalive`: `int`"""
         self.jid=jid
         self.secret=secret
@@ -105,11 +109,11 @@ class Component:
         self.lock=threading.RLock()
         self.state_changed=threading.Condition(self.lock)
         self.stream_class=ComponentStream
-        self.disco_items=None
-        self.disco_info=None
-        self.disco_identity=None
-        self.disco_category=disco_category
-        self.disco_type=disco_type
+        self.disco_items=DiscoItems()
+        self.disco_info=DiscoInfo()
+        self.disco_identity=DiscoIdentity(self.disco_info,
+                            disco_name, disco_category, disco_type)
+        self.register_feature("stringprep")
         self.__logger=logging.getLogger("pyxmpp.jabberd.Component")
 
 # public methods
@@ -155,11 +159,6 @@ class Component:
             self.stream=None
             self.state_changed.release()
             raise
-        self.disco_items=DiscoItems()
-        self.disco_info=DiscoInfo()
-        self.disco_identity=DiscoIdentity(self.disco_info,
-                            "PyXMPP based jabberd component",
-                            self.disco_category,self.disco_type)
 
     def get_stream(self):
         """Get the stream of the component in a safe way.
@@ -191,6 +190,25 @@ class Component:
         This usually will be replaced by something more sophisticated. E.g.
         handling of other input sources."""
         self.stream.loop(timeout)
+
+    def register_feature(self, feature_name):
+        """Register a feature to be announced by Service Discovery.
+
+        :Parameters:
+            - `feature_name`: feature namespace or name.
+        :Types:
+            - `feature_name`: `unicode`"""
+        self.disco_info.add_feature(feature_name)
+
+    def unregister_feature(self, feature_name):
+        """Unregister a feature to be announced by Service Discovery.
+
+        :Parameters:
+            - `feature_name`: feature namespace or name.
+        :Types:
+            - `feature_name`: `unicode`"""
+        self.disco_info.remove_feature(feature_name)
+
 
 # private methods
     def __stream_state_change(self,state,arg):
