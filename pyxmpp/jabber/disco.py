@@ -15,6 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+__revision__="$Id: disco.py,v 1.10 2004/09/10 13:18:40 jajcus Exp $"
+
 import sys
 import re
 import libxml2

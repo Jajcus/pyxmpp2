@@ -15,6 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+__revision__="$Id: plain.py,v 1.8 2004/09/10 13:18:55 jajcus Exp $"
+
 import logging
 
 from pyxmpp.utils import to_utf8,from_utf8

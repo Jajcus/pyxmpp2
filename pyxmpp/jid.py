@@ -17,6 +17,8 @@
 
 """jid --- Jabber ID handling"""
 
+__revision__="$Id: jid.py,v 1.26 2004/09/10 13:18:32 jajcus Exp $"
+
 import re
 import weakref
 

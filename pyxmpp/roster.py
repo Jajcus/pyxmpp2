@@ -17,6 +17,8 @@
 
 """XMPP-IM roster handling"""
 
+__revision__="$Id: roster.py,v 1.17 2004/09/10 13:18:32 jajcus Exp $"
+
 from types import StringType,UnicodeType
 
 from pyxmpp.stanza import common_doc,common_root

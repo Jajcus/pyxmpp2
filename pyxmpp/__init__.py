@@ -17,6 +17,8 @@
 
 """PyXMPP - Jabber/XMPP protocol implementation"""
 
+__revision__="$Id: __init__.py,v 1.13 2004/09/10 13:18:32 jajcus Exp $"
+
 from pyxmpp.stream import Stream,StreamError,FatalStreamError,StreamParseError
 from pyxmpp.stream import StreamEncryptionRequired,tls_available,TLSSettings
 from pyxmpp.clientstream import ClientStream,ClientStreamError

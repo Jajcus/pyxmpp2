@@ -1,11 +1,29 @@
+#
+# (C) Copyright 2003 Jacek Konieczny <jajcus@bnet.pl>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License Version
+# 2.1 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+
+""" Nodeprep and resourceprep stringprep profiles."""
+
+__revision__="$Id: xmppstringprep.py,v 1.11 2004/09/10 13:18:32 jajcus Exp $"
 
 from types import ListType
 import string
 import stringprep
 import unicodedata
 import weakref
-
-""" Stringprep (RFC3454) implementation with nodeprep and resourceprep profiles."""
 
 class LookupFunction:
     def __init__(self,function):

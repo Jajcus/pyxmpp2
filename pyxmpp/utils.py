@@ -17,6 +17,8 @@
 
 """Utility functions for the pyxmpp package."""
 
+__revision__="$Id: utils.py,v 1.14 2004/09/10 13:18:32 jajcus Exp $"
+
 import sys
 
 if sys.hexversion<0x02030000:

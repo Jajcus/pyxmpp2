@@ -15,6 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+__revision__="$Id: muc.py,v 1.19 2004/09/10 13:18:40 jajcus Exp $"
+
 import libxml2
 import logging
 from types import StringType,UnicodeType

@@ -15,6 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+__revision__="$Id: error.py,v 1.20 2004/09/10 13:18:32 jajcus Exp $"
+
 import libxml2
 from types import StringType,UnicodeType
 

@@ -15,6 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+__revision__="$Id: client.py,v 1.9 2004/09/10 13:18:40 jajcus Exp $"
+
 import logging
 
 from pyxmpp.jabber.clientstream import LegacyClientStream

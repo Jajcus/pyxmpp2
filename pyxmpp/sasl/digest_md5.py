@@ -15,6 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+__revision__="$Id: digest_md5.py,v 1.18 2004/09/10 13:18:55 jajcus Exp $"
+
 from binascii import b2a_hex as HEX, a2b_hex as unHEX
 import re
 import string

@@ -15,6 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+__revision__="$Id: iq.py,v 1.11 2004/09/10 13:18:32 jajcus Exp $"
+
 import libxml2
 
 from pyxmpp.utils import from_utf8,to_utf8,get_node_ns_uri
