@@ -16,7 +16,7 @@
 #
 
 import libxml2
-import libxml2addon
+import xmlextra
 import socket
 import os
 import sys
@@ -74,31 +74,7 @@ def StanzaFactory(node):
 	else:
 		return Stanza(node)
 
-class StreamReader:
-	def __init__(self,stream):
-		self.stream=stream
-		self.fd=stream.socket.fileno()
-		self.left=None
-	def pending_input(self):
-		self.stream.debug("pending input: %r" % (self.left,))
-		return self.left is not None
-		
-	def read(self,l):
-		if self.left:
-			r,self.left=self.left,None
-		else:
-			r=os.read(self.fd,l)
-			self.stream.debug("IN: %r" % (r,))
-		if r=="":
-			self.stream.eof_handler()
-		i=r.find(">")
-		if i>=0 and i<len(r)-1:
-			i+=1
-			self.left=r[i:]
-			r=r[:i]
-		return r
-
-class Stream(sasl.PasswordManager):
+class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def __init__(self,default_ns,extra_ns=[],sasl_mechanisms=[],enable_tls=0,require_tls=0):
 		self.default_ns_uri=default_ns
 		self.extra_ns_uris=extra_ns
@@ -149,7 +125,7 @@ class Stream(sasl.PasswordManager):
 			self.peer=None
 		self.initiator=1
 		self.send_stream_start()
-		self.make_reader(sock)
+		self.make_reader()
 
 	def connect(self,addr,port,to=None):
 		if to is None:
@@ -169,7 +145,7 @@ class Stream(sasl.PasswordManager):
 		else:
 			self.me=None
 		self.initiator=0
-		self.make_reader(self.socket)
+		self.make_reader()
 
 	def disconnect(self):
 		if self.doc_out:
@@ -188,11 +164,68 @@ class Stream(sasl.PasswordManager):
 			self.socket.close()
 		self.reset()
 
-	def make_reader(self,sock):
-		self.ioreader=StreamReader(self)
-		input=libxml2.inputBuffer(self.ioreader)
-		self.reader=input.newStreamReader("input stream")
+	def make_reader(self):
+		self.reader=xmlextra.StreamReader(self)
 
+	def stream_start(self,doc):
+		self.doc_in=doc
+		self.debug("input document: %r" % (self.doc_in.serialize(),))
+		
+		r=self.doc_in.getRootElement()
+		if r.ns().getContent() != STREAM_NS:
+			e=ErrorNode("format","invalid-namespace","stream")
+			self.send_stream_error(e)
+			raise FatalStreamError,"Invalid namespace."
+
+		self.version=r.prop("version")
+		if self.version and self.version!="1.0":
+			e=ErrorNode("format","unsupported-version","stream")
+			self.send_stream_error(e)
+			raise FatalStreamError,"Unsupported protocol version."
+		
+		to_from_mismatch=0
+		if not self.doc_out:
+			self.send_stream_start(self.generate_id())
+		else:
+			self.stream_id=r.prop("id")
+			peer=r.prop("from")
+			if peer:
+				peer=JID(peer)
+			if self.peer:
+				if peer and peer!=self.peer:
+					to_from_mismatch=1
+			else:
+				self.peer=peer
+
+		if not self.initiator:
+			self.send_stream_features()
+		self.post_connect()
+		if to_from_mismatch:
+			raise HostMismatch
+
+	def stream_end(self,doc):
+		self.debug("Stream ended")
+		if self.doc_out:
+			self.send_stream_end()
+		if self.doc_in:
+			self.doc_in.freeDoc()
+			self.doc_in=None
+			if self.features:
+				self.features=None
+		self.post_disconnect()
+
+	def stanza_start(self,doc,node):
+		pass
+
+	def stanza_end(self,doc,node):
+		print >>sys.stderr,"Got node:",`node.serialize()`
+		self.process_node(node)
+		node.unlinkNode()
+		node.freeNode()
+
+	def error(self,desc):
+		raise FatalStreamError,desc
+				
 	def send_stream_end(self):
 		self.doc_out.getRootElement().addContent(" ")
 		str=self.doc_out.getRootElement().serialize(encoding="UTF-8")
@@ -280,7 +313,7 @@ class Stream(sasl.PasswordManager):
 			try:
 				if self.socket in id or self.socket in ed:
 					self.debug("data on input")
-					self.read()
+					self.read(self.socket.fileno())
 				else:
 					self.debug("input timeout")
 					self.idle()
@@ -290,88 +323,10 @@ class Stream(sasl.PasswordManager):
 				self.close()
 				raise
 
-	def read(self):
-		self.read1()
-		while (self.ioreader.pending_input()):
-			self.read1()
-		
-	def read1(self):
-		self.debug("Stream.read()")
-		if not self.reader:
-			raise StreamError,"No reader defined. Socket not connected?"
-		if self.skip:
-			self.debug("skiping to the next node")
-			ret=self.reader.Next()
-			self.skip=0
-		else:
-			self.debug("reading current node")
-			ret=self.reader.Read()
-			
-		if ret==0:
-			self.eof=1
-			return	
-		
-		if ret!=1 and not self.eof:
-			self.debug("reader failed")
-			raise FatalStreamError,"Read error."
-
-		self.debug("node type: %i" % (self.reader.NodeType(),))
-		if self.eof or self.reader.NodeType()==15:
-			self.debug("Stream ended")
-			if self.doc_out:
-				self.send_stream_end()
-			if self.doc_in:
-				self.doc_in.freeDoc()
-				self.doc_in=None
-				if self.features:
-					self.features=None
-			self.post_disconnect()
-			
-		if self.reader.NodeType()!=1:
-			self.skip=1
-			return
-		if self.doc_in:
-			n=self.reader.Expand()
-			self.skip=1
-			node=n.docCopyNode(self.doc_in,1)
-			self.doc_in.getRootElement().addChild(node)
-			self.process_node(node)
-			node.unlinkNode()
-			node.freeNode()
-			return
-		self.doc_in=self.reader.CurrentDoc().copyDoc(1)
-		self.debug("input document: %r" % (self.doc_in.serialize(),))
-		
-		r=self.doc_in.getRootElement()
-		if r.ns().getContent() != STREAM_NS:
-			e=ErrorNode("format","invalid-namespace","stream")
-			self.send_stream_error(e)
-			raise FatalStreamError,"Invalid namespace."
-		self.version=r.prop("version")
-		if self.version and self.version!="1.0":
-			e=ErrorNode("format","unsupported-version","stream")
-			self.send_stream_error(e)
-			raise FatalStreamError,"Unsupported protocol version."
-		
-		to_from_mismatch=0
-		if not self.doc_out:
-			self.send_stream_start(self.generate_id())
-		else:
-			self.stream_id=r.prop("id")
-			peer=r.prop("from")
-			if peer:
-				peer=JID(peer)
-			if self.peer:
-				if peer and peer!=self.peer:
-					to_from_mismatch=1
-			else:
-				self.peer=peer
-
-		if not self.initiator:
-			self.send_stream_features()
-		self.post_connect()
-		if to_from_mismatch:
-			raise HostMismatch
+	def read(self,fd):
+		r=os.read(fd,1024)
+		self.debug("IN: %r" % (r,))
+		self.reader.feed(r)
 
 	def process_node(self,node):
 		ns_uri=node.ns().getContent()

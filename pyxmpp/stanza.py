@@ -18,6 +18,7 @@
 import libxml2
 import random
 
+import xmlextra
 from utils import from_utf8,to_utf8
 from types import StringType,UnicodeType
 from jid import JID
@@ -51,8 +52,8 @@ class Stanza:
 			common_doc.addChild(self.node)
 			ns=self.node.ns()
 			if not ns.name:
-				self.node.replaceNs(ns,None)
-				self.node.removeNs(ns)
+				xmlextra.replace_ns(self.node,ns,None)
+				xmlextra.remove_ns(self.node,ns)
 		else:	
 			self.node=common_doc.newChild(None,name_node,None)
 
