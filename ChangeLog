@@ -1,5 +1,8 @@
 2004-09-03  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/stream.py, CHANGES:
+	- Stream.data_in() and Stream.data_out() callbacks removed in favor of 'logging' module loggers
+
 	* CHANGES:
 	- info about new logging
 
