@@ -1,5 +1,10 @@
 This file should describe the bigest and most important API changes.
 
+2004-08-29
+
+	All debug messages are passed to the standard python 'logging' module.
+	There is no debug() methods in PyXMPP classes any more.
+
 2005-06-02
 
 	Python 2.2 support is gone. Compliant XMPP implementation
