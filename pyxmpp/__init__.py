@@ -17,7 +17,8 @@
 
 """PyXMPP - Jabber/XMPP protocol implementation"""
 
-from stream import Stream,StreamError,FatalStreamError,StreamParseError,tls_available,TLSSettings
+from stream import Stream,StreamError,FatalStreamError,StreamParseError
+from stream import StreamEncryptionRequired,tls_available,TLSSettings
 from clientstream import ClientStream,ClientStreamError
 from client import Client,ClientError
 from iq import Iq
