@@ -1,5 +1,13 @@
 This file should describe the bigest and most important API changes.
 
+2004-09-03
+
+	Stream.data_in and Stream.data_out callbacks removed. Data sent and
+	received is now logged via 'logging' module to 'pyxmpp.Stream.out' and
+	'pyxmpp.Stream.in' loggers.  The raw data is available for logging
+	handlers as the first element of 'args' attribute of the log record
+	(record.args[0]).
+
 2004-08-29
 
 	All debug messages are passed to the standard python 'logging' module.

@@ -440,7 +440,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         self._write_raw(self.features.serialize(encoding="UTF-8"))
 
     def _write_raw(self,str):
-        self.data_out(str)
+        logging.getLogger("pyxmpp.Stream.out").debug("OUT: %r",str)
         try:
             self.socket.send(str)
         except (IOError,OSError),e:
@@ -580,7 +580,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             if e.args[0]!=errno.EINTR:
                 raise
             return
-        self.data_in(r)
+        logging.getLogger("pyxmpp.Stream.in").debug("IN: %r",r)
         if r:
             try:
                 r=self.reader.feed(r)
@@ -597,12 +597,6 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             self.disconnect()
         if self.eof:
             self.stream_end(None)
-
-    def data_in(self,data):
-        self.__logger.debug("IN: %r" % (data,))
-
-    def data_out(self,data):
-        self.__logger.debug("OUT: %r" % (data,))
 
     def _process_node(self,node):
         ns_uri=node.ns().getContent()
