@@ -1,0 +1,4 @@
+pyxmpp
+*.txt
+log
+*.pyc

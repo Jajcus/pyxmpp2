@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# $Id: setup.py,v 1.4 2003/06/06 10:15:24 jajcus Exp $
+# $Id: setup.py,v 1.5 2003/06/08 16:17:25 jajcus Exp $
 
 from distutils.core import setup, Extension
 
@@ -29,6 +29,7 @@ setup(
 	packages = [
                 'pyxmpp',
 		'pyxmpp.sasl',
+		'pyxmpp.unicode',
 	],
 )
 
