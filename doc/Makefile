@@ -11,7 +11,7 @@ all: doc
 www: $(WEBFILES) doc
 
 publish: www
-	rsync -e ssh -rav --exclude .svn www/ jabberstudio.org:/var/projects/pyxmpp/www
+	rsync -e ssh -rav --exclude .svn www/ ssh.jabberstudio.org:/var/projects/pyxmpp/www
 
 doc: doc-tstamp check-epydoc check-docutils
 
