@@ -206,7 +206,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         if serv_name:
             digest_uri="%s/%s/%s" % (serv_type,host,serv_name)
         else:
-            digest_uri="%s/%s/%s" % (serv_type,host)
+            digest_uri="%s/%s" % (serv_type,host)
 
         digest_uri=quote(digest_uri)
         params.append('digest-uri="%s"' % (digest_uri,))
