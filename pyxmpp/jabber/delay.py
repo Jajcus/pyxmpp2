@@ -102,7 +102,7 @@ class Delay:
             self.delay_from=None
         self.reason=from_utf8(node.getContent())
 
-    def as_xml(self,parent=None):
+    def as_xml(self, parent=None, doc=None):
         """
         Return XML representation of the Delay object.
 
@@ -117,10 +117,21 @@ class Delay:
         :return: the XML element.
         :returntype: `libxml2.xmlNode`"""
         if parent:
+            if doc:
+                try:
+                    ns=parent.searchNsByHref(doc,DELAY_NS)
+                except libxml2.treeError:
+                    ns=None
             node=parent.newTextChild(None,"x",None)
         else:
-            node=common_doc.newDocNode(None,"x",None)
-        ns=node.newNs(DELAY_NS,None)
+            ns=None
+            if doc:
+                doc1=doc
+            else:
+                doc1=libxml2.newDoc("1.0")
+            node=doc1.newDocNode(None,"x",None)
+        if not ns:
+            ns=node.newNs(DELAY_NS,None)
         node.setNs(ns)
         tm=self.timestamp.strftime("%Y%m%dT%H:%M:%S")
         node.setProp("stamp",tm)
@@ -128,7 +139,10 @@ class Delay:
             node.setProp("from",self.delay_from.as_utf8())
         if self.reason:
             node.setContent(to_utf8(self.reason))
-        return node
+        if doc or parent:
+            return node
+        doc1.setRootElement(node)
+        return doc1
 
     def datetime_local(self):
         """Get the timestamp as a local time.

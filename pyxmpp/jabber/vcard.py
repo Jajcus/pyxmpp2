@@ -1526,17 +1526,17 @@ class VCard:
                 v=value.rfc2426()
                 ret+=v
         return ret+"end:VCARD\r\n"
-    def as_xml(self,doc=None,parent=None):
+    def as_xml(self,parent=None,doc=None):
         """Get the XML representation of `self`.
 
         New document will be created if no `parent` and no `doc` is given. 
 
         :Parameters:
-            - `doc`: the document where the element should be created.
             - `parent`: the parent for the vCard element.
+            - `doc`: the document where the element should be created.
         :Types:
-            - `doc`: `libxml2.xmlDoc`
             - `parent`: `libxml2.xmlNode`
+            - `doc`: `libxml2.xmlDoc`
 
         :return: XML element with the vCard or the new document .
         :returntype: `libxml2.xmlNode` or `libxml2.xmlDoc`"""
@@ -1558,8 +1558,6 @@ class VCard:
             else:
                 doc1=libxml2.newDoc("1.0")
             root=doc1.newChild(None,"vCard",None)
-            if not doc:
-                doc1.setRootElement(root)
             ns=root.newNs(VCARD_NS,None)
             root.setNs(ns)
         for name,value in self.content.items():
@@ -1572,8 +1570,8 @@ class VCard:
                 value.as_xml(root)
         if doc:
             return root
-        else:
-            return doc
+        doc1.setRootElement(root)
+        return doc1
 
     def __getattr__(self,name):
         try:
