@@ -357,7 +357,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			self.close()
 			raise
 		except:
-			traceback.print_exc(file=sys.stderr)
+			self.debug_exception()
 
 	def read(self):
 		if self.eof:
@@ -420,8 +420,12 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
 		typ=stanza.get_type()
 		if typ in ("result","error"):
-			if self.iq_response_handlers.has_key((id,fr.as_unicode())):
-				key=(id,fr.as_unicode())
+			if fr:
+				ufr=fr.as_unicode()
+			else:
+				ufr=None
+			if self.iq_response_handlers.has_key((id,ufr)):
+				key=(id,ufr)
 			elif fr==self.peer and self.iq_response_handlers.has_key((id,None)):
 				key=(id,None)
 			else:
@@ -459,11 +463,11 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			return 1	
 		
 		typ=stanza.get_type()
-		if not typ:
-			typ="normal"
-			
 		if self.message_handlers.has_key(typ):
 			self.message_handlers[typ](stanza)
+			return 1
+		elif typ!="error" and self.message_handlers.has_key("normal"):
+			self.message_handlers["normal"](stanza)
 			return 1
 		return 0
 		
@@ -558,14 +562,20 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
 	def set_presence_handler(self,type,handler):
 		if not type:
-			type=="available"
-		self.message_handlers[type]=handler
+			type="available"
+		self.presence_handlers[type]=handler
 
 	def generate_id(self):
 		return "%i-%i-%s" % (os.getpid(),time.time(),str(random.random())[2:])
 
 	def debug(self,str):
 		print >>sys.stderr,"DEBUG:",str
+
+	def debug_exception(self):
+		for s in traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback):
+			if s[-1]=='\n':
+				s=s[:-1]
+			self.debug(s)
 
 	def got_features(self):
 		ctxt = self.doc_in.xpathNewContext()
