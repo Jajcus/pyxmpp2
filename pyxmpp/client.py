@@ -83,8 +83,8 @@ class Client:
 		iq.new_query("jabber:iq:roster")
 		self.stream.set_response_handlers(iq,
 			self.__roster_result,self.__roster_error,self.__roster_timeout)
+		self.stream.set_iq_set_handler("query","jabber:iq:roster",self.__roster_push)
 		self.stream.send(iq)
-
 
 	def socket(self):
 		return self.stream.socket
@@ -117,6 +117,21 @@ class Client:
 			self.roster_updated()
 		else:
 			raise ClientError("Roster retrieval failed")
+
+	def __roster_push(self,iq):
+		fr=iq.get_from()
+		if fr and fr!=self.jid:
+			resp=iq.make_error_response("forbidden")
+			self.stream.send(resp)
+			raise ClientError("Got roster update from wrong source")
+		if not self.roster:
+			raise ClientError("Roster update, but no roster")
+		q=iq.get_query()
+		item=self.roster.update(q)
+		if item:
+			self.roster_updated(item.jid())
+		resp=iq.make_result_response()
+		self.stream.send(resp)
 	
 	def __post_auth(self):
 		ClientStream.post_auth(self.stream)
