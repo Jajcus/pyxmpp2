@@ -1,27 +1,83 @@
-#!/usr/bin/python
+#!/usr/bin/python -u
 # -*- coding: UTF-8 -*-
 
 import unittest
+import libxml2
 from pyxmpp import xmlextra
 from pyxmpp.jid import JID,JIDError
 from pyxmpp import xmppstringprep
 
+def xml_elements_equal(a,b):
+    if a.name!=b.name:
+        return False
+    try:
+        ns1 = a.ns()
+    except libxml2.treeError:
+        ns1 = None
+    try:
+        ns2 = b.ns()
+    except libxml2.treeError:
+        ns2 = None
+    if ns1 or ns2:
+        if None in (ns1,ns2):
+            return False
+        if ns1.content != ns2.content:
+            return False
+ 
+    ap = a.properties
+    bp = b.properties
+    while 1:
+        if (ap, bp) == (None, None):
+            break
+        if None in (ap, bp):
+            return False
+        if ap.name != bp.name:
+            return False
+        if ap.content != bp.content:
+            return False
+        ap = ap.next
+        bp = bp.next
+   
+    ac = a.children
+    bc = b.children
+    while 1:
+        if (ac, bc) == (None, None):
+            return True
+        if None in (ac, bc):
+            return False
+        if ac.type != bc.type:
+            return False
+        if ac.type == 'element':
+            if not xml_elements_equal(ac, bc):
+                return False
+        elif ac.content != bc.content:
+            return False
+        ac = ac.next
+        bc = bc.next
+    return True
+
 class EventTemplate:
     def __init__(self, template):
-        self.event, self.offset, self.xml = template.split(None,2)
-        self.offset = int(self.offset)
+        self.event, offset, xml = template.split(None,2)
+        self.offset = int(offset)
+        self.xml = libxml2.parseDoc(eval(xml))
+
+    def __del__(self):
+        self.xml.freeDoc()
 
     def match(self, event, node):
         if self.event!=event:
             return False
+        if event=="end":
+            return True
         if node.type!='element':
             return False
-        if self.xml!=`node.serialize()`:
+        if not xml_elements_equal(self.xml.getRootElement(),node):
             return False
         return True
             
     def __repr__(self):
-        return "<EventTemplate %r at %r: %s>" % (self.event, self.offset, self.xml)
+        return "<EventTemplate %r at %r: %r>" % (self.event, self.offset, self.xml.getRootElement().serialize())
 
 class StreamHandler(xmlextra.StreamHandler):
     def __init__(self, test_case):
@@ -29,10 +85,8 @@ class StreamHandler(xmlextra.StreamHandler):
     def stream_start(self, doc):
         self.test_case.event("start", doc.getRootElement())
     def stream_end(self, doc):
-        self.test_case.event("end", doc.getRootElement())
+        self.test_case.event("end", None)
     def stanza(self, doc, node):
-        self.test_case.event("node", node)
-    def stanza_end(self, doc, node):
         self.test_case.event("node", node)
 
 expected_events = []
