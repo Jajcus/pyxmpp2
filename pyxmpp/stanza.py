@@ -104,18 +104,18 @@ class Stanza:
         return self.node
     def get_from(self):
         if self.node.hasProp("from"):
-            return JID(self.node.prop("from"))
+            return JID(from_utf8(self.node.prop("from")))
         else:
             return None
     def get_to(self):
         if self.node.hasProp("to"):
-            return JID(self.node.prop("to"))
+            return JID(from_utf8(self.node.prop("to")))
         else:
             return None
     def get_type(self):
-        return self.node.prop("type")
+        return from_utf8(self.node.prop("type"))
     def get_id(self):
-        return self.node.prop("id")
+        return from_utf8(self.node.prop("id"))
     def get_error(self):
         if self.error:
             return self.error
