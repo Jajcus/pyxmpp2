@@ -25,6 +25,10 @@ from pyxmpp.jid import JID
 
 from pyxmpp.utils import to_utf8,from_utf8
 
+DISCO_NS="http://jabber.org/protocol/disco"
+DISCO_ITEMS_NS=DISCO_NS+"#items"
+DISCO_INFO_NS=DISCO_NS+"#info"
+
 class DiscoError(StandardError):
 	pass
 
@@ -36,7 +40,7 @@ class DiscoItem:
 				self.xmlnode=disco.xmlnode.newChild(disco.xmlnode.ns(),"item",None)
 			else:
 				self.xmlnode=common_root.newChild(None,"item",None)
-				ns=self.xmlnode.newNs("http://jabber.org/protocol/disco#items",None)
+				ns=self.xmlnode.newNs(DISCO_ITEMS_NS,None)
 				self.xmlnode.setNs(ns)
 			self.xmlnode.setProp("jid",xmlnode_or_jid.as_string())
 		else:
@@ -46,7 +50,7 @@ class DiscoItem:
 				self.xmlnode=node_or_jid
 		self.xpath_ctxt=common_doc.xpathNewContext()
 		self.xpath_ctxt.setContextNode(self.xmlnode)
-		self.xpath_ctxt.xpathRegisterNs("d","http://jabber.org/protocol/disco#items")
+		self.xpath_ctxt.xpathRegisterNs("d",DISCO_ITEMS_NS)
 		if name is not None:
 			self.set_name(name)
 		if node is not None:
@@ -134,7 +138,7 @@ class DiscoIdentity:
 				self.xmlnode=disco.xmlnode.newChild(disco.xmlnode.ns(),"identity",None)
 			else:
 				self.xmlnode=common_root.newChild(None,"identity",None)
-				ns=self.xmlnode.newNs("http://jabber.org/protocol/disco#info",None)
+				ns=self.xmlnode.newNs(DISCO_INFO_NS,None)
 				self.xmlnode.setNs(ns)
 			self.xmlnode.setProp("name",to_utf8(xmlnode_or_name))
 			self.xmlnode.setProp("category",to_utf8(category))
@@ -142,7 +146,7 @@ class DiscoIdentity:
 				self.xmlnode.setProp("type",to_utf8(type))
 		self.xpath_ctxt=common_doc.xpathNewContext()
 		self.xpath_ctxt.setContextNode(self.xmlnode)
-		self.xpath_ctxt.xpathRegisterNs("d","http://jabber.org/protocol/disco#info")
+		self.xpath_ctxt.xpathRegisterNs("d",DISCO_INFO_NS)
 
 	def __del__(self):
 		if self.disco is None:
@@ -195,20 +199,20 @@ class DiscoItems:
 		self.xpath_ctxt=None
 		if isinstance(xmlnode_or_node,libxml2.xmlNode):
 			ns=xmlnode.ns()
-			if ns.getContent() != "http://jabber.org/protocol/disco#items":
+			if ns.getContent() != DISCO_ITEMS_NS:
 				raise RosterError,"Bad disco-items namespace"
 			self.xmlnode=xmlnode.docCopyNode(common_doc,1)
 			common_root.addChild(self.xmlnode)
 			self.ns=self.xmlnode.ns()
 		else:
 			self.xmlnode=common_root.newChild(None,"query",None)
-			self.ns=self.xmlnode.newNs("http://jabber.org/protocol/disco#items",None)
+			self.ns=self.xmlnode.newNs(DISCO_ITEMS_NS,None)
 			self.xmlnode.setNs(self.ns)
 			if xmlnode_or_node:
 				slef.xmlnode.setProp("node",to_utf8(xmlnode_or_node))
 		self.xpath_ctxt=common_doc.xpathNewContext()
 		self.xpath_ctxt.setContextNode(self.xmlnode)
-		self.xpath_ctxt.xpathRegisterNs("d","http://jabber.org/protocol/disco#items")
+		self.xpath_ctxt.xpathRegisterNs("d",DISCO_ITEMS_NS)
 	
 	def __del__(self):
 		if self.xmlnode:
@@ -259,21 +263,21 @@ class DiscoInfo:
 		self.xpath_ctxt=None
 		if isinstance(xmlnode_or_node,libxml2.xmlNode):
 			ns=xmlnode.ns()
-			if ns.getContent() != "http://jabber.org/protocol/disco#info":
+			if ns.getContent() != DISCO_INFO_NS:
 				raise RosterError,"Bad disco-info namespace"
 			self.xmlnode=xmlnode.docCopyNode(common_doc,1)
 			common_root.addChild(self.xmlnode)
 			self.ns=self.xmlnode.ns()
 		else:
 			self.xmlnode=common_root.newChild(None,"query",None)
-			self.ns=self.xmlnode.newNs("http://jabber.org/protocol/disco#info",None)
+			self.ns=self.xmlnode.newNs(DISCO_INFO_NS,None)
 			self.xmlnode.setNs(self.ns)
 			if xmlnode_or_node:
 				slef.xmlnode.setProp("node",to_utf8(xmlnode_or_node))
 
 		self.xpath_ctxt=common_doc.xpathNewContext()
 		self.xpath_ctxt.setContextNode(self.xmlnode)
-		self.xpath_ctxt.xpathRegisterNs("d","http://jabber.org/protocol/disco#info")
+		self.xpath_ctxt.xpathRegisterNs("d",DISCO_INFO_NS)
 	
 	def __del__(self):
 		if self.xmlnode:

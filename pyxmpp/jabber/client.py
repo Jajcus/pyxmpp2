@@ -16,7 +16,7 @@
 #
 
 from clientstream import LegacyClientStream
-from disco import DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
+from disco import DISCO_ITEMS_NS,DISCO_INFO_NS,DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
 from pyxmpp.client import Client,ClientError,FatalClientError
 from pyxmpp.stanza import Stanza
 
@@ -83,10 +83,8 @@ class JabberClient(Client):
 
 	def authorized(self):
 		Client.authorized(self)
-		self.stream.set_iq_get_handler("query","http://jabber.org/protocol/disco#items",
-									self.__disco_items)
-		self.stream.set_iq_get_handler("query","http://jabber.org/protocol/disco#info",
-									self.__disco_info)
+		self.stream.set_iq_get_handler("query",DISCO_ITEMS_NS,self.__disco_items)
+		self.stream.set_iq_get_handler("query",DISCO_INFO_NS,self.__disco_info)
 
 	def disco_get_info(self,node,iq):
 		to=iq.get_to()

@@ -25,6 +25,8 @@ import string
 import pyxmpp.jid
 from pyxmpp.utils import to_utf8,from_utf8
 
+VCARD_NS="vcard-temp"
+
 class Empty(Exception):
 	pass
 
@@ -685,8 +687,8 @@ class VCard:
 		self.content={}
 		if isinstance(data,libxml2.xmlNode):
 			ns=get_node_ns(data)
-			if ns and ns.getContent()!="vcard-temp":
-				raise ValueError,"Not in the 'vcard-temp' namespace"
+			if ns and ns.getContent()!=VCARD_NS:
+				raise ValueError,"Not in the %r namespace" % (VCARD_NS,)
 			if data.name!="vCard":
 				raise ValueError,"Bad root element name: %r" % (data.name,)
 			n=data.children
@@ -808,19 +810,19 @@ class VCard:
 		if parent:
 			if doc:
 				try:
-					ns=parent.searchNsByHref(doc,"vcard-temp")
+					ns=parent.searchNsByHref(doc,VCARD_NS)
 				except libxml2.treeError:
 					ns=None
 			else:
 				ns=None
 			root=parent.newChild(ns,"vCard",None)
 			if not ns:
-				ns=root.newNs("vcard-temp",None)
+				ns=root.newNs(VCARD_NS,None)
 				root.setNs(ns)
 		else:
 			doc=libxml2.newDoc("1.0")
 			root=doc.newChild(None,"vCard",None)
-			ns=root.newNs("vcard-temp",None)
+			ns=root.newNs(VCARD_NS,None)
 			root.setNs(ns)
 		for name,value in self.content.items():
 			if value is None:
