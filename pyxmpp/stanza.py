@@ -95,7 +95,7 @@ class Stanza:
             if not ns.name:
                 xmlextra.replace_ns(self.xmlnode, ns, common_ns)
         else:
-            self.xmlnode=common_doc.newChild(None,name_or_xmlnode,None)
+            self.xmlnode=common_doc.newChild(common_ns,name_or_xmlnode,None)
 
         if from_jid is not None:
             if not isinstance(from_jid,JID):
