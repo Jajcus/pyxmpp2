@@ -1,5 +1,8 @@
 2004-03-22  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/jabber/vcard.py:
+	- vcard support near finishing
+
 	* tests/.cvsignore, tests/vcard.py, tests/vcard1.xml, tests/vcard2.txt:
 	- vcard test suite
 
