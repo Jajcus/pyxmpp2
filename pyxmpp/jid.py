@@ -67,7 +67,7 @@ class JID:
             self.domain=node.domain
             self.resource=node.resource
             return
-        if node and ((u"@" in node) or ("/" in node)):
+        if node and ((u"@" in node) or (u"/" in node)):
             self.from_string(node)
             return
         if domain is None and resource is None:
@@ -164,7 +164,7 @@ class JID:
         elif not self.resource:
             return u"%s@%s" % (self.node,self.domain)
         else:
-            return "%s@%s/%s" % (self.node,self.domain,self.resource)
+            return u"%s@%s/%s" % (self.node,self.domain,self.resource)
     def bare(self):
         "Returns bare JID made by removing resource from current JID"
         return JID(self.node,self.domain,check=0)
