@@ -32,12 +32,12 @@ from pyxmpp.stanza import Stanza,StanzaError,gen_id
 class Iq(Stanza):
     """Wraper object for <iq /> stanzas."""
     stanza_type="iq"
-    def __init__(self,node=None,from_jid=None,to_jid=None,stanza_type=None,stanza_id=None,
+    def __init__(self,xmlnode=None,from_jid=None,to_jid=None,stanza_type=None,stanza_id=None,
             error=None,error_cond=None):
         """Initialize an `Iq` object.
 
         :Parameters:
-            - `node`: XML node to_jid be wrapped into the `Iq` object
+            - `xmlnode`: XML node to_jid be wrapped into the `Iq` object
               or other Iq object to be copied. If not given then new
               presence stanza is created using following parameters.
             - `from_jid`: sender JID.
@@ -47,34 +47,34 @@ class Iq(Stanza):
               given, then unique for the session value is generated.
             - `error_cond`: error condition name. Ignored if `stanza_type` is not "error".
         :Types:
-            - `node`: `unicode` or `libxml2.xmlNode` or `Iq`
+            - `xmlnode`: `unicode` or `libxml2.xmlNode` or `Iq`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
             - `stanza_id`: `unicode`
             - `error_cond`: `unicode`"""
-        self.node=None
-        if isinstance(node,Iq):
+        self.xmlnode=None
+        if isinstance(xmlnode,Iq):
             pass
-        elif isinstance(node,Stanza):
+        elif isinstance(xmlnode,Stanza):
             raise TypeError,"Couldn't make Iq from other Stanza"
-        elif isinstance(node,libxml2.xmlNode):
+        elif isinstance(xmlnode,libxml2.xmlNode):
             pass
-        elif node is not None:
-            raise TypeError,"Couldn't make Iq from %r" % (type(node),)
+        elif xmlnode is not None:
+            raise TypeError,"Couldn't make Iq from %r" % (type(xmlnode),)
         elif not stanza_type:
             raise StanzaError,"type is required for Iq"
         else:
             if not stanza_id:
                 stanza_id=gen_id()
 
-        if not node and stanza_type not in ("get","set","result","error"):
+        if not xmlnode and stanza_type not in ("get","set","result","error"):
             raise StanzaError,"Invalid Iq type: %r" % (stanza_type,)
 
-        if node is None:
-            node="iq"
+        if xmlnode is None:
+            xmlnode="iq"
 
-        Stanza.__init__(self, node, from_jid=from_jid, to_jid=to_jid,
+        Stanza.__init__(self, xmlnode, from_jid=from_jid, to_jid=to_jid,
             stanza_type=stanza_type, stanza_id=stanza_id, error=error,
             error_cond=error_cond)
 
@@ -103,7 +103,7 @@ class Iq(Stanza):
         n=self.get_query()
         if n:
             n=n.copyNode(1)
-            iq.node.children.addPrevSibling(n)
+            iq.xmlnode.children.addPrevSibling(n)
         return iq
 
     def make_result_response(self):
@@ -139,7 +139,7 @@ class Iq(Stanza):
 
         :return: the payload element or None if there is no payload.
         :returntype: `libxml2.xmlNode`"""
-        for c in self.node.xpathEval("*"):
+        for c in self.xmlnode.xpathEval("*"):
             try:
                 if c.ns():
                     return c

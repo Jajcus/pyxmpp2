@@ -80,7 +80,7 @@ class StreamSASLMixIn(sasl.PasswordManager):
             ml.setNs(ns)
             for m in self.sasl_mechanisms:
                 if m in sasl.all_mechanisms:
-                    ml.newTextChild(ns,"mechanism",m)
+                    ml.newTextChild(None,"mechanism",m)
         return features
 
     def _handle_sasl_features(self):
@@ -103,47 +103,47 @@ class StreamSASLMixIn(sasl.PasswordManager):
             for n in sasl_mechanisms_n:
                 self.peer_sasl_mechanisms.append(n.getContent())
 
-    def _process_node_sasl(self,node):
+    def _process_node_sasl(self,xmlnode):
         """Process incoming stream element. Pass it to _process_sasl_node
         if it is in the SASL namespace.
 
         :return: `True` when the node was recognized as a SASL element.
         :returntype: `bool`"""
-        ns_uri=node.ns().getContent()
+        ns_uri=xmlnode.ns().getContent()
         if ns_uri==SASL_NS:
-            self._process_sasl_node(node)
+            self._process_sasl_node(xmlnode)
             return True
         return False
 
-    def _process_sasl_node(self,node):
+    def _process_sasl_node(self,xmlnode):
         """Process stream element in the SASL namespace.
 
         :Parameters:
-            - `node`: the XML node received
+            - `xmlnode`: the XML node received
         """
         if self.initiator:
             if not self.authenticator:
-                self.__logger.debug("Unexpected SASL response: %r" % (node.serialize()))
+                self.__logger.debug("Unexpected SASL response: %r" % (xmlnode.serialize()))
                 ret=False
-            elif node.name=="challenge":
-                ret=self._process_sasl_challenge(node.getContent())
-            elif node.name=="success":
-                ret=self._process_sasl_success(node.getContent())
-            elif node.name=="failure":
-                ret=self._process_sasl_failure(node)
+            elif xmlnode.name=="challenge":
+                ret=self._process_sasl_challenge(xmlnode.getContent())
+            elif xmlnode.name=="success":
+                ret=self._process_sasl_success(xmlnode.getContent())
+            elif xmlnode.name=="failure":
+                ret=self._process_sasl_failure(xmlnode)
             else:
-                self.__logger.debug("Unexpected SASL node: %r" % (node.serialize()))
+                self.__logger.debug("Unexpected SASL node: %r" % (xmlnode.serialize()))
                 ret=False
         else:
-            if node.name=="auth":
-                mechanism=node.prop("mechanism")
-                ret=self._process_sasl_auth(mechanism,node.getContent())
-            if node.name=="response":
-                ret=self._process_sasl_response(node.getContent())
-            if node.name=="abort":
+            if xmlnode.name=="auth":
+                mechanism=xmlnode.prop("mechanism")
+                ret=self._process_sasl_auth(mechanism,xmlnode.getContent())
+            if xmlnode.name=="response":
+                ret=self._process_sasl_response(xmlnode.getContent())
+            if xmlnode.name=="abort":
                 ret=self._process_sasl_abort()
             else:
-                self.__logger.debug("Unexpected SASL node: %r" % (node.serialize()))
+                self.__logger.debug("Unexpected SASL node: %r" % (xmlnode.serialize()))
                 ret=False
         return ret
 
@@ -176,17 +176,17 @@ class StreamSASLMixIn(sasl.PasswordManager):
             content=None
 
         root=self.doc_out.getRootElement()
-        node=root.newChild(None,el_name,None)
-        ns=node.newNs(SASL_NS,None)
-        node.setNs(ns)
+        xmlnode=root.newChild(None,el_name,None)
+        ns=xmlnode.newNs(SASL_NS,None)
+        xmlnode.setNs(ns)
         if content:
-            node.setContent(content)
+            xmlnode.setContent(content)
         if isinstance(r,sasl.Failure):
-            node.newChild(ns,r.reason,None)
+            xmlnode.newChild(None,r.reason,None)
 
-        self._write_raw(node.serialize(encoding="UTF-8"))
-        node.unlinkNode()
-        node.freeNode()
+        self._write_raw(xmlnode.serialize(encoding="UTF-8"))
+        xmlnode.unlinkNode()
+        xmlnode.freeNode()
 
         if isinstance(r,sasl.Success):
             if r.authzid:
@@ -223,15 +223,15 @@ class StreamSASLMixIn(sasl.PasswordManager):
             content=None
 
         root=self.doc_out.getRootElement()
-        node=root.newChild(None,el_name,None)
-        ns=node.newNs(SASL_NS,None)
-        node.setNs(ns)
+        xmlnode=root.newChild(None,el_name,None)
+        ns=xmlnode.newNs(SASL_NS,None)
+        xmlnode.setNs(ns)
         if content:
-            node.setContent(content)
+            xmlnode.setContent(content)
 
-        self._write_raw(node.serialize(encoding="UTF-8"))
-        node.unlinkNode()
-        node.freeNode()
+        self._write_raw(xmlnode.serialize(encoding="UTF-8"))
+        xmlnode.unlinkNode()
+        xmlnode.freeNode()
 
         if isinstance(r,sasl.Failure):
             raise SASLAuthenticationFailed,"SASL authentication failed"
@@ -262,17 +262,17 @@ class StreamSASLMixIn(sasl.PasswordManager):
             content=None
 
         root=self.doc_out.getRootElement()
-        node=root.newChild(None,el_name,None)
-        ns=node.newNs(SASL_NS,None)
-        node.setNs(ns)
+        xmlnode=root.newChild(None,el_name,None)
+        ns=xmlnode.newNs(SASL_NS,None)
+        xmlnode.setNs(ns)
         if content:
-            node.setContent(content)
+            xmlnode.setContent(content)
         if isinstance(r,sasl.Failure):
-            node.newChild(ns,r.reason,None)
+            xmlnode.newChild(None,r.reason,None)
 
-        self._write_raw(node.serialize(encoding="UTF-8"))
-        node.unlinkNode()
-        node.freeNode()
+        self._write_raw(xmlnode.serialize(encoding="UTF-8"))
+        xmlnode.unlinkNode()
+        xmlnode.freeNode()
 
         if isinstance(r,sasl.Success):
             authzid=r.authzid
@@ -318,19 +318,19 @@ class StreamSASLMixIn(sasl.PasswordManager):
             raise SASLAuthenticationFailed,"Additional success data procesing failed"
         return True
 
-    def _process_sasl_failure(self,node):
+    def _process_sasl_failure(self,xmlnode):
         """Process incoming <sasl:failure/> element.
 
         [initiating entity only]
 
         :Parameters:
-            - `node`: the XML node received.
+            - `xmlnode`: the XML node received.
         """
         if not self.authenticator:
             self.__logger.debug("Unexpected SASL response")
             return False
 
-        self.__logger.debug("SASL authentication failed: %r" % (node.serialize(),))
+        self.__logger.debug("SASL authentication failed: %r" % (xmlnode.serialize(),))
         raise SASLAuthenticationFailed,"SASL authentication failed"
 
     def _process_sasl_abort(self):
@@ -384,15 +384,15 @@ class StreamSASLMixIn(sasl.PasswordManager):
             raise SASLAuthenticationFailed,"SASL initiation failed"
 
         root=self.doc_out.getRootElement()
-        node=root.newChild(None,"auth",None)
-        ns=node.newNs(SASL_NS,None)
-        node.setNs(ns)
-        node.setProp("mechanism",mechanism)
+        xmlnode=root.newChild(None,"auth",None)
+        ns=xmlnode.newNs(SASL_NS,None)
+        xmlnode.setNs(ns)
+        xmlnode.setProp("mechanism",mechanism)
         if initial_response.data:
-            node.setContent(initial_response.base64())
+            xmlnode.setContent(initial_response.base64())
 
-        self._write_raw(node.serialize(encoding="UTF-8"))
-        node.unlinkNode()
-        node.freeNode()
+        self._write_raw(xmlnode.serialize(encoding="UTF-8"))
+        xmlnode.unlinkNode()
+        xmlnode.freeNode()
 
 # vi: sts=4 et sw=4

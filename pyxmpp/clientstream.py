@@ -235,7 +235,7 @@ class ClientStream(Stream):
             r=stanza.make_result_response()
             self.peer.set_resource(resource)
             q=r.new_query(BIND_NS,"bind")
-            q.newTextChild(q.ns(),"jid",to_utf8(self.peer.as_unicode()))
+            q.newTextChild(None,"jid",to_utf8(self.peer.as_unicode()))
             self.state_change("authorized",self.peer)
         r.set_to(None)
         self.send(r)

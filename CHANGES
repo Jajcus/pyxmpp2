@@ -5,12 +5,33 @@ Those are mentioned here as are not backward compatible.
 I want the api to be stable and consistent in the next release and later,
 so I do all the big changes now (I would have to do them at some time anyway).
 
+
+2005-01-09
+
+	Continuation of the big API unification.
+
+	All attribute and parameter names "node", relating to XML node have
+	been renamed to "xmlnode". The most important change is `Stanza.node` renamed
+	to `Stanza.xmlnode`.
+
+	Roster.items(), Roster.groups(), Roster.items_by_name(), Roster.items_by_group(),
+	Roser.items_by_jid() renamed to: Roster.get_items(), Roster.get_groups(),
+	Roster.get_items_by_name(), Roster.get_items_by_group(), Roster.get_item_by_jid()
+
+	Keys of Roster.items_dict are now JIDs, not unicode.
+
+	More .as_xml() methods unified. To reuse most of the code needed two
+	new virtual classes were added: pyxmpp.objects.StanzaPayloadObject
+	and pyxmpp.objects.StanzaPayloadWrapperObject. Objects providing .as_xml()
+	methods may be used directly as argument to Stanza.set_content() and
+	Stanza.add_content() methods.
+
 2005-01-06
 
 	Big API unification started.
 	
 	jabber.vcard.VCard and jabber.delay.Delay
-	classes' method add_xml accepts now "parent" and "doc" arguments in
+	classes' method as_xml accepts now "parent" and "doc" arguments in
 	that order. Argument interpretation is also unified. All other similar
 	objects will have the add_xml() with the same signature soon.
 

@@ -24,6 +24,7 @@ Normative reference:
 __revision__="$Id$"
 __docformat__="restructuredtext en"
 
+import libxml2
 from types import StringType,UnicodeType
 
 from pyxmpp.stanza import common_doc
@@ -31,15 +32,19 @@ from pyxmpp.iq import Iq
 from pyxmpp.jid import JID
 
 from pyxmpp.utils import to_utf8,from_utf8,get_node_ns_uri,get_node_ns
+from pyxmpp.objects import StanzaPayloadObject
 
 ROSTER_NS="jabber:iq:roster"
 
-class RosterItem:
+class RosterItem(StanzaPayloadObject):
     """
     Roster item.
 
     Represents part of a roster, or roster update request.
     """
+
+    xml_element_name = "item"
+    xml_element_namespace = ROSTER_NS
 
     def __init__(self,node_or_jid,subscription="none",name=None,groups=(),ask=None):
         """
@@ -52,9 +57,10 @@ class RosterItem:
             - `groups`: sequence of groups the item is member of
             - `ask`: True if there was unreplied subsription or unsubscription
               request sent."""
-        if type(node_or_jid) in (StringType,UnicodeType):
+        if isinstance(node_or_jid,libxml2.xmlNode):
+            self.from_xml(node_or_jid)
+        else:
             node_or_jid=JID(node_or_jid)
-        if isinstance(node_or_jid,JID):
             if subscription not in ("none","from","to","both","remove"):
                 raise ValueError,"Bad subscription type: %r" % (subscription,)
             if ask not in ("subscribe",None):
@@ -64,8 +70,6 @@ class RosterItem:
             self.subscription=subscription
             self.name=name
             self.groups=list(groups)
-        else:
-            self.from_xml(node_or_jid)
 
     def from_xml(self,node):
         """Initialize RosterItem from XML node."""
@@ -102,35 +106,31 @@ class RosterItem:
         self.subscription=subscription
         self.ask=ask
 
-    def as_xml(self,parent=None):
-        """
-        Return XML representation of the roster item.
+    def complete_xml_element(self, xmlnode, doc):
+        """Complete the XML node with `self` content.
 
-        If `parent` is given the item will be created as its child.
-        The item will be standalone node in `common_doc` context overwise.
-        """
-        if parent:
-            ns=get_node_ns(parent)
-            node=parent.newChild(ns,"item",None)
-        else:
-            ns=None
-            node=common_doc.newDocNode(None,"item",None)
-        if not ns:
-            ns=node.newNs(ROSTER_NS,None)
-            node.setNs(ns)
-        node.setProp("jid",self.jid.as_utf8())
+        Should be overriden in classes derived from `StanzaPayloadElement`.
+
+        :Parameters:
+            - `xmlnode`: XML node with the element being built. It has already
+              right name and namespace, but no attributes or content.
+            - `doc`: document to which the element belongs.
+        :Types:
+            - `xmlnode`: `libxml.xmlNode`
+            - `doc`: `libxml.xmlDoc"""
+        xmlnode.setProp("jid",self.jid.as_utf8())
         if self.name:
-            node.setProp("name",to_utf8(self.name))
-        node.setProp("subscription",self.subscription)
+            xmlnode.setProp("name",to_utf8(self.name))
+        xmlnode.setProp("subscription",self.subscription)
         if self.ask:
-            node.setProp("ask",to_utf8(self.ask))
+            xmlnode.setProp("ask",to_utf8(self.ask))
         for g in self.groups:
-            node.newTextChild(ns,"group",g)
-        return node
+            xmlnode.newTextChild(None,"group",g)
 
     def __str__(self):
-        n=self.as_xml()
+        n=self.as_xml(doc=common_doc)
         r=n.serialize()
+        n.unlinkNode()
         n.freeNode()
         return r
 
@@ -141,11 +141,20 @@ class RosterItem:
         """
         iq=Iq(stanza_type="set")
         q=iq.new_query(ROSTER_NS)
-        self.as_xml(q)
+        self.as_xml(parent=q, doc=common_doc)
         return iq
 
-class Roster:
-    """Class representing XMPP-IM roster"""
+class Roster(StanzaPayloadObject):
+    """Class representing XMPP-IM roster.
+    
+    :Ivariables:
+        - `items_dict`: items indexed by JID.
+    :Types:
+        - `items_dict`: `dict` of `JID` -> `RosterItem`"""
+
+    xml_element_name = "query"
+    xml_element_namespace = ROSTER_NS
+
     def __init__(self,node=None,server=False,strict=True):
         """
         Initialize Roster object.
@@ -187,44 +196,39 @@ class Roster:
                 continue
             try:
                 item=RosterItem(n)
-                self.items_dict[item.jid.as_unicode()]=item
+                self.items_dict[item.jid]=item
             except ValueError:
                 if strict:
                     raise
             n=n.next
 
-    def as_xml(self,parent=None):
-        """
-        Return XML representation of the roster.
+    def complete_xml_element(self, xmlnode, doc):
+        """Complete the XML node with `self` content.
 
-        If `parent` is given (e.g. IQ stanza node) the roster node will be
-        created as its child.  The item will be standalone node in `common_doc`
-        context overwise.
-        """
-        if parent:
-            ns=get_node_ns(parent)
-            node=parent.newChild(ns,"query",None)
-        else:
-            ns=None
-            node=common_doc.newDocNode(None,"query",None)
-        if not ns:
-            ns=node.newNs(ROSTER_NS,None)
-            node.setNs(ns)
+        Should be overriden in classes derived from `StanzaPayloadElement`.
+
+        :Parameters:
+            - `xmlnode`: XML node with the element being built. It has already
+              right name and namespace, but no attributes or content.
+            - `doc`: document to which the element belongs.
+        :Types:
+            - `xmlnode`: `libxml.xmlNode`
+            - `doc`: `libxml.xmlDoc"""
         for it in self.items_dict.values():
-            it.as_xml(node)
-        return node
+            it.as_xml(parent=xmlnode, doc=doc)
 
     def __str__(self):
-        n=self.as_xml()
+        n=self.as_xml(doc=common_doc)
         r=n.serialize()
+        n.unlinkNode()
         n.freeNode()
         return r
 
-    def items(self):
+    def get_items(self):
         """Return a list of items in the roster."""
         return self.items_dict.values()
 
-    def groups(self):
+    def get_groups(self):
         """Return a list of groups in the roster."""
         r={}
         for it in self.items_dict.values():
@@ -236,7 +240,7 @@ class Roster:
                 r[None]=True
         return r.keys()
 
-    def items_by_name(self,name,case_sensitive=True):
+    def get_items_by_name(self,name,case_sensitive=True):
         """
         Return a list of items with given `name`.
 
@@ -254,7 +258,7 @@ class Roster:
                 r.append(it)
         return r
 
-    def items_by_group(self,group,case_sensitive=True):
+    def get_items_by_group(self,group,case_sensitive=True):
         """
         Return a list of groups with given name.
 
@@ -276,7 +280,7 @@ class Roster:
                 r.append(it)
         return r
 
-    def item_by_jid(self,jid):
+    def get_item_by_jid(self,jid):
         """
         Return roster item with given `jid`.
 
@@ -284,7 +288,7 @@ class Roster:
         """
         if not jid:
             raise ValueError,"jid is None"
-        return self.items_dict[jid.as_unicode()]
+        return self.items_dict[jid]
 
     def add_item(self,item_or_jid,subscription="none",name=None,groups=(),ask=None):
         """
@@ -296,22 +300,22 @@ class Roster:
         """
         if isinstance(item_or_jid,RosterItem):
             item=item_or_jid
-            if self.items_dict.has_key(item.jid.as_unicode()):
+            if self.items_dict.has_key(item.jid):
                 raise ValueError,"Item already exists"
         else:
-            if self.items_dict.has_key(item_or_jid.as_unicode()):
+            if self.items_dict.has_key(item_or_jid):
                 raise ValueError,"Item already exists"
             if not self.server or subscription not in ("none","from","to","both"):
                 subscription="none"
             if not self.server:
                 ask=None
             item=RosterItem(item_or_jid,subscription,name,groups,ask)
-        self.items_dict[item.jid.as_unicode()]=item
+        self.items_dict[item.jid]=item
         return item
 
-    def rm_item(self,jid):
+    def remove_item(self,jid):
         """Remove item from the roster."""
-        del self.items_dict[jid.as_unicode()]
+        del self.items_dict[jid]
         return RosterItem(jid,"remove")
 
     def update(self,query):
@@ -332,7 +336,7 @@ class Roster:
         jid=item.jid
         subscription=item.subscription
         try:
-            local_item=self.item_by_jid(jid)
+            local_item=self.get_item_by_jid(jid)
             local_item.subscription=subscription
         except KeyError:
             if subscription=="remove":
@@ -341,13 +345,13 @@ class Roster:
                 subscription="none"
             local_item=RosterItem(jid,subscription)
         if subscription=="remove":
-            del self.items_dict[local_item.jid.as_unicode()]
+            del self.items_dict[local_item.jid]
             return RosterItem(jid,"remove")
         local_item.name=item.name
         local_item.groups=list(item.groups)
         if not self.server:
             local_item.ask=item.ask
-        self.items_dict[local_item.jid.as_unicode()]=local_item
+        self.items_dict[local_item.jid]=local_item
         return local_item
 
 # vi: sts=4 et sw=4

@@ -91,20 +91,20 @@ class Stream(StreamTLSMixIn,StreamSASLMixIn,StreamBase):
         self._make_stream_sasl_features(features)
         return features
 
-    def _process_node(self,node):
+    def _process_node(self,xmlnode):
         """Process first level element of the stream.
 
         The element may be stream error or features, StartTLS
         request/response, SASL request/response or a stanza.
 
         :Parameters:
-            - `node`: XML node describing the element
+            - `xmlnode`: XML node describing the element
         """
-        if self._process_node_tls(node):
+        if self._process_node_tls(xmlnode):
             return
-        if self._process_node_sasl(node):
+        if self._process_node_sasl(xmlnode):
             return
-        StreamBase._process_node(self,node)
+        StreamBase._process_node(self,xmlnode)
 
     def _got_features(self):
         """Process incoming <stream:features/> element.

@@ -32,6 +32,7 @@ from pyxmpp.error import ErrorNodeError
 from pyxmpp.iq import Iq
 from pyxmpp.jid import JID
 from pyxmpp import xmlextra
+from pyxmpp.objects import StanzaPayloadWrapperObject
 
 MUC_NS="http://jabber.org/protocol/muc"
 MUC_USER_NS=MUC_NS+"#user"
@@ -41,64 +42,64 @@ MUC_OWNER_NS=MUC_NS+"#owner"
 affiliations=("admin","member","none","outcast","owner")
 roles=("moderator","none","participant","visitor")
 
-class MucXBase:
+class MucXBase(StanzaPayloadWrapperObject):
     """
     Base class for MUC-specific stanza payload - wrapper around
     an XML element.
 
     :Ivariables:
-        - `node`: the wrapped XML node
+        - `xmlnode`: the wrapped XML node
     """
     element="x"
     ns=None
-    def __init__(self,node=None,copy=True,parent=None):
+    def __init__(self, xmlnode=None, copy=True, parent=None):
         """
         Copy MucXBase object or create a new one, possibly
         based on or wrapping an XML node.
         
         :Parameters:
-            - `node`: is the object to copy or an XML node to wrap.
+            - `xmlnode`: is the object to copy or an XML node to wrap.
             - `copy`: when `True` a copy of the XML node provided will be included
               in `self`, the node will be copied otherwise.
             - `parent`: parent node for the created/copied XML element.
         :Types:
-            - `node`: `MucXBase` or `libxml2.xmlNode`
+            - `xmlnode`: `MucXBase` or `libxml2.xmlNode`
             - `copy`: `bool`
             - `parent`: `libxml2.xmlNode`
         """
         if self.ns==None:
             raise RuntimeError,"Pure virtual class called"
-        self.node=None
+        self.xmlnode=None
         self.borrowed=False
-        if isinstance(node,libxml2.xmlNode):
+        if isinstance(xmlnode,libxml2.xmlNode):
             if copy:
-                self.node=node.docCopyNode(common_doc,1)
-                common_root.addChild(self.node)
+                self.xmlnode=xmlnode.docCopyNode(common_doc,1)
+                common_root.addChild(self.xmlnode)
             else:
-                self.node=node
+                self.xmlnode=xmlnode
                 self.borrowed=True
             if copy:
-                ns=node.ns()
-                xmlextra.replace_ns(self.node,ns,None)
-                xmlextra.remove_ns(self.node,ns)
-        elif isinstance(node,MucXBase):
+                ns=xmlnode.ns()
+                xmlextra.replace_ns(self.xmlnode,ns,None)
+                xmlextra.remove_ns(self.xmlnode,ns)
+        elif isinstance(xmlnode,MucXBase):
             if not copy:
                 raise ErrorNodeError,"MucXBase may only be copied"
-            self.node=node.node.docCopyNode(common_doc,1)
-            common_root.addChild(self.node)
-        elif node is not None:
+            self.xmlnode=xmlnode.xmlnode.docCopyNode(common_doc,1)
+            common_root.addChild(self.xmlnode)
+        elif xmlnode is not None:
             raise ErrorNodeError,"Bad MucX constructor argument"
         else:
             if parent:
-                self.node=parent.newChild(None,self.element,None)
+                self.xmlnode=parent.newChild(None,self.element,None)
                 self.borrowed=True
             else:
-                self.node=common_root.newChild(None,self.element,None)
-            ns=self.node.newNs(self.ns,None)
-            self.node.setNs(ns)
+                self.xmlnode=common_root.newChild(None,self.element,None)
+            ns=self.xmlnode.newNs(self.ns,None)
+            self.xmlnode.setNs(ns)
 
     def __del__(self):
-        if self.node:
+        if self.xmlnode:
             self.free()
 
     def free(self):
@@ -106,19 +107,19 @@ class MucXBase:
         Unlink and free the XML node owned by `self`.
         """
         if not self.borrowed:
-            self.node.unlinkNode()
-            self.node.freeNode()
-        self.node=None
+            self.xmlnode.unlinkNode()
+            self.xmlnode.freeNode()
+        self.xmlnode=None
 
     def free_borrowed(self):
         """
         Detach the XML node borrowed by `self`.
         """
-        self.node=None
+        self.xmlnode=None
 
     def xpath_eval(self,expr):
         """
-        Evaluate XPath expression in context of `self.node`.
+        Evaluate XPath expression in context of `self.xmlnode`.
 
         :Parameters:
             - `expr`: the XPath expression
@@ -129,7 +130,7 @@ class MucXBase:
         :returntype: list of `libxml2.xmlNode`
         """
         ctxt = common_doc.xpathNewContext()
-        ctxt.setContextNode(self.node)
+        ctxt.setContextNode(self.xmlnode)
         ctxt.xpathRegisterNs("muc",self.ns.getContent())
         ret=ctxt.xpathEval(to_utf8(expr))
         ctxt.xpathFreeContext()
@@ -139,10 +140,10 @@ class MucXBase:
         """
         Serialize `self` as XML.
 
-        :return: serialized `self.node`.
+        :return: serialized `self.xmlnode`.
         :returntype: `str`
         """
-        return self.node.serialize()
+        return self.xmlnode.serialize()
 
 class MucX(MucXBase):
     """
@@ -150,11 +151,11 @@ class MucX(MucXBase):
     stanza payload "x" elements.
     """
     ns=MUC_NS
-    def __init__(self,node=None,copy=True,parent=None):
-        MucXBase.__init__(self,node=node,copy=copy,parent=parent)
+    def __init__(self, xmlnode=None, copy=True, parent=None):
+        MucXBase.__init__(self,xmlnode=xmlnode, copy=copy, parent=parent)
     # FIXME: set/get password/history
 
-class MucItemBase:
+class MucItemBase(object):
     """
     Base class for <status/> and <item/> element wrappers.
     """
@@ -181,12 +182,12 @@ class MucItem(MucItemBase):
         - `actor`: `JID`
         - `reason`: `unicode`
     """
-    def __init__(self,node_or_affiliation,role=None,jid=None,nick=None,actor=None,reason=None):
+    def __init__(self,xmlnode_or_affiliation,role=None,jid=None,nick=None,actor=None,reason=None):
         """
         Initialize a `MucItem` object.
 
         :Parameters:
-            - `node_or_affiliation`: XML node to be pased or the affiliation of
+            - `xmlnode_or_affiliation`: XML node to be pased or the affiliation of
               the user being described.
             - `role`: role of the user.
             - `jid`: JID of the user.
@@ -194,7 +195,7 @@ class MucItem(MucItemBase):
             - `actor`: actor modyfying the user data.
             - `reason`: reason of change of the user data.
         :Types:
-            - `node_or_affiliation`: `libxml2.xmlNode` or `str`
+            - `xmlnode_or_affiliation`: `libxml2.xmlNode` or `str`
             - `role`: `str`
             - `jid`: `JID`
             - `nick`: `unicode`
@@ -203,10 +204,10 @@ class MucItem(MucItemBase):
         """
         self.jid,self.nick,self.actor,self.affiliation,self.reason,self.role=(None,)*6
         MucItemBase.__init__(self)
-        if isinstance(node_or_affiliation,libxml2.xmlNode):
-            self.__from_node(node_or_affiliation)
+        if isinstance(xmlnode_or_affiliation,libxml2.xmlNode):
+            self.__from_xmlnode(xmlnode_or_affiliation)
         else:
-            self.__init(node_or_affiliation,role,jid,nick,actor,reason)
+            self.__init(xmlnode_or_affiliation,role,jid,nick,actor,reason)
 
     def __init(self,affiliation,role,jid=None,nick=None,actor=None,reason=None):
         """Initialize a `MucItem` object from a set of attributes.
@@ -247,17 +248,17 @@ class MucItem(MucItemBase):
         self.nick=nick
         self.reason=reason
 
-    def __from_node(self,node):
+    def __from_xmlnode(self, xmlnode):
         """Initialize a `MucItem` object from an XML node.
 
         :Parameters:
-            - `node`: the XML node.
+            - `xmlnode`: the XML node.
         :Types:
-            - `node`: `libxml2.xmlNode`
+            - `xmlnode`: `libxml2.xmlNode`
         """
         actor=None
         reason=None
-        n=node.children
+        n=xmlnode.children
         while n:
             ns=n.ns()
             if ns and ns.getContent()!=MUC_USER_NS:
@@ -268,10 +269,10 @@ class MucItem(MucItemBase):
                 reason=n.getContent()
             n=n.next
         self.__init(
-            from_utf8(node.prop("affiliation")),
-            from_utf8(node.prop("role")),
-            from_utf8(node.prop("jid")),
-            from_utf8(node.prop("nick")),
+            from_utf8(xmlnode.prop("affiliation")),
+            from_utf8(xmlnode.prop("role")),
+            from_utf8(xmlnode.prop("jid")),
+            from_utf8(xmlnode.prop("nick")),
             from_utf8(actor),
             from_utf8(reason),
             );
@@ -288,11 +289,11 @@ class MucItem(MucItemBase):
         :return: an XML node.
         :returntype: `libxml2.xmlNode`
         """
-        n=parent.newChild(parent.ns(),"item",None)
+        n=parent.newChild(None,"item",None)
         if self.actor:
-            n.newTextChild(parent.ns(),"actor",to_utf8(self.actor))
+            n.newTextChild(None,"actor",to_utf8(self.actor))
         if self.reason:
-            n.newTextChild(parent.ns(),"reason",to_utf8(self.reason))
+            n.newTextChild(None,"reason",to_utf8(self.reason))
         n.setProp("affiliation",to_utf8(self.affiliation))
         n.setProp("role",to_utf8(self.role))
         if self.jid:
@@ -310,20 +311,20 @@ class MucStatus(MucItemBase):
     :Types:
         - `code`: `int`
     """
-    def __init__(self,node_or_code):
+    def __init__(self,xmlnode_or_code):
         """Initialize a `MucStatus` element.
 
         :Parameters:
-            - `node_or_code`: XML node to parse or a status code.
+            - `xmlnode_or_code`: XML node to parse or a status code.
         :Types:
-            - `node_or_code`: `libxml2.xmlNode` or `int`
+            - `xmlnode_or_code`: `libxml2.xmlNode` or `int`
         """
         self.code=None
         MucItemBase.__init__(self)
-        if isinstance(node_or_code,libxml2.xmlNode):
-            self.__from_node(node_or_code)
+        if isinstance(xmlnode_or_code,libxml2.xmlNode):
+            self.__from_xmlnode(xmlnode_or_code)
         else:
-            self.__init(node_or_code)
+            self.__init(xmlnode_or_code)
 
     def __init(self,code):
         """Initialize a `MucStatus` element from a status code.
@@ -338,15 +339,15 @@ class MucStatus(MucItemBase):
             raise ValueError,"Bad status code"
         self.code=code
 
-    def __from_node(self,node):
+    def __from_xmlnode(self, xmlnode):
         """Initialize a `MucStatus` element from an XML node.
 
         :Parameters:
-            - `node`: XML node to parse.
+            - `xmlnode`: XML node to parse.
         :Types:
-            - `node`: `libxml2.xmlNode`
+            - `xmlnode`: `libxml2.xmlNode`
         """
-        self.code=int(node.prop("code"))
+        self.code=int(xmlnode.prop("code"))
 
     def as_xml(self,parent):
         """
@@ -360,7 +361,7 @@ class MucStatus(MucItemBase):
         :return: an XML node.
         :returntype: `libxml2.xmlNode`
         """
-        n=parent.newChild(parent.ns(),"status",None)
+        n=parent.newChild(None,"status",None)
         n.setProp("code","%03i" % (self.code,))
         return n
 
@@ -371,9 +372,9 @@ class MucUserX(MucXBase):
     about a room user.
 
     :Ivariables:
-        - `node`: wrapped XML node
+        - `xmlnode`: wrapped XML node
     :Types:
-        - `node`: `libxml2.xmlNode`
+        - `xmlnode`: `libxml2.xmlNode`
     """
     ns=MUC_USER_NS
     def get_items(self):
@@ -382,10 +383,10 @@ class MucUserX(MucXBase):
         :return: the list of objects.
         :returntype: `list` of `MucItemBase` (`MucItem` and/or `MucStatus`)
         """
-        if not self.node.children:
+        if not self.xmlnode.children:
             return []
         ret=[]
-        n=self.node.children
+        n=self.xmlnode.children
         while n:
             ns=n.ns()
             if ns and ns.getContent()!=self.ns:
@@ -399,11 +400,11 @@ class MucUserX(MucXBase):
         return ret
     def clear(self):
         """
-        Clear the content of `self.node` removing all <item/>, <status/>, etc.
+        Clear the content of `self.xmlnode` removing all <item/>, <status/>, etc.
         """
-        if not self.node.children:
+        if not self.xmlnode.children:
             return
-        n=self.node.children
+        n=self.xmlnode.children
         while n:
             ns=n.ns()
             if ns and ns.getContent()!=MUC_USER_NS:
@@ -422,7 +423,7 @@ class MucUserX(MucXBase):
         """
         if not isinstance(item,MucItemBase):
             raise TypeError,"Bad item type for muc#user"
-        item.as_xml(self.node)
+        item.as_xml(self.xmlnode)
 
 class MucOwnerX(MucXBase):
     """
@@ -431,9 +432,9 @@ class MucOwnerX(MucXBase):
     about a room user.
 
     :Ivariables:
-        - `node`: wrapped XML node.
+        - `xmlnode`: wrapped XML node.
     :Types:
-        - `node`: `libxml2.xmlNode`
+        - `xmlnode`: `libxml2.xmlNode`
     """
     # FIXME: implement
     pass
@@ -458,7 +459,7 @@ class MucStanzaExt:
         """Initialize a `MucStanzaExt` derived object."""
         if self.__class__ is MucStanzaExt:
             raise RuntimeError,"Abstract class called"
-        self.node=None
+        self.xmlnode=None
         self.muc_child=None
 
     def get_muc_child(self):
@@ -470,9 +471,9 @@ class MucStanzaExt:
         """
         if self.muc_child:
             return self.muc_child
-        if not self.node.children:
+        if not self.xmlnode.children:
             return None
-        n=self.node.children
+        n=self.xmlnode.children
         while n:
             if n.name not in ("x","query"):
                 n=n.next
@@ -503,9 +504,9 @@ class MucStanzaExt:
         if self.muc_child:
             self.muc_child.free_borrowed()
             self.muc_child=None
-        if not self.node.children:
+        if not self.xmlnode.children:
             return
-        n=self.node.children
+        n=self.xmlnode.children
         while n:
             if n.name not in ("x","query"):
                 n=n.next
@@ -528,7 +529,7 @@ class MucStanzaExt:
         :returntype: `MucUserX`
         """
         self.clear_muc_child()
-        self.muc_child=MucUserX(parent=self.node)
+        self.muc_child=MucUserX(parent=self.xmlnode)
         return self.muc_child
 
     def make_muc_admin_quey(self):
@@ -539,7 +540,7 @@ class MucStanzaExt:
         :returntype: `MucAdminQuery`
         """
         self.clear_muc_child()
-        self.muc_child=MucAdminQuery(parent=self.node)
+        self.muc_child=MucAdminQuery(parent=self.xmlnode)
         return self.muc_child
 
     def muc_free(self):
@@ -553,12 +554,12 @@ class MucPresence(Presence,MucStanzaExt):
     """
     Extend `Presence` with MUC related interface.
     """
-    def __init__(self,node=None,from_jid=None,to_jid=None,stanza_type=None,stanza_id=None,
+    def __init__(self, xmlnode=None,from_jid=None,to_jid=None,stanza_type=None,stanza_id=None,
             show=None,status=None,priority=0,error=None,error_cond=None):
         """Initialize a `MucPresence` object.
 
         :Parameters:
-            - `node`: XML node to_jid be wrapped into the `MucPresence` object
+            - `xmlnode`: XML node to_jid be wrapped into the `MucPresence` object
               or other Presence object to be copied. If not given then new
               presence stanza is created using following parameters.
             - `from_jid`: sender JID.
@@ -573,7 +574,7 @@ class MucPresence(Presence,MucStanzaExt):
             - `priority`: presence priority.
             - `error_cond`: error condition name. Ignored if `stanza_type` is not "error"
         :Types:
-            - `node`: `unicode` or `libxml2.xmlNode` or `pyxmpp.stanza.Stanza`
+            - `xmlnode`: `unicode` or `libxml2.xmlNode` or `pyxmpp.stanza.Stanza`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
@@ -583,7 +584,7 @@ class MucPresence(Presence,MucStanzaExt):
             - `priority`: `unicode`
             - `error_cond`: `unicode`"""
         MucStanzaExt.__init__(self)
-        Presence.__init__(self,node,from_jid=from_jid,to_jid=to_jid,
+        Presence.__init__(self,xmlnode,from_jid=from_jid,to_jid=to_jid,
                 stanza_type=stanza_type,stanza_id=stanza_id,
                 show=show,status=status,priority=priority,
                 error=error,error_cond=error_cond)
@@ -599,7 +600,7 @@ class MucPresence(Presence,MucStanzaExt):
         Make the presence stanza a MUC room join request.
         """
         self.clear_muc_child()
-        self.muc_child=MucX(parent=self.node)
+        self.muc_child=MucX(parent=self.xmlnode)
 
     def get_join_info(self):
         """If `self` is a MUC room join request return the information contained.
@@ -623,12 +624,12 @@ class MucIq(Iq,MucStanzaExt):
     """
     Extend `Iq` with MUC related interface.
     """
-    def __init__(self,node=None,from_jid=None,to_jid=None,stanza_type=None,stanza_id=None,
+    def __init__(self,xmlnode=None,from_jid=None,to_jid=None,stanza_type=None,stanza_id=None,
             error=None,error_cond=None):
         """Initialize an `Iq` object.
 
         :Parameters:
-            - `node`: XML node to_jid be wrapped into the `Iq` object
+            - `xmlnode`: XML node to_jid be wrapped into the `Iq` object
               or other Iq object to be copied. If not given then new
               presence stanza is created using following parameters.
             - `from_jid`: sender JID.
@@ -638,14 +639,14 @@ class MucIq(Iq,MucStanzaExt):
               given, then unique for the session value is generated.
             - `error_cond`: error condition name. Ignored if `stanza_type` is not "error".
         :Types:
-            - `node`: `unicode` or `libxml2.xmlNode` or `Iq`
+            - `xmlnode`: `unicode` or `libxml2.xmlNode` or `Iq`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
             - `stanza_id`: `unicode`
             - `error_cond`: `unicode`"""
         MucStanzaExt.__init__(self)
-        Iq.__init__(self,node,from_jid=from_jid,to_jid=to_jid,
+        Iq.__init__(self,xmlnode,from_jid=from_jid,to_jid=to_jid,
                 stanza_type=stanza_type,stanza_id=stanza_id,
                 error=error,error_cond=error_cond)
 
@@ -668,7 +669,7 @@ class MucIq(Iq,MucStanzaExt):
         :returntype: `MucItem`
         """
         self.clear_muc_child()
-        self.muc_child=MucAdminQuery(parent=self.node)
+        self.muc_child=MucAdminQuery(parent=self.xmlnode)
         item=MucItem("none","none",nick=nick,reason=reason)
         self.muc_child.add_item(item)
         return self.muc_child

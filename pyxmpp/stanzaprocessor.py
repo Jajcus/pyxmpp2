@@ -126,8 +126,8 @@ class StanzaProcessor:
         :return: result of the last handler or `False` if no
             handler was found."""
         namespaces=[]
-        if stanza.node.children:
-            c=stanza.node.children
+        if stanza.xmlnode.children:
+            c=stanza.xmlnode.children
             while c:
                 try:
                     ns=c.ns()

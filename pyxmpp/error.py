@@ -183,11 +183,11 @@ class ErrorNodeError(RuntimeError):
 
 class ErrorNode:
     """Base class for both XMPP stream and stanza errors"""
-    def __init__(self,node_or_cond,ns=None,copy=True,parent=None):
+    def __init__(self,xmlnode_or_cond,ns=None,copy=True,parent=None):
         """Initialize an ErrorNode object.
 
         :Parameters:
-            - `node_or_cond`: XML node to be wrapped into this object
+            - `xmlnode_or_cond`: XML node to be wrapped into this object
               or error condition name.
             - `ns`: XML namespace URI of the error condition element (to be
               used when the provided node has no namespace).
@@ -195,55 +195,55 @@ class ErrorNode:
               otherwise it is only borrowed.
             - `parent`: Parent node for the XML node to be copied or created.
         :Types:
-            - `node_or_cond`: `libxml2.xmlNode` or `unicode`
+            - `xmlnode_or_cond`: `libxml2.xmlNode` or `unicode`
             - `ns`: `unicode`
             - `copy`: `bool`
             - `parent`: `libxml2.xmlNode`"""
-        if type(node_or_cond) is StringType:
-            node_or_cond=unicode(node_or_cond,"utf-8")
-        self.node=None
+        if type(xmlnode_or_cond) is StringType:
+            xmlnode_or_cond=unicode(xmlnode_or_cond,"utf-8")
+        self.xmlnode=None
         self.borrowed=0
-        if isinstance(node_or_cond,libxml2.xmlNode):
-            self.__from_node(node_or_cond,ns,copy,parent)
-        elif isinstance(node_or_cond,ErrorNode):
+        if isinstance(xmlnode_or_cond,libxml2.xmlNode):
+            self.__from_xml(xmlnode_or_cond,ns,copy,parent)
+        elif isinstance(xmlnode_or_cond,ErrorNode):
             if not copy:
                 raise ErrorNodeError,"ErrorNodes may only be copied"
-            self.ns=from_utf8(node_or_cond.ns.getContent())
-            self.node=node_or_cond.node.docCopyNode(common_doc,1)
+            self.ns=from_utf8(xmlnode_or_cond.ns.getContent())
+            self.xmlnode=xmlnode_or_cond.xmlnode.docCopyNode(common_doc,1)
             if not parent:
                 parent=common_root
-            parent.addChild(self.node)
+            parent.addChild(self.xmlnode)
         elif ns is None:
             raise ErrorNodeError,"Condition namespace not given"
         else:
             if parent:
-                self.node=parent.newChild(None,"error",None)
+                self.xmlnode=parent.newChild(None,"error",None)
                 self.borrowed=1
             else:
-                self.node=common_root.newChild(None,"error",None)
-            cond=self.node.newChild(None,to_utf8(node_or_cond),None)
+                self.xmlnode=common_root.newChild(None,"error",None)
+            cond=self.xmlnode.newChild(None,to_utf8(xmlnode_or_cond),None)
             ns=cond.newNs(ns,None)
             cond.setNs(ns)
             self.ns=from_utf8(ns.getContent())
 
-    def __from_node(self,node,ns,copy,parent):
+    def __from_xml(self,xmlnode,ns,copy,parent):
         """Initialize an ErrorNode object from an XML node.
 
         :Parameters:
-            - `node`: XML node to be wrapped into this object.
+            - `xmlnode`: XML node to be wrapped into this object.
             - `ns`: XML namespace URI of the error condition element (to be
               used when the provided node has no namespace).
             - `copy`: When `True` then the XML node will be copied,
               otherwise it is only borrowed.
             - `parent`: Parent node for the XML node to be copied or created.
         :Types:
-            - `node`: `libxml2.xmlNode`
+            - `xmlnode`: `libxml2.xmlNode`
             - `ns`: `unicode`
             - `copy`: `bool`
             - `parent`: `libxml2.xmlNode`"""
         if not ns:
             ns=None
-            c=node.children
+            c=xmlnode.children
             while c:
                 ns=c.ns().getContent()
                 if ns in (STREAM_ERROR_NS,STANZA_ERROR_NS):
@@ -255,39 +255,39 @@ class ErrorNode:
                 raise ErrorNodeError,"Bad error namespace"
         self.ns=from_utf8(ns)
         if copy:
-            self.node=node.docCopyNode(common_doc,1)
+            self.xmlnode=xmlnode.docCopyNode(common_doc,1)
             if not parent:
                 parent=common_root
-            parent.addChild(self.node)
+            parent.addChild(self.xmlnode)
         else:
-            self.node=node
+            self.xmlnode=xmlnode
             self.borrowed=1
         if copy:
-            ns1=node.ns()
-            xmlextra.replace_ns(self.node,ns1,None)
-            xmlextra.remove_ns(self.node,ns1)
+            ns1=xmlnode.ns()
+            xmlextra.replace_ns(self.xmlnode,ns1,None)
+            xmlextra.remove_ns(self.xmlnode,ns1)
 
     def __del__(self):
-        if self.node:
+        if self.xmlnode:
             self.free()
 
     def free(self):
         """Free the associated XML node."""
         if not self.borrowed:
-            self.node.unlinkNode()
-            self.node.freeNode()
-        self.node=None
+            self.xmlnode.unlinkNode()
+            self.xmlnode.freeNode()
+        self.xmlnode=None
 
     def free_borrowed(self):
         """Free the associated "borrowed" XML node."""
-        self.node=None
+        self.xmlnode=None
 
     def is_legacy(self):
         """Check if the error node is a legacy error element.
 
         :return: `True` if it is a legacy error.
         :returntype: `bool`"""
-        return not self.node.hasProp("type")
+        return not self.xmlnode.hasProp("type")
 
     def xpath_eval(self,expr,namespaces=None):
         """Evaluate XPath expression on the error element.
@@ -302,9 +302,9 @@ class ErrorNode:
         :return: the result of the expression evaluation.
         """
         if not namespaces:
-            return self.node.xpathEval(expr)
+            return self.xmlnode.xpathEval(expr)
         ctxt = common_doc.xpathNewContext()
-        ctxt.setContextNode(self.node)
+        ctxt.setContextNode(self.xmlnode)
         for prefix,uri in namespaces.items():
             ctxt.xpathRegisterNs(prefix,uri)
         ret=ctxt.xpathEval(expr)
@@ -364,7 +364,7 @@ class ErrorNode:
 
         :return: the new condition element.
         :returntype: `libxml2.xmlNode`"""
-        c=self.node.newTextChild(None,to_utf8(cond),content)
+        c=self.xmlnode.newTextChild(None,to_utf8(cond),content)
         ns=c.newNs(to_utf8(ns),None)
         c.setNs(ns)
         return c
@@ -375,11 +375,11 @@ class ErrorNode:
         Use the error code provided to select the condition and the
         <error/> CDATA for the error text."""
 
-        if not self.node.hasProp("code"):
+        if not self.xmlnode.hasProp("code"):
             code=None
         else:
             try:
-                code=int(self.node.prop("code"))
+                code=int(self.xmlnode.prop("code"))
             except (ValueError,KeyError):
                 code=None
 
@@ -392,19 +392,19 @@ class ErrorNode:
         if condition:
             return
         elif cond is None:
-            condition=self.node.newChild(None,"undefined-condition",None)
+            condition=self.xmlnode.newChild(None,"undefined-condition",None)
             ns=condition.newNs(to_utf8(self.ns),None)
             condition.setNs(ns)
-            condition=self.node.newChild(None,"unknown-legacy-error",None)
+            condition=self.xmlnode.newChild(None,"unknown-legacy-error",None)
             ns=condition.newNs(PYXMPP_ERROR_NS,None)
             condition.setNs(ns)
         else:
-            condition=self.node.newChild(None,cond,None)
+            condition=self.xmlnode.newChild(None,cond,None)
             ns=condition.newNs(to_utf8(self.ns),None)
             condition.setNs(ns)
-        txt=self.node.getContent()
+        txt=self.xmlnode.getContent()
         if txt:
-            text=self.node.newTextChild(None,"text",txt)
+            text=self.xmlnode.newTextChild(None,"text",txt)
             ns=text.newNs(to_utf8(self.ns),None)
             text.setNs(ns)
 
@@ -412,43 +412,43 @@ class ErrorNode:
         """Downgrade an XMPP error element to the legacy format.
 
         Add a numeric code attribute according to the condition name."""
-        if self.node.hasProp("code"):
+        if self.xmlnode.hasProp("code"):
             return
         cond=self.get_condition()
         if not cond:
             return
         cond=cond.name
         if stanza_errors.has_key(cond) and stanza_errors[cond][2]:
-            self.node.setProp("code",to_utf8(stanza_errors[cond][2]))
+            self.xmlnode.setProp("code",to_utf8(stanza_errors[cond][2]))
 
     def serialize(self):
         """Serialize the element node.
 
         :return: serialized element in UTF-8 encoding.
         :returntype: `str`"""
-        return self.node.serialize(encoding="utf-8")
+        return self.xmlnode.serialize(encoding="utf-8")
 
 class StreamErrorNode(ErrorNode):
     """Stream error element."""
-    def __init__(self,node_or_cond,copy=1,parent=None):
+    def __init__(self,xmlnode_or_cond,copy=1,parent=None):
         """Initialize a StreamErrorNode object.
 
         :Parameters:
-            - `node_or_cond`: XML node to be wrapped into this object
+            - `xmlnode_or_cond`: XML node to be wrapped into this object
               or the primary (defined by XMPP specification) error condition name.
             - `copy`: When `True` then the XML node will be copied,
               otherwise it is only borrowed.
             - `parent`: Parent node for the XML node to be copied or created.
         :Types:
-            - `node_or_cond`: `libxml2.xmlNode` or `unicode`
+            - `xmlnode_or_cond`: `libxml2.xmlNode` or `unicode`
             - `copy`: `bool`
             - `parent`: `libxml2.xmlNode`"""
-        if type(node_or_cond) is StringType:
-            node_or_cond=unicode(node_or_cond,"utf-8")
-        if type(node_or_cond) is UnicodeType:
-            if not stream_errors.has_key(node_or_cond):
+        if type(xmlnode_or_cond) is StringType:
+            xmlnode_or_cond=unicode(xmlnode_or_cond,"utf-8")
+        if type(xmlnode_or_cond) is UnicodeType:
+            if not stream_errors.has_key(xmlnode_or_cond):
                 raise ErrorNodeError,"Bad error condition"
-        ErrorNode.__init__(self,node_or_cond,STREAM_ERROR_NS,copy=copy,parent=parent)
+        ErrorNode.__init__(self,xmlnode_or_cond,STREAM_ERROR_NS,copy=copy,parent=parent)
 
     def get_message(self):
         """Get the message for the error.
@@ -468,11 +468,11 @@ class StreamErrorNode(ErrorNode):
 
 class StanzaErrorNode(ErrorNode):
     """Stanza error element."""
-    def __init__(self,node_or_cond,error_type=None,copy=1,parent=None):
+    def __init__(self,xmlnode_or_cond,error_type=None,copy=1,parent=None):
         """Initialize a StreamErrorNode object.
 
         :Parameters:
-            - `node_or_cond`: XML node to be wrapped into this object
+            - `xmlnode_or_cond`: XML node to be wrapped into this object
               or the primary (defined by XMPP specification) error condition name.
             - `error_type`: type of the error, one of: 'cancel', 'continue',
               'modify', 'auth', 'wait'.
@@ -480,31 +480,31 @@ class StanzaErrorNode(ErrorNode):
               otherwise it is only borrowed.
             - `parent`: Parent node for the XML node to be copied or created.
         :Types:
-            - `node_or_cond`: `libxml2.xmlNode` or `unicode`
+            - `xmlnode_or_cond`: `libxml2.xmlNode` or `unicode`
             - `error_type`: `unicode`
             - `copy`: `bool`
             - `parent`: `libxml2.xmlNode`"""
-        if type(node_or_cond) is StringType:
-            node_or_cond=unicode(node_or_cond,"utf-8")
-        if type(node_or_cond) is UnicodeType:
-            if not stanza_errors.has_key(node_or_cond):
+        if type(xmlnode_or_cond) is StringType:
+            xmlnode_or_cond=unicode(xmlnode_or_cond,"utf-8")
+        if type(xmlnode_or_cond) is UnicodeType:
+            if not stanza_errors.has_key(xmlnode_or_cond):
                 raise ErrorNodeError,"Bad error condition"
 
-        ErrorNode.__init__(self,node_or_cond,STANZA_ERROR_NS,copy=copy,parent=parent)
+        ErrorNode.__init__(self,xmlnode_or_cond,STANZA_ERROR_NS,copy=copy,parent=parent)
 
-        if type(node_or_cond) is UnicodeType:
+        if type(xmlnode_or_cond) is UnicodeType:
             if error_type is None:
-                error_type=stanza_errors[node_or_cond][1]
-            self.node.setProp("type",to_utf8(error_type))
+                error_type=stanza_errors[xmlnode_or_cond][1]
+            self.xmlnode.setProp("type",to_utf8(error_type))
 
     def get_type(self):
         """Get the error type.
 
         :return: type of the error.
         :returntype: `unicode`"""
-        if not self.node.hasProp("type"):
+        if not self.xmlnode.hasProp("type"):
             self.upgrade()
-        return from_utf8(self.node.prop("type"))
+        return from_utf8(self.xmlnode.prop("type"))
 
     def upgrade(self):
         """Upgrade a legacy error element to the XMPP compliant one.
@@ -512,13 +512,13 @@ class StanzaErrorNode(ErrorNode):
         Use the error code provided to select the condition and the
         <error/> CDATA for the error text."""
         ErrorNode.upgrade(self)
-        if self.node.hasProp("type"):
+        if self.xmlnode.hasProp("type"):
             return
 
         cond=self.get_condition().name
         if stanza_errors.has_key(cond):
             typ=stanza_errors[cond][1]
-            self.node.setProp("type",typ)
+            self.xmlnode.setProp("type",typ)
 
     def get_message(self):
         """Get the message for the error.

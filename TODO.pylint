@@ -1,14 +1,21 @@
 ************* Module pyxmpp.xmppstringprep
 ignore that: W0403: 28: Uses of a deprecated module 'stringprep'
+************* Module pyxmpp.roster
+ignore that: W0231: 49:RosterItem.__init__: __init__ method from base class 'StanzaPayloadObject' is not called
+ignore that: W0613:109:RosterItem.complete_xml_element: Unused argument 'doc'
+ignore that: W0231:158:Roster.__init__: __init__ method from base class 'StanzaPayloadObject' is not called
+W0611: 28: Unused import StringType
+W0611: 34: Unused import get_node_ns
+W0611: 28: Unused import UnicodeType
 ************* Module pyxmpp.cache
-W0511:560: TODO: optimize somehow.
+W0511:559: TODO: optimize somehow.
 ignore that: W0231: 68:CacheItem.__init__: __init__ method from base class 'object' is not called
-ignore that: W0141:434:Cache.request_object.error_handler: Missing docstring
-ignore that: E0102:434:Cache.request_object.error_handler: function already defined line 369
-ignore that: W0613:434:Cache.request_object.error_handler: Unused argument 'data'
-ignore that: W0141:437:Cache.request_object.timeout_handler: Missing docstring
-ignore that: E0102:437:Cache.request_object.timeout_handler: function already defined line 369
-W0612:569:Cache.purge_items: Unused variable 'i'
+ignore that: W0141:435:Cache.request_object.error_handler: Missing docstring
+ignore that: E0102:435:Cache.request_object.error_handler: function already defined line 369
+ignore that: W0613:435:Cache.request_object.error_handler: Unused argument 'data'
+ignore that: W0141:438:Cache.request_object.timeout_handler: Missing docstring
+ignore that: E0102:438:Cache.request_object.timeout_handler: function already defined line 369
+ignore that: W0612:568:Cache.purge_items: Unused variable 'i'
 ************* Module pyxmpp.streamsasl
 ignore that: W0201:309:StreamSASLMixIn._process_sasl_success: Attribute 'me' defined outside __init__
 ignore that: W0201:312:StreamSASLMixIn._process_sasl_success: Attribute 'authenticated' defined outside __init__
@@ -95,6 +102,13 @@ W0611: 39: Unused import Message
 W0611: 41: Unused import StanzaError
 ************* Module pyxmpp.client
 ignore that: W0613:247:Client.__session_result: Unused argument 'iq'
+************* Module pyxmpp.objects
+ignore that: W0232: 26:StanzaPayloadObject: Class has no __init__ method
+ignore that: W0232:111:StanzaPayloadWrapperObject: Class has no __init__ method
+E0201:152:StanzaPayloadWrapperObject.as_xml: Access to undefined member 'xmlnode'
+E0201:160:StanzaPayloadWrapperObject.as_xml: Access to undefined member 'xmlnode'
+ignore that: W0232:166:CachedPropertyObject: Class has no __init__ method
+W0611: 24: Unused import common_root
 ************* Module pyxmpp.streamtls
 ignore that: W0201:110:StreamTLSMixIn._reset_tls: Attribute 'tls' defined outside __init__
 ignore that: W0201:263:StreamTLSMixIn._process_tls_node: Attribute 'socket' defined outside __init__
@@ -104,8 +118,10 @@ ignore that: W0201:236:StreamTLSMixIn._request_tls: Attribute 'features' defined
 W0141:  0: Missing docstring
 W0103:  0: Missing required attribute "__revision__"
 W0103:  0: Missing required attribute "__docformat__"
+************* Module pyxmpp.jabberd.component
+F0001:  0: Unable to load module pyxmpp.jabberd.component (cannot import name cache)
 ************* Module pyxmpp.jabberd.all
-F0001:  0: Unable to load module pyxmpp.jabberd.all ('module' object has no attribute 'jabberd')
+F0001:  0: Unable to load module pyxmpp.jabberd.all (cannot import name Component)
 ************* Module pyxmpp.jabberd.componentstream
 ignore that: W0221: 80:ComponentStream.connect: Arguments number differs from overriden method
 ignore that: W0221:100:ComponentStream._connect: Arguments number differs from overriden method
@@ -133,9 +149,11 @@ ignore that: W0613:488:DigestMD5ServerAuthenticator.start: Unused argument 'resp
 W0511:550: TODO: kicks
 ignore that: W0613:380:MucRoomState.set_stream: Unused argument 'stream'
 ************* Module pyxmpp.jabber.muccore
-W0511:155: FIXME: set/get password/history
-W0511:397: FIXME: alt,decline,invite,password
-W0511:438: FIXME: implement
+W0511:156: FIXME: set/get password/history
+W0511:398: FIXME: alt,decline,invite,password
+W0511:439: FIXME: implement
+ignore that: W0231: 55:MucXBase.__init__: __init__ method from base class 'StanzaPayloadWrapperObject' is not called
+ignore that: W0231:162:MucItemBase.__init__: __init__ method from base class 'object' is not called
 ************* Module pyxmpp.jabber.clientstream
 ignore that: W0613:260:LegacyClientStream._plain_auth_stage2: Unused argument 'stanza'
 ignore that: W0613:274:LegacyClientStream._plain_auth_in_stage2: Unused argument 'resource'
@@ -143,59 +161,77 @@ ignore that: W0613:302:LegacyClientStream._digest_auth_stage2: Unused argument '
 ignore that: W0613:317:LegacyClientStream._digest_auth_in_stage2: Unused argument 'resource'
 ignore that: W0613:355:LegacyClientStream.auth_finish: Unused argument 'stanza'
 ************* Module pyxmpp.jabber.all
-W0611: 35: Unused import DiscoItem
-W0611: 34: Unused import DISCO_INFO_NS
-W0611: 34: Unused import DISCO_ITEMS_NS
-W0611: 35: Unused import DiscoItems
-W0611: 32: Unused import LegacyClientStream
-W0611: 33: Unused import Client
-W0611: 35: Unused import DiscoInfo
-W0611: 35: Unused import DiscoIdentity
-W0611: 36: Unused import VCARD_NS
-W0611: 34: Unused import DISCO_NS
-W0611: 36: Unused import VCard
+F0001:  0: Unable to load module pyxmpp.jabber.all (cannot import name DISCO_ITEMS_NS)
 ************* Module pyxmpp.jabber.client
-ignore that: W0613: 83:JabberClient.connect: Unused argument 'register'
+ignore that: W0613: 87:JabberClient.connect: Unused argument 'register'
+************* Module pyxmpp.jabber.delay
+ignore that: W0231: 55:Delay.__init__: __init__ method from base class 'StanzaPayloadObject' is not called
+ignore that: W0613:109:Delay.complete_xml_element: Unused argument 'doc'
+W0611: 31: Unused import common_doc
+************* Module pyxmpp.jabber.disco
+ignore that: W0231: 61:DiscoItem.__init__: __init__ method from base class 'CachedPropertyObject' is not called
+ignore that: W0231: 61:DiscoItem.__init__: __init__ method from base class 'StanzaPayloadWrapperObject' is not called
+ignore that: W0201:168:DiscoItem.get_node: Attribute 'node' defined outside __init__
+ignore that: W0201:226:DiscoItem.get_jid: Attribute 'jid' defined outside __init__
+ignore that: W0201:140:DiscoItem.get_name: Attribute 'name' defined outside __init__
+ignore that: W0201:197:DiscoItem.get_action: Attribute 'action' defined outside __init__
+ignore that: W0231:252:DiscoIdentity.__init__: __init__ method from base class 'CachedPropertyObject' is not called
+ignore that: W0231:252:DiscoIdentity.__init__: __init__ method from base class 'StanzaPayloadWrapperObject' is not called
+ignore that: W0201:361:DiscoIdentity.get_category: Attribute 'category' defined outside __init__
+ignore that: W0201:337:DiscoIdentity.get_name: Attribute 'name' defined outside __init__
+ignore that: W0201:385:DiscoIdentity.get_type: Attribute 'type' defined outside __init__
+ignore that: W0231:413:DiscoItems.__init__: __init__ method from base class 'CachedPropertyObject' is not called
+ignore that: W0231:413:DiscoItems.__init__: __init__ method from base class 'StanzaPayloadWrapperObject' is not called
+ignore that: W0152:510:DiscoItems.set_items: Used * or ** magic
+ignore that: W0201:457:DiscoItems.get_node: Attribute 'node' defined outside __init__
+ignore that: W0201:489:DiscoItems.get_items: Attribute 'items' defined outside __init__
+ignore that: W0231:572:DiscoInfo.__init__: __init__ method from base class 'CachedPropertyObject' is not called
+ignore that: W0231:572:DiscoInfo.__init__: __init__ method from base class 'StanzaPayloadWrapperObject' is not called
+ignore that: W0152:813:DiscoInfo.set_identities: Used * or ** magic
+ignore that: W0201:626:DiscoInfo.get_node: Attribute 'node' defined outside __init__
+ignore that: W0201:658:DiscoInfo.get_features: Attribute 'features' defined outside __init__
+ignore that: W0201:753:DiscoInfo.get_identities: Attribute 'identities' defined outside __init__
 ************* Module pyxmpp.jabber.vcard
-W0511:1327: FIXME#
-W0302:  0: Too many lines in module (1581)
-ignore that: W0613:119:VCardString.__init__: Unused argument 'rfc2425parameters'
+W0511:1318: FIXME#
+W0302:  0: Too many lines in module (1551)
+ignore that: W0613:120:VCardString.__init__: Unused argument 'rfc2425parameters'
 ignore that: W0613:190:VCardJID.__init__: Unused argument 'rfc2425parameters'
-ignore that: W0613:248:VCardName.__init__: Unused argument 'rfc2425parameters'
-ignore that: W0613:822:VCardGeo.__init__: Unused argument 'rfc2425parameters'
-ignore that: W0613:890:VCardOrg.__init__: Unused argument 'rfc2425parameters'
-ignore that: W0613:963:VCardCategories.__init__: Unused argument 'rfc2425parameters'
-ignore that: W0613:1117:VCardPrivacy.__init__: Unused argument 'rfc2425parameters'
-ignore that: W0612:1366:VCard.__init__: Unused variable 'cl'
-ignore that: W0612:1519:VCard.rfc2426: Unused variable 'name'
-ignore that: W0612:1560:VCard.xml: Unused variable 'name'
-E0201:1383:VCard.__make_fn: Access to undefined member 'n'
-E0201:1384:VCard.__make_fn: Access to undefined member 'n'
-E0201:1385:VCard.__make_fn: Access to undefined member 'n'
-E0201:1386:VCard.__make_fn: Access to undefined member 'n'
-E0201:1387:VCard.__make_fn: Access to undefined member 'n'
-E0201:1388:VCard.__make_fn: Access to undefined member 'n'
-E0201:1389:VCard.__make_fn: Access to undefined member 'n'
-E0201:1390:VCard.__make_fn: Access to undefined member 'n'
-E0201:1391:VCard.__make_fn: Access to undefined member 'n'
-E0201:1392:VCard.__make_fn: Access to undefined member 'n'
-E0201:1355:VCard.__init__: Access to undefined member 'fn'
+ignore that: W0613:247:VCardName.__init__: Unused argument 'rfc2425parameters'
+ignore that: W0613:815:VCardGeo.__init__: Unused argument 'rfc2425parameters'
+ignore that: W0613:882:VCardOrg.__init__: Unused argument 'rfc2425parameters'
+ignore that: W0613:954:VCardCategories.__init__: Unused argument 'rfc2425parameters'
+ignore that: W0613:1106:VCardPrivacy.__init__: Unused argument 'rfc2425parameters'
+ignore that: W0231:1332:VCard.__init__: __init__ method from base class 'StanzaPayloadObject' is not called
+ignore that: W0612:1357:VCard.__init__: Unused variable 'cl'
+ignore that: W0612:1510:VCard.rfc2426: Unused variable 'name'
+ignore that: W0612:1533:VCard.complete_xml_element: Unused variable 'name'
+ignore that: W0613:1521:VCard.complete_xml_element: Unused argument 'doc'
+ignore that: E0201:1374:VCard.__make_fn: Access to undefined member 'n'
+ignore that: E0201:1375:VCard.__make_fn: Access to undefined member 'n'
+ignore that: E0201:1376:VCard.__make_fn: Access to undefined member 'n'
+ignore that: E0201:1377:VCard.__make_fn: Access to undefined member 'n'
+ignore that: E0201:1378:VCard.__make_fn: Access to undefined member 'n'
+ignore that: E0201:1379:VCard.__make_fn: Access to undefined member 'n'
+ignore that: E0201:1380:VCard.__make_fn: Access to undefined member 'n'
+ignore that: E0201:1381:VCard.__make_fn: Access to undefined member 'n'
+ignore that: E0201:1382:VCard.__make_fn: Access to undefined member 'n'
+ignore that: E0201:1383:VCard.__make_fn: Access to undefined member 'n'
 W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 
 Report
 ======
-5822 statements analysed.
+5839 statements analysed.
 
 Statistics by type
 ------------------
 
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-module   40     40         =          97.50       0.00     
-class    108    108        =          100.00      0.00     
+module   39     39         =          97.44       0.00     
+class    112    112        =          100.00      0.00     
 method   0      0          =          0.00        0.00     
-function 630    630        =          99.68       0.00     
+function 628    628        =          99.68       0.00     
 
 
 Raw metrics
@@ -203,10 +239,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6418   48.43 6418     =          
-docstring 5321   40.16 5321     =          
-comment   663    5.00  663      =          
-empty     849    6.41  849      =          
+code      6416   48.23 6416     =          
+docstring 5390   40.51 5390     =          
+comment   642    4.83  642      =          
+empty     856    6.43  856      =          
 
 
 External dependencies
@@ -215,10 +251,10 @@ External dependencies
 
     stringprep (pyxmpp.xmppstringprep)
     base64 (pyxmpp.streamsasl,pyxmpp.jabber.vcard)
-    logging (pyxmpp.streamsasl,pyxmpp.streambase,pyxmpp.clientstream,pyxmpp.client,pyxmpp.stream,pyxmpp.streamtls,pyxmpp.stanzaprocessor,pyxmpp.jabberd.component,pyxmpp.jabberd.componentstream,pyxmpp.sasl.plain,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.client)
+    logging (pyxmpp.streamsasl,pyxmpp.streambase,pyxmpp.clientstream,pyxmpp.client,pyxmpp.stream,pyxmpp.streamtls,pyxmpp.stanzaprocessor,pyxmpp.jabberd.componentstream,pyxmpp.sasl.plain,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.client)
     socket (pyxmpp.streambase,pyxmpp.resolver,pyxmpp.streamtls)
-    threading (pyxmpp.cache,pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.client,pyxmpp.expdict,pyxmpp.stanzaprocessor,pyxmpp.jabberd.component)
-    libxml2 (pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.utils,pyxmpp.stanza,pyxmpp.message,pyxmpp.stanzaprocessor,pyxmpp.iq,pyxmpp.error,pyxmpp.jabber.muccore,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    threading (pyxmpp.cache,pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.client,pyxmpp.expdict,pyxmpp.stanzaprocessor)
+    libxml2 (pyxmpp.roster,pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.utils,pyxmpp.stanza,pyxmpp.message,pyxmpp.objects,pyxmpp.stanzaprocessor,pyxmpp.iq,pyxmpp.error,pyxmpp.jabber.muccore,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
     random (pyxmpp.streambase,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.sasl,pyxmpp.sasl.core)
     weakref (pyxmpp.jid,pyxmpp.jabber.muc)
     re (pyxmpp.jid,pyxmpp.utils,pyxmpp.resolver,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
@@ -244,22 +280,23 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0613      35         
-W0201      33         
-W0611      31         
-E0201      25         
+W0201      45         
+W0613      38         
+E0201      26         
+W0611      25         
+W0231      15         
 W0511      8          
 W0612      6          
 W0221      6          
+W0232      4          
 W0103      4          
 W0141      3          
+F0001      3          
+W0152      2          
 E0102      2          
 W0403      1          
 W0401      1          
 W0302      1          
-W0232      1          
-W0231      1          
-F0001      1          
 
 
 Total errors / warnings
@@ -267,8 +304,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 131    131      =          
-errors   27     27       =          
+warnings 159    159      =          
+errors   28     28       =          
 
 
 % errors / warnings by module
@@ -276,32 +313,35 @@ errors   27     27       =
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jid                     51.85 0.76    
-pyxmpp.jabber.vcard            40.74 9.92    
-pyxmpp.cache                   7.41  4.58    
-pyxmpp.streambase              0.00  16.79   
-pyxmpp.all                     0.00  14.50   
-pyxmpp.jabber.all              0.00  8.40    
-pyxmpp.sasl.core               0.00  7.63    
-pyxmpp.streamsasl              0.00  5.34    
-pyxmpp.clientstream            0.00  5.34    
-pyxmpp.jabberd.componentstream 0.00  4.58    
-pyxmpp.jabber.clientstream     0.00  3.82    
-pyxmpp.xmlextra                0.00  3.05    
-pyxmpp.streamtls               0.00  3.05    
-pyxmpp.version                 0.00  2.29    
-pyxmpp.jabber.muccore          0.00  2.29    
-pyxmpp.sasl.plain              0.00  1.53    
-pyxmpp.jabber.muc              0.00  1.53    
-pyxmpp._xmlextra               0.00  1.53    
-pyxmpp.xmppstringprep          0.00  0.76    
-pyxmpp.sasl.digest_md5         0.00  0.76    
-pyxmpp.jabber.client           0.00  0.76    
-pyxmpp.client                  0.00  0.76    
+pyxmpp.jid                     50.00 0.63    
+pyxmpp.jabber.vcard            35.71 9.43    
+pyxmpp.cache                   7.14  3.77    
+pyxmpp.objects                 7.14  2.52    
+pyxmpp.streambase              0.00  13.84   
+pyxmpp.jabber.disco            0.00  13.84   
+pyxmpp.all                     0.00  11.95   
+pyxmpp.sasl.core               0.00  6.29    
+pyxmpp.streamsasl              0.00  4.40    
+pyxmpp.clientstream            0.00  4.40    
+pyxmpp.roster                  0.00  3.77    
+pyxmpp.jabberd.componentstream 0.00  3.77    
+pyxmpp.jabber.muccore          0.00  3.14    
+pyxmpp.jabber.clientstream     0.00  3.14    
+pyxmpp.xmlextra                0.00  2.52    
+pyxmpp.streamtls               0.00  2.52    
+pyxmpp.version                 0.00  1.89    
+pyxmpp.jabber.delay            0.00  1.89    
+pyxmpp.sasl.plain              0.00  1.26    
+pyxmpp.jabber.muc              0.00  1.26    
+pyxmpp._xmlextra               0.00  1.26    
+pyxmpp.xmppstringprep          0.00  0.63    
+pyxmpp.sasl.digest_md5         0.00  0.63    
+pyxmpp.jabber.client           0.00  0.63    
+pyxmpp.client                  0.00  0.63    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 9.54/10 (previous run: 9.54/10)
+Your code has been rated at 9.49/10 (previous run: 9.49/10)
 So close to being perfect...
 

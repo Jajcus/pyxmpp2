@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -67,19 +67,35 @@ def remove_evil_characters(s):
     else:
         return evil_characters_re.sub(utf8_replacement_char,s)
 
-def get_node_ns(node):
-    """Return namespace of the XML `node` or None if namespace is not set."""
+def get_node_ns(xmlnode):
+    """Namespace of an XML node.
+    
+    :Parameters:
+        - `xmlnode`: the XML node to query.
+    :Types:
+        - `xmlnode`: `libxml2.xmlNode`
+        
+    :return: namespace of the node or `None`
+    :returntype: `libxml2.xmlNs`"""
     try:
-        return node.ns()
+        return xmlnode.ns()
     except libxml2.treeError:
         return None
 
 
-def get_node_ns_uri(node):
-    """Return namespace URI of the XML `node` or None if namespace is not set."""
-    ns=get_node_ns(node)
+def get_node_ns_uri(xmlnode):
+    """Return namespace URI of an XML node.
+    
+    :Parameters:
+        - `xmlnode`: the XML node to query.
+    :Types:
+        - `xmlnode`: `libxml2.xmlNode`
+        
+    :return: namespace URI of the node or `None`
+    :returntype: `unicode`"""
+    ns=get_node_ns(xmlnode)
     if ns:
-        return ns.getContent()
+        return unicode(ns.getContent(),"utf-8")
     else:
         return None
 
@@ -124,18 +140,5 @@ def datetime_local_to_utc(local):
     """
     ts=time.mktime(local.timetuple())
     return datetime.datetime.utcfromtimestamp(ts)
-
-class XMPPObject(object):
-    def __getattr__(self,name):
-        try:
-            getattr(self.__class__,"get_"+name)(self)
-            return self.__dict__[name]
-        except (AttributeError,KeyError),e:
-            raise AttributeError,"This object has no attribute %r" % (name,)
-    def __setattr__(self,name,value):
-        try:
-            self.__dict__["set_"+name](value)
-        except KeyError:
-            self.__dict__[name]=value
 
 # vi: sts=4 et sw=4

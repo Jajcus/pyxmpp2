@@ -3,7 +3,7 @@ SNAPSHOT=
 
 DESTDIR="/"
 
-.PHONY: all build test version dist doc cosmetics TODO.pylint pylint ChangeLog www publish
+.PHONY: all build test version dist update-doc doc cosmetics TODO.pylint pylint ChangeLog www publish
 
 all: build test
 
@@ -19,6 +19,9 @@ test:
 
 doc:
 	$(MAKE) -C doc
+
+update-doc:
+	$(MAKE) -C doc update-doc
 
 www:
 	$(MAKE) -C doc www

@@ -33,10 +33,11 @@ from pyxmpp.jid import JID
 
 from pyxmpp.utils import to_utf8,from_utf8,get_node_ns_uri
 from pyxmpp.utils import datetime_utc_to_local,datetime_local_to_utc
+from pyxmpp.objects import StanzaPayloadObject
 
 DELAY_NS="jabber:x:delay"
 
-class Delay:
+class Delay(StanzaPayloadObject):
     """
     Delayed delivery tag.
 
@@ -48,6 +49,9 @@ class Delay:
         - `timestamp`: the UTC timestamp as naive datetime object
     """
 
+    xml_element_name = "x"
+    xml_element_namespace = DELAY_NS
+    
     def __init__(self,node_or_datetime,delay_from=None,reason=None,utc=True):
         """
         Initialize the Delay object.
@@ -75,19 +79,19 @@ class Delay:
             self.delay_from=JID(delay_from)
             self.reason=unicode(reason)
 
-    def from_xml(self,node):
+    def from_xml(self,xmlnode):
         """Initialize Delay object from an XML node.
 
         :Parameters:
-            - `node`: the jabber:x:delay XML element.
+            - `xmlnode`: the jabber:x:delay XML element.
         :Types:
-            - `node`: `libxml2.xmlNode`"""
-        if node.type!="element":
+            - `xmlnode`: `libxml2.xmlNode`"""
+        if xmlnode.type!="element":
             raise ValueError,"XML node is not a jabber:x:delay element (not an element)"
-        ns=get_node_ns_uri(node)
-        if ns and ns!=DELAY_NS or node.name!="x":
+        ns=get_node_ns_uri(xmlnode)
+        if ns and ns!=DELAY_NS or xmlnode.name!="x":
             raise ValueError,"XML node is not a jabber:x:delay element"
-        stamp=node.prop("stamp")
+        stamp=xmlnode.prop("stamp")
         if stamp.endswith("Z"):
             stamp=stamp[:-1]
         if "-" in stamp:
@@ -95,56 +99,34 @@ class Delay:
         tm=time.strptime(stamp,"%Y%m%dT%H:%M:%S")
         tm=tm[0:8]+(0,)
         self.timestamp=datetime.datetime.fromtimestamp(time.mktime(tm))
-        delay_from=node.prop("from")
+        delay_from=xmlnode.prop("from")
         if delay_from:
             self.delay_from=JID(delay_from)
         else:
             self.delay_from=None
-        self.reason=from_utf8(node.getContent())
+        self.reason=from_utf8(xmlnode.getContent())
 
-    def as_xml(self, parent=None, doc=None):
-        """
-        Return XML representation of the Delay object.
+    def complete_xml_element(self, xmlnode, doc):
+        """Complete the XML node with `self` content.
+
+        Should be overriden in classes derived from `StanzaPayloadElement`.
 
         :Parameters:
-            - `parent`: the parent node for the element to be created.
+            - `xmlnode`: XML node with the element being built. It has already
+              right name and namespace, but no attributes or content.
+            - `doc`: document to which the element belongs.
         :Types:
-            - `parent`: `libxml2.xmlNode`
+            - `xmlnode`: `libxml.xmlNode`
+            - `doc`: `libxml.xmlDoc"""
 
-        If the `parent` is not given then the element will be standalone node
-        in `pyxmpp.stanza.common_doc` context.
-
-        :return: the XML element.
-        :returntype: `libxml2.xmlNode`"""
-        if parent:
-            if doc:
-                try:
-                    ns=parent.searchNsByHref(doc,DELAY_NS)
-                except libxml2.treeError:
-                    ns=None
-            node=parent.newTextChild(None,"x",None)
-        else:
-            ns=None
-            if doc:
-                doc1=doc
-            else:
-                doc1=libxml2.newDoc("1.0")
-            node=doc1.newDocNode(None,"x",None)
-        if not ns:
-            ns=node.newNs(DELAY_NS,None)
-        node.setNs(ns)
         tm=self.timestamp.strftime("%Y%m%dT%H:%M:%S")
-        node.setProp("stamp",tm)
+        xmlnode.setProp("stamp",tm)
         if self.delay_from:
-            node.setProp("from",self.delay_from.as_utf8())
+            xmlnode.setProp("from",self.delay_from.as_utf8())
         if self.reason:
-            node.setContent(to_utf8(self.reason))
-        if doc or parent:
-            return node
-        doc1.setRootElement(node)
-        return doc1
+            xmlnode.setContent(to_utf8(self.reason))
 
-    def datetime_local(self):
+    def get_datetime_local(self):
         """Get the timestamp as a local time.
 
         :return: the timestamp of the delay element represented in the local
@@ -153,7 +135,7 @@ class Delay:
         r=datetime_utc_to_local(self.timestamp)
         return r
 
-    def datetime_utc(self):
+    def get_datetime_utc(self):
         """Get the timestamp as a UTC.
 
         :return: the timestamp of the delay element represented in UTC.
@@ -180,7 +162,7 @@ def get_delays(stanza):
     :return: list of delay tags sorted by the timestamp.
     :returntype: `list` of `Delay`"""
     delays=[]
-    n=stanza.node.children
+    n=stanza.xmlnode.children
     while n:
         if n.type=="element" and get_node_ns_uri(n)==DELAY_NS and n.name=="x":
             delays.append(Delay(n))

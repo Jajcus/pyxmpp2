@@ -199,7 +199,7 @@ class Client:
         stream.set_iq_set_handler("query","jabber:iq:roster",self.__roster_push)
         stream.send(iq)
 
-    def socket(self):
+    def get_socket(self):
         """Get the socket object of the active connection.
 
         :return: socket used by the stream.

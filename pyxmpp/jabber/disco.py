@@ -29,7 +29,8 @@ from pyxmpp.stanza import common_doc,common_root,StanzaError
 from pyxmpp.jid import JID
 from pyxmpp import cache
 
-from pyxmpp.utils import to_utf8,XMPPObject
+from pyxmpp.utils import to_utf8
+from pyxmpp.objects import CachedPropertyObject, StanzaPayloadWrapperObject
 
 DISCO_NS="http://jabber.org/protocol/disco"
 DISCO_ITEMS_NS=DISCO_NS+"#items"
@@ -39,7 +40,7 @@ class DiscoError(StandardError):
     """Raised on disco related error"""
     pass
 
-class DiscoItem(XMPPObject):
+class DiscoItem(CachedPropertyObject, StanzaPayloadWrapperObject):
     """An item of disco#items reply.
 
     :Ivariables:
@@ -78,7 +79,7 @@ class DiscoItem(XMPPObject):
         if isinstance(xmlnode_or_jid,JID):
             if disco:
                 disco.invalidate_items()
-                self.xmlnode=disco.xmlnode.newChild(disco.xmlnode.ns(),"item",None)
+                self.xmlnode=disco.xmlnode.newChild(None,"item",None)
             else:
                 self.xmlnode=common_root.newChild(None,"item",None)
                 ns=self.xmlnode.newNs(DISCO_ITEMS_NS,None)
@@ -222,7 +223,7 @@ class DiscoItem(XMPPObject):
 
         :return: the JID of the item.
         :returntype: `JID`"""
-        self.jid=JID(self.xmlnode.prop("jid"))
+        self.jid=JID(unicode(self.xmlnode.prop("jid"),"utf-8"))
         return self.jid
 
     def set_jid(self,jid):
@@ -236,7 +237,7 @@ class DiscoItem(XMPPObject):
         self.xmlnode.setProp("jid",jid.as_unicode().encode("utf-8"))
         self.jid=jid
 
-class DiscoIdentity(XMPPObject):
+class DiscoIdentity(CachedPropertyObject, StanzaPayloadWrapperObject):
     """An <identity/> element of disco#info reply.
 
     Identifies an item by its name, category and type.
@@ -287,7 +288,7 @@ class DiscoIdentity(XMPPObject):
         else:
             if disco:
                 disco.invalidate_identities()
-                self.xmlnode=disco.xmlnode.newChild(disco.xmlnode.ns(),"identity",None)
+                self.xmlnode=disco.xmlnode.newChild(None,"identity",None)
             else:
                 self.xmlnode=common_root.newChild(None,"identity",None)
                 ns=self.xmlnode.newNs(DISCO_INFO_NS,None)
@@ -397,7 +398,7 @@ class DiscoIdentity(XMPPObject):
         self.xmlnode.setProp("type",item_type.encode("utf-8"))
         self.type=item_type
 
-class DiscoItems(XMPPObject):
+class DiscoItems(CachedPropertyObject, StanzaPayloadWrapperObject):
     """A disco#items response or publish-request object.
 
     :Ivariables:
@@ -554,41 +555,7 @@ class DiscoItems(XMPPObject):
                 return True
         return False
 
-    def as_xml(self,parent=None,doc=None):
-        """Get the XML representation of `self`.
-
-        New document will be created if not `parent` and no `doc` is given. 
-
-        :Parameters:
-            - `parent`: the parent for the `DiscoItems` element.
-            - `doc`: the document where the element should be created.
-        :Types:
-            - `parent`: `libxml2.xmlNode`
-            - `doc`: `libxml2.xmlDoc`
-
-        :return: XML element with the disco#items (if doc and/or parent is
-          given) or the new document.
-        :returntype: `libxml2.xmlNode` or `libxml2.xmlDoc`"""
-        if parent:
-            if not doc:
-                doc=common_doc
-                copy=self.xmlnode.copyNode(True)
-            else:
-                copy=self.xmlnode.docCopyNode(doc,True)
-            parent.addChild(copy)
-            return copy
-        else:
-            if not doc:
-                doc1=libxml2.newDoc("1.0")
-            else:
-                doc1=doc
-            node=doc1.addChild(self.xmlnode.docCopyNode(doc,True))
-            if doc:
-                return node
-            doc1.setRootElement(node)
-            return doc1
-
-class DiscoInfo(XMPPObject):
+class DiscoInfo(CachedPropertyObject, StanzaPayloadWrapperObject):
     """A disco#info response object.
 
     :Ivariables:
@@ -602,7 +569,7 @@ class DiscoInfo(XMPPObject):
         - `features`: `tuple` of `unicode`
         - `xmlnode`: `libxml2.xmlNode`
     """
-    def __init__(self,xmlnode_or_node=None, parent=None):
+    def __init__(self,xmlnode_or_node=None, parent=None, doc=None):
         """Initialize an `DiscoInfo` object.
         
         Wrap an existing disco#info XML element or create a new one.
@@ -610,24 +577,32 @@ class DiscoInfo(XMPPObject):
         :Parameters:
             - `xmlnode_or_node`: XML node to be wrapped into `self` or an item
               node name.
+            - `parent`: parent node for the `DiscoInfo` element.
+            - `doc`: document for the `DiscoInfo` element.
         :Types:
-            - `xmlnode_or_node`: `libxml2.xmlNode` or `unicode`"""
+            - `xmlnode_or_node`: `libxml2.xmlNode` or `unicode`
+            - `parent`: `libxml2.xmlNode`
+            - `doc`: `libxml2.xmlDoc`
+            """
         self.xmlnode=None
         self.xpath_ctxt=None
+        if not doc:
+            doc=common_doc
+        if not parent:
+            parent=common_root
         if isinstance(xmlnode_or_node,libxml2.xmlNode):
             ns=xmlnode_or_node.ns()
             if ns.getContent() != DISCO_INFO_NS:
                 raise DiscoError,"Bad disco-info namespace"
-            self.xmlnode=xmlnode_or_node.docCopyNode(common_doc,1)
-            common_root.addChild(self.xmlnode)
-            self.ns=self.xmlnode.ns()
+            self.xmlnode=xmlnode_or_node.docCopyNode(doc,1)
+            parent.addChild(self.xmlnode)
         else:
-            self.xmlnode=common_root.newChild(None,"query",None)
+            self.xmlnode=parent.newChild(None,"query",None)
             self.ns=self.xmlnode.newNs(DISCO_INFO_NS,None)
             self.xmlnode.setNs(self.ns)
             self.set_node(xmlnode_or_node)
 
-        self.xpath_ctxt=common_doc.xpathNewContext()
+        self.xpath_ctxt=doc.xpathNewContext()
         self.xpath_ctxt.setContextNode(self.xmlnode)
         self.xpath_ctxt.xpathRegisterNs("d",DISCO_INFO_NS)
 
@@ -738,7 +713,7 @@ class DiscoInfo(XMPPObject):
             - `var`: `unicode`"""
         if self.has_feature(var):
             return
-        n=self.xmlnode.newChild(self.ns,"feature",None)
+        n=self.xmlnode.newChild(None,"feature",None)
         n.setProp("var",to_utf8(var))
 
     def remove_feature(self,var):
@@ -860,44 +835,20 @@ class DiscoInfo(XMPPObject):
         :returntype: `DiscoIdentity`"""
         return DiscoIdentity(self,item_name,item_category,item_type)
 
-    def as_xml(self,parent=None,doc=None):
-        """Get the XML representation of `self`.
-
-        New document will be created if not `parent` and no `doc` is given. 
-
-        :Parameters:
-            - `parent`: the parent for the `DiscoInfo` element.
-            - `doc`: the document where the element should be created.
-        :Types:
-            - `parent`: `libxml2.xmlNode`
-            - `doc`: `libxml2.xmlDoc`
-
-        :return: XML element with the disco#info (if doc and/or parent is
-          given) or the new document.
-        :returntype: `libxml2.xmlNode` or `libxml2.xmlDoc`"""
-        if parent:
-            if not doc:
-                doc=common_doc
-                copy=self.xmlnode.copyNode(True)
-            else:
-                copy=self.xmlnode.docCopyNode(doc,True)
-            parent.addChild(copy)
-            return copy
-        else:
-            if not doc:
-                doc1=libxml2.newDoc("1.0")
-            else:
-                doc1=doc
-            node=doc1.addChild(self.xmlNode.docCopyNode(doc,True))
-            if doc:
-                return node
-            doc1.setRootElement(node)
-            return doc1
-
 class DiscoCacheFetcherBase(cache.CacheFetcher):
+    """Base class for disco cache fetchers.
+
+    :Cvariables:
+        - `stream`: stream used by the fetcher.
+        - `disco_class`: disco class to be used (`DiscoInfo` or `DiscoItems`).
+    :Types:
+        - `stream`: `pyxmpp.stream.Stream`
+        - `disco_class`: `classobj`
+    """
     stream=None
     disco_class=None
     def fetch(self):
+        """Initialize the Service Discovery process."""
         from pyxmpp.iq import Iq
         jid,node = self.address
         iq = Iq(to_jid = jid, stanza_type = "get")
@@ -906,7 +857,14 @@ class DiscoCacheFetcherBase(cache.CacheFetcher):
         self.stream.set_response_handlers(iq,self.__response, self.__error,
                 self.__timeout)
         self.stream.send(iq)
+        
     def __response(self,stanza):
+        """Handle successful disco response.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `pyxmpp.stanza.Stanza`"""
         try:
             d=self.disco_class(stanza.get_query())
             self.got_it(d)
@@ -914,6 +872,12 @@ class DiscoCacheFetcherBase(cache.CacheFetcher):
             self.error(e)
 
     def __error(self,stanza):
+        """Handle disco error response.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `pyxmpp.stanza.Stanza`"""
         try:
             self.error(stanza.get_error())
         except StanzaError:
@@ -921,17 +885,31 @@ class DiscoCacheFetcherBase(cache.CacheFetcher):
             self.error(StanzaErrorNode("undefined-condition"))
 
     def __timeout(self,stanza):
+        """Handle disco timeout."""
         pass
     
-def register_disco_cache_fetchers(cache,stream):
+def register_disco_cache_fetchers(cache_suite,stream):
+    """Register Service Discovery cache fetchers into given
+    cache suite and using the stream provided.
+
+    :Parameters:
+        - `cache_suite`: the cache suite where the fetchers are to be
+          registered.
+        - `stream`: the stream to be used by the fetchers.
+    :Types:
+        - `cache_suite`: `cache.CacheSuite`
+        - `stream`: `pyxmpp.stream.Stream`
+    """
     tmp=stream
     class DiscoInfoCacheFetcher(DiscoCacheFetcherBase):
+        """Cache fetcher for DiscoInfo."""
         stream=tmp
         disco_class=DiscoInfo
     class DiscoItemsCacheFetcher(DiscoCacheFetcherBase):
+        """Cache fetcher for DiscoItems."""
         stream=tmp
         disco_class=DiscoItems
-    cache.register_fetcher(DiscoInfo,DiscoInfoCacheFetcher)
-    cache.register_fetcher(DiscoItems,DiscoItemsCacheFetcher)
+    cache_suite.register_fetcher(DiscoInfo,DiscoInfoCacheFetcher)
+    cache_suite.register_fetcher(DiscoItems,DiscoItemsCacheFetcher)
 
 # vi: sts=4 et sw=4

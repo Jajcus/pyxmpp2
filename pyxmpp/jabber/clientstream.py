@@ -144,12 +144,12 @@ class LegacyClientStream(ClientStream):
 
             iq=stanza.make_result_response()
             q=iq.new_query("jabber:iq:auth")
-            q.newChild(q.ns(),"username",None)
-            q.newChild(q.ns(),"resource",None)
+            q.newChild(None,"username",None)
+            q.newChild(None,"resource",None)
             if "plain" in self.auth_methods:
-                q.newChild(q.ns(),"password",None)
+                q.newChild(None,"password",None)
             if "digest" in self.auth_methods:
-                q.newChild(q.ns(),"digest",None)
+                q.newChild(None,"digest",None)
             self.send(iq)
             iq.free()
         finally:
@@ -203,8 +203,8 @@ class LegacyClientStream(ClientStream):
         [client only]"""
         iq=Iq(stanza_type="get")
         q=iq.new_query("jabber:iq:auth")
-        q.newTextChild(q.ns(),"username",to_utf8(self.my_jid.node))
-        q.newTextChild(q.ns(),"resource",to_utf8(self.my_jid.resource))
+        q.newTextChild(None,"username",to_utf8(self.my_jid.node))
+        q.newTextChild(None,"resource",to_utf8(self.my_jid.resource))
         self.send(iq)
         self.set_response_handlers(iq,self.auth_stage2,self.auth_error,
                             self.auth_timeout,timeout=60)

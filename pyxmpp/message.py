@@ -33,12 +33,12 @@ message_types=("normal","chat","headline","error","groupchat")
 class Message(Stanza):
     """Wraper object for <message /> stanzas."""
     stanza_type="message"
-    def __init__(self,node=None,from_jid=None,to_jid=None,stanza_type=None,stanza_id=None,
+    def __init__(self,xmlnode=None,from_jid=None,to_jid=None,stanza_type=None,stanza_id=None,
             subject=None, body=None, thread=None,error=None,error_cond=None):
         """Initialize a `Message` object.
 
         :Parameters:
-            - `node`: XML node to_jid be wrapped into the `Message` object
+            - `xmlnode`: XML node to_jid be wrapped into the `Message` object
               or other Message object to be copied. If not given then new
               presence stanza is created using following parameters.
             - `from_jid`: sender JID.
@@ -51,7 +51,7 @@ class Message(Stanza):
             - `thread`: message thread id.
             - `error_cond`: error condition name. Ignored if `stanza_type` is not "error".
         :Types:
-            - `node`: `unicode` or `libxml2.xmlNode` or `Stanza`
+            - `xmlnode`: `unicode` or `libxml2.xmlNode` or `Stanza`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
@@ -61,31 +61,31 @@ class Message(Stanza):
             - `thread`: `unicode`
             - `error_cond`: `unicode`"""
 
-        self.node=None
-        if isinstance(node,Message):
+        self.xmlnode=None
+        if isinstance(xmlnode,Message):
             pass
-        elif isinstance(node,Stanza):
+        elif isinstance(xmlnode,Stanza):
             raise TypeError,"Couldn't make Message from other Stanza"
-        elif isinstance(node,libxml2.xmlNode):
+        elif isinstance(xmlnode,libxml2.xmlNode):
             pass
-        elif node is not None:
-            raise TypeError,"Couldn't make Message from %r" % (type(node),)
+        elif xmlnode is not None:
+            raise TypeError,"Couldn't make Message from %r" % (type(xmlnode),)
 
         if stanza_type=="normal":
             stanza_type=None
 
-        if node is None:
-            node="message"
+        if xmlnode is None:
+            xmlnode="message"
 
-        Stanza.__init__(self, node, from_jid=from_jid, to_jid=to_jid,
+        Stanza.__init__(self, xmlnode, from_jid=from_jid, to_jid=to_jid,
                 stanza_type=stanza_type,stanza_id=stanza_id, error=error, error_cond=error_cond)
 
         if subject is not None:
-            self.node.newTextChild(None,"subject",to_utf8(subject))
+            self.xmlnode.newTextChild(None,"subject",to_utf8(subject))
         if body is not None:
-            self.node.newTextChild(None,"body",to_utf8(body))
+            self.xmlnode.newTextChild(None,"body",to_utf8(body))
         if thread is not None:
-            self.node.newTextChild(None,"thread",to_utf8(thread))
+            self.xmlnode.newTextChild(None,"thread",to_utf8(thread))
 
     def get_subject(self):
         """Get the message subject.
@@ -143,10 +143,10 @@ class Message(Stanza):
         m=Message(stanza_type="error",from_jid=self.get_to(),to_jid=self.get_from(),
             stanza_id=self.get_id(),error_cond=cond)
 
-        if self.node.children:
-            n=self.node.children
+        if self.xmlnode.children:
+            n=self.xmlnode.children
             while n:
-                m.node.children.addPrevSibling(n.copyNode(1))
+                m.xmlnode.children.addPrevSibling(n.copyNode(1))
                 n=n.next
         return m
 

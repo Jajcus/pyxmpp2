@@ -77,16 +77,16 @@ class StreamAuthenticationError(FatalStreamError):
     """Raised when stream authentication fails."""
     pass
 
-def stanza_factory(node):
-    """Creates Iq, Message or Presence object for XML stanza `node`"""
-    if node.name=="iq":
-        return Iq(node)
-    if node.name=="message":
-        return Message(node)
-    if node.name=="presence":
-        return Presence(node)
+def stanza_factory(xmlnode):
+    """Creates Iq, Message or Presence object for XML stanza `xmlnode`"""
+    if xmlnode.name=="iq":
+        return Iq(xmlnode)
+    if xmlnode.name=="message":
+        return Message(xmlnode)
+    if xmlnode.name=="presence":
+        return Presence(xmlnode)
     else:
-        return Stanza(node)
+        return Stanza(xmlnode)
 
 class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
     """Base class for a generic XMPP stream.
@@ -484,7 +484,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         if not self.doc_out:
             self._send_stream_start()
         e=StreamErrorNode(condition)
-        e.node.setNs(self.stream_ns)
+        e.xmlnode.setNs(self.stream_ns)
         self._write_raw(e.serialize())
         e.free()
         self._send_stream_end()
@@ -538,22 +538,22 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         except (IOError,OSError),e:
             raise FatalStreamError("IO Error: "+str(e))
 
-    def _write_node(self,node):
-        """Write XML `node` to the stream.
+    def _write_node(self,xmlnode):
+        """Write XML `xmlnode` to the stream.
 
         :Parameters:
-            - `node`: XML node to send."""
+            - `xmlnode`: XML node to send."""
         if self.eof or not self.socket or not self.doc_out:
-            self.__logger.debug("Dropping stanza: %r" % (node,))
+            self.__logger.debug("Dropping stanza: %r" % (xmlnode,))
             return
-        node=node.docCopyNode(self.doc_out,1)
-        self.doc_out.addChild(node)
+        xmlnode=xmlnode.docCopyNode(self.doc_out,1)
+        self.doc_out.addChild(xmlnode)
         #node.reconciliateNs(self.doc_out)
-        s=node.serialize(encoding="UTF-8")
+        s=xmlnode.serialize(encoding="UTF-8")
         s=remove_evil_characters(s)
         self._write_raw(s)
-        node.unlinkNode()
-        node.freeNode()
+        xmlnode.unlinkNode()
+        xmlnode.freeNode()
 
     def send(self,stanza):
         """Write stanza to the stream.
@@ -576,7 +576,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
             if err:
                 err.downgrade()
         self.fix_out_stanza(stanza)
-        self._write_node(stanza.node)
+        self._write_node(stanza.xmlnode)
 
     def idle(self):
         """Do some housekeeping (cache expiration, timeout handling).
@@ -715,22 +715,22 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         if self.eof:
             self.stream_end(None)
 
-    def _process_node(self,node):
+    def _process_node(self,xmlnode):
         """Process first level element of the stream.
 
         The element may be stream error or features, StartTLS
         request/response, SASL request/response or a stanza.
 
         :Parameters:
-            - `node`: XML node describing the element
+            - `xmlnode`: XML node describing the element
         """
-        ns_uri=node.ns().getContent()
+        ns_uri=xmlnode.ns().getContent()
         if ns_uri=="http://etherx.jabber.org/streams":
-            self._process_stream_node(node)
+            self._process_stream_node(xmlnode)
             return
 
         if ns_uri==self.default_ns_uri:
-            stanza=stanza_factory(node)
+            stanza=stanza_factory(xmlnode)
             self.lock.release()
             try:
                 self.process_stanza(stanza)
@@ -738,18 +738,18 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
                 self.lock.acquire()
                 stanza.free()
         else:
-            self.__logger.debug("Unhandled node: %r" % (node.serialize(),))
+            self.__logger.debug("Unhandled node: %r" % (xmlnode.serialize(),))
 
-    def _process_stream_node(self,node):
+    def _process_stream_node(self,xmlnode):
         """Process first level stream-namespaced element of the stream.
 
         The element may be stream error or stream features.
 
         :Parameters:
-            - `node`: XML node describing the element
+            - `xmlnode`: XML node describing the element
         """
-        if node.name=="error":
-            e=StreamErrorNode(node)
+        if xmlnode.name=="error":
+            e=StreamErrorNode(xmlnode)
             self.lock.release()
             try:
                 self.process_stream_error(e)
@@ -757,15 +757,15 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
                 self.lock.acquire()
                 e.free()
             return
-        elif node.name=="features":
+        elif xmlnode.name=="features":
             self.__logger.debug("Got stream features")
-            self.__logger.debug("Node: %r" % (node,))
-            self.features=node.copyNode(1)
+            self.__logger.debug("Node: %r" % (xmlnode,))
+            self.features=xmlnode.copyNode(1)
             self.doc_in.addChild(self.features)
             self._got_features()
             return
 
-        self.__logger.debug("Unhandled stream node: %r" % (node.serialize(),))
+        self.__logger.debug("Unhandled stream node: %r" % (xmlnode.serialize(),))
 
     def process_stream_error(self,err):
         """Process stream error element received.
@@ -832,7 +832,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         iq=Iq(stanza_type="set")
         q=iq.new_query(BIND_NS,"bind")
         if resource:
-            q.newTextChild(q.ns(),"resource",to_utf8(resource))
+            q.newTextChild(None,"resource",to_utf8(resource))
         self.state_change("binding",resource)
         self.set_response_handlers(iq,self._bind_success,self._bind_error)
         self.send(iq)

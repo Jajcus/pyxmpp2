@@ -127,7 +127,7 @@ class StreamTLSMixIn:
             ns=tls.newNs(TLS_NS,None)
             tls.setNs(ns)
             if self.tls_settings.require:
-                tls.newChild(ns,"required",None)
+                tls.newChild(None,"required",None)
         return features
 
     def _write_raw(self,data):
@@ -178,7 +178,7 @@ class StreamTLSMixIn:
             self.close()
             raise TLSError("TLS Error: "+str(e))
 
-    def _process_node_tls(self,node):
+    def _process_node_tls(self,xmlnode):
         """Process incoming stream element. Pass it to _process_tls_node
         if it is in TLS namespace.
 
@@ -188,11 +188,11 @@ class StreamTLSMixIn:
 
         :return: `True` when the node was recognized as TLS element.
         :returntype: `bool`"""
-        ns_uri=node.ns().getContent()
+        ns_uri=xmlnode.ns().getContent()
         if ns_uri==STREAM_NS:
             return False
         elif ns_uri==TLS_NS:
-            self._process_tls_node(node)
+            self._process_tls_node(xmlnode)
             return True
         if self.tls_settings and self.tls_settings.require and not self.tls:
             raise StreamEncryptionRequired,"TLS encryption required and not started yet"
@@ -235,27 +235,27 @@ class StreamTLSMixIn:
         self.tls_requested=1
         self.features=None
         root=self.doc_out.getRootElement()
-        node=root.newChild(None,"starttls",None)
-        ns=node.newNs(TLS_NS,None)
-        node.setNs(ns)
-        self._write_raw(node.serialize(encoding="UTF-8"))
-        node.unlinkNode()
-        node.freeNode()
+        xmlnode=root.newChild(None,"starttls",None)
+        ns=xmlnode.newNs(TLS_NS,None)
+        xmlnode.setNs(ns)
+        self._write_raw(xmlnode.serialize(encoding="UTF-8"))
+        xmlnode.unlinkNode()
+        xmlnode.freeNode()
 
-    def _process_tls_node(self,node):
+    def _process_tls_node(self,xmlnode):
         """Process stream element in the TLS namespace.
 
         :Parameters:
-            - `node`: the XML node received
+            - `xmlnode`: the XML node received
         """
         if not self.tls_settings or not tls_available:
-            self.__logger.debug("Unexpected TLS node: %r" % (node.serialize()))
+            self.__logger.debug("Unexpected TLS node: %r" % (xmlnode.serialize()))
             return False
         if self.initiator:
-            if node.name=="failure":
+            if xmlnode.name=="failure":
                 raise TLSNegotiationFailed,"Peer failed to initialize TLS connection"
-            elif node.name!="proceed" or not self.tls_requested:
-                self.__logger.debug("Unexpected TLS node: %r" % (node.serialize()))
+            elif xmlnode.name!="proceed" or not self.tls_requested:
+                self.__logger.debug("Unexpected TLS node: %r" % (xmlnode.serialize()))
                 return False
             try:
                 self.tls_requested=0

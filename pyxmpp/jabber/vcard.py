@@ -34,6 +34,7 @@ import types
 
 import pyxmpp.jid
 from pyxmpp.utils import to_utf8,from_utf8,get_node_ns
+from pyxmpp.objects import StanzaPayloadObject
 
 VCARD_NS="vcard-temp"
 
@@ -154,8 +155,7 @@ class VCardString(VCardField):
 
         :return: xml node with the field data.
         :returntype: `libxml2.xmlNode`"""
-        return parent.newTextChild(get_node_ns(parent),
-                to_utf8(self.name.upper()),to_utf8(self.value))
+        return parent.newTextChild(None, to_utf8(self.name.upper()), to_utf8(self.value))
     def __unicode__(self):
         return self.value
     def __str__(self):
@@ -221,10 +221,9 @@ class VCardJID(VCardField):
 
         :return: xml node with the field data.
         :returntype: `libxml2.xmlNode`"""
-        ns=get_node_ns(parent)
         name=to_utf8(self.name.upper())
         content=self.value.as_utf8()
-        return parent.newTextChild(ns,name,content)
+        return parent.newTextChild(None, name, content)
     def __unicode__(self):
         return self.value.as_unicode()
     def __str__(self):
@@ -312,13 +311,12 @@ class VCardName(VCardField):
 
         :return: xml node with the field data.
         :returntype: `libxml2.xmlNode`"""
-        ns=get_node_ns(parent)
-        n=parent.newChild(ns,"N",None)
-        n.newTextChild(ns,"FAMILY",to_utf8(self.family))
-        n.newTextChild(ns,"GIVEN",to_utf8(self.given))
-        n.newTextChild(ns,"MIDDLE",to_utf8(self.middle))
-        n.newTextChild(ns,"PREFIX",to_utf8(self.prefix))
-        n.newTextChild(ns,"SUFFIX",to_utf8(self.suffix))
+        n=parent.newChild(None,"N",None)
+        n.newTextChild(None,"FAMILY",to_utf8(self.family))
+        n.newTextChild(None,"GIVEN",to_utf8(self.given))
+        n.newTextChild(None,"MIDDLE",to_utf8(self.middle))
+        n.newTextChild(None,"PREFIX",to_utf8(self.prefix))
+        n.newTextChild(None,"SUFFIX",to_utf8(self.suffix))
         return n
     def __unicode__(self):
         r=[]
@@ -414,14 +412,13 @@ class VCardImage(VCardField):
 
         :return: xml node with the field data.
         :returntype: `libxml2.xmlNode`"""
-        ns=get_node_ns(parent)
-        n=parent.newChild(ns,self.name.upper(),None)
+        n=parent.newChild(None,self.name.upper(),None)
         if self.uri:
-            n.newTextChild(ns,"EXTVAL",to_utf8(self.uri))
+            n.newTextChild(None,"EXTVAL",to_utf8(self.uri))
         else:
             if self.type:
-                n.newTextChild(n.ns(),"TYPE",self.type)
-            n.newTextChild(ns,"BINVAL",binascii.b2a_base64(self.image))
+                n.newTextChild(None,"TYPE",self.type)
+            n.newTextChild(None,"BINVAL",binascii.b2a_base64(self.image))
         return n
     def __unicode__(self):
         if self.uri:
@@ -547,18 +544,17 @@ class VCardAdr(VCardField):
 
         :return: xml node with the field data.
         :returntype: `libxml2.xmlNode`"""
-        ns=get_node_ns(parent)
-        n=parent.newChild(ns,"ADR",None)
+        n=parent.newChild(None,"ADR",None)
         for t in ("home","work","postal","parcel","dom","intl","pref"):
             if t in self.type:
-                n.newChild(n.ns(),t.upper(),None)
-        n.newTextChild(ns,"POBOX",to_utf8(self.pobox))
-        n.newTextChild(ns,"EXTADR",to_utf8(self.extadr))
-        n.newTextChild(ns,"STREET",to_utf8(self.street))
-        n.newTextChild(ns,"LOCALITY",to_utf8(self.locality))
-        n.newTextChild(ns,"REGION",to_utf8(self.region))
-        n.newTextChild(ns,"PCODE",to_utf8(self.pcode))
-        n.newTextChild(ns,"CTRY",to_utf8(self.ctry))
+                n.newChild(None,t.upper(),None)
+        n.newTextChild(None,"POBOX",to_utf8(self.pobox))
+        n.newTextChild(None,"EXTADR",to_utf8(self.extadr))
+        n.newTextChild(None,"STREET",to_utf8(self.street))
+        n.newTextChild(None,"LOCALITY",to_utf8(self.locality))
+        n.newTextChild(None,"REGION",to_utf8(self.region))
+        n.newTextChild(None,"PCODE",to_utf8(self.pcode))
+        n.newTextChild(None,"CTRY",to_utf8(self.ctry))
         return n
 
 class VCardLabel(VCardField):
@@ -639,13 +635,12 @@ class VCardLabel(VCardField):
 
         :return: xml node with the field data.
         :returntype: `libxml2.xmlNode`"""
-        ns=get_node_ns(parent)
-        n=parent.newChild(ns,"ADR",None)
+        n=parent.newChild(None,"ADR",None)
         for t in ("home","work","postal","parcel","dom","intl","pref"):
             if t in self.type:
-                n.newChild(ns,t.upper(),None)
+                n.newChild(None,t.upper(),None)
         for l in self.lines:
-            n.newTextChild(ns,"LINE",l)
+            n.newTextChild(None,"LINE",l)
         return n
 
 class VCardTel(VCardField):
@@ -721,13 +716,12 @@ class VCardTel(VCardField):
 
         :return: xml node with the field data.
         :returntype: `libxml2.xmlNode`"""
-        ns=get_node_ns(parent)
-        n=parent.newChild(ns,"TEL",None)
+        n=parent.newChild(None,"TEL",None)
         for t in ("home","work","voice","fax","pager","msg","cell","video",
                 "bbs","modem","isdn","pcs","pref"):
             if t in self.type:
-                n.newChild(ns,t.upper(),None)
-        n.newTextChild(ns,"NUMBER",to_utf8(self.number))
+                n.newChild(None,t.upper(),None)
+        n.newTextChild(None,"NUMBER",to_utf8(self.number))
         return n
 
 class VCardEmail(VCardField):
@@ -801,12 +795,11 @@ class VCardEmail(VCardField):
 
         :return: xml node with the field data.
         :returntype: `libxml2.xmlNode`"""
-        ns=get_node_ns(parent)
-        n=parent.newChild(ns,"EMAIL",None)
+        n=parent.newChild(None,"EMAIL",None)
         for t in ("home","work","internet","x400"):
             if t in self.type:
-                n.newChild(ns,t.upper(),None)
-        n.newTextChild(ns,"USERID",to_utf8(self.address))
+                n.newChild(None,t.upper(),None)
+        n.newTextChild(None,"USERID",to_utf8(self.address))
         return n
 
 class VCardGeo(VCardField):
@@ -871,10 +864,9 @@ class VCardGeo(VCardField):
 
         :return: xml node with the field data.
         :returntype: `libxml2.xmlNode`"""
-        ns=get_node_ns(parent)
-        n=parent.newChild(ns,"GEO",None)
-        n.newTextChild(ns,"LAT",to_utf8(self.lat))
-        n.newTextChild(ns,"LON",to_utf8(self.lon))
+        n=parent.newChild(None,"GEO",None)
+        n.newTextChild(None,"LAT",to_utf8(self.lat))
+        n.newTextChild(None,"LON",to_utf8(self.lon))
         return n
 
 class VCardOrg(VCardField):
@@ -946,10 +938,9 @@ class VCardOrg(VCardField):
 
         :return: xml node with the field data.
         :returntype: `libxml2.xmlNode`"""
-        ns=get_node_ns(parent)
-        n=parent.newChild(ns,"ORG",None)
-        n.newTextChild(ns,"ORGNAME",to_utf8(self.name))
-        n.newTextChild(ns,"ORGUNIT",to_utf8(self.unit))
+        n=parent.newChild(None,"ORG",None)
+        n.newTextChild(None,"ORGNAME",to_utf8(self.name))
+        n.newTextChild(None,"ORGUNIT",to_utf8(self.unit))
         return n
 
 class VCardCategories(VCardField):
@@ -1010,10 +1001,9 @@ class VCardCategories(VCardField):
 
         :return: xml node with the field data.
         :returntype: `libxml2.xmlNode`"""
-        ns=get_node_ns(parent)
-        n=parent.newChild(ns,"CATEGORIES",None)
+        n=parent.newChild(None,"CATEGORIES",None)
         for k in self.keywords:
-            n.newTextChild(ns,"KEYWORD",to_utf8(k))
+            n.newTextChild(None,"KEYWORD",to_utf8(k))
         return n
 
 class VCardSound(VCardField):
@@ -1096,14 +1086,13 @@ class VCardSound(VCardField):
 
         :return: xml node with the field data.
         :returntype: `libxml2.xmlNode`"""
-        ns=get_node_ns(parent)
-        n=parent.newChild(ns,self.name.upper(),None)
+        n=parent.newChild(None,self.name.upper(),None)
         if self.uri:
-            n.newTextChild(ns,"EXTVAL",to_utf8(self.uri))
+            n.newTextChild(None,"EXTVAL",to_utf8(self.uri))
         elif self.phonetic:
-            n.newTextChild(ns,"PHONETIC",to_utf8(self.phonetic))
+            n.newTextChild(None,"PHONETIC",to_utf8(self.phonetic))
         else:
-            n.newTextChild(ns,"BINVAL",binascii.b2a_base64(self.sound))
+            n.newTextChild(None,"BINVAL",binascii.b2a_base64(self.sound))
         return n
 
 class VCardPrivacy(VCardField):
@@ -1165,10 +1154,9 @@ class VCardPrivacy(VCardField):
 
         :return: xml node with the field data.
         :returntype: `libxml2.xmlNode`"""
-        ns=get_node_ns(parent)
         if self.value in ("public","private","confidental"):
-            n=parent.newChild(ns,self.name.upper(),None)
-            n.newChild(ns,self.value.upper(),None)
+            n=parent.newChild(None,self.name.upper(),None)
+            n.newChild(None,self.value.upper(),None)
             return n
         return None
 
@@ -1237,14 +1225,13 @@ class VCardKey(VCardField):
 
         :return: xml node with the field data.
         :returntype: `libxml2.xmlNode`"""
-        ns=get_node_ns(parent)
-        n=parent.newChild(ns,self.name.upper(),None)
+        n=parent.newChild(None,self.name.upper(),None)
         if self.type:
-            n.newTextChild(ns,"TYPE",self.type)
-        n.newTextChild(ns,"CRED",binascii.b2a_base64(self.cred))
+            n.newTextChild(None,"TYPE",self.type)
+        n.newTextChild(None,"CRED",binascii.b2a_base64(self.cred))
         return n
 
-class VCard:
+class VCard(StanzaPayloadObject):
     """Jabber (vcard-temp) or RFC2426 vCard.
 
     :Ivariables:
@@ -1306,6 +1293,10 @@ class VCard:
         - `key`: `list` of `VCardKey`
         - `desc`: `list` of `VCardXString`
     """
+
+    xml_element_name = "query"
+    xml_element_namespace = VCARD_NS
+
     components={
             #"VERSION": (VCardString,"optional"),
             "FN": (VCardString,"required"),
@@ -1352,7 +1343,7 @@ class VCard:
         else:
             self.__from_rfc2426(data)
         if not self.content.get("N") and self.content.get("FN"):
-            s=self.fn.value.replace(";",",")
+            s=self.content['FN'].value.replace(";",",")
             s=s.split(None,2)
             if len(s)==2:
                 s=u"%s;%s;;;" % (s[1],s[0])
@@ -1526,52 +1517,27 @@ class VCard:
                 v=value.rfc2426()
                 ret+=v
         return ret+"end:VCARD\r\n"
-    def as_xml(self,parent=None,doc=None):
-        """Get the XML representation of `self`.
 
-        New document will be created if no `parent` and no `doc` is given. 
+    def complete_xml_element(self, xmlnode, doc):
+        """Complete the XML node with `self` content.
+
+        Should be overriden in classes derived from `StanzaPayloadElement`.
 
         :Parameters:
-            - `parent`: the parent for the vCard element.
-            - `doc`: the document where the element should be created.
+            - `xmlnode`: XML node with the element being built. It has already
+              right name and namespace, but no attributes or content.
+            - `doc`: document to which the element belongs.
         :Types:
-            - `parent`: `libxml2.xmlNode`
-            - `doc`: `libxml2.xmlDoc`
-
-        :return: XML element with the vCard or the new document .
-        :returntype: `libxml2.xmlNode` or `libxml2.xmlDoc`"""
-        if parent:
-            if doc:
-                try:
-                    ns=parent.searchNsByHref(doc,VCARD_NS)
-                except libxml2.treeError:
-                    ns=None
-            else:
-                ns=None
-            root=parent.newChild(ns,"vCard",None)
-            if not ns:
-                ns=root.newNs(VCARD_NS,None)
-                root.setNs(ns)
-        else:
-            if doc:
-                doc1=doc
-            else:
-                doc1=libxml2.newDoc("1.0")
-            root=doc1.newChild(None,"vCard",None)
-            ns=root.newNs(VCARD_NS,None)
-            root.setNs(ns)
+            - `xmlnode`: `libxml.xmlNode`
+            - `doc`: `libxml.xmlDoc"""
         for name,value in self.content.items():
             if value is None:
                 continue
             if type(value) is types.ListType:
                 for v in value:
-                    v.as_xml(root)
+                    v.as_xml(xmlnode)
             else:
-                value.as_xml(root)
-        if doc:
-            return root
-        doc1.setRootElement(root)
-        return doc1
+                value.as_xml(xmlnode)
 
     def __getattr__(self,name):
         try:

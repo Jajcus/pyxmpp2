@@ -49,12 +49,12 @@ deny_responses={
 class Presence(Stanza):
     """Wraper object for <presence /> stanzas."""
     stanza_type="presence"
-    def __init__(self,node=None,from_jid=None,to_jid=None,stanza_type=None,stanza_id=None,
+    def __init__(self,xmlnode=None,from_jid=None,to_jid=None,stanza_type=None,stanza_id=None,
             show=None,status=None,priority=0,error=None,error_cond=None):
         """Initialize a `Presence` object.
 
         :Parameters:
-            - `node`: XML node to_jid be wrapped into the `Presence` object
+            - `xmlnode`: XML node to_jid be wrapped into the `Presence` object
               or other Presence object to be copied. If not given then new
               presence stanza is created using following parameters.
             - `from_jid`: sender JID.
@@ -69,7 +69,7 @@ class Presence(Stanza):
             - `priority`: presence priority.
             - `error_cond`: error condition name. Ignored if `stanza_type` is not "error"
         :Types:
-            - `node`: `unicode` or `libxml2.xmlNode` or `Stanza`
+            - `xmlnode`: `unicode` or `libxml2.xmlNode` or `Stanza`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
@@ -78,15 +78,15 @@ class Presence(Stanza):
             - `status`: `unicode`
             - `priority`: `unicode`
             - `error_cond`: `unicode`"""
-        self.node=None
-        if isinstance(node,Presence):
+        self.xmlnode=None
+        if isinstance(xmlnode,Presence):
             pass
-        elif isinstance(node,Stanza):
+        elif isinstance(xmlnode,Stanza):
             raise TypeError,"Couldn't make Presence from other Stanza"
-        elif isinstance(node,libxml2.xmlNode):
+        elif isinstance(xmlnode,libxml2.xmlNode):
             pass
-        elif node is not None:
-            raise TypeError,"Couldn't make Presence from %r" % (type(node),)
+        elif xmlnode is not None:
+            raise TypeError,"Couldn't make Presence from %r" % (type(xmlnode),)
 
         if stanza_type and stanza_type not in presence_types:
             raise StanzaError,"Invalid presence type: %r" % (type,)
@@ -94,18 +94,18 @@ class Presence(Stanza):
         if stanza_type=="available":
             stanza_type=None
 
-        if node is None:
-            node="presence"
+        if xmlnode is None:
+            xmlnode="presence"
 
-        Stanza.__init__(self, node, from_jid=from_jid, to_jid=to_jid, stanza_type=stanza_type,
+        Stanza.__init__(self, xmlnode, from_jid=from_jid, to_jid=to_jid, stanza_type=stanza_type,
                 stanza_id=stanza_id, error=error, error_cond=error_cond)
 
         if show:
-            self.node.newTextChild(None,"show",to_utf8(show))
+            self.xmlnode.newTextChild(None,"show",to_utf8(show))
         if status:
-            self.node.newTextChild(None,"status",to_utf8(status))
+            self.xmlnode.newTextChild(None,"status",to_utf8(status))
         if priority and priority!=0:
-            self.node.newTextChild(None,"priority",to_utf8(str(priority)))
+            self.xmlnode.newTextChild(None,"priority",to_utf8(str(priority)))
 
     def copy(self):
         """Create a deep copy of the presence stanza.
@@ -130,7 +130,7 @@ class Presence(Stanza):
         if n:
             n[0].setContent(to_utf8(status))
         else:
-            self.node.newTextChild(None,"status",to_utf8(status))
+            self.xmlnode.newTextChild(None,"status",to_utf8(status))
 
     def get_status(self):
         """Get presence status description.
@@ -172,7 +172,7 @@ class Presence(Stanza):
         if n:
             n[0].setContent(to_utf8(show))
         else:
-            self.node.newTextChild(None,"show",to_utf8(show))
+            self.xmlnode.newTextChild(None,"show",to_utf8(show))
 
     def get_priority(self):
         """Get presence priority.
@@ -210,7 +210,7 @@ class Presence(Stanza):
         if n:
             n[0].setContent(priority)
         else:
-            self.node.newTextChild(None,"priority",priority)
+            self.xmlnode.newTextChild(None,"priority",priority)
 
     def make_accept_response(self):
         """Create "accept" response for the "subscribe"/"subscribed"/"unsubscribe"/"unsubscribed"
@@ -258,10 +258,10 @@ class Presence(Stanza):
         p=Presence(stanza_type="error",from_jid=self.get_to(),to_jid=self.get_from(),
             stanza_id=self.get_id(),error_cond=cond)
 
-        if self.node.children:
-            n=self.node.children
+        if self.xmlnode.children:
+            n=self.xmlnode.children
             while n:
-                p.node.children.addPrevSibling(n.copyNode(1))
+                p.xmlnode.children.addPrevSibling(n.copyNode(1))
                 n=n.next
         return p
 
