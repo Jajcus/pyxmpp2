@@ -136,6 +136,7 @@ class ClientStream(Stream):
 				self.debug("Must wait for <features/>")
 				return
 		elif method not in ("plain","digest"):
+			self.auth_methods_left.pop(0)
 			self.debug("Skipping unknown auth method: %s" % method)
 			return self.try_auth()
 		elif self.available_auth_methods is not None:
