@@ -19,6 +19,7 @@ import re
 from types import StringType,UnicodeType
 from stanza import common_doc,common_root
 from iq import Iq
+from jid import JID
 
 from utils import to_utf8,from_utf8
 
@@ -30,11 +31,11 @@ class RosterItem:
 		self.roster=roster
 		self.node=node
 	def name(self):
-		return unicode(self.node.prep("name"),"utf-8")
+		return unicode(self.node.prop("name"),"utf-8")
 	def jid(self):
-		return unicode(self.node.prep("jid"),"utf-8")
+		return JID(self.node.prop("jid"))
 	def subscription(self):
-		return unicode(self.node.prep("subscription"),"utf-8")
+		return unicode(self.node.prop("subscription"),"utf-8")
 	def groups(self):
 		ctxt=common_doc.xpathNewContext()
 		ctxt.setContextNode(self.node)
@@ -60,7 +61,7 @@ class Roster:
 			self.node.setNs(self.ns)
 		else:
 			ns=node.ns()
-			if ns != "jabber:iq:roster":
+			if ns.getContent() != "jabber:iq:roster":
 				raise RosterError,"Bad roster namespace"
 			self.node=node.docCopyNode(common_doc,1)
 			common_root.addChild(self.node)
@@ -96,13 +97,13 @@ class Roster:
 				ret.append(gname)
 		return ret
 		
-	def item_by_name(self,name):
+	def items_by_name(self,name):
 		if not name:
 			raise ValueError,"name is None"
 		name=to_utf8(name)
-		if not name.contains('"'):
+		if '"' not in name:
 			expr='r:item[@name="%s"]' % name
-		elif not name.contains("'"):
+		elif "'" not in name:
 			expr="r:item[@name='%s']" % name
 		else:
 			raise RosterError,"Unsupported roster item name format"
@@ -114,14 +115,14 @@ class Roster:
 			ret.append(RosterItem(self,i))
 		return ret
 	
-	def item_by_group(self,group):
-		if not name:
+	def items_by_group(self,group):
+		if not group:
 			raise ValueError,"group is None"
 		group=to_utf8(group)
-		if not name.contains('"'):
-			expr='r:item[group="%s"]' % group
-		elif not name.contains("'"):
-			expr="r:item[group='%s']" % group
+		if '"' not in group:
+			expr='r:item[r:group="%s"]' % group
+		elif "'" not in group:
+			expr="r:item[r:group='%s']" % group
 		else:
 			raise RosterError,"Unsupported roster group name format"
 		l=self.xpath_ctxt.xpathEval(expr)
@@ -136,9 +137,9 @@ class Roster:
 		if not jid:
 			raise ValueError,"jid is None"
 		jid=jid.as_string()
-		if not jid.contains('"'):
+		if '"' not in jid:
 			expr='r:item[@name="%s"]' % jid
-		elif not jid.contains("'"):
+		elif "'" not in jid:
 			expr="r:item[@name='%s']" % jid
 		else:
 			raise RosterError,"Unsupported roster item jid format"
