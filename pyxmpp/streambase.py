@@ -413,15 +413,6 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         """
         pass
 
-    def stanza_end(self,doc,node):
-        """Process stanza (first level child element of the stream) end tag.
-
-        :Parameters:
-            - `doc`: parsed document
-            - `node`: stanza's full XML
-        """
-        self._process_node(node)
-
     def stanza(self,doc,node):
         """Process stanza (first level child element of the stream).
 

@@ -231,7 +231,7 @@ xmlNsPtr new_ns,old_ns;
  * Stream reader functions 
  */
 
-#if 0
+#if 1
 /*
  * SAX-based stream reader 
  */
@@ -272,11 +272,11 @@ PyObject *obj;
 		else Py_DECREF(obj);
 	}
 	else if (ctxt->nodeNr==2){
-		obj=PyObject_CallMethod(reader->handler,"_stanza_start","OO",
+		/*obj=PyObject_CallMethod(reader->handler,"_stanza_start","OO",
 					libxml_xmlDocPtrWrap(ctxt->myDoc),
 					libxml_xmlNodePtrWrap(ctxt->node));
 		if (obj==NULL) reader->exception=1;
-		else Py_DECREF(obj);
+		else Py_DECREF(obj);*/
 	}
 }
 
@@ -296,7 +296,7 @@ xmlNodePtr node;
 		else Py_DECREF(obj);
 	}
 	else if (ctxt->nodeNr==1 && node){
-		obj=PyObject_CallMethod(reader->handler,"_stanza_end","OO",
+		obj=PyObject_CallMethod(reader->handler,"_stanza","OO",
 					libxml_xmlDocPtrWrap(ctxt->myDoc),
 					libxml_xmlNodePtrWrap(node));
 		if (obj==NULL) reader->exception=1;
@@ -445,8 +445,9 @@ int ret;
 	if (reader->exception) return NULL;
 	
 	if (ret==0){	
-		Py_INCREF(Py_None);
-		return Py_None;
+		return Py_BuildValue("i", 0);
+		/* Py_INCREF(Py_None);
+		return Py_None; */
 	}
 
 	PyErr_Format(MyError,"Parser error #%d.",ret);
@@ -492,7 +493,7 @@ static PyTypeObject SaxReaderType = {
 	0,          /*tp_as_mapping*/
 	0,          /*tp_hash */
 };
-#endif
+#else
 
 /*
  * Preparsing stream reader 
@@ -1435,14 +1436,16 @@ static PyTypeObject PreparsingReaderType = {
 	0,          /*tp_as_mapping*/
 	0,          /*tp_hash */
 };
+#endif
 
 static PyMethodDef xmlextraMethods[] = {
 	{(char *)"replace_ns", replace_ns, METH_VARARGS, NULL },
 	{(char *)"remove_ns", remove_ns, METH_VARARGS, NULL },
-#if 0
+#if 1
 	{(char *)"sax_reader_new", sax_reader_new, METH_VARARGS, NULL},
-#endif
+#else
 	{(char *)"preparsing_reader_new", preparsing_reader_new, METH_VARARGS, NULL},
+#endif
 	{NULL, NULL, 0, NULL}
 };
 
@@ -1451,10 +1454,11 @@ static int initialized = 0;
 PyObject *m, *d;
 
 	if (initialized != 0) return;
-#if 0
+#if 1
 	SaxReaderType.ob_type = &PyType_Type;
-#endif
+#else
 	PreparsingReaderType.ob_type = &PyType_Type;
+#endif
 	m = Py_InitModule((char *) "_xmlextra", xmlextraMethods);
 	d = PyModule_GetDict(m);
 	MyError = PyErr_NewException("_xmlextra.error", NULL, NULL);

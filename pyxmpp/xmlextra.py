@@ -42,16 +42,6 @@ class StreamHandler:
         """Process stream end."""
         doc=libxml2.xmlDoc(_doc)
         self.stream_end(doc)
-    def _stanza_start(self,_doc,_node):
-        """Process stanza start."""
-        doc=libxml2.xmlDoc(_doc)
-        node=libxml2.xmlNode(_node)
-        self.stanza_start(doc,node)
-    def _stanza_end(self,_doc,_node):
-        """Process stanza end."""
-        doc=libxml2.xmlDoc(_doc)
-        node=libxml2.xmlNode(_node)
-        self.stanza_end(doc,node)
     def _stanza(self,_doc,_node):
         """Process complete stanza."""
         doc=libxml2.xmlDoc(_doc)
@@ -76,32 +66,7 @@ class StreamHandler:
         :Types:
             - `doc`: `libxml2.xmlDoc`"""
         print >>sys.stderr,"Unhandled stream end",`doc.serialize()`
-    def stanza_start(self,doc,node):
-        """Called when the start tag of a direct child of the root
-        element is encountered in the stream.
-
-        :Parameters:
-            - `doc`: the document being parsed.
-            - `node`: the (incomplete) element being processed
-        :Types:
-            - `doc`: `libxml2.xmlDoc`
-            - `node`: `libxml2.xmlNode`"""
-        print >>sys.stderr,"Unhandled stanza start",`node.serialize()`
-    def stanza_end(self,doc,node):
-        """Called when the end tag of a direct child of the root
-        element is encountered in the stream.
-
-        Please note, that node will be removed from the document
-        and freed after this method returns. If it is needed after
-        that a copy must be made before the method returns.
-
-        :Parameters:
-            - `doc`: the document being parsed.
-            - `node`: the (complete) element being processed
-        :Types:
-            - `doc`: `libxml2.xmlDoc`
-            - `node`: `libxml2.xmlNode`"""
-        print >>sys.stderr,"Unhandled stanza end",`node.serialize()`
+    
     def stanza(self,doc,node):
         """Called when the end tag of a direct child of the root
         element is encountered in the stream.
@@ -136,7 +101,7 @@ class StreamReader:
         :Types:
             - `handler`: `StreamHandler` derived class
         """
-        self.reader=_xmlextra.preparsing_reader_new(handler)
+        self.reader=_xmlextra.sax_reader_new(handler)
         self.lock=threading.RLock()
         self.in_use=0
     def doc(self):

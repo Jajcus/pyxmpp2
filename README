@@ -39,7 +39,7 @@ For PyXMPP you will need:
 
   - `Python <http://www.python.org/>`__. PyXMPP was designed for Python 2.3,
     2.4 shoud work too.
-  - `libxml2 <http://xmlsoft.org/>`__. Recent release (2.6.x) with python
+  - `libxml2 <http://xmlsoft.org/>`__. Recent release (>=2.6.11) with python
     bindings and all developement files (usually in separate libxml2-devel
     package) is required.
   - `dnspython <http://www.pythondns.org/>`__. PyXMPP is tested with version
