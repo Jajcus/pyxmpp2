@@ -60,7 +60,7 @@ class ClientStream(Stream):
 		self.auth_methods=auth_methods
 	
 	def reset(self):
-		Stream.reset()
+		Stream.reset(self)
 		self.auth_methods_left=[]
 		self.session_established=1
 		self.available_auth_methods=None
@@ -91,8 +91,9 @@ class ClientStream(Stream):
 							self.auth_in_stage2)
 
 	def post_auth(self):
-		self.unset_iq_get_handler("query","jabber:iq:auth")
-		self.unset_iq_set_handler("query","jabber:iq:auth")
+		if not self.initiator:
+			self.unset_iq_get_handler("query","jabber:iq:auth")
+			self.unset_iq_set_handler("query","jabber:iq:auth")
 
 	def request_session(self):
 		if not self.version:

@@ -12,12 +12,18 @@ class Disconnected(Exception):
 
 class Stream(ClientStream):
 	def post_auth(self):
+		ClientStream.post_auth(self)
+		self.request_session()
+		
+	def session_started(self):
+		ClientStream.session_started(self)
 		print ":-)"
 		self.send(Presence())
+		
 	def idle(self):
 		print "idle"
 		ClientStream.idle(self)
-		if self.authenticated:
+		if self.session_established:
 			target=JID("jajcus",s.jid.domain)
 			self.send(Message(to=target,body=unicode("Te¶cik","iso-8859-2")))
 	def post_disconnect(self):

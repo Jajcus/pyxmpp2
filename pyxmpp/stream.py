@@ -503,14 +503,16 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def set_iq_get_handler(self,element,namespace,handler):
 		self.iq_get_handlers[(element,namespace)]=handler
 
-	def unset_iq_get_handler(self,element,namespace,handler):
-		del self.iq_get_handlers[(element,namespace)]
+	def unset_iq_get_handler(self,element,namespace):
+		if self.iq_get_handlers.has_key((element,namespace)):
+			del self.iq_get_handlers[(element,namespace)]
 
 	def set_iq_set_handler(self,element,namespace,handler):
 		self.iq_set_handlers[(element,namespace)]=handler
 
-	def unset_iq_set_handler(self,element,namespace,handler):
-		del self.iq_get_handlers[(element,namespace)]
+	def unset_iq_set_handler(self,element,namespace):
+		if self.iq_set_handlers.has_key((element,namespace)):
+			del self.iq_set_handlers[(element,namespace)]
 
 	def set_message_handler(self,type,handler):
 		if not type:
