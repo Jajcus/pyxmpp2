@@ -163,6 +163,8 @@ class Stanza:
             return JID(from_utf8(self.node.prop("from")))
         else:
             return None
+            
+    get_from_jid=get_from
 
     def get_to(self):
         """Get "to" attribute of the stanza.
@@ -174,6 +176,8 @@ class Stanza:
         else:
             return None
 
+    get_to_jid=get_to
+
     def get_type(self):
         """Get "type" attribute of the stanza.
 
@@ -184,6 +188,8 @@ class Stanza:
         else:
             return None
 
+    get_stanza_type=get_type
+
     def get_id(self):
         """Get "id" attribute of the stanza.
 
@@ -193,6 +199,8 @@ class Stanza:
             return from_utf8(self.node.prop("id"))
         else:
             return None
+
+    get_stanza_id=get_id
 
     def get_error(self):
         """Get stanza error information.

@@ -29,7 +29,7 @@ from pyxmpp.stanza import common_doc,common_root,StanzaError
 from pyxmpp.jid import JID
 from pyxmpp import cache
 
-from pyxmpp.utils import to_utf8
+from pyxmpp.utils import to_utf8,XMPPObject
 
 DISCO_NS="http://jabber.org/protocol/disco"
 DISCO_ITEMS_NS=DISCO_NS+"#items"
@@ -39,13 +39,21 @@ class DiscoError(StandardError):
     """Raised on disco related error"""
     pass
 
-class DiscoItem:
+class DiscoItem(XMPPObject):
     """An item of disco#items reply.
 
     :Ivariables:
+        - `jid`: the JID of the item (cached).
+        - `node`: node name of the item (cached).
+        - `name`: name of the item (cached).
+        - `action`: action of the item (cached).
         - `disco`: the disco reply this is the part of.
         - `xmlnode`: XML element describing the item.
     :Types:
+        - `jid`: `JID`
+        - `node`: `unicode`
+        - `name`: `unicode`
+        - `action`: `unicode`
         - `disco`: `DiscoItems`
         - `xmlnode`: `libxml2.xmlNode`
     """
@@ -69,33 +77,40 @@ class DiscoItem:
         self.disco=disco
         if isinstance(xmlnode_or_jid,JID):
             if disco:
+                disco.invalidate_items()
                 self.xmlnode=disco.xmlnode.newChild(disco.xmlnode.ns(),"item",None)
             else:
                 self.xmlnode=common_root.newChild(None,"item",None)
                 ns=self.xmlnode.newNs(DISCO_ITEMS_NS,None)
                 self.xmlnode.setNs(ns)
-            self.xmlnode.setProp("jid",xmlnode_or_jid.as_string())
+            self.set_jid(xmlnode_or_jid)
+            self.set_name(name)
+            self.set_node(node)
+            self.set_action(action)
         else:
             if disco is None:
                 self.xmlnode=xmlnode_or_jid.copyNode(1)
             else:
+                disco.invalidate_items()
                 self.xmlnode=xmlnode_or_jid
+            if name:
+                self.set_name(name)
+            if node:
+                self.set_node(node)
+            if action:
+                self.set_action(action)
         self.xpath_ctxt=common_doc.xpathNewContext()
         self.xpath_ctxt.setContextNode(self.xmlnode)
         self.xpath_ctxt.xpathRegisterNs("d",DISCO_ITEMS_NS)
-        if name is not None:
-            self.set_name(name)
-        if node is not None:
-            self.set_node(node)
-        if action is not None:
-            self.set_action(action)
-
+        
     def __del__(self):
         if self.disco is None:
             if self.xmlnode:
                 self.xmlnode.unlinkNode()
                 self.xmlnode.freeNode()
                 self.xmlnode=None
+        else:
+            self.disco.invalidate_items()
         if self.xpath_ctxt:
             self.xpath_ctxt.xpathFreeContext()
             
@@ -106,6 +121,7 @@ class DiscoItem:
         """Remove `self` from the containing `DiscoItems` object."""
         if self.disco is None:
             return
+        self.disco.invalidate_items()
         self.xmlnode.unlinkNode()
         oldns=self.xmlnode.ns()
         ns=self.xmlnode.newNs(oldns.getContent(),None)
@@ -113,15 +129,17 @@ class DiscoItem:
         common_root.addChild(self.xmlnode())
         self.disco=None
 
-    def name(self):
+    def get_name(self):
         """Get the name of the item.
 
         :return: the name of the item or `None`.
         :returntype: `unicode`"""
         name=self.xmlnode.prop("name")
         if name is None:
+            self.name=None
             return None
-        return unicode(name,"utf-8")
+        self.name=unicode(name,"utf-8")
+        return self.name
 
     def set_name(self,name):
         """Set the name of the item.
@@ -133,18 +151,23 @@ class DiscoItem:
         if name is None:
             if self.xmlnode.hasProp("name"):
                 self.xmlnode.unsetProp("name")
+            self.name=None
             return
+        name=unicode(name)
         self.xmlnode.setProp("name",name.encode("utf-8"))
+        self.name=name
 
-    def node(self):
+    def get_node(self):
         """Get the node of the item.
 
         :return: the node of the item or `None`.
         :returntype: `unicode`"""
         node=self.xmlnode.prop("node")
         if node is None:
+            self.node=None
             return None
-        return unicode(node,"utf-8")
+        self.node=unicode(node,"utf-8")
+        return self.node
 
     def set_node(self,node):
         """Set the node of the item.
@@ -157,18 +180,23 @@ class DiscoItem:
         if node is None:
             if self.xmlnode.hasProp("node"):
                 self.xmlnode.unsetProp("node")
+            self.node=None
             return
+        node=unicode(node)
         self.xmlnode.setProp("node",node.encode("utf-8"))
+        self.node=node
 
-    def action(self):
+    def get_action(self):
         """Get the action attribute of the item.
 
         :return: the action of the item or `None`.
         :returntype: `unicode`"""
         action=self.xmlnode.prop("action")
         if action is None:
+            self.action=None
             return None
-        return unicode(action,"utf-8")
+        self.action=unicode(action,"utf-8")
+        return self.action
 
     def set_action(self,action):
         """Set the action of the item.
@@ -181,17 +209,21 @@ class DiscoItem:
         if action is None:
             if self.xmlnode.hasProp("action"):
                 self.xmlnode.unsetProp("action")
+            self.action=None
             return
         if action not in ("remove","update"):
             raise DiscoError,"Action must be 'update' or 'remove'"
+        action=unicode(action)
         self.xmlnode.setProp("action",action.encode("utf-8"))
+        self.action=action
 
-    def jid(self):
+    def get_jid(self):
         """Get the JID of the item.
 
         :return: the JID of the item.
         :returntype: `JID`"""
-        return JID(self.xmlnode.prop("jid"))
+        self.jid=JID(self.xmlnode.prop("jid"))
+        return self.jid
 
     def set_jid(self,jid):
         """Set the JID of the item.
@@ -202,8 +234,9 @@ class DiscoItem:
             - `jid`: `JID`
         """
         self.xmlnode.setProp("jid",jid.as_unicode().encode("utf-8"))
+        self.jid=jid
 
-class DiscoIdentity:
+class DiscoIdentity(XMPPObject):
     """An <identity/> element of disco#info reply.
 
     Identifies an item by its name, category and type.
@@ -235,6 +268,7 @@ class DiscoIdentity:
         """
         self.disco=disco
         if disco and replace:
+            disco.invalidate_identities()
             old=disco.xpath_ctxt.xpathEval("d:identity")
             if old:
                 for n in old:
@@ -244,23 +278,23 @@ class DiscoIdentity:
             if disco is None:
                 self.xmlnode=xmlnode_or_name.copyNode(1)
             else:
+                disco.invalidate_identities()
                 self.xmlnode=xmlnode_or_name
         elif not item_category:
             raise ValueError,"DiscoInfo requires category"
+        elif not item_type:
+            raise ValueError,"DiscoInfo requires type"
         else:
             if disco:
+                disco.invalidate_identities()
                 self.xmlnode=disco.xmlnode.newChild(disco.xmlnode.ns(),"identity",None)
             else:
                 self.xmlnode=common_root.newChild(None,"identity",None)
                 ns=self.xmlnode.newNs(DISCO_INFO_NS,None)
                 self.xmlnode.setNs(ns)
-            if xmlnode_or_name:
-                self.xmlnode.setProp("name",to_utf8(xmlnode_or_name))
-            self.xmlnode.setProp("category",to_utf8(item_category))
-            if item_type:
-                self.xmlnode.setProp("type",to_utf8(item_type))
-            else:
-                raise ValueError,"DiscoInfo requires type"
+            self.set_name(xmlnode_or_name)
+            self.set_category(item_category)
+            self.set_type(item_type)
         self.xpath_ctxt=common_doc.xpathNewContext()
         self.xpath_ctxt.setContextNode(self.xmlnode)
         self.xpath_ctxt.xpathRegisterNs("d",DISCO_INFO_NS)
@@ -271,8 +305,11 @@ class DiscoIdentity:
                 self.xmlnode.unlinkNode()
                 self.xmlnode.freeNode()
                 self.xmlnode=None
+        else:
+            self.disco.invalidate_identities()
         if self.xpath_ctxt:
             self.xpath_ctxt.xpathFreeContext()
+            
     def __str__(self):
         return self.xmlnode.serialize()
 
@@ -280,6 +317,7 @@ class DiscoIdentity:
         """Remove `self` from the containing `DiscoInfo` object."""
         if self.disco is None:
             return
+        self.disco.invalidate_identities()
         self.xmlnode.unlinkNode()
         oldns=self.xmlnode.ns()
         ns=self.xmlnode.newNs(oldns.getContent(),None)
@@ -287,13 +325,16 @@ class DiscoIdentity:
         common_root.addChild(self.xmlnode())
         self.disco=None
 
-    def name(self):
+    def get_name(self):
         """Get the name of the item.
 
         :return: the name of the item or `None`.
         :returntype: `unicode`"""
         var=self.xmlnode.prop("name")
-        return unicode(var,"utf-8")
+        if not var:
+            var=""
+        self.name=unicode(var,"utf-8")
+        return self.name
 
     def set_name(self,name):
         """Set the name of the item.
@@ -304,15 +345,20 @@ class DiscoIdentity:
             - `name`: `unicode` """
         if not name:
             raise ValueError,"name is required in DiscoIdentity"
+        name=unicode(name)
         self.xmlnode.setProp("name",name.encode("utf-8"))
+        self.name=name
 
-    def category(self):
+    def get_category(self):
         """Get the category of the item.
 
         :return: the category of the item.
         :returntype: `unicode`"""
         var=self.xmlnode.prop("category")
-        return unicode(var,"utf-8")
+        if not var:
+            var="?"
+        self.category=unicode(var,"utf-8")
+        return self.category
 
     def set_category(self,category):
         """Set the category of the item.
@@ -321,17 +367,22 @@ class DiscoIdentity:
             - `category`: the new category.
         :Types:
             - `category`: `unicode` """
+        if not category:
+            raise ValueError,"Category is required in DiscoIdentity"
+        category=unicode(category)
         self.xmlnode.setProp("category",category.encode("utf-8"))
+        self.category=category
 
-    def type(self):
+    def get_type(self):
         """Get the type of the item.
 
         :return: the type of the item.
         :returntype: `unicode`"""
         item_type=self.xmlnode.prop("type")
-        if item_type is None:
-            return None
-        return unicode(item_type,"utf-8")
+        if not item_type:
+            item_type="?"
+        self.type=unicode(item_type,"utf-8")
+        return self.type
 
     def set_type(self,item_type):
         """Set the type of the item.
@@ -340,18 +391,22 @@ class DiscoIdentity:
             - `item_type`: the new type.
         :Types:
             - `item_type`: `unicode` """
-        if item_type is None:
-            if self.xmlnode.hasProp("type"):
-                self.xmlnode.unsetProp("type")
-            return
+        if not item_type:
+            raise ValueError,"Type is required in DiscoIdentity"
+        item_type=unicode(item_type)
         self.xmlnode.setProp("type",item_type.encode("utf-8"))
+        self.type=item_type
 
-class DiscoItems:
+class DiscoItems(XMPPObject):
     """A disco#items response or publish-request object.
 
     :Ivariables:
+        - `node`: node name of the disco#items element (cached).
+        - `items`: items in the disco#items element (cached).
         - `xmlnode`: XML element listing the items.
     :Types:
+        - `node`: `unicode`
+        - `items`: `tuple` of `DiscoItem`
         - `xmlnode`: `libxml2.xmlNode`
     """
     def __init__(self,xmlnode_or_node=None):
@@ -377,8 +432,7 @@ class DiscoItems:
             self.xmlnode=common_root.newChild(None,"query",None)
             self.ns=self.xmlnode.newNs(DISCO_ITEMS_NS,None)
             self.xmlnode.setNs(self.ns)
-            if xmlnode_or_node:
-                self.xmlnode.setProp("node",to_utf8(xmlnode_or_node))
+            self.set_node(xmlnode_or_node)
         self.xpath_ctxt=common_doc.xpathNewContext()
         self.xpath_ctxt.setContextNode(self.xmlnode)
         self.xpath_ctxt.xpathRegisterNs("d",DISCO_ITEMS_NS)
@@ -392,18 +446,36 @@ class DiscoItems:
             self.xpath_ctxt.xpathFreeContext()
             self.xpath_ctxt=None
 
-    def node(self):
+    def get_node(self):
         """Get the node address of the `DiscoItems` object.
 
         :return: the node name.
         :returntype: `unicode`"""
-        
         node=self.xmlnode.prop("node")
         if not node:
+            self.node=None
             return None
-        return unicode(node,"utf-8")
+        self.node=unicode(node,"utf-8")
+        return self.node
 
-    def items(self):
+    def set_node(self,node):
+        """Set the node of the disco#item element.
+
+        :Parameters:
+            - `node`: the new node or `None`.
+        :Types:
+            - `node`: `unicode`
+        """
+        if node is None:
+            if self.xmlnode.hasProp("node"):
+                self.xmlnode.unsetProp("node")
+            self.node=None
+            return
+        node=unicode(node)
+        self.xmlnode.setProp("node",node.encode("utf-8"))
+        self.node=node
+
+    def get_items(self):
         """Get the items contained in `self`.
 
         :return: the items contained.
@@ -413,7 +485,35 @@ class DiscoItems:
         if l is not None:
             for i in l:
                 ret.append(DiscoItem(self,i))
+        self.items=tuple(ret) # make it immutable
         return ret
+
+    def set_items(self,item_list):
+        """Set items in the disco#items object.
+
+        All previous items are removed.
+
+        :Parameters:
+            - `item_list`: list of items or item properties
+              (jid,node,name,action).
+        :Types:
+            - `item_list`: sequence of `DiscoItem` or sequence of sequences
+        """
+        for item in self.items:
+            item.remove()
+        del self.items
+        for item in item_list:
+            try:
+                self.add_item(item.jid,item.node,item.name,item.action)
+            except AttributeError:
+                self.add_item(*item)
+
+    def invalidate_items(self):
+        """Clear cached item list."""
+        try:
+            del self.items
+        except AttributeError:
+            pass
 
     def add_item(self,jid,node=None,name=None,action=None):
         """Add a new item to the `DiscoItems` object.
@@ -450,21 +550,21 @@ class DiscoItems:
             return False
         for it in l:
             di=DiscoItem(self,it)
-            if di.jid()==jid and di.node()==node:
+            if di.jid==jid and di.node==node:
                 return True
         return False
 
-    def as_xml(self,doc=None,parent=None):
+    def as_xml(self,parent=None,doc=None):
         """Get the XML representation of `self`.
 
         New document will be created if not `parent` and no `doc` is given. 
 
         :Parameters:
-            - `doc`: the document where the element should be created.
             - `parent`: the parent for the `DiscoItems` element.
+            - `doc`: the document where the element should be created.
         :Types:
-            - `doc`: `libxml2.xmlDoc`
             - `parent`: `libxml2.xmlNode`
+            - `doc`: `libxml2.xmlDoc`
 
         :return: XML element with the disco#items (if doc and/or parent is
           given) or the new document.
@@ -482,18 +582,24 @@ class DiscoItems:
                 doc1=libxml2.newDoc("1.0")
             else:
                 doc1=doc
-            node=doc1.addChild(self.xmlNode.docCopyNode(doc,True))
+            node=doc1.addChild(self.xmlnode.docCopyNode(doc,True))
             if doc:
                 return node
-            else:
-                return doc1
+            doc1.setRootElement(node)
+            return doc1
 
-class DiscoInfo:
+class DiscoInfo(XMPPObject):
     """A disco#info response object.
 
     :Ivariables:
+        - `node`: node name of the disco#info element (cached).
+        - `identities`: identities in the disco#info object.
+        - `features`: features in the disco#info object.
         - `xmlnode`: XML element listing the items.
     :Types:
+        - `node`: `unicode`
+        - `identities`: `tuple` of `DiscoIdentity`
+        - `features`: `tuple` of `unicode`
         - `xmlnode`: `libxml2.xmlNode`
     """
     def __init__(self,xmlnode_or_node=None, parent=None):
@@ -519,8 +625,7 @@ class DiscoInfo:
             self.xmlnode=common_root.newChild(None,"query",None)
             self.ns=self.xmlnode.newNs(DISCO_INFO_NS,None)
             self.xmlnode.setNs(self.ns)
-            if xmlnode_or_node:
-                self.xmlnode.setProp("node",to_utf8(xmlnode_or_node))
+            self.set_node(xmlnode_or_node)
 
         self.xpath_ctxt=common_doc.xpathNewContext()
         self.xpath_ctxt.setContextNode(self.xmlnode)
@@ -535,7 +640,7 @@ class DiscoInfo:
             self.xpath_ctxt.xpathFreeContext()
             self.xpath_ctxt=None
 
-    def node(self):
+    def get_node(self):
         """Get the node address of the `DiscoInfo` object.
 
         :return: the node name.
@@ -543,10 +648,29 @@ class DiscoInfo:
         
         node=self.xmlnode.prop("node")
         if not node:
+            self.node=None
             return None
-        return unicode(node,"utf-8")
+        self.node=unicode(node,"utf-8")
+        return self.node
 
-    def features(self):
+    def set_node(self,node):
+        """Set the node of the disco#info element.
+
+        :Parameters:
+            - `node`: the new node or `None`.
+        :Types:
+            - `node`: `unicode`
+        """
+        if node is None:
+            if self.xmlnode.hasProp("node"):
+                self.xmlnode.unsetProp("node")
+            self.node=None
+            return
+        node=unicode(node)
+        self.xmlnode.setProp("node",node.encode("utf-8"))
+        self.node=node
+
+    def get_features(self):
         """Get the features contained in `self`.
 
         :return: the list of features.
@@ -556,6 +680,7 @@ class DiscoInfo:
         for f in l:
             if f.hasProp("var"):
                 ret.append(unicode(f.prop("var"),"utf-8"))
+        self.features=tuple(ret) # made it immutable
         return ret
 
     def has_feature(self,var):
@@ -582,6 +707,27 @@ class DiscoInfo:
             return True
         else:
             return False
+
+    def set_features(self,features):
+        """Set features in the disco#info object.
+
+        All existing features are removed from `self`.
+
+        :Parameters:
+            - `features`: list of features.
+        :Types:
+            - `features`: sequence of `unicode`
+        """
+        self.invalidate_features()
+        for var in features:
+            self.add_feature(var)
+
+    def invalidate_features(self):
+        """Clear cached feature list."""
+        try:
+            del self.features
+        except AttributeError:
+            pass
 
     def add_feature(self,var):
         """Add a feature to `self`.
@@ -619,7 +765,7 @@ class DiscoInfo:
             f.unlinkNode()
             f.freeNode()
 
-    def identities(self):
+    def get_identities(self):
         """List the identity objects contained in `self`.
 
         :return: the list of identities.
@@ -629,7 +775,9 @@ class DiscoInfo:
         if l is not None:
             for i in l:
                 ret.append(DiscoIdentity(self,i))
+        self.identities=tuple(ret) # make it immutable
         return ret
+
 
     def identity_is(self,item_category,item_type=None):
         """Check if the item described by `self` belongs to the given category 
@@ -669,6 +817,33 @@ class DiscoInfo:
         else:
             return False
 
+    def set_identities(self,identities):
+        """Set identities in the disco#info object.
+
+        Remove all existing identities from `self`.
+
+        :Parameters:
+            - `identities`: list of identities or identity properties
+              (jid,node,category,type,name).
+        :Types:
+            - `identities`: sequence of `DiscoIdentity` or sequence of sequences
+        """
+        for identity in self.identities:
+            identity.remove()
+        del self.identities
+        for identity in identities:
+            try:
+                self.add_identity(identity.item_name,identity.item_category,identity.item_type)
+            except AttributeError:
+                self.add_identity(*identity)
+
+    def invalidate_identities(self):
+        """Clear cached identity list."""
+        try:
+            del self.identities
+        except AttributeError:
+            pass
+
     def add_identity(self,item_name,item_category=None,item_type=None):
         """Add an identity to the `DiscoInfo` object.
 
@@ -685,17 +860,17 @@ class DiscoInfo:
         :returntype: `DiscoIdentity`"""
         return DiscoIdentity(self,item_name,item_category,item_type)
 
-    def as_xml(self,doc=None,parent=None):
+    def as_xml(self,parent=None,doc=None):
         """Get the XML representation of `self`.
 
         New document will be created if not `parent` and no `doc` is given. 
 
         :Parameters:
-            - `doc`: the document where the element should be created.
             - `parent`: the parent for the `DiscoInfo` element.
+            - `doc`: the document where the element should be created.
         :Types:
-            - `doc`: `libxml2.xmlDoc`
             - `parent`: `libxml2.xmlNode`
+            - `doc`: `libxml2.xmlDoc`
 
         :return: XML element with the disco#info (if doc and/or parent is
           given) or the new document.
@@ -716,8 +891,8 @@ class DiscoInfo:
             node=doc1.addChild(self.xmlNode.docCopyNode(doc,True))
             if doc:
                 return node
-            else:
-                return doc1
+            doc1.setRootElement(node)
+            return doc1
 
 class DiscoCacheFetcherBase(cache.CacheFetcher):
     stream=None

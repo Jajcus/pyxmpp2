@@ -1,6 +1,25 @@
 Most Important API Changes
 --------------------------
 
+Those are mentioned here as are not backward compatible.
+I want the api to be stable and consistent in the next release and later,
+so I do all the big changes now (I would have to do them at some time anyway).
+
+2005-01-06
+
+	Big API unification started.
+	
+	jabber.vcard.VCard and jabber.delay.Delay
+	classes' method add_xml accepts now "parent" and "doc" arguments in
+	that order. Argument interpretation is also unified. All other similar
+	objects will have the add_xml() with the same signature soon.
+
+	Classes in jabber.disco module were modified heavily, so  all the 
+	getter are named get_*, all the setters set_* and all the interesting
+	properties may be accessed as attributes which also adds some caching.
+	Other classes, if they don't use that get_*/set_* naming, will be
+	modified in similar way soon.
+
 2004-12-31
 
 	There was a design flaw in PyXMPP from the very beginning, which caused

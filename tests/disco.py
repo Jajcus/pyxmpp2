@@ -38,8 +38,8 @@ class TestDiscoInfo(unittest.TestCase):
     def test_xml_input(self):
         xmldata=libxml2.parseFile("data/disco_info_in.xml")
         di=disco.DiscoInfo(xmldata.getRootElement())
-        txt=`[(i.name(),i.category(),i.type()) for i in di.identities()]`
-        txt+="\n"+`di.features()`+"\n"
+        txt=`[(i.name,i.category,i.type) for i in di.identities]`
+        txt+="\n"+`di.features`+"\n"
         should_be=file("data/disco_info_in.txt").read()
         self.failUnlessEqual(txt,should_be)
         
@@ -58,17 +58,17 @@ class TestDiscoInfo(unittest.TestCase):
     
     def test_building_with_node(self):
         di=self.build_disco_info("test")
-        self.failUnlessEqual(di.node(),"test")
+        self.failUnlessEqual(di.node,"test")
 
     def test_identities(self):
         di=self.build_disco_info()
-        actual_identities=[(i.name(),i.category(),i.type()) for i in di.identities()]
+        actual_identities=[(i.name,i.category,i.type) for i in di.identities]
         actual_identities.sort()
         self.failUnlessEqual(actual_identities,test_identities)
 
     def test_features(self):
         di=self.build_disco_info()
-        actual_features=di.features()
+        actual_features=di.get_features()
         actual_features.sort()
         self.failUnlessEqual(actual_features,test_features)
 
@@ -115,7 +115,7 @@ class TestDiscoItems(unittest.TestCase):
     def test_xml_input(self):
         xmldata=libxml2.parseFile("data/disco_items_in.xml")
         di=disco.DiscoItems(xmldata.getRootElement())
-        txt=`[(i.jid(),i.name(),i.node(),i.action()) for i in di.items()]`+"\n"
+        txt=`[(i.jid,i.name,i.node,i.action) for i in di.items]`+"\n"
         should_be=file("data/disco_items_in.txt").read()
         self.failUnlessEqual(txt,should_be)
 
@@ -127,7 +127,7 @@ class TestDiscoItems(unittest.TestCase):
 
     def test_xml_output(self):
         di=self.build_disco_items()
-        txt=di.xmlnode.serialize()+"\n"
+        txt=di.as_xml().serialize()
         should_be=file("data/disco_items_out.xml").read()
         self.failUnlessEqual(txt,should_be)
 
@@ -136,11 +136,11 @@ class TestDiscoItems(unittest.TestCase):
     
     def test_building_with_node(self):
         di=self.build_disco_items("test")
-        self.failUnlessEqual(di.node(),"test")
+        self.failUnlessEqual(di.node,"test")
 
     def test_items(self):
         di=self.build_disco_items()
-        actual_items=[(i.jid(),i.node(),i.name()) for i in di.items()]
+        actual_items=[(i.jid,i.node,i.name) for i in di.items]
         actual_items.sort()
         self.failUnlessEqual(actual_items,test_items)
 
