@@ -69,6 +69,7 @@ class Client:
 				self.port,self.auth_methods,self.enable_tls,self.require_tls)
 			stream.debug=self.debug
 			stream.print_exception=self.print_exception
+			stream.process_stream_error=self.stream_error
 			self.stream_created(stream)
 			stream.connect()
 			stream.post_auth=self.__post_auth
@@ -227,6 +228,10 @@ class Client:
 		p=Presence()
 		self.stream.send(p)
 		self.request_roster()
+
+	def stream_error(self,err):
+		self.debug("Stream error: condition: %s %r" 
+				% (err.get_condition().name,err.serialize()))
 
 	def roster_updated(self):
 		pass
