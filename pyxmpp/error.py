@@ -153,11 +153,13 @@ class ErrorNode:
 		if isinstance(node_or_cond,libxml2.xmlNode):
 			if not ns:	
 				ns=None
-				for c in node_or_cond.children:
+				c=node_or_cond.children
+				while c:
 					ns=c.ns().getContent()
 					if ns in (STREAM_ERROR_NS,STANZA_ERROR_NS):
 						break
 					ns=None
+					c=c.next
 				
 				if ns==None:
 					raise ErrorNodeError,"Bad error namespace"

@@ -63,11 +63,14 @@ class VCardName:
 			raise RuntimeError,"VCardName handles only 'N' type"
 		if isinstance(value,libxml2.xmlNone):
 			self.family,self.given,self.middle,self.prefix,self.suffix=[""]*5
-			for n in value.get_children():
+			n=value.children
+			while n:
 				if n.type!='element':
+					n=n.next
 					continue
 				if (n.ns() and value.ns() 
 						and n.ns().getContent()!=value.ns().getContent()):
+					n=n.next
 					continue
 				if n.name=='FAMILY':
 					self.family=unicode(n.getContent(),"utf-8")
@@ -79,6 +82,7 @@ class VCardName:
 					self.prefix=unicode(n.getContent(),"utf-8")
 				if n.name=='SUFFIX':
 					self.suffix=unicode(n.getContent(),"utf-8")
+				n=n.next
 		else:
 			value=[""]*5
 			v=value.split(";")
@@ -101,11 +105,14 @@ class VCardImage:
 		self.name=name
 		if isinstance(value,libxml2.xmlNone):
 			self.uri,self.type,self.image=[None]*3
-			for n in value.get_children():
+			n=value.children
+			while n:
 				if n.type!='element':
+					n=n.next
 					continue
 				if (n.ns() and value.ns() 
 						and n.ns().getContent()!=value.ns().getContent()):
+					n=n.next
 					continue
 				if n.name=='TYPE':
 					self.type=unicode(n.getContent(),"utf-8","replace")
@@ -113,6 +120,7 @@ class VCardImage:
 					self.image=base64.decodestring(n.getContent())
 				if n.name=='EXTVAL':
 					self.uri=unicode(n.getContent(),"utf-8","replace")
+				n=n.next
 			if (self.uri and self.image) or (not self.uri and not self.image):
 				raise ValueError,"Bad %s value in vcard" % (name,)
 		else:
@@ -149,11 +157,14 @@ class VCardAdr:
 			(self.pobox,self.extadr,self.street,self.locality,
 					self.region,self.pcode,self.ctry)=[""]*7
 			self.type=[]
-			for n in value.get_children():
+			n=value.children
+			while n:
 				if n.type!='element':
+					n=n.next
 					continue
 				if (n.ns() and value.ns() 
 						and n.ns().getContent()!=value.ns().getContent()):
+					n=n.next
 					continue
 				if n.name=='POBOX':
 					self.pobox=unicode(n.getContent(),"utf-8","replace")
@@ -172,6 +183,7 @@ class VCardAdr:
 				elif n.name in ("HOME","WORK","POSTAL","PARCEL","DOM","INTL",
 						"PREF"):
 					self.type.append(n.name.lower())
+				n=n.next
 			if self.type==[]:
 				self.type=["intl","postal","parcel","work"]
 			elif "dom" in self.type and "intl" in self.type:
@@ -214,11 +226,14 @@ class VCardLabel:
 		if isinstance(value,libxml2.xmlNone):
 			self.lines=[]
 			self.type=[]
-			for n in value.get_children():
+			n=value.children
+			while n:
 				if n.type!='element':
+					n=n.next
 					continue
 				if (n.ns() and value.ns() 
 						and n.ns().getContent()!=value.ns().getContent()):
+					n=n.next
 					continue
 				if n.name=='LINE':
 					l=unicode(n.getContent(),"utf-8","replace").strip()
@@ -227,6 +242,7 @@ class VCardLabel:
 				elif n.name in ("HOME","WORK","POSTAL","PARCEL","DOM","INTL",
 						"PREF"):
 					self.type.append(n.name.lower())
+				n=n.next
 			if self.type==[]:
 				self.type=["intl","postal","parcel","work"]
 			elif "dom" in self.type and "intl" in self.type:
@@ -260,11 +276,14 @@ class VCardTel:
 		if isinstance(value,libxml2.xmlNone):
 			number=None
 			self.type=[]
-			for n in value.get_children():
+			n=value.children
+			while n:
 				if n.type!='element':
+					n=n.next
 					continue
 				if (n.ns() and value.ns() 
 						and n.ns().getContent()!=value.ns().getContent()):
+					n=n.next
 					continue
 				if n.name=='NUMBER':
 					self.number=unicode(n.getContent(),"utf-8","replace")
@@ -272,6 +291,7 @@ class VCardTel:
 						"CELL","VIDEO","BBS","MODEM","ISDN","PCS",
 						"PREF"):
 					self.type.append(n.name.lower())
+				n=n.next
 			if self.type==[]:
 				self.type=["voice"]
 		else:
@@ -299,16 +319,20 @@ class VCardEmail:
 		if isinstance(value,libxml2.xmlNone):
 			number=None
 			self.type=[]
-			for n in value.get_children():
+			n=value.children
+			while n:
 				if n.type!='element':
+					n=n.next
 					continue
 				if (n.ns() and value.ns() 
 						and n.ns().getContent()!=value.ns().getContent()):
+					n=n.next
 					continue
 				if n.name=='USERID':
 					self.address=unicode(n.getContent(),"utf-8","replace")
 				elif n.name in ("HOME","WORK","INTERNET","X400"):
 					self.type.append(n.name.lower())
+				n=n.next
 			if self.type==[]:
 				self.type=["internet"]
 		else:
@@ -334,16 +358,20 @@ class VCardGeo:
 			raise RuntimeError,"VCardName handles only 'GEO' type"
 		if isinstance(value,libxml2.xmlNone):
 			self.lat,self.lon=[None]*2
-			for n in value.get_children():
+			n=value.children
+			while n:
 				if n.type!='element':
+					n=n.next
 					continue
 				if (n.ns() and value.ns() 
 						and n.ns().getContent()!=value.ns().getContent()):
+					n=n.next
 					continue
 				if n.name=='LAT':
 					self.lat=unicode(n.getContent(),"utf-8")
 				if n.name=='LON':
 					self.lon=unicode(n.getContent(),"utf-8")
+				n=n.next
 			if not self.lat or not self.lon:
 				raise ValueError,"Bad vcard GEO value"
 		else:
@@ -363,16 +391,20 @@ class VCardOrg:
 			raise RuntimeError,"VCardName handles only 'ORG' type"
 		if isinstance(value,libxml2.xmlNone):
 			self.lat,self.lon=[None]*2
-			for n in value.get_children():
+			n=value.children
+			while n:
 				if n.type!='element':
+					n=n.next
 					continue
 				if (n.ns() and value.ns() 
 						and n.ns().getContent()!=value.ns().getContent()):
+					n=n.next
 					continue
 				if n.name=='ORGNAME':
 					self.name=unicode(n.getContent(),"utf-8")
 				if n.name=='ORGUNIT':
 					self.unit=unicode(n.getContent(),"utf-8")
+				n=n.next
 			if not self.lat or not self.lon:
 				raise ValueError,"Bad vcard ORG value"
 		else:
@@ -392,14 +424,18 @@ class VCardCategories:
 			raise RuntimeError,"VCardName handles only 'CATEGORIES' type"
 		if isinstance(value,libxml2.xmlNone):
 			self.keywords=[]
-			for n in value.get_children():
+			n=value.children
+			while n:
 				if n.type!='element':
+					n=n.next
 					continue
 				if (n.ns() and value.ns() 
 						and n.ns().getContent()!=value.ns().getContent()):
+					n=n.next
 					continue
 				if n.name=='KEYWORD':
 					self.keywords.append(unicode(n.getContent(),"utf-8"))
+				n=n.next
 			if not self.keywords:
 				raise ValueError,"Bad vcard CATEGORIES value"
 		else:
@@ -417,11 +453,14 @@ class VCardSound:
 		self.name=name
 		if isinstance(value,libxml2.xmlNone):
 			self.uri,self.sound,self.phonetic=[None]*3
-			for n in value.get_children():
+			n=value.children
+			while n:
 				if n.type!='element':
+					n=n.next
 					continue
 				if (n.ns() and value.ns() 
 						and n.ns().getContent()!=value.ns().getContent()):
+					n=n.next
 					continue
 				if n.name=='BINVAL':
 					if (self.phonetic or self.uri):
@@ -435,6 +474,7 @@ class VCardSound:
 					if (self.phonetic or self.sound):
 						raise Value,"Bad SOUND value in vcard"
 					self.uri=unicode(n.getContent(),"utf-8","replace")
+				n=n.next
 			if (not self.phonetic and not self.image and not self.sound):
 				raise Value,"Bad SOUND value in vcard"
 		else:
@@ -465,11 +505,14 @@ class VCardPrivacy:
 	def __init__(self,name,value,rfc2425parameters={}):
 		if isinstance(value,libxml2.xmlNone):
 			self.value=None
-			for n in value.get_children():
+			n=value.children
+			while n:
 				if n.type!='element':
+					n=n.next
 					continue
 				if (n.ns() and value.ns() 
 						and n.ns().getContent()!=value.ns().getContent()):
+					n=n.next
 					continue
 				if n.name=='PUBLIC':
 					self.value="public"
@@ -477,6 +520,7 @@ class VCardPrivacy:
 					self.value="private"
 				elif n.name=='CONFIDENTAL':
 					self.value="confidental"
+				n=n.next
 			if not self.value:
 				raise ValueError,"Bad PRIVACY value in vcard"
 		else:

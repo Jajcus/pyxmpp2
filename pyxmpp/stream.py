@@ -693,7 +693,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def __try_handlers(self,handler_list,typ,stanza):
 		namespaces=[]
 		if stanza.node.children:
-			for c in stanza.node.children:
+			c=stanza.node.children
+			while c:
 				try:
 					ns=c.ns()
 				except libxml2.treeError:
@@ -701,6 +702,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 				ns_uri=ns.getContent()
 				if ns_uri not in namespaces:
 					namespaces.append(ns_uri)
+				c=c.next
 		for prio,t,ns,handler in handler_list:
 			if t!=typ:
 				continue

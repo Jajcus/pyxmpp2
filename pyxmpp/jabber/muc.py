@@ -126,7 +126,8 @@ class MucItem:
 	def __from_node(self,node):
 		actor=None
 		reason=None
-		for n in node.children:
+		n=node.children
+		while n:
 			ns=n.ns()
 			if ns and ns.getContent()!=MUC_USER_NS:
 				continue
@@ -134,6 +135,7 @@ class MucItem:
 				actor=n.getContent()
 			if n.name=="reason":
 				reason=n.getContent()
+			n=n.next
 		self.__init(
 			from_utf8(node.prop("affiliation")),
 			from_utf8(node.prop("role")),
@@ -168,23 +170,28 @@ class MucUserX(MucXBase):
 		if not self.node.children:
 			return []
 		ret=[]
-		for n in self.children:
-			n=n.ns()
+		n=self.children
+		while n:
+			ns=n.ns()
 			if ns and ns.getContent()!=MUC_USER_NS:
-				continue
-			if n.name=="item":
+				pass
+			elif n.name=="item":
 				ret.append(MucItem(n))
 			# FIXME: alt,decline,invite,password,status
+			n=n.next
 		return ret
 	def clear(self):
 		if not self.node.children:
 			return
-		for n in list(self.children):
-			n=n.ns()
+		n=self.children
+		while n:
+			ns=n.ns()
 			if ns and ns.getContent()!=MUC_USER_NS:
-				continue
-			n.unlinkNode()
-			n.freeNode()
+				pass
+			else:
+				n.unlinkNode()
+				n.freeNode()
+			n=n.next
 	def add_item(self,item):
 		if not isinstance(item,MucItem):
 			raise TypeError,"Bad item type for muc#user"
@@ -201,11 +208,14 @@ class MucStanzaExt:
 			return self.muc_x
 		if not self.node.children:
 			return None
-		for n in self.node.children:
+		n=self.node.children
+		while n:
 			if n.name!="x":
+				n=n.next
 				continue
 			ns=n.ns()
 			if not ns:
+				n=n.next
 				continue
 			ns_uri=ns.getContent()
 			if ns_uri==MUC_NS:
@@ -220,6 +230,7 @@ class MucStanzaExt:
 			if ns_uri==MUC_OWNER_NS:
 				self.muc_x=MucOwnerX(n)
 				return self.muc_x
+			n=n.next
 
 	def clear_muc_x(self):
 		if self.muc_x:
@@ -227,16 +238,20 @@ class MucStanzaExt:
 			self.muc_x=None
 		if not self.node.children:
 			return
-		for n in list(self.node.children):
+		n=self.node.children
+		while n:
 			if n.name!="x":
+				n=n.next
 				continue
 			ns=n.ns()
 			if not ns:
+				n=n.next
 				continue
 			ns_uri=ns.getContent()
 			if ns_uri in (MUC_NS,MUC_USER_NS,MUC_ADMIN_NS,MUC_OWNER_NS):
 				n.unlinkNode()
 				n.freeNode()
+			n=n.next
 
 	def make_muc_userinfo(self,status=None):
 		self.clear_muc_x()

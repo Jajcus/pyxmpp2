@@ -178,8 +178,9 @@ class Presence(Stanza):
 			id=self.get_id(),error_cond=cond)
 		
 		if self.node.children:
-			for n in list(self.node.children):
-				n=n.copyNode(1)
-				p.node.children.addPrevSibling(n)
+			n=self.node.children
+			while n:
+				p.node.children.addPrevSibling(n.copyNode(1))
+				n=n.next
 		return p
 
