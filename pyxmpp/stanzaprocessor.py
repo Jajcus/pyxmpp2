@@ -17,7 +17,7 @@
 
 """Handling of XMPP stanzas."""
 
-__revision__="$Id: stanzaprocessor.py,v 1.1 2004/09/20 21:06:28 jajcus Exp $"
+__revision__="$Id: stanzaprocessor.py,v 1.2 2004/09/21 06:15:36 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -136,6 +136,7 @@ class StanzaProcessor:
                 c=c.next
         for handler_entry in handler_list:
             t=handler_entry[1]
+            ns=handler_entry[2]
             handler=handler_entry[3]
             if t!=typ:
                 continue
