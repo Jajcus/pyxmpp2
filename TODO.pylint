@@ -5,7 +5,6 @@ umask 022 ; python setup.py build
 running build
 running build_py
 copying pyxmpp/version.py -> build/lib.linux-i686-2.3/pyxmpp
-copying pyxmpp/jabberd/component.py -> build/lib.linux-i686-2.3/pyxmpp/jabberd
 running build_ext
 cd examples ; rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp .
 cd examples ; chmod a+x *.py
@@ -79,11 +78,11 @@ W0103:  0: Missing required attribute "__docformat__"
 ************* Module pyxmpp.resolver
 ignore that: W0612:159:do_query: Unused variable 'canonname'
 ************* Module pyxmpp.clientstream
-W0511:340: FIXME: that should be the hostname choosen from SRV records found.
+W0511:341: FIXME: that should be the hostname choosen from SRV records found.
 ignore that: W0221:108:ClientStream.connect: Arguments number differs from overriden method
 ignore that: W0221:128:ClientStream._connect: Arguments number differs from overriden method
 ignore that: W0221:148:ClientStream.accept: Arguments number differs from overriden method
-ignore that: W0613:239:ClientStream.get_password: Unused argument 'realm'
+ignore that: W0613:240:ClientStream.get_password: Unused argument 'realm'
 ignore that: W0201:145:ClientStream._connect: Attribute 'me' defined outside __init__
 ignore that: W0201:106:ClientStream._reset: Attribute '_auth_methods_left' defined outside __init__
 ************* Module pyxmpp.client
@@ -97,62 +96,15 @@ ignore that: W0201:220:StreamTLSMixIn._request_tls: Attribute 'features' defined
 W0141:  0: Missing docstring
 W0103:  0: Missing required attribute "__revision__"
 W0103:  0: Missing required attribute "__docformat__"
-************* Module pyxmpp.jabberd
-W0141:  0: Missing docstring
 ************* Module pyxmpp.jabberd.componentstream
-W0141:  0: Missing docstring
-W0141: 36:ComponentStreamError: Missing docstring
-W0141: 39:FatalComponentStreamError: Missing docstring
-W0141: 42:LegacyAuthenticationError: Missing docstring
-W0141: 45:ComponentStream: Missing docstring
-W0141: 58:ComponentStream._reset: Missing docstring
-W0221: 61:ComponentStream.connect: Arguments number differs from overriden method
-W0141: 61:ComponentStream.connect: Missing docstring
-W0141: 68:ComponentStream._connect: Missing docstring
-W0221: 68:ComponentStream._connect: Arguments number differs from overriden method
-W0141: 79:ComponentStream.accept: Missing docstring
-W0221: 79:ComponentStream.accept: Arguments number differs from overriden method
-W0141: 82:ComponentStream.stream_start: Missing docstring
-W0141: 88:ComponentStream._post_connect: Missing docstring
-W0141: 92:ComponentStream._compute_handshake: Missing docstring
-W0622:100:ComponentStream._auth: Redefining built-in 'hash'
-W0141: 95:ComponentStream._auth: Missing docstring
-W0141:107:ComponentStream._process_node: Missing docstring
-W0201:113:ComponentStream._process_node: Attribute 'authenticated' defined outside __init__
-W0201:123:ComponentStream._process_node: Attribute 'peer_authenticated' defined outside __init__
-W0201:118:ComponentStream._process_node: Attribute 'peer' defined outside __init__
-W0611: 33: Unused import JID
-W0611: 21: Unused import libxml2
-W0611: 34: Unused import from_utf8
-W0611: 31: Unused import Iq
-W0611: 30: Unused import SASLNotAvailable
-W0611: 25: Unused import UnicodeType
-W0611: 23: Unused import time
-W0611: 30: Unused import SASLMechanismNotAvailable
-************* Module pyxmpp.sasl
-W0141:  0: Missing docstring
-W0403: 22: Uses of a deprecated module 'string'
-W0404: 24: Relative import 'core'
-W0404: 26: Relative import 'plain'
-W0404: 27: Relative import 'digest_md5'
-W0133: 38:ClientAuthenticator: Invalid name "ClientAuthenticator" (should match [a-z_][a-z0-9_]*$)
-W0141: 38:ClientAuthenticator: Missing docstring
-W0133: 42:ServerAuthenticator: Invalid name "ServerAuthenticator" (should match [a-z_][a-z0-9_]*$)
-W0141: 42:ServerAuthenticator: Missing docstring
+ignore that: W0221: 76:ComponentStream.connect: Arguments number differs from overriden method
+ignore that: W0221: 96:ComponentStream._connect: Arguments number differs from overriden method
+ignore that: W0221:108:ComponentStream.accept: Arguments number differs from overriden method
+ignore that: W0201:173:ComponentStream._process_node: Attribute 'authenticated' defined outside __init__
+ignore that: W0201:183:ComponentStream._process_node: Attribute 'peer_authenticated' defined outside __init__
+ignore that: W0201:178:ComponentStream._process_node: Attribute 'peer' defined outside __init__
 ************* Module pyxmpp.sasl.plain
-W0141:  0: Missing docstring
-W0141: 27:PlainClientAuthenticator: Missing docstring
-W0141: 31:PlainClientAuthenticator.start: Missing docstring
-W0221: 31:PlainClientAuthenticator.start: Arguments number differs from overriden method
-W0141: 41:PlainClientAuthenticator.challenge: Missing docstring
-W0613: 41:PlainClientAuthenticator.challenge: Unused argument 'challenge'
-W0201: 32:PlainClientAuthenticator.start: Attribute 'username' defined outside __init__
-W0201: 38:PlainClientAuthenticator.start: Attribute 'finished' defined outside __init__
-W0201: 37:PlainClientAuthenticator.start: Attribute 'password' defined outside __init__
-W0201: 34:PlainClientAuthenticator.start: Attribute 'authzid' defined outside __init__
-W0141: 55:PlainServerAuthenticator: Missing docstring
-W0141: 59:PlainServerAuthenticator.start: Missing docstring
-W0141: 63:PlainServerAuthenticator.response: Missing docstring
+ignore that: W0613: 66:PlainClientAuthenticator.challenge: Unused argument 'challenge'
 ************* Module pyxmpp.sasl.core
 W0141:  0: Missing docstring
 W0403: 22: Uses of a deprecated module 'string'
@@ -177,26 +129,26 @@ W0141: 54:Reply: Missing docstring
 W0141: 55:Reply.base64: Missing docstring
 E0201: 56:Reply.base64: Access to undefined member 'data'
 E0201: 57:Reply.base64: Access to undefined member 'data'
-W0141: 63:Response: Missing docstring
-W0141: 69:Challenge: Missing docstring
-W0141: 75:Failure: Missing docstring
-W0141: 81:Success: Missing docstring
-W0141: 90:ClientAuthenticator: Missing docstring
-W0141: 94:ClientAuthenticator.start: Missing docstring
-E0602: 95:ClientAuthenticator.start: Undefined variable 'Abort'
-W0613: 94:ClientAuthenticator.start: Unused argument 'username'
-W0613: 94:ClientAuthenticator.start: Unused argument 'authzid'
-W0141: 96:ClientAuthenticator.challenge: Missing docstring
-E0602: 97:ClientAuthenticator.challenge: Undefined variable 'Abort'
-W0613: 96:ClientAuthenticator.challenge: Unused argument 'challenge'
-W0141: 98:ClientAuthenticator.finish: Missing docstring
-W0613: 98:ClientAuthenticator.finish: Unused argument 'data'
-E0201: 99:ClientAuthenticator.finish: Access to undefined member 'authzid'
-W0141:101:ServerAuthenticator: Missing docstring
-W0141:105:ServerAuthenticator.start: Missing docstring
-W0613:105:ServerAuthenticator.start: Unused argument 'initial_response'
-W0141:107:ServerAuthenticator.response: Missing docstring
-W0613:107:ServerAuthenticator.response: Unused argument 'response'
+W0141: 64:Response: Missing docstring
+W0141: 70:Challenge: Missing docstring
+W0141: 76:Failure: Missing docstring
+W0141: 82:Success: Missing docstring
+W0141: 91:ClientAuthenticator: Missing docstring
+W0141: 95:ClientAuthenticator.start: Missing docstring
+E0602: 96:ClientAuthenticator.start: Undefined variable 'Abort'
+W0613: 95:ClientAuthenticator.start: Unused argument 'username'
+W0613: 95:ClientAuthenticator.start: Unused argument 'authzid'
+W0141: 97:ClientAuthenticator.challenge: Missing docstring
+E0602: 98:ClientAuthenticator.challenge: Undefined variable 'Abort'
+W0613: 97:ClientAuthenticator.challenge: Unused argument 'challenge'
+W0141: 99:ClientAuthenticator.finish: Missing docstring
+W0613: 99:ClientAuthenticator.finish: Unused argument 'data'
+E0201:100:ClientAuthenticator.finish: Access to undefined member 'authzid'
+W0141:102:ServerAuthenticator: Missing docstring
+W0141:106:ServerAuthenticator.start: Missing docstring
+W0613:106:ServerAuthenticator.start: Unused argument 'initial_response'
+W0141:108:ServerAuthenticator.response: Missing docstring
+W0613:108:ServerAuthenticator.response: Unused argument 'response'
 W0611: 22: Unused import string
 W0611: 23: Unused import sys
 ************* Module pyxmpp.sasl.digest_md5
@@ -533,17 +485,17 @@ W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 Report
 ======
-5943 statements analysed.
+5937 statements analysed.
 
 Statistics by type
 ------------------
 
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-module   37     37         =          67.57       0.00     
-class    115    116        -1         64.35       0.00     
+module   37     37         =          78.38       0.00     
+class    114    114        =          69.30       0.00     
 method   0      0          =          0.00        0.00     
-function 631    631        =          78.29       0.63     
+function 631    631        =          80.67       0.32     
 
 
 Raw metrics
@@ -551,10 +503,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6515   60.62 6521     -6         
-docstring 3055   28.43 2871     +184       
-comment   583    5.42  583      =          
-empty     594    5.53  572      +22        
+code      6507   59.60 6507     =          
+docstring 3208   29.39 3208     =          
+comment   587    5.38  587      =          
+empty     615    5.63  615      =          
 
 
 External dependencies
@@ -562,15 +514,11 @@ External dependencies
 ::
 
     stringprep (pyxmpp.xmppstringprep)
-    pyxmpp 
-      \-plain (pyxmpp.sasl)
-      \-digest_md5 (pyxmpp.sasl)
-      \-core (pyxmpp.sasl)
     base64 (pyxmpp.streamsasl,pyxmpp.jabber.vcard)
     logging (pyxmpp.streamsasl,pyxmpp.streambase,pyxmpp.clientstream,pyxmpp.client,pyxmpp.stream,pyxmpp.streamtls,pyxmpp.stanzaprocessor,pyxmpp.jabberd.component,pyxmpp.jabberd.componentstream,pyxmpp.sasl.plain,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.client)
     socket (pyxmpp.streambase,pyxmpp.resolver,pyxmpp.streamtls)
     re (pyxmpp.jid,pyxmpp.utils,pyxmpp.resolver,pyxmpp.sasl.digest_md5,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
-    libxml2 (pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.utils,pyxmpp.stanza,pyxmpp.message,pyxmpp.stanzaprocessor,pyxmpp.iq,pyxmpp.error,pyxmpp.jabberd.componentstream,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    libxml2 (pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.utils,pyxmpp.stanza,pyxmpp.message,pyxmpp.stanzaprocessor,pyxmpp.iq,pyxmpp.error,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
     random (pyxmpp.dns,pyxmpp.streambase,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.sasl,pyxmpp.sasl.core)
     weakref (pyxmpp.jid,pyxmpp.jabber.muc)
     threading (pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.client,pyxmpp.expdict,pyxmpp.stanzaprocessor,pyxmpp.jabberd.component)
@@ -583,8 +531,8 @@ External dependencies
     encodings 
       \-idna (pyxmpp.jid,pyxmpp.dns)
     os (pyxmpp.streambase)
-    types (pyxmpp.xmppstringprep,pyxmpp.roster,pyxmpp.jid,pyxmpp.dns,pyxmpp.streambase,pyxmpp.utils,pyxmpp.error,pyxmpp.jabberd.componentstream,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
-    string (pyxmpp.sasl,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
+    types (pyxmpp.xmppstringprep,pyxmpp.roster,pyxmpp.jid,pyxmpp.dns,pyxmpp.streambase,pyxmpp.utils,pyxmpp.error,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    string (pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
 
 
 
@@ -593,25 +541,24 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0141      190        
-W0201      66         
+W0141      165        
+W0201      62         
 W0613      45         
-W0611      41         
 E0201      37         
+W0611      33         
 W0102      18         
 E0602      18         
 W0311      8          
-W0221      8          
-W0133      8          
 W0612      7          
-W0622      5          
+W0221      7          
+W0133      6          
 W0511      5          
-W0403      5          
+W0622      4          
+W0403      4          
 W0232      4          
 W0231      4          
 W0112      4          
 W0103      4          
-W0404      3          
 W0301      3          
 W0115      3          
 W0151      2          
@@ -626,8 +573,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 438    467      -29        
-errors   55     56       -1         
+warnings 393    393      =          
+errors   55     55       =          
 
 
 % errors / warnings by module
@@ -635,34 +582,32 @@ errors   55     56       -1
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            27.27 19.41   
-pyxmpp.jid                     23.64 0.23    
-pyxmpp.jabber.muc              16.36 8.90    
-pyxmpp.sasl.core               10.91 8.90    
-pyxmpp.jabber.disco            7.27  8.90    
-pyxmpp.jabber.client           5.45  3.42    
-pyxmpp.jabber.clientstream     3.64  9.59    
-pyxmpp.jabber.delay            3.64  2.74    
-pyxmpp.sasl.digest_md5         1.82  12.56   
-pyxmpp.jabberd.componentstream 0.00  6.62    
-pyxmpp.streambase              0.00  5.02    
-pyxmpp.sasl.plain              0.00  2.97    
-pyxmpp.sasl                    0.00  2.05    
-pyxmpp.dns                     0.00  1.83    
-pyxmpp.streamsasl              0.00  1.60    
-pyxmpp.clientstream            0.00  1.60    
-pyxmpp.streamtls               0.00  0.91    
-pyxmpp.xmlextra                0.00  0.68    
-pyxmpp.version                 0.00  0.68    
-pyxmpp._xmlextra               0.00  0.46    
-pyxmpp.xmppstringprep          0.00  0.23    
-pyxmpp.resolver                0.00  0.23    
-pyxmpp.jabberd                 0.00  0.23    
-pyxmpp.client                  0.00  0.23    
+pyxmpp.jabber.vcard            27.27 21.63   
+pyxmpp.jid                     23.64 0.25    
+pyxmpp.jabber.muc              16.36 9.92    
+pyxmpp.sasl.core               10.91 9.92    
+pyxmpp.jabber.disco            7.27  9.92    
+pyxmpp.jabber.client           5.45  3.82    
+pyxmpp.jabber.clientstream     3.64  10.69   
+pyxmpp.jabber.delay            3.64  3.05    
+pyxmpp.sasl.digest_md5         1.82  13.99   
+pyxmpp.streambase              0.00  5.60    
+pyxmpp.dns                     0.00  2.04    
+pyxmpp.streamsasl              0.00  1.78    
+pyxmpp.clientstream            0.00  1.78    
+pyxmpp.jabberd.componentstream 0.00  1.53    
+pyxmpp.streamtls               0.00  1.02    
+pyxmpp.xmlextra                0.00  0.76    
+pyxmpp.version                 0.00  0.76    
+pyxmpp._xmlextra               0.00  0.51    
+pyxmpp.xmppstringprep          0.00  0.25    
+pyxmpp.sasl.plain              0.00  0.25    
+pyxmpp.resolver                0.00  0.25    
+pyxmpp.client                  0.00  0.25    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 8.80/10 (previous run: 8.74/10)
+Your code has been rated at 8.87/10 (previous run: 8.87/10)
 That's pretty good. Good work mate.
 

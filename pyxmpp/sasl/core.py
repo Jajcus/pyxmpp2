@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: core.py,v 1.10 2004/09/10 14:01:17 jajcus Exp $"
+__revision__="$Id: core.py,v 1.11 2004/09/28 21:31:19 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import random
@@ -60,6 +60,7 @@ class Reply:
             return ret
         else:
             return None
+
 class Response(Reply):
     def __init__(self,data=""):
         self.data=data
@@ -106,4 +107,5 @@ class ServerAuthenticator:
         return Failure("not-authorized")
     def response(self,response):
         return Failure("not-authorized")
+
 # vi: sts=4 et sw=4

@@ -14,8 +14,9 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+"""PLAIN authentication mechanism for PyXMPP SASL implementation."""
 
-__revision__="$Id: plain.py,v 1.9 2004/09/10 14:01:17 jajcus Exp $"
+__revision__="$Id: plain.py,v 1.10 2004/09/28 21:31:19 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import logging
@@ -25,20 +26,53 @@ from pyxmpp.sasl.core import ClientAuthenticator,ServerAuthenticator
 from pyxmpp.sasl.core import Success,Failure,Challenge,Response
 
 class PlainClientAuthenticator(ClientAuthenticator):
+    """Provides PLAIN SASL authentication for a client."""
+    
     def __init__(self,password_manager):
+        """Initialize a `PlainClientAuthenticator` object.
+
+        :Parameters:
+            - `password_manager`: name of the password manager object providing
+              authentication credentials.
+        :Types:
+            - `password_manager`: `PasswordManager`"""
         ClientAuthenticator.__init__(self,password_manager)
+        self.username=None
+        self.finished=None
+        self.password=None
+        self.authzid=None
         self.__logger=logging.getLogger("pyxmpp.sasl.PlainClientAuthenticator")
-    def start(self,username,authzid,password=None):
+
+    def start(self,username,authzid):
+        """Start the authentication process and return the initial response.
+        
+        :Parameters:
+            - `username`: username (authentication id).
+            - `authzid`: authorization id.
+        :Types:
+            - `username`: `unicode`
+            - `authzid`: `unicode`
+        
+        :return: the initial response or a failure indicator.
+        :returntype: `sasl.Response` or `sasl.Failure`"""
         self.username=username
         if authzid:
             self.authzid=authzid
         else:
             self.authzid=""
-        self.password=password
         self.finished=0
         return self.challenge("")
 
     def challenge(self,challenge):
+        """Process the challenge and return the response.
+        
+        :Parameters:
+            - `challenge`: username (authentication id).
+        :Types:
+            - `challenge`: `str`
+       
+        :return: the response or a failure indicator.
+        :returntype: `sasl.Response` or `sasl.Failure`"""
         if self.finished:
             self.__logger.debug("Already authenticated")
             return Failure("extra-challenge")
@@ -53,32 +87,59 @@ class PlainClientAuthenticator(ClientAuthenticator):
                             to_utf8(self.password)))
 
 class PlainServerAuthenticator(ServerAuthenticator):
+    """Provides PLAIN SASL authentication for a server."""
+    
     def __init__(self,password_manager):
+        """Initialize a `PlainServerAuthenticator` object.
+
+        :Parameters:
+            - `password_manager`: name of the password manager object providing
+              authentication credential verification.
+        :Types:
+            - `password_manager`: `PasswordManager`"""
         ServerAuthenticator.__init__(self,password_manager)
         self.__logger=logging.getLogger("pyxmpp.sasl.PlainServerAuthenticator")
+
     def start(self,response):
+        """Start the authentication process.
+        
+        :Parameters:
+            - `response`: the initial response from the client.
+        :Types:
+            - `response`: `str`
+        
+        :return: a challenge, a success indicator or a failure indicator.
+        :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
         if not response:
             return Challenge("")
         return self.response(response)
+        
     def response(self,response):
+        """Process a client reponse.
+        
+        :Parameters:
+            - `response`: the response from the client.
+        :Types:
+            - `response`: `str`
+        
+        :return: a challenge, a success indicator or a failure indicator.
+        :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
         s=response.split("\000")
         if len(s)!=3:
             self.__logger.debug("Bad response: %r" % (response,))
             return Failure("not-authorized")
         authzid,username,password=s
-
         authzid=from_utf8(authzid)
         username=from_utf8(username)
         password=from_utf8(password)
-
         if not self.password_manager.check_password(username,password):
             self.__logger.debug("Bad password. Response was: %r" % (response,))
             return Failure("not-authorized")
-
         info={"mechanism":"PLAIN","username":username}
         if self.password_manager.check_authzid(authzid,info):
             return Success(username,None,authzid)
         else:
             self.__logger.debug("Authzid verification failed.")
             return Failure("invalid-authzid")
+
 # vi: sts=4 et sw=4

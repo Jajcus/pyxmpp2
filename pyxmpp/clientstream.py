@@ -17,7 +17,7 @@
 
 """Client stream handling."""
 
-__revision__="$Id: clientstream.py,v 1.36 2004/09/22 21:32:26 jajcus Exp $"
+__revision__="$Id: clientstream.py,v 1.37 2004/09/28 21:31:00 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import logging
@@ -75,8 +75,8 @@ class ClientStream(Stream):
             - `keepalive`: keepalive output interval. 0 to disable.
         :Types:
             - `jid`: `pyxmpp.JID`
-            - `password`: `str`
-            - `server`: `str`
+            - `password`: `unicode`
+            - `server`: `unicode`
             - `port`: `int`
             - `auth_methods`: sequence of `str`
             - `tls_settings`: `pyxmpp.TLSSettings`
@@ -100,13 +100,13 @@ class ClientStream(Stream):
         self.__logger=logging.getLogger("pyxmpp.ClientStream")
 
     def _reset(self):
-        """Reset `ClientStream` object state making it ready to handle new
-        connections."""
+        """Reset `ClientStream` object state, making the object ready to handle
+        new connections."""
         Stream._reset(self)
         self._auth_methods_left=[]
 
     def connect(self,server=None,port=None):
-        """Establish a client connection to server.
+        """Establish a client connection to a server.
 
         [client only]
 
@@ -117,7 +117,7 @@ class ClientStream(Stream):
               proper value should be derived automatically from the JID.
               
         :Types:
-            - `server`: `unicode` or `str`
+            - `server`: `unicode`
             - `port`: `int`"""
         self.lock.acquire()
         try:
@@ -146,7 +146,7 @@ class ClientStream(Stream):
         Stream._connect(self,server,port,service,self.my_jid.domain)
 
     def accept(self,sock):
-        """Accept incoming client connection.
+        """Accept an incoming client connection.
 
         [server only]
 
@@ -162,7 +162,8 @@ class ClientStream(Stream):
             self._try_auth()
 
     def _try_auth(self):
-        """Try to authenticate using the first one of allowed authentication methods left.
+        """Try to authenticate using the first one of allowed authentication
+        methods left.
         
         [client only]"""
         if self.authenticated:

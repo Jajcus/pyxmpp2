@@ -14,36 +14,49 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+"""Component (jabber:component:accept) stream handling."""
 
-__revision__="$Id: componentstream.py,v 1.12 2004/09/22 21:32:38 jajcus Exp $"
+__revision__="$Id: componentstream.py,v 1.13 2004/09/28 21:31:10 jajcus Exp $"
 __docformat__="restructuredtext en"
 
-import libxml2
 import sha
-import time
 import logging
-from types import UnicodeType
 
 from pyxmpp.stream import Stream
 from pyxmpp.streambase import StreamError,FatalStreamError
-from pyxmpp.streambase import StreamAuthenticationError,stanza_factory,HostMismatch
-from pyxmpp.streamsasl import SASLNotAvailable,SASLMechanismNotAvailable
-from pyxmpp.iq import Iq
+from pyxmpp.streambase import stanza_factory,HostMismatch
 from pyxmpp.stanza import common_doc,common_root
-from pyxmpp.jid import JID
-from pyxmpp.utils import to_utf8,from_utf8
+from pyxmpp.utils import to_utf8
 
 class ComponentStreamError(StreamError):
+    """Raised on a component error."""
     pass
 
-class FatalComponentStreamError(FatalStreamError):
-    pass
-
-class LegacyAuthenticationError(StreamAuthenticationError):
+class FatalComponentStreamError(ComponentStreamError,FatalStreamError):
+    """Raised on a fatal component error."""
     pass
 
 class ComponentStream(Stream):
+    """Handles jabberd component (jabber:component:accept) connection stream.
+
+    :Ivariables:
+        - `server`: server to use.
+        - `port`: port number to use.
+        - `secret`: authentication secret.
+    :Types:
+        - `server`: `unicode`
+        - `port`: `int`
+        - `secret`: `unicode`"""
+        
     def __init__(self,jid,secret,server,port,keepalive=0):
+        """Initialize a `ComponentStream` object.
+        
+        :Parameters:
+            - `jid`: JID of the component.
+            - `secret`: authentication secret.
+            - `server`: server address.
+            - `port`: TCP port number on the server.
+            - `keepalive`: keepalive interval. 0 to disable."""
         Stream.__init__(self,"jabber:component:accept",
                     sasl_mechanisms=[],
                     tls_settings=None,
@@ -56,9 +69,24 @@ class ComponentStream(Stream):
         self.__logger=logging.getLogger("pyxmpp.jabberd.ComponentStream")
 
     def _reset(self):
+        """Reset `ComponentStream` object state, making the object ready to
+        handle new connections."""
         Stream._reset(self)
 
     def connect(self,server=None,port=None):
+        """Establish a client connection to a server.
+
+        [component only]
+
+        :Parameters:
+            - `server`: name or address of the server to use.  If not given
+              then use the one specified when creating the object.
+            - `port`: port number of the server to use.  If not given then use
+              the one specified when creating the object.
+              
+        :Types:
+            - `server`: `unicode`
+            - `port`: `int`"""
         self.lock.acquire()
         try:
             self._connect(server,port)
@@ -66,6 +94,7 @@ class ComponentStream(Stream):
             self.lock.release()
 
     def _connect(self,server=None,port=None):
+        """Same as `ComponentStream.connect` but assume `self.lock` is acquired."""
         if self.me.node or self.me.resource:
             raise ComponentStreamError,"Component JID may have only domain defined"
         if not server:
@@ -77,34 +106,65 @@ class ComponentStream(Stream):
         Stream._connect(self,server,port,None,self.me)
 
     def accept(self,sock):
+        """Accept an incoming component connection.
+
+        [server only]
+
+        :Parameters:
+            - `sock`: a listening socket."""
         Stream.accept(self,sock,None)
 
     def stream_start(self,doc):
+        """Process <stream:stream> (stream start) tag received from peer.
+
+        Call `Stream.stream_start`, but ignore any `HostMismatch` error.
+        
+        :Parameters:
+            - `doc`: document created by the parser"""
         try:
             Stream.stream_start(self,doc)
         except HostMismatch:
             pass
 
     def _post_connect(self):
+        """Initialize authentication when the connection is established
+        and we are the initiator."""
         if self.initiator:
             self._auth()
 
     def _compute_handshake(self):
+        """Compute the authentication handshake value.
+
+        :return: the computed hash value.
+        :returntype: `str`"""
         return sha.new(to_utf8(self.stream_id)+to_utf8(self.secret)).hexdigest()
 
     def _auth(self):
+        """Authenticate on the server.
+
+        [component only]"""
         if self.authenticated:
             self.__logger.debug("_auth: already authenticated")
             return
         self.__logger.debug("doing handshake...")
-        hash=self._compute_handshake()
-        n=common_root.newTextChild(None,"handshake",hash)
+        hash_value=self._compute_handshake()
+        n=common_root.newTextChild(None,"handshake",hash_value)
         self._write_node(n)
         n.unlinkNode()
         n.freeNode()
         self.__logger.debug("handshake hash sent.")
 
     def _process_node(self,node):
+        """Process first level element of the stream.
+
+        Handle component handshake (authentication) element, and
+        treat elements in "jabber:component:accept", "jabber:client"
+        and "jabber:server" equally (pass to `self.process_stanza`).
+        All other elements are passed to `Stream._process_node`. 
+
+        :Parameters:
+            - `node`: XML node describing the element
+        """
         ns=node.ns()
         if ns:
             ns_uri=node.ns().getContent()
@@ -138,4 +198,5 @@ class ComponentStream(Stream):
                 stanza.free()
             return
         return Stream._process_node(self,node)
+
 # vi: sts=4 et sw=4

@@ -14,17 +14,17 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+"""SASL authentication implementaion for PyXMPP."""
 
-__revision__="$Id: __init__.py,v 1.7 2004/09/10 14:01:17 jajcus Exp $"
+__revision__="$Id: __init__.py,v 1.8 2004/09/28 21:31:19 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import random
-import string
 
-from core import Reply,Response,Challenge,Success,Failure,PasswordManager
+from pyxmpp.sasl.core import Reply,Response,Challenge,Success,Failure,PasswordManager
 
-from plain import PlainClientAuthenticator,PlainServerAuthenticator
-from digest_md5 import DigestMD5ClientAuthenticator,DigestMD5ServerAuthenticator
+from pyxmpp.sasl.plain import PlainClientAuthenticator,PlainServerAuthenticator
+from pyxmpp.sasl.digest_md5 import DigestMD5ClientAuthenticator,DigestMD5ServerAuthenticator
 
 safe_mechanisms_dict={"DIGEST-MD5":(DigestMD5ClientAuthenticator,DigestMD5ServerAuthenticator)}
 unsafe_mechanisms_dict={"PLAIN":(PlainClientAuthenticator,PlainServerAuthenticator)}
@@ -35,11 +35,38 @@ safe_mechanisms=safe_mechanisms_dict.keys()
 unsafe_mechanisms=unsafe_mechanisms_dict.keys()
 all_mechanisms=safe_mechanisms+unsafe_mechanisms
 
-def ClientAuthenticator(mechanism,password_manager):
+def client_authenticator_factory(mechanism,password_manager):
+    """Create a client authenticator object for given SASL mechanism and
+    password manager.
+
+    :Parameters:
+        - `mechanism`: name of the SASL mechanism ("PLAIN" or "DIGEST-MD5").
+        - `password_manager`: name of the password manager object providing
+          authentication credentials.
+    :Types:
+        - `mechanism`: `str`
+        - `password_manager`: `PasswordManager`
+
+    :return: new authenticator.
+    :returntype: `sasl.core.ClientAuthenticator`"""
     authenticator=all_mechanisms_dict[mechanism][0]
     return authenticator(password_manager)
 
-def ServerAuthenticator(mechanism,password_manager):
+def server_authenticator_factory(mechanism,password_manager):
+    """Create a server authenticator object for given SASL mechanism and
+    password manager.
+
+    :Parameters:
+        - `mechanism`: name of the SASL mechanism ("PLAIN" or "DIGEST-MD5").
+        - `password_manager`: name of the password manager object to be used
+          for authentication credentials verification.
+    :Types:
+        - `mechanism`: `str`
+        - `password_manager`: `PasswordManager`
+
+    :return: new authenticator.
+    :returntype: `sasl.core.ServerAuthenticator`"""
     authenticator=all_mechanisms_dict[mechanism][1]
     return authenticator(password_manager)
+
 # vi: sts=4 et sw=4

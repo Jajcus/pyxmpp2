@@ -17,7 +17,7 @@
 
 """Core XMPP stream functionality"""
 
-__revision__="$Id: streamsasl.py,v 1.1 2004/09/24 08:12:27 jajcus Exp $"
+__revision__="$Id: streamsasl.py,v 1.2 2004/09/28 21:31:00 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import base64
@@ -156,7 +156,7 @@ class StreamSASLMixIn(sasl.PasswordManager):
             return False
 
         self.auth_method_used="sasl:"+mechanism
-        self.authenticator=sasl.ServerAuthenticator(mechanism,self)
+        self.authenticator=sasl.server_authenticator_factory(mechanism,self)
 
         r=self.authenticator.start(base64.decodestring(content))
 
@@ -372,7 +372,7 @@ class StreamSASLMixIn(sasl.PasswordManager):
 
         self.auth_method_used="sasl:"+mechanism
 
-        self.authenticator=sasl.ClientAuthenticator(mechanism,self)
+        self.authenticator=sasl.client_authenticator_factory(mechanism,self)
 
         initial_response=self.authenticator.start(username,authzid)
         if not isinstance(initial_response,sasl.Response):
