@@ -1,3 +1,11 @@
+2004-07-19  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/stream.py:
+	- don't catch and dump StreamError exceptions
+
+	* pyxmpp/__init__.py:
+	- import StreamEncryptionRequired exception from stream.py
+
 2004-07-16  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/client.py, pyxmpp/clientstream.py:
