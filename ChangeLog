@@ -1,3 +1,8 @@
+2004-09-25  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/jabber/clientstream.py, pyxmpp/client.py, pyxmpp/expdict.py, pyxmpp/stanzaprocessor.py:
+	- timout handler may accept less than two arguments and other ExpiringDictionary cleanups
+
 2004-09-24  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/jabber/disco.py:
