@@ -66,7 +66,7 @@ class LegacyClientStream(ClientStream):
             - `keepalive`: `int`
         """
         (self.authenticated,self.available_auth_methods,self.auth_stanza,
-                self.peer_authenticated,self.auth_method_used)=(None,)*3
+                self.peer_authenticated,self.auth_method_used)=(None,)*5
         ClientStream.__init__(self,jid,password,server,port,
                             auth_methods,tls_settings,keepalive)
         self.__logger=logging.getLogger("pyxmpp.jabber.LegacyClientStream")
