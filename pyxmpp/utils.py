@@ -21,45 +21,45 @@ from types import UnicodeType,StringType
 import re
 
 def to_utf8(s):
-        """ to_utf8(string_or_unicode) -> string
+    """ to_utf8(string_or_unicode) -> string
 
-        If given unicode object returns is UTF-8 representation.
-        If given string object returns it unchanged.
-        If given object of any other type returns its string representation.
-        When given None returns None."""
-        if s is None:
-                return None
-        elif type(s) is UnicodeType:
-                return s.encode("utf-8")
-        else:
-                return str(s)
+    If given unicode object returns is UTF-8 representation.
+    If given string object returns it unchanged.
+    If given object of any other type returns its string representation.
+    When given None returns None."""
+    if s is None:
+        return None
+    elif type(s) is UnicodeType:
+        return s.encode("utf-8")
+    else:
+        return str(s)
 
 def from_utf8(s):
-        """ from_utf8(string_or_unicode) -> unicode
+    """ from_utf8(string_or_unicode) -> unicode
 
-        If given unicode object returns it unchanged.
-        If given string object converts it to unicode assuming UTF-8 encoding.
-        If given object of any other type returns its unicode representation.
-        When given None returns None."""
-        if s is None:
-                return None
-        elif type(s) is UnicodeType:
-                return s
-        elif type(s) is StringType:
-                return unicode(s,"utf-8")
-        else:
-                return unicode(s)
+    If given unicode object returns it unchanged.
+    If given string object converts it to unicode assuming UTF-8 encoding.
+    If given object of any other type returns its unicode representation.
+    When given None returns None."""
+    if s is None:
+        return None
+    elif type(s) is UnicodeType:
+        return s
+    elif type(s) is StringType:
+        return unicode(s,"utf-8")
+    else:
+        return unicode(s)
 
 evil_characters_re=re.compile(r"[\000-\010\013\014\016-\037]",re.UNICODE)
 utf8_replacement_char=u"\ufffd".encode("utf-8")
 def remove_evil_characters(s):
-        """ remove_evil_characters(unicode) -> unicode
-            remove_evil_characters(utf8_string) -> utf8_string
+    """ remove_evil_characters(unicode) -> unicode
+        remove_evil_characters(utf8_string) -> utf8_string
 
-        Remove control characters (not allowed in XML) from a string.
-        """
-        if type(s) is UnicodeType:
-                return evil_characters_re.sub(u"\ufffd",s)
-        else:
-                return evil_characters_re.sub(utf8_replacement_char,s)
+    Remove control characters (not allowed in XML) from a string.
+    """
+    if type(s) is UnicodeType:
+        return evil_characters_re.sub(u"\ufffd",s)
+    else:
+        return evil_characters_re.sub(utf8_replacement_char,s)
 # vi: sts=4 et sw=4

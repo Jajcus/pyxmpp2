@@ -9,71 +9,71 @@ import socket
 from pyxmpp import ClientStream,JID,Iq,Presence,Message,StreamError
 
 accounts={
-                u'test': '123',
-        };
+        u'test': '123',
+    };
 
 class Stream(ClientStream):
-        def state_change(self,state,arg):
-                print "*** State changed: %s %r ***" % (state,arg)
-                if state=="authorized":
-                        self.disconnect_time=time.time()+60
-                        if not self.version:
-                                self.welcome()
-                                return
-                        self.set_iq_set_handler("session","urn:ietf:params:xml:ns:xmpp-session",
-                                                                        self.set_session)
+    def state_change(self,state,arg):
+        print "*** State changed: %s %r ***" % (state,arg)
+        if state=="authorized":
+            self.disconnect_time=time.time()+60
+            if not self.version:
+                self.welcome()
+                return
+            self.set_iq_set_handler("session","urn:ietf:params:xml:ns:xmpp-session",
+                                    self.set_session)
 
-        def set_session(self,stanza):
-                fr=stanza.get_from()
-                if fr and fr!=self.peer:
-                        iq=stanza.make_error_response("forbidden")
-                        self.send(iq)
-                else:
-                        iq=stanza.make_result_response()
-                        iq.set_to(None)
-                        self.send(iq)
-                        self.welcome()
-                iq.free()
+    def set_session(self,stanza):
+        fr=stanza.get_from()
+        if fr and fr!=self.peer:
+            iq=stanza.make_error_response("forbidden")
+            self.send(iq)
+        else:
+            iq=stanza.make_result_response()
+            iq.set_to(None)
+            self.send(iq)
+            self.welcome()
+        iq.free()
 
-        def welcome(self):
-                m=Message(type="chat",to=self.peer,
-                                body="You have authenticated with: %r" % (self.auth_method_used))
-                self.send(m)
-                m=Message(type="chat",to=self.peer,body="You will be disconnected in 1 minute.")
-                self.send(m)
-                m=Message(type="chat",to=self.peer,body="Thank you for testing.")
-                self.send(m)
-                self.set_message_handler('chat',self.echo_message)
-                self.set_message_handler('normal',self.echo_message)
+    def welcome(self):
+        m=Message(type="chat",to=self.peer,
+                body="You have authenticated with: %r" % (self.auth_method_used))
+        self.send(m)
+        m=Message(type="chat",to=self.peer,body="You will be disconnected in 1 minute.")
+        self.send(m)
+        m=Message(type="chat",to=self.peer,body="Thank you for testing.")
+        self.send(m)
+        self.set_message_handler('chat',self.echo_message)
+        self.set_message_handler('normal',self.echo_message)
 
-        def echo_message(self,message):
-                typ=message.get_type()
-                body=message.get_body()
-                if not body:
-                        return
-                body=u"ECHO: %s" % (body,)
-                subject=message.get_subject()
-                if subject:
-                        subject=u"Re: %s" % (subject,)
-                m=Message(type=typ,to=self.peer,body=body,subject=subject)
-                self.send(m)
+    def echo_message(self,message):
+        typ=message.get_type()
+        body=message.get_body()
+        if not body:
+            return
+        body=u"ECHO: %s" % (body,)
+        subject=message.get_subject()
+        if subject:
+            subject=u"Re: %s" % (subject,)
+        m=Message(type=typ,to=self.peer,body=body,subject=subject)
+        self.send(m)
 
-        def idle(self):
-                ClientStream.idle(self)
-                if not self.peer_authenticated:
-                        return
-                if time.time()>=self.disconnect_time:
-                        m=Message(type="chat",to=self.peer,body="Bye.")
-                        self.send(m)
-                        self.disconnect()
+    def idle(self):
+        ClientStream.idle(self)
+        if not self.peer_authenticated:
+            return
+        if time.time()>=self.disconnect_time:
+            m=Message(type="chat",to=self.peer,body="Bye.")
+            self.send(m)
+            self.disconnect()
 
-#       def get_realms(self):
-#               return None
+#   def get_realms(self):
+#       return None
 
-        def get_password(self,username,realm=None,acceptable_formats=("plain",)):
-                if "plain" in acceptable_formats and accounts.has_key(username):
-                        return accounts[username],"plain"
-                return None,None
+    def get_password(self,username,realm=None,acceptable_formats=("plain",)):
+        if "plain" in acceptable_formats and accounts.has_key(username):
+            return accounts[username],"plain"
+        return None,None
 
 print "creating socket..."
 sock=socket.socket()
@@ -85,17 +85,17 @@ print "creating stream..."
 s=Stream(JID("localhost"),auth_methods=("sasl:DIGEST-MD5","plain","digest"))
 
 while 1:
-        print "accepting..."
-        s.accept(sock)
+    print "accepting..."
+    s.accept(sock)
 
-        print "processing..."
+    print "processing..."
+    try:
         try:
-                try:
-                        s.loop(1)
-                finally:
-                        print "closing..."
-                        s.close()
-        except StreamError:
-                traceback.print_exc(file=sys.stderr)
-                continue
+            s.loop(1)
+        finally:
+            print "closing..."
+            s.close()
+    except StreamError:
+        traceback.print_exc(file=sys.stderr)
+        continue
 # vi: sts=4 et sw=4

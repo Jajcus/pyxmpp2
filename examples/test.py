@@ -10,22 +10,22 @@ from pyxmpp import JID,Iq,Presence,Message,StreamError
 from pyxmpp.jabber import Client
 
 class Disconnected(Exception):
-        pass
+    pass
 
 class MyClient(Client):
-        def session_started(self):
-                self.stream.send(Presence())
+    def session_started(self):
+        self.stream.send(Presence())
 
-        def idle(self):
-                print "idle"
-                Client.idle(self)
-                if self.session_established:
-                        target=JID("jajcus",s.jid.domain)
-                        self.stream.send(Message(to=target,body=unicode("Teścik","utf-8")))
+    def idle(self):
+        print "idle"
+        Client.idle(self)
+        if self.session_established:
+            target=JID("jajcus",s.jid.domain)
+            self.stream.send(Message(to=target,body=unicode("Teścik","utf-8")))
 
-        def post_disconnect(self):
-                print "Disconnected"
-                raise Disconnected
+    def post_disconnect(self):
+        print "Disconnected"
+        raise Disconnected
 
 libxml2.debugMemory(1)
 
@@ -37,14 +37,14 @@ s.connect()
 
 print "processing..."
 try:
-        try:
-                s.loop(1)
-        finally:
-                s.disconnect()
+    try:
+        s.loop(1)
+    finally:
+        s.disconnect()
 except KeyboardInterrupt:
-        traceback.print_exc(file=sys.stderr)
+    traceback.print_exc(file=sys.stderr)
 except (StreamError,Disconnected),e:
-        raise
+    raise
 
 libxml2.cleanupParser()
 if libxml2.debugMemory(1) == 0:
