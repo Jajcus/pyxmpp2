@@ -679,7 +679,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         if self.eof:
             return
         try:
-            r=os.read(self.socket.fileno(),1024)
+            r=self.socket.recv(1024)
         except socket.error,e:
             if e.args[0]!=errno.EINTR:
                 raise
