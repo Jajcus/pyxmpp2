@@ -13,4 +13,9 @@
 - jabber:client stream - both server and client side
 	- legacy jabber authentication (JEP-78) - digest and plain
 	- SASL authentication
+
+- roster object
+
+- base Client class
 	- establishing of session
+	- roster management (only initial retrieval now)

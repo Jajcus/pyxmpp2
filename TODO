@@ -2,13 +2,12 @@ general:
 - better error handling
 - documentation
 
-
 xmpp-base:
 - full StartTLS support
 - jabber:server stream support
 
 xmpp-im:
-- roster management
+- roster updates
 - privacy lists
 
 other:

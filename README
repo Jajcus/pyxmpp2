@@ -7,6 +7,10 @@ This is PyXMPP - a python XMPP module. It is based on libxml2 - fast and
 fully-featured XML parser, so it has features like full namespace support,
 XPath queries etc. 
 
+This package also contains CJC - Console Jabber Client. When PyXMPP API stabilizes 
+CJC will be separated, until then PyXMPP and CJC are developed together. You will find
+CJC in the examples directory.
+
 Unfortunately original libxml2 doesn't have a python interface which would work
 well with XML streams, so custom extension had to be included - thats why this
 module is not 100% pure python. 
@@ -23,4 +27,4 @@ To install it:
 
 python setup.py install
 
-API documentation and more examples are coming soon...
+API documentation and more examples are coming soon (I hope)...
