@@ -126,39 +126,24 @@ ignore that: W0613: 83:JabberClient.connect: Unused argument 'register'
 ************* Module pyxmpp.jabber.disco
 W0511:415: FIXME: stringprep!
 ************* Module pyxmpp.jabber.vcard
-W0511:1177: FIXME#
-W0302:  0: Too many lines in module (1375)
+W0511:1328: FIXME#
+W0302:  0: Too many lines in module (1580)
 ignore that: W0613:119:VCardString.__init__: Unused argument 'rfc2425parameters'
 ignore that: W0613:190:VCardJID.__init__: Unused argument 'rfc2425parameters'
 ignore that: W0613:248:VCardName.__init__: Unused argument 'rfc2425parameters'
-W0112:455:VCardAdr.__init__: Too many branches (19/15)
-W0141:552:VCardLabel: Missing docstring
-W0141:630:VCardTel: Missing docstring
-W0141:703:VCardEmail: Missing docstring
-W0141:773:VCardGeo: Missing docstring
-ignore that: W0613:774:VCardGeo.__init__: Unused argument 'rfc2425parameters'
-W0141:832:VCardOrg: Missing docstring
-ignore that: W0613:833:VCardOrg.__init__: Unused argument 'rfc2425parameters'
-W0141:898:VCardCategories: Missing docstring
-ignore that: W0613:899:VCardCategories.__init__: Unused argument 'rfc2425parameters'
-W0141:955:VCardSound: Missing docstring
-W0141:1035:VCardPrivacy: Missing docstring
-ignore that: W0613:1036:VCardPrivacy.__init__: Unused argument 'rfc2425parameters'
-W0141:1094:VCardKey: Missing docstring
-W0141:1158:VCard: Missing docstring
-W0112:1191:VCard.__init__: Too many branches (40/15)
-W0115:1191:VCard.__init__: Too many statements (95/50)
-W0141:1292:VCard.process_rfc2425_record: Missing docstring
-W0141:1326:VCard.rfc2426: Missing docstring
-W0612:1329:VCard.rfc2426: Unused variable 'name'
-W0141:1339:VCard.xml: Missing docstring
-W0612:1357:VCard.xml: Unused variable 'name'
+ignore that: W0613:821:VCardGeo.__init__: Unused argument 'rfc2425parameters'
+ignore that: W0613:889:VCardOrg.__init__: Unused argument 'rfc2425parameters'
+ignore that: W0613:964:VCardCategories.__init__: Unused argument 'rfc2425parameters'
+ignore that: W0613:1118:VCardPrivacy.__init__: Unused argument 'rfc2425parameters'
+ignore that: W0612:1368:VCard.__init__: Unused variable 'cl'
+ignore that: W0612:1521:VCard.rfc2426: Unused variable 'name'
+ignore that: W0612:1562:VCard.xml: Unused variable 'name'
 W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 
 Report
 ======
-6018 statements analysed.
+6026 statements analysed.
 
 Statistics by type
 ------------------
@@ -166,9 +151,9 @@ Statistics by type
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 module   38     38         =          97.37       0.00     
-class    115    115        =          91.30       0.00     
+class    115    115        =          100.00      0.00     
 method   0      0          =          0.00        0.00     
-function 644    644        =          99.53       0.00     
+function 648    647        +1         100.00      0.00     
 
 
 Raw metrics
@@ -176,10 +161,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6605   50.24 6605     =          
-docstring 5082   38.66 4877     +205       
-comment   611    4.65  610      +1         
-empty     849    6.46  829      +20        
+code      6613   49.48 6611     +2         
+docstring 5274   39.46 5271     +3         
+comment   611    4.57  611      =          
+empty     867    6.49  866      +1         
 
 
 External dependencies
@@ -215,19 +200,17 @@ message id occurences
 ::::::::::::::::::::::
 W0613      41         
 W0201      33         
-W0141      14         
 E0201      13         
 W0511      8          
-W0612      6          
+W0612      7          
 W0221      6          
 W0103      4          
-W0112      2          
 W0611      1          
 W0403      1          
 W0401      1          
 W0302      1          
 W0232      1          
-W0115      1          
+W0141      1          
 
 
 Total errors / warnings
@@ -235,7 +218,7 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 120    126      -6         
+warnings 105    106      -1         
 errors   13     13       =          
 
 
@@ -244,32 +227,32 @@ errors   13     13       =
 
 module                         error  warning 
 ::::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jid                     100.00 0.83    
-pyxmpp.jabber.vcard            0.00   23.33   
-pyxmpp.streambase              0.00   18.33   
-pyxmpp.sasl.core               0.00   8.33    
-pyxmpp.dns                     0.00   6.67    
-pyxmpp.streamsasl              0.00   5.83    
-pyxmpp.clientstream            0.00   5.83    
-pyxmpp.jabberd.componentstream 0.00   5.00    
-pyxmpp.jabber.clientstream     0.00   4.17    
-pyxmpp.xmlextra                0.00   3.33    
-pyxmpp.streamtls               0.00   3.33    
-pyxmpp.version                 0.00   2.50    
-pyxmpp.jabber.muccore          0.00   2.50    
-pyxmpp.sasl.plain              0.00   1.67    
-pyxmpp.jabber.muc              0.00   1.67    
-pyxmpp._xmlextra               0.00   1.67    
-pyxmpp.xmppstringprep          0.00   0.83    
-pyxmpp.sasl.digest_md5         0.00   0.83    
-pyxmpp.resolver                0.00   0.83    
-pyxmpp.jabber.disco            0.00   0.83    
-pyxmpp.jabber.client           0.00   0.83    
-pyxmpp.client                  0.00   0.83    
+pyxmpp.jid                     100.00 0.95    
+pyxmpp.streambase              0.00   20.95   
+pyxmpp.jabber.vcard            0.00   12.38   
+pyxmpp.sasl.core               0.00   9.52    
+pyxmpp.dns                     0.00   7.62    
+pyxmpp.streamsasl              0.00   6.67    
+pyxmpp.clientstream            0.00   6.67    
+pyxmpp.jabberd.componentstream 0.00   5.71    
+pyxmpp.jabber.clientstream     0.00   4.76    
+pyxmpp.xmlextra                0.00   3.81    
+pyxmpp.streamtls               0.00   3.81    
+pyxmpp.version                 0.00   2.86    
+pyxmpp.jabber.muccore          0.00   2.86    
+pyxmpp.sasl.plain              0.00   1.90    
+pyxmpp.jabber.muc              0.00   1.90    
+pyxmpp._xmlextra               0.00   1.90    
+pyxmpp.xmppstringprep          0.00   0.95    
+pyxmpp.sasl.digest_md5         0.00   0.95    
+pyxmpp.resolver                0.00   0.95    
+pyxmpp.jabber.disco            0.00   0.95    
+pyxmpp.jabber.client           0.00   0.95    
+pyxmpp.client                  0.00   0.95    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 9.69/10 (previous run: 9.68/10)
+Your code has been rated at 9.72/10 (previous run: 9.72/10)
 So close to being perfect...
 

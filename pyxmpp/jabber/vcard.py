@@ -468,42 +468,11 @@ class VCardAdr(VCardField):
             rfc2425parameters={}
         if self.name.upper()!="ADR":
             raise RuntimeError,"VCardAdr handles only 'ADR' type"
+        (self.pobox,self.extadr,self.street,self.locality,
+                self.region,self.pcode,self.ctry)=[""]*7
+        self.type=[]
         if isinstance(value,libxml2.xmlNode):
-            (self.pobox,self.extadr,self.street,self.locality,
-                    self.region,self.pcode,self.ctry)=[""]*7
-            self.type=[]
-            n=value.children
-            vns=get_node_ns(value)
-            while n:
-                if n.type!='element':
-                    n=n.next
-                    continue
-                ns=get_node_ns(n)
-                if (ns and vns and ns.getContent()!=vns.getContent()):
-                    n=n.next
-                    continue
-                if n.name=='POBOX':
-                    self.pobox=unicode(n.getContent(),"utf-8","replace")
-                elif n.name=='EXTADR':
-                    self.extadr=unicode(n.getContent(),"utf-8","replace")
-                elif n.name=='STREET':
-                    self.street=unicode(n.getContent(),"utf-8","replace")
-                elif n.name=='LOCALITY':
-                    self.locality=unicode(n.getContent(),"utf-8","replace")
-                elif n.name=='REGION':
-                    self.region=unicode(n.getContent(),"utf-8","replace")
-                elif n.name=='PCODE':
-                    self.pcode=unicode(n.getContent(),"utf-8","replace")
-                elif n.name=='CTRY':
-                    self.ctry=unicode(n.getContent(),"utf-8","replace")
-                elif n.name in ("HOME","WORK","POSTAL","PARCEL","DOM","INTL",
-                        "PREF"):
-                    self.type.append(n.name.lower())
-                n=n.next
-            if self.type==[]:
-                self.type=["intl","postal","parcel","work"]
-            elif "dom" in self.type and "intl" in self.type:
-                raise ValueError,"Both 'dom' and 'intl' specified in vcard ADR"
+            self.__from_xml(value)
         else:
             t=rfc2425parameters.get("type")
             if t:
@@ -516,6 +485,46 @@ class VCardAdr(VCardField):
             (self.pobox,self.extadr,self.street,self.locality,
                     self.region,self.pcode,self.ctry)=value
 
+    def __from_xml(self,value):
+        """Initialize a `VCardAdr` object from and XML element.
+
+        :Parameters:
+            - `value`: field value as an XML node
+        :Types:
+            - `value`: `libxml2.xmlNode`"""
+        n=value.children
+        vns=get_node_ns(value)
+        while n:
+            if n.type!='element':
+                n=n.next
+                continue
+            ns=get_node_ns(n)
+            if (ns and vns and ns.getContent()!=vns.getContent()):
+                n=n.next
+                continue
+            if n.name=='POBOX':
+                self.pobox=unicode(n.getContent(),"utf-8","replace")
+            elif n.name=='EXTADR':
+                self.extadr=unicode(n.getContent(),"utf-8","replace")
+            elif n.name=='STREET':
+                self.street=unicode(n.getContent(),"utf-8","replace")
+            elif n.name=='LOCALITY':
+                self.locality=unicode(n.getContent(),"utf-8","replace")
+            elif n.name=='REGION':
+                self.region=unicode(n.getContent(),"utf-8","replace")
+            elif n.name=='PCODE':
+                self.pcode=unicode(n.getContent(),"utf-8","replace")
+            elif n.name=='CTRY':
+                self.ctry=unicode(n.getContent(),"utf-8","replace")
+            elif n.name in ("HOME","WORK","POSTAL","PARCEL","DOM","INTL",
+                    "PREF"):
+                self.type.append(n.name.lower())
+            n=n.next
+        if self.type==[]:
+            self.type=["intl","postal","parcel","work"]
+        elif "dom" in self.type and "intl" in self.type:
+            raise ValueError,"Both 'dom' and 'intl' specified in vcard ADR"
+
     def rfc2426(self):
         """RFC2426-encode the field content.
 
@@ -525,6 +534,7 @@ class VCardAdr(VCardField):
                 (self.pobox,self.extadr,self.street,self.locality,
                         self.region,self.pcode,self.ctry),
                 {"type":",".join(self.type)})
+
     def xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
@@ -550,6 +560,15 @@ class VCardAdr(VCardField):
         return n
 
 class VCardLabel(VCardField):
+    """Address label vCard field.
+
+    :Ivariables:
+        - `lines`: list of label text lines.
+        - `type`: type of the label.
+    :Types:
+        - `lines`: `list` of `unicode`
+        - `type`: `list` of "home","work","postal","parcel","dom","intl" or "pref"
+    """
     def __init__(self,name,value,rfc2425parameters=None):
         """Initialize a `VCardLabel` object.
 
@@ -628,6 +647,16 @@ class VCardLabel(VCardField):
         return n
 
 class VCardTel(VCardField):
+    """Telephone vCard field.
+
+    :Ivariables:
+        - `number`: phone number.
+        - `type`: type of the phone number.
+    :Types:
+        - `number`: `unicode`
+        - `type`: `list` of "home","work","voice","fax","pager","msg",
+           "cell","video","bbs","modem","isdn","pcs" or "pref".
+    """
     def __init__(self,name,value,rfc2425parameters=None):
         """Initialize a `VCardTel` object.
 
@@ -701,6 +730,15 @@ class VCardTel(VCardField):
         return n
 
 class VCardEmail(VCardField):
+    """E-mail vCard field.
+
+    :Ivariables:
+        - `address`: e-mail address.
+        - `type`: type of the address.
+    :Types:
+        - `address`: `unicode`
+        - `type`: `list` of "home","work","internet" or "x400".
+    """
     def __init__(self,name,value,rfc2425parameters=None):
         """Initialize a `VCardEmail` object.
 
@@ -771,6 +809,15 @@ class VCardEmail(VCardField):
         return n
 
 class VCardGeo(VCardField):
+    """Geographical location vCard field.
+
+    :Ivariables:
+        - `lat`: the latitude.
+        - `lon`: the longitude.
+    :Types:
+        - `lat`: `unicode`
+        - `lon`: `unicode`
+    """
     def __init__(self,name,value,rfc2425parameters=None):
         """Initialize a `VCardGeo` object.
 
@@ -830,6 +877,15 @@ class VCardGeo(VCardField):
         return n
 
 class VCardOrg(VCardField):
+    """Organization vCard field.
+
+    :Ivariables:
+        - `name`: organization name.
+        - `unit`: organizational unit.
+    :Types:
+        - `name`: `unicode`
+        - `unit`: `unicode`
+    """
     def __init__(self,name,value,rfc2425parameters=None):
         """Initialize a `VCardOrg` object.
 
@@ -896,6 +952,15 @@ class VCardOrg(VCardField):
         return n
 
 class VCardCategories(VCardField):
+    """Categories vCard field.
+
+    :Ivariables:
+        - `name`: organization name.
+        - `unit`: organizational unit.
+    :Types:
+        - `name`: `unicode`
+        - `unit`: `unicode`
+    """
     def __init__(self,name,value,rfc2425parameters=None):
         """Initialize a `VCardCategories` object.
 
@@ -953,6 +1018,16 @@ class VCardCategories(VCardField):
         return n
 
 class VCardSound(VCardField):
+    """Sound vCard field.
+
+    :Ivariables:
+        - `sound`: binary sound data (when `uri` is None)
+        - `uri`: sound URI (when `sound` is None)
+        - `phonetic`: phonetic transcription
+    :Types:
+        - `sound`: `str`
+        - `uri`: `unicode`
+        - `phonetic`: `unicode`"""
     def __init__(self,name,value,rfc2425parameters=None):
         """Initialize a `VCardSound` object.
 
@@ -1033,6 +1108,13 @@ class VCardSound(VCardField):
         return n
 
 class VCardPrivacy(VCardField):
+    """Privacy vCard field.
+
+    :Ivariables:
+        - `value`: privacy information about the vcard data (
+            "public", "private" or "confidental")
+    :Types:
+        - `value`: `str` """
     def __init__(self,name,value,rfc2425parameters=None):
         """Initialize a `VCardPrivacy` object.
 
@@ -1092,6 +1174,14 @@ class VCardPrivacy(VCardField):
         return None
 
 class VCardKey(VCardField):
+    """Key vCard field.
+
+    :Ivariables:
+        - `type`: key type.
+        - `cred`: key data.
+    :Types:
+        - `type`: `unicode`
+        - `cred`: `str` """
     def __init__(self,name,value,rfc2425parameters=None):
         """Initialize a `VCardKey` object.
 
@@ -1121,7 +1211,7 @@ class VCardKey(VCardField):
                 if n.name=='TYPE':
                     self.type=unicode(n.getContent(),"utf-8","replace")
                 if n.name=='CRED':
-                    self.sound=base64.decodestring(n.getContent())
+                    self.cred=base64.decodestring(n.getContent())
                 n=n.next
             if not self.cred:
                 raise Empty,"Bad %s value in vcard" % (name,)
@@ -1156,6 +1246,67 @@ class VCardKey(VCardField):
         return n
 
 class VCard:
+    """Jabber (vcard-temp) or RFC2426 vCard.
+
+    :Ivariables:
+        - `fn`: full name.
+        - `n`: structural name.
+        - `nickname`: nickname(s).
+        - `photo`: photo(s).
+        - `bday`: birthday date(s).
+        - `adr`: address(es).
+        - `label`: address label(s).
+        - `tel`: phone number(s).
+        - `email`: e-mail address(es).
+        - `jabberid`: JID(s).
+        - `mailer`: mailer(s).
+        - `tz`: timezone(s).
+        - `geo`: geolocation(s).
+        - `title`: title(s).
+        - `role`: role(s).
+        - `logo`: logo(s).
+        - `org`: organization(s).
+        - `categories`: categories.
+        - `note`: note(s).
+        - `prodid`: product id(s).
+        - `rev`: revision(s).
+        - `sort-string`: sort string(s).
+        - `sound`: sound(s).
+        - `uid`: user identifier(s).
+        - `url`: URL(s).
+        - `class`: class(es).
+        - `key`: key(s).
+        - `desc`: description.
+    :Types:
+        - `fn`: `VCardString`,
+        - `n`: `VCardName`,
+        - `nickname`: `list` of `VCardString`
+        - `photo`: `list` of `VCardImage`
+        - `bday`: `list` of `VCardString`
+        - `adr`: `list` of `VCardAdr`
+        - `label`: `list` of `VCardLabel`
+        - `tel`: `list` of `VCardTel`
+        - `email`: `list` of `VCardEmail`
+        - `jabberid`: `list` of `VCardJID`
+        - `mailer`: `list` of `VCardString`
+        - `tz`: `list` of `VCardString`
+        - `geo`: `list` of `VCardGeo`
+        - `title`: `list` of `VCardString`
+        - `role`: `list` of `VCardString`
+        - `logo`: `list` of `VCardImage`
+        - `org`: `list` of `VCardOrg`
+        - `categories`: `list` of `VCardCategories`
+        - `note`: `list` of `VCardString`
+        - `prodid`: `list` of `VCardString`
+        - `rev`: `list` of `VCardString`
+        - `sort-string`: `list` of `VCardString`
+        - `sound`: `list` of `VCardSound`
+        - `uid`: `list` of `VCardString`
+        - `url`: `list` of `VCardString`
+        - `class`: `list` of `VCardString`
+        - `key`: `list` of `VCardKey`
+        - `desc`: `list` of `VCardXString`
+    """
     components={
             #"VERSION": (VCardString,"optional"),
             "FN": (VCardString,"required"),
@@ -1189,70 +1340,19 @@ class VCard:
             "DESC": (VCardXString,"multi"),
         };
     def __init__(self,data):
+        """Initialize a VCard object from data which may be XML node
+        or an RFC2426 string.
+        
+        :Parameters:
+            - `data`: vcard to parse.
+        :Types:
+            - `vcard`: `libxml2.xmlNode`, `unicode` or `str`"""
         self.content={}
         self.n,self.fn=None,None # dummy attributes
         if isinstance(data,libxml2.xmlNode):
-            ns=get_node_ns(data)
-            if ns and ns.getContent()!=VCARD_NS:
-                raise ValueError,"Not in the %r namespace" % (VCARD_NS,)
-            if data.name!="vCard":
-                raise ValueError,"Bad root element name: %r" % (data.name,)
-            n=data.children
-            dns=get_node_ns(data)
-            while n:
-                if n.type!='element':
-                    n=n.next
-                    continue
-                ns=get_node_ns(n)
-                if (ns and dns and ns.getContent()!=dns.getContent()):
-                    n=n.next
-                    continue
-                if not self.components.has_key(n.name):
-                    n=n.next
-                    continue
-                cl,tp=self.components[n.name]
-                if tp in ("required","optional"):
-                    if self.content.has_key(n.name):
-                        raise ValueError,"Duplicate %s" % (n.name,)
-                    try:
-                        self.content[n.name]=cl(n.name,n)
-                    except Empty:
-                        pass
-                elif tp=="multi":
-                    if not self.content.has_key(n.name):
-                        self.content[n.name]=[]
-                    try:
-                        self.content[n.name].append(cl(n.name,n))
-                    except Empty:
-                        pass
-                n=n.next
+            self.__from_xml(data)
         else:
-            data=from_utf8(data)
-            lines=data.split("\n")
-            started=0
-            current=None
-            for l in lines:
-                if not l:
-                    continue
-                if l[-1]=="\r":
-                    l=l[:-1]
-                if not l:
-                    continue
-                if l[0] in " \t":
-                    if current is None:
-                        continue
-                    current+=l[1:]
-                    continue
-                if not started and current and current.upper().strip()=="BEGIN:VCARD":
-                    started=1
-                elif started and current.upper().strip()=="END:VCARD":
-                    current=None
-                    break
-                elif current and started:
-                    self.process_rfc2425_record(current)
-                current=l
-            if started and current:
-                self.process_rfc2425_record(current)
+            self.__from_rfc2426(data)
         if not self.content.get("N") and self.content.get("FN"):
             s=self.fn.value.replace(";",",")
             s=s.split(None,2)
@@ -1264,19 +1364,7 @@ class VCard:
                 s=u"%s;;;;" % (s[0],)
             self.content["N"]=VCardName("N",s)
         elif not self.content.get("FN") and self.content.get("N"):
-            s=[]
-            if self.n.prefix:
-                s.append(self.n.prefix)
-            if self.n.given:
-                s.append(self.n.given)
-            if self.n.middle:
-                s.append(self.n.middle)
-            if self.n.family:
-                s.append(self.n.family)
-            if self.n.suffix:
-                s.append(self.n.suffix)
-            s=" ".join(s)
-            self.content["FN"]=VCardString("FN",s)
+            self.__make_fn()
         for c,(cl,tp) in self.components.items():
             if self.content.has_key(c):
                 continue
@@ -1289,7 +1377,107 @@ class VCard:
             else:
                 continue
 
-    def process_rfc2425_record(self,data):
+    def __make_fn(self):
+        """Initialize the mandatory `self.fn` from `self.n`.
+
+        This is a workaround for buggy clients which set only one of them."""
+        s=[]
+        if self.n.prefix:
+            s.append(self.n.prefix)
+        if self.n.given:
+            s.append(self.n.given)
+        if self.n.middle:
+            s.append(self.n.middle)
+        if self.n.family:
+            s.append(self.n.family)
+        if self.n.suffix:
+            s.append(self.n.suffix)
+        s=" ".join(s)
+        self.content["FN"]=VCardString("FN",s)
+
+    def __from_xml(self,data):
+        """Initialize a VCard object from XML node.
+        
+        :Parameters:
+            - `data`: vcard to parse.
+        :Types:
+            - `vcard`: `libxml2.xmlNode`"""
+        ns=get_node_ns(data)
+        if ns and ns.getContent()!=VCARD_NS:
+            raise ValueError,"Not in the %r namespace" % (VCARD_NS,)
+        if data.name!="vCard":
+            raise ValueError,"Bad root element name: %r" % (data.name,)
+        n=data.children
+        dns=get_node_ns(data)
+        while n:
+            if n.type!='element':
+                n=n.next
+                continue
+            ns=get_node_ns(n)
+            if (ns and dns and ns.getContent()!=dns.getContent()):
+                n=n.next
+                continue
+            if not self.components.has_key(n.name):
+                n=n.next
+                continue
+            cl,tp=self.components[n.name]
+            if tp in ("required","optional"):
+                if self.content.has_key(n.name):
+                    raise ValueError,"Duplicate %s" % (n.name,)
+                try:
+                    self.content[n.name]=cl(n.name,n)
+                except Empty:
+                    pass
+            elif tp=="multi":
+                if not self.content.has_key(n.name):
+                    self.content[n.name]=[]
+                try:
+                    self.content[n.name].append(cl(n.name,n))
+                except Empty:
+                    pass
+            n=n.next
+
+    def __from_rfc2426(self,data):
+        """Initialize a VCard object from an RFC2426 string.
+        
+        :Parameters:
+            - `data`: vcard to parse.
+        :Types:
+            - `vcard`: `libxml2.xmlNode`, `unicode` or `str`"""
+        data=from_utf8(data)
+        lines=data.split("\n")
+        started=0
+        current=None
+        for l in lines:
+            if not l:
+                continue
+            if l[-1]=="\r":
+                l=l[:-1]
+            if not l:
+                continue
+            if l[0] in " \t":
+                if current is None:
+                    continue
+                current+=l[1:]
+                continue
+            if not started and current and current.upper().strip()=="BEGIN:VCARD":
+                started=1
+            elif started and current.upper().strip()=="END:VCARD":
+                current=None
+                break
+            elif current and started:
+                self._process_rfc2425_record(current)
+            current=l
+        if started and current:
+            self._process_rfc2425_record(current)
+
+    def _process_rfc2425_record(self,data):
+        """Parse single RFC2425 record and update attributes of `self`.
+
+        :Parameters:
+            - `data`: the record (probably multiline)
+        :Types:
+            - `data`: `unicode`"""
         label,value=data.split(":",1)
         value=value.replace("\\n","\n").replace("\\N","\n")
         psplit=label.split(";")
@@ -1324,6 +1512,10 @@ class VCard:
     def __repr__(self):
         return "<vCard of %r>" % (self.content["FN"].value,)
     def rfc2426(self):
+        """Get the RFC2426 representation of `self`.
+
+        :return: the UTF-8 encoded RFC2426 representation.
+        :returntype: `str`"""
         ret="begin:VCARD\r\n"
         ret+="version:3.0\r\n"
         for name,value in self.content.items():
@@ -1337,6 +1529,19 @@ class VCard:
                 ret+=v
         return ret+"end:VCARD\r\n"
     def xml(self,doc=None,parent=None):
+        """Get the XML representation of `self`.
+
+        New document will be created if not `parent` and no `doc` is given. 
+
+        :Parameters:
+            - `doc`: the document where the element should be created.
+            - `parent`: the parent for the vCard element.
+        :Types:
+            - `doc`: `libxml2.xmlDoc`
+            - `parent`: `libxml2.xmlNode`
+
+        :return: XML element with the vCard or the new document .
+        :returntype: `libxml2.xmlNode` or `libxml2.xmlDoc`"""
         if parent:
             if doc:
                 try:
