@@ -23,21 +23,13 @@ Normative reference:
 __revision__="$Id: clientstream.py,v 1.20 2004/10/07 22:28:11 jajcus Exp $"
 __docformat__="restructuredtext en"
 
-import libxml2
 import sha
-import time
 import logging
-from types import UnicodeType
 
-from pyxmpp.stream import Stream
-from pyxmpp.streambase import StreamError,FatalStreamError,StreamAuthenticationError
-from pyxmpp.streamsasl import SASLNotAvailable,SASLMechanismNotAvailable
 from pyxmpp.iq import Iq
-from pyxmpp.stanza import common_doc
-from pyxmpp.jid import JID
 from pyxmpp.utils import to_utf8,from_utf8
 
-from pyxmpp.clientstream import ClientStreamError,FatalClientStreamError
+from pyxmpp.clientstream import ClientStreamError
 from pyxmpp.clientstream import ClientStream
 
 class LegacyAuthentication(ClientStreamError):

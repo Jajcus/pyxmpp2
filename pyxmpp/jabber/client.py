@@ -30,8 +30,8 @@ __docformat__="restructuredtext en"
 import logging
 
 from pyxmpp.jabber.clientstream import LegacyClientStream
-from pyxmpp.jabber.disco import DISCO_ITEMS_NS,DISCO_INFO_NS,DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
-from pyxmpp.client import Client,ClientError,FatalClientError
+from pyxmpp.jabber.disco import DISCO_ITEMS_NS,DISCO_INFO_NS,DiscoInfo,DiscoItems,DiscoIdentity
+from pyxmpp.client import Client
 from pyxmpp.stanza import Stanza
 
 class JabberClient(Client):

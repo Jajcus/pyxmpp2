@@ -25,7 +25,6 @@ __docformat__="restructuredtext en"
 
 import libxml2
 import logging
-from types import StringType,UnicodeType
 
 from pyxmpp.utils import to_utf8,from_utf8
 from pyxmpp.stanza import common_doc,common_root

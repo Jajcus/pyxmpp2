@@ -24,15 +24,12 @@ Normative reference:
 __revision__="$Id: disco.py,v 1.16 2004/10/07 22:28:11 jajcus Exp $"
 __docformat__="restructuredtext en"
 
-import sys
-import re
 import libxml2
-from types import StringType,UnicodeType
 
 from pyxmpp.stanza import common_doc,common_root
 from pyxmpp.jid import JID
 
-from pyxmpp.utils import to_utf8,from_utf8
+from pyxmpp.utils import to_utf8
 
 DISCO_NS="http://jabber.org/protocol/disco"
 DISCO_ITEMS_NS=DISCO_NS+"#items"
