@@ -88,7 +88,7 @@ stanza_errors={
 				"auth",403),
 			u"gone":
 				("Recipient or server can no longer be contacted at this address",
-				"modify",501),
+				"modify",302),
 			u"internal-server-error":
 				("Internal server error",
 				"wait",500),
@@ -100,22 +100,22 @@ stanza_errors={
 				"modify",400),
 			u"not-acceptable":
 				("Requested action is not acceptable",
-				"modify",405),
+				"modify",406),
 			u"not-allowed":
 				("Requested action is not allowed",
 				"cancel",405),
 			u"not-authorized":
 				("Not authorized",
-				"auth",405),
+				"auth",401),
 			u"payment-required":
 				("Payment required",
-				"auth",405),
+				"auth",402),
 			u"recipient-unavailable":
 				("Recipient is not available",
 				"wait",404),
 			u"redirect":
 				("Redirection",
-				"modify",404),
+				"modify",302),
 			u"registration-required":
 				("Registration required",
 				"auth",407),
@@ -127,25 +127,26 @@ stanza_errors={
 				"wait",504),
 			u"resource-constraint":
 				("Resource constraint",
-				"wait",503),
+				"wait",500),
 			u"service-unavailable":
 				("Service is not available",
 				"cancel",503),
 			u"subscription-required":
 				("Subscription is required",
-				"auth",None),
+				"auth",407),
 			u"undefined-condition":
 				("Unknown error",
-				"cancel",None),
+				"cancel",500),
 			u"unexpected-request":
 				("Unexpected request",
-				"wait",None),
+				"wait",400),
 	}
 
 legacy_codes={
+		302: "redirect",
 		400: "bad-request",
-		401: "not-allowed",
-		402: "registration-required",
+		401: "not-authorized",
+		402: "payment-required",
 		403: "forbidden",
 		404: "item-not-found",
 		405: "not-allowed",
@@ -156,6 +157,7 @@ legacy_codes={
 		500: "internal-server-error",
 		501: "feature-not-implemented",
 		502: "service-unavailable",
+		503: "service-unavailable",
 		504: "remote-server-timeout",
 		510: "service-unavailable",
 	}
