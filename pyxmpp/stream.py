@@ -25,6 +25,7 @@ import random
 import base64
 import traceback
 import threading
+import errno
 
 
 from types import StringType,UnicodeType
@@ -522,8 +523,13 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def _loop_iter(self,timeout):
 		import select
 		self.lock.release()
-		try:
-			id,od,ed=select.select([self.socket],[],[self.socket],timeout)
+		try:	
+			try:
+				id,od,ed=select.select([self.socket],[],[self.socket],timeout)
+			except select.error,e:
+				if e.args[0]!=errno.EINTR:
+					raise
+				id,od,ed=[],[],[]
 		finally:
 			self.lock.acquire()
 		if self.socket in id or self.socket in ed:
@@ -558,12 +564,17 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def _read(self):
 		if self.eof:
 			return
-		if not self.tls:
-			r=os.read(self.socket.fileno(),1024)
-		else:
-			r=self.socket.read()
-			if r is None:
-				return
+		try:
+			if not self.tls:
+				r=os.read(self.socket.fileno(),1024)
+			else:
+				r=self.socket.read()
+				if r is None:
+					return
+		except socket.error,e:
+			if e.args[0]!=errno.EINTR:
+				raise
+			return
 		self.data_in(r)
 		if r:
 			try:
