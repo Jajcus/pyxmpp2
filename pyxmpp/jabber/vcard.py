@@ -23,18 +23,12 @@ import types
 import string
 
 import pyxmpp.jid
-from pyxmpp.utils import to_utf8,from_utf8
+from pyxmpp.utils import to_utf8,from_utf8,get_node_ns
 
 VCARD_NS="vcard-temp"
 
 class Empty(Exception):
     pass
-
-def get_node_ns(node):
-    try:
-        return node.ns()
-    except libxml2.treeError:
-        return None
 
 valid_string_re=re.compile(r"^[\w\d \t]*$")
 

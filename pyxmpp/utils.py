@@ -62,4 +62,19 @@ def remove_evil_characters(s):
         return evil_characters_re.sub(u"\ufffd",s)
     else:
         return evil_characters_re.sub(utf8_replacement_char,s)
+
+def get_node_ns(node):
+    try:
+        return node.ns()
+    except libxml2.treeError:
+        return None
+
+
+def get_node_ns_uri(node):
+    ns=get_node_ns(node)
+    if ns:
+        return ns.getContent()
+    else:
+        return None
+    
 # vi: sts=4 et sw=4
