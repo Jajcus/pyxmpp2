@@ -17,12 +17,12 @@
 
 """XMPP-IM roster handling"""
 
-__revision__="$Id: roster.py,v 1.18 2004/09/10 14:00:54 jajcus Exp $"
+__revision__="$Id: roster.py,v 1.19 2004/09/12 18:58:03 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 from types import StringType,UnicodeType
 
-from pyxmpp.stanza import common_doc,common_root
+from pyxmpp.stanza import common_doc
 from pyxmpp.iq import Iq
 from pyxmpp.jid import JID
 
@@ -37,12 +37,17 @@ class RosterItem:
     Represents part of a roster, or roster update request.
     """
 
-    def __init__(self,node_or_jid,subscription="none",name=None,groups=[],ask=None):
+    def __init__(self,node_or_jid,subscription="none",name=None,groups=(),ask=None):
         """
-        Initialize a roster item from XML node (if `node_or_item` is an instance of
-        `libxml2.xmlNode`) or jid and optional attributes (when `node_or_item`
-        is a `JID`).
-        """
+        Initialize a roster item from XML node or jid and optional attributes.
+        
+        :Parameters:
+            - `node_or_item`: XML node or JID
+            - `subscription`: subscription type ("none", "to", "from" or "both"
+            - `name`: item visible name
+            - `groups`: sequence of groups the item is member of
+            - `ask`: True if there was unreplied subsription or unsubscription
+              request sent."""
         if type(node_or_jid) in (StringType,UnicodeType):
             node_or_jid=JID(node_or_jid)
         if isinstance(node_or_jid,JID):
@@ -54,7 +59,7 @@ class RosterItem:
             self.ask=ask
             self.subscription=subscription
             self.name=name
-            self.groups=groups
+            self.groups=list(groups)
         else:
             self.from_xml(node_or_jid)
 
@@ -136,6 +141,7 @@ class RosterItem:
         return iq
 
 class Roster:
+    """Class representing XMPP-IM roster"""
     def __init__(self,node=None,server=False,strict=True):
         """
         Initialize Roster object.
@@ -171,7 +177,7 @@ class Roster:
             if n.type!="element":
                 n=n.next
                 continue
-            nw=get_node_ns_uri(n)
+            ns=get_node_ns_uri(n)
             if ns and ns!=ROSTER_NS or n.name!="item":
                 n=n.next
                 continue
@@ -201,7 +207,7 @@ class Roster:
             ns=node.newNs(ROSTER_NS,None)
             node.setNs(ns)
         for it in self.items_dict.values():
-            n=it.as_xml(node)
+            it.as_xml(node)
         return node
 
     def __str__(self):
@@ -262,7 +268,7 @@ class Roster:
         for it in self.items_dict.values():
             if group in it.groups:
                 r.append(it)
-            elif not case_sensitive and group in [lower(g) for g in it.groups]:
+            elif not case_sensitive and group in [g.lower() for g in it.groups]:
                 r.append(it)
         return r
 
@@ -276,7 +282,7 @@ class Roster:
             raise ValueError,"jid is None"
         return self.items_dict[jid.as_unicode()]
 
-    def add_item(self,item_or_jid,subscription="none",name=None,groups=[],ask=None):
+    def add_item(self,item_or_jid,subscription="none",name=None,groups=(),ask=None):
         """
         Add an item to the roster.
 
@@ -334,7 +340,7 @@ class Roster:
             del self.items_dict[local_item.jid.as_unicode()]
             return RosterItem(jid,"remove")
         local_item.name=item.name
-        local_item.groups=item.groups
+        local_item.groups=list(item.groups)
         if not self.server:
             local_item.ask=item.ask
         self.items_dict[local_item.jid.as_unicode()]=local_item

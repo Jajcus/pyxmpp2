@@ -1,30 +1,11 @@
 ************* Module pyxmpp.xmppstringprep
 W0403: 24: Uses of a deprecated module 'stringprep'
 ************* Module pyxmpp.roster
-W0102: 40:RosterItem.__init__: Dangerous default value [] as argument
-W0141:138:Roster: Missing docstring
-W0612:174:Roster.from_xml: Unused variable 'nw'
-W0612:204:Roster.as_xml: Unused variable 'n'
-E0602:265:Roster.items_by_group: Undefined variable 'lower'
-W0102:279:Roster.add_item: Dangerous default value [] as argument
-E0602:319:Roster.update: Undefined variable 'RosterError'
-W0611: 25: Unused import common_root
+E0602:325:Roster.update: Undefined variable 'RosterError'
 ************* Module pyxmpp.presence
-W0141:  0: Missing docstring
-W0141: 43:Presence: Missing docstring
-W0231: 45:Presence.__init__: __init__ method from base class 'Stanza' is not called
+W0231: 48:Presence.__init__: __init__ method from base class 'Stanza' is not called
 W0151:  0:Presence.__init__: Used builtin function 'apply'
-W0112: 45:Presence.__init__: Too many branches (16/12)
-W0141: 88:Presence.copy: Missing docstring
-W0141: 91:Presence.set_status: Missing docstring
-W0141:104:Presence.get_status: Missing docstring
-W0141:111:Presence.get_show: Missing docstring
-W0141:118:Presence.set_show: Missing docstring
-W0141:131:Presence.get_priority: Missing docstring
-W0141:141:Presence.set_priority: Missing docstring
-W0141:158:Presence.make_accept_response: Missing docstring
-W0141:167:Presence.make_deny_response: Missing docstring
-W0141:176:Presence.make_error_response: Missing docstring
+W0112: 48:Presence.__init__: Too many branches (16/12)
 ************* Module pyxmpp.jid
 W0141: 35:is_domain_valid: Missing docstring
 W0702: 39:is_domain_valid: No exception's type specified
@@ -894,10 +875,10 @@ Statistics by type
 
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-module   31     37         -6         25.81       0.00     
-class    109    111        -2         33.94       4.59     
+module   31     31         =          29.03       0.00     
+class    109    109        =          35.78       4.59     
 method   0      0          =          0.00        0.00     
-function 580    591        -11        45.34       1.55     
+function 580    580        =          47.07       1.55     
 
 
 Raw metrics
@@ -905,10 +886,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6224   77.66 7031     -807       
-docstring 994    12.40 3359     -2365      
-comment   488    6.09  995      -507       
-empty     308    3.84  323      -15        
+code      6224   76.96 6224     =          
+docstring 1055   13.05 994      +61        
+comment   488    6.03  488      =          
+empty     320    3.96  308      +12        
 
 
 External dependencies
@@ -948,17 +929,17 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0141      412        
-W0611      74         
+W0141      399        
+W0611      73         
 W0201      68         
 W0613      46         
 E0201      37         
-E0602      24         
-W0102      22         
+E0602      23         
 W0622      20         
+W0102      20         
 W0133      19         
-W0612      17         
 W0112      16         
+W0612      15         
 W0311      14         
 W0231      8          
 W0221      8          
@@ -986,8 +967,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 790    849      -59        
-errors   61     61       =          
+warnings 772    790      -18        
+errors   60     61       -1         
 
 
 % errors / warnings by module
@@ -995,39 +976,39 @@ errors   61     61       =
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            24.59 11.14   
-pyxmpp.jid                     21.31 1.65    
-pyxmpp.jabber.muc              14.75 4.94    
-pyxmpp.jabber.disco            11.48 4.94    
-pyxmpp.sasl.core               9.84  4.94    
-pyxmpp.jabber.client           4.92  1.90    
-pyxmpp.jabber.delay            3.28  1.52    
-pyxmpp.roster                  3.28  0.76    
-pyxmpp.stream                  1.64  9.87    
-pyxmpp.sasl.digest_md5         1.64  7.09    
-pyxmpp.stanza                  1.64  4.05    
-pyxmpp.error                   1.64  3.29    
-pyxmpp.dns                     0.00  8.86    
-pyxmpp.jabber.clientstream     0.00  5.70    
-pyxmpp.clientstream            0.00  4.94    
-pyxmpp.client                  0.00  4.81    
-pyxmpp.resolver                0.00  4.05    
-pyxmpp.jabberd.componentstream 0.00  3.80    
-pyxmpp.xmlextra                0.00  2.15    
-pyxmpp.presence                0.00  1.90    
-pyxmpp.sasl.plain              0.00  1.65    
-pyxmpp.iq                      0.00  1.52    
-pyxmpp.message                 0.00  1.27    
-pyxmpp.sasl                    0.00  1.14    
-pyxmpp.utils                   0.00  0.76    
-pyxmpp.expdict                 0.00  0.51    
-pyxmpp.version                 0.00  0.38    
-pyxmpp._xmlextra               0.00  0.38    
+pyxmpp.jabber.vcard            25.00 11.40   
+pyxmpp.jid                     21.67 1.68    
+pyxmpp.jabber.muc              15.00 5.05    
+pyxmpp.jabber.disco            11.67 5.05    
+pyxmpp.sasl.core               10.00 5.05    
+pyxmpp.jabber.client           5.00  1.94    
+pyxmpp.jabber.delay            3.33  1.55    
+pyxmpp.stream                  1.67  10.10   
+pyxmpp.sasl.digest_md5         1.67  7.25    
+pyxmpp.stanza                  1.67  4.15    
+pyxmpp.error                   1.67  3.37    
+pyxmpp.roster                  1.67  0.00    
+pyxmpp.dns                     0.00  9.07    
+pyxmpp.jabber.clientstream     0.00  5.83    
+pyxmpp.clientstream            0.00  5.05    
+pyxmpp.client                  0.00  4.92    
+pyxmpp.resolver                0.00  4.15    
+pyxmpp.jabberd.componentstream 0.00  3.89    
+pyxmpp.xmlextra                0.00  2.20    
+pyxmpp.sasl.plain              0.00  1.68    
+pyxmpp.iq                      0.00  1.55    
+pyxmpp.message                 0.00  1.30    
+pyxmpp.sasl                    0.00  1.17    
+pyxmpp.utils                   0.00  0.78    
+pyxmpp.expdict                 0.00  0.52    
+pyxmpp.version                 0.00  0.39    
+pyxmpp.presence                0.00  0.39    
+pyxmpp._xmlextra               0.00  0.39    
 pyxmpp.xmppstringprep          0.00  0.13    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 8.08/10 (previous run: 8.04/10)
+Your code has been rated at 8.12/10 (previous run: 8.08/10)
 That's pretty good. Good work mate.
 
