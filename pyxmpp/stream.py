@@ -896,8 +896,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def _bind_success(self,stanza):
 		jid_n=stanza.xpath_eval("bind:bind/bind:jid",{"bind":BIND_NS})
 		if jid_n:
-			self.jid=JID(jid_n[0].getContent())
-		self.state_change("authorized",self.jid)
+			self.me=JID(jid_n[0].getContent())
+		self.state_change("authorized",self.me)
 	
 	def _bind_error(self,stanza):
 		raise FatalStreamError,"Resource binding failed"
