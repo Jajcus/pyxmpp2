@@ -349,9 +349,11 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		if self.socket in id or self.socket in ed:
 			self.debug("data on input")
 			self.process()
+			return 1
 		else:
 			self.debug("input timeout")
 			self.idle()
+			return 0
 
 	def process(self):
 		try:
