@@ -23,7 +23,7 @@ from types import UnicodeType
 from pyxmpp.stream import Stream,StreamError,FatalStreamError,SASLNotAvailable,SASLMechanismNotAvailable
 from pyxmpp.stream import StreamAuthenticationError,StanzaFactory
 from pyxmpp.iq import Iq
-from pyxmpp.stanza import common_doc
+from pyxmpp.stanza import common_doc,common_root
 from pyxmpp.jid import JID
 from pyxmpp.utils import to_utf8,from_utf8
 
@@ -85,10 +85,11 @@ class ComponentStream(Stream):
 			return
 		self.debug("doing handshake...")
 		hash=self._compute_handshake()
-		n=common_doc.newTextChild(None,"handshake",hash)
+		n=common_root.newTextChild(None,"handshake",hash)
 		self._write_node(n)
 		n.unlinkNode()
 		n.freeNode()
+		self.debug("handshake hash sent.")
 	
 	def _process_node(self,node):
 		ns=node.ns()
