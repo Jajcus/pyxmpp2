@@ -1,5 +1,8 @@
 2004-08-29  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/sasl/core.py, pyxmpp/sasl/digest_md5.py, pyxmpp/sasl/plain.py, pyxmpp/jabberd/__init__.py, pyxmpp/jabberd/component.py, pyxmpp/jabberd/componentstream.py, pyxmpp/jabber/__init__.py, pyxmpp/jabber/client.py, pyxmpp/jabber/clientstream.py, pyxmpp/jabber/muc.py, pyxmpp/client.py, pyxmpp/clientstream.py, pyxmpp/stream.py, examples/componentstreamtest.py, examples/echocomponent.py, examples/stest.py, examples/test.py:
+	- switched to logging module for debug messages
+
 	* pyxmpp/jabber/delay.py:
 	- don't panic on jabber:x:delay elements without 'from' attribute
 
