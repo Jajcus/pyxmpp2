@@ -1,5 +1,8 @@
 2004-06-09  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* tests/unorm.py:
+	- not needed any more (no custom Unicode normalization implementation)
+
 	* pyxmpp/jabber/muc.py:
 	- return True from __presence_unavailable()
 
