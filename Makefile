@@ -3,7 +3,7 @@ SNAPSHOT=
 
 .PHONY: all version snapshot dist
 
-all:
+all: version
 	python setup.py build
 	cd examples && ln -sf ../build/lib*/pyxmpp .
 	cd examples && chmod a+x *.py
