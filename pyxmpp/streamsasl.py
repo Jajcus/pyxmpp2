@@ -21,7 +21,7 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: streamsasl.py,v 1.4 2004/10/07 22:28:04 jajcus Exp $"
+__revision__="$Id: streamsasl.py,v 1.5 2004/10/22 20:23:30 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import base64
@@ -55,6 +55,7 @@ class StreamSASLMixIn(sasl.PasswordManager):
           - `sasl_mechanisms`: sequence of SASL mechanisms allowed for
             authentication. Currently "PLAIN" and "DIGEST-MD5" are supported.
         """
+        sasl.PasswordManager.__init__(self)
         if sasl_mechanisms:
             self.sasl_mechanisms=sasl_mechanisms
         else:
