@@ -80,10 +80,8 @@ class Client:
 			stream.print_exception=self.print_exception
 			stream.process_stream_error=self.stream_error
 			self.stream_created(stream)
+			stream.state_change=self.__stream_state_change
 			stream.connect()
-			stream.post_auth=self._post_auth
-			stream.post_disconnect=self.__post_disconnect
-			stream.post_connect=self.__post_connect
 			self.stream=stream
 			self.state_changed.notify()
 			self.state_changed.release()
@@ -180,25 +178,23 @@ class Client:
 		resp=iq.make_result_response()
 		self.stream.send(resp)
 
-	def __post_connect(self):
-		self.stream_class.post_connect(self.stream)
-		self.connected()
-	
-	def _post_auth(self):
-		self.stream_class.post_auth(self.stream)
-		self.authenticated()
-	
-	def __post_disconnect(self):
-		self.state_changed.acquire()
-		try:
-			if self.stream:
-				self.stream.close()
-			self.stream_closed(self.stream)
-			self.stream=None
-			self.state_changed.notify()
-		finally:
-			self.state_changed.release()
-		self.disconnected()
+	def __stream_state_change(self,state,arg):
+		self.stream_state_changed(state,arg)
+		if state=="fully connected":
+			self.connected()
+		elif state=="authenticated":
+			self.authenticated()
+		elif state=="disconnected":
+			self.state_changed.acquire()
+			try:
+				if self.stream:
+					self.stream.close()
+				self.stream_closed(self.stream)
+				self.stream=None
+				self.state_changed.notify()
+			finally:
+				self.state_changed.release()
+			self.disconnected()
 
 # Method to override
 	def idle(self):
@@ -222,6 +218,9 @@ class Client:
 				% (err.get_condition().name,err.serialize()))
 
 	def roster_updated(self):
+		pass
+
+	def stream_state_changed(self,state,arg):
 		pass
 
 	def connected(self):

@@ -24,6 +24,7 @@ import time
 import random
 import base64
 import traceback
+from types import StringType,UnicodeType
 
 from expdict import ExpiringDictionary
 from utils import from_utf8,to_utf8
@@ -166,8 +167,25 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def connect(self,addr,port,to=None):
 		if to is None:
 			to=str(addr)
-		s=socket.socket()
-		s.connect((addr,port))
+		if type(addr) in (StringType,UnicodeType):
+			self.state_change("resolving",addr)
+		s=None
+		for res in socket.getaddrinfo(addr,port,0,socket.SOCK_STREAM):
+			family,socktype,proto,canonname,sockaddr=res
+			try:
+				s=socket.socket(family,socktype,proto)
+				self.state_change("connecting",sockaddr)
+				s.connect(sockaddr)
+				self.state_change("connected",sockaddr)
+			except socket.error, msg:
+				self.debug("Connect to %r failed" % sockaddr)
+				if s:
+					s.close()
+				continue
+			break
+		if not s:
+			raise socket.error, msg
+
 		self.addr=addr
 		self.port=port
 		self.connect_socket(s,to)
@@ -189,6 +207,15 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def disconnect(self):
 		if self.doc_out:
 			self.send_stream_end()
+
+	def post_connect(self):
+		pass
+
+	def post_auth(self):
+		pass
+
+	def state_change(self,state,arg):
+		self.debug("State: %s: %r" % (state,arg))
 
 	def close(self):
 		self.disconnect()
@@ -245,9 +272,11 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 				self.me=JID(to)
 			self.send_stream_start(self.generate_id())
 			self.send_stream_features()
+			self.state_change("fully connected",self.peer)
 			self.post_connect()
 
 		if not self.version:
+			self.state_change("fully connected",self.peer)
 			self.post_connect()
 
 		if to_from_mismatch:
@@ -263,7 +292,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			self.reader=None
 			if self.features:
 				self.features=None
-		self.post_disconnect()
+		self.state_change("disconnected",self.peer)
 
 	def stanza_start(self,doc,node):
 		pass
@@ -617,15 +646,6 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 				return
 		self.debug("Unhandled %r stanza: %r" % (stanza.stanza_type,stanza.serialize()))
 
-	def post_connect(self,node):
-		pass
-		
-	def post_auth(self):
-		pass
-		
-	def post_disconnect(self):
-		pass
-
 	def check_to(self,to):
 		if to!=self.me:
 			return None
@@ -724,6 +744,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			for n in sasl_mechanisms_n:
 				self.peer_sasl_mechanisms.append(n.getContent())
 		if not self.tls_requested and not self.authenticated:
+			self.state_change("fully connected",self.peer)
 			self.post_connect()
 
 	def connected(self):
@@ -793,6 +814,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		if isinstance(r,sasl.Success):
 			self.peer=JID(r.authzid)
 			self.peer_authenticated=1
+			self.state_change("authenticated",self.peer)
 			self.post_auth()
 			
 		if isinstance(r,sasl.Failure):
@@ -861,6 +883,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		if isinstance(r,sasl.Success):
 			self.peer=JID(r.authzid)
 			self.peer_authenticated=1
+			self.state_change("authenticated",self.peer)
 			self.post_auth()
 
 		if isinstance(r,sasl.Failure):
@@ -880,6 +903,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			self.me=JID(r.authzid)
 			self.authenticated=1
 			self.restart_stream()
+			self.state_change("authenticated",self.me)
 			self.post_auth()
 		else:
 			self.debug("SASL authentication failed")
@@ -984,6 +1008,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		if not tls_available or not self.tls_settings:
 			raise TLSError,"TLS is not available"
 			
+		self.state_change("tls connecting",self.peer)
 		self.debug("Creating TLS context")
 		if self.tls_settings.ctx:
 			ctx=self.tls_settings.ctx
@@ -1014,6 +1039,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.tls.set_connect_state()
 		self.debug("Starting TLS handshake")
 		self.tls.connect_ssl()
+		self.state_change("tls connected",self.peer)
 		self.tls.setblocking(0)
 		
 		# clear any exception state left by some M2Crypto broken code

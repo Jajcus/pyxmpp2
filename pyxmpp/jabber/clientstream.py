@@ -197,6 +197,7 @@ class LegacyClientStream(ClientStream):
 			self.send(iq)
 			self.peer_authenticated=1
 			self.auth_method_used="plain"
+			self.state_change("authenticated",self.peer)
 			self.post_auth()
 		else:
 			self.debug("Plain auth failed")
@@ -241,6 +242,7 @@ class LegacyClientStream(ClientStream):
 			self.send(iq)
 			self.peer_authenticated=1
 			self.auth_method_used="digest"
+			self.state_change("authenticated",self.peer)
 			self.post_auth()
 		else:
 			self.debug("Digest auth failed: %r != %r" % (digest,mydigest))
@@ -253,6 +255,7 @@ class LegacyClientStream(ClientStream):
 		self.debug("Authenticated")
 		self.me=self.jid
 		self.authenticated=1
+		self.state_change("authenticated",self.me)
 		self.post_auth()
 
 	def get_password(self,username,realm=None,acceptable_formats=("plain",)):

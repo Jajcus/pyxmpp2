@@ -127,22 +127,22 @@ class Stanza:
 		return self.error
 	def set_from(self,fr):
 		if fr:
-			return self.node.setProp("from",str(fr))
+			return self.node.setProp("from",to_utf8(fr))
 		else:
 			return self.node.unsetProp("from")
 	def set_to(self,to):
 		if to:
-			return self.node.setProp("to",str(to))
+			return self.node.setProp("to",to_utf8(to))
 		else:
 			return self.node.unsetProp("to")
 	def set_type(self,type):
 		if type:
-			return self.node.setProp("type",type)
+			return self.node.setProp("type",to_utf8(type))
 		else:
 			return self.node.unsetProp("type")
 	def set_id(self,id):
 		if id:
-			return self.node.setProp("id",id)
+			return self.node.setProp("id",to_utf8(id))
 		else:
 			return self.node.unsetProp("id")
 	
