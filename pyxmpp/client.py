@@ -83,7 +83,7 @@ class Client:
 			self.disco_info.add_feature("iq")
 			self.disco_identity=DiscoIdentity(self.disco_info,
 								"libxml2 based Jabber client",
-								"x-jabber","x-client")
+								"client","pc")
 			self.state_changed.notify()
 			self.state_changed.release()
 		except:
