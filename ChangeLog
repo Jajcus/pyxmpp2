@@ -1,6 +1,9 @@
 2004-09-24  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/jabber/disco.py:
+	- typo
+
+	* pyxmpp/jabber/disco.py:
 	- s/xmlnode/xmlnode_or_node/ in one more place
 	- DiscoItems.items() fixed
 	- node parameter to DiscoItem.__init__ is optional
