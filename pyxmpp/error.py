@@ -23,6 +23,14 @@ from stanza import common_doc,common_root
 import xmlextra
 
 stream_errors={
+			u"bad-format":
+				("Received XML cannot be processed",),
+			u"bad-namespace-prefix":
+				("Bad namespace prefix",),
+			u"conflict":
+				("Closing stream because of conflicting stream being opened",),
+			u"connection-timeout":
+				("Connection was idle too long",),
 			u"host-gone":
 				("Hostname is no longer hosted on the server",),
 			u"host-unknown":
@@ -31,24 +39,32 @@ stream_errors={
 				("Improper addressing",),
 			u"internal-server-error":
 				("Internal server error",),
+			u"invalid-from":
+				("Invalid sender address",),
 			u"invalid-id":
 				("Invalid stream ID",),
 			u"invalid-namespace":
 				("Invalid namespace",),
-			u"nonmatching-hosts":
-				("Nonmatching hosts",),
+			u"invalid-xml":
+				("Invalid XML",),
 			u"not-authorized":
 				("Not authorized",),
+			u"policy-violation":
+				("Local policy violation",),
 			u"remote-connection-failed":
 				("Remote connection failed",),
 			u"resource-constraint":
 				("Remote connection failed",),
+			u"restricted-xml":
+				("Restricted XML received",),
 			u"see-other-host":
 				("Redirection required",),
 			u"system-shutdown":
 				("The server is being shut down",),
 			u"undefined-condition":
 				("Unknown error",),
+			u"unsupported-encoding":
+				("Unsupported encoding",),
 			u"unsupported-stanza-type":
 				("Unsupported stanza type",),
 			u"unsupported-version":
