@@ -1,0 +1,10 @@
+- generic XMPP stream creation, reading, writting
+	- StartTLS negotiation (but no real TLS support)
+
+- XMPP errors including 2-way translations for backward compatibility
+
+- basic stanza (iq,presence,message) creation
+	- IQ requests, results and error handling
+	
+- jabber:client stream - both server and client side
+	- legacy jabber authentication (JEP-78) - digest and plain
