@@ -145,22 +145,24 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 		if realms:
 			realms=[unicode(r,charset) for r in realms]
 			realm=self.password_manager.choose_realm(realms)
-			if realm:
-				if type(realm) is UnicodeType:
-					try:
-						realm=realm.encode(charset)
-					except UnicodeError:
-						self.debug("Couldn't encode realm to %r" % (charset,))
-						return Failure("incompatible-charset")
-				elif charset!="utf-8":
-					try:
-						realm=unicode(realm,"utf-8").encode(charser)
-					except UnicodeError:
-						self.debug("Couldn't encode realm from utf-8 to %r"
-											% (charset,))
-						return Failure("incompatible-charset")
-				realm=quote(realm)
-				params.append('realm="%s"' % (realm,))
+		else:
+			realm=self.password_manager.choose_realm([])
+		if realm:
+			if type(realm) is UnicodeType:
+				try:
+					realm=realm.encode(charset)
+				except UnicodeError:
+					self.debug("Couldn't encode realm to %r" % (charset,))
+					return Failure("incompatible-charset")
+			elif charset!="utf-8":
+				try:
+					realm=unicode(realm,"utf-8").encode(charser)
+				except UnicodeError:
+					self.debug("Couldn't encode realm from utf-8 to %r"
+										% (charset,))
+					return Failure("incompatible-charset")
+			realm=quote(realm)
+			params.append('realm="%s"' % (realm,))
 
 		try:
 			username=self.username.encode(charset)
