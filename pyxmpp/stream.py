@@ -17,7 +17,7 @@
 
 """Core XMPP stream functionality"""
 
-__revision__="$Id: stream.py,v 1.71 2004/09/19 21:34:11 jajcus Exp $"
+__revision__="$Id: stream.py,v 1.72 2004/09/20 19:57:58 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -710,7 +710,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         self.lock.acquire()
         try:
             while not self.eof and self.socket is not None:
-                self._loop_iter(timeout)
+                act=self._loop_iter(timeout)
+                if not act:
+                    self._idle()
         finally:
             self.lock.release()
 
@@ -737,10 +739,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             self.lock.acquire()
         if self.socket in ifd or self.socket in efd:
             self._process()
-            return 1
+            return True
         else:
-            self._idle()
-            return 0
+            return False
 
     def process(self):
         """Process stream's pending events.
