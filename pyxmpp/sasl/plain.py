@@ -16,7 +16,7 @@
 #
 """PLAIN authentication mechanism for PyXMPP SASL implementation."""
 
-__revision__="$Id: plain.py,v 1.10 2004/09/28 21:31:19 jajcus Exp $"
+__revision__="$Id: plain.py,v 1.11 2004/09/29 21:23:24 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import logging
@@ -85,6 +85,18 @@ class PlainClientAuthenticator(ClientAuthenticator):
         return Response("%s\000%s\000%s" % (    to_utf8(self.authzid),
                             to_utf8(self.username),
                             to_utf8(self.password)))
+
+    def finish(self,data):
+        """Handle authentication succes information from the server.
+
+        :Parameters:
+            - `data`: the optional additional data returned with the success.
+        :Types:
+            - `data`: `str`
+            
+        :return: a success indicator.
+        :returntype: `Succes`"""
+        return Success(self.username,None,self.authzid)
 
 class PlainServerAuthenticator(ServerAuthenticator):
     """Provides PLAIN SASL authentication for a server."""
