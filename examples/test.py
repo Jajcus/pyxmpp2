@@ -7,8 +7,8 @@ import traceback
 import sys
 import logging
 
-from pyxmpp import JID,Iq,Presence,Message,StreamError
-from pyxmpp.jabber import Client
+from pyxmpp.all import JID,Iq,Presence,Message,StreamError
+from pyxmpp.jabber.all import Client
 
 class Disconnected(Exception):
     pass
