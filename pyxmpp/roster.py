@@ -17,6 +17,7 @@
 
 import sys
 import re
+import libxml2
 
 from types import StringType,UnicodeType
 from stanza import common_doc,common_root
@@ -24,6 +25,8 @@ from iq import Iq
 from jid import JID
 
 from utils import to_utf8,from_utf8
+
+ROSTER_NS="jabber:iq:roster"
 
 class RosterError(StandardError):
 	pass
@@ -36,7 +39,7 @@ class RosterItem:
 				self.node=roster.node.newChild(roster.node.ns(),"item",None)
 			else:
 				self.node=common_root.newChild(None,"item",None)
-				ns=self.node.newNs("jabber:iq:roster",None)
+				ns=self.node.newNs(ROSTER_NS,None)
 				self.node.setNs(ns)
 			self.node.setProp("jid",node_or_jid.as_utf8())
 			self.set_subscription(subscription)
@@ -47,7 +50,7 @@ class RosterItem:
 				self.node=node_or_jid
 		self.xpath_ctxt=common_doc.xpathNewContext()
 		self.xpath_ctxt.setContextNode(self.node)
-		self.xpath_ctxt.xpathRegisterNs("r","jabber:iq:roster")
+		self.xpath_ctxt.xpathRegisterNs("r",ROSTER_NS)
 		if name is not None:
 			self.set_name(name)
 	def __del__(self):
@@ -126,7 +129,7 @@ class RosterItem:
 				g.freeNode()
 	def make_roster_push(self):
 		iq=Iq(type="set")
-		q=iq.new_query("jabber:iq:roster")
+		q=iq.new_query(ROSTER_NS)
 		q.addChild(self.node.copyNode(1))
 		return iq
 
@@ -137,18 +140,18 @@ class Roster:
 		self.xpath_ctxt=None
 		if node is None:
 			self.node=common_root.newChild(None,"query",None)
-			self.ns=self.node.newNs("jabber:iq:roster",None)
+			self.ns=self.node.newNs(ROSTER_NS,None)
 			self.node.setNs(self.ns)
 		else:
 			ns=node.ns()
-			if ns.getContent() != "jabber:iq:roster":
+			if ns.getContent() != ROSTER_NS:
 				raise RosterError,"Bad roster namespace"
 			self.node=node.docCopyNode(common_doc,1)
 			common_root.addChild(self.node)
 			self.ns=self.node.ns()
 		self.xpath_ctxt=common_doc.xpathNewContext()
 		self.xpath_ctxt.setContextNode(self.node)
-		self.xpath_ctxt.xpathRegisterNs("r","jabber:iq:roster")
+		self.xpath_ctxt.xpathRegisterNs("r",ROSTER_NS)
 	
 	def __del__(self):
 		if self.node:
@@ -179,22 +182,40 @@ class Roster:
 			ret.append(None)
 		return ret
 		
-	def items_by_name(self,name):
+	def items_by_name(self,name,case_sensitive=1):
 		if not name:
 			raise ValueError,"name is None"
 		name=to_utf8(name)
-		if '"' not in name:
-			expr='r:item[@name="%s"]' % name
-		elif "'" not in name:
-			expr="r:item[@name='%s']" % name
-		else:
-			raise RosterError,"Unsupported roster item name format"
-		l=self.xpath_ctxt.xpathEval(expr)
-		if not l:
-			raise KeyError,name
+		if not case_sensitive:
+			name=name.lower()
 		ret=[]
-		for i in l:
-			ret.append(RosterItem(self,i))
+		n=self.node.children
+		while n:
+			if n.type!='element':
+				n=n.next
+				continue
+			try:
+				ns=n.ns()
+			except libxml2.treeError:
+				return None
+			if ns and ns.getContent()!=ROSTER_NS:
+				n=n.next
+				continue
+			if n.name!='item':
+				continue
+			item_name=n.prop("name")
+			if item_name is None:
+				if name is None:
+					ret.append(RosterItem(self,n))
+			else:
+				if case_sensitive: 
+					if name==item_name:
+						ret.append(RosterItem(self,n))
+				elif name==item_name.lower():
+					ret.append(RosterItem(self,n))
+			n=n.next
+		if not ret:
+			raise KeyError,name
 		return ret
 	
 	def items_by_group(self,group):
@@ -253,7 +274,7 @@ class Roster:
 	def update(self,query):
 		ctxt=common_doc.xpathNewContext()
 		ctxt.setContextNode(query)
-		ctxt.xpathRegisterNs("r","jabber:iq:roster")
+		ctxt.xpathRegisterNs("r",ROSTER_NS)
 		item=ctxt.xpathEval("r:item")
 		ctxt.xpathFreeContext()
 		if not item:
