@@ -12,7 +12,7 @@ all:
 
 version:
 	if test -n "$(SNAPSHOT)" ; then \
-		SNAPSHOT="$(SNAPSHOT)" ; \
+		SNAPSHOT=".$(SNAPSHOT)" ; \
 	else \
 		SNAPSHOT=.`find . -name "*.py" '!' -name "version.py" -printf '%TY%Tm%Td\n' | sort -r | head -1` ; \
 	fi ; \
