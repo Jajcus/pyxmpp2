@@ -253,10 +253,13 @@ class DiscoIdentity:
                 self.xmlnode=common_root.newChild(None,"identity",None)
                 ns=self.xmlnode.newNs(DISCO_INFO_NS,None)
                 self.xmlnode.setNs(ns)
-            self.xmlnode.setProp("name",to_utf8(xmlnode_or_name))
+            if xmlnode_or_name:
+                self.xmlnode.setProp("name",to_utf8(xmlnode_or_name))
             self.xmlnode.setProp("category",to_utf8(item_category))
             if item_type:
                 self.xmlnode.setProp("type",to_utf8(item_type))
+            else:
+                raise ValueError,"DiscoInfo requires type"
         self.xpath_ctxt=common_doc.xpathNewContext()
         self.xpath_ctxt.setContextNode(self.xmlnode)
         self.xpath_ctxt.xpathRegisterNs("d",DISCO_INFO_NS)
@@ -441,31 +444,14 @@ class DiscoItems:
             
         :return: `True` if the item is found in `self`.
         :returntype: `bool`"""
-        #FIXME: stringprep!
-        if not jid:
-            raise ValueError,"bad jid"
-        if isinstance(jid,JID):
-            jid=jid.as_string()
-        if not node:
-            node_expr=""
-        elif '"' not in node:
-            node_expr=' and @node="%s"' % (node,)
-        elif "'" not in node:
-            node_expr=" and @node='%s'" % (node,)
-        else:
-            raise ValueError,"Invalid node name"
-        if '"' not in jid:
-            expr='d:item[@jid="%s"%s]' % (jid,node_expr)
-        elif "'" not in jid:
-            expr="d:item[@jid='%s'%s]" % (jid,node_expr)
-        else:
-            raise ValueError,"Invalid jid name"
-
-        l=self.xpath_ctxt.xpathEval(expr)
-        if l:
-            return True
-        else:
+        l=self.xpath_ctxt.xpathEval("d:item")
+        if l is None:
             return False
+        for it in l:
+            di=DiscoItem(self,it)
+            if di.jid()==jid and di.node()==node:
+                return True
+        return False
 
 class DiscoInfo:
     """A disco#info response object.
