@@ -91,7 +91,10 @@ class Stanza:
         elif isinstance(name_or_xmlnode,libxml2.xmlNode):
             self.xmlnode=name_or_xmlnode.docCopyNode(common_doc,1)
             common_doc.addChild(self.xmlnode)
-            ns=self.xmlnode.ns()
+            try:
+                ns = self.xmlnode.ns()
+            except libxml2.treeError:
+                ns = None
             if not ns or not ns.name:
                 xmlextra.replace_ns(self.xmlnode, ns, common_ns)
         else:
