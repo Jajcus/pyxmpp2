@@ -1,5 +1,11 @@
 2004-09-10  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/sasl/__init__.py, pyxmpp/sasl/core.py, pyxmpp/sasl/digest_md5.py, pyxmpp/sasl/plain.py, pyxmpp/jabberd/__init__.py, pyxmpp/jabberd/component.py, pyxmpp/jabberd/componentstream.py, pyxmpp/jabber/__init__.py, pyxmpp/jabber/client.py, pyxmpp/jabber/clientstream.py, pyxmpp/jabber/delay.py, pyxmpp/jabber/disco.py, pyxmpp/jabber/muc.py, pyxmpp/jabber/vcard.py, pyxmpp/__init__.py, pyxmpp/client.py, pyxmpp/clientstream.py, pyxmpp/dns.py, pyxmpp/error.py, pyxmpp/expdict.py, pyxmpp/iq.py, pyxmpp/jid.py, pyxmpp/message.py, pyxmpp/presence.py, pyxmpp/resolver.py, pyxmpp/roster.py, pyxmpp/stanza.py, pyxmpp/stream.py, pyxmpp/utils.py, pyxmpp/xmlextra.py, pyxmpp/xmppstringprep.py:
+	- __revision__ attribute added to all modules
+
+	* pylint.sh, pylintrc:
+	- made pylint checks more current-code-friendly
+
 	* TODO.pylint:
 	- code-cleanup TODO list, made with pylint
 
