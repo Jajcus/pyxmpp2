@@ -1,5 +1,5 @@
 BASE_VERSION=0.1
-SNAPSHOT=
+RELEASE=
 
 DESTDIR="/"
 
@@ -13,17 +13,18 @@ all: version
 	cd tests && chmod a+x *.py
 
 version:
-	if test -n "$(SNAPSHOT)" ; then \
-		SNAPSHOT=".$(SNAPSHOT)" ; \
+	if test -n "$(RELEASE)" ; then \
+		SNAPSHOT="" ; \
 	else \
-		SNAPSHOT=.`find . -name "*.py" '!' -name "version.py" -printf '%TY%Tm%Td\n' | sort -r | head -1` ; \
+		SNAPSHOT=.`find . -name "*.py" '!' -name "version.py" -printf '%TY%Tm%Td_%TH%TM\n' | sort -r | head -1` ; \
 	fi ; \
 	echo "version='$(BASE_VERSION)$$SNAPSHOT'" > pyxmpp/version.py ; \
 
-snapshot: version dist
-
-dist:
+dist: all
 	python setup.py sdist
 
-install:
+clean:
+	python setup.py clean
+
+install: all
 	umask 022 ; python setup.py install --root $(DESTDIR)
