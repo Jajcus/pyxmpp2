@@ -17,7 +17,7 @@
 
 """General XMPP Stanza handling."""
 
-__revision__="$Id: stanza.py,v 1.18 2004/09/14 19:57:58 jajcus Exp $"
+__revision__="$Id: stanza.py,v 1.19 2004/09/15 21:23:13 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -51,7 +51,10 @@ class Stanza:
     :Ivariables:
         - `node`: stanza XML node.
         - `_error`: `pyxmpp.error.StanzaErrorNode` describing the error associated with
-          the stanza of type "error"."""
+          the stanza of type "error".
+    :Types:
+        - `node`: `libxml2.xmlNode`
+        - `_error`: `pyxmpp.error.StanzaErrorNode`"""
     stanza_type="Unknown"
 
     def __init__(self,name_or_node,fr=None,to=None,typ=None,sid=None,
@@ -67,9 +70,15 @@ class Stanza:
             - `typ`: staza type: one of: "get", "set", "result" or "error".
             - `sid`: stanza id -- value of stanza's "id" attribute. If not
               given, then unique for the session value is generated. 
-            - `error_cond`: error condition name. Ignored if `typ` is not "error". """
-
-
+            - `error_cond`: error condition name. Ignored if `typ` is not
+              "error".
+        :Types:
+            - `name_or_node`: `unicode` or `libxml2.xmlNode` or `Stanza`
+            - `fr`: `JID`
+            - `to`: `JID`
+            - `typ`: `unicode`
+            - `sid`: `unicode`
+            - `error_cond`: `unicode`"""
         self._error=None
         self.node=None
         if isinstance(name_or_node,Stanza):
@@ -118,23 +127,29 @@ class Stanza:
         self.node=None
 
     def copy(self):
-        """Create a deep copy of the stanza."""
+        """Create a deep copy of the stanza.
+        
+        :returntype: `Stanza`"""
         return Stanza(self)
 
     def serialize(self):
-        """Serialize the stanza into a XML string.
+        """Serialize the stanza into an UTF-8 encoded XML string.
         
-        :return: serialized stanza."""
-        return self.node.serialize()
+        :return: serialized stanza.
+        :returntype: `str`"""
+        return self.node.serialize(encoding="utf-8")
 
     def get_node(self):
-        """Return XML node wrapped into `self`."""
+        """Return the XML node wrapped into `self`.
+        
+        :returntype: `libxml2.xmlNode`"""
         return self.node
         
     def get_from(self):
         """Get "from" attribute of the stanza.
         
-        :return: value of the "from" attribute (sender JID) or None."""
+        :return: value of the "from" attribute (sender JID) or None.
+        :returntype: `unicode`"""
         if self.node.hasProp("from"):
             return JID(from_utf8(self.node.prop("from")))
         else:
@@ -143,7 +158,8 @@ class Stanza:
     def get_to(self):
         """Get "to" attribute of the stanza.
         
-        :return: value of the "to" attribute (recipient JID) or None."""
+        :return: value of the "to" attribute (recipient JID) or None.
+        :returntype: `unicode`"""
         if self.node.hasProp("to"):
             return JID(from_utf8(self.node.prop("to")))
         else:
@@ -152,7 +168,8 @@ class Stanza:
     def get_type(self):
         """Get "type" attribute of the stanza.
         
-        :return: value of the "type" attribute (stanza type) or None."""
+        :return: value of the "type" attribute (stanza type) or None.
+        :returntype: `unicode`"""
         if self.node.hasProp("type"):
             return from_utf8(self.node.prop("type"))
         else:
@@ -161,7 +178,8 @@ class Stanza:
     def get_id(self):
         """Get "id" attribute of the stanza.
         
-        :return: value of the "id" attribute (stanza identifier) or None."""
+        :return: value of the "id" attribute (stanza identifier) or None.
+        :returntype: `unicode`"""
         if self.node.hasProp("id"):
             return from_utf8(self.node.prop("id"))
         else:
@@ -170,7 +188,8 @@ class Stanza:
     def get_error(self):
         """Get stanza error information.
 
-        :return: `pyxmpp.error.StanzaErrorNode` object describing the error."""
+        :return: object describing the error.
+        :returntype: `pyxmpp.error.StanzaErrorNode`"""
         if self._error:
             return self._error
         n=self.node.xpathEval(u"error")
@@ -184,7 +203,9 @@ class Stanza:
         """Set "from" attribute of the stanza.
         
         :Parameters:
-            - `fr`: new value of the "from" attribute (sender JID)."""
+            - `fr`: new value of the "from" attribute (sender JID).
+        :Types:
+            - `fr`: `unicode`"""
         if fr:
             return self.node.setProp("from",to_utf8(fr))
         else:
@@ -194,7 +215,9 @@ class Stanza:
         """Set "to" attribute of the stanza.
         
         :Parameters:
-            - `to`: new value of the "to" attribute (recipient JID)."""
+            - `to`: new value of the "to" attribute (recipient JID).
+        :Types:
+            - `to`: `unicode`"""
         if to:
             return self.node.setProp("to",to_utf8(to))
         else:
@@ -204,7 +227,9 @@ class Stanza:
         """Set "type" attribute of the stanza.
         
         :Parameters:
-            - `typ`: new value of the "type" attribute (stanza type)."""
+            - `typ`: new value of the "type" attribute (stanza type).
+        :Types:
+            - `typ`: `unicode`"""
         if typ:
             return self.node.setProp("type",to_utf8(typ))
         else:
@@ -214,7 +239,9 @@ class Stanza:
         """Set "id" attribute of the stanza.
         
         :Parameters:
-            - `sid`: new value of the "id" attribute (stanza identifier)."""
+            - `sid`: new value of the "id" attribute (stanza identifier).
+        :Types:
+            - `sid`: `unicode`"""
         if sid:
             return self.node.setProp("id",to_utf8(sid))
         else:
@@ -225,6 +252,8 @@ class Stanza:
 
         :Parameters:
             - `content`: XML node to be included in the stanza.
+        :Types:
+            - `content`: `libxml2.xmlNode` or UTF-8 `str`
         """
         while self.node.children:
             self.node.children.unlinkNode()
@@ -238,6 +267,8 @@ class Stanza:
 
         :Parameters:
             - `content`: XML node to be added to the payload.
+        :Types:
+            - `content`: `libxml2.xmlNode` or UTF-8 `str`
         """
         if isinstance(content,libxml2.xmlNode):
             self.node.addChild(content.docCopyNode(common_doc,1))
@@ -250,6 +281,9 @@ class Stanza:
         :Parameters:
             - `ns_uri`: XML namespace URI of the element.
             - `name`: element name.
+        :Types:
+            - `ns_uri`: `str`
+            - `name`: `str` or `unicode`
         """
         while self.node.children:
             self.node.children.unlinkNode()
@@ -261,8 +295,11 @@ class Stanza:
         :Parameters:
             - `ns_uri`: XML namespace URI of the element.
             - `name`: element name.
+        :Types:
+            - `ns_uri`: `str`
+            - `name`: `str` or `unicode`
         """
-        c=self.node.newChild(None,name,None)
+        c=self.node.newChild(None,to_utf8(name),None)
         if ns_uri:
             ns=c.newNs(ns_uri,None)
             c.setNs(ns)
@@ -274,14 +311,17 @@ class Stanza:
         :Parameters:
             - `expr`: XPath expression.
             - `namespaces`: mapping from namespace prefixes to URIs.
+        :Types:
+            - `expr`: `unicode`
+            - `namespaces`: `dict` or other mapping
         """
         if not namespaces:
-            return self.node.xpathEval(expr)
+            return self.node.xpathEval(to_utf8(expr))
         ctxt = common_doc.xpathNewContext()
         ctxt.setContextNode(self.node)
         for prefix,uri in namespaces.items():
-            ctxt.xpathRegisterNs(prefix,uri)
-        ret=ctxt.xpathEval(expr)
+            ctxt.xpathRegisterNs(to_utf8(prefix),uri)
+        ret=ctxt.xpathEval(to_utf8(expr))
         ctxt.xpathFreeContext()
         return ret
 

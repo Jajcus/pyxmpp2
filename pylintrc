@@ -75,7 +75,7 @@ min-name-length=1
 module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
 
 # Regular expression which should only match correct class names
-class-rgx=[A-Z][a-zA-Z0-9]+$
+class-rgx=[A-Z][a-z_A-Z0-9]+$
 
 # Regular expression which should only match correct function names
 function-rgx=[a-z_][a-z0-9_]*$

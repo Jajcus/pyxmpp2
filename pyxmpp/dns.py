@@ -15,26 +15,30 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: dns.py,v 1.8 2004/09/10 14:00:53 jajcus Exp $"
+"""A simple implementation of a part of the DNS protocol."""
+
+__revision__="$Id: dns.py,v 1.9 2004/09/15 21:23:13 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import random
 import struct
-import sys
-import string
 from encodings import idna
 from types import StringType,UnicodeType
 
-class ResolverError(Exception):
+class DNSError(Exception):
+    """Base class for all DNS exception."""
     pass
 
-class DataTruncated(ResolverError):
+class DataTruncated(DNSError):
+    """Raised when part of data received is incomplete."""
     pass
 
-class BadPacket(ResolverError):
+class BadPacket(DNSError):
+    """Raised when invalid DNS message is encountered."""
     pass
 
-class InvalidDomainName(ResolverError):
+class InvalidDomainName(DNSError):
+    """Raised when invalid domain name is used."""
     pass
 
 resolve_errors={
@@ -47,6 +51,13 @@ resolve_errors={
     }
 
 def domain_str2bin(name):
+    """Convert domain name from a string to a binary representation.
+
+    :param name: domain name.
+    :type name: `str`
+
+    :return: binary representation of the domain name.
+    :returntype: `str`"""
     if type(name) is UnicodeType:
         name=idna.ToASCII(name)
     ret=""
@@ -59,6 +70,22 @@ def domain_str2bin(name):
     return ret+chr(0)
 
 def domain_bin2str(packet,offset=0,depth=0):
+    """Convert domain name from a binary representation in a message to a
+    string. Recursively follow pointers in compressed domain names
+    (uncompressing them them).
+
+    :Parameters:
+        - `packet`: data packed containing the encoded domain name.
+        - `offset`: offset of the first byte of the encoded domain name.
+        - `depth`: current recursion depth.
+    :Types:
+        - `packet`: `str`
+        - `offset`: `int`
+        - `depth`: `int`
+
+    :return: decoded domain name.
+    :returntype: `str`"""
+
     if depth>10:
         raise BadPacket,"Domain compression recursion limit reached"
     ret=[]
@@ -75,33 +102,59 @@ def domain_bin2str(packet,offset=0,depth=0):
         elif l&0xc0==0xc0:
             l1=ord(packet[offset+1])
             ptr=((l&0x3f)<<8)+l1
-            return string.join(ret+[domain_bin2str(packet,ptr,depth+1)[0]],"."),offset+2
+            return ".".join(ret+[domain_bin2str(packet,ptr,depth+1)[0]]),offset+2
         else:
             raise BadPacket
-    return string.join(ret,"."),offset
+    return ".".join(ret),offset
 
 query_types_by_code={}
 query_types_by_name={}
-record_types_by_code={}
-record_types_by_name={}
-record_bin_parsers={}
 classes_by_name={ "IN": 1 }
 classes_by_code={ 1: "IN" }
 
-def add_query_type(name,code):
+def _add_query_type(name,code):
+    """Register a supported query type."""
     query_types_by_code[code]=name
     query_types_by_name[name]=code
 
-def add_record_type(cls,py_class,bin_parser):
-    add_query_type(py_class.type,py_class.code)
-    record_types_by_code[py_class.code]=py_class
-    record_types_by_name[py_class.type]=py_class
-    record_bin_parsers[py_class.code,cls]=bin_parser
-
 class RR:
+    """Base class for all DNS resource records types.
+
+    :Cvariables:
+        - `code`: code of the RR type.
+        - `type`: name of the RR type.
+        - `_rr_types_by_name`: mapping from RR type names to RR class.
+        - `_rr_types_by_code`: mapping from RR type codes to RR class.
+
+    :Ivariables:
+        - `name`: domain name of the RR.
+        - `ttl`: TTL value of the RR.
+        - `cls`: class code or name of the RR.
+
+    :Types:
+        - `code`: `int`
+        - `type`: `str`
+        - `name`: `str`
+        - `ttl`: `int`
+        - `cls`: `int`
+        - `rr_types_by_name`: `dict`
+        - `rr_types_by_code`: `dict`
+    """
     code=0
     type="?"
+    _record_types_by_code={}
+    _record_types_by_name={}
     def __init__(self,name,ttl,cls):
+        """Initialize the RR object.
+
+        :Parameters:
+            - `name`: domain name of the RR.
+            - `ttl`: TTL value of the RR.
+            - `cls`: class code or name of the RR.
+        :Types:
+            - `name`: `str`
+            - `ttl`: `int`
+            - `cls`: `int`"""
         self.name=name
         self.ttl=ttl
         if type(cls) is StringType:
@@ -122,9 +175,17 @@ class RR:
                 and self.format_data()==other.format_data())
 
     def format_data(self):
+        """Format RR data as a string.
+        
+        :return: formatted data.
+        :returntype: `str`"""
         return ""
 
     def bin_format(self):
+        """Create binary representation of the RR.
+
+        :return: binary representation of the RR.
+        :returntype: `str`"""
         if self.name is None or self.ttl is None:
             raise ValueError,"Incomplete RR"
         data=self.bin_format_data()
@@ -134,7 +195,74 @@ class RR:
                 struct.pack("!HHIH",self.code,self.cls,self.ttl,len(data))+data)
 
     def bin_format_data(self):
-        raise NotImplemented
+        """Create binary representation of the RR data.
+
+        :return: binary representation of the RR data.
+        :returntype: `str`"""
+        raise NotImplementedError
+
+    def parse_bin(packet,offset):
+        """Parse binary representation of the RR.
+
+        :Parameters:
+            - `packet`: the packet containing the RR.
+            - `offset`: offset of the first byte of the RR data.
+        :Types:
+            - `packet`: `int`
+            - `offset`: `int`
+
+        :return: parsed RR and an offset of the next RR.
+        :returntype: `RR`, `int`"""
+        name,offset=domain_bin2str(packet,offset)
+        if offset+10>len(packet):
+            raise DataTruncated
+        typ,cls,ttl,rdl=struct.unpack("!HHIH",packet[offset:offset+10])
+        if offset+rdl>len(packet):
+            raise DataTruncated
+        offset+=10
+        if cls!=1:
+            return None,offset+rdl
+        if not RR._record_types_by_code.has_key(typ):
+            return None,offset+rdl
+        cls_name=classes_by_code.get(cls)
+        rr_type=RR._record_types_by_code[typ]
+        rr,roffset=rr_type.parse_bin_data(name,ttl,cls,packet,offset,len)
+        if roffset!=offset+rdl:
+            raise BadPacket,"Record length mismatch"
+        return rr,roffset
+    
+    parse_bin=staticmethod(parse_bin)
+
+    def parse_bin_data(name,ttl,cls,packet,offset,len):
+        """Parse binary representation of the RR data.
+
+        :Parameters:
+            - `name`: domain name of the RR.
+            - `ttl`: TTL value of the RR.
+            - `cls`: class code or name of the RR.
+            - `packet`: the packet containing the RR.
+            - `offset`: offset of the first byte of the RR data in the packet.
+        :Types:
+            - `name`: `str`
+            - `ttl`: `int`
+            - `cls`: `int`
+            - `packet`: `int`
+            - `offset`: `int`
+
+        :return: parsed RR.
+        :returntype: `RR`"""
+        raise NotImplementedError
+
+    parse_bin_data=staticmethod(parse_bin_data)
+
+    def _add_record_type(py_class):
+        """Register a supported record type."""
+        _add_query_type(py_class.type,py_class.code)
+        RR._record_types_by_code[py_class.code]=py_class
+        RR._record_types_by_name[py_class.type]=py_class
+    
+    _add_record_type=staticmethod(_add_record_type)
+
 
 class RR_A(RR):
     type="A"
@@ -150,15 +278,18 @@ class RR_A(RR):
         ip1,ip2,ip3,ip4=self.ip.split(".")
         return struct.pack("!BBBB",int(ip1),int(ip2),int(ip3),int(ip4))
 
-def bin_parse_A(name,ttl,cls,packet,offset,len):
-    if offset+4>len(packet):
-        raise DataTruncated
-    data=packet[offset:offset+4]
-    data=[ord(b) for b in data]
-    ip="%i.%i.%i.%i" % tuple(data)
-    return RR_A(name,ttl,ip),offset+4
+    def parse_bin_data(name,ttl,cls,packet,offset,len):
+        ""
+        if offset+4>len(packet):
+            raise DataTruncated
+        data=packet[offset:offset+4]
+        data=[ord(b) for b in data]
+        ip="%i.%i.%i.%i" % tuple(data)
+        return RR_A(name,ttl,ip),offset+4
+    
+    parse_bin_data=staticmethod(parse_bin_data)
 
-add_record_type("IN",RR_A,bin_parse_A)
+RR._add_record_type(RR_A)
 
 class RR_NS(RR):
     type="NS"
@@ -173,11 +304,13 @@ class RR_NS(RR):
     def bin_format_data(self):
         return domain_str2bin(self.target)
 
-def bin_parse_NS(name,ttl,cls,packet,offset,len):
-    target,offset=domain_bin2str(packet,offset)
-    return RR_CNAME(name,ttl,cls,target),offset
+    def parse_bin_data(name,ttl,cls,packet,offset,len):
+        target,offset=domain_bin2str(packet,offset)
+        return RR_CNAME(name,ttl,cls,target),offset
+        
+    parse_bin_data=staticmethod(parse_bin_data)
 
-add_record_type(None,RR_NS,bin_parse_NS)
+RR._add_record_type(RR_NS)
 
 class RR_CNAME(RR):
     type="CNAME"
@@ -192,11 +325,13 @@ class RR_CNAME(RR):
     def bin_format_data(self):
         return domain_str2bin(self.target)
 
-def bin_parse_CNAME(name,ttl,cls,packet,offset,len):
-    target,offset=domain_bin2str(packet,offset)
-    return RR_CNAME(name,ttl,cls,target),offset
+    def parse_bin_data(name,ttl,cls,packet,offset,len):
+        target,offset=domain_bin2str(packet,offset)
+        return RR_CNAME(name,ttl,cls,target),offset
+        
+    parse_bin_data=staticmethod(parse_bin_data)
 
-add_record_type(None,RR_CNAME,bin_parse_CNAME)
+RR._add_record_type(RR_CNAME)
 
 class RR_SOA(RR):
     type="SOA"
@@ -221,16 +356,18 @@ class RR_SOA(RR):
                 +struct.pack("!IIIII",self.serial,self.refresh,self.retry,
                 self.expire,self.minimum))
 
-def bin_parse_SOA(name,ttl,cls,packet,offset,len):
-    pri_master,offset=domain_bin2str(packet,offset)
-    mailbox,offset=domain_bin2str(packet,offset)
-    if offset+20>len(packet):
-        raise DataTruncated
-    serial,refresh,retry,expire,minimum=struct.unpack("!IIIII",packet[offset:offset+20])
-    offset+=20
-    return RR_SOA(name,ttl,cls,pri_master,mailbox,serial,refresh,retry,expire,minimum),offset
+    def parse_bin_data(name,ttl,cls,packet,offset,len):
+        pri_master,offset=domain_bin2str(packet,offset)
+        mailbox,offset=domain_bin2str(packet,offset)
+        if offset+20>len(packet):
+            raise DataTruncated
+        serial,refresh,retry,expire,minimum=struct.unpack("!IIIII",packet[offset:offset+20])
+        offset+=20
+        return RR_SOA(name,ttl,cls,pri_master,mailbox,serial,refresh,retry,expire,minimum),offset
+        
+    parse_bin_data=staticmethod(parse_bin_data)
 
-add_record_type(None,RR_SOA,bin_parse_SOA)
+RR._add_record_type(RR_SOA)
 
 class RR_SRV(RR):
     type="SRV"
@@ -307,39 +444,20 @@ class RR_SRV(RR):
     def __ge__(self,other):
         return not self.__lt__(other)
 
-def bin_parse_SRV(name,ttl,cls,packet,offset,len):
-    if offset+7>len(packet):
-        raise DataTruncated
-    priority,weight,port=struct.unpack("!HHH",packet[offset:offset+6])
-    target,offset=domain_bin2str(packet,offset+6)
-    return RR_SRV(name,ttl,priority,weight,port,target),offset
+    def parse_bin_data(name,ttl,cls,packet,offset,len):
+        if offset+7>len(packet):
+            raise DataTruncated
+        priority,weight,port=struct.unpack("!HHH",packet[offset:offset+6])
+        target,offset=domain_bin2str(packet,offset+6)
+        return RR_SRV(name,ttl,priority,weight,port,target),offset
+        
+    parse_bin_data=staticmethod(parse_bin_data)
 
-add_record_type("IN",RR_SRV,bin_parse_SRV)
+RR._add_record_type(RR_SRV)
 
-add_query_type("*",255)
-add_query_type("AXFR",252)
+_add_query_type("*",255)
+_add_query_type("AXFR",252)
 
-def parse_rr(packet,offset):
-    name,offset=domain_bin2str(packet,offset)
-    if offset+10>len(packet):
-        raise DataTruncated
-    typ,cls,ttl,rdl=struct.unpack("!HHIH",packet[offset:offset+10])
-    if offset+rdl>len(packet):
-        raise DataTruncated
-    offset+=10
-    if cls!=1:
-        return None,offset+rdl
-    if not record_types_by_code.has_key(typ):
-        return None,offset+rdl
-    cls_name=classes_by_code.get(cls)
-    try:
-        parse_func=record_bin_parsers[typ,cls_name]
-    except KeyError:
-        parse_func=record_bin_parsers[typ,None]
-    rr,roffset=parse_func(name,ttl,cls,packet,offset,len)
-    if roffset!=offset+rdl:
-        raise BadPacket,"Record length mismatch"
-    return rr,roffset
 
 class Message:
     def __init__(self,id,qr,opcode=0,aa=0,tc=0,rd=0,ra=0,rcode=0,
@@ -496,15 +614,15 @@ def parse_message(packet):
 
     try:
         for i in range(0,ancount):
-            rr,offset=parse_rr(packet,offset)
+            rr,offset=RR.parse_bin(packet,offset)
             if rr:
                 answers.append(rr)
         for i in range(0,nscount):
-            rr,offset=parse_rr(packet,offset)
+            rr,offset=RR.parse_bin(packet,offset)
             if rr:
                 authorities.append(rr)
         for i in range(0,arcount):
-            rr,offset=parse_rr(packet,offset)
+            rr,offset=RR.parse_bin(packet,offset)
             if rr:
                 additionals.append(rr)
     except DataTruncated:

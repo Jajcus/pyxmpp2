@@ -17,7 +17,7 @@
 
 """Iq XMPP stanza handling"""
 
-__revision__="$Id: iq.py,v 1.15 2004/09/14 19:57:58 jajcus Exp $"
+__revision__="$Id: iq.py,v 1.16 2004/09/15 21:23:13 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -41,8 +41,14 @@ class Iq(Stanza):
             - `typ`: staza type: one of: "get", "set", "result" or "error".
             - `sid`: stanza id -- value of stanza's "id" attribute. If not
               given, then unique for the session value is generated. 
-            - `error_cond`: error condition name. Ignored if `typ` is not "error". """
-
+            - `error_cond`: error condition name. Ignored if `typ` is not "error".
+        :Types:
+            - `name_or_node`: `unicode` or `libxml2.xmlNode` or `Iq`
+            - `fr`: `JID`
+            - `to`: `JID`
+            - `typ`: `unicode`
+            - `sid`: `unicode`
+            - `error_cond`: `unicode`"""
         self.node=None
         if isinstance(node,Iq):
             pass
@@ -68,7 +74,9 @@ class Iq(Stanza):
                 error=error, error_cond=error_cond)
 
     def copy(self):
-        """Create a deep copy of the iq stanza."""
+        """Create a deep copy of the iq stanza.
+        
+        :returntype: `Iq`"""
         return Iq(self)
 
     def make_error_response(self,cond):
@@ -79,7 +87,8 @@ class Iq(Stanza):
 
         :return: new `Iq` object with the same "id" as self, "from" and "to"
             attributes swapped, type="error" and containing <error /> element
-            plus payload of `self`."""
+            plus payload of `self`.
+        :returntype: `Iq`"""
 
         if self.get_type() not in ("set","get"):
             raise StanzaError,"Errors may only be generated for 'set' or 'get' iq"
@@ -96,7 +105,8 @@ class Iq(Stanza):
         """Create result response for the a "get" or "set" iq stanza.
 
         :return: new `Iq` object with the same "id" as self, "from" and "to"
-            attributes replaced and type="result"."""
+            attributes replaced and type="result".
+        :returntype: `Iq`"""
 
         if self.get_type() not in ("set","get"):
             raise StanzaError,"Results may only be generated for 'set' or 'get' iq"
@@ -110,14 +120,19 @@ class Iq(Stanza):
         :Parameters:
             - `ns_uri`: namespace URI of the element.
             - `name`: element name.
+        :Types:
+            - `ns_uri`: `str`
+            - `name`: `unicode`
         
-        :return: the new payload node."""
+        :return: the new payload node.
+        :returntype: `libxml2.xmlNode`"""
         return self.set_new_content(ns_uri,name)
 
     def get_query(self):
         """Get the payload element of the stanza.
 
-        :return: the payload element or None if there is no payload."""
+        :return: the payload element or None if there is no payload.
+        :returntype: `libxml2.xmlNode`"""
         for c in self.node.xpathEval("*"):
             try:
                 if c.ns():
@@ -129,7 +144,9 @@ class Iq(Stanza):
     def get_query_ns(self):
         """Get a namespace of the stanza payload.
 
-        :return: XML namespace URI of the payload or None if there is no payload."""
+        :return: XML namespace URI of the payload or None if there is no
+            payload.
+        :returntype: `str`"""
         q=self.get_query()
         if q:
             return get_node_ns_uri(q)

@@ -17,7 +17,7 @@
 
 """Message XMPP stanza handling"""
 
-__revision__="$Id: message.py,v 1.18 2004/09/14 19:57:58 jajcus Exp $"
+__revision__="$Id: message.py,v 1.19 2004/09/15 21:23:13 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -41,8 +41,21 @@ class Message(Stanza):
             - `to`: recipient JID.
             - `typ`: staza type: one of: "get", "set", "result" or "error".
             - `sid`: stanza id -- value of stanza's "id" attribute. If not
-              given, then unique for the session value is generated. 
-            - `error_cond`: error condition name. Ignored if `typ` is not "error". """
+              given, then unique for the session value is generated.
+            - `subject`: message subject,
+            - `body`: message body.
+            - `thread`: message thread id.
+            - `error_cond`: error condition name. Ignored if `typ` is not "error".
+        :Types:
+            - `name_or_node`: `unicode` or `libxml2.xmlNode` or `Stanza`
+            - `fr`: `JID`
+            - `to`: `JID`
+            - `typ`: `unicode`
+            - `sid`: `unicode`
+            - `subject`: `unicode`
+            - `body`: `unicode`
+            - `thread`: `unicode`
+            - `error_cond`: `unicode`"""
 
         self.node=None
         if isinstance(node,Message):
@@ -73,7 +86,8 @@ class Message(Stanza):
     def get_subject(self):
         """Get the message subject.
         
-        :return: the message subject or `None` if there is no subject."""
+        :return: the message subject or `None` if there is no subject.
+        :returntype: `unicode`"""
         n=self.xpath_eval("subject")
         if n:
             return from_utf8(n[0].getContent())
@@ -83,7 +97,8 @@ class Message(Stanza):
     def get_thread(self):
         """Get the thread-id subject.
         
-        :return: the thread-id or `None` if there is no thread-id."""
+        :return: the thread-id or `None` if there is no thread-id.
+        :returntype: `unicode`"""
         n=self.xpath_eval("thread")
         if n:
             return from_utf8(n[0].getContent())
@@ -91,13 +106,16 @@ class Message(Stanza):
             return None
 
     def copy(self):
-        """Create a deep copy of the message stanza."""
+        """Create a deep copy of the message stanza.
+        
+        :returntype: `Message`"""
         return Message(self)
 
     def get_body(self):
         """Get the body of the message.
         
-        :return: the body of the message or `None` if there is no body."""
+        :return: the body of the message or `None` if there is no body.
+        :returntype: `unicode`"""
         n=self.xpath_eval("body")
         if n:
             return from_utf8(n[0].getContent())
@@ -110,9 +128,10 @@ class Message(Stanza):
         :Parameters:
             - `cond`: error condition name, as defined in XMPP specification.
 
-        :return: new `Message` object with the same "id" as self, "from" and
+        :return: new message stanza with the same "id" as self, "from" and
             "to" attributes swapped, type="error" and containing <error />
-            element plus payload of `self`."""
+            element plus payload of `self`.
+        :returntype: `unicode`"""
 
         if self.get_type() == "error":
             raise StanzaError,"Errors may not be generated in response to errors"

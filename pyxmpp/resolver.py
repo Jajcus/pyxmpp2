@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: resolver.py,v 1.12 2004/09/10 14:00:54 jajcus Exp $"
+__revision__="$Id: resolver.py,v 1.13 2004/09/15 21:23:13 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import socket
@@ -30,7 +30,7 @@ import re
 from types import StringType,UnicodeType,IntType
 
 from pyxmpp import dns
-from pyxmpp.dns import ResolverError,DataTruncated,BadPacket,InvalidDomainName,resolve_errors
+from pyxmpp.dns import DNSError,DataTruncated,BadPacket,InvalidDomainName,resolve_errors
 
 nameservers=[]
 search_list=[]
@@ -73,7 +73,7 @@ def query(name,typ):
                 r=do_query("%s.%s" % (name,d),typ)
                 if r:
                     return r
-            except ResolverError,e:
+            except DNSError,e:
                 continue
         if e:
             raise e

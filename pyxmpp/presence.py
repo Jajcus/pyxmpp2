@@ -17,7 +17,7 @@
 
 """Presence XMPP stanza handling"""
 
-__revision__="$Id: presence.py,v 1.21 2004/09/14 19:57:58 jajcus Exp $"
+__revision__="$Id: presence.py,v 1.22 2004/09/15 21:23:13 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -63,7 +63,17 @@ class Presence(Stanza):
               "xa", "dnd", "chat".
             - `status`: descriptive text for the presence stanza.
             - `priority`: presence priority.
-            - `error_cond`: error condition name. Ignored if `typ` is not "error" """
+            - `error_cond`: error condition name. Ignored if `typ` is not "error"
+        :Types:
+            - `name_or_node`: `unicode` or `libxml2.xmlNode` or `Stanza`
+            - `fr`: `JID`
+            - `to`: `JID`
+            - `typ`: `unicode`
+            - `sid`: `unicode`
+            - `show`: `unicode`
+            - `status`: `unicode`
+            - `priority`: `unicode`
+            - `error_cond`: `unicode`"""
         self.node=None
         if isinstance(node,Presence):
             pass
@@ -94,14 +104,18 @@ class Presence(Stanza):
             self.node.newTextChild(None,"priority",to_utf8(str(priority)))
 
     def copy(self):
-        """Create a deep copy of the presence stanza."""
+        """Create a deep copy of the presence stanza.
+        
+        :returntype: `Presence`"""
         return Presence(self)
 
     def set_status(self,status):
         """Change presence status description.
         
         :Parameters:
-            - `status`: descriptive text for the presence stanza."""
+            - `status`: descriptive text for the presence stanza.
+        :Types:
+            - `status`: `unicode`"""
         n=self.xpath_eval("status")
         if not status:
             if n:
@@ -117,7 +131,8 @@ class Presence(Stanza):
     def get_status(self):
         """Get presence status description.
         
-        :return: value of stanza's <status/> field."""
+        :return: value of stanza's <status/> field.
+        :returntype: `unicode`"""
         n=self.xpath_eval("status")
         if n:
             return from_utf8(n[0].getContent())
@@ -127,7 +142,8 @@ class Presence(Stanza):
     def get_show(self):
         """Get presence "show" field.
         
-        :return: value of stanza's <show/> field."""
+        :return: value of stanza's <show/> field.
+        :returntype: `unicode`"""
         n=self.xpath_eval("show")
         if n:
             return from_utf8(n[0].getContent())
@@ -139,7 +155,9 @@ class Presence(Stanza):
         
         :Parameters:
             - `show`: new value for the "show" field of presence stanza. One
-              of: None, "away", "xa", "dnd", "chat"."""
+              of: None, "away", "xa", "dnd", "chat".
+        :Types:
+            - `show`: `unicode`"""
         n=self.xpath_eval("show")
         if not show:
             if n:
@@ -156,7 +174,8 @@ class Presence(Stanza):
         """Get presence priority.
         
         :return: value of stanza's priority. 0 if the stanza doesn't contain
-            <priority/> element"""
+            <priority/> element.
+        :returntype: `int`"""
         n=self.xpath_eval("priority")
         if not n:
             return 0
@@ -170,7 +189,9 @@ class Presence(Stanza):
         """Change presence priority.
         
         :Parameters:
-            - `priority`: new presence priority"""
+            - `priority`: new presence priority.
+        :Types:
+            - `priority`: `int`"""
         n=self.xpath_eval("priority")
         if not priority:
             if n:
@@ -191,7 +212,8 @@ class Presence(Stanza):
         """Create "accept" response for the "subscribe"/"subscribed"/"unsubscribe"/"unsubscribed"
         presence stanza.
 
-        :return: new `Presence` object."""
+        :return: new stanza.
+        :returntype: `Presence`"""
 
         if self.get_type() not in ("subscribe","subscribed","unsubscribe","unsubscribed"):
             raise StanzaError,("Results may only be generated for 'subscribe',"
@@ -205,7 +227,8 @@ class Presence(Stanza):
         """Create "deny" response for the "subscribe"/"subscribed"/"unsubscribe"/"unsubscribed"
         presence stanza.
 
-        :return: new `Presence` object."""
+        :return: new presence stanza.
+        :returntype: `Presence`"""
         if self.get_type() not in ("subscribe","subscribed","unsubscribe","unsubscribed"):
             raise StanzaError,("Results may only be generated for 'subscribe',"
                 "'subscribed','unsubscribe' or 'unsubscribed' presence")
@@ -219,8 +242,11 @@ class Presence(Stanza):
 
         :Parameters:
             - `cond`: error condition name, as defined in XMPP specification.
+        :Types:
+            - `cond`: `unicode`
 
-        :return: new `Presence` object."""
+        :return: new presence stanza.
+        :returntype: `Presence`"""
         
         if self.get_type() == "error":
             raise StanzaError,"Errors may not be generated in response to errors"
