@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -257,7 +257,7 @@ class LegacyClientStream(ClientStream):
         finally:
             self.lock.release()
 
-    def _plain_auth_stage2(self,stanza):
+    def _plain_auth_stage2(self, _unused):
         """Do the second stage (<iq type='set'/>) of legacy "plain"
         authentication.
         
@@ -271,7 +271,7 @@ class LegacyClientStream(ClientStream):
         self.set_response_handlers(iq,self.auth_finish,self.auth_error)
         iq.free()
 
-    def _plain_auth_in_stage2(self,username,resource,stanza):
+    def _plain_auth_in_stage2(self, username, _unused, stanza):
         """Handle the second stage (<iq type='set'/>) of legacy "plain"
         authentication.
         
@@ -299,7 +299,7 @@ class LegacyClientStream(ClientStream):
             e.add_custom_condition('jabber:iq:auth:error',"user-unauthorized")
             self.send(iq)
 
-    def _digest_auth_stage2(self,stanza):
+    def _digest_auth_stage2(self, _unused):
         """Do the second stage (<iq type='set'/>) of legacy "digest"
         authentication.
         
@@ -314,7 +314,7 @@ class LegacyClientStream(ClientStream):
         self.set_response_handlers(iq,self.auth_finish,self.auth_error)
         iq.free()
 
-    def _digest_auth_in_stage2(self,username,resource,stanza):
+    def _digest_auth_in_stage2(self, username, _unused, stanza):
         """Handle the second stage (<iq type='set'/>) of legacy "digest"
         authentication.
         
@@ -352,7 +352,7 @@ class LegacyClientStream(ClientStream):
             e.add_custom_condition('jabber:iq:auth:error',"user-unauthorized")
             self.send(iq)
 
-    def auth_finish(self,stanza):
+    def auth_finish(self, _unused):
         """Handle success of the legacy authentication."""
         self.lock.acquire()
         try:

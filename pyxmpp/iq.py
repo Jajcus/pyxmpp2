@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -28,7 +28,6 @@ import libxml2
 
 from pyxmpp.utils import get_node_ns_uri
 from pyxmpp.stanza import Stanza,StanzaError,gen_id
-from pyxmpp.xmlextra import common_ns
 
 class Iq(Stanza):
     """Wraper object for <iq /> stanzas."""

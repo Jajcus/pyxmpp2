@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -25,13 +25,12 @@ __revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import libxml2
-from types import StringType,UnicodeType
 
 from pyxmpp.stanza import common_doc
 from pyxmpp.iq import Iq
 from pyxmpp.jid import JID
 
-from pyxmpp.utils import to_utf8,from_utf8,get_node_ns_uri,get_node_ns
+from pyxmpp.utils import to_utf8,from_utf8,get_node_ns_uri
 from pyxmpp.objects import StanzaPayloadObject
 
 ROSTER_NS="jabber:iq:roster"
@@ -106,7 +105,7 @@ class RosterItem(StanzaPayloadObject):
         self.subscription=subscription
         self.ask=ask
 
-    def complete_xml_element(self, xmlnode, doc):
+    def complete_xml_element(self, xmlnode, _unused):
         """Complete the XML node with `self` content.
 
         Should be overriden in classes derived from `StanzaPayloadElement`.
@@ -114,10 +113,10 @@ class RosterItem(StanzaPayloadObject):
         :Parameters:
             - `xmlnode`: XML node with the element being built. It has already
               right name and namespace, but no attributes or content.
-            - `doc`: document to which the element belongs.
+            - `_unused`: document to which the element belongs.
         :Types:
             - `xmlnode`: `libxml.xmlNode`
-            - `doc`: `libxml.xmlDoc"""
+            - `_unused`: `libxml.xmlDoc"""
         xmlnode.setProp("jid",self.jid.as_utf8())
         if self.name:
             xmlnode.setProp("name",to_utf8(self.name))

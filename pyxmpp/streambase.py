@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -14,6 +14,7 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+# pylint: disable-msg=W0201
 
 """Core XMPP stream functionality.
 
@@ -32,10 +33,7 @@ import random
 import threading
 import errno
 import logging
-import re
 
-
-from types import StringType,UnicodeType
 
 from pyxmpp import xmlextra
 from pyxmpp.expdict import ExpiringDictionary
@@ -216,11 +214,11 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
             addrs=[(addr,port)]
         msg=None
         for addr,port in addrs:
-            if type(addr) in (StringType,UnicodeType):
+            if type(addr) in (str, unicode):
                 self.state_change("resolving",addr)
             s=None
             for res in resolver.getaddrinfo(addr,port,0,socket.SOCK_STREAM):
-                family,socktype,proto,canonname,sockaddr=res
+                family, socktype, proto, _unused, sockaddr = res
                 try:
                     s=socket.socket(family,socktype,proto)
                     self.state_change("connecting",sockaddr)
@@ -388,11 +386,11 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         if to_from_mismatch:
             raise HostMismatch
 
-    def stream_end(self,doc):
+    def stream_end(self, _unused):
         """Process </stream:stream> (stream end) tag received from peer.
 
         :Parameters:
-            - `doc`: document created by the parser"""
+            - `_unused`: document created by the parser"""
         self.__logger.debug("Stream ended")
         self.eof=1
         if self.doc_out:
@@ -414,11 +412,11 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         """
         pass
 
-    def stanza(self,doc,node):
+    def stanza(self, _unused, node):
         """Process stanza (first level child element of the stream).
 
         :Parameters:
-            - `doc`: parsed document
+            - `_unused`: parsed document
             - `node`: stanza's full XML
         """
         self._process_node(node)
@@ -628,11 +626,11 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         self.lock.release()
         try:
             try:
-                ifd,ofd,efd=select.select([self.socket],[],[self.socket],timeout)
+                ifd, _unused, efd = select.select( [self.socket], [], [self.socket], timeout )
             except select.error,e:
                 if e.args[0]!=errno.EINTR:
                     raise
-                ifd,ofd,efd=[],[],[]
+                ifd, _unused, efd=[], [], []
         finally:
             self.lock.acquire()
         if self.socket in ifd or self.socket in efd:

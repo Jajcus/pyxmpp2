@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -14,6 +14,8 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+# pylint treats "import stringprep" like depreciated "import string"
+# pylint: disable-msg=W0402
 
 """Nodeprep and resourceprep stringprep profiles.
 
@@ -24,7 +26,6 @@ Normative reference:
 __revision__="$Id: xmppstringprep.py,v 1.16 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
-from types import ListType
 import stringprep
 import unicodedata
 
@@ -108,7 +109,7 @@ def nfkc(data):
         - `data`: list of Unicode characters or Unicode string.
 
     :return: normalized Unicode string."""
-    if type(data) is ListType:
+    if type(data) is list:
         data=u"".join(data)
     return unicodedata.normalize("NFKC",data)
 
@@ -157,7 +158,7 @@ class Profile:
         s=self.check_unassigned(s)
         if self.bidi:
             s=self.check_bidi(s)
-        if type(s) is ListType:
+        if type(s) is list:
             s=u"".string.join()
         if len(self.cache_items)>=stringprep_cache_size:
             remove=self.cache_items[:-stringprep_cache_size/2]
@@ -189,7 +190,7 @@ class Profile:
         s=self.prohibit(s)
         if self.bidi:
             s=self.check_bidi(s)
-        if type(s) is ListType:
+        if type(s) is list:
             s=u"".string.join(s)
         return s
 

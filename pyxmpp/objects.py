@@ -14,6 +14,7 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+# pylint: disable-msg=W0232, E0201
 
 """General base classes for PyXMPP objects."""
 
@@ -21,7 +22,7 @@ __revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import libxml2
-from pyxmpp.xmlextra import common_doc, common_root
+from pyxmpp.xmlextra import common_doc
 
 class StanzaPayloadObject(object):
     """Base class for objects that may be used as XMPP stanza payload and don't keep

@@ -432,11 +432,15 @@ class Cache:
             if not self._fetcher:
                 raise TypeError, "No cache fetcher defined"
             if not error_handler:
-                def error_handler(address, data):
+                def default_error_handler(address, _unused):
+                    "Default error handler."
                     return object_handler(address, None, 'error')
+                error_handler = default_error_handler
             if not timeout_handler:
-                def timeout_handler(address):
+                def default_timeout_handler(address):
+                    "Default timeout handler."
                     return error_handler(address, None)
+                timeout_handler = default_timeout_handler
             if freshness_period is None:
                 freshness_period = self.default_freshness_period
             if expiration_period is None:
@@ -565,7 +569,7 @@ class Cache:
             num_items = len(il)
             need_remove = num_items - int(0.75 * self.max_items)
 
-            for i in range(need_remove):
+            for _unused in range(need_remove):
                 item=il.pop(0)
                 try:
                     del self._items[item.address]

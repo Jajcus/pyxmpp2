@@ -14,6 +14,8 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+# pylint: disable-msg=W0232, E0201
+
 """Simple API for simple things like sendig messages or single stanzas."""
 
 __revision__="$Id: client.py 528 2005-01-20 21:14:53Z jajcus $"
@@ -26,7 +28,9 @@ def xmpp_do(jid,password,function,server=None,port=None):
     closed."""
     from pyxmpp.jabber.client import JabberClient
     class Client(JabberClient):
+        """The simplest client implementation."""
         def session_started(self):
+            """Call the function provided when the session starts and exit."""
             function(self.stream)
             self.disconnect()
     c=Client(jid,password,server=server,port=port)
@@ -37,11 +41,35 @@ def xmpp_do(jid,password,function,server=None,port=None):
         print u"disconnecting..."
         c.disconnect()
 
-def send_message(my_jid,my_password,to_jid, body, subject=None,
-        message_type=None,server=None,port=None):
+def send_message(my_jid, my_password, to_jid, body, subject=None,
+        message_type=None, server=None, port=None):
+    """Star an XMPP session and send a message, then exit.
+
+    :Parameters:
+        - `my_jid`: sender JID.
+        - `my_password`: sender password.
+        - `to_jid`: recipient JID.
+        - `body`: message body.
+        - `subject`: message subject.
+        - `message_type`: message type.
+        - `server`: server to connect to (default: derivied from `my_jid` using
+          DNS records).
+        - `port`: TCP port number to connect to (default: retrieved using SRV
+          DNS record, or 5222).
+    :Types:
+        - `my_jid`: `pyxmpp.jid.JID`
+        - `my_password`: `unicode`
+        - `to_jid`: `pyxmpp.jid.JID`
+        - `body`: `unicode`
+        - `subject`: `unicode`
+        - `message_type`: `str`
+        - `server`: `unicode` or `str`
+        - `port`: `int`
+    """    
     from pyxmpp.message import Message
     msg=Message(to_jid=to_jid,body=body,subject=subject,stanza_type=message_type)
     def fun(stream):
+        """Send a mesage `msg` via a stream."""
         stream.send(msg)
     xmpp_do(my_jid,my_password,fun,server,port)
 

@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -30,7 +30,7 @@ __docformat__="restructuredtext en"
 import logging
 
 from pyxmpp.jabber.clientstream import LegacyClientStream
-from pyxmpp.jabber.disco import DISCO_ITEMS_NS,DISCO_INFO_NS,DiscoInfo,DiscoItems,DiscoIdentity
+from pyxmpp.jabber.disco import DISCO_ITEMS_NS,DISCO_INFO_NS
 from pyxmpp.jabber.disco import DiscoInfo,DiscoItems,DiscoIdentity
 from pyxmpp.jabber import disco
 from pyxmpp.client import Client
@@ -100,12 +100,13 @@ class JabberClient(Client):
 
 # public methods
 
-    def connect(self,register=False):
+    def connect(self, register=False):
         """Connect to the server and set up the stream.
 
         Set `self.stream` and notify `self.state_changed` when connection
         succeeds. Additionally, initialize Disco items and info of the client.
         """
+        _unused = register
         Client.connect(self)
 
     def register_feature(self, feature_name):

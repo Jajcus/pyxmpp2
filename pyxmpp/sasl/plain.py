@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -67,7 +67,7 @@ class PlainClientAuthenticator(ClientAuthenticator):
         self.finished=0
         return self.challenge("")
 
-    def challenge(self,challenge):
+    def challenge(self, challenge):
         """Process the challenge and return the response.
 
         :Parameters:
@@ -77,6 +77,7 @@ class PlainClientAuthenticator(ClientAuthenticator):
 
         :return: the response or a failure indicator.
         :returntype: `sasl.Response` or `sasl.Failure`"""
+        _unused = challenge
         if self.finished:
             self.__logger.debug("Already authenticated")
             return Failure("extra-challenge")
@@ -100,6 +101,7 @@ class PlainClientAuthenticator(ClientAuthenticator):
 
         :return: a success indicator.
         :returntype: `Success`"""
+        _unused = data
         return Success(self.username,None,self.authzid)
 
 class PlainServerAuthenticator(ServerAuthenticator):

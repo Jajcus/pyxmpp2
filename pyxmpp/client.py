@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -264,13 +264,13 @@ class Client:
         msg=err.get_message()
         raise FatalClientError("Failed to establish a session: "+msg)
 
-    def __session_result(self,iq):
+    def __session_result(self, _unused):
         """Process session request success.
 
         :Parameters:
-            - `iq`: IQ result stanza received in reply to the session request.
+            - `_unused`: IQ result stanza received in reply to the session request.
         :Types:
-            - `iq`: `pyxmpp.Iq`"""
+            - `_unused`: `pyxmpp.Iq`"""
         self.state_changed.acquire()
         self.session_established=True
         self.state_changed.notify()

@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@bnet.pl>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@bnet.pl>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -388,6 +388,7 @@ class MucRoomState:
         :Types:
             - `stream`: `pyxmpp.stream.Stream`
         """
+        _unused = stream
         if self.joined and self.handler:
             self.handler.user_left(self.me,None)
         self.joined=False

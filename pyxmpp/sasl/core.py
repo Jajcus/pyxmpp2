@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -62,6 +62,7 @@ class PasswordManager:
 
         :return: the password and its encoding (format).
         :returntype: `unicode`,`str` tuple."""
+        _unused, _unused, _unused = username, realm, acceptable_formats
         return None,None
 
     def check_password(self,username,password,realm=None):
@@ -307,6 +308,7 @@ class ClientAuthenticator:
         :return: the initial response to send to the server or a failuer
             indicator.
         :returntype: `Response` or `Failure`"""
+        _unused, _unused = username, authzid
         return Failure("Not implemented")
 
     def challenge(self,challenge):
@@ -319,6 +321,7 @@ class ClientAuthenticator:
 
         :return: the response or a failure indicator.
         :returntype: `Response` or `Failure`"""
+        _unused = challenge
         return Failure("Not implemented")
 
     def finish(self,data):
@@ -331,6 +334,7 @@ class ClientAuthenticator:
 
         :return: success or failure indicator.
         :returntype: `Success` or `Failure`"""
+        _unused = data
         return Failure("Not implemented")
 
 class ServerAuthenticator:
@@ -363,6 +367,7 @@ class ServerAuthenticator:
 
         :return: a challenge, a success or a failure indicator.
         :returntype: `Challenge` or `Failure` or `Success`"""
+        _unused = initial_response
         return Failure("not-authorized")
 
     def response(self,response):
@@ -375,6 +380,7 @@ class ServerAuthenticator:
 
         :return: a challenge, a success or a failure indicator.
         :returntype: `Challenge` or `Success` or `Failure`"""
+        _unused = response
         return Failure("not-authorized")
 
 # vi: sts=4 et sw=4

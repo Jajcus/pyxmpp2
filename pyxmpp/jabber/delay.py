@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -28,7 +28,6 @@ import libxml2
 import time
 import datetime
 
-from pyxmpp.stanza import common_doc
 from pyxmpp.jid import JID
 
 from pyxmpp.utils import to_utf8,from_utf8,get_node_ns_uri
@@ -106,7 +105,7 @@ class Delay(StanzaPayloadObject):
             self.delay_from=None
         self.reason=from_utf8(xmlnode.getContent())
 
-    def complete_xml_element(self, xmlnode, doc):
+    def complete_xml_element(self, xmlnode, _unused):
         """Complete the XML node with `self` content.
 
         Should be overriden in classes derived from `StanzaPayloadElement`.
@@ -114,11 +113,10 @@ class Delay(StanzaPayloadObject):
         :Parameters:
             - `xmlnode`: XML node with the element being built. It has already
               right name and namespace, but no attributes or content.
-            - `doc`: document to which the element belongs.
+            - `_unused`: document to which the element belongs.
         :Types:
             - `xmlnode`: `libxml.xmlNode`
-            - `doc`: `libxml.xmlDoc"""
-
+            - `_unused`: `libxml.xmlDoc"""
         tm=self.timestamp.strftime("%Y%m%dT%H:%M:%S")
         xmlnode.setProp("stamp",tm)
         if self.delay_from:

@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -14,6 +14,7 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+# pylint: disable-msg=W0232, E0201
 
 """jid -- Jabber ID handling
 
@@ -27,7 +28,6 @@ __docformat__="restructuredtext en"
 import re
 import weakref
 
-from types import StringType,UnicodeType
 from encodings import idna
 
 from pyxmpp.utils import from_utf8
@@ -248,7 +248,7 @@ class JID(object):
     def __eq__(self,other):
         if other is None:
             return False
-        elif type(other) in (StringType,UnicodeType):
+        elif type(other) in (str, unicode):
             try:
                 other=JID(other)
             except:

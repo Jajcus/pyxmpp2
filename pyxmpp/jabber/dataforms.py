@@ -23,7 +23,6 @@ Normative reference:
 __revision__="$Id: disco.py 513 2005-01-09 16:34:00Z jajcus $"
 __docformat__="restructuredtext en"
 
-import sys
 import libxml2
 from pyxmpp.objects import StanzaPayloadObject
 from pyxmpp.utils import from_utf8, to_utf8
@@ -52,8 +51,8 @@ class Option(StanzaPayloadObject):
             - `label`: `unicode`
             - `value`: `unicode`
         """
-	self.label = label
-	self.value = value
+        self.label = label
+        self.value = unicode(value)
 
     def complete_xml_element(self, xmlnode, doc):
         """Complete the XML node with `self` content.
@@ -65,11 +64,22 @@ class Option(StanzaPayloadObject):
         :Types:
             - `xmlnode`: `libxml.xmlNode`
             - `doc`: `libxml.xmlDoc"""
-	xmlnode.setProp("label", self.label.encode("utf-8"))
-	xmlnode.newTextChild(xmlnode.ns(), "value", self.value.encode("utf-8"))
-	return xmlnode
+        _unused = doc
+        xmlnode.setProp("label", self.label.encode("utf-8"))
+        xmlnode.newTextChild(xmlnode.ns(), "value", self.value.encode("utf-8"))
+        return xmlnode
 
     def _new_from_xml(cls, xmlnode):
+        """Create a new `Option` object from an XML element.
+
+        :Parameters:
+            - `xmlnode`: the XML element.
+        :Types:
+            - `xmlnode`: `libxml2.xmlNode`
+
+        :return: the object created.
+        :returntype: `Option`
+        """
         label = from_utf8(xmlnode.prop("label"))
         child = xmlnode.children
         while child:
@@ -98,7 +108,9 @@ class Field(StanzaPayloadObject):
     :Types:
         - `name`: `unicode`
         - `values`: `list` of `unicode`
-        - `value`: `unicode` or `list` or `pyxmpp.jid.JID` or `boolean`
+        - `value`: `bool` for "boolean" field, `JID` for "jid-single", `list` of `JID`
+          for "jid-multi", `list` of `unicode` for "list-multi" and "text-multi"
+          and `unicode` for other field types.
         - `label`: `unicode`
         - `type`: `str`
         - `options`: `Option`
@@ -111,18 +123,46 @@ class Field(StanzaPayloadObject):
                 "jid-single", "list-multi", "list-single", "text-multi", 
                 "text-private", "text-single")
     def __init__(self, name, values = None, field_type = None, label = None,
-            options = None, required = False, desc = None):
-	self.name = name 
+            options = None, required = False, desc = None, value = None):
+        """Initialize a `Field` object. 
+
+        :Parameters:
+            - `name`: field name.
+            - `values`: raw field values. Not to be used together with `value`.
+            - `field_type`: field type.
+            - `label`: field label.
+            - `options`: optional values for the field.
+            - `required`: `True` if the field is required.
+            - `desc`: natural-language description of the field.
+            - `value`: field value or values in a field_type-specific type. May be used only
+              if `values` parameter is not provided.
+        :Types:
+            - `name`: `unicode`
+            - `values`: `list` of `unicode`
+            - `field_type`: `str`
+            - `label`: `unicode`
+            - `options`: `list` of `Option`
+            - `required`: `bool`
+            - `desc`: `unicode`
+            - `value`: `bool` for "boolean" field, `JID` for "jid-single", `list` of `JID`
+              for "jid-multi", `list` of `unicode` for "list-multi" and "text-multi"
+              and `unicode` for other field types.
+        """
+        self.name = name 
         if field_type is not None and field_type not in self.allowed_types:
             raise ValueError, "Invalid form field type: %r" % (field_type,)
-	self.type = field_type
-        if not values:
+        self.type = field_type
+        if value is not None:
+            if values:
+                raise ValueError, "values or value must be given, not both"
+            self.value = value
+        elif not values:
             self.values = []
-	else:
+        else:
             self.values = list(values)
         if field_type and not field_type.endswith("-multi") and len(self.values) > 1:
             raise ValueError, "Multiple values for a single-value field"
-	self.label = label
+        self.label = label
         if not options:
             self.options = []
         elif field_type and not field_type.startswith("list-"):
@@ -188,9 +228,9 @@ class Field(StanzaPayloadObject):
             - `label`: `unicode`
             - `value`: `unicodez
         """
-	option = Option(value, label)
-	self.options.append(option)
-	return option
+        option = Option(value, label)
+        self.options.append(option)
+        return option
 
     def complete_xml_element(self, xmlnode, doc):
         """Complete the XML node with `self` content.
@@ -203,26 +243,36 @@ class Field(StanzaPayloadObject):
             - `xmlnode`: `libxml.xmlNode`
             - `doc`: `libxml.xmlDoc"""
         if self.type is not None and self.type not in self.allowed_types:
-            raise ValueError, "Invalid form field type: %r" % (field_type,)
-	xmlnode.setProp("type", self.type)
-	if not self.label is None:
-	    xmlnode.setProp("label", self.label)
-	if not self.name is None:
-	    xmlnode.setProp("var", self.name)
-	if self.values:
+            raise ValueError, "Invalid form field type: %r" % (self.type,)
+        xmlnode.setProp("type", self.type)
+        if not self.label is None:
+            xmlnode.setProp("label", self.label)
+        if not self.name is None:
+            xmlnode.setProp("var", self.name)
+        if self.values:
             if self.type and len(self.values) > 1 and not self.type.endswith(u"-multi"):
                 raise ValueError, "Multiple values not allowed for %r field" % (self.type,)
             for value in self.values:
                 xmlnode.newTextChild(xmlnode.ns(), "value", to_utf8(value))
-	for option in self.options:
-	    option.as_xml(xmlnode, doc)
+        for option in self.options:
+            option.as_xml(xmlnode, doc)
         if self.required:
             xmlnode.newChild(xmlnode.ns(), "required", None)
         if self.desc:
             xmlnode.newTextChild(xmlnode.ns(), "desc", to_utf8(self.desc))
-	return xmlnode
+        return xmlnode
 
     def _new_from_xml(cls, xmlnode):
+        """Create a new `Field` object from an XML element.
+
+        :Parameters:
+            - `xmlnode`: the XML element.
+        :Types:
+            - `xmlnode`: `libxml2.xmlNode`
+
+        :return: the object created.
+        :returntype: `Field`
+        """
         field_type = xmlnode.prop("type")
         label = from_utf8(xmlnode.prop("label"))
         name = from_utf8(xmlnode.prop("var"))
@@ -249,10 +299,38 @@ class Field(StanzaPayloadObject):
     _new_from_xml = classmethod(_new_from_xml)
 
 class Item(StanzaPayloadObject):
+    """An item of multi-item form data (e.g. a search result).
+
+    Additionally to the direct access to the contained fields via the `fields` attribute,
+    `Item` object provides an iterator and mapping interface for field access. E.g.::
+
+    for field in item:
+        ...
+
+    or::
+
+    field = item['field_name']
+
+    :Ivariables:
+        - `fields`: the fields of the item.
+    :Types:
+        - `fields`: `list` of `Field`.
+    """
     xml_element_name = "item"
     xml_element_namespace = "jabber:x:data"
-    def __init__(self, fields):
-	self.fields = list(fields)
+    
+    def __init__(self, fields = None):
+        """Initialize an `Item` object.
+
+        :Parameters:
+            - `fields`: item fields.
+        :Types:
+            - `fields`: `list` of `Field`.
+        """
+        if fields is None:
+            self.fields = []
+        else:
+            self.fields = list(fields)
 
     def __getitem__(self, name_or_index):
         if isinstance(name_or_index, int):
@@ -272,10 +350,38 @@ class Item(StanzaPayloadObject):
         for field in self.fields:
             yield field
 
-    def add_field(self, name = None, values = None, field_type = None, label = None, options = None):
-	field = Field(name, values, field_type, label, options)
-	self.fields.append(field)
-	return field
+    def add_field(self, name = None, values = None, field_type = None, 
+            label = None, options = None, required = False, desc = None, value = None):
+        """Add a field to the item.
+
+        :Parameters:
+            - `name`: field name.
+            - `values`: raw field values. Not to be used together with `value`.
+            - `field_type`: field type.
+            - `label`: field label.
+            - `options`: optional values for the field.
+            - `required`: `True` if the field is required.
+            - `desc`: natural-language description of the field.
+            - `value`: field value or values in a field_type-specific type. May be used only
+              if `values` parameter is not provided.
+        :Types:
+            - `name`: `unicode`
+            - `values`: `list` of `unicode`
+            - `field_type`: `str`
+            - `label`: `unicode`
+            - `options`: `list` of `Option`
+            - `required`: `bool`
+            - `desc`: `unicode`
+            - `value`: `bool` for "boolean" field, `JID` for "jid-single", `list` of `JID`
+              for "jid-multi", `list` of `unicode` for "list-multi" and "text-multi"
+              and `unicode` for other field types.
+
+        :return: the field added.
+        :returntype: `Field`
+        """
+        field = Field(name, values, field_type, label, options, required, desc, value)
+        self.fields.append(field)
+        return field
 
     def complete_xml_element(self, xmlnode, doc):
         """Complete the XML node with `self` content.
@@ -287,26 +393,81 @@ class Item(StanzaPayloadObject):
         :Types:
             - `xmlnode`: `libxml.xmlNode`
             - `doc`: `libxml.xmlDoc"""
-	for field in self.fields:
-	    field.as_xml(xmlnode, doc)
+        for field in self.fields:
+            field.as_xml(xmlnode, doc)
+
     def _new_from_xml(cls, xmlnode):
+        """Create a new `Item` object from an XML element.
+
+        :Parameters:
+            - `xmlnode`: the XML element.
+        :Types:
+            - `xmlnode`: `libxml2.xmlNode`
+
+        :return: the object created.
+        :returntype: `Item`
+        """
         child = xmlnode.children
         fields = []
         while child:
             if child.type != "element" or child.ns().content != "jabber:x:data":
                 pass
-	    elif child.name == "field":
+            elif child.name == "field":
                 fields.append(Field._new_from_xml(child))
-	    child = child.next
+            child = child.next
         return cls(fields)
     _new_from_xml = classmethod(_new_from_xml)
 
 class Form(StanzaPayloadObject):
+    """A JEP-0004 compliant data form.
+
+    Additionally to the direct access to the contained fields via the `fields` attribute,
+    `Form` object provides an iterator and mapping interface for field access. E.g.::
+
+    for field in form:
+        ...
+
+    or::
+
+    field = form['field_name']
+
+    :Ivariables:
+        - `type`: form type ("form", "submit", "cancel" or "result").
+        - `title`: form title.
+        - `instructions`: instructions for a form user.
+        - `fields`: the fields in the form.
+        - `reported_fields`: list of fields returned in a multi-item data form.
+        - `items`: items in a multi-item data form.
+    :Types:
+        - `title`: `unicode`
+        - `instructions`: `unicode`
+        - `fields`: `list` of `Field`
+        - `reported_fields`: `list` of `Field`
+        - `items`: `list` of `Item`
+    """
     allowed_types = ("form", "submit", "cancel", "result")
     xml_element_name = "x"
     xml_element_namespace = "jabber:x:data"
+    
     def __init__(self, xmlnode_or_type = "form", title = None, instructions = None,
             fields = None, reported_fields = None, items = None):
+        """Initialize a `Form` object.
+
+        :Parameters:
+            - `xmlnode_or_type`: XML element to parse or a form title.
+            - `title`: form title.
+            - `instructions`: instructions for the form.
+            - `fields`: form fields.
+            - `reported_fields`: fields reported in multi-item data.
+            - `items`: items of multi-item data.
+        :Types:
+            - `xmlnode_or_type`: `libxml2.xmlNode` or `str`
+            - `title`: `unicode`
+            - `instructions`: `unicode`
+            - `fields`: `list` of `Field`
+            - `reported_fields`: `list` of `Field`
+            - `items`: `list` of `Item`
+        """
         if isinstance(xmlnode_or_type, libxml2.xmlNode):
             self.__from_xml(xmlnode_or_type)
         elif xmlnode_or_type not in self.allowed_types:
@@ -337,7 +498,7 @@ class Form(StanzaPayloadObject):
         raise KeyError, name_or_index
 
     def __contains__(self, name):
-        for f in fields:
+        for f in self.fields:
             if f.name == name:
                 return True
         return False
@@ -346,12 +507,50 @@ class Form(StanzaPayloadObject):
         for field in self.fields:
             yield field
 
-    def add_field(self, name = None, values = None, field_type = None, label = None, options = None, required = False, desc = None):
-	field = Field(name, values, field_type, label, options, required, desc)
-	self.fields.append(field)
-	return field
+    def add_field(self, name = None, values = None, field_type = None,
+            label = None, options = None, required = False, desc = None, value = None):
+        """Add a field to the form.
 
-    def add_item(self, fields):
+        :Parameters:
+            - `name`: field name.
+            - `values`: raw field values. Not to be used together with `value`.
+            - `field_type`: field type.
+            - `label`: field label.
+            - `options`: optional values for the field.
+            - `required`: `True` if the field is required.
+            - `desc`: natural-language description of the field.
+            - `value`: field value or values in a field_type-specific type. May be used only
+              if `values` parameter is not provided.
+        :Types:
+            - `name`: `unicode`
+            - `values`: `list` of `unicode`
+            - `field_type`: `str`
+            - `label`: `unicode`
+            - `options`: `list` of `Option`
+            - `required`: `bool`
+            - `desc`: `unicode`
+            - `value`: `bool` for "boolean" field, `JID` for "jid-single", `list` of `JID`
+              for "jid-multi", `list` of `unicode` for "list-multi" and "text-multi"
+              and `unicode` for other field types.
+
+        :return: the field added.
+        :returntype: `Field`
+        """
+        field = Field(name, values, field_type, label, options, required, desc, value)
+        self.fields.append(field)
+        return field
+
+    def add_item(self, fields = None):
+        """Add and item to the form.
+
+        :Parameters:
+            - `fields`: fields of the item (they may be added later).
+        :Types:
+            - `fields`: `list` of `Field`
+
+        :return: the item added.
+        :returntype: `Item`
+        """
         item = Item(fields)
         self.items.append(item)
         return item
@@ -372,22 +571,29 @@ class Form(StanzaPayloadObject):
         if self.type == "cancel":
             return
         ns = xmlnode.ns()
-	if self.title is not None:
-	    xmlnode.newTextChild(ns, "title", self.title)
-	if self.instructions is not None:
-	    xmlnode.newTextChild(ns, "instructions", self.instructions)
-	for field in self.fields:
-	    field.as_xml(xmlnode, doc)
+        if self.title is not None:
+            xmlnode.newTextChild(ns, "title", self.title)
+        if self.instructions is not None:
+            xmlnode.newTextChild(ns, "instructions", self.instructions)
+        for field in self.fields:
+            field.as_xml(xmlnode, doc)
         if self.type != "result":
             return
         if self.reported_fields:
-	    Textreported = node.newChild(ns, "reported", None)
+            reported = xmlnode.newChild(ns, "reported", None)
             for field in self.reported_fields:
                 field.as_xml(reported, doc)
-	for items in self.items:
-	    item.as_xml(xmlnode, doc)
+        for item in self.items:
+            item.as_xml(xmlnode, doc)
 
     def __from_xml(self, xmlnode):
+        """Initialize a `Form` object from an XML element.
+
+        :Parameters:
+            - `xmlnode`: the XML element.
+        :Types:
+            - `xmlnode`: `libxml2.xmlNode`
+        """
         self.fields = []
         self.reported_fields = []
         self.items = []
@@ -403,23 +609,29 @@ class Form(StanzaPayloadObject):
         while child:
             if child.type != "element" or child.ns().content != "jabber:x:data":
                 pass
-	    elif child.name == "title":
+            elif child.name == "title":
                 self.title = from_utf8(child.getContent())
-	    elif child.name == "instructions":
+            elif child.name == "instructions":
                 self.instructions = from_utf8(child.getContent())
-	    elif child.name == "field":
+            elif child.name == "field":
                 self.fields.append(Field._new_from_xml(child))
             elif child.name == "item":
                 self.items.append(Item._new_from_xml(child))
             elif child.name == "reported":
                 self.__get_reported(child)
-	    child = child.next
+            child = child.next
 
     def __get_reported(self, xmlnode):
+        """Parse the <reported/> element of the form.
+        
+        :Parameters:
+            - `xmlnode`: the element to parse.
+        :Types:
+            - `xmlnode`: `libxml2.xmlNode`"""
         child = xmlnode.children
         while child:
             if child.type != "element" or child.ns().content != "jabber:x:data":
                 pass
-	    elif child.name == "field":
+            elif child.name == "field":
                 self.reported_fields.append(Field._new_from_xml(child))
-	    child = child.next
+            child = child.next

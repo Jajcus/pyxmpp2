@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -14,6 +14,7 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+# pylint: disable-msg=W0221
 
 """Client stream handling.
 
@@ -101,6 +102,8 @@ class ClientStream(Stream):
         self.password=password
         self.auth_methods=auth_methods
         self.my_jid=jid
+        self.me = None
+        self._auth_methods_left = None
         self.__logger=logging.getLogger("pyxmpp.ClientStream")
 
     def _reset(self):
@@ -241,7 +244,7 @@ class ClientStream(Stream):
         self.send(r)
         r.free()
 
-    def get_password(self,username,realm=None,acceptable_formats=("plain",)):
+    def get_password(self, username, realm=None, acceptable_formats=("plain",)):
         """Get a user password for the SASL authentication.
 
         :Parameters:
@@ -255,6 +258,7 @@ class ClientStream(Stream):
 
         :return: The password and the format name ('plain').
         :returntype: (`unicode`,`str`)"""
+        _unused = realm
         if self.initiator and self.my_jid.node==username and "plain" in acceptable_formats:
             return self.password,"plain"
         else:

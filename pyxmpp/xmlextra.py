@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -14,6 +14,7 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+# pylint: disable-msg=C0103, W0132, W0611
 
 """Extension to libxml2 for XMPP stream and stanza processing"""
 
@@ -77,7 +78,7 @@ class StreamHandler:
             - `doc`: `libxml2.xmlDoc`"""
         print >>sys.stderr,"Unhandled stream end",`doc.serialize()`
     
-    def stanza(self,doc,node):
+    def stanza(self, _unused, node):
         """Called when the end tag of a direct child of the root
         element is encountered in the stream.
 
@@ -86,10 +87,10 @@ class StreamHandler:
         that a copy must be made before the method returns.
 
         :Parameters:
-            - `doc`: the document being parsed.
+            - `_unused`: the document being parsed.
             - `node`: the (complete) element being processed
         :Types:
-            - `doc`: `libxml2.xmlDoc`
+            - `_unused`: `libxml2.xmlDoc`
             - `node`: `libxml2.xmlNode`"""
         print >>sys.stderr,"Unhandled stanza",`node.serialize()`
         
@@ -149,9 +150,11 @@ except ImportError:
 # Pure python implementation (slow workarounds for libxml2 limitations) 
 #-----------------------------------------------------------------------
     class error(Exception):
+        """Exception raised on a stream parse error."""
         pass
 
     def _escape(data):
+        """Escape data for XML"""
         data=data.replace("&","&amp;")
         data=data.replace("<","&lt;")
         data=data.replace(">","&gt;")
@@ -160,7 +163,15 @@ except ImportError:
         return data
 
     class _SAXCallback(libxml2.SAXCallback):
+        """SAX events handler for the python-only stream parser."""
         def __init__(self, handler):
+            """Initialize the SAX handler.
+
+            :Parameters:
+                - `handler`: Object to handle stream start, end and stanzas.
+            :Types:
+                - `handler`: `StreamHandler`
+            """
             self._handler = handler 
             self._head = ""
             self._tail = ""
@@ -170,20 +181,25 @@ except ImportError:
             self._root = None
             
         def cdataBlock(self, data):
+            ""
             if self._level>1:
                 self._current += _escape(data)
 
         def characters(self, data):
+            ""
             if self._level>1:
                 self._current += _escape(data)
 
         def comment(self, content):
+            ""
             pass
 
         def endDocument(self):
+            ""
             pass
 
         def endElement(self, tag):
+            ""
             self._current+="</%s>" % (tag,)
             self._level -= 1
             if self._level > 1:
@@ -218,6 +234,7 @@ except ImportError:
                     doc.freeDoc()
 
         def error(self, msg):
+            ""
             self._handler.error(msg)
 
         fatalError = error
@@ -225,12 +242,15 @@ except ImportError:
         ignorableWhitespace = characters
 
         def reference(self, name):
+            ""
             self._current += "&" + name + ";"
 
         def startDocument(self):
+            ""
             pass
 
         def startElement(self, tag, attrs):
+            ""
             s = "<"+tag
             if attrs:
                 for a,v in attrs.items():
@@ -250,20 +270,42 @@ except ImportError:
             self._level += 1
 
         def warning(self):
+            ""
             pass
 
     class _PythonReader:
+        """Python-only stream reader."""
         def __init__(self,handler):
+            """Initialize the reader.
+
+            :Parameters:
+                - `handler`: Object to handle stream start, end and stanzas.
+            :Types:
+                - `handler`: `StreamHandler`
+            """
             self.handler = handler
             self.sax = _SAXCallback(handler)
             self.parser = libxml2.createPushParser(self.sax, '', 0, 'stream')
 
         def feed(self, data):
+            """Feed the parser with a chunk of data. Apropriate methods
+            of `self.handler` will be called whenever something interesting is
+            found.
+            
+            :Parameters:
+                - `data`: the chunk of data to parse.
+            :Types:
+                - `data`: `str`"""
             return self.parser.parseChunk(data, len(data), 0)
         
     _create_reader = _PythonReader
 
     def _get_ns(node):
+        """Get namespace of node.
+
+        :return: the namespace object or `None` if the node has no namespace
+        assigned.
+        :returntype: `libxml2.xmlNs`"""
         try:
             return node.ns()
         except libxml2.treeError:
@@ -285,8 +327,6 @@ except ImportError:
 
         old_ns_uri = old_ns.content
         old_ns_prefix = old_ns.name
-        new_ns_uri = new_ns.content
-        new_ns_prefix = new_ns.name
 
         ns = _get_ns(node)
         if ns and ns.content == old_ns_uri and ns.name == old_ns_prefix:

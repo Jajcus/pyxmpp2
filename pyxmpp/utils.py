@@ -25,7 +25,6 @@ import sys
 if sys.hexversion<0x02030000:
     raise ImportError,"Python 2.3 or newer is required"
 
-from types import UnicodeType,StringType
 import re
 import libxml2
 import time
@@ -38,7 +37,7 @@ def to_utf8(s):
     """
     if s is None:
         return None
-    elif type(s) is UnicodeType:
+    elif type(s) is unicode:
         return s.encode("utf-8")
     else:
         return str(s)
@@ -51,9 +50,9 @@ def from_utf8(s):
     """
     if s is None:
         return None
-    elif type(s) is UnicodeType:
+    elif type(s) is unicode:
         return s
-    elif type(s) is StringType:
+    elif type(s) is str:
         return unicode(s,"utf-8")
     else:
         return unicode(s)
@@ -62,7 +61,7 @@ evil_characters_re=re.compile(r"[\000-\010\013\014\016-\037]",re.UNICODE)
 utf8_replacement_char=u"\ufffd".encode("utf-8")
 def remove_evil_characters(s):
     """Remove control characters (not allowed in XML) from a string."""
-    if type(s) is UnicodeType:
+    if type(s) is unicode:
         return evil_characters_re.sub(u"\ufffd",s)
     else:
         return evil_characters_re.sub(utf8_replacement_char,s)

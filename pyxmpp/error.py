@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -26,7 +26,6 @@ __revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import libxml2
-from types import StringType,UnicodeType
 
 from pyxmpp.utils import from_utf8, to_utf8
 from pyxmpp.xmlextra import common_doc, common_root, common_ns
@@ -199,7 +198,7 @@ class ErrorNode:
             - `ns`: `unicode`
             - `copy`: `bool`
             - `parent`: `libxml2.xmlNode`"""
-        if type(xmlnode_or_cond) is StringType:
+        if type(xmlnode_or_cond) is str:
             xmlnode_or_cond=unicode(xmlnode_or_cond,"utf-8")
         self.xmlnode=None
         self.borrowed=0
@@ -447,9 +446,9 @@ class StreamErrorNode(ErrorNode):
             - `xmlnode_or_cond`: `libxml2.xmlNode` or `unicode`
             - `copy`: `bool`
             - `parent`: `libxml2.xmlNode`"""
-        if type(xmlnode_or_cond) is StringType:
+        if type(xmlnode_or_cond) is str:
             xmlnode_or_cond=unicode(xmlnode_or_cond,"utf-8")
-        if type(xmlnode_or_cond) is UnicodeType:
+        if type(xmlnode_or_cond) is unicode:
             if not stream_errors.has_key(xmlnode_or_cond):
                 raise ErrorNodeError,"Bad error condition"
         ErrorNode.__init__(self,xmlnode_or_cond,STREAM_ERROR_NS,copy=copy,parent=parent)
@@ -488,15 +487,15 @@ class StanzaErrorNode(ErrorNode):
             - `error_type`: `unicode`
             - `copy`: `bool`
             - `parent`: `libxml2.xmlNode`"""
-        if type(xmlnode_or_cond) is StringType:
+        if type(xmlnode_or_cond) is str:
             xmlnode_or_cond=unicode(xmlnode_or_cond,"utf-8")
-        if type(xmlnode_or_cond) is UnicodeType:
+        if type(xmlnode_or_cond) is unicode:
             if not stanza_errors.has_key(xmlnode_or_cond):
                 raise ErrorNodeError,"Bad error condition"
 
         ErrorNode.__init__(self,xmlnode_or_cond,STANZA_ERROR_NS,copy=copy,parent=parent)
 
-        if type(xmlnode_or_cond) is UnicodeType:
+        if type(xmlnode_or_cond) is unicode:
             if error_type is None:
                 error_type=stanza_errors[xmlnode_or_cond][1]
             self.xmlnode.setProp("type",to_utf8(error_type))

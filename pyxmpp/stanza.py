@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -30,7 +30,7 @@ import random
 from pyxmpp import xmlextra
 from pyxmpp.utils import from_utf8,to_utf8
 from pyxmpp.jid import JID
-from pyxmpp.xmlextra import common_doc, common_root, common_ns, COMMON_NS
+from pyxmpp.xmlextra import common_doc, common_ns, COMMON_NS
 
 class StanzaError(ValueError):
     """Raised on ivalid stanza objects usage."""

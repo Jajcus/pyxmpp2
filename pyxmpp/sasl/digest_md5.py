@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -26,7 +26,6 @@ __docformat__="restructuredtext en"
 from binascii import b2a_hex
 import re
 import md5
-from types import UnicodeType
 import logging
 
 from pyxmpp.sasl.core import ClientAuthenticator,ServerAuthenticator
@@ -111,7 +110,7 @@ def _make_urp_hash(username,realm,passwd):
     :returntype: `str`"""
     if realm is None:
         realm=""
-    if type(passwd) is UnicodeType:
+    if type(passwd) is unicode:
         passwd=passwd.encode("utf-8")
     return _h_value("%s:%s:%s" % (username,realm,passwd))
 
@@ -392,7 +391,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         else:
             realm=self.password_manager.choose_realm([])
         if realm:
-            if type(realm) is UnicodeType:
+            if type(realm) is unicode:
                 try:
                     realm=realm.encode(charset)
                 except UnicodeError:
@@ -496,6 +495,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
+        _unused = response
         self.last_nonce_count=0
         params=[]
         realms=self.password_manager.get_realms()

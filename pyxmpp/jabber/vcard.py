@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -14,6 +14,7 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+# pylint: disable-msg=W0302
 """Jabber vCard and MIME (RFC 2426) vCard implementation.
 
 Normative reference:
@@ -30,7 +31,6 @@ import base64
 import binascii
 import libxml2
 import re
-import types
 
 import pyxmpp.jid
 from pyxmpp.utils import to_utf8,from_utf8,get_node_ns
@@ -64,12 +64,12 @@ def rfc2425encode(name,value,parameters=None,charset="utf-8"):
     :returntype: `str`"""
     if not parameters:
         parameters={}
-    if type(value) is types.UnicodeType:
+    if type(value) is unicode:
         value=value.replace(u"\r\n",u"\\n")
         value=value.replace(u"\n",u"\\n")
         value=value.replace(u"\r",u"\\n")
         value=value.encode(charset,"replace")
-    elif type(value) is not types.StringType:
+    elif type(value) is not str:
         raise TypeError,"Bad type for rfc2425 value"
     elif not valid_string_re.match(value):
         parameters["encoding"]="b"
@@ -128,6 +128,7 @@ class VCardString(VCardField):
             - `name`: `str`
             - `value`: `str` or `libxml2.xmlNode`
             - `rfc2425parameters`: `dict`"""
+        _unused = rfc2425parameters
         VCardField.__init__(self,name)
         if isinstance(value,libxml2.xmlNode):
             value=value.getContent()
@@ -198,6 +199,7 @@ class VCardJID(VCardField):
             - `name`: `str`
             - `value`: `str` or `libxml2.xmlNode`
             - `rfc2425parameters`: `dict`"""
+        _unused = rfc2425parameters
         VCardField.__init__(self,name)
         if isinstance(value,libxml2.xmlNode):
             self.value=pyxmpp.jid.JID(value.getContent())
@@ -255,6 +257,7 @@ class VCardName(VCardField):
             - `name`: `str`
             - `value`: `str` or `libxml2.xmlNode`
             - `rfc2425parameters`: `dict`"""
+        _unused = rfc2425parameters
         VCardField.__init__(self,name)
         if self.name.upper()!="N":
             raise RuntimeError,"VCardName handles only 'N' type"
@@ -823,6 +826,7 @@ class VCardGeo(VCardField):
             - `name`: `str`
             - `value`: `str` or `libxml2.xmlNode`
             - `rfc2425parameters`: `dict`"""
+        _unused = rfc2425parameters
         VCardField.__init__(self,name)
         if self.name.upper()!="GEO":
             raise RuntimeError,"VCardName handles only 'GEO' type"
@@ -890,6 +894,7 @@ class VCardOrg(VCardField):
             - `name`: `str`
             - `value`: `str` or `libxml2.xmlNode`
             - `rfc2425parameters`: `dict`"""
+        _unused = rfc2425parameters
         VCardField.__init__(self,name)
         if self.name.upper()!="ORG":
             raise RuntimeError,"VCardName handles only 'ORG' type"
@@ -962,6 +967,7 @@ class VCardCategories(VCardField):
             - `name`: `str`
             - `value`: `str` or `libxml2.xmlNode`
             - `rfc2425parameters`: `dict`"""
+        _unused = rfc2425parameters
         VCardField.__init__(self,name)
         self.name=name
         if self.name.upper()!="CATEGORIES":
@@ -1114,6 +1120,7 @@ class VCardPrivacy(VCardField):
             - `name`: `str`
             - `value`: `str` or `libxml2.xmlNode`
             - `rfc2425parameters`: `dict`"""
+        _unused = rfc2425parameters
         VCardField.__init__(self,name)
         if isinstance(value,libxml2.xmlNode):
             self.value=None
@@ -1315,7 +1322,7 @@ class VCard(StanzaPayloadObject):
             "TITLE": (VCardString,"multi"),
             "ROLE": (VCardString,"multi"),
             "LOGO": (VCardImage,"multi"),
-            "AGENT": ("VCardAgent","ignore"), #FIXME#
+            "AGENT": ("VCardAgent","ignore"), #FIXME: agent field
             "ORG": (VCardOrg,"multi"),
             "CATEGORIES": (VCardCategories,"multi"),
             "NOTE": (VCardString,"multi"),
@@ -1337,6 +1344,11 @@ class VCard(StanzaPayloadObject):
             - `data`: vcard to parse.
         :Types:
             - `data`: `libxml2.xmlNode`, `unicode` or `str`"""
+
+        # to make pylint happy
+        self.n = None
+        del self.n
+        
         self.content={}
         if isinstance(data,libxml2.xmlNode):
             self.__from_xml(data)
@@ -1354,7 +1366,7 @@ class VCard(StanzaPayloadObject):
             self.content["N"]=VCardName("N",s)
         elif not self.content.get("FN") and self.content.get("N"):
             self.__make_fn()
-        for c,(cl,tp) in self.components.items():
+        for c, (_unused, tp) in self.components.items():
             if self.content.has_key(c):
                 continue
             if tp=="required":
@@ -1507,10 +1519,10 @@ class VCard(StanzaPayloadObject):
         :returntype: `str`"""
         ret="begin:VCARD\r\n"
         ret+="version:3.0\r\n"
-        for name,value in self.content.items():
+        for _unused, value in self.content.items():
             if value is None:
                 continue
-            if type(value) is types.ListType:
+            if type(value) is list:
                 for v in value:
                     ret+=v.rfc2426()
             else:
@@ -1518,7 +1530,7 @@ class VCard(StanzaPayloadObject):
                 ret+=v
         return ret+"end:VCARD\r\n"
 
-    def complete_xml_element(self, xmlnode, doc):
+    def complete_xml_element(self, xmlnode, _unused):
         """Complete the XML node with `self` content.
 
         Should be overriden in classes derived from `StanzaPayloadElement`.
@@ -1528,12 +1540,12 @@ class VCard(StanzaPayloadObject):
               right name and namespace, but no attributes or content.
             - `doc`: document to which the element belongs.
         :Types:
-            - `xmlnode`: `libxml.xmlNode`
-            - `doc`: `libxml.xmlDoc"""
-        for name,value in self.content.items():
+            - `_unused`: `libxml.xmlNode`
+            - `_unused`: `libxml.xmlDoc"""
+        for _unused1, value in self.content.items():
             if value is None:
                 continue
-            if type(value) is types.ListType:
+            if type(value) is list:
                 for v in value:
                     v.as_xml(xmlnode)
             else:
