@@ -33,21 +33,59 @@ from pyxmpp.jabber.clientstream import LegacyClientStream
 from pyxmpp.jabber.disco import DISCO_ITEMS_NS,DISCO_INFO_NS,DiscoInfo,DiscoItems,DiscoIdentity
 from pyxmpp.client import Client
 from pyxmpp.stanza import Stanza
+from pyxmpp.utils import from_utf8
 
 class JabberClient(Client):
+    """Base class for a Jabber client.
+    
+    :Ivariables:
+        - `disco_items`: default Disco#items reply for a query to an empty node.
+        - `disco_info`: default Disco#ifo reply for a query to an empty node
+            -- provides information about the client and its supported fetures.
+        - `disco_identity`: default identity of the default `disco_info`.
+    :Types:
+        - `disco_items`: `DiscoItems`
+        - `disco_info`: `DiscoInfo`
+    """
     def __init__(self,jid=None,password=None,server=None,port=5222,
-            auth_methods=["sasl:DIGEST-MD5","digest"],
+            auth_methods=("sasl:DIGEST-MD5","digest"),
             tls_settings=None,keepalive=0):
+        """Initialize a JabberClient object.
+
+        :Parameters:
+            - `jid`: user full JID for the connection.
+            - `password`: user password.
+            - `server`: server to use. If not given then address will be derived form the JID.
+            - `port`: port number to use. If not given then address will be derived form the JID.
+            - `auth_methods`: sallowed authentication methods. SASL authentication mechanisms
+              in the list should be prefixed with "sasl:" string.
+            - `tls_settings`: settings for StartTLS -- `TLSSettings` instance.
+            - `keepalive`: keepalive output interval. 0 to disable.
+        :Types:
+            - `jid`: `pyxmpp.JID`
+            - `password`: `unicode`
+            - `server`: `unicode`
+            - `port`: `int`
+            - `auth_methods`: sequence of `str`
+            - `tls_settings`: `pyxmpp.TLSSettings`
+            - `keepalive`: `int`
+        """
 
         Client.__init__(self,jid,password,server,port,auth_methods,tls_settings,keepalive)
         self.stream_class=LegacyClientStream
         self.disco_items=None
         self.disco_info=None
+        self.disco_identity=None
         self.__logger=logging.getLogger("pyxmpp.jabber.JabberClient")
 
 # public methods
 
-    def connect(self,register=0):
+    def connect(self,register=False):
+        """Connect to the server and set up the stream.
+
+        Set `self.stream` and notify `self.state_changed` when connection
+        succeeds. Additionally, initialize Disco items and info of the client.
+        """
         Client.connect(self)
         self.disco_items=DiscoItems()
         self.disco_info=DiscoInfo()
@@ -57,6 +95,14 @@ class JabberClient(Client):
 
 # private methods
     def __disco_info(self,iq):
+        """Handle a disco#info request.
+
+        `self.disco_get_info` method will be used to prepare the query response.
+        
+        :Parameters:
+            - `iq`: the IQ stanza received.
+        :Types:
+            - `iq`: `pyxmpp.Iq`"""
         q=iq.get_query()
         if q.hasProp("node"):
             node=from_utf8(q.prop("node"))
@@ -68,7 +114,7 @@ class JabberClient(Client):
             self.__logger.debug("Disco-info query: %s preparing response: %s with reply: %s"
                 % (iq.serialize(),resp.serialize(),info.xmlnode.serialize()))
             resp.set_content(info.xmlnode.copyNode(1))
-        elif isinstance(info,stanza):
+        elif isinstance(info,Stanza):
             resp=info
         else:
             resp=iq.make_error_response("item-not-found")
@@ -76,6 +122,14 @@ class JabberClient(Client):
         self.stream.send(resp)
 
     def __disco_items(self,iq):
+        """Handle a disco#items request.
+
+        `self.disco_get_items` method will be used to prepare the query response.
+        
+        :Parameters:
+            - `iq`: the IQ stanza received.
+        :Types:
+            - `iq`: `pyxmpp.Iq`"""
         q=iq.get_query()
         if q.hasProp("node"):
             node=from_utf8(q.prop("node"))
@@ -97,11 +151,24 @@ class JabberClient(Client):
 # methods to override
 
     def authorized(self):
+        """Handle "authorized" event. May be overriden in derived classes.
+        By default: request an IM session and setup Disco handlers."""
         Client.authorized(self)
         self.stream.set_iq_get_handler("query",DISCO_ITEMS_NS,self.__disco_items)
         self.stream.set_iq_get_handler("query",DISCO_INFO_NS,self.__disco_info)
 
     def disco_get_info(self,node,iq):
+        """Return Disco#info data for a node.
+
+        :Parameters:
+            - `node`: the node queried.
+            - `iq`: the request stanza received.
+        :Types:
+            - `node`: `unicode`
+            - `iq`: `pyxmpp.Iq`
+
+        :return: self.disco_info if `node` is empty or `None` otherwise.
+        :returntype: `DiscoInfo`"""
         to=iq.get_to()
         if to and to!=self.jid:
             return iq.make_error_response("recipient-unavailable")
@@ -110,6 +177,17 @@ class JabberClient(Client):
         return None
 
     def disco_get_items(self,node,iq):
+        """Return Disco#items data for a node.
+
+        :Parameters:
+            - `node`: the node queried.
+            - `iq`: the request stanza received.
+        :Types:
+            - `node`: `unicode`
+            - `iq`: `pyxmpp.Iq`
+
+        :return: self.disco_info if `node` is empty or `None` otherwise.
+        :returntype: `DiscoInfo`"""
         to=iq.get_to()
         if to and to!=self.jid:
             return iq.make_error_response("recipient-unavailable")

@@ -25,6 +25,7 @@ IGNORE="${IGNORE}\\|W0613:[^:]*:ServerAuthenticator.*\\('initial_response'\\|'re
 IGNORE="${IGNORE}\\|W0613:[^:]*:DigestMD5ServerAuthenticator.start.*'response'"
 IGNORE="${IGNORE}\\|W0613:[^:]*:MucRoomState.set_stream.*'stream'"
 IGNORE="${IGNORE}\\|W0613:[^:]*:LegacyClientStream.*'\\(stanza\\|resource\\)'"
+IGNORE="${IGNORE}\\|W0613:[^:]*:JabberClient\\.connect.*'register'"
 IGNORE="${IGNORE}\\|W0612:[^:]*:\\(StreamBase._connect.*'canonname'\\|StreamBase._loop_iter.*'ofd'\\)"
 IGNORE="${IGNORE}\\|W0612:[^:]*:\\(parse_message:.*'i'\\|do_query:.*'canonname'\\)"
 IGNORE="${IGNORE}\\|W0201:[^:]*:\\([^.]*\\._reset\\|ClientStream.*'me'\\)"

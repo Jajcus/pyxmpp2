@@ -41,7 +41,7 @@ class FatalClientError(ClientError):
     pass
 
 class Client:
-    """Base class for XMPP-IM client.
+    """Base class for an XMPP-IM client.
 
     This class does not provide any JSF extensions to the XMPP protocol,
     including legacy authentication methods.
@@ -81,7 +81,26 @@ class Client:
     def __init__(self,jid=None,password=None,server=None,port=5222,
             auth_methods=("sasl:DIGEST-MD5",),
             tls_settings=None,keepalive=0):
+        """Initialize a Client object.
 
+        :Parameters:
+            - `jid`: user full JID for the connection.
+            - `password`: user password.
+            - `server`: server to use. If not given then address will be derived form the JID.
+            - `port`: port number to use. If not given then address will be derived form the JID.
+            - `auth_methods`: sallowed authentication methods. SASL authentication mechanisms
+              in the list should be prefixed with "sasl:" string.
+            - `tls_settings`: settings for StartTLS -- `TLSSettings` instance.
+            - `keepalive`: keepalive output interval. 0 to disable.
+        :Types:
+            - `jid`: `pyxmpp.JID`
+            - `password`: `unicode`
+            - `server`: `unicode`
+            - `port`: `int`
+            - `auth_methods`: sequence of `str`
+            - `tls_settings`: `pyxmpp.TLSSettings`
+            - `keepalive`: `int`
+        """
         self.jid=jid
         self.password=password
         self.server=server
