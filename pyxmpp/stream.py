@@ -310,6 +310,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 				peer=JID(peer)
 			if self.peer:
 				if peer and peer!=self.peer:
+					self.debug("peer hostname mismatch:"
+						" %r != %r" % (peer,self.peer))
 					to_from_mismatch=1
 			else:
 				self.peer=peer
