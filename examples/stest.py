@@ -14,14 +14,8 @@ accounts={
 	};
 
 class Stream(ClientStream):
-	def __init__(self,jid,password=None,server=None,port=5222,
-			auth_methods=["sasl:DIGEST-MD5","digest"],
-			enable_tls=0,require_tls=0):
-		ClientStream.__init__(self,jid,password,server,port,auth_methods,
-								enable_tls,require_tls)
-		self.disconnect_time=time.time()+60
-
 	def post_auth(self):
+		self.disconnect_time=time.time()+60
 		m=Message(type="chat",to=self.peer,
 				body="You have authenticated with: %r" % (self.auth_method_used))
 		self.send(m)
@@ -29,12 +23,27 @@ class Stream(ClientStream):
 		self.send(m)
 		m=Message(type="chat",to=self.peer,body="Thank you for testing.")
 		self.send(m)
+		self.set_message_handler('chat',self.echo_message)
+		self.set_message_handler('normal',self.echo_message)
+
+	def echo_message(self,message):
+		typ=message.get_type()
+		body=message.get_body()
+		if not body:
+			return
+		body=u"ECHO: %s" % (body,)
+		subject=message.get_subject()
+		if subject:
+			subject=u"Re: %s" % (subject,)
+		m=Message(type=typ,to=self.peer,body=body,subject=subject)
+		self.send(m)
 
 	def idle(self):
 		ClientStream.idle(self)
+		if not self.peer_authenticated:
+			return
 		if time.time()>=self.disconnect_time:
-			m=Message(type="chat",to=self.peer,
-					body="Bye." % (self.auth_method_used))
+			m=Message(type="chat",to=self.peer,body="Bye.")
 			self.send(m)
 			self.disconnect()
 		

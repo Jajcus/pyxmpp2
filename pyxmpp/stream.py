@@ -154,7 +154,6 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def close(self):
 		self.disconnect()
 		if self.doc_in:
-			self.doc_in.freeDoc()
 			self.doc_in=None
 		if self.features:
 			self.features=None
@@ -208,8 +207,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		if self.doc_out:
 			self.send_stream_end()
 		if self.doc_in:
-			self.doc_in.freeDoc()
 			self.doc_in=None
+			self.reader=None
 			if self.features:
 				self.features=None
 		self.post_disconnect()
@@ -220,8 +219,6 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def stanza_end(self,doc,node):
 		print >>sys.stderr,"Got node:",`node.serialize()`
 		self.process_node(node)
-		node.unlinkNode()
-		node.freeNode()
 
 	def error(self,desc):
 		raise FatalStreamError,desc
@@ -318,15 +315,21 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 					self.debug("input timeout")
 					self.idle()
 			except (FatalStreamError,KeyboardInterrupt,SystemExit),e:
-				traceback.print_exc(file=sys.stderr)
-			except:
 				self.close()
 				raise
+			except:
+				traceback.print_exc(file=sys.stderr)
 
 	def read(self,fd):
+		if self.eof or not self.reader:
+			return
 		r=os.read(fd,1024)
 		self.debug("IN: %r" % (r,))
-		self.reader.feed(r)
+		if r:
+			self.reader.feed(r)
+		else:
+			self.eof=1
+			self.disconnect()
 
 	def process_node(self,node):
 		ns_uri=node.ns().getContent()

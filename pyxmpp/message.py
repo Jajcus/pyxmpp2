@@ -34,8 +34,8 @@ class Message(Stanza):
 		elif node is not None:
 			raise TypeError,"Couldn't make Message from %r" % (type(node),)
 	
-		if kw.has_key("type") and kw["type"] not in message_types:
-			raise StanzaError,"Invalid message type: %r" % (type,)
+		if kw.has_key("type") and kw["type"] and kw["type"] not in message_types:
+			raise StanzaError,"Invalid message type: %r" % (kw["type"],)
 
 		if kw.has_key("body"):
 			body=kw["body"]

@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# $Id: setup.py,v 1.3 2003/06/06 08:40:44 jajcus Exp $
+# $Id: setup.py,v 1.4 2003/06/06 10:15:24 jajcus Exp $
 
 from distutils.core import setup, Extension
 
@@ -21,13 +21,13 @@ setup(
 		    ],
 		    libraries =		['xml2'],
 		    include_dirs =	['libxml2addon','/usr/include/libxml2'],
+		    extra_compile_args = ['-g2'],
 		),
 
 	],
 	#-- Python modules
 	packages = [
                 'pyxmpp',
-		'pyxmpp.libxml2addon',
 		'pyxmpp.sasl',
 	],
 )

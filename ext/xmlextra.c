@@ -236,6 +236,10 @@ typedef struct _reader{
 	
 	startElementSAXFunc	startElement;
 	endElementSAXFunc	endElement;
+	charactersSAXFunc	characters;
+	cdataBlockSAXFunc	cdataBlock;
+	processingInstructionSAXFunc processingInstruction;
+	
 	errorSAXFunc		error;
 	fatalErrorSAXFunc	fatalError;
 
@@ -281,12 +285,41 @@ xmlNodePtr node;
 		if (obj==NULL) reader->exception=1;
 		else Py_DECREF(obj);
 	}
-	else if (ctxt->nodeNr==1){
+	else if (ctxt->nodeNr==1 && node){
 		obj=PyObject_CallMethod(reader->handler,"_stanza_end","OO",
 					libxml_xmlDocPtrWrap(ctxt->myDoc),
 					libxml_xmlNodePtrWrap(node));
 		if (obj==NULL) reader->exception=1;
 		else Py_DECREF(obj);
+		xmlUnlinkNode(node);
+		xmlFreeNode(node);
+	}
+}
+
+void myCharacters(void *ctx,const xmlChar *ch,int len){
+xmlParserCtxtPtr ctxt=(xmlParserCtxtPtr) ctx;
+ReaderObject *reader=(ReaderObject *)ctxt->_private;
+
+	if (ctxt->nodeNr>1){
+		reader->characters(ctx,ch,len);
+	}
+}
+
+void myCdataBlock(void *ctx,const xmlChar *value,int len){
+xmlParserCtxtPtr ctxt=(xmlParserCtxtPtr) ctx;
+ReaderObject *reader=(ReaderObject *)ctxt->_private;
+
+	if (ctxt->nodeNr>1){
+		reader->cdataBlock(ctx,value,len);
+	}
+}
+
+void myProcessingInstruction(void *ctx,const xmlChar *target,const xmlChar *data){
+xmlParserCtxtPtr ctxt=(xmlParserCtxtPtr) ctx;
+ReaderObject *reader=(ReaderObject *)ctxt->_private;
+
+	if (ctxt->nodeNr==0){
+		reader->processingInstruction(ctx,target,data);
 	}
 }
 
@@ -338,6 +371,8 @@ PyObject *handler;
 	if (reader==NULL) return NULL;
 
 	memcpy(&reader->sax,&xmlDefaultSAXHandler,sizeof(xmlSAXHandler));
+
+	/* custom handlers */
 	reader->startElement=reader->sax.startElement;
 	reader->sax.startElement=myStartElement;
 	reader->endElement=reader->sax.endElement;
@@ -346,9 +381,30 @@ PyObject *handler;
 	reader->sax.error=myError;
 	reader->fatalError=reader->sax.fatalError;
 	reader->sax.fatalError=myFatalError;
+	
+	/* things processed only at specific levels */
+	reader->characters=reader->sax.characters;
+	reader->sax.characters=myCharacters;
+	reader->cdataBlock=reader->sax.cdataBlock;
+	reader->sax.cdataBlock=myCdataBlock;
+	reader->processingInstruction=reader->sax.processingInstruction;
+	reader->sax.processingInstruction=myProcessingInstruction;
+
+	/* unused in XMPP */
+	reader->sax.resolveEntity=NULL;
+	reader->sax.getEntity=NULL;
+	reader->sax.entityDecl=NULL;
+	reader->sax.notationDecl=NULL;
+	reader->sax.attributeDecl=NULL;
+	reader->sax.elementDecl=NULL;
+	reader->sax.unparsedEntityDecl=NULL;
+	reader->sax.comment=NULL;
+	reader->sax.externalSubset=NULL;
+	
 	reader->eof=0;
 	reader->exception=0;
 	reader->handler=handler;
+	Py_INCREF(handler);
 	
 	reader->ctxt=xmlCreatePushParserCtxt(&reader->sax,NULL,"",0,"test.xml");
 	reader->ctxt->_private=reader;
@@ -372,6 +428,8 @@ int ret;
 
 	if (!PyArg_ParseTuple(args, "s#", &str, &len)) return NULL;
 
+	reader->exception=0;
+
 	ret=xmlParseChunk(reader->ctxt,str,len,len==0);
 
 	if (reader->exception) return NULL;
@@ -381,7 +439,7 @@ int ret;
 		return Py_None;
 	}
 
-	PyErr_Format(MyError,"Parser error #%i",ret);
+	PyErr_Format(MyError,"Parser error #%d.",ret);
 	return NULL;
 }
 

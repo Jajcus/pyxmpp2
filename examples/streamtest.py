@@ -3,12 +3,15 @@
 import sys,os
 from pyxmpp import xmlextra
 
+
 h=xmlextra.StreamHandler()
-r=xmlextra.StreamReader(h)
-print dir(r.reader)
 
-while 1:
-	r.feed(os.read(sys.stdin.fileno(),100))
+for i in range(0,3):
+	r=xmlextra.StreamReader(h)
+	print dir(r.reader)
 
-del r
-
+	try:
+		while 1:
+			r.feed(os.read(sys.stdin.fileno(),100))
+	except:
+		print "Interrupted"
