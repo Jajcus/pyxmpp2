@@ -25,3 +25,4 @@ from presence import Presence
 from message import Message
 from jid import JID,JIDError
 from stanza import StanzaError
+# vi: sts=4 et sw=4

@@ -28,106 +28,107 @@ from pyxmpp.jid import JID
 from pyxmpp.utils import to_utf8,from_utf8
 
 class ComponentStreamError(StreamError):
-	pass
+        pass
 
 class FatalComponentStreamError(FatalStreamError):
-	pass
+        pass
 
 class LegacyAuthenticationError(StreamAuthenticationError):
-	pass
+        pass
 
 class ComponentStream(Stream):
-	def __init__(self,jid,secret,server,port,keepalive=0):
-		Stream.__init__(self,"jabber:component:accept",
-					sasl_mechanisms=[],
-					tls_settings=None,
-					keepalive=keepalive)
-		self.server=server
-		self.port=port
-		self.jid=jid
-		self.secret=secret
-		self.process_all_stanzas=1
-	
-	def _reset(self):
-		Stream._reset(self)
+        def __init__(self,jid,secret,server,port,keepalive=0):
+                Stream.__init__(self,"jabber:component:accept",
+                                        sasl_mechanisms=[],
+                                        tls_settings=None,
+                                        keepalive=keepalive)
+                self.server=server
+                self.port=port
+                self.jid=jid
+                self.secret=secret
+                self.process_all_stanzas=1
 
-	def connect(self,server=None,port=None):
-		self.lock.acquire()
-		try:
-			self._connect(server,port)
-		finally:
-			self.lock.release()
-		
-	def _connect(self,server=None,port=None):
-		if self.jid.node or self.jid.resource:
-			raise ComponentStreamError,"Component JID may have only domain defined"
-		if not server:
-			server=self.server
-		if not port:
-			port=self.port
-		if not server or not port:
-			raise ComponentStreamError,"Server or port not given"
-		Stream._connect(self,server,port,None,self.jid)
+        def _reset(self):
+                Stream._reset(self)
 
-	def accept(self,sock):
-		Stream.accept(self,sock,None)
+        def connect(self,server=None,port=None):
+                self.lock.acquire()
+                try:
+                        self._connect(server,port)
+                finally:
+                        self.lock.release()
 
-	def stream_start(self,doc):
-		try:
-			Stream.stream_start(self,doc)
-		except HostMismatch:
-			pass
+        def _connect(self,server=None,port=None):
+                if self.jid.node or self.jid.resource:
+                        raise ComponentStreamError,"Component JID may have only domain defined"
+                if not server:
+                        server=self.server
+                if not port:
+                        port=self.port
+                if not server or not port:
+                        raise ComponentStreamError,"Server or port not given"
+                Stream._connect(self,server,port,None,self.jid)
 
-	def _post_connect(self):
-		if self.initiator:
-			self._auth()
+        def accept(self,sock):
+                Stream.accept(self,sock,None)
 
-	def _compute_handshake(self):
-		return sha.new(to_utf8(self.stream_id)+to_utf8(self.secret)).hexdigest()
+        def stream_start(self,doc):
+                try:
+                        Stream.stream_start(self,doc)
+                except HostMismatch:
+                        pass
 
-	def _auth(self):
-		if self.authenticated:
-			self.debug("_auth: already authenticated")
-			return
-		self.debug("doing handshake...")
-		hash=self._compute_handshake()
-		n=common_root.newTextChild(None,"handshake",hash)
-		self._write_node(n)
-		n.unlinkNode()
-		n.freeNode()
-		self.debug("handshake hash sent.")
-	
-	def _process_node(self,node):
-		ns=node.ns()
-		if ns:
-			ns_uri=node.ns().getContent()
-		if (not ns or ns_uri=="jabber:component:accept") and node.name=="handshake":
-			if self.initiator and not self.authenticated:
-				self.authenticated=1
-				self.state_change("authenticated",self.jid)
-				self._post_auth()
-				return
-			elif not self.authenticated and node.getContent()==self._compute_handshake():
-				self.peer=self.me
-				n=common_doc.newChild(None,"handshake",None)
-				self._write_node(n)
-				n.unlinkNode()
-				n.freeNode()
-				self.peer_authenticated=1
-				self.state_change("authenticated",self.peer)
-				self._post_auth()
-				return
-			else:
-				self._send_stream_error("not-authorized")
-				raise FatalComponentStreamError,"Hanshake error."
+        def _post_connect(self):
+                if self.initiator:
+                        self._auth()
 
-		if ns_uri in ("jabber:component:accept","jabber:client","jabber:server"):
-			stanza=StanzaFactory(node)
-			self.lock.release()
-			try:
-				self.process_stanza(stanza)
-			finally:
-				self.lock.acquire()
-				stanza.free()
-			return
-		return Stream._process_node(self,node)
+        def _compute_handshake(self):
+                return sha.new(to_utf8(self.stream_id)+to_utf8(self.secret)).hexdigest()
+
+        def _auth(self):
+                if self.authenticated:
+                        self.debug("_auth: already authenticated")
+                        return
+                self.debug("doing handshake...")
+                hash=self._compute_handshake()
+                n=common_root.newTextChild(None,"handshake",hash)
+                self._write_node(n)
+                n.unlinkNode()
+                n.freeNode()
+                self.debug("handshake hash sent.")
+
+        def _process_node(self,node):
+                ns=node.ns()
+                if ns:
+                        ns_uri=node.ns().getContent()
+                if (not ns or ns_uri=="jabber:component:accept") and node.name=="handshake":
+                        if self.initiator and not self.authenticated:
+                                self.authenticated=1
+                                self.state_change("authenticated",self.jid)
+                                self._post_auth()
+                                return
+                        elif not self.authenticated and node.getContent()==self._compute_handshake():
+                                self.peer=self.me
+                                n=common_doc.newChild(None,"handshake",None)
+                                self._write_node(n)
+                                n.unlinkNode()
+                                n.freeNode()
+                                self.peer_authenticated=1
+                                self.state_change("authenticated",self.peer)
+                                self._post_auth()
+                                return
+                        else:
+                                self._send_stream_error("not-authorized")
+                                raise FatalComponentStreamError,"Hanshake error."
+
+                if ns_uri in ("jabber:component:accept","jabber:client","jabber:server"):
+                        stanza=StanzaFactory(node)
+                        self.lock.release()
+                        try:
+                                self.process_stanza(stanza)
+                        finally:
+                                self.lock.acquire()
+                                stanza.free()
+                        return
+                return Stream._process_node(self,node)
+# vi: sts=4 et sw=4

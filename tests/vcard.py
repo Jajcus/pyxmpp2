@@ -31,3 +31,4 @@ root.newNs("vcard-temp","vcard")
 vc3.xml(doc,root)
 file("vcard3.out.xml","w").write(doc.serialize(encoding="utf-8"))
 
+# vi: sts=4 et sw=4
