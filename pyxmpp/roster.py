@@ -266,6 +266,7 @@ class Roster:
 		subscription=item.subscription()
 		try:
 			local_item=self.item_by_jid(jid)
+			local_item.set_subscription(subscription)
 		except KeyError:
 			if subscription=="remove":
 				return None
