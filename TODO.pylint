@@ -4,7 +4,7 @@ fi
 umask 022 ; python setup.py build
 running build
 running build_py
-copying pyxmpp/expdict.py -> build/lib.linux-i686-2.3/pyxmpp
+copying pyxmpp/error.py -> build/lib.linux-i686-2.3/pyxmpp
 copying pyxmpp/version.py -> build/lib.linux-i686-2.3/pyxmpp
 running build_ext
 cd examples ; rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp .
@@ -93,35 +93,8 @@ ignore that: W0201:106:StreamTLSMixIn._reset_tls: Attribute 'tls' defined outsid
 ignore that: W0201:247:StreamTLSMixIn._process_tls_node: Attribute 'socket' defined outside __init__
 ignore that: W0201:107:StreamTLSMixIn._reset_tls: Attribute 'tls_requested' defined outside __init__
 ignore that: W0201:220:StreamTLSMixIn._request_tls: Attribute 'features' defined outside __init__
-************* Module pyxmpp.iq
-W0301:115: Line too long (104/100)
 ************* Module pyxmpp.error
-W0141:  0: Missing docstring
-W0141:173:ErrorNodeError: Missing docstring
-W0141:176:ErrorNode: Missing docstring
-W0112:177:ErrorNode.__init__: Too many branches (16/15)
-W0141:240:ErrorNode.free: Missing docstring
-W0141:246:ErrorNode.free_borrowed: Missing docstring
-W0141:249:ErrorNode.is_legacy: Missing docstring
-W0141:252:ErrorNode.xpath_eval: Missing docstring
-W0141:263:ErrorNode.get_condition: Missing docstring
-W0141:278:ErrorNode.get_text: Missing docstring
-W0141:287:ErrorNode.add_custom_condition: Missing docstring
-W0622:299:ErrorNode.upgrade: Redefining built-in 'KeyError'
-W0141:293:ErrorNode.upgrade: Missing docstring
-W0133:299:ErrorNode.upgrade: Invalid name "KeyError" (should match [a-z_][a-z0-9_]*$)
-W0612:299:ErrorNode.upgrade: Unused variable 'KeyError'
-W0141:327:ErrorNode.downgrade: Missing docstring
-W0612:332:ErrorNode.downgrade: Unused variable 'typ'
-W0141:340:ErrorNode.serialize: Missing docstring
-W0141:343:StreamErrorNode: Missing docstring
-W0613:344:StreamErrorNode.__init__: Unused argument 'ns'
-W0141:358:StreamErrorNode.get_message: Missing docstring
-W0141:370:StanzaErrorNode: Missing docstring
-W0141:391:StanzaErrorNode.get_type: Missing docstring
-W0141:396:StanzaErrorNode.upgrade: Missing docstring
-W0141:406:StanzaErrorNode.get_message: Missing docstring
-W0611: 24: Unused import from_utf8
+W0141:223:ErrorNode.__from_node: Missing docstring
 ************* Module pyxmpp.version
 W0141:  0: Missing docstring
 W0103:  0: Missing required attribute "__revision__"
@@ -593,17 +566,17 @@ W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 Report
 ======
-5946 statements analysed.
+5947 statements analysed.
 
 Statistics by type
 ------------------
 
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-module   37     37         =          62.16       0.00     
-class    116    116        =          58.62       0.00     
+module   37     0          +37        64.86       0.00     
+class    116    0          +116       62.07       0.00     
 method   0      0          =          0.00        0.00     
-function 630    630        =          73.02       0.63     
+function 631    0          +631       75.12       0.63     
 
 
 Raw metrics
@@ -611,10 +584,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6520   62.60 6520     =          
-docstring 2756   26.46 2756     =          
-comment   582    5.59  582      =          
-empty     557    5.35  557      =          
+code      6521   61.92 0        +6521      
+docstring 2856   27.12 0        +2856      
+comment   583    5.54  0        +583       
+empty     571    5.42  0        +571       
 
 
 External dependencies
@@ -654,26 +627,26 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0141      232        
+W0141      214        
 W0201      67         
-W0613      46         
-W0611      46         
+W0613      45         
+W0611      45         
 E0201      37         
 E0602      19         
 W0102      18         
-W0612      9          
-W0133      9          
 W0311      8          
 W0221      8          
-W0622      7          
+W0133      8          
+W0612      7          
+W0622      6          
 W0511      5          
 W0403      5          
-W0112      5          
-W0301      4          
 W0232      4          
 W0231      4          
+W0112      4          
 W0103      4          
 W0404      3          
+W0301      3          
 W0115      3          
 W0151      2          
 W0111      2          
@@ -687,8 +660,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 494    496      -2         
-errors   56     57       -1         
+warnings 468    0        +468       
+errors   56     0        +56        
 
 
 % errors / warnings by module
@@ -696,37 +669,36 @@ errors   56     57       -1
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            26.79 17.21   
-pyxmpp.jid                     23.21 0.20    
-pyxmpp.jabber.muc              16.07 7.89    
-pyxmpp.sasl.core               10.71 7.89    
-pyxmpp.jabber.disco            7.14  7.89    
-pyxmpp.jabber.client           5.36  3.04    
-pyxmpp.jabber.clientstream     3.57  8.50    
-pyxmpp.jabber.delay            3.57  2.43    
-pyxmpp.sasl.digest_md5         1.79  11.13   
-pyxmpp.jabberd.component       1.79  5.87    
-pyxmpp.jabberd.componentstream 0.00  5.87    
-pyxmpp.error                   0.00  5.26    
-pyxmpp.streambase              0.00  4.45    
-pyxmpp.sasl.plain              0.00  2.63    
-pyxmpp.sasl                    0.00  1.82    
-pyxmpp.dns                     0.00  1.62    
-pyxmpp.streamsasl              0.00  1.42    
-pyxmpp.clientstream            0.00  1.42    
-pyxmpp.streamtls               0.00  0.81    
-pyxmpp.xmlextra                0.00  0.61    
-pyxmpp.version                 0.00  0.61    
-pyxmpp._xmlextra               0.00  0.40    
-pyxmpp.xmppstringprep          0.00  0.20    
-pyxmpp.resolver                0.00  0.20    
-pyxmpp.jabberd                 0.00  0.20    
-pyxmpp.iq                      0.00  0.20    
-pyxmpp.client                  0.00  0.20    
+pyxmpp.jabber.vcard            26.79 18.16   
+pyxmpp.jid                     23.21 0.21    
+pyxmpp.jabber.muc              16.07 8.33    
+pyxmpp.sasl.core               10.71 8.33    
+pyxmpp.jabber.disco            7.14  8.33    
+pyxmpp.jabber.client           5.36  3.21    
+pyxmpp.jabber.clientstream     3.57  8.97    
+pyxmpp.jabber.delay            3.57  2.56    
+pyxmpp.sasl.digest_md5         1.79  11.75   
+pyxmpp.jabberd.component       1.79  6.20    
+pyxmpp.jabberd.componentstream 0.00  6.20    
+pyxmpp.streambase              0.00  4.70    
+pyxmpp.sasl.plain              0.00  2.78    
+pyxmpp.sasl                    0.00  1.92    
+pyxmpp.dns                     0.00  1.71    
+pyxmpp.streamsasl              0.00  1.50    
+pyxmpp.clientstream            0.00  1.50    
+pyxmpp.streamtls               0.00  0.85    
+pyxmpp.xmlextra                0.00  0.64    
+pyxmpp.version                 0.00  0.64    
+pyxmpp._xmlextra               0.00  0.43    
+pyxmpp.xmppstringprep          0.00  0.21    
+pyxmpp.resolver                0.00  0.21    
+pyxmpp.jabberd                 0.00  0.21    
+pyxmpp.error                   0.00  0.21    
+pyxmpp.client                  0.00  0.21    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 8.70/10 (previous run: 8.69/10)
+Your code has been rated at 8.74/10
 That's pretty good. Good work mate.
 
