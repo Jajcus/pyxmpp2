@@ -1,5 +1,8 @@
 2004-06-04  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/stream.py:
+	- allow local processing of stanzas directed to other resource of out JID
+
 	* pyxmpp/iq.py:
 	- return None from get_query() if no query is contained in the Iq stanza. The same for get_query_ns()
 
