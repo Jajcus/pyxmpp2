@@ -1,3 +1,8 @@
+2004-06-03  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/jabber/delay.py, pyxmpp/utils.py:
+	- jabber:x:delay support changed to use datetime module and enhanced with a local time interface
+
 2004-06-02  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/utils.py, setup.py:
