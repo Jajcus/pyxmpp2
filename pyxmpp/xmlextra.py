@@ -362,6 +362,88 @@ except ImportError:
 # Common code                                    
 #-------------
 
+def get_node_ns(xmlnode):
+    """Namespace of an XML node.
+    
+    :Parameters:
+        - `xmlnode`: the XML node to query.
+    :Types:
+        - `xmlnode`: `libxml2.xmlNode`
+        
+    :return: namespace of the node or `None`
+    :returntype: `libxml2.xmlNs`"""
+    try:
+        return xmlnode.ns()
+    except libxml2.treeError:
+        return None
+
+def get_node_ns_uri(xmlnode):
+    """Return namespace URI of an XML node.     
+
+    :Parameters:
+        - `xmlnode`: the XML node to query.
+    :Types:
+        - `xmlnode`: `libxml2.xmlNode`
+        
+    :return: namespace URI of the node or `None`
+    :returntype: `unicode`"""
+    ns=get_node_ns(xmlnode)
+    if ns:
+        return unicode(ns.getContent(),"utf-8")
+    else:
+        return None
+
+def xml_node_iter(nodelist):
+    """Iterate over sibling XML nodes. All types of nodes will be returned
+    (not only the elements).
+
+    Usually used to iterade over node's children like this::
+        xml_node_iter(node.children)
+
+    :Parameters:
+        - `nodelist`: start node of the list.
+    :Types:
+        - `nodelist`: `libxml2.xmlNode`
+    """
+    node = nodelist
+    while node:
+        yield node
+        node = node.next
+
+def xml_element_iter(nodelist):
+    """Iterate over sibling XML elements. Non-element nodes will be skipped.
+
+    Usually used to iterade over node's children like this::
+        xml_node_iter(node.children)
+
+    :Parameters:
+        - `nodelist`: start node of the list.
+    :Types:
+        - `nodelist`: `libxml2.xmlNode`
+    """
+    node = nodelist
+    while node:
+        if node.type == "element":
+            yield node
+        node = node.next
+
+def xml_element_ns_iter(nodelist, ns_uri):
+    """Iterate over sibling XML elements. Only elements in the given namespace will be returned.
+
+    Usually used to iterade over node's children like this::
+        xml_node_iter(node.children)
+
+    :Parameters:
+        - `nodelist`: start node of the list.
+    :Types:
+        - `nodelist`: `libxml2.xmlNode`
+    """
+    node = nodelist
+    while node:
+        if node.type == "element" and get_node_ns_uri(node)==ns_uri:
+            yield node
+        node = node.next
+
 evil_characters_re=re.compile(r"[\000-\010\013\014\016-\037]",re.UNICODE)
 utf8_replacement_char=u"\ufffd".encode("utf-8")
 
