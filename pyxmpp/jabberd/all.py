@@ -15,9 +15,24 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""JSF defined XMPP extension and legacy Jabber protocol elements"""
+"""Convenience module containing most important objects fr pyxmpp.jabberd package.
 
-__revision__="$Id$"
+Suggested usage::
+import pyxmpp.jabberd.all
+
+(imports all important names into pyxmpp.jabberd namespace)"""
+
+__revision__="$Id: __init__.py 477 2004-12-29 13:25:42Z jajcus $"
 __docformat__="restructuredtext en"
+
+import pyxmpp
+import pyxmpp.jabberd
+
+from pyxmpp.jabberd.componentstream import ComponentStream
+from pyxmpp.jabberd.component import Component
+
+for name in dir():
+    if not name.startswith("__") and name!="pyxmpp":
+        setattr(pyxmpp.jabberd,name,globals()[name])
 
 # vi: sts=4 et sw=4

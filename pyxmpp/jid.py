@@ -149,6 +149,8 @@ class JID(object):
                 object.__setattr__(self,"resource",s1[1])
         else:
             object.__setattr__(self,"resource",None)
+        if not self.domain:
+            raise JIDError,"Domain is required in JID."
 
     def __set_node(self,s):
         """Initialize `self.node`

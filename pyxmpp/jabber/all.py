@@ -15,9 +15,28 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""JSF defined XMPP extension and legacy Jabber protocol elements"""
+"""Convenience module containing most important objects from pyxmpp.jabber
+package.
 
-__revision__="$Id$"
+Suggested usage::
+import pyxmpp.jabber.all
+
+(imports all important names into pyxmpp.jabber namespace)"""
+
+__revision__="$Id: __init__.py 477 2004-12-29 13:25:42Z jajcus $"
 __docformat__="restructuredtext en"
+
+import pyxmpp
+import pyxmpp.jabber
+
+from pyxmpp.jabber.clientstream import LegacyClientStream
+from pyxmpp.jabber.client import JabberClient as Client
+from pyxmpp.jabber.disco import DISCO_NS,DISCO_INFO_NS,DISCO_ITEMS_NS
+from pyxmpp.jabber.disco import DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
+from pyxmpp.jabber.vcard import VCARD_NS,VCard
+
+for name in dir():
+    if not name.startswith("__") and name!="pyxmpp":
+        setattr(pyxmpp.jabber,name,globals()[name])
 
 # vi: sts=4 et sw=4

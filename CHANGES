@@ -1,6 +1,30 @@
 Most Important API Changes
 --------------------------
 
+2004-12-31
+
+	There was a design flaw in PyXMPP from the very beginning, which caused
+	that many unnecessary modules from PyXMPP package (and subpackages,
+	when they were used) were imported even when only one simple module was
+	used. That was because pyxmpp imported all the useful names from
+	submodules. That was a problem (unnecessarily long startup time
+	sometimes), but it was also quite convenient.
+
+	To resolve the problem those imports were removed from __init__
+	modules, so importing a package doesn't cause any other imports now.
+	To improve backward compatibility and keep the convenience of the old
+	behavior "all" modules were added to "pyxmpp", "pyxmpp.jabber" and
+	"pyxmpp.jabber" packages. 
+
+	If your application was broken by that change just import "pyxmpp.all"
+	(and/or "pyxmpp.jabber.all", "pyxmpp.jabberd.all" if you use them)
+	there -- you need to do it once per application (no need to change
+	every module). After that everything should work as before.
+
+	If you use only small part of the API and don't want to import unused
+	modules import names like "JID" or "Stanza" directly from modules that
+	define them (e.g.: 'import JID from pyxmpp.jid').
+
 2004-12-18
 
 	dnspython (http://www.dnspython.org) is now used for resolving DNS

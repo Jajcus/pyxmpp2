@@ -20,16 +20,4 @@
 __revision__="$Id$"
 __docformat__="restructuredtext en"
 
-from pyxmpp.stream import Stream
-from pyxmpp.streambase import StreamError,FatalStreamError,StreamParseError
-from pyxmpp.streamtls import StreamEncryptionRequired,tls_available,TLSSettings
-from pyxmpp.clientstream import ClientStream,ClientStreamError
-from pyxmpp.client import Client,ClientError
-from pyxmpp.iq import Iq
-from pyxmpp.presence import Presence
-from pyxmpp.message import Message
-from pyxmpp.jid import JID,JIDError
-from pyxmpp.stanza import StanzaError
-from pyxmpp.roster import Roster,RosterItem
-
 # vi: sts=4 et sw=4
