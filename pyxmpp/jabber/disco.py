@@ -25,8 +25,9 @@ __docformat__="restructuredtext en"
 
 import libxml2
 
-from pyxmpp.stanza import common_doc,common_root
+from pyxmpp.stanza import common_doc,common_root,StanzaError
 from pyxmpp.jid import JID
+from pyxmpp import cache
 
 from pyxmpp.utils import to_utf8
 
@@ -453,6 +454,40 @@ class DiscoItems:
                 return True
         return False
 
+    def as_xml(self,doc=None,parent=None):
+        """Get the XML representation of `self`.
+
+        New document will be created if not `parent` and no `doc` is given. 
+
+        :Parameters:
+            - `doc`: the document where the element should be created.
+            - `parent`: the parent for the `DiscoItems` element.
+        :Types:
+            - `doc`: `libxml2.xmlDoc`
+            - `parent`: `libxml2.xmlNode`
+
+        :return: XML element with the disco#items (if doc and/or parent is
+          given) or the new document.
+        :returntype: `libxml2.xmlNode` or `libxml2.xmlDoc`"""
+        if parent:
+            if not doc:
+                doc=common_doc
+                copy=self.xmlnode.copyNode(True)
+            else:
+                copy=self.xmlnode.docCopyNode(doc,True)
+            parent.addChild(copy)
+            return copy
+        else:
+            if not doc:
+                doc1=libxml2.newDoc("1.0")
+            else:
+                doc1=doc
+            node=doc1.addChild(self.xmlNode.docCopyNode(doc,True))
+            if doc:
+                return node
+            else:
+                return doc1
+
 class DiscoInfo:
     """A disco#info response object.
 
@@ -461,7 +496,7 @@ class DiscoInfo:
     :Types:
         - `xmlnode`: `libxml2.xmlNode`
     """
-    def __init__(self,xmlnode_or_node=None):
+    def __init__(self,xmlnode_or_node=None, parent=None):
         """Initialize an `DiscoInfo` object.
         
         Wrap an existing disco#info XML element or create a new one.
@@ -649,5 +684,79 @@ class DiscoInfo:
         :returns: the identity created.
         :returntype: `DiscoIdentity`"""
         return DiscoIdentity(self,item_name,item_category,item_type)
+
+    def as_xml(self,doc=None,parent=None):
+        """Get the XML representation of `self`.
+
+        New document will be created if not `parent` and no `doc` is given. 
+
+        :Parameters:
+            - `doc`: the document where the element should be created.
+            - `parent`: the parent for the `DiscoInfo` element.
+        :Types:
+            - `doc`: `libxml2.xmlDoc`
+            - `parent`: `libxml2.xmlNode`
+
+        :return: XML element with the disco#info (if doc and/or parent is
+          given) or the new document.
+        :returntype: `libxml2.xmlNode` or `libxml2.xmlDoc`"""
+        if parent:
+            if not doc:
+                doc=common_doc
+                copy=self.xmlnode.copyNode(True)
+            else:
+                copy=self.xmlnode.docCopyNode(doc,True)
+            parent.addChild(copy)
+            return copy
+        else:
+            if not doc:
+                doc1=libxml2.newDoc("1.0")
+            else:
+                doc1=doc
+            node=doc1.addChild(self.xmlNode.docCopyNode(doc,True))
+            if doc:
+                return node
+            else:
+                return doc1
+
+class DiscoCacheFetcherBase(cache.CacheFetcher):
+    stream=None
+    disco_class=None
+    def fetch(self):
+        from pyxmpp.iq import Iq
+        jid,node = self.address
+        iq = Iq(to_jid = jid, stanza_type = "get")
+        disco = self.disco_class(node)
+        iq.add_content(disco.xmlnode)
+        self.stream.set_response_handlers(iq,self.__response, self.__error,
+                self.__timeout)
+        self.stream.send(iq)
+    def __response(self,stanza):
+        try:
+            d=self.disco_class(stanza.get_query())
+            self.got_it(d)
+        except DiscoError,e:
+            self.error(e)
+
+    def __error(self,stanza):
+        try:
+            self.error(stanza.get_error())
+        except StanzaError:
+            from pyxmpp.error import StanzaErrorNode
+            self.error(StanzaErrorNode("undefined-condition"))
+
+    def __timeout(self,stanza):
+        pass
+    
+def register_disco_cache_fetchers(cache,stream):
+    tmp=stream
+    class DiscoInfoCacheFetcher(DiscoCacheFetcherBase):
+        stream=tmp
+        disco_class=DiscoInfo
+    class DiscoItemsCacheFetcher(DiscoCacheFetcherBase):
+        stream=tmp
+        disco_class=DiscoItems
+    cache.register_fetcher(DiscoInfo,DiscoInfoCacheFetcher)
+    cache.register_fetcher(DiscoItems,DiscoItemsCacheFetcher)
 
 # vi: sts=4 et sw=4

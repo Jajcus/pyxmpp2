@@ -31,8 +31,11 @@ import logging
 
 from pyxmpp.jabber.clientstream import LegacyClientStream
 from pyxmpp.jabber.disco import DISCO_ITEMS_NS,DISCO_INFO_NS,DiscoInfo,DiscoItems,DiscoIdentity
+from pyxmpp.jabber.disco import DiscoInfo,DiscoItems,DiscoIdentity
+from pyxmpp.jabber import disco
 from pyxmpp.client import Client
 from pyxmpp.stanza import Stanza
+from pyxmpp.cache import CacheSuite
 from pyxmpp.utils import from_utf8
 
 class JabberClient(Client):
@@ -47,9 +50,9 @@ class JabberClient(Client):
         - `disco_items`: `DiscoItems`
         - `disco_info`: `DiscoInfo`
     """
-    def __init__(self,jid=None,password=None,server=None,port=5222,
+    def __init__(self,jid=None, password=None, server=None, port=5222,
             auth_methods=("sasl:DIGEST-MD5","digest"),
-            tls_settings=None,keepalive=0):
+            tls_settings=None, keepalive=0):
         """Initialize a JabberClient object.
 
         :Parameters:
@@ -72,11 +75,12 @@ class JabberClient(Client):
         """
 
         Client.__init__(self,jid,password,server,port,auth_methods,tls_settings,keepalive)
-        self.stream_class=LegacyClientStream
-        self.disco_items=None
-        self.disco_info=None
-        self.disco_identity=None
-        self.__logger=logging.getLogger("pyxmpp.jabber.JabberClient")
+        self.stream_class = LegacyClientStream
+        self.disco_items = None
+        self.disco_info = None
+        self.disco_identity = None
+        self.cache = CacheSuite(max_items = 1000)
+        self.__logger = logging.getLogger("pyxmpp.jabber.JabberClient")
 
 # public methods
 
@@ -156,6 +160,7 @@ class JabberClient(Client):
         Client.authorized(self)
         self.stream.set_iq_get_handler("query",DISCO_ITEMS_NS,self.__disco_items)
         self.stream.set_iq_get_handler("query",DISCO_INFO_NS,self.__disco_info)
+        disco.register_disco_cache_fetchers(self.cache,self.stream)
 
     def disco_get_info(self,node,iq):
         """Return Disco#info data for a node.

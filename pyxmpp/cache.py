@@ -428,6 +428,7 @@ class Cache:
             item = self.get_item(address, state)
             if item:
                 object_handler(item.address, item.value, item.state)
+                return
             if not self._fetcher:
                 raise TypeError, "No cache fetcher defined"
             if not error_handler:
