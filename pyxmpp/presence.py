@@ -50,8 +50,11 @@ class Presence(Stanza):
 		elif node is not None:
 			raise TypeError,"Couldn't make Presence from %r" % (type(node),)
 	
-		if kw.has_key("type") and kw["type"] not in presence_types:
+		if kw.has_key("type") and kw["type"] and kw["type"] not in presence_types:
 			raise StanzaError,"Invalid presence type: %r" % (type,)
+
+		if kw.get("type")=="available":
+			kw["type"]=None
 
 		if kw.has_key("show"):
 			show=kw["show"]
@@ -108,7 +111,8 @@ class Presence(Stanza):
 			
 	def make_accept_response(self):
 		if self.get_type() not in ("subscribe","subscribed","unsubscribe","unsubscribed"):
-			raise StanzaError,"Results may only be generated for 'set' or 'get' iq"
+			raise StanzaError,("Results may only be generated for 'subscribe',"
+				"'subscribed','unsubscribe' or 'unsubscribed' presence")
 		
 		pr=Presence(type=accept_responses[self.get_type()],
 			fr=self.get_to(),to=self.get_from(),id=self.get_id())
@@ -116,7 +120,8 @@ class Presence(Stanza):
 
 	def make_deny_response(self):
 		if self.get_type() not in ("subscribe","subscribed","unsubscribe","unsubscribed"):
-			raise StanzaError,"Results may only be generated for 'set' or 'get' iq"
+			raise StanzaError,("Results may only be generated for 'subscribe',"
+				"'subscribed','unsubscribe' or 'unsubscribed' presence")
 		
 		pr=Presence(type=accept_responses[self.get_type()],
 			fr=self.get_to(),to=self.get_from(),id=self.get_id())
