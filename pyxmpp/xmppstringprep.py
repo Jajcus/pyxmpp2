@@ -77,7 +77,7 @@ class Profile:
 		"""Checks for prohibited characters."""
 		for c in s:
 			for t in self.prohibited:
-				if t.lookup(c) is not None:
+				if t.lookup(c):
 					raise StringprepError,"Prohibited character: %r" % (c,)
 		return s
 	
@@ -85,7 +85,7 @@ class Profile:
 		"""Checks for unassigned character codes."""
 		for c in s:
 			for t in self.unassigned:
-				if t.lookup(c) is not None:
+				if t.lookup(c):
 					raise StringprepError,"Unassigned character: %r" % (c,)
 		return s
 	
@@ -94,9 +94,9 @@ class Profile:
 		has_L=0
 		has_RAL=0
 		for c in s:
-			if D_1.lookup(c) is not None:
+			if D_1.lookup(c):
 				has_RAL=1
-			elif D_2.lookup(c) is not None:
+			elif D_2.lookup(c):
 				has_L=1
 		if has_L and has_RAL:
 			raise StringprepError,"Both RandALCat and LCat characters present"
