@@ -85,6 +85,19 @@ class Presence(Stanza):
 	def copy(self):
 		return Presence(self)
 
+	def set_status(self,status):
+		n=self.xpath_eval("status")
+		if not status:
+			if n:
+				n[0].unlinkNode()
+				n[0].freeNode()
+			else:
+				return
+		if n:
+			n[0].setContent(to_utf8(status))
+		else:
+			self.node.newTextChild(None,"status",to_utf8(status))
+
 	def get_status(self):
 		n=self.xpath_eval("status")
 		if n:
@@ -99,6 +112,19 @@ class Presence(Stanza):
 		else:
 			return None
 
+	def set_show(self,show):
+		n=self.xpath_eval("show")
+		if not show:
+			if n:
+				n[0].unlinkNode()
+				n[0].freeNode()
+			else:
+				return
+		if n:
+			n[0].setContent(to_utf8(show))
+		else:
+			self.node.newTextChild(None,"show",to_utf8(show))
+
 	def get_priority(self):
 		n=self.xpath_eval("priority")
 		if not n:
@@ -108,7 +134,24 @@ class Presence(Stanza):
 		except ValueError:
 			return 0
 		return prio
-			
+	
+	def set_priority(self,priority):
+		n=self.xpath_eval("priority")
+		if not priority:
+			if n:
+				n[0].unlinkNode()
+				n[0].freeNode()
+			else:
+				return
+		priority=int(priority)
+		if priority<-128 or priority>127:
+			raise ValueError,"Bad priority value"
+		priority=str(priority)
+		if n:
+			n[0].setContent(priority)
+		else:
+			self.node.newTextChild(None,"priority",priority)
+		
 	def make_accept_response(self):
 		if self.get_type() not in ("subscribe","subscribed","unsubscribe","unsubscribed"):
 			raise StanzaError,("Results may only be generated for 'subscribe',"
