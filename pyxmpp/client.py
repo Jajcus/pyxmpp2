@@ -25,6 +25,7 @@ from iq import Iq
 from presence import Presence
 from utils import to_utf8,from_utf8
 from roster import Roster
+from disco import DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
 
 class ClientError(StandardError):
 	pass
@@ -58,21 +59,32 @@ class Client:
 			raise ClientError,"In-band registration not implemented yet"
 
 		self.lock.acquire()
-		stream=self.stream
-		self.stream=None
-		if stream:
-			stream.close()
-			
-		stream=ClientStream(self.jid,self.password,self.server,
-			self.port,self.auth_methods,self.enable_tls,self.require_tls)
-		stream.debug=self.debug
-		stream.print_exception=self.print_exception
-		stream.connect()
-		stream.post_auth=self.__post_auth
-		stream.post_disconnect=self.__post_disconnect
-		self.stream=stream
-		self.state_changed.notify()
-		self.state_changed.release()
+		try:
+			stream=self.stream
+			self.stream=None
+			if stream:
+				stream.close()
+				
+			stream=ClientStream(self.jid,self.password,self.server,
+				self.port,self.auth_methods,self.enable_tls,self.require_tls)
+			stream.debug=self.debug
+			stream.print_exception=self.print_exception
+			stream.connect()
+			stream.post_auth=self.__post_auth
+			stream.post_disconnect=self.__post_disconnect
+			self.stream=stream
+			self.disco_items=DiscoItems()
+			self.disco_info=DiscoInfo()
+			self.disco_info.add_feature("iq")
+			self.disco_identity=DiscoIdentity(self.disco_info,
+								"libxml2 based Jabber client",
+								"x-jabber","x-client")
+			self.state_changed.notify()
+			self.state_changed.release()
+		except:
+			self.stream=None
+			self.state_changed.release()
+			raise
 
 	def get_stream(self):
 		self.lock.acquire()
@@ -164,6 +176,10 @@ class Client:
 	
 	def __post_auth(self):
 		ClientStream.post_auth(self.stream)
+		self.stream.set_iq_get_handler("query","http://jabber.org/protocol/disco#items",
+									self.__disco_items)
+		self.stream.set_iq_get_handler("query","http://jabber.org/protocol/disco#info",
+									self.__disco_info)
 		self.authenticated()
 	
 	def __post_disconnect(self):
@@ -174,6 +190,22 @@ class Client:
 		self.state_changed.notify()
 		self.state_changed.release()
 		self.disconnected()
+
+	def __disco_info(self,iq):
+		resp=iq.make_result_response()
+		self.debug("Disco-info query: %s preparing response: %s with reply: %s" 
+			% (iq.serialize(),resp.serialize(),self.disco_info.xmlnode.serialize()))
+		resp.set_content(self.disco_info.xmlnode.copyNode(1))
+		self.debug("Disco-info response: %s" % (resp.serialize(),))
+		self.stream.send(resp)
+
+	def __disco_items(self,iq):
+		resp=iq.make_result_response()
+		self.debug("Disco-items query: %s preparing response: %s with reply: %s" 
+			% (iq.serialize(),resp.serialize(),self.disco_info.xmlnode.serialize()))
+		resp.set_content(self.disco_items.xmlnode.copyNode(1))
+		self.debug("Disco-items response: %s" % (resp.serialize(),))
+		self.stream.send(resp)
 		
 # Method to override
 	def idle(self):
