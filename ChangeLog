@@ -1,3 +1,8 @@
+2004-09-16  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/jabber/clientstream.py, pyxmpp/jabber/muc.py, pyxmpp/client.py, pyxmpp/iq.py, pyxmpp/message.py, pyxmpp/presence.py, pyxmpp/roster.py, pyxmpp/stanza.py, pyxmpp/stream.py, CHANGES, migrate-0_5-0_6.py:
+	- 'to' -> 'stanza_to', 'fr' -> 'stanza_from', 'sid' -> 'stanza_id', 'typ' -> 'stanza_type'
+
 2004-09-15  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/dns.py, pyxmpp/iq.py, pyxmpp/message.py, pyxmpp/presence.py, pyxmpp/resolver.py, pyxmpp/stanza.py, pyxmpp/xmlextra.py, TODO.pylint, pylintrc:
