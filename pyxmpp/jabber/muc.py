@@ -744,7 +744,7 @@ class MucRoomState:
         :returntype: `unicode`
         """
         
-        if form.type == "submit":
+        if form.type == "cancel":
             return None
         elif form.type != "submit":
             raise ValueError, "A 'submit' form required to configure a room"
