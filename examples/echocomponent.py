@@ -99,14 +99,6 @@ class Component(pyxmpp.jabberd.Component):
                 self.stream.send(iq)
 		return 1
 
-	def get_version(self,iq):
-		iq=iq.make_result_response()
-	        q=iq.new_query("jabber:iq:version")
-                q.newTextChild(q.ns(),"name","Echo component")
-                q.newTextChild(q.ns(),"version","1.0")
-                self.stream.send(iq)
-		return 1
-
 	def message(self,stanza):
 		subject=stanza.get_subject()
 		if subject:
