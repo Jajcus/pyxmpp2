@@ -21,7 +21,7 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: streambase.py,v 1.3 2004/10/07 22:28:04 jajcus Exp $"
+__revision__="$Id: streambase.py,v 1.4 2004/10/11 18:33:51 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -660,7 +660,12 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
     def _process(self):
         """Same as `Stream.process` but assume `self.lock` is acquired."""
         try:
-            self._read()
+            try:
+                self._read()
+            except (xmlextra.error,),e:
+                raise StreamParseError(unicode(e))
+            except:
+                raise
         except (IOError,OSError),e:
             self.close()
             raise FatalStreamError("IO Error: "+str(e))
