@@ -44,9 +44,7 @@ def load_resolv_conf():
 		search_list[:]=[]
 
 def query(name,typ):
-	if "." in name or not search_list:
-		return do_query(name,typ)
-	else:
+	if search_list:
 		e=None
 		for d in search_list:
 			try:
@@ -57,8 +55,7 @@ def query(name,typ):
 				continue
 		if e:
 			raise e
-				
-	return None
+	return do_query(name,typ)
 
 def do_query(name,typ):
 	if cache.has_key((name,typ)):
