@@ -1,6 +1,11 @@
 2004-06-02  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/jabber/muc.py:
+	- documentation
+	- s/make_node/as_xml/ (for consistency with other pyxmpp modules)
+	- s/process_presence_error/process_error_presence/
+
+	* pyxmpp/jabber/muc.py:
 	- pass stanza to MucRoomHandler.other_joined() and MucRoomHandler.other_left() callbacks
 
 	* pyxmpp/utils.py:
