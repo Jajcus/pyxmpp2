@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: muc.py,v 1.21 2004/09/11 20:48:57 jajcus Exp $"
+__revision__="$Id: muc.py,v 1.22 2004/09/12 08:21:32 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -907,7 +907,7 @@ class MucRoomManager:
         """
         Change the stream assigned to `self`.
         """
-        self.jid=stream.jid
+        self.jid=stream.me
         self.stream=stream
         for r in self.rooms.values():
             r.set_stream(stream)
@@ -933,7 +933,7 @@ class MucRoomManager:
         """
         if not room.node or room.resource:
             raise ValueError,"Invalid room JID"
-        rs=MucRoomState(self,self.stream.jid,
+        rs=MucRoomState(self,self.stream.me,
                 JID(room.node,room.domain,nick),handler)
         self.rooms[rs.room_jid.bare().as_unicode()]=rs
         rs.join()

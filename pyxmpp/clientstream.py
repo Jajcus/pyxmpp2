@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: clientstream.py,v 1.32 2004/09/11 23:11:21 jajcus Exp $"
+__revision__="$Id: clientstream.py,v 1.33 2004/09/12 08:21:19 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -56,7 +56,7 @@ class ClientStream(Stream):
                     keepalive=keepalive)
         self.server=server
         self.port=port
-        self.jid=jid
+        self.me=jid
         self.password=password
         self.auth_methods=auth_methods
         self.__logger=logging.getLogger("pyxmpp.ClientStream")
@@ -73,7 +73,7 @@ class ClientStream(Stream):
             self.lock.release()
 
     def _connect(self,server=None,port=None):
-        if not self.jid.node or not self.jid.resource:
+        if not self.me.node or not self.me.resource:
             raise ClientStreamError,"Client JID must have username and resource"
         if not server:
             server=self.server
@@ -87,11 +87,11 @@ class ClientStream(Stream):
         if port is None:
             port=5222
         if server is None:
-            server=self.jid.domain
-        Stream._connect(self,server,port,service,self.jid.domain)
+            server=self.me.domain
+        Stream._connect(self,server,port,service,self.me.domain)
 
     def accept(self,sock):
-        Stream.accept(self,sock,self.jid)
+        Stream.accept(self,sock,self.me)
 
     def _post_connect(self):
         if self.initiator:
@@ -110,7 +110,7 @@ class ClientStream(Stream):
             if self.version:
                 self.auth_methods_left.pop(0)
                 try:
-                    self._sasl_authenticate(self.jid.node, None,
+                    self._sasl_authenticate(self.me.node, None,
                             mechanism=method[5:].upper())
                 except (SASLMechanismNotAvailable,SASLNotAvailable),e:
                     self.__logger.debug("Skipping unavailable auth method: %s" % (method,) )
@@ -160,19 +160,19 @@ class ClientStream(Stream):
         r.free()
 
     def get_password(self,username,realm=None,acceptable_formats=("plain",)):
-        if self.initiator and self.jid.node==username and "plain" in acceptable_formats:
+        if self.initiator and self.me.node==username and "plain" in acceptable_formats:
             return self.password,"plain"
         else:
             return None,None
 
     def get_realms(self):
-        return [self.jid.domain]
+        return [self.me.domain]
 
     def choose_realm(self,realm_list):
         if not realm_list:
-            return self.jid.domain
-        if self.jid.domain in realm_list:
-            return self.jid.domain
+            return self.me.domain
+        if self.me.domain in realm_list:
+            return self.me.domain
         return realm_list[0]
 
     def check_authzid(self,authzid,extra_info={}):
@@ -184,7 +184,7 @@ class ClientStream(Stream):
                 return 0
             if jid.node!=extra_info["username"]:
                 return 0
-            if jid.domain!=self.jid.domain:
+            if jid.domain!=self.me.domain:
                 return 0
             if not jid.resource:
                 return 0
@@ -195,10 +195,10 @@ class ClientStream(Stream):
         return "xmpp"
 
     def get_serv_name(self):
-        return self.jid.domain
+        return self.me.domain
 
     def get_serv_host(self):
-        return self.jid.domain
+        return self.me.domain
 
     def fix_out_stanza(self,stanza):
         if self.initiator:

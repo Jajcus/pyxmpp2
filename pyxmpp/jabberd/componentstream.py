@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: componentstream.py,v 1.9 2004/09/10 14:01:10 jajcus Exp $"
+__revision__="$Id: componentstream.py,v 1.10 2004/09/12 08:21:39 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -48,7 +48,7 @@ class ComponentStream(Stream):
                     keepalive=keepalive)
         self.server=server
         self.port=port
-        self.jid=jid
+        self.me=jid
         self.secret=secret
         self.process_all_stanzas=1
         self.__logger=logging.getLogger("pyxmpp.jabberd.ComponentStream")
@@ -64,7 +64,7 @@ class ComponentStream(Stream):
             self.lock.release()
 
     def _connect(self,server=None,port=None):
-        if self.jid.node or self.jid.resource:
+        if self.me.node or self.me.resource:
             raise ComponentStreamError,"Component JID may have only domain defined"
         if not server:
             server=self.server
@@ -72,7 +72,7 @@ class ComponentStream(Stream):
             port=self.port
         if not server or not port:
             raise ComponentStreamError,"Server or port not given"
-        Stream._connect(self,server,port,None,self.jid)
+        Stream._connect(self,server,port,None,self.me)
 
     def accept(self,sock):
         Stream.accept(self,sock,None)
@@ -109,7 +109,7 @@ class ComponentStream(Stream):
         if (not ns or ns_uri=="jabber:component:accept") and node.name=="handshake":
             if self.initiator and not self.authenticated:
                 self.authenticated=1
-                self.state_change("authenticated",self.jid)
+                self.state_change("authenticated",self.me)
                 self._post_auth()
                 return
             elif not self.authenticated and node.getContent()==self._compute_handshake():

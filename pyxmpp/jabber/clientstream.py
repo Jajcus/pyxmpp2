@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: clientstream.py,v 1.12 2004/09/10 14:01:01 jajcus Exp $"
+__revision__="$Id: clientstream.py,v 1.13 2004/09/12 08:21:32 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -153,8 +153,8 @@ class LegacyClientStream(ClientStream):
     def _auth_stage1(self):
         iq=Iq(type="get")
         q=iq.new_query("jabber:iq:auth")
-        q.newTextChild(q.ns(),"username",to_utf8(self.jid.node))
-        q.newTextChild(q.ns(),"resource",to_utf8(self.jid.resource))
+        q.newTextChild(q.ns(),"username",to_utf8(self.me.node))
+        q.newTextChild(q.ns(),"resource",to_utf8(self.me.resource))
         self.send(iq)
         self.set_response_handlers(iq,self.auth_stage2,self.auth_error,
                             self.auth_timeout,timeout=60)
@@ -200,8 +200,8 @@ class LegacyClientStream(ClientStream):
     def _plain_auth_stage2(self,stanza):
         iq=Iq(type="set")
         q=iq.new_query("jabber:iq:auth")
-        q.newTextChild(None,"username",to_utf8(self.jid.node))
-        q.newTextChild(None,"resource",to_utf8(self.jid.resource))
+        q.newTextChild(None,"username",to_utf8(self.me.node))
+        q.newTextChild(None,"resource",to_utf8(self.me.resource))
         q.newTextChild(None,"password",to_utf8(self.password))
         self.send(iq)
         self.set_response_handlers(iq,self.auth_finish,self.auth_error)
@@ -234,8 +234,8 @@ class LegacyClientStream(ClientStream):
     def _digest_auth_stage2(self,stanza):
         iq=Iq(type="set")
         q=iq.new_query("jabber:iq:auth")
-        q.newTextChild(None,"username",to_utf8(self.jid.node))
-        q.newTextChild(None,"resource",to_utf8(self.jid.resource))
+        q.newTextChild(None,"username",to_utf8(self.me.node))
+        q.newTextChild(None,"resource",to_utf8(self.me.resource))
         digest=sha.new(to_utf8(self.stream_id)+to_utf8(self.password)).hexdigest()
         q.newTextChild(None,"digest",digest)
         self.send(iq)
@@ -280,7 +280,7 @@ class LegacyClientStream(ClientStream):
         self.lock.acquire()
         try:
             self.__logger.debug("Authenticated")
-            self.me=self.jid
+            self.me=self.me
             self.authenticated=1
             self.state_change("authorized",self.me)
             self._post_auth()
