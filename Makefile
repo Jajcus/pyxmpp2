@@ -16,7 +16,7 @@ doc:
 	$(MAKE) -C doc
 
 ChangeLog: FORCE
-	svn log -v --xml | svn2log.py -p '/(branches/[^/]+|trunk)' -x ChangeLog -u aux/users
+	TZ=UTC svn log -v --xml | svn2log.py -p '/(branches/[^/]+|trunk)' -x ChangeLog -u aux/users
 	
 FORCE:
 	
