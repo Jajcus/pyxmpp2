@@ -5,6 +5,7 @@ import libxml2
 import time
 import traceback
 import sys
+import logging
 
 from pyxmpp import JID,Iq,Presence,Message,StreamError
 from pyxmpp.jabber import Client
@@ -26,6 +27,10 @@ class MyClient(Client):
     def post_disconnect(self):
         print "Disconnected"
         raise Disconnected
+
+logger=logging.getLogger()
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.DEBUG)
 
 libxml2.debugMemory(1)
 

@@ -18,6 +18,7 @@
 import libxml2
 import sha
 import time
+import logging
 from types import UnicodeType
 
 from pyxmpp.stream import Stream,StreamError,FatalStreamError,SASLNotAvailable,SASLMechanismNotAvailable
@@ -37,6 +38,7 @@ class LegacyClientStream(ClientStream):
 
         ClientStream.__init__(self,jid,password,server,port,
                             auth_methods,tls_settings,keepalive)
+        self.__logger=logging.getLogger("pyxmpp.jabber.LegacyClientStream")
 
     def _reset(self):
         ClientStream._reset(self)
@@ -60,9 +62,9 @@ class LegacyClientStream(ClientStream):
 
     def _try_auth(self):
         if self.authenticated:
-            self.debug("try_auth: already authenticated")
+            self.__logger.debug("try_auth: already authenticated")
             return
-        self.debug("trying auth: %r" % (self.auth_methods_left,))
+        self.__logger.debug("trying auth: %r" % (self.auth_methods_left,))
         if not self.auth_methods_left:
             raise LegacyAuthenticationError,"No allowed authentication methods available"
         method=self.auth_methods_left[0]
@@ -70,7 +72,7 @@ class LegacyClientStream(ClientStream):
             return ClientStream._try_auth(self)
         elif method not in ("plain","digest"):
             self.auth_methods_left.pop(0)
-            self.debug("Skipping unknown auth method: %s" % method)
+            self.__logger.debug("Skipping unknown auth method: %s" % method)
             return self._try_auth()
         elif self.available_auth_methods is not None:
             if method in self.available_auth_methods:
@@ -83,7 +85,7 @@ class LegacyClientStream(ClientStream):
                 self.auth_stanza=None
                 return
             else:
-                self.debug("Skipping unavailable auth method: %s" % method)
+                self.__logger.debug("Skipping unavailable auth method: %s" % method)
         else:
             self._auth_stage1()
 
@@ -123,7 +125,7 @@ class LegacyClientStream(ClientStream):
             if resource:
                 resource=from_utf8(resource[0].getContent())
             if not username or not resource:
-                self.debug("No username or resource found in auth request")
+                self.__logger.debug("No username or resource found in auth request")
                 iq=stanza.make_error_response("bad-request")
                 self.send(iq)
                 return
@@ -158,7 +160,7 @@ class LegacyClientStream(ClientStream):
     def auth_timeout(self,*args):
         self.lock.acquire()
         try:
-            self.debug("Timeout while waiting for jabber:iq:auth result")
+            self.__logger.debug("Timeout while waiting for jabber:iq:auth result")
             if self.auth_methods_left:
                 self.auth_methods_left.pop(0)
         finally:
@@ -181,7 +183,7 @@ class LegacyClientStream(ClientStream):
     def auth_stage2(self,stanza):
         self.lock.acquire()
         try:
-            self.debug("Procesing auth response...")
+            self.__logger.debug("Procesing auth response...")
             self.available_auth_methods=[]
             if (stanza.xpath_eval("a:query/a:digest",{"a":"jabber:iq:auth"}) and self.stream_id):
                         self.available_auth_methods.append("digest")
@@ -207,7 +209,7 @@ class LegacyClientStream(ClientStream):
         if password:
             password=from_utf8(password[0].getContent())
         if not password:
-            self.debug("No password found in plain auth request")
+            self.__logger.debug("No password found in plain auth request")
             iq=stanza.make_error_response("bad-request")
             self.send(iq)
             return
@@ -220,7 +222,7 @@ class LegacyClientStream(ClientStream):
             self.state_change("authorized",self.peer)
             self._post_auth()
         else:
-            self.debug("Plain auth failed")
+            self.__logger.debug("Plain auth failed")
             iq=stanza.make_error_response("bad-request")
             e=iq.get_error()
             e.add_custom_condition('jabber:iq:auth:error',"user-unauthorized")
@@ -242,7 +244,7 @@ class LegacyClientStream(ClientStream):
         if digest:
             digest=digest[0].getContent()
         if not digest:
-            self.debug("No digest found in digest auth request")
+            self.__logger.debug("No digest found in digest auth request")
             iq=stanza.make_error_response("bad-request")
             self.send(iq)
             return
@@ -265,7 +267,7 @@ class LegacyClientStream(ClientStream):
             self.state_change("authorized",self.peer)
             self._post_auth()
         else:
-            self.debug("Digest auth failed: %r != %r" % (digest,mydigest))
+            self.__logger.debug("Digest auth failed: %r != %r" % (digest,mydigest))
             iq=stanza.make_error_response("bad-request")
             e=iq.get_error()
             e.add_custom_condition('jabber:iq:auth:error',"user-unauthorized")
@@ -274,7 +276,7 @@ class LegacyClientStream(ClientStream):
     def auth_finish(self,stanza):
         self.lock.acquire()
         try:
-            self.debug("Authenticated")
+            self.__logger.debug("Authenticated")
             self.me=self.jid
             self.authenticated=1
             self.state_change("authorized",self.me)

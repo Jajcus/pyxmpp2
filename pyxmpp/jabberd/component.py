@@ -19,8 +19,9 @@ import libxml2
 import sys
 import threading
 import traceback
+import logging
 
-from componentstream import ComponentStream
+from pyxmpp.jabberd.componentstream import ComponentStream
 from pyxmpp.utils import to_utf8,from_utf8
 from pyxmpp.jabber import DiscoItems,DiscoInfo,DiscoIdentity
 from pyxmpp.stanza import Stanza
@@ -47,6 +48,7 @@ class Component:
         self.disco_info=None
         self.category=category
         self.type=type
+        self.__logger=logging.getLogger("pyxmpp.jabberd.Component")
 
 # public methods
 
@@ -67,14 +69,12 @@ class Component:
             if stream:
                 stream.close()
 
-            self.debug("Creating component stream: %r" % (self.stream_class,))
+            self.__logger.debug("Creating component stream: %r" % (self.stream_class,))
             stream=self.stream_class(jid=self.jid,
                     secret=self.secret,
                     server=self.server,
                     port=self.port,
                     keepalive=self.keepalive)
-            stream.debug=self.debug
-            stream.print_exception=self.print_exception
             stream.process_stream_error=self.stream_error
             self.stream_created(stream)
             stream.state_change=self.__stream_state_change
@@ -140,14 +140,14 @@ class Component:
         info=self.disco_get_info(node,iq)
         if isinstance(info,DiscoInfo):
             resp=iq.make_result_response()
-            self.debug("Disco-info query: %s preparing response: %s with reply: %s"
+            self.__logger.debug("Disco-info query: %s preparing response: %s with reply: %s"
                 % (iq.serialize(),resp.serialize(),info.xmlnode.serialize()))
             resp.set_content(info.xmlnode.copyNode(1))
         elif isinstance(info,Stanza):
             resp=info
         else:
             resp=iq.make_error_response("item-not-found")
-        self.debug("Disco-info response: %s" % (resp.serialize(),))
+        self.__logger.debug("Disco-info response: %s" % (resp.serialize(),))
         self.stream.send(resp)
 
     def __disco_items(self,iq):
@@ -159,14 +159,14 @@ class Component:
         items=self.disco_get_items(node,iq)
         if isinstance(items,DiscoItems):
             resp=iq.make_result_response()
-            self.debug("Disco-items query: %s preparing response: %s with reply: %s"
+            self.__logger.debug("Disco-items query: %s preparing response: %s with reply: %s"
                 % (iq.serialize(),resp.serialize(),items.xmlnode.serialize()))
             resp.set_content(items.xmlnode.copyNode(1))
         elif isinstance(items,Stanza):
             resp=items
         else:
             resp=iq.make_error_response("item-not-found")
-        self.debug("Disco-items response: %s" % (resp.serialize(),))
+        self.__logger.debug("Disco-items response: %s" % (resp.serialize(),))
         self.stream.send(resp)
 
 # Method to override
@@ -182,7 +182,7 @@ class Component:
         pass
 
     def stream_error(self,err):
-        self.debug("Stream error: condition: %s %r"
+        self.__logger.debug("Stream error: condition: %s %r"
                 % (err.get_condition().name,err.serialize()))
 
     def stream_state_changed(self,state,arg):
@@ -192,7 +192,7 @@ class Component:
         pass
 
     def authenticated(self):
-        self.debug("Setting up Disco handlers...")
+        self.__logger.debug("Setting up Disco handlers...")
         self.stream.set_iq_get_handler("query","http://jabber.org/protocol/disco#items",
                                     self.__disco_items)
         self.stream.set_iq_get_handler("query","http://jabber.org/protocol/disco#info",
@@ -220,12 +220,4 @@ class Component:
     def disconnected(self):
         pass
 
-    def debug(self,str):
-        print >>sys.stderr,"DEBUG:",str
-
-    def print_exception(self):
-        for s in traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback):
-            if s[-1]=='\n':
-                s=s[:-1]
-            self.debug(s)
 # vi: sts=4 et sw=4

@@ -1,9 +1,14 @@
 #!/usr/bin/python -u
 
 import sys
+import logging
 
 from pyxmpp import JID
 from pyxmpp.jabberd import ComponentStream
+
+logger=logging.getLogger()
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.DEBUG)
 
 class Stream(ComponentStream):
     def state_change(self,state,arg):

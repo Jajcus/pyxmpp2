@@ -18,14 +18,15 @@
 import libxml2
 import sha
 import time
+import logging
 from types import UnicodeType
 
-from stream import Stream,StreamError,FatalStreamError,SASLNotAvailable,SASLMechanismNotAvailable
-from stream import StreamAuthenticationError,BIND_NS
-from iq import Iq
-from stanza import common_doc
-from jid import JID
-from utils import to_utf8,from_utf8
+from pyxmpp.stream import Stream,StreamError,FatalStreamError,SASLNotAvailable,SASLMechanismNotAvailable
+from pyxmpp.stream import StreamAuthenticationError,BIND_NS
+from pyxmpp.iq import Iq
+from pyxmpp.stanza import common_doc
+from pyxmpp.jid import JID
+from pyxmpp.utils import to_utf8,from_utf8
 
 class ClientStreamError(StreamError):
     pass
@@ -55,6 +56,7 @@ class ClientStream(Stream):
         self.jid=jid
         self.password=password
         self.auth_methods=auth_methods
+        self.__logger=logging.getLogger("pyxmpp.ClientStream")
 
     def _reset(self):
         Stream._reset(self)
@@ -75,7 +77,7 @@ class ClientStream(Stream):
         if not port:
             port=self.port
         if server:
-            self.debug("server: %r" % (server,))
+            self.__logger.debug("server: %r" % (server,))
             service=None
         else:
             service="xmpp-client"
@@ -95,9 +97,9 @@ class ClientStream(Stream):
 
     def _try_auth(self):
         if self.authenticated:
-            self.debug("try_auth: already authenticated")
+            self.__logger.debug("try_auth: already authenticated")
             return
-        self.debug("trying auth: %r" % (self.auth_methods_left,))
+        self.__logger.debug("trying auth: %r" % (self.auth_methods_left,))
         if not self.auth_methods_left:
             raise LegacyAuthenticationError,"No allowed authentication methods available"
         method=self.auth_methods_left[0]
@@ -108,15 +110,15 @@ class ClientStream(Stream):
                     self._sasl_authenticate(self.jid.node, None,
                             mechanism=method[5:].upper())
                 except (SASLMechanismNotAvailable,SASLNotAvailable),e:
-                    self.debug("Skipping unavailable auth method: %s" % (method,) )
+                    self.__logger.debug("Skipping unavailable auth method: %s" % (method,) )
                     return self._try_auth()
             else:
                 self.auth_methods_left.pop(0)
-                self.debug("Skipping auth method %s as legacy protocol is in use" % (method,) )
+                self.__logger.debug("Skipping auth method %s as legacy protocol is in use" % (method,) )
                 return self._try_auth()
         else:
             self.auth_methods_left.pop(0)
-            self.debug("Skipping unknown auth method: %s" % method)
+            self.__logger.debug("Skipping unknown auth method: %s" % method)
             return self._try_auth()
 
     def _get_stream_features(self):

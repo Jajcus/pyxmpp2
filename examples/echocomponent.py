@@ -22,6 +22,7 @@
 #  </service>
 
 import sys
+import logging
 
 from pyxmpp import ClientStream,JID,Iq,Presence,Message,StreamError
 import pyxmpp.jabberd
@@ -127,6 +128,10 @@ class Component(pyxmpp.jabberd.Component):
         p=stanza.make_accept_response()
         self.stream.send(p)
         return 1
+
+logger=logging.getLogger()
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.DEBUG)
 
 if len(sys.argv)<5:
     print "Usage:"

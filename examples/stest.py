@@ -5,6 +5,7 @@ import time
 import sys
 import traceback
 import socket
+import logging
 
 from pyxmpp import ClientStream,JID,Iq,Presence,Message,StreamError
 
@@ -74,6 +75,10 @@ class Stream(ClientStream):
         if "plain" in acceptable_formats and accounts.has_key(username):
             return accounts[username],"plain"
         return None,None
+
+logger=logging.getLogger()
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.DEBUG)
 
 print "creating socket..."
 sock=socket.socket()

@@ -21,9 +21,10 @@ import string
 import md5
 from types import UnicodeType
 import sys
+import logging
 
-from core import ClientAuthenticator,ServerAuthenticator
-from core import Reply,Failure,Response,Challenge,Success,Failure,PasswordManager
+from pyxmpp.sasl.core import ClientAuthenticator,ServerAuthenticator
+from pyxmpp.sasl.core import Reply,Failure,Response,Challenge,Success,Failure,PasswordManager
 
 from pyxmpp.utils import to_utf8,from_utf8
 
@@ -75,6 +76,9 @@ def compute_response_auth(username,realm,urp_hash,nonce,cnonce,nonce_count,authz
 param_re=re.compile(r'^(?P<var>[^=]+)\=(?P<val>(\"(([^"\\]+)|(\\\")|(\\\\))+\")|([^",]+))(\,(?P<rest>.*))?$')
 
 class DigestMD5ClientAuthenticator(ClientAuthenticator):
+    def __init__(self,password_manager):
+        ClientAuthenticator.__init__(self,password_manager)
+        self.__logger=logging.getLogger("pyxmpp.sasl.DigestMD5ClientAuthenticator")
     def start(self,username,authzid,password=None):
         self.username=from_utf8(username)
         if authzid:
@@ -95,7 +99,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 
     def challenge(self,challenge):
         if not challenge:
-            self.debug("Empty challenge")
+            self.__logger.debug("Empty challenge")
             return Failure("bad-challenge")
 
         challenge=challenge.split('\x00')[0]
@@ -110,43 +114,43 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         while challenge:
             m=param_re.match(challenge)
             if not m:
-                self.debug("Challenge syntax error: %r" % (challenge,))
+                self.__logger.debug("Challenge syntax error: %r" % (challenge,))
                 return Failure("bad-challenge")
             challenge=m.group("rest")
             var=m.group("var")
             val=m.group("val")
-            self.debug("%r: %r" % (var,val))
+            self.__logger.debug("%r: %r" % (var,val))
             if var=="realm":
                 realms.append(unquote(val))
             elif var=="nonce":
                 if nonce:
-                    self.debug("Duplicate nonce")
+                    self.__logger.debug("Duplicate nonce")
                     return Failure("bad-challenge")
                 nonce=unquote(val)
             elif var=="qop":
                 qopl=unquote(val).split(",")
                 if "auth" not in qopl:
-                    self.debug("auth not supported")
+                    self.__logger.debug("auth not supported")
                     return Failure("not-implemented")
             elif var=="charset":
                 if val!="utf-8":
-                    self.debug("charset given and not utf-8")
+                    self.__logger.debug("charset given and not utf-8")
                     return Failure("bad-challenge")
                 charset="utf-8"
             elif var=="algorithm":
                 if val!="md5-sess":
-                    self.debug("algorithm given and not md5-sess")
+                    self.__logger.debug("algorithm given and not md5-sess")
                     return Failure("bad-challenge")
 
         if not nonce:
-            self.debug("nonce not given")
+            self.__logger.debug("nonce not given")
             return Failure("bad-challenge")
 
         if self.password is None:
             self.password,self.pformat=self.password_manager.get_password(
                         self.username,["plain","md5:user:realm:pass"])
         if not self.password or self.pformat not in ("plain","md5:user:realm:pass"):
-            self.debug("Couldn't get plain password. Password: %r Format: %r"
+            self.__logger.debug("Couldn't get plain password. Password: %r Format: %r"
                             % (self.password,self.pformat))
             return Failure("password-unavailable")
 
@@ -161,13 +165,13 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
                 try:
                     realm=realm.encode(charset)
                 except UnicodeError:
-                    self.debug("Couldn't encode realm to %r" % (charset,))
+                    self.__logger.debug("Couldn't encode realm to %r" % (charset,))
                     return Failure("incompatible-charset")
             elif charset!="utf-8":
                 try:
                     realm=unicode(realm,"utf-8").encode(charser)
                 except UnicodeError:
-                    self.debug("Couldn't encode realm from utf-8 to %r"
+                    self.__logger.debug("Couldn't encode realm from utf-8 to %r"
                                         % (charset,))
                     return Failure("incompatible-charset")
             self.realm=realm
@@ -177,7 +181,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         try:
             username=self.username.encode(charset)
         except UnicodeError:
-            self.debug("Couldn't encode username to %r" % (charset,))
+            self.__logger.debug("Couldn't encode username to %r" % (charset,))
             return Failure("incompatible-charset")
 
         username=quote(username)
@@ -211,7 +215,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
             try:
                 authzid=self.authzid.encode(charset)
             except UnicodeError:
-                self.debug("Couldn't encode authzid to %r" % (charset,))
+                self.__logger.debug("Couldn't encode authzid to %r" % (charset,))
                 return Failure("incompatible-charset")
             authzid=quote(authzid)
         else:
@@ -243,25 +247,25 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         while challenge:
             m=param_re.match(challenge)
             if not m:
-                self.debug("Challenge syntax error: %r" % (challenge,))
+                self.__logger.debug("Challenge syntax error: %r" % (challenge,))
                 return Failure("bad-challenge")
             challenge=m.group("rest")
             var=m.group("var")
             val=m.group("val")
-            self.debug("%r: %r" % (var,val))
+            self.__logger.debug("%r: %r" % (var,val))
             if var=="rspauth":
                 rspauth=val
 
         if not rspauth:
-            self.debug("Final challenge without rspauth")
+            self.__logger.debug("Final challenge without rspauth")
             return Failure("bad-success")
 
         if rspauth==self.response_auth:
             self.rspauth_checked=1
             return Response("")
         else:
-            self.debug("Wrong rspauth value - peer is cheating?")
-            self.debug("my rspauth: %r" % (self.response_auth,))
+            self.__logger.debug("Wrong rspauth value - peer is cheating?")
+            self.__logger.debug("my rspauth: %r" % (self.response_auth,))
             return Failure("bad-success")
 
     def finish(self,data):
@@ -271,10 +275,13 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
             self.final_challenge(data)
 
         if not self.response_auth:
-            self.debug("Got success too early")
+            self.__logger.debug("Got success too early")
             return Failure("bad-success")
 
 class DigestMD5ServerAuthenticator(ServerAuthenticator):
+    def __init__(self,password_manager):
+        ServerAuthenticator.__init__(self,password_manager)
+        self.__logger=logging.getLogger("pyxmpp.sasl.DigestMD5ServerAuthenticator")
     def start(self,response):
         self.last_nonce_count=0
         params=[]
@@ -318,22 +325,22 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         while response:
             m=param_re.match(response)
             if not m:
-                self.debug("Response syntax error: %r" % (response,))
+                self.__logger.debug("Response syntax error: %r" % (response,))
                 return Failure("not-authorized")
             response=m.group("rest")
             var=m.group("var")
             val=m.group("val")
-            self.debug("%r: %r" % (var,val))
+            self.__logger.debug("%r: %r" % (var,val))
             if var=="realm":
                 realm=val[1:-1]
             elif var=="cnonce":
                 if cnonce:
-                    self.debug("Duplicate cnonce")
+                    self.__logger.debug("Duplicate cnonce")
                     return Failure("not-authorized")
                 cnonce=val[1:-1]
             elif var=="qop":
                 if val!='auth':
-                    self.debug("qop other then 'auth'")
+                    self.__logger.debug("qop other then 'auth'")
                     return Failure("not-authorized")
             elif var=="digest-uri":
                 digest_uri=val[1:-1]
@@ -347,24 +354,24 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
                 nonce_count=val
                 self.last_nonce_count+=1
                 if int(nonce_count)!=self.last_nonce_count:
-                    self.debug("bad nonce: %r != %r"
+                    self.__logger.debug("bad nonce: %r != %r"
                             % (nonce_count,self.last_nonce_count))
                     return Failure("not-authorized")
 
         if not cnonce:
-            self.debug("Required 'cnonce' parameter not given")
+            self.__logger.debug("Required 'cnonce' parameter not given")
             return Failure("not-authorized")
         if not response_val:
-            self.debug("Required 'response' parameter not given")
+            self.__logger.debug("Required 'response' parameter not given")
             return Failure("not-authorized")
         if not username:
-            self.debug("Required 'username' parameter not given")
+            self.__logger.debug("Required 'username' parameter not given")
             return Failure("not-authorized")
         if not digest_uri:
-            self.debug("Required 'digest_uri' parameter not given")
+            self.__logger.debug("Required 'digest_uri' parameter not given")
             return Failure("not-authorized")
         if not nonce_count:
-            self.debug("Required 'nc' parameter not given")
+            self.__logger.debug("Required 'nc' parameter not given")
             return Failure("not-authorized")
 
 
@@ -389,13 +396,13 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         elif pformat=="plain":
             urp_hash=make_urp_hash(username,realm,password)
         else:
-            self.debug("Couldn't get password.")
+            self.__logger.debug("Couldn't get password.")
             return Failure("not-authorized")
 
         valid_response=compute_response(username,realm,urp_hash,self.nonce,cnonce,
                             nonce_count,authzid,digest_uri)
         if response_val!=valid_response:
-            self.debug("Response mismatch: %r != %r" % (response_val,valid_response))
+            self.__logger.debug("Response mismatch: %r != %r" % (response_val,valid_response))
             return Failure("not-authorized")
 
         s=digest_uri_uq.split("/")
@@ -406,7 +413,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
             serv_type,host=s
             serv_name=None
         else:
-            self.debug("Bad digest_uri: %r" % (digest_uri_uq,))
+            self.__logger.debug("Bad digest_uri: %r" % (digest_uri_uq,))
             return Failure("not-authorized")
 
         info={}
@@ -422,6 +429,6 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
             self.done=1
             return Challenge("rspauth="+rspauth)
         else:
-            self.debug("Authzid check failed")
+            self.__logger.debug("Authzid check failed")
             return Failure("invalid_authzid")
 # vi: sts=4 et sw=4

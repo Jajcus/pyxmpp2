@@ -16,6 +16,7 @@
 #
 
 import libxml2
+import logging
 from types import StringType,UnicodeType
 
 from pyxmpp.utils import to_utf8,from_utf8
@@ -503,6 +504,7 @@ class MucRoomHandler:
     """
     def __init__(self):
         self.room_state=None
+        self.__logger=logging.getLogger("pyxmpp.jabber.MucRoomHandler")
 
     def assign_state(self,state_obj):
         """Called to assign a `MucRoomState` object to this `MucRoomHandler` instance."""
@@ -598,11 +600,8 @@ class MucRoomHandler:
 
     def error(self,stanza):
         err=stanza.get_error()
-        self.debug("Error from: %r Condition: %r"
+        self.__logger.debug("Error from: %r Condition: %r"
                 % (stanza.get_from(),err.get_condition))
-
-    def debug(self,s):
-        self.room_state.manager.stream.debug(s)
 
 class MucRoomUser:
     """
@@ -705,6 +704,7 @@ class MucRoomState:
         self.users={}
         self.me=MucRoomUser(room_jid)
         handler.assign_state(self)
+        self.__logger=logging.getLogger("pyxmpp.jabber.MucRoomState")
 
     def get_user(self,nick_or_jid,create=False):
         """
@@ -882,9 +882,6 @@ class MucRoomState:
         """
         self.handler.error(stanza)
 
-    def debug(self,s):
-        self.manager.stream.debug(s)
-
 class MucRoomManager:
     """
     Manage collection of MucRoomState objects and dispatch events.
@@ -899,6 +896,7 @@ class MucRoomManager:
         """
         self.rooms={}
         self.set_stream(stream)
+        self.__logger=logging.getLogger("pyxmpp.jabber.MucRoomManager")
 
     def set_stream(self,stream):
         """
@@ -953,7 +951,7 @@ class MucRoomManager:
         key=fr.bare().as_unicode()
         rs=self.rooms.get(key)
         if not rs:
-            self.debug("groupchat message from unknown source")
+            self.__logger.debug("groupchat message from unknown source")
             return False
         rs.process_groupchat_message(stanza)
         return True
@@ -993,8 +991,5 @@ class MucRoomManager:
             return False
         rs.process_unavailable_presence(MucPresence(stanza))
         return True
-
-    def debug(self,s):
-        self.stream.debug(s)
 
 # vi: sts=4 et sw=4

@@ -15,8 +15,10 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-from clientstream import LegacyClientStream
-from disco import DISCO_ITEMS_NS,DISCO_INFO_NS,DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
+import logging
+
+from pyxmpp.jabber.clientstream import LegacyClientStream
+from pyxmpp.jabber.disco import DISCO_ITEMS_NS,DISCO_INFO_NS,DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
 from pyxmpp.client import Client,ClientError,FatalClientError
 from pyxmpp.stanza import Stanza
 
@@ -29,6 +31,7 @@ class JabberClient(Client):
         self.stream_class=LegacyClientStream
         self.disco_items=None
         self.disco_info=None
+        self.__logger=logging.getLogger("pyxmpp.jabber.JabberClient")
 
 # public methods
 
@@ -50,14 +53,14 @@ class JabberClient(Client):
         info=self.disco_get_info(node,iq)
         if isinstance(info,DiscoInfo):
             resp=iq.make_result_response()
-            self.debug("Disco-info query: %s preparing response: %s with reply: %s"
+            self.__logger.debug("Disco-info query: %s preparing response: %s with reply: %s"
                 % (iq.serialize(),resp.serialize(),info.xmlnode.serialize()))
             resp.set_content(info.xmlnode.copyNode(1))
         elif isinstance(info,stanza):
             resp=info
         else:
             resp=iq.make_error_response("item-not-found")
-        self.debug("Disco-info response: %s" % (resp.serialize(),))
+        self.__logger.debug("Disco-info response: %s" % (resp.serialize(),))
         self.stream.send(resp)
 
     def __disco_items(self,iq):
@@ -69,14 +72,14 @@ class JabberClient(Client):
         items=self.disco_get_items(node,iq)
         if isinstance(items,DiscoItems):
             resp=iq.make_result_response()
-            self.debug("Disco-items query: %s preparing response: %s with reply: %s"
+            self.__logger.debug("Disco-items query: %s preparing response: %s with reply: %s"
                 % (iq.serialize(),resp.serialize(),items.xmlnode.serialize()))
             resp.set_content(items.xmlnode.copyNode(1))
         elif isinstance(items,Stanza):
             resp=items
         else:
             resp=iq.make_error_response("item-not-found")
-        self.debug("Disco-items response: %s" % (resp.serialize(),))
+        self.__logger.debug("Disco-items response: %s" % (resp.serialize(),))
         self.stream.send(resp)
 
 # methods to override
@@ -101,4 +104,5 @@ class JabberClient(Client):
         if not node and self.disco_items:
             return self.disco_items
         return None
+
 # vi: sts=4 et sw=4

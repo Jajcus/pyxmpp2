@@ -18,6 +18,7 @@
 import random
 import string
 import sys
+import logging
 from binascii import b2a_base64
 
 class PasswordManager:
@@ -86,22 +87,20 @@ class Success(Reply):
 class ClientAuthenticator:
     def __init__(self,password_manager):
         self.password_manager=password_manager
+        self.__logger=logging.getLogger("pyxmpp.sasl.ClientAuthenticator")
     def start(self,username,authzid):
         return Abort("Not implemented")
     def challenge(self,challenge):
         return Abort("Not implemented")
     def finish(self,data):
         return Success(self.authzid)
-    def debug(self,s):
-        print >>sys.stderr,"SASL client:",self.__class__,s
 
 class ServerAuthenticator:
     def __init__(self,password_manager):
         self.password_manager=password_manager
+        self.__logger=logging.getLogger("pyxmpp.sasl.ServerAuthenticator")
     def start(self,initial_response):
         return Failure("not-authorized")
     def response(self,response):
         return Failure("not-authorized")
-    def debug(self,s):
-        print >>sys.stderr,"%s: %s" % (self.__class__,s)
 # vi: sts=4 et sw=4

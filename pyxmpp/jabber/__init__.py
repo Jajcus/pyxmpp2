@@ -17,9 +17,10 @@
 
 """JSF defined XMPP extension and legacy Jabber protocol elements"""
 
-from clientstream import LegacyClientStream
-from client import JabberClient as Client
-from disco import DISCO_NS,DISCO_INFO_NS,DISCO_ITEMS_NS
-from disco import DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
-from vcard import VCARD_NS,VCard
+from pyxmpp.jabber.clientstream import LegacyClientStream
+from pyxmpp.jabber.client import JabberClient as Client
+from pyxmpp.jabber.disco import DISCO_NS,DISCO_INFO_NS,DISCO_ITEMS_NS
+from pyxmpp.jabber.disco import DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
+from pyxmpp.jabber.vcard import VCARD_NS,VCard
+
 # vi: sts=4 et sw=4

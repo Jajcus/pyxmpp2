@@ -19,13 +19,14 @@ import libxml2
 import sys
 import threading
 import traceback
+import logging
 
-from clientstream import ClientStream
-from jid import JID
-from iq import Iq
-from presence import Presence
-from utils import to_utf8,from_utf8
-from roster import Roster
+from pyxmpp.clientstream import ClientStream
+from pyxmpp.jid import JID
+from pyxmpp.iq import Iq
+from pyxmpp.presence import Presence
+from pyxmpp.utils import to_utf8,from_utf8
+from pyxmpp.roster import Roster
 
 class ClientError(StandardError):
     pass
@@ -51,6 +52,7 @@ class Client:
         self.session_established=0
         self.roster=None
         self.stream_class=ClientStream
+        self.__logger=logging.getLogger("pyxmpp.Client")
 
 # public methods
 
@@ -69,7 +71,7 @@ class Client:
             if stream:
                 stream.close()
 
-            self.debug("Creating client stream: %r, auth_methods=%r"
+            self.__logger.debug("Creating client stream: %r, auth_methods=%r"
                     % (self.stream_class,self.auth_methods))
             stream=self.stream_class(jid=self.jid,
                     password=self.password,
@@ -78,8 +80,6 @@ class Client:
                     auth_methods=self.auth_methods,
                     tls_settings=self.tls_settings,
                     keepalive=self.keepalive)
-            stream.debug=self.debug
-            stream.print_exception=self.print_exception
             stream.process_stream_error=self.stream_error
             self.stream_created(stream)
             stream.state_change=self.__stream_state_change
@@ -216,7 +216,7 @@ class Client:
         self.request_roster()
 
     def stream_error(self,err):
-        self.debug("Stream error: condition: %s %r"
+        self.__logger.debug("Stream error: condition: %s %r"
                 % (err.get_condition().name,err.serialize()))
 
     def roster_updated(self,item=None):
@@ -237,12 +237,4 @@ class Client:
     def disconnected(self):
         pass
 
-    def debug(self,str):
-        print >>sys.stderr,"DEBUG:",str
-
-    def print_exception(self):
-        for s in traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback):
-            if s[-1]=='\n':
-                s=s[:-1]
-            self.debug(s)
 # vi: sts=4 et sw=4

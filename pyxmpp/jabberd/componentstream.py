@@ -18,6 +18,7 @@
 import libxml2
 import sha
 import time
+import logging
 from types import UnicodeType
 
 from pyxmpp.stream import Stream,StreamError,FatalStreamError,SASLNotAvailable,SASLMechanismNotAvailable
@@ -47,6 +48,7 @@ class ComponentStream(Stream):
         self.jid=jid
         self.secret=secret
         self.process_all_stanzas=1
+        self.__logger=logging.getLogger("pyxmpp.jabberd.ComponentStream")
 
     def _reset(self):
         Stream._reset(self)
@@ -87,15 +89,15 @@ class ComponentStream(Stream):
 
     def _auth(self):
         if self.authenticated:
-            self.debug("_auth: already authenticated")
+            self.__logger.debug("_auth: already authenticated")
             return
-        self.debug("doing handshake...")
+        self.__logger.debug("doing handshake...")
         hash=self._compute_handshake()
         n=common_root.newTextChild(None,"handshake",hash)
         self._write_node(n)
         n.unlinkNode()
         n.freeNode()
-        self.debug("handshake hash sent.")
+        self.__logger.debug("handshake hash sent.")
 
     def _process_node(self,node):
         ns=node.ns()
