@@ -383,11 +383,6 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 				% (err.get_class(),err.get_condition().name,err.serialize()))
 
 	def process_iq(self,stanza):
-		if not self.initiator and not self.peer_authenticated:
-			pre_auth=1
-		else:
-			pre_auth=0
-			
 		id=stanza.get_id()
 		fr=stanza.get_from()
 
@@ -412,11 +407,11 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		el=q.name
 		ns=q.ns().getContent()
 
-		if typ=="get" and self.iq_get_handlers.has_key((el,ns,pre_auth)):
-			self.iq_get_handlers[(el,ns,pre_auth)](stanza)
+		if typ=="get" and self.iq_get_handlers.has_key((el,ns)):
+			self.iq_get_handlers[(el,ns)](stanza)
 			return 1
-		elif typ=="set" and self.iq_set_handlers.has_key((el,ns,pre_auth)):
-			self.iq_set_handlers[(el,ns,pre_auth)](stanza)
+		elif typ=="set" and self.iq_set_handlers.has_key((el,ns)):
+			self.iq_set_handlers[(el,ns)](stanza)
 			return 1
 		else:
 			r=stanza.make_error_reply("recipient","feature-not-implemented")
@@ -505,11 +500,17 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			self.iq_reply_handlers[(iq.get_id(),iq.get_to().as_unicode()),timeout]=(
 								res_handler,err_handler)
 
-	def set_iq_get_handler(self,element,namespace,handler,pre_auth=0):
-		self.iq_get_handlers[(element,namespace,pre_auth)]=handler
+	def set_iq_get_handler(self,element,namespace,handler):
+		self.iq_get_handlers[(element,namespace)]=handler
 
-	def set_iq_set_handler(self,element,namespace,handler,pre_auth=0):
-		self.iq_set_handlers[(element,namespace,pre_auth)]=handler
+	def unset_iq_get_handler(self,element,namespace,handler):
+		del self.iq_get_handlers[(element,namespace)]
+
+	def set_iq_set_handler(self,element,namespace,handler):
+		self.iq_set_handlers[(element,namespace)]=handler
+
+	def unset_iq_set_handler(self,element,namespace,handler):
+		del self.iq_get_handlers[(element,namespace)]
 
 	def set_message_handler(self,type,handler):
 		if not type:

@@ -27,7 +27,10 @@ from stanza import common_doc
 from jid import JID
 from utils import to_utf8,from_utf8
 
-class ClientError(RuntimeError):
+class ClientError(StreamError):
+	pass
+
+class FatalClientError(FatalStreamError):
 	pass
 
 class LegacyAuthenticationError(StreamAuthenticationError):
@@ -55,7 +58,11 @@ class ClientStream(Stream):
 		self.jid=jid
 		self.password=password
 		self.auth_methods=auth_methods
+	
+	def reset(self):
+		Stream.reset()
 		self.auth_methods_left=[]
+		self.session_established=1
 		self.available_auth_methods=None
 		self.features_timeout=None
 		self.auth_stanza=None
@@ -79,9 +86,36 @@ class ClientStream(Stream):
 		else:
 			if "plain" in self.auth_methods or "digest" in self.auth_methods:
 				self.set_iq_get_handler("query","jabber:iq:auth",
-							self.auth_in_stage1,pre_auth=1)
+							self.auth_in_stage1)
 				self.set_iq_set_handler("query","jabber:iq:auth",
-							self.auth_in_stage2, pre_auth=1)
+							self.auth_in_stage2)
+
+	def post_auth(self):
+		self.unset_iq_get_handler("query","jabber:iq:auth")
+		self.unset_iq_set_handler("query","jabber:iq:auth")
+
+	def request_session(self):
+		if not self.version:
+			self.session_established=1
+			self.session_started()
+		else:
+			iq=Iq(type="set")
+			iq.new_query("urn:ietf:params:xml:ns:xmpp-session","session")
+			self.set_reply_handlers(iq,self.session_result,self.session_error)
+			self.send(iq)
+		
+	def session_timeout(self,k,v):
+		raise FatalClientError("Timeout while tryin to establish a session")
+		
+	def session_error(self,iq):
+		raise FatalClientError("Failed establish session")
+	
+	def session_result(self,iq):
+		self.session_established=1
+		self.session_started()
+	
+	def session_started(self):
+		pass
 
 	def idle(self):
 		Stream.idle(self)
