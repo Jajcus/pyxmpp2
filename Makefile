@@ -1,4 +1,5 @@
 VERSION=0.5
+SNAPSHOT=
 
 DESTDIR="/"
 
@@ -25,7 +26,7 @@ version:
 	fi
 
 dist: all
-	echo "version='$(VERSION)'" > pyxmpp/version.py
+	echo "version='$(VERSION)$(SNAPSHOT)'" > pyxmpp/version.py
 	python setup.py sdist
 
 clean:
