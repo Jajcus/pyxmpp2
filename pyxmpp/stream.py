@@ -112,6 +112,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.authenticator=None
 		self.authenticated=0
 		self.peer_authenticated=0
+		self.auth_method_used=None
 
 	def __del__(self):
 		self.close()
@@ -139,6 +140,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def accept(self,sock,myname):
 		self.eof=0
 		self.socket,addr=sock.accept()
+		self.debug("Connection from: %r" % (addr,))
 		self.addr,self.port=addr
 		if myname:
 			self.me=JID(myname)
@@ -204,6 +206,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
 	def stream_end(self,doc):
 		self.debug("Stream ended")
+		self.eof=1
 		if self.doc_out:
 			self.send_stream_end()
 		if self.doc_in:
@@ -321,7 +324,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 				traceback.print_exc(file=sys.stderr)
 
 	def read(self,fd):
-		if self.eof or not self.reader:
+		if self.eof:
 			return
 		r=os.read(fd,1024)
 		self.debug("IN: %r" % (r,))
@@ -562,6 +565,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		if self.authenticator:
 			self.debug("Authentication already started")
 			return 0
+			
+		self.auth_method_used="sasl:"+mechanism
 		self.authenticator=sasl.ServerAuthenticator(mechanism,self)
 		
 		r=self.authenticator.start(base64.decodestring(content))
@@ -722,6 +727,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		else:
 			if mechanism not in self.peer_sasl_mechanisms:
 				raise SASLMechanismNotAvailable,"%s is not available" % (mechanism,)
+
+		self.auth_method_used="sasl:"+mechanism
 				
 		self.authenticator=sasl.ClientAuthenticator(mechanism,self)
 	
