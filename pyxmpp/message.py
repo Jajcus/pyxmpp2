@@ -72,9 +72,6 @@ class Message(Stanza):
         elif xmlnode is not None:
             raise TypeError,"Couldn't make Message from %r" % (type(xmlnode),)
 
-        if stanza_type=="normal":
-            stanza_type=None
-
         if xmlnode is None:
             xmlnode="message"
 
