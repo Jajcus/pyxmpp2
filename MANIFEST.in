@@ -1,6 +1,9 @@
 include Makefile
-include COPYING TODO DONE ChangeLog
+include COPYING TODO DONE ChangeLog CHANGES
 include examples/*.py
 include tests/*.py
+include tests/Makefile
+include tests/data/*
 include utils/*.py
 include doc
+include utils
