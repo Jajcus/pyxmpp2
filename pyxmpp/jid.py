@@ -57,10 +57,10 @@ class JID(object):
         is not checked for specification compliance. This
         should be used only when other arguments are known
         to be valid.
-        
+
         JID objects are immutable
         """
-   
+
         if isinstance(node,JID):
             return node
 
@@ -70,7 +70,7 @@ class JID(object):
             obj=None
         if obj is None:
             obj=object.__new__(cls)
-        
+
         if node and ((u"@" in node) or (u"/" in node)):
             obj.__from_string(node)
             cls.cache[node]=obj
@@ -177,7 +177,7 @@ class JID(object):
         if not JID.cache.has_key(r):
             JID.cache[r]=self
         return r
-        
+
     def bare(self):
         "Returns bare JID made by removing resource from current JID"
         return JID(self.node,self.domain,check=0)

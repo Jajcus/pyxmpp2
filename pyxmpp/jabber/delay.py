@@ -42,11 +42,11 @@ class Delay:
     reason - the "reason" (content) of the delay element
     timestamp - the UTC timestamp as naive datetime object
     """
-    
+
     def __init__(self,node_or_datetime,fr=None,reason=None,utc=True):
         """
         Initialize the Delay object.
-        
+
         If `node_or_datetime` is an XML node it will be parsed,
         otherwise it should be a i`datetime.datetime` object containing the
         timestamp.

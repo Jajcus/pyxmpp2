@@ -32,7 +32,7 @@ class RosterItem:
 
     Represents part of a roster, or roster update request.
     """
-    
+
     def __init__(self,node_or_jid,subscription="none",name=None,groups=[],ask=None):
         """
         Initialize a roster item from XML node (if `node_or_item` is an instance of
@@ -120,7 +120,7 @@ class RosterItem:
         r=n.serialize()
         n.freeNode()
         return r
-    
+
     def make_roster_push(self):
         """
         Make "roster push" IQ stanza from the item representing roster update
