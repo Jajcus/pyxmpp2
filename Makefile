@@ -1,10 +1,12 @@
 BASE_VERSION=0.1
 SNAPSHOT=
 
+DESTDIR="/"
+
 .PHONY: all version snapshot dist
 
 all: version
-	python setup.py build
+	umask 022 ; python setup.py build
 	cd examples && ln -sf ../build/lib*/pyxmpp .
 	cd examples && chmod a+x *.py
 	cd tests && ln -sf ../build/lib*/pyxmpp .
@@ -22,3 +24,6 @@ snapshot: version dist
 
 dist:
 	python setup.py sdist
+
+install:
+	umask 022 ; python setup.py install --root $(DESTDIR)
