@@ -1,11 +1,15 @@
 
 import unicodedata,string
 import sys
+from types import ListType
 
 try:
 	from unicodedata import normalize
+	import string
 	
 	def NFKC(input):
+		if type(input) is ListType:
+			input=string.join(input,u"")	
 		return normalize("NFKC",input)
 
 except ImportError:
