@@ -59,7 +59,6 @@ class ClientStream(Stream):
 		self.available_auth_methods=None
 		self.features_timeout=None
 		self.auth_stanza=None
-		self.auth_method_used=None
 
 	def connect(self,server=None,port=None):
 		if not self.jid.node or not self.jid.resource:
@@ -116,7 +115,6 @@ class ClientStream(Stream):
 				except (SASLMechanismNotAvailable,SASLNotAvailable),e:
 					self.debug("Skipping unavailable auth method: %s" % method)
 					return self.try_auth()
-				self.auth_method_used=method
 			else:
 				self.features_timeout=time.time()+60
 				self.debug("Must wait for <features/>")
@@ -127,11 +125,11 @@ class ClientStream(Stream):
 		elif self.available_auth_methods is not None:
 			if method in self.available_auth_methods:
 				self.auth_methods_left.pop(0)
+				self.auth_method_used=method
 				if method=="digest":
 					self.digest_auth_stage2(self.auth_stanza)
 				else:
 					self.plain_auth_stage2(self.auth_stanza)
-				self.auth_method_used=method
 				self.auth_stanza=None
 				return
 			else:
@@ -244,6 +242,7 @@ class ClientStream(Stream):
 			iq=stanza.make_result_reply()
 			self.send(iq)
 			self.peer_authenticated=1
+			self.auth_method_used="plain"
 			self.post_auth()
 		else:
 			self.debug("Plain auth failed")
@@ -285,6 +284,7 @@ class ClientStream(Stream):
 			iq=stanza.make_result_reply()
 			self.send(iq)
 			self.peer_authenticated=1
+			self.auth_method_used="digest"
 			self.post_auth()
 		else:
 			self.debug("Digest auth failed: %r != %r" % (digest,mydigest))
