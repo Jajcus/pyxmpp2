@@ -360,8 +360,10 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.data_out(str)
 		try:
 			self.socket.send(str)
+		except (IOError,OSError),e: 
+			raise FatalStreamError("IO Error: "+str(e))
 		except SSLError,e:
-			raise TLSError(e)
+			raise TLSError("TLS Error: "+str(e))
 
 	def write_node(self,node):
 		if self.eof or not self.socket or not self.doc_out:
@@ -422,6 +424,12 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def process(self):
 		try:
 			self.read()
+		except SSLError,e:
+			self.close()
+			raise TLSError("TLS Error: "+str(e))
+		except (IOError,OSError),e: 
+			self.close()
+			raise FatalStreamError("IO Error: "+str(e))
 		except (FatalStreamError,KeyboardInterrupt,SystemExit),e:
 			self.close()
 			raise
@@ -434,10 +442,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		if not self.tls:
 			r=os.read(self.socket.fileno(),1024)
 		else:
-			try:
-				r=self.socket.read()
-			except SSLError,e:
-				raise TLSError(e)
+			r=self.socket.read()
 			if r is None:
 				return
 		self.data_in(r)
@@ -968,7 +973,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 				self.socket=self.tls
 			except SSLError,e:
 				self.tls=0
-				raise TLSError(e)
+				raise TLSError("TLS Error: "+str(e))
 			self.debug("Restarting XMPP stream")
 			self.restart_stream()
 			return 0
