@@ -67,7 +67,7 @@ class VCardName:
 				if n.type!='element':
 					continue
 				if (n.ns() and value.ns() 
-						and n.ns().getContent()!=value.ns().getContent())
+						and n.ns().getContent()!=value.ns().getContent()):
 					continue
 				if n.name=='FAMILY':
 					self.family=unicode(n.getContent(),"utf-8")
@@ -86,7 +86,7 @@ class VCardName:
 			self.family,self.given,self.middle,self.prefix,self.suffix=value
 	def rfc2426(self):
 		return rfc2425encode("n","%s;%s;%s;%s" % 
-				(self.family,self.given,self.middle,self.prefix,self.suffix)
+				(self.family,self.given,self.middle,self.prefix,self.suffix))
 	def xml(self,parent):
 		n=parent.newChild(parent.ns(),"N",None)
 		n.newTextChild(n.ns(),"FAMILY",to_utf8(self.family))
@@ -105,7 +105,7 @@ class VCardImage:
 				if n.type!='element':
 					continue
 				if (n.ns() and value.ns() 
-						and n.ns().getContent()!=value.ns().getContent())
+						and n.ns().getContent()!=value.ns().getContent()):
 					continue
 				if n.name=='TYPE':
 					self.type=unicode(n.getContent(),"utf-8","replace")
@@ -116,7 +116,7 @@ class VCardImage:
 			if (self.uri and self.image) or (not self.uri and not self.image):
 				raise ValueError,"Bad %s value in vcard" % (name,)
 		else:
-			if rfc2425parameters.get("value").lower()="uri":
+			if rfc2425parameters.get("value").lower()=="uri":
 				self.uri=value
 				self.type=None
 			else:
@@ -153,7 +153,7 @@ class VCardAdr:
 				if n.type!='element':
 					continue
 				if (n.ns() and value.ns() 
-						and n.ns().getContent()!=value.ns().getContent())
+						and n.ns().getContent()!=value.ns().getContent()):
 					continue
 				if n.name=='POBOX':
 					self.pobox=unicode(n.getContent(),"utf-8","replace")
@@ -170,7 +170,7 @@ class VCardAdr:
 				elif n.name=='CTRY':
 					self.ctry=unicode(n.getContent(),"utf-8","replace")
 				elif n.name in ("HOME","WORK","POSTAL","PARCEL","DOM","INTL",
-						"PREF")
+						"PREF"):
 					self.type.append(n.name.lower())
 			if self.type==[]:
 				self.type=["intl","postal","parcel","work"]
@@ -195,7 +195,7 @@ class VCardAdr:
 				{"type":string.join(self.type,",")})
 	def xml(self,parent):
 		n=parent.newChild(parent.ns(),"ADR",None)
-		for t in ("home","work","postal","parcel","dom","intl","pref")
+		for t in ("home","work","postal","parcel","dom","intl","pref"):
 			if t in self.type:
 				n.newChild(n.ns(),t.upper(),None)
 		n.newTextChild(n.ns(),"POBOX",to_utf8(self.pobox))
@@ -218,14 +218,14 @@ class VCardLabel:
 				if n.type!='element':
 					continue
 				if (n.ns() and value.ns() 
-						and n.ns().getContent()!=value.ns().getContent())
+						and n.ns().getContent()!=value.ns().getContent()):
 					continue
 				if n.name=='LINE':
 					l=unicode(n.getContent(),"utf-8","replace").strip()
 					l=l.replace("\n"," ").replace("\r"," ")
 					self.lines.append(l)
 				elif n.name in ("HOME","WORK","POSTAL","PARCEL","DOM","INTL",
-						"PREF")
+						"PREF"):
 					self.type.append(n.name.lower())
 			if self.type==[]:
 				self.type=["intl","postal","parcel","work"]
@@ -242,11 +242,11 @@ class VCardLabel:
 			self.lines=value.split("\\n")
 
 	def rfc2426(self):
-		return rfc2425encode("label",string.join(self.lines,"\n")),
+		return rfc2425encode("label",string.join(self.lines,"\n"),
 				{"type":string.join(self.type,",")})
 	def xml(self,parent):
 		n=parent.newChild(parent.ns(),"ADR",None)
-		for t in ("home","work","postal","parcel","dom","intl","pref")
+		for t in ("home","work","postal","parcel","dom","intl","pref"):
 			if t in self.type:
 				n.newChild(n.ns(),t.upper(),None)
 		for l in self.lines:
@@ -264,13 +264,13 @@ class VCardTel:
 				if n.type!='element':
 					continue
 				if (n.ns() and value.ns() 
-						and n.ns().getContent()!=value.ns().getContent())
+						and n.ns().getContent()!=value.ns().getContent()):
 					continue
 				if n.name=='NUMBER':
 					self.number=unicode(n.getContent(),"utf-8","replace")
 				elif n.name in ("HOME","WORK","VOICE","FAX","PAGER","MSG",
 						"CELL","VIDEO","BBS","MODEM","ISDN","PCS",
-						"PREF")
+						"PREF"):
 					self.type.append(n.name.lower())
 			if self.type==[]:
 				self.type=["voice"]
@@ -303,7 +303,7 @@ class VCardEmail:
 				if n.type!='element':
 					continue
 				if (n.ns() and value.ns() 
-						and n.ns().getContent()!=value.ns().getContent())
+						and n.ns().getContent()!=value.ns().getContent()):
 					continue
 				if n.name=='USERID':
 					self.address=unicode(n.getContent(),"utf-8","replace")
@@ -338,7 +338,7 @@ class VCardGeo:
 				if n.type!='element':
 					continue
 				if (n.ns() and value.ns() 
-						and n.ns().getContent()!=value.ns().getContent())
+						and n.ns().getContent()!=value.ns().getContent()):
 					continue
 				if n.name=='LAT':
 					self.lat=unicode(n.getContent(),"utf-8")
@@ -350,7 +350,7 @@ class VCardGeo:
 			self.lat,self.lon=value.split(";")
 	def rfc2426(self):
 		return rfc2425encode("geo","%s;%s" % 
-				(self.lat,self.lon)
+				(self.lat,self.lon))
 	def xml(self,parent):
 		n=parent.newChild(parent.ns(),"GEO",None)
 		n.newTextChild(n.ns(),"LAT",to_utf8(self.lat))
@@ -367,7 +367,7 @@ class VCardOrg:
 				if n.type!='element':
 					continue
 				if (n.ns() and value.ns() 
-						and n.ns().getContent()!=value.ns().getContent())
+						and n.ns().getContent()!=value.ns().getContent()):
 					continue
 				if n.name=='ORGNAME':
 					self.name=unicode(n.getContent(),"utf-8")
@@ -379,7 +379,7 @@ class VCardOrg:
 			self.name,self.unit=value.split(";")
 	def rfc2426(self):
 		return rfc2425encode("org","%s;%s" % 
-				(self.name,self.unit)
+				(self.name,self.unit))
 	def xml(self,parent):
 		n=parent.newChild(parent.ns(),"ORG",None)
 		n.newTextChild(n.ns(),"ORGNAME",to_utf8(self.name))
@@ -396,7 +396,7 @@ class VCardCategories:
 				if n.type!='element':
 					continue
 				if (n.ns() and value.ns() 
-						and n.ns().getContent()!=value.ns().getContent())
+						and n.ns().getContent()!=value.ns().getContent()):
 					continue
 				if n.name=='KEYWORD':
 					self.keywords.append(unicode(n.getContent(),"utf-8"))
@@ -421,7 +421,7 @@ class VCardSound:
 				if n.type!='element':
 					continue
 				if (n.ns() and value.ns() 
-						and n.ns().getContent()!=value.ns().getContent())
+						and n.ns().getContent()!=value.ns().getContent()):
 					continue
 				if n.name=='BINVAL':
 					if (self.phonetic or self.uri):
@@ -438,7 +438,7 @@ class VCardSound:
 			if (not self.phonetic and not self.image and not self.sound):
 				raise Value,"Bad SOUND value in vcard"
 		else:
-			if rfc2425parameters.get("value").lower()="uri":
+			if rfc2425parameters.get("value").lower()=="uri":
 				self.uri=value
 				self.sound=None
 				self.phonetic=None
@@ -469,7 +469,7 @@ class VCardPrivacy:
 				if n.type!='element':
 					continue
 				if (n.ns() and value.ns() 
-						and n.ns().getContent()!=value.ns().getContent())
+						and n.ns().getContent()!=value.ns().getContent()):
 					continue
 				if n.name=='PUBLIC':
 					self.value="public"
