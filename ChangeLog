@@ -1,3 +1,8 @@
+2004-03-23  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/jabber/vcard.py:
+	- add 'version:3.0' to rfc2426 output
+
 2004-03-22  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/jabber/vcard.py:
