@@ -15,6 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+"""PyXMPP - Jabber/XMPP protocol implementation"""
+
 from stream import Stream,StreamError,FatalStreamError,StreamParseError
 from clientstream import ClientStream,ClientStreamError
 from client import Client,ClientError

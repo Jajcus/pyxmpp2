@@ -15,6 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+"""jid --- Jabber ID handling"""
+
 import re
 from types import StringType,UnicodeType
 
@@ -27,10 +29,20 @@ domain_invalid_re=re.compile(r"[^-a-zA-Z]")
 
 
 class JIDError(ValueError):
+	"Exception raised when invalid JID is used"
 	pass
 
 class JID:
 	def __init__(self,node=None,domain=None,resource=None,check=1):
+		"""JID(string[,check=val]) -> JID
+		JID(domain[,check=val]) -> JID
+		JID(node,domain[,resource][,check=val]) -> JID
+		
+		Constructor for JID object.
+		When check argument is given and equal 0, than JID
+		is not checked for specification compliance. This
+		should be used only when other arguments are known 
+		to be valid."""
 		if isinstance(node,JID):
 			self.node=node.node
 			self.domain=node.domain
@@ -110,13 +122,18 @@ class JID:
 	def __str__(self):
 		return self.as_string()
 	
+	def __unicode__(self):
+		return self.as_unicode()
+	
 	def __repr__(self):
 		return "<JID: %r>" % (self.as_string())
 	
 	def as_string(self):
+		"Returns UTF-8 encoded JID representation"
 		return self.as_unicode().encode("utf-8")
 		
 	def as_unicode(self):
+		"Unicode JID representation"
 		if not self.node and not self.resource:
 			return self.domain
 		elif not self.node:
@@ -126,6 +143,7 @@ class JID:
 		else:
 			return "%s@%s/%s" % (self.node,self.domain,self.resource)
 	def bare(self):
+		"Returns bare JID made by removing resource from current JID"
 		return JID(self.node,self.domain,check=0)
 
 	def __eq__(self,other):
