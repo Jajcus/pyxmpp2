@@ -37,10 +37,14 @@ import sasl
 
 try:
 	from M2Crypto import SSL
+	from M2Crypto.SSL import SSLError
 	import M2Crypto.SSL.cb
 	tls_available=1
 except ImportError:
 	tls_available=0
+	class SSLError(Exception):
+		"dummy"
+		pass
 
 STREAM_NS="http://etherx.jabber.org/streams"
 TLS_NS="urn:ietf:params:xml:ns:xmpp-tls"
@@ -356,7 +360,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.data_out(str)
 		try:
 			self.socket.send(str)
-		except SSL.SSLError,e:
+		except SSLError,e:
 			raise TLSError(e)
 
 	def write_node(self,node):
@@ -432,7 +436,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		else:
 			try:
 				r=self.socket.read()
-			except SSL.SSLError,e:
+			except SSLError,e:
 				raise TLSError(e)
 			if r is None:
 				return
@@ -962,7 +966,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 				self.tls_requested=0
 				self.make_tls_connection()
 				self.socket=self.tls
-			except SSL.SSLError,e:
+			except SSLError,e:
 				self.tls=0
 				raise TLSError(e)
 			self.debug("Restarting XMPP stream")
