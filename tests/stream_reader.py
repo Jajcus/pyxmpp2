@@ -128,7 +128,12 @@ class TestStreamReader(unittest.TestCase):
             if not data:
                 break
             self.chunk_end += len(data)
-            self.reader.feed(data)
+            r=self.reader.feed(data)
+            while r:
+                r=self.reader.feed()
+            if r is None:
+                self.event("end", None)
+                break
             self.chunk_start = self.chunk_end
 
     def event(self, event, node):
