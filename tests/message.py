@@ -23,9 +23,7 @@ message2_doc = libxml2.parseDoc(message2)
 message2_node = message2_doc.getRootElement()
 
 class TestMessage(unittest.TestCase):
-    def test_message_from_xml_full(self, m = None, xml = message1_node):
-        if m is None:
-            m = Message(xml)
+    def check_message_full(self, m):
         self.failUnlessEqual(m.get_from(), JID("source@example.com/res"))
         self.failUnlessEqual(m.get_to(), JID("dest@example.com"))
         self.failUnlessEqual(m.get_type(), "normal")
@@ -39,9 +37,7 @@ class TestMessage(unittest.TestCase):
         self.failUnless(nodes[0].children)
         self.failUnlessEqual(nodes[0].children.name, "abc")
 
-    def test_message_from_xml_empty(self, m = None, xml = message2_node):
-        if m is None:
-            m = Message(xml)
+    def check_message_empty(self, m):
         self.failUnlessEqual(m.get_from(), None)
         self.failUnlessEqual(m.get_to(), None)
         self.failUnlessEqual(m.get_type(), None)
@@ -51,14 +47,22 @@ class TestMessage(unittest.TestCase):
         self.failUnlessEqual(m.get_thread(), None)
         nodes = m.xpath_eval("t:payload",{"t":"http://pyxmpp.jabberstudio.org/xmlns/test"})
         self.failIf(nodes)
+    
+    def test_message_full_from_xml(self):
+        m = Message(message1_node)
+        self.check_message_full(m)
+
+    def test_message_empty_from_xml(self):
+        m = Message(message2_node)
+        self.check_message_empty(m)
 
     def test_message_empty(self):
         m = Message()
-        self.test_message_from_xml_empty(m)
+        self.check_message_empty(m)
         node, doc = self.stanza_to_xml(m)
-        self.test_message_from_xml_empty(xml = node)
+        self.check_message_empty( Message(node) )
         node, doc = self.xml_to_xml(doc)
-        self.test_message_from_xml_empty(xml = node)
+        self.check_message_empty( Message(node) )
  
     def test_message_full(self):
         m = Message(
@@ -73,11 +77,11 @@ class TestMessage(unittest.TestCase):
         ns = n.newNs("http://pyxmpp.jabberstudio.org/xmlns/test", "t")
         n.setNs(ns)
         n.newChild(ns, "abc", None)
-        self.test_message_from_xml_full(m)
+        self.check_message_full( m )
         node, doc = self.stanza_to_xml(m)
-        self.test_message_from_xml_full(xml = node)
+        self.check_message_full( Message(node) )
         xml = self.xml_to_xml(doc)
-        self.test_message_from_xml_full(xml = node)
+        self.check_message_full( Message(node) )
    
     def stanza_to_xml(self, stanza):
         d = libxml2.newDoc("1.0")
