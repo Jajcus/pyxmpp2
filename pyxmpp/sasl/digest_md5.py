@@ -16,7 +16,7 @@
 #
 """DIGEST-MD5 authentication mechanism for PyXMPP SASL implementation."""
 
-__revision__="$Id: digest_md5.py,v 1.20 2004/10/01 22:05:17 jajcus Exp $"
+__revision__="$Id: digest_md5.py,v 1.21 2004/10/03 20:49:05 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 from binascii import b2a_hex
@@ -32,7 +32,7 @@ from pyxmpp.utils import to_utf8,from_utf8
 
 quote_re=re.compile(r"(?<!\\)\\(.)")
 
-def unquote(s):
+def _unquote(s):
     """Unquote quoted value from DIGEST-MD5 challenge or response.
 
     If `s` doesn't start or doesn't end with '"' then return it unchanged,
@@ -49,7 +49,7 @@ def unquote(s):
         return s
     return quote_re.sub(r"\1",s[1:-1])
 
-def quote(s):
+def _quote(s):
     """Prepare a string for quoting for DIGEST-MD5 challenge or response.
 
     Don't add the quotes, only escape '"' and "\\" with backslashes.
@@ -65,7 +65,7 @@ def quote(s):
     s=s.replace('"','\\"')
     return '%s' % (s,)
 
-def h_value(s):
+def _h_value(s):
     """H function of the DIGEST-MD5 algorithm (MD5 sum).
     
     :Parameters:
@@ -77,7 +77,7 @@ def h_value(s):
     :returntype: `str`"""
     return md5.new(s).digest()
 
-def kd_value(k,s):
+def _kd_value(k,s):
     """KD function of the DIGEST-MD5 algorithm.
  
     :Parameters:
@@ -89,9 +89,9 @@ def kd_value(k,s):
         
     :return: MD5 sum of the strings joined with ':'.
     :returntype: `str`"""
-    return h_value("%s:%s" % (k,s))
+    return _h_value("%s:%s" % (k,s))
 
-def make_urp_hash(username,realm,passwd):
+def _make_urp_hash(username,realm,passwd):
     """Compute MD5 sum of username:realm:password.
 
     :Parameters:
@@ -109,9 +109,9 @@ def make_urp_hash(username,realm,passwd):
         realm=""
     if type(passwd) is UnicodeType:
         passwd=passwd.encode("utf-8")
-    return h_value("%s:%s:%s" % (username,realm,passwd))
+    return _h_value("%s:%s:%s" % (username,realm,passwd))
 
-def compute_response(urp_hash,nonce,cnonce,nonce_count,authzid,digest_uri):
+def _compute_response(urp_hash,nonce,cnonce,nonce_count,authzid,digest_uri):
     """Compute DIGEST-MD5 response value.
 
     :Parameters:
@@ -135,11 +135,11 @@ def compute_response(urp_hash,nonce,cnonce,nonce_count,authzid,digest_uri):
     else:
         a1="%s:%s:%s" % (urp_hash,nonce,cnonce)
     a2="AUTHENTICATE:"+digest_uri
-    return b2a_hex(kd_value( b2a_hex(h_value(a1)),"%s:%s:%s:%s:%s" % (
+    return b2a_hex(_kd_value( b2a_hex(_h_value(a1)),"%s:%s:%s:%s:%s" % (
             nonce,nonce_count,
-            cnonce,"auth",b2a_hex(h_value(a2)) ) ))
+            cnonce,"auth",b2a_hex(_h_value(a2)) ) ))
 
-def compute_response_auth(urp_hash,nonce,cnonce,nonce_count,authzid,digest_uri):
+def _compute_response_auth(urp_hash,nonce,cnonce,nonce_count,authzid,digest_uri):
     """Compute DIGEST-MD5 rspauth value.
 
     :Parameters:
@@ -163,11 +163,11 @@ def compute_response_auth(urp_hash,nonce,cnonce,nonce_count,authzid,digest_uri):
     else:
         a1="%s:%s:%s" % (urp_hash,nonce,cnonce)
     a2=":"+digest_uri
-    return b2a_hex(kd_value( b2a_hex(h_value(a1)),"%s:%s:%s:%s:%s" % (
+    return b2a_hex(_kd_value( b2a_hex(_h_value(a1)),"%s:%s:%s:%s:%s" % (
             nonce,nonce_count,
-            cnonce,"auth",b2a_hex(h_value(a2)) ) ))
+            cnonce,"auth",b2a_hex(_h_value(a2)) ) ))
 
-param_re=re.compile(r'^(?P<var>[^=]+)\=(?P<val>(\"(([^"\\]+)|(\\\")'
+_param_re=re.compile(r'^(?P<var>[^=]+)\=(?P<val>(\"(([^"\\]+)|(\\\")'
         r'|(\\\\))+\")|([^",]+))(\,(?P<rest>.*))?$')
 
 class DigestMD5ClientAuthenticator(ClientAuthenticator):
@@ -237,7 +237,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         nonce=None
         charset="iso-8859-1"
         while challenge:
-            m=param_re.match(challenge)
+            m=_param_re.match(challenge)
             if not m:
                 self.__logger.debug("Challenge syntax error: %r" % (challenge,))
                 return Failure("bad-challenge")
@@ -246,14 +246,14 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
             val=m.group("val")
             self.__logger.debug("%r: %r" % (var,val))
             if var=="realm":
-                realms.append(unquote(val))
+                realms.append(_unquote(val))
             elif var=="nonce":
                 if nonce:
                     self.__logger.debug("Duplicate nonce")
                     return Failure("bad-challenge")
-                nonce=unquote(val)
+                nonce=_unquote(val)
             elif var=="qop":
-                qopl=unquote(val).split(",")
+                qopl=_unquote(val).split(",")
                 if "auth" not in qopl:
                     self.__logger.debug("auth not supported")
                     return Failure("not-implemented")
@@ -301,8 +301,10 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         :returntype: `sasl.Response` or `sasl.Failure`"""
         params=[]
         realm=self._get_realm(realms,charset)
-        if realm:
-            realm=quote(realm)
+        if isinstance(realm,Failure):
+            return realm
+        elif realm:
+            realm=_quote(realm)
             params.append('realm="%s"' % (realm,))
 
         try:
@@ -311,14 +313,14 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
             self.__logger.debug("Couldn't encode username to %r" % (charset,))
             return Failure("incompatible-charset")
 
-        username=quote(username)
+        username=_quote(username)
         params.append('username="%s"' % (username,))
 
         cnonce=self.password_manager.generate_nonce()
-        cnonce=quote(cnonce)
+        cnonce=_quote(cnonce)
         params.append('cnonce="%s"' % (cnonce,))
 
-        params.append('nonce="%s"' % (quote(nonce),))
+        params.append('nonce="%s"' % (_quote(nonce),))
 
         self.nonce_count+=1
         nonce_count="%08x" % (self.nonce_count,)
@@ -335,7 +337,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         else:
             digest_uri="%s/%s" % (serv_type,host)
 
-        digest_uri=quote(digest_uri)
+        digest_uri=_quote(digest_uri)
         params.append('digest-uri="%s"' % (digest_uri,))
 
         if self.authzid:
@@ -344,18 +346,18 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
             except UnicodeError:
                 self.__logger.debug("Couldn't encode authzid to %r" % (charset,))
                 return Failure("incompatible-charset")
-            authzid=quote(authzid)
+            authzid=_quote(authzid)
         else:
             authzid=""
 
         if self.pformat=="md5:user:realm:pass":
             urp_hash=self.password
         else:
-            urp_hash=make_urp_hash(username,realm,self.password)
+            urp_hash=_make_urp_hash(username,realm,self.password)
 
-        response=compute_response(urp_hash,nonce,cnonce,nonce_count,
+        response=_compute_response(urp_hash,nonce,cnonce,nonce_count,
                             authzid,digest_uri)
-        self.response_auth=compute_response_auth(urp_hash,nonce,cnonce,
+        self.response_auth=_compute_response_auth(urp_hash,nonce,cnonce,
                             nonce_count,authzid,digest_uri)
         params.append('response=%s' % (response,))
         if authzid:
@@ -372,8 +374,8 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
             - `realms`: `list` of `str
             - `charset`: `str`
 
-        :return: the realm chosen.
-        :returntype: `str`"""
+        :return: the realm chosen or a failure indicator.
+        :returntype: `str` or `Failure`"""
         if realms:
             realms=[unicode(r,charset) for r in realms]
             realm=self.password_manager.choose_realm(realms)
@@ -394,6 +396,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
                                         % (charset,))
                     return Failure("incompatible-charset")
             self.realm=realm
+        return realm
 
     def _final_challenge(self,challenge):
         """Process the second challenge from the server and return the response.
@@ -410,7 +413,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         challenge=challenge.split('\x00')[0]
         rspauth=None
         while challenge:
-            m=param_re.match(challenge)
+            m=_param_re.match(challenge)
             if not m:
                 self.__logger.debug("Challenge syntax error: %r" % (challenge,))
                 return Failure("bad-challenge")
@@ -487,13 +490,13 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         params=[]
         realms=self.password_manager.get_realms()
         if realms:
-            self.realm=quote(realms[0])
+            self.realm=_quote(realms[0])
             for r in realms:
-                r=quote(r)
+                r=_quote(r)
                 params.append('realm="%s"' % (r,))
         else:
             self.realm=None
-        nonce=quote(self.password_manager.generate_nonce())
+        nonce=_quote(self.password_manager.generate_nonce())
         self.nonce=nonce
         params.append('nonce="%s"' % (nonce,))
         params.append('qop="auth"')
@@ -532,7 +535,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         response=response.split('\x00')[0] # workaround for some SASL implementations
         if self.realm:
             realm=to_utf8(self.realm)
-            realm=quote(realm)
+            realm=_quote(realm)
         else:
             realm=None
         username=None
@@ -542,7 +545,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         authzid=None
         nonce_count=None
         while response:
-            m=param_re.match(response)
+            m=_param_re.match(response)
             if not m:
                 self.__logger.debug("Response syntax error: %r" % (response,))
                 return Failure("not-authorized")
@@ -661,11 +664,11 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         if pformat=="md5:user:realm:pass":
             urp_hash=password
         elif pformat=="plain":
-            urp_hash=make_urp_hash(username,realm,password)
+            urp_hash=_make_urp_hash(username,realm,password)
         else:
             self.__logger.debug("Couldn't get password.")
             return Failure("not-authorized")
-        valid_response=compute_response(urp_hash,self.nonce,cnonce,
+        valid_response=_compute_response(urp_hash,self.nonce,cnonce,
                             nonce_count,authzid,digest_uri)
         if response_val!=valid_response:
             self.__logger.debug("Response mismatch: %r != %r" % (response_val,valid_response))
@@ -686,7 +689,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         info["host"]=host
         info["serv-name"]=serv_name
         if self.password_manager.check_authzid(authzid_uq,info):
-            rspauth=compute_response_auth(urp_hash,self.nonce,
+            rspauth=_compute_response_auth(urp_hash,self.nonce,
                             cnonce,nonce_count,authzid,digest_uri)
             self.authzid=authzid
             self.done=1
