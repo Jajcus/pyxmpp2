@@ -19,12 +19,18 @@ quite low-level and not well integrated with Python's garbage collector
 - so it is easy to get Segmentation Fault when the module is used incorrectly.
 However high-level pyxmpp functions and classes should be quite safe. 
 
-To build the module just run:
+To build the package just invoke:
 
-python setup.py build
+	python setup.py build
 
 To install it:
 
-python setup.py install
+	python setup.py install
+
+If you just want to play with the examples (including CJC) just invoke:
+
+	make
+
+then go to examples directory and play.
 
 API documentation and more examples are coming soon (I hope)...
