@@ -78,12 +78,14 @@ def StanzaFactory(node):
 		return Stanza(node)
 
 class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
-	def __init__(self,default_ns,extra_ns=[],sasl_mechanisms=[],enable_tls=0,require_tls=0):
+	def __init__(self,default_ns,extra_ns=[],sasl_mechanisms=[],
+					enable_tls=0,require_tls=0,keepalive=0):
 		self.default_ns_uri=default_ns
 		self.extra_ns_uris=extra_ns
 		self.sasl_mechanisms=sasl_mechanisms
 		self.enable_tls=enable_tls
 		self.require_tls=require_tls
+		self.keepalive=keepalive
 		self.reset()
 
 	def reset(self):
@@ -117,6 +119,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.peer_authenticated=0
 		self.auth_method_used=None
 		self.version=None
+		self.last_keepalive=0
 
 	def __del__(self):
 		self.close()
@@ -140,6 +143,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.addr=addr
 		self.port=port
 		self.connect_socket(s,to)
+		self.last_keepalive=time.time()
 
 	def accept(self,sock,myname):
 		self.eof=0
@@ -152,6 +156,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			self.me=None
 		self.initiator=0
 		self.make_reader()
+		self.last_keepalive=time.time()
 
 	def disconnect(self):
 		if self.doc_out:
@@ -336,6 +341,12 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 
 	def idle(self):
 		self.iq_response_handlers.expire()
+		if not self.socket or self.eof:
+			return
+		now=time.time()
+		if self.keepalive and now-self.last_keepalive>=self.keepalive:
+			self.write_raw(" ")
+			self.last_keepalive=now
 
 	def fileno(self):
 		return self.socket.fileno()

@@ -39,7 +39,7 @@ class LegacyAuthenticationError(StreamAuthenticationError):
 class ClientStream(Stream):
 	def __init__(self,jid,password=None,server=None,port=5222,
 			auth_methods=["sasl:DIGEST-MD5","digest"],
-			enable_tls=0,require_tls=0):
+			enable_tls=0,require_tls=0,keepalive=0):
 		sasl_mechanisms=[]
 		for m in auth_methods:
 			if not m.startswith("sasl:"):
@@ -49,7 +49,8 @@ class ClientStream(Stream):
 		Stream.__init__(self,"jabber:client",
 					sasl_mechanisms=sasl_mechanisms,
 					enable_tls=enable_tls,
-					require_tls=require_tls)
+					require_tls=require_tls,
+					keepalive=keepalive)
 		if server:
 			self.server=server
 		else:
