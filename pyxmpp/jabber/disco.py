@@ -20,7 +20,7 @@ Normative reference:
   - `JEP 30 <http://www.jabber.org/jeps/jep-0030.html>`__
 """
 
-__revision__="$Id: disco.py,v 1.16 2004/10/07 22:28:11 jajcus Exp $"
+__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -333,9 +333,9 @@ class DiscoIdentity:
         """Set the type of the item.
 
         :Parameters:
-            - `type`: the new type.
+            - `item_type`: the new type.
         :Types:
-            - `type`: `unicode` """
+            - `item_type`: `unicode` """
         if item_type is None:
             if self.xmlnode.hasProp("type"):
                 self.xmlnode.unsetProp("type")
@@ -351,7 +351,7 @@ class DiscoItems:
         - `xmlnode`: `libxml2.xmlNode`
     """
     def __init__(self,xmlnode_or_node=None):
-        """Ininitalize an `DiscoItems object`.
+        """Initialize an `DiscoItems` object.
         
         Wrap an existing disco#items XML element or create a new one.
 
@@ -447,7 +447,7 @@ class DiscoInfo:
         - `xmlnode`: `libxml2.xmlNode`
     """
     def __init__(self,xmlnode_or_node=None):
-        """Ininitalize an `DiscoInfo object`.
+        """Initialize an `DiscoInfo` object.
         
         Wrap an existing disco#info XML element or create a new one.
 

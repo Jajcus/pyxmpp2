@@ -21,7 +21,7 @@ Normative reference:
   - `JEP 114 <http://www.jabber.org/jeps/jep-0114.html>`__
 """
 
-__revision__="$Id: component.py,v 1.11 2004/10/07 22:28:45 jajcus Exp $"
+__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import threading
@@ -77,14 +77,14 @@ class Component:
             disco_category="x-service",disco_type="x-unknown",keepalive=0):
         """Initialize a `Component` object.
 
-        :Ivariables:
+        :Parameters:
             - `jid`: component JID (should contain only the domain part).
             - `secret`: the authentication secret.
             - `server`: server name or address the component should connect.
             - `port`: port number on the server where the component should connect.
             - `disco_category`: disco item category to be used in the
               component's 'disco info' responses.
-            - `disco_category`: disco item type to be used in the component's
+            - `disco_type`: disco item type to be used in the component's
               'disco info' responses.
             - `keepalive`: keepalive interval for the stream.
 

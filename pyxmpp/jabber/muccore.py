@@ -20,7 +20,7 @@ Normative reference:
   - `JEP 45 <http://www.jabber.org/jeps/jep-0045.html>`__
 """
 
-__revision__="$Id: muc.py,v 1.27 2004/10/07 22:28:11 jajcus Exp $"
+__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -185,7 +185,7 @@ class MucItem(MucItemBase):
         """
         Initialize a `MucItem` object.
 
-        :Ivariables:
+        :Parameters:
             - `node_or_affiliation`: XML node to be pased or the affiliation of
               the user being described.
             - `role`: role of the user.
@@ -210,6 +210,7 @@ class MucItem(MucItemBase):
 
     def __init(self,affiliation,role,jid=None,nick=None,actor=None,reason=None):
         """Initialize a `MucItem` object from a set of attributes.
+        
         :Parameters:
             - `affiliation`: affiliation of the user.
             - `role`: role of the user.
@@ -572,7 +573,7 @@ class MucPresence(Presence,MucStanzaExt):
             - `priority`: presence priority.
             - `error_cond`: error condition name. Ignored if `stanza_type` is not "error"
         :Types:
-            - `node`: `unicode` or `libxml2.xmlNode` or `Stanza`
+            - `node`: `unicode` or `libxml2.xmlNode` or `pyxmpp.stanza.Stanza`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`

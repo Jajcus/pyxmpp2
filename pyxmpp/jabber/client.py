@@ -24,7 +24,7 @@ Normative reference:
   - `JEP 30 <http://www.jabber.org/jeps/jep-0030.html>`__
 """
 
-__revision__="$Id: client.py,v 1.12 2004/10/07 22:28:11 jajcus Exp $"
+__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import logging
@@ -40,8 +40,8 @@ class JabberClient(Client):
     
     :Ivariables:
         - `disco_items`: default Disco#items reply for a query to an empty node.
-        - `disco_info`: default Disco#ifo reply for a query to an empty node
-            -- provides information about the client and its supported fetures.
+        - `disco_info`: default Disco#ifo reply for a query to an empty node --
+          provides information about the client and its supported fetures.
         - `disco_identity`: default identity of the default `disco_info`.
     :Types:
         - `disco_items`: `DiscoItems`

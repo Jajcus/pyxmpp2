@@ -23,7 +23,7 @@ Normative reference:
 """
 
 
-__revision__="$Id: vcard.py,v 1.18 2004/10/07 22:28:11 jajcus Exp $"
+__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import base64
@@ -654,8 +654,7 @@ class VCardTel(VCardField):
         - `type`: type of the phone number.
     :Types:
         - `number`: `unicode`
-        - `type`: `list` of "home","work","voice","fax","pager","msg",
-           "cell","video","bbs","modem","isdn","pcs" or "pref".
+        - `type`: `list` of "home","work","voice","fax","pager","msg","cell","video","bbs","modem","isdn","pcs" or "pref".
     """
     def __init__(self,name,value,rfc2425parameters=None):
         """Initialize a `VCardTel` object.
@@ -1111,8 +1110,8 @@ class VCardPrivacy(VCardField):
     """Privacy vCard field.
 
     :Ivariables:
-        - `value`: privacy information about the vcard data (
-            "public", "private" or "confidental")
+        - `value`: privacy information about the vcard data ("public", "private" 
+          or "confidental")
     :Types:
         - `value`: `str` """
     def __init__(self,name,value,rfc2425parameters=None):
@@ -1346,7 +1345,7 @@ class VCard:
         :Parameters:
             - `data`: vcard to parse.
         :Types:
-            - `vcard`: `libxml2.xmlNode`, `unicode` or `str`"""
+            - `data`: `libxml2.xmlNode`, `unicode` or `str`"""
         self.content={}
         self.n,self.fn=None,None # dummy attributes
         if isinstance(data,libxml2.xmlNode):
@@ -1401,7 +1400,7 @@ class VCard:
         :Parameters:
             - `data`: vcard to parse.
         :Types:
-            - `vcard`: `libxml2.xmlNode`"""
+            - `data`: `libxml2.xmlNode`"""
         ns=get_node_ns(data)
         if ns and ns.getContent()!=VCARD_NS:
             raise ValueError,"Not in the %r namespace" % (VCARD_NS,)
@@ -1443,7 +1442,7 @@ class VCard:
         :Parameters:
             - `data`: vcard to parse.
         :Types:
-            - `vcard`: `libxml2.xmlNode`, `unicode` or `str`"""
+            - `data`: `libxml2.xmlNode`, `unicode` or `str`"""
         data=from_utf8(data)
         lines=data.split("\n")
         started=0
