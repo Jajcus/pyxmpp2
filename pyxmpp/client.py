@@ -15,9 +15,12 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""Basic XHTML-IM client implementation."""
+"""Basic XHTML-IM client implementation.
 
-__revision__="$Id: client.py,v 1.30 2004/09/25 15:42:19 jajcus Exp $"
+Normative reference: "RFC 3921":http://www.ietf.org/rfc/rfc3921.txt 
+"""
+
+__revision__="$Id: client.py,v 1.31 2004/10/07 21:07:56 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import threading

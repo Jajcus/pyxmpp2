@@ -15,9 +15,13 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""Client stream handling."""
+"""Client stream handling.
 
-__revision__="$Id: clientstream.py,v 1.37 2004/09/28 21:31:00 jajcus Exp $"
+Normative reference: "RFC 3920":http://www.ietf.org/rfc/rfc3920.txt 
+"RFC 3921":http://www.ietf.org/rfc/rfc3921.txt
+"""
+
+__revision__="$Id: clientstream.py,v 1.38 2004/10/07 21:07:56 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import logging
