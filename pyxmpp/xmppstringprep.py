@@ -3,6 +3,7 @@ from types import ListType
 import string
 import stringprep
 import unicodedata
+import weakref
 
 """ Stringprep (RFC3454) implementation with nodeprep and resourceprep profiles."""
 
@@ -61,6 +62,7 @@ class StringprepError(StandardError):
 
 class Profile:
     """Base class for stringprep profiles."""
+    cache_items=[]
     def __init__(self,unassigned,mapping,normalization,prohibited,bidi=1):
         """ Profile(unassigned,mapping,normalization,prohibited,bidi=1) -> Profile
 
@@ -77,11 +79,15 @@ class Profile:
         self.normalization=normalization
         self.prohibited=prohibited
         self.bidi=bidi
+        self.cache={}
 
-    def prepare(self,s):
+    def prepare(self,input):
         """Complete string preparation procedure for 'stored' strings.
         (includes checks for unassigned codes)"""
-        s=self.map(s)
+        r=self.cache.get(input)
+        if r is not None:
+            return r
+        s=self.map(input)
         if self.normalization:
             s=self.normalization(s)
         s=self.prohibit(s)
@@ -90,6 +96,16 @@ class Profile:
             s=self.check_bidi(s)
         if type(s) is ListType:
             s=string.join(s)
+        if len(self.cache_items)>=stringprep_cache_size:
+            remove=self.cache_items[:-stringprep_cache_size/2]
+            for profile,key in remove:
+                try:
+                    del profile.cache[key]
+                except KeyError:
+                    pass
+            self.cache_items=self.cache_items[-stringprep_cache_size/2:]
+        self.cache_items.append((self,input))
+        self.cache[input]=s
         return s
 
     def prepare_query(self,s):
@@ -165,5 +181,18 @@ resourceprep=Profile(
     normalization=NFKC,
     prohibited=(C_1_2,C_2_1,C_2_2,C_3,C_4,C_5,C_6,C_7,C_8,C_9),
     bidi=1)
+
+stringprep_cache_size=1000
+def set_stringprep_cache_size(size):
+    global stringprep_cache_size
+    stringprep_cache_size=size
+    if len(Profile.cache_items)>size:
+        remove=Profile.cache_items[:-size]
+        for profile,key in remove:
+            try:
+                del profile.cache[key]
+            except KeyError:
+                pass
+        Profile.cache_items=Profile.cache_items[-size:]
 
 # vi: sts=4 et sw=4
