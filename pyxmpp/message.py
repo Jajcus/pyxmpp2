@@ -92,7 +92,7 @@ class Message(Stanza):
 
         :return: the message subject or `None` if there is no subject.
         :returntype: `unicode`"""
-        n=self.xpath_eval("subject")
+        n=self.xpath_eval("ns:subject")
         if n:
             return from_utf8(n[0].getContent())
         else:
@@ -103,7 +103,7 @@ class Message(Stanza):
 
         :return: the thread-id or `None` if there is no thread-id.
         :returntype: `unicode`"""
-        n=self.xpath_eval("thread")
+        n=self.xpath_eval("ns:thread")
         if n:
             return from_utf8(n[0].getContent())
         else:
@@ -120,7 +120,7 @@ class Message(Stanza):
 
         :return: the body of the message or `None` if there is no body.
         :returntype: `unicode`"""
-        n=self.xpath_eval("body")
+        n=self.xpath_eval("ns:body")
         if n:
             return from_utf8(n[0].getContent())
         else:

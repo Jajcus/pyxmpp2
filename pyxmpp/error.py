@@ -291,6 +291,11 @@ class ErrorNode:
     def xpath_eval(self,expr,namespaces=None):
         """Evaluate XPath expression on the error element.
 
+        The expression will be evaluated in context where the common namespace
+        (the one used for stanza elements, mapped to 'jabber:client',
+        'jabber:server', etc.) is bound to prefix "ns" and other namespaces are
+        bound accordingly to the `namespaces` list.
+
         :Parameters:
             - `expr`: the XPath expression.
             - `namespaces`: prefix to namespace mapping.
@@ -300,12 +305,12 @@ class ErrorNode:
 
         :return: the result of the expression evaluation.
         """
-        if not namespaces:
-            return self.xmlnode.xpathEval(expr)
         ctxt = common_doc.xpathNewContext()
         ctxt.setContextNode(self.xmlnode)
-        for prefix,uri in namespaces.items():
-            ctxt.xpathRegisterNs(prefix,uri)
+        ctxt.xpathRegisterNs("ns",to_utf8(self.ns))
+        if namespaces:
+            for prefix,uri in namespaces.items():
+                ctxt.xpathRegisterNs(prefix,uri)
         ret=ctxt.xpathEval(expr)
         ctxt.xpathFreeContext()
         return ret
@@ -323,10 +328,10 @@ class ErrorNode:
         :returntype: `libxml2.xmlNode`"""
         if ns is None:
             ns=self.ns
-        c=self.xpath_eval("ns:*",{'ns':to_utf8(ns)})
+        c=self.xpath_eval("ns:*")
         if not c:
             self.upgrade()
-            c=self.xpath_eval("ns:*",{'ns':to_utf8(ns)})
+            c=self.xpath_eval("ns:*")
         if not c:
             return None
         if ns==self.ns and c[0].name=="text":
@@ -340,10 +345,10 @@ class ErrorNode:
 
         :return: the text provided with the error or `None`.
         :returntype: `unicode`"""
-        c=self.xpath_eval("ns:*",{'ns':to_utf8(self.ns)})
+        c=self.xpath_eval("ns:*")
         if not c:
             self.upgrade()
-        t=self.xpath_eval("ns:text",{'ns':to_utf8(self.ns)})
+        t=self.xpath_eval("ns:text")
         if not t:
             return None
         return from_utf8(t[0].getContent())
@@ -387,7 +392,7 @@ class ErrorNode:
         else:
             cond=None
 
-        condition=self.xpath_eval("ns:*",{'ns':to_utf8(self.ns)})
+        condition=self.xpath_eval("ns:*")
         if condition:
             return
         elif cond is None:

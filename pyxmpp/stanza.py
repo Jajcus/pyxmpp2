@@ -30,7 +30,7 @@ import random
 from pyxmpp import xmlextra
 from pyxmpp.utils import from_utf8,to_utf8
 from pyxmpp.jid import JID
-from pyxmpp.xmlextra import common_doc, common_root, common_ns
+from pyxmpp.xmlextra import common_doc, common_root, common_ns, COMMON_NS
 
 class StanzaError(ValueError):
     """Raised on ivalid stanza objects usage."""
@@ -206,7 +206,7 @@ class Stanza:
         :returntype: `pyxmpp.error.StanzaErrorNode`"""
         if self._error:
             return self._error
-        n=self.xmlnode.xpathEval(u"error")
+        n=self.xpath_eval(u"ns:error")
         if not n:
             raise StanzaError,"This stanza contains no error"
         from pyxmpp.error import StanzaErrorNode
@@ -326,6 +326,11 @@ class Stanza:
     def xpath_eval(self,expr,namespaces=None):
         """Evaluate an XPath expression on the stanza XML node.
 
+        The expression will be evaluated in context where the common namespace
+        (the one used for stanza elements, mapped to 'jabber:client',
+        'jabber:server', etc.) is bound to prefix "ns" and other namespaces are
+        bound accordingly to the `namespaces` list.
+
         :Parameters:
             - `expr`: XPath expression.
             - `namespaces`: mapping from namespace prefixes to URIs.
@@ -333,12 +338,12 @@ class Stanza:
             - `expr`: `unicode`
             - `namespaces`: `dict` or other mapping
         """
-        if not namespaces:
-            return self.xmlnode.xpathEval(to_utf8(expr))
         ctxt = common_doc.xpathNewContext()
         ctxt.setContextNode(self.xmlnode)
-        for prefix,uri in namespaces.items():
-            ctxt.xpathRegisterNs(to_utf8(prefix),uri)
+        ctxt.xpathRegisterNs("ns",COMMON_NS)
+        if namespaces:
+            for prefix,uri in namespaces.items():
+                ctxt.xpathRegisterNs(to_utf8(prefix),uri)
         ret=ctxt.xpathEval(to_utf8(expr))
         ctxt.xpathFreeContext()
         return ret

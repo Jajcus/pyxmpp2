@@ -139,12 +139,14 @@ class Iq(Stanza):
 
         :return: the payload element or None if there is no payload.
         :returntype: `libxml2.xmlNode`"""
-        for c in self.xmlnode.xpathEval("*"):
+        c = self.xmlnode.children
+        while c:
             try:
                 if c.ns():
                     return c
             except libxml2.treeError:
                 pass
+            c = c.next
         return None
 
     def get_query_ns(self):

@@ -120,7 +120,7 @@ class Presence(Stanza):
             - `status`: descriptive text for the presence stanza.
         :Types:
             - `status`: `unicode`"""
-        n=self.xpath_eval("status")
+        n=self.xpath_eval("ns:status")
         if not status:
             if n:
                 n[0].unlinkNode()
@@ -137,7 +137,7 @@ class Presence(Stanza):
 
         :return: value of stanza's <status/> field.
         :returntype: `unicode`"""
-        n=self.xpath_eval("status")
+        n=self.xpath_eval("ns:status")
         if n:
             return from_utf8(n[0].getContent())
         else:
@@ -148,7 +148,7 @@ class Presence(Stanza):
 
         :return: value of stanza's <show/> field.
         :returntype: `unicode`"""
-        n=self.xpath_eval("show")
+        n=self.xpath_eval("ns:show")
         if n:
             return from_utf8(n[0].getContent())
         else:
@@ -162,7 +162,7 @@ class Presence(Stanza):
               of: None, "away", "xa", "dnd", "chat".
         :Types:
             - `show`: `unicode`"""
-        n=self.xpath_eval("show")
+        n=self.xpath_eval("ns:show")
         if not show:
             if n:
                 n[0].unlinkNode()
@@ -180,7 +180,7 @@ class Presence(Stanza):
         :return: value of stanza's priority. 0 if the stanza doesn't contain
             <priority/> element.
         :returntype: `int`"""
-        n=self.xpath_eval("priority")
+        n=self.xpath_eval("ns:priority")
         if not n:
             return 0
         try:
@@ -196,7 +196,7 @@ class Presence(Stanza):
             - `priority`: new presence priority.
         :Types:
             - `priority`: `int`"""
-        n=self.xpath_eval("priority")
+        n=self.xpath_eval("ns:priority")
         if not priority:
             if n:
                 n[0].unlinkNode()
