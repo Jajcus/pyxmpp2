@@ -673,7 +673,7 @@ char c;
 			if (c=='<') {
 				new_state=LS_TSTART;
 				if (reader->buffer_pos>1) {
-					current_markup=MT_CDATA;
+					current_markup=MT_IGNORE;
 					*len=reader->buffer_pos-1;
 				}
 			}
