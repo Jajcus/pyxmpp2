@@ -20,8 +20,8 @@ ChangeLog: FORCE
 FORCE:
 	
 version:
-	if test -f "CVS/Entries" ; then \
-		echo "version='$(VERSION)+cvs'" > pyxmpp/version.py ; \
+	if test -d ".svn" ; then \
+		echo "version='$(VERSION)+svn'" > pyxmpp/version.py ; \
 	fi
 
 dist: all
