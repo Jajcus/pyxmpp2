@@ -50,10 +50,7 @@ class ClientStream(Stream):
                     sasl_mechanisms=sasl_mechanisms,
                     tls_settings=tls_settings,
                     keepalive=keepalive)
-        if server:
-            self.server=server
-        else:
-            self.server=jid.domain
+        self.server=server
         self.port=port
         self.jid=jid
         self.password=password
@@ -77,14 +74,16 @@ class ClientStream(Stream):
             server=self.server
         if not port:
             port=self.port
+        if server:
+            self.debug("server: %r" % (server,))
+            service=None
+        else:
+            service="xmpp-client"
+        if port is None:
+            port=5222
         if server is None:
             server=self.jid.domain
-        if port is None:
-            service="xmpp-client"
-            port=5222
-        else:
-            service=None
-        Stream._connect(self,server,port,"xmpp-client",self.jid.domain)
+        Stream._connect(self,server,port,service,self.jid.domain)
 
     def accept(self,sock):
         Stream.accept(self,sock,self.jid)

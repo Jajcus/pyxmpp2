@@ -69,16 +69,11 @@ class Client:
             if stream:
                 stream.close()
 
-            if self.server:
-                server=self.server
-            else:
-                server=self.jid.domain
-
             self.debug("Creating client stream: %r, auth_methods=%r"
                     % (self.stream_class,self.auth_methods))
             stream=self.stream_class(jid=self.jid,
                     password=self.password,
-                    server=server,
+                    server=self.server,
                     port=self.port,
                     auth_methods=self.auth_methods,
                     tls_settings=self.tls_settings,
