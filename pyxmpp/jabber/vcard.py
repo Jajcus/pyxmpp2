@@ -1347,7 +1347,6 @@ class VCard:
         :Types:
             - `data`: `libxml2.xmlNode`, `unicode` or `str`"""
         self.content={}
-        self.n,self.fn=None,None # dummy attributes
         if isinstance(data,libxml2.xmlNode):
             self.__from_xml(data)
         else:
@@ -1571,8 +1570,9 @@ class VCard:
         else:
             return doc
     def __getattr__(self,name):
-        if self.content.has_key(name.upper()):
+        try:
             return self.content[name.upper()]
-        raise AttributeError,"Attribute %r not found" % (name,)
+        except KeyError:
+            raise AttributeError,"Attribute %r not found" % (name,)
 
 # vi: sts=4 et sw=4
