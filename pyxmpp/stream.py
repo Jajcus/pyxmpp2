@@ -340,15 +340,18 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		return self.socket.fileno()
 
 	def loop(self,timeout):
-		import select
 		while not self.eof and self.socket is not None:
-			id,od,ed=select.select([self.socket],[],[self.socket],timeout)
-			if self.socket in id or self.socket in ed:
-				self.debug("data on input")
-				self.process()
-			else:
-				self.debug("input timeout")
-				self.idle()
+			self.loop_iter(timeout)
+
+	def loop_iter(self,timeout):
+		import select
+		id,od,ed=select.select([self.socket],[],[self.socket],timeout)
+		if self.socket in id or self.socket in ed:
+			self.debug("data on input")
+			self.process()
+		else:
+			self.debug("input timeout")
+			self.idle()
 
 	def process(self):
 		try:
