@@ -27,10 +27,12 @@ from core import Reply,Failure,Response,Challenge,Success,Failure,PasswordManage
 
 from pyxmpp.utils import to_utf8,from_utf8
 
+quote_re=re.compile(r"\\(.)")
+
 def unquote(s):
 	if s[0]!='"':
 		return s
-	return s[1:-1].replace('\\','') #FIXME
+	return quote_re.sub(r"\1",s[1:-1])
 
 def quote(s):
 	s=s.replace('\\','\\\\')
