@@ -116,37 +116,11 @@ W0511:155: FIXME: set/get password/history
 W0511:396: FIXME: alt,decline,invite,password
 W0511:437: FIXME: implement
 ************* Module pyxmpp.jabber.clientstream
-W0311:194: Bad indentation. Found 24 spaces, expected 16
-W0311:196: Bad indentation. Found 24 spaces, expected 16
-W0141: 39:LegacyClientStream: Missing docstring
-W0102: 40:LegacyClientStream.__init__: Dangerous default value ['sasl:DIGEST-MD5', 'digest'] as argument
-W0141: 48:LegacyClientStream._reset: Missing docstring
-W0141: 53:LegacyClientStream._post_connect: Missing docstring
-W0141: 62:LegacyClientStream._post_auth: Missing docstring
-W0141: 68:LegacyClientStream._try_auth: Missing docstring
-E0602: 74:LegacyClientStream._try_auth: Undefined variable 'LegacyAuthenticationError'
-W0141: 97:LegacyClientStream.auth_in_stage1: Missing docstring
-W0141:118:LegacyClientStream.auth_in_stage2: Missing docstring
-W0141:155:LegacyClientStream._auth_stage1: Missing docstring
-W0141:165:LegacyClientStream.auth_timeout: Missing docstring
-W0141:174:LegacyClientStream.auth_error: Missing docstring
-E0602:183:LegacyClientStream.auth_error: Undefined variable 'LegacyAuthenticationError'
-W0141:188:LegacyClientStream.auth_stage2: Missing docstring
-W0141:202:LegacyClientStream._plain_auth_stage2: Missing docstring
-W0613:202:LegacyClientStream._plain_auth_stage2: Unused argument 'stanza'
-W0141:212:LegacyClientStream._plain_auth_in_stage2: Missing docstring
-W0613:212:LegacyClientStream._plain_auth_in_stage2: Unused argument 'resource'
-W0141:236:LegacyClientStream._digest_auth_stage2: Missing docstring
-W0613:236:LegacyClientStream._digest_auth_stage2: Unused argument 'stanza'
-W0141:247:LegacyClientStream._digest_auth_in_stage2: Missing docstring
-W0613:247:LegacyClientStream._digest_auth_in_stage2: Unused argument 'resource'
-W0141:281:LegacyClientStream.auth_finish: Missing docstring
-W0613:281:LegacyClientStream.auth_finish: Unused argument 'stanza'
-ignore that: W0201: 50:LegacyClientStream._reset: Attribute 'available_auth_methods' defined outside __init__
-W0201:285:LegacyClientStream.auth_finish: Attribute 'authenticated' defined outside __init__
-W0201:225:LegacyClientStream._plain_auth_in_stage2: Attribute 'peer_authenticated' defined outside __init__
-ignore that: W0201: 51:LegacyClientStream._reset: Attribute 'auth_stanza' defined outside __init__
-W0201: 85:LegacyClientStream._try_auth: Attribute 'auth_method_used' defined outside __init__
+ignore that: W0613:260:LegacyClientStream._plain_auth_stage2: Unused argument 'stanza'
+ignore that: W0613:274:LegacyClientStream._plain_auth_in_stage2: Unused argument 'resource'
+ignore that: W0613:302:LegacyClientStream._digest_auth_stage2: Unused argument 'stanza'
+ignore that: W0613:317:LegacyClientStream._digest_auth_in_stage2: Unused argument 'resource'
+ignore that: W0613:355:LegacyClientStream.auth_finish: Unused argument 'stanza'
 ************* Module pyxmpp.jabber.client
 W0141: 37:JabberClient: Missing docstring
 W0102: 38:JabberClient.__init__: Dangerous default value ['sasl:DIGEST-MD5', 'digest'] as argument
@@ -303,7 +277,7 @@ W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 Report
 ======
-5991 statements analysed.
+5992 statements analysed.
 
 Statistics by type
 ------------------
@@ -311,9 +285,9 @@ Statistics by type
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 module   38     38         =          97.37       0.00     
-class    115    115        =          78.26       0.00     
+class    115    115        =          79.13       0.00     
 method   0      0          =          0.00        0.00     
-function 642    642        =          87.85       0.00     
+function 642    642        =          90.19       0.00     
 
 
 Raw metrics
@@ -321,10 +295,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6578   53.96 6578     =          
-docstring 4267   35.00 4109     +158       
-comment   608    4.99  608      =          
-empty     738    6.05  734      +4         
+code      6580   53.57 6580     =          
+docstring 4341   35.34 4341     =          
+comment   608    4.95  608      =          
+empty     754    6.14  754      =          
 
 
 External dependencies
@@ -359,19 +333,18 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0141      104        
+W0141      88         
 W0613      41         
-W0201      39         
+W0201      34         
 E0201      27         
-W0102      17         
-E0602      10         
+W0102      16         
+E0602      8          
 W0612      7          
 W0511      7          
 W0221      6          
 W0622      4          
 W0103      4          
 W0403      2          
-W0311      2          
 W0232      2          
 W0112      2          
 W0611      1          
@@ -385,8 +358,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 241    248      -7         
-errors   37     37       =          
+warnings 217    217      =          
+errors   35     35       =          
 
 
 % errors / warnings by module
@@ -394,32 +367,32 @@ errors   37     37       =
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            40.54 34.85   
-pyxmpp.jid                     35.14 0.41    
-pyxmpp.jabber.disco            10.81 13.69   
-pyxmpp.jabber.client           8.11  4.15    
-pyxmpp.jabber.clientstream     5.41  12.03   
-pyxmpp.streambase              0.00  9.13    
-pyxmpp.sasl.core               0.00  4.15    
-pyxmpp.dns                     0.00  3.32    
-pyxmpp.streamsasl              0.00  2.90    
-pyxmpp.clientstream            0.00  2.90    
-pyxmpp.jabberd.componentstream 0.00  2.49    
-pyxmpp.xmlextra                0.00  1.66    
-pyxmpp.streamtls               0.00  1.66    
-pyxmpp.version                 0.00  1.24    
-pyxmpp.jabber.muccore          0.00  1.24    
-pyxmpp.sasl.plain              0.00  0.83    
-pyxmpp.jabber.muc              0.00  0.83    
-pyxmpp._xmlextra               0.00  0.83    
-pyxmpp.xmppstringprep          0.00  0.41    
-pyxmpp.sasl.digest_md5         0.00  0.41    
-pyxmpp.resolver                0.00  0.41    
-pyxmpp.client                  0.00  0.41    
+pyxmpp.jabber.vcard            42.86 38.71   
+pyxmpp.jid                     37.14 0.46    
+pyxmpp.jabber.disco            11.43 15.21   
+pyxmpp.jabber.client           8.57  4.61    
+pyxmpp.streambase              0.00  10.14   
+pyxmpp.sasl.core               0.00  4.61    
+pyxmpp.dns                     0.00  3.69    
+pyxmpp.streamsasl              0.00  3.23    
+pyxmpp.clientstream            0.00  3.23    
+pyxmpp.jabberd.componentstream 0.00  2.76    
+pyxmpp.jabber.clientstream     0.00  2.30    
+pyxmpp.xmlextra                0.00  1.84    
+pyxmpp.streamtls               0.00  1.84    
+pyxmpp.version                 0.00  1.38    
+pyxmpp.jabber.muccore          0.00  1.38    
+pyxmpp.sasl.plain              0.00  0.92    
+pyxmpp.jabber.muc              0.00  0.92    
+pyxmpp._xmlextra               0.00  0.92    
+pyxmpp.xmppstringprep          0.00  0.46    
+pyxmpp.sasl.digest_md5         0.00  0.46    
+pyxmpp.resolver                0.00  0.46    
+pyxmpp.client                  0.00  0.46    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 9.29/10 (previous run: 9.28/10)
+Your code has been rated at 9.35/10 (previous run: 9.35/10)
 So close to being perfect...
 

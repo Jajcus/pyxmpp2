@@ -32,25 +32,55 @@ from pyxmpp.utils import to_utf8,from_utf8
 from pyxmpp.clientstream import ClientStreamError
 from pyxmpp.clientstream import ClientStream
 
-class LegacyAuthentication(ClientStreamError):
+class LegacyAuthenticationError(ClientStreamError):
     """Raised on a legacy authentication error."""
     pass
 
 class LegacyClientStream(ClientStream):
-    def __init__(self,jid,password=None,server=None,port=5222,
-            auth_methods=["sasl:DIGEST-MD5","digest"],
-            tls_settings=None,keepalive=0):
+    """Handles Jabber (both XMPP and legacy protocol) client connection stream.
 
+    Both client and server side of the connection is supported. This class handles
+    client SASL and legacy authentication, authorisation and XMPP resource binding.
+    """
+    def __init__(self,jid,password=None,server=None,port=5222,
+            auth_methods=("sasl:DIGEST-MD5","digest"),
+            tls_settings=None,keepalive=0):
+        """Initialize a LegacyClientStream object.
+
+        :Parameters:
+            - `jid`: local JID.
+            - `password`: user's password.
+            - `server`: server to use. If not given then address will be derived form the JID.
+            - `port`: port number to use. If not given then address will be derived form the JID.
+            - `auth_methods`: sallowed authentication methods. SASL authentication mechanisms
+              in the list should be prefixed with "sasl:" string.
+            - `tls_settings`: settings for StartTLS -- `TLSSettings` instance.
+            - `keepalive`: keepalive output interval. 0 to disable.
+        :Types:
+            - `jid`: `pyxmpp.JID`
+            - `password`: `unicode`
+            - `server`: `unicode`
+            - `port`: `int`
+            - `auth_methods`: sequence of `str`
+            - `tls_settings`: `pyxmpp.TLSSettings`
+            - `keepalive`: `int`
+        """
+        (self.authenticated,self.available_auth_methods,self.auth_stanza,
+                self.peer_authenticated,self.auth_method_used)=(None,)*3
         ClientStream.__init__(self,jid,password,server,port,
                             auth_methods,tls_settings,keepalive)
         self.__logger=logging.getLogger("pyxmpp.jabber.LegacyClientStream")
 
     def _reset(self):
+        """Reset the `LegacyClientStream` object state, making the object ready
+        to handle new connections."""
         ClientStream._reset(self)
         self.available_auth_methods=None
         self.auth_stanza=None
 
     def _post_connect(self):
+        """Initialize authentication when the connection is established
+        and we are the initiator."""
         if not self.initiator:
             if "plain" in self.auth_methods or "digest" in self.auth_methods:
                 self.set_iq_get_handler("query","jabber:iq:auth",
@@ -60,12 +90,18 @@ class LegacyClientStream(ClientStream):
         ClientStream._post_connect(self)
 
     def _post_auth(self):
+        """Unregister legacy authentication handlers after successfull
+        authentication."""
         ClientStream._post_auth(self)
         if not self.initiator:
             self.unset_iq_get_handler("query","jabber:iq:auth")
             self.unset_iq_set_handler("query","jabber:iq:auth")
 
     def _try_auth(self):
+        """Try to authenticate using the first one of allowed authentication
+        methods left.
+
+        [client only]"""
         if self.authenticated:
             self.__logger.debug("try_auth: already authenticated")
             return
@@ -95,6 +131,10 @@ class LegacyClientStream(ClientStream):
             self._auth_stage1()
 
     def auth_in_stage1(self,stanza):
+        """Handle the first stage (<iq type='get'/>) of legacy ("plain" or
+        "digest") authentication.
+        
+        [server only]"""
         self.lock.acquire()
         try:
             if "plain" not in self.auth_methods and "digest" not in self.auth_methods:
@@ -116,6 +156,10 @@ class LegacyClientStream(ClientStream):
             self.lock.release()
 
     def auth_in_stage2(self,stanza):
+        """Handle the second stage (<iq type='set'/>) of legacy ("plain" or
+        "digest") authentication.
+        
+        [server only]"""
         self.lock.acquire()
         try:
             if "plain" not in self.auth_methods and "digest" not in self.auth_methods:
@@ -153,6 +197,10 @@ class LegacyClientStream(ClientStream):
             self.lock.release()
 
     def _auth_stage1(self):
+        """Do the first stage (<iq type='get'/>) of legacy ("plain" or
+        "digest") authentication.
+        
+        [client only]"""
         iq=Iq(stanza_type="get")
         q=iq.new_query("jabber:iq:auth")
         q.newTextChild(q.ns(),"username",to_utf8(self.my_jid.node))
@@ -163,6 +211,9 @@ class LegacyClientStream(ClientStream):
         iq.free()
 
     def auth_timeout(self):
+        """Handle legacy authentication timeout.
+        
+        [client only]"""
         self.lock.acquire()
         try:
             self.__logger.debug("Timeout while waiting for jabber:iq:auth result")
@@ -172,6 +223,9 @@ class LegacyClientStream(ClientStream):
             self.lock.release()
 
     def auth_error(self,stanza):
+        """Handle legacy authentication error.
+        
+        [client only]"""
         self.lock.acquire()
         try:
             err=stanza.get_error()
@@ -186,20 +240,28 @@ class LegacyClientStream(ClientStream):
             self.lock.release()
 
     def auth_stage2(self,stanza):
+        """Handle the first stage authentication response (result of the <iq
+        type="get"/>).
+
+        [client only]"""
         self.lock.acquire()
         try:
             self.__logger.debug("Procesing auth response...")
             self.available_auth_methods=[]
             if (stanza.xpath_eval("a:query/a:digest",{"a":"jabber:iq:auth"}) and self.stream_id):
-                        self.available_auth_methods.append("digest")
+                self.available_auth_methods.append("digest")
             if (stanza.xpath_eval("a:query/a:password",{"a":"jabber:iq:auth"})):
-                        self.available_auth_methods.append("plain")
+                self.available_auth_methods.append("plain")
             self.auth_stanza=stanza.copy()
             self._try_auth()
         finally:
             self.lock.release()
 
     def _plain_auth_stage2(self,stanza):
+        """Do the second stage (<iq type='set'/>) of legacy "plain"
+        authentication.
+        
+        [client only]"""
         iq=Iq(stanza_type="set")
         q=iq.new_query("jabber:iq:auth")
         q.newTextChild(None,"username",to_utf8(self.my_jid.node))
@@ -210,6 +272,10 @@ class LegacyClientStream(ClientStream):
         iq.free()
 
     def _plain_auth_in_stage2(self,username,resource,stanza):
+        """Handle the second stage (<iq type='set'/>) of legacy "plain"
+        authentication.
+        
+        [server only]"""
         password=stanza.xpath_eval("a:query/a:password",{"a":"jabber:iq:auth"})
         if password:
             password=from_utf8(password[0].getContent())
@@ -222,7 +288,7 @@ class LegacyClientStream(ClientStream):
         if self.check_password(username,password):
             iq=stanza.make_result_response()
             self.send(iq)
-            self.peer_authenticated=1
+            self.peer_authenticated=True
             self.auth_method_used="plain"
             self.state_change("authorized",self.peer)
             self._post_auth()
@@ -234,6 +300,10 @@ class LegacyClientStream(ClientStream):
             self.send(iq)
 
     def _digest_auth_stage2(self,stanza):
+        """Do the second stage (<iq type='set'/>) of legacy "digest"
+        authentication.
+        
+        [client only]"""
         iq=Iq(stanza_type="set")
         q=iq.new_query("jabber:iq:auth")
         q.newTextChild(None,"username",to_utf8(self.my_jid.node))
@@ -245,6 +315,10 @@ class LegacyClientStream(ClientStream):
         iq.free()
 
     def _digest_auth_in_stage2(self,username,resource,stanza):
+        """Handle the second stage (<iq type='set'/>) of legacy "digest"
+        authentication.
+        
+        [server only]"""
         digest=stanza.xpath_eval("a:query/a:digest",{"a":"jabber:iq:auth"})
         if digest:
             digest=digest[0].getContent()
@@ -267,7 +341,7 @@ class LegacyClientStream(ClientStream):
         if mydigest==digest:
             iq=stanza.make_result_response()
             self.send(iq)
-            self.peer_authenticated=1
+            self.peer_authenticated=True
             self.auth_method_used="digest"
             self.state_change("authorized",self.peer)
             self._post_auth()
@@ -279,10 +353,11 @@ class LegacyClientStream(ClientStream):
             self.send(iq)
 
     def auth_finish(self,stanza):
+        """Handle success of the legacy authentication."""
         self.lock.acquire()
         try:
             self.__logger.debug("Authenticated")
-            self.authenticated=1
+            self.authenticated=True
             self.state_change("authorized",self.my_jid)
             self._post_auth()
         finally:
