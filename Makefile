@@ -36,7 +36,7 @@ version:
 		echo "version='$(VERSION)+svn'" > pyxmpp/version.py ; \
 	fi
 
-dist: all
+dist: all ChangeLog
 	echo "version='$(VERSION)$(SNAPSHOT)'" > pyxmpp/version.py
 	python setup.py sdist
 
