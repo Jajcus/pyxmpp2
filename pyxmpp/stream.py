@@ -106,8 +106,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.iq_response_handlers=ExpiringDictionary()
 		self.iq_get_handlers={}
 		self.iq_set_handlers={}
-		self.message_handlers={}
-		self.presence_handlers={}
+		self.message_handlers=[]
+		self.presence_handlers=[]
 		self.eof=0
 		self.initiator=None
 		self.features=None
@@ -465,18 +465,36 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			self.send(r)
 			return 1
 
+	def __try_handlers(self,handler_list,typ,stanza):
+		namespaces=[]
+		if stanza.node.children:
+			for c in stanza.node.children:
+				try:
+					ns=c.ns()
+				except libxml2.treeError:
+					continue
+				ns_uri=ns.getContent()
+				if ns_uri not in namespaces:
+					namespaces.append(ns_uri)
+		for prio,t,ns,handler in handler_list:
+			if t!=typ:
+				continue
+			if ns is not None and ns not in namespaces:
+				continue
+			if handler(stanza):
+				return 1
+		return 0
+
 	def process_message(self,stanza):
 		if not self.initiator and not self.peer_authenticated:
 			self.debug("Ignoring message - peer not authenticated yet")
 			return 1	
 		
 		typ=stanza.get_type()
-		if self.message_handlers.has_key(typ):
-			self.message_handlers[typ](stanza)
+		if self.__try_handlers(self.message_handlers,typ,stanza):
 			return 1
-		elif typ!="error" and self.message_handlers.has_key("normal"):
-			self.message_handlers["normal"](stanza)
-			return 1
+		if typ!="error":
+			return self.__try_handlers(self.message_handlers,"normal",stanza)
 		return 0
 		
 	def process_presence(self,stanza):
@@ -485,14 +503,9 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			return 1	
 		
 		typ=stanza.get_type()
-		
 		if not typ:
 			typ="available"
-			
-		if self.presence_handlers.has_key(typ):
-			self.presence_handlers[typ](stanza)
-			return 1
-		return 0
+		return self.__try_handlers(self.presence_handlers,typ,stanza)
 
 	def route_stanza(self,stanza):
 		r=stanza.make_error_response("recipient-unavailable")
@@ -563,15 +576,21 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		if self.iq_set_handlers.has_key((element,namespace)):
 			del self.iq_set_handlers[(element,namespace)]
 
-	def set_message_handler(self,type,handler):
+	def __add_handler(self,handler_list,typ,namespace,priority,handler):
+		if priority<0 or priority>100:
+			raise StreamError,"Bad handler priority (must be in 0:100)"
+		handler_list.append((priority,typ,namespace,handler))
+		handler_list.sort()
+
+	def set_message_handler(self,type,handler,namespace=None,priority=100):
 		if not type:
 			type=="normal"
-		self.message_handlers[type]=handler
+		self.__add_handler(self.message_handlers,type,namespace,priority,handler)
 
-	def set_presence_handler(self,type,handler):
+	def set_presence_handler(self,type,handler,namespace=None,priority=100):
 		if not type:
 			type="available"
-		self.presence_handlers[type]=handler
+		self.__add_handler(self.presence_handlers,type,namespace,priority,handler)
 
 	def generate_id(self):
 		return "%i-%i-%s" % (os.getpid(),time.time(),str(random.random())[2:])
