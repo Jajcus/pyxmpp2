@@ -27,6 +27,7 @@ import copy
 import libxml2
 from pyxmpp.objects import StanzaPayloadObject
 from pyxmpp.utils import from_utf8, to_utf8
+from pyxmpp.xmlextra import xml_element_ns_iter
 from pyxmpp.jid import JID
 
 DATAFORM_NS = "jabber:x:data"
@@ -36,15 +37,15 @@ class Option(StanzaPayloadObject):
 
     :Ivariables:
         - `label`: option label.
-        - `value`: option value.
+        - `values`: option values.
     :Types:
         - `label`: `unicode`
-        - `value`: `unicode`
+        - `values`: `list` of `unicode`
     """
     xml_element_name = "option"
     xml_element_namespace = DATAFORM_NS
     
-    def __init__(self, value, label = None):
+    def __init__(self, values, label = None):
         """Initialize an `Option` object.
 
         :Parameters:
@@ -55,7 +56,7 @@ class Option(StanzaPayloadObject):
             - `value`: `unicode`
         """
         self.label = label
-        self.value = unicode(value)
+        self.values = values
 
     def complete_xml_element(self, xmlnode, doc):
         """Complete the XML node with `self` content.
@@ -69,7 +70,8 @@ class Option(StanzaPayloadObject):
             - `doc`: `libxml2.xmlDoc`"""
         _unused = doc
         xmlnode.setProp("label", self.label.encode("utf-8"))
-        xmlnode.newTextChild(xmlnode.ns(), "value", self.value.encode("utf-8"))
+        for value in self.values:
+            xmlnode.newTextChild(xmlnode.ns(), "value", value.encode("utf-8"))
         return xmlnode
 
     def _new_from_xml(cls, xmlnode):
@@ -85,13 +87,11 @@ class Option(StanzaPayloadObject):
         """
         label = from_utf8(xmlnode.prop("label"))
         child = xmlnode.children
-        while child:
-            if (child.type != "element" or child.ns().content != DATAFORM_NS):
-                pass
-            elif child.name == "value":
-                value = from_utf8(child.getContent())
-            child = child.next
-        return cls(value, label)
+        values = []
+        for child in xml_element_ns_iter(xmlnode.children, DATAFORM_NS):
+            if child.name == "value":
+                values.append(from_utf8(child.getContent()))
+        return cls(values, label)
     _new_from_xml = classmethod(_new_from_xml)
 
 class Field(StanzaPayloadObject):
@@ -224,17 +224,24 @@ class Field(StanzaPayloadObject):
             values = [JID(v).as_unicode() for v in values]
         self.values = values
 
-    def add_option(self, value, label):
+    def add_option(self, values, label):
         """Add an option for the field.
 
         :Parameters:
             - `label`: option label (human-readable description).
-            - `value`: option value.
+            - `values`: option values.
         :Types:
             - `label`: `unicode`
-            - `value`: `unicode`
+            - `values`: `list` of `unicode`
         """
-        option = Option(value, label)
+        if not values:
+            raise ValueError, "Option value must not be empty"
+        if self.type == "list-single":
+            if len(values)>1:
+                raise ValueError, "'list-single' options require a single value."
+        elif self.type != "list-multi":
+            raise ValueError, "Options are allowed only for list types."
+        option = Option(values, label)
         self.options.append(option)
         return option
 

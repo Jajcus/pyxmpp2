@@ -236,7 +236,7 @@ class TestForm(unittest.TestCase):
             field = form.add_field(name = name, field_type = ftype, values = values,
                     label = label, required = required, desc = desc)
             for olabel, ovalue in options:
-                field.add_option(ovalue, olabel)
+                field.add_option([ovalue], olabel)
         return form
 
     def build_form_direct(self, form_type, title, instructions, field_data):
@@ -244,7 +244,7 @@ class TestForm(unittest.TestCase):
         for name, ftype, values, label, options, required, desc in field_data:
             foptions = []
             for olabel, ovalue in options:
-                foptions.append(Option(ovalue, olabel))
+                foptions.append(Option([ovalue], olabel))
             field = Field(name = name, field_type = ftype, values = values,
                     label = label, options = foptions, required = required, desc = desc)
             fields.append(field)
@@ -264,7 +264,7 @@ class TestForm(unittest.TestCase):
             self.failUnlessEqual(field.name, name)
             self.failUnlessEqual(field.type, ftype)
             self.failUnlessEqual(field.values, values)
-            foptions = [(o.label, o.value) for o in field.options]
+            foptions = [(o.label, o.values[0]) for o in field.options]
             self.failUnlessEqual(foptions, options)
             self.failUnlessEqual(field.required, required)
             self.failUnlessEqual(field.desc, desc)
@@ -278,7 +278,7 @@ class TestForm(unittest.TestCase):
             self.failUnlessEqual(field.name, name)
             self.failUnlessEqual(field.type, ftype)
             self.failUnlessEqual(field.values, values)
-            foptions = [(o.label, o.value) for o in field.options]
+            foptions = [(o.label, o.values[0]) for o in field.options]
             self.failUnlessEqual(foptions, options)
             self.failUnlessEqual(field.required, required)
             self.failUnlessEqual(field.desc, desc)
