@@ -30,7 +30,7 @@ import datetime
 
 def to_utf8(s):
     """
-    Convevert `s` to UTF-8 if it is Unicode, leave unchanged 
+    Convevert `s` to UTF-8 if it is Unicode, leave unchanged
     if it is string or None and convert to string overwise
     """
     if s is None:
@@ -43,7 +43,7 @@ def to_utf8(s):
 def from_utf8(s):
     """
     Convert `s` to Unicode or leave unchanged if it is None.
-    
+
     Regular strings are assumed to be UTF-8 encoded
     """
     if s is None:
@@ -90,36 +90,36 @@ def datetime_utc_to_local(utc):
         It seems standard Python 2.3 library doesn't provide any better way to
         do that.
         """
-	ts=time.time()
-	cur=datetime.datetime.fromtimestamp(ts)
-	cur_utc=datetime.datetime.utcfromtimestamp(ts)
+        ts=time.time()
+        cur=datetime.datetime.fromtimestamp(ts)
+        cur_utc=datetime.datetime.utcfromtimestamp(ts)
 
-	offset=cur-cur_utc
-	t=utc
+        offset=cur-cur_utc
+        t=utc
 
-	d=datetime.timedelta(hours=2)
-	while d>minute:
-		local=t+offset
+        d=datetime.timedelta(hours=2)
+        while d>minute:
+                local=t+offset
                 tm=local.timetuple()
                 tm=tm[0:8]+(0,)
-		ts=time.mktime(tm)
-		u=datetime.datetime.utcfromtimestamp(ts)
-		diff=u-utc
-		if diff<minute and diff>-minute:
-			break
-		if diff>nulldelta:
-			offset-=d
-		else:
-			offset+=d
-		d/=2
-	return local
+                ts=time.mktime(tm)
+                u=datetime.datetime.utcfromtimestamp(ts)
+                diff=u-utc
+                if diff<minute and diff>-minute:
+                        break
+                if diff>nulldelta:
+                        offset-=d
+                else:
+                        offset+=d
+                d/=2
+        return local
 
 def datetime_local_to_utc(local):
         """
         Simple function to convert naive `datetime.datetime` object containing
         local time to a naive `datetime.datetime` object with UTC time.
         """
-	ts=time.mktime(local.timetuple())
-	return datetime.datetime.utcfromtimestamp(ts)
-    
+        ts=time.mktime(local.timetuple())
+        return datetime.datetime.utcfromtimestamp(ts)
+
 # vi: sts=4 et sw=4
