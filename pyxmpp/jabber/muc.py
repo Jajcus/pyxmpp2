@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003 Jacek Konieczny <jajcus@bnet.pl>
+# (C) Copyright 2003-2004 Jacek Konieczny <jajcus@bnet.pl>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -45,11 +45,17 @@ class MucRoomHandler:
 
     """
     def __init__(self):
+        """Initialize a `MucRoomHandler` object."""
         self.room_state=None
         self.__logger=logging.getLogger("pyxmpp.jabber.MucRoomHandler")
 
     def assign_state(self,state_obj):
-        """Called to assign a `MucRoomState` object to this `MucRoomHandler` instance."""
+        """Assign a state object to this `MucRoomHandler` instance.
+        
+        :Parameters:
+            - `state_obj`: the state object.
+        :Types:
+            - `state_obj`: `MucRoomState`"""
         self.room_state=state_obj
 
     def user_joined(self,user,stanza):
@@ -185,6 +191,14 @@ class MucRoomHandler:
         pass
 
     def error(self,stanza):
+        """
+        Called when an error stanza is received.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `pyxmpp.stanza.Stanza`
+        """
         err=stanza.get_error()
         self.__logger.debug("Error from: %r Condition: %r"
                 % (stanza.get_from(),err.get_condition))
@@ -193,17 +207,33 @@ class MucRoomUser:
     """
     Describes a user of a MUC room.
 
-    Public attributes (should not be changed):
-    presence - last presence stanza received for the user
-    role - user's role
-    affiliation - user's affiliation
-    room_jid - user's room jid
-    real_jid - user's real jid or None if not available
-    nick - user's nick (resource part of room_jid)
+    The attributes of this object should not be changed directly.
+
+    :Ivariables:
+        - `presence`: last presence stanza received for the user.
+        - `role`: user's role.
+        - `affiliation`: user's affiliation.
+        - `room_jid`: user's room jid.
+        - `real_jid`: user's real jid or None if not available.
+        - `nick`: user's nick (resource part of `room_jid`)
+    :Types:
+        - `presence`: `MucPresence`
+        - `role`: `str`
+        - `affiliation`: `str`
+        - `room_jid`: `JID`
+        - `real_jid`: `JID`
+        - `nick`: `unicode`
     """
     def __init__(self,presence_or_user_or_jid):
         """
-        Initialize `self` from presence stanza or a JID.
+        Initialize a `MucRoomUser` object.
+
+        :Parameters:
+            - `presence_or_user_or_jid`: a MUC presence stanza with user
+              information, a user object to copy or a room JID of a user.
+        :Types:
+            - `presence_or_user_or_jid`: `MucPresence` or `MucRoomUser` or
+              `JID`
 
         When `presence_or_user_or_jid` is a JID user's
         role and affiliation are set to "none".
@@ -235,7 +265,12 @@ class MucRoomUser:
 
     def update_presence(self,presence):
         """
-        Update user information using the presence stanza provided.
+        Update user information.
+        
+        :Parameters:
+            - `presence`: a presence stanza with user information update.
+        :Types:
+            - `presence`: `MucPresence`
         """
         self.presence=MucPresence(presence)
         t=presence.get_type()
@@ -259,7 +294,18 @@ class MucRoomUser:
                 if item.nick:
                     self.new_nick=item.nick
                 break
+
     def same_as(self,other):
+        """Check if two `MucRoomUser` objects describe the same user in the
+        same room.
+        
+        :Parameters:
+            - `other`: the user object to compare `self` with.
+        :Types:
+            - `other`: `MucRoomUser`
+           
+        :return: `True` if the two object describe the same user.
+        :returntype: `bool`"""
         return self.room_jid==other.room_jid
 
 class MucRoomState:
@@ -279,7 +325,19 @@ class MucRoomState:
     """
     def __init__(self,manager,own_jid,room_jid,handler):
         """
-        Initialize `self` with given attributes.
+        Initialize a `MucRoomState` object.
+
+        :Parameters:
+            - `manager`: an object to manage this room.
+            - `own_jid`: real JID of the owner (client using this class).
+            - `room_jid`: room JID of the owner (provides the room name and
+              the nickname).
+            - `handler`: an object to handle room events.
+        :Types:
+            - `manager`: `MucRoomManager`
+            - `own_jid`: JID
+            - `room_jid`: JID
+            - `handler`: `MucRoomHandler`
         """
         self.own_jid=own_jid
         self.room_jid=room_jid
@@ -294,11 +352,18 @@ class MucRoomState:
 
     def get_user(self,nick_or_jid,create=False):
         """
-        Return room user with given nick or JID.
+        Get a room user with given nick or JID.
 
-        If JID is given with non-empty resource and user is not known, then
-        create a new MucRoomUser object. Otherwise return None if the user is
-        not known.
+        :Parameters:
+            - `nick_or_jid`: the nickname or room JID of the user requested.
+            - `create`: if `True` and `nick_or_jid` is a JID, then a new
+              user object will be created if there is no such user in the room.
+        :Types:
+            - `nick_or_jid`: `unicode` or `JID`
+            - `create`: `bool`
+
+        :return: the named user or `None`
+        :returntype: `MucRoomUser`
         """
         if isinstance(nick_or_jid,JID):
             if not nick_or_jid.resource:
@@ -314,9 +379,14 @@ class MucRoomState:
 
     def set_stream(self,stream):
         """
+        Called when current stream changes.
+
         Mark the room not joined and inform `self.handler` that it was left.
 
-        Called when current stream changes.
+        :Parameters:
+            - `stream`: the new stream.
+        :Types:
+            - `stream`: `pyxmpp.stream.Stream`
         """
         if self.joined and self.handler:
             self.handler.user_left(self.me,None)
@@ -342,6 +412,11 @@ class MucRoomState:
     def send_message(self,body):
         """
         Send a message to the room.
+
+        :Parameters:
+            - `body`: the message body.
+        :Types:
+            - `body`: `unicode`
         """
         m=Message(to_jid=self.room_jid.bare(),stanza_type="groupchat",body=body)
         self.manager.stream.send(m)
@@ -349,6 +424,11 @@ class MucRoomState:
     def set_subject(self,subject):
         """
         Send a subject change request to the room.
+
+        :Parameters:
+            - `subject`: the new subject.
+        :Types:
+            - `subject`: `unicode`
         """
         m=Message(to_jid=self.room_jid.bare(),stanza_type="groupchat",subject=subject)
         self.manager.stream.send(m)
@@ -356,6 +436,11 @@ class MucRoomState:
     def change_nick(self,new_nick):
         """
         Send a nick change request to the room.
+
+        :Parameters:
+            - `new_nick`: the new nickname requested.
+        :Types:
+            - `new_nick`: `unicode`
         """
         new_room_jid=JID(self.room_jid.node,self.room_jid.domain,new_nick)
         p=Presence(to_jid=new_room_jid)
@@ -363,7 +448,15 @@ class MucRoomState:
 
     def get_room_jid(self,nick=None):
         """
-        Return the room jid or a room jid for given `nick`.
+        Get own room JID or a room JID for given `nick`.
+
+        :Parameters:
+            - `nick`: a nick for which the room JID is requested.
+        :Types:
+            - `nick`: `unicode`
+
+        :return: the room JID.
+        :returntype: `JID`
         """
         if nick is None:
             return self.room_jid
@@ -371,13 +464,21 @@ class MucRoomState:
 
     def get_nick(self):
         """
-        Return own nick.
+        Get own nick.
+
+        :return: own nick.
+        :returntype: `unicode`
         """
         return self.room_jid.resource
 
     def process_available_presence(self,stanza):
         """
         Process <presence/> received from the room.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `MucPresence`
         """
         fr=stanza.get_from()
         if not fr.resource:
@@ -411,6 +512,11 @@ class MucRoomState:
     def process_unavailable_presence(self,stanza):
         """
         Process <presence type="unavailable"/> received from the room.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `MucPresence`
         """
         fr=stanza.get_from()
         if not fr.resource:
@@ -446,6 +552,11 @@ class MucRoomState:
     def process_groupchat_message(self,stanza):
         """
         Process <message type="groupchat"/> received from the room.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `Message`
         """
         fr=stanza.get_from()
         user=self.get_user(fr,True)
@@ -459,12 +570,22 @@ class MucRoomState:
     def process_error_message(self,stanza):
         """
         Process <message type="error"/> received from the room.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `Message`
         """
         self.handler.error(stanza)
 
     def process_error_presence(self,stanza):
         """
         Process <presence type="error"/> received from the room.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `Presence`
         """
         self.handler.error(stanza)
 
@@ -479,7 +600,12 @@ class MucRoomManager:
     """
     def __init__(self,stream):
         """
-        Initialize `self` and assign it the given `stream`.
+        Initialize a `MucRoomManager` object.
+        
+        :Parameters:
+            - `stream`: a stream to be initially assigned to `self`.
+        :Types:
+            - `stream`: `pyxmpp.stream.Stream`
         """
         self.rooms={}
         self.stream,self.jid=(None,)*2
@@ -489,6 +615,11 @@ class MucRoomManager:
     def set_stream(self,stream):
         """
         Change the stream assigned to `self`.
+
+        :Parameters:
+            - `stream`: the new stream to be assigned to `self`.
+        :Types:
+            - `stream`: `pyxmpp.stream.Stream`
         """
         self.jid=stream.me
         self.stream=stream
@@ -497,7 +628,12 @@ class MucRoomManager:
 
     def set_handlers(self,priority=10):
         """
-        Assign stanza handlers in `self` to the `self.stream`.
+        Assign MUC stanza handlers to the `self.stream`.
+
+        :Parameters:
+            - `priority`: priority for the handlers.
+        :Types:
+            - `priority`: `int`
         """
         self.stream.set_message_handler("groupchat",self.__groupchat_message,None,priority)
         self.stream.set_message_handler("error",self.__error_message,None,priority)
@@ -507,12 +643,20 @@ class MucRoomManager:
 
     def join(self,room,nick,handler):
         """
-        Create and return a new RoomState object and request joining
+        Create and return a new room state object and request joining
         to a MUC room.
 
-        `room` is the name of a room to be joined
-        `nick` is the nickname to be used in the room
-        `handler` is a MucRoomHandler object which will handle room events
+        :Parameters:
+            - `room`: the name of a room to be joined
+            - `nick`: the nickname to be used in the room
+            - `handler`: is an object to handle room events.
+        :Types:
+            - `room`: `JID`
+            - `nick`: `unicode`
+            - `handler`: `MucRoomHandler`
+
+        :return: the room state object created.
+        :returntype: `MucRoomState`
         """
         if not room.node or room.resource:
             raise ValueError,"Invalid room JID"
@@ -523,11 +667,25 @@ class MucRoomManager:
         return rs
 
     def get_room_state(self,room):
+        """Get the room state object of a room.
+
+        :Parameters:
+            - `room`: JID or the room which state is requested.
+        :Types:
+            - `room`: `JID`
+            
+        :return: the state object.
+        :returntype: `MucRoomState`"""
         return self.rooms.get(room.bare().as_unicode())
 
     def forget(self,rs):
         """
-        Remove a RoomStateObject `rs` from `self.rooms`.
+        Remove a room from the list of managed rooms.
+
+        :Parameters:
+            - `rs`: the state object of the room.
+        :Types:
+            - `rs`: `MucRoomState`
         """
         try:
             del self.rooms[rs.room_jid.bare().as_unicode()]
@@ -535,6 +693,16 @@ class MucRoomManager:
             pass
 
     def __groupchat_message(self,stanza):
+        """Process a groupchat message from a MUC room.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `Message`
+
+        :return: `True` if the message was properly recognized as directed to
+            one of the managed rooms, `False` otherwise.
+        :returntype: `bool`"""
         fr=stanza.get_from()
         key=fr.bare().as_unicode()
         rs=self.rooms.get(key)
@@ -545,6 +713,16 @@ class MucRoomManager:
         return True
 
     def __error_message(self,stanza):
+        """Process an error message from a MUC room.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `Message`
+
+        :return: `True` if the message was properly recognized as directed to
+            one of the managed rooms, `False` otherwise.
+        :returntype: `bool`"""
         fr=stanza.get_from()
         key=fr.bare().as_unicode()
         rs=self.rooms.get(key)
@@ -554,6 +732,16 @@ class MucRoomManager:
         return True
 
     def __presence_error(self,stanza):
+        """Process an presence error from a MUC room.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `Presence`
+
+        :return: `True` if the stanza was properly recognized as generated by
+            one of the managed rooms, `False` otherwise.
+        :returntype: `bool`"""
         fr=stanza.get_from()
         key=fr.bare().as_unicode()
         rs=self.rooms.get(key)
@@ -563,6 +751,16 @@ class MucRoomManager:
         return True
 
     def __presence_available(self,stanza):
+        """Process an available presence from a MUC room.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `Presence`
+
+        :return: `True` if the stanza was properly recognized as generated by
+            one of the managed rooms, `False` otherwise.
+        :returntype: `bool`"""
         fr=stanza.get_from()
         key=fr.bare().as_unicode()
         rs=self.rooms.get(key)
@@ -572,6 +770,16 @@ class MucRoomManager:
         return True
 
     def __presence_unavailable(self,stanza):
+        """Process an unavailable presence from a MUC room.
+
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `Presence`
+
+        :return: `True` if the stanza was properly recognized as generated by
+            one of the managed rooms, `False` otherwise.
+        :returntype: `bool`"""
         fr=stanza.get_from()
         key=fr.bare().as_unicode()
         rs=self.rooms.get(key)
