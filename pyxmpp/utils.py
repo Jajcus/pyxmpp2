@@ -17,7 +17,7 @@
 
 """Utility functions for the pyxmpp package."""
 
-__revision__="$Id: utils.py,v 1.15 2004/09/10 14:00:54 jajcus Exp $"
+__revision__="$Id: utils.py,v 1.16 2004/09/11 20:48:50 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import sys
@@ -87,35 +87,35 @@ minute=datetime.timedelta(minutes=1)
 nulldelta=datetime.timedelta()
 
 def datetime_utc_to_local(utc):
-        """
-        An ugly hack to convert naive `datetime.datetime` object containing
-        UTC time to a naive `datetime.datetime` object with local time.
-        It seems standard Python 2.3 library doesn't provide any better way to
-        do that.
-        """
-        ts=time.time()
-        cur=datetime.datetime.fromtimestamp(ts)
-        cur_utc=datetime.datetime.utcfromtimestamp(ts)
+    """
+    An ugly hack to convert naive `datetime.datetime` object containing
+    UTC time to a naive `datetime.datetime` object with local time.
+    It seems standard Python 2.3 library doesn't provide any better way to
+    do that.
+    """
+    ts=time.time()
+    cur=datetime.datetime.fromtimestamp(ts)
+    cur_utc=datetime.datetime.utcfromtimestamp(ts)
 
-        offset=cur-cur_utc
-        t=utc
+    offset=cur-cur_utc
+    t=utc
 
-        d=datetime.timedelta(hours=2)
-        while d>minute:
-                local=t+offset
-                tm=local.timetuple()
-                tm=tm[0:8]+(0,)
-                ts=time.mktime(tm)
-                u=datetime.datetime.utcfromtimestamp(ts)
-                diff=u-utc
-                if diff<minute and diff>-minute:
-                        break
-                if diff>nulldelta:
-                        offset-=d
-                else:
-                        offset+=d
-                d/=2
-        return local
+    d=datetime.timedelta(hours=2)
+    while d>minute:
+        local=t+offset
+        tm=local.timetuple()
+        tm=tm[0:8]+(0,)
+        ts=time.mktime(tm)
+        u=datetime.datetime.utcfromtimestamp(ts)
+        diff=u-utc
+        if diff<minute and diff>-minute:
+                break
+        if diff>nulldelta:
+                offset-=d
+        else:
+                offset+=d
+        d/=2
+    return local
 
 def datetime_local_to_utc(local):
         """

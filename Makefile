@@ -2,7 +2,7 @@ VERSION=0.5
 
 DESTDIR="/"
 
-.PHONY: all version snapshot dist
+.PHONY: all version snapshot dist doc
 
 all: version
 	umask 022 ; python setup.py build
@@ -10,6 +10,9 @@ all: version
 	-cd examples ; chmod a+x *.py
 	-cd tests ; rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp .
 	-cd tests ; chmod a+x *.py
+
+doc:
+	$(MAKE) -C doc
 	
 version:
 	if test -f "CVS/Entries" ; then \

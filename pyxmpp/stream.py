@@ -15,11 +15,12 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: stream.py,v 1.63 2004/09/10 14:00:54 jajcus Exp $"
+"""Core XMPP stream functionality"""
+
+__revision__="$Id: stream.py,v 1.64 2004/09/11 20:48:50 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
-import xmlextra
 import socket
 import os
 import sys
@@ -34,6 +35,7 @@ import logging
 
 from types import StringType,UnicodeType
 
+from pyxmpp import xmlextra
 from pyxmpp.expdict import ExpiringDictionary
 from pyxmpp.utils import from_utf8,to_utf8,remove_evil_characters
 from pyxmpp.stanza import Stanza,common_doc,StanzaError
@@ -62,42 +64,67 @@ SASL_NS="urn:ietf:params:xml:ns:xmpp-sasl"
 BIND_NS="urn:ietf:params:xml:ns:xmpp-bind"
 
 class StreamError(StandardError):
+    """Base class for all stream errors."""
     pass
 
 class StreamEncryptionRequired(StreamError):
+    """Exception raised when stream encryption is requested, but not used."""
     pass
 
 class HostMismatch(StreamError):
+    """Exception raised when the connected host name is other then requested."""
     pass
 
 class FatalStreamError(StreamError):
+    """Base class for all fatal Stream exceptions.
+    When `FatalScreamError` is raised the stream is no longer usable."""
     pass
 
 class StreamParseError(FatalStreamError):
+    """Raised when invalid XML is received in an XMPP stream."""
     pass
 
 class StreamAuthenticationError(FatalStreamError):
+    """Raised when stream authentication fails."""
     pass
 
 class SASLNotAvailable(StreamAuthenticationError):
+    """Raised when SASL authentication is requested, but not available."""
     pass
 
 class SASLMechanismNotAvailable(StreamAuthenticationError):
+    """Raised when none of SASL authentication mechanisms requested is
+    available."""
     pass
 
 class SASLAuthenticationFailed(StreamAuthenticationError):
+    """Raised when stream SASL authentication fails."""
     pass
 
 class TLSNegotiationFailed(FatalStreamError):
+    """Raised when stream TLS negotiation fails."""
     pass
 
 class TLSError(FatalStreamError):
+    """Raised on TLS error during stream processing."""
     pass
 
 class TLSSettings:
-    def __init__(self,require=0,verify_peer=1,cert_file=None,key_file=None,
-            cacert_file=None,verify_callback=None,
-            ctx=None):
+    """Storage for TLS-related settings of an XMPP stream."""
+    def __init__(self,
+            require=False,verify_peer=True,
+            cert_file=None,key_file=None,cacert_file=None,
+            verify_callback=None,ctx=None):
+        """Initialize the TLSSettings object.
+        
+        :Parameters:
+            - `require`:  is TLS required
+            - `verify_peer`: should the peer's certificate be verified
+            - `cert_file`: path to own X.509 certificate
+            - `key_file`: path to the private key for own X.509 certificate
+            - `cacert_file`: path to a file with trusted CA certificates
+            - `verify_callback`: callback function for certificate
+              verification. See M2Crypto documentation for details."""
         self.require=require
         self.ctx=ctx
         self.verify_peer=verify_peer
@@ -106,7 +133,8 @@ class TLSSettings:
         self.key_file=key_file
         self.verify_callback=verify_callback
 
-def StanzaFactory(node):
+def stanza_factory(node):
+    """Creates Iq, Message or Presence object for XML stanza `node`"""
     if node.name=="iq":
         return Iq(node)
     if node.name=="message":
@@ -117,11 +145,36 @@ def StanzaFactory(node):
         return Stanza(node)
 
 class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
-    def __init__(self,default_ns,extra_ns=[],sasl_mechanisms=[],
+    """Base class for XMPP stream.
+    
+    Responsible for establishing connection, parsing the stream,
+    StartTLS encryption and SASL authentication negotiation
+    and usage, dispatching received stanzas to apopriate handlers
+    and sending application's stanzas."""
+    def __init__(self,default_ns,extra_ns=None,sasl_mechanisms=None,
                     tls_settings=None,keepalive=0):
+        """Initialize Stream object
+
+        :Parameters:
+          - `default_ns`: stream's default namespace ("jabber:client" for
+            client, "jabber:server" for server, etc.)
+          - `extra_ns`: list of extra namespace URIs to be defined for
+            the stream.
+          - `sasl_mechanisms`: list of SASL mechanisms allowed for
+            authentication. Currently "PLAIN" and "DIGEST-MD5" are supported.
+          - `tls_settings`: settings for StartTLS -- `TLSSettings` instance.
+          - `keepalive`: keepalive output interval. `0` to disable.
+
+        """
         self.default_ns_uri=default_ns
-        self.extra_ns_uris=extra_ns
-        self.sasl_mechanisms=sasl_mechanisms
+        if extra_ns:
+            self.extra_ns_uris=extra_ns
+        else:
+            self.extra_ns_uris=[]
+        if sasl_mechanisms:
+            self.sasl_mechanisms=sasl_mechanisms
+        else:
+            self.sasl_mechanisms=[]
         self.tls_settings=tls_settings
         self.keepalive=keepalive
         self.lock=threading.RLock()
@@ -131,6 +184,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         self.__logger=logging.getLogger("pyxmpp.Stream")
 
     def _reset(self):
+        """Resets Stream object state making it ready to handle new
+        connections."""
         self.doc_in=None
         self.doc_out=None
         self.socket=None
@@ -614,7 +669,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
             raise StreamEncryptionRequired,"TLS encryption required and not started yet"
 
         if ns_uri==self.default_ns_uri:
-            stanza=StanzaFactory(node)
+            stanza=stanza_factory(node)
             self.lock.release()
             try:
                 self.process_stanza(stanza)

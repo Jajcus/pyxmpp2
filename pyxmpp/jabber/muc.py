@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: muc.py,v 1.20 2004/09/10 14:01:01 jajcus Exp $"
+__revision__="$Id: muc.py,v 1.21 2004/09/11 20:48:57 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -501,9 +501,10 @@ class MucRoomHandler:
 
     Methods of this class will be called for various events in the room.
 
-    Public attributes:
-    - room_state - MucRoomState object describing room state and its
-      participants.
+    :Ivariables:
+      - `room_state`: MucRoomState object describing room state and its
+        participants.
+
     """
     def __init__(self):
         self.room_state=None
@@ -889,9 +890,10 @@ class MucRoomManager:
     """
     Manage collection of MucRoomState objects and dispatch events.
 
-    Public attributes:
-    - rooms a dictionary containing known MUC rooms. Unicode room JIDs are the
-      keys.
+    :Ivariables:
+      - rooms a dictionary containing known MUC rooms. Unicode room JIDs are the
+        keys.
+    
     """
     def __init__(self,stream):
         """
