@@ -159,8 +159,11 @@ class MucItem:
 
 class MucUserX(MucXBase):
 	ns=MUC_USER_NS
-	def __init__(self,node=None,copy=1,parent=None):
+	def __init__(self,node=None,copy=1,parent=None,status=None):
 		MucXBase.__init__(self,node,copy=copy,parent=parent)
+		if status:
+			sn=self.node.newChild(self.node.ns(),"status",None)
+			sn.setProp("code",str(status))
 	def get_items(self):
 		if not self.node.children:
 			return []
@@ -235,9 +238,9 @@ class MucStanzaExt:
 				n.unlinkNode()
 				n.freeNode()
 
-	def make_muc_userinfo(self):
+	def make_muc_userinfo(self,status=None):
 		self.clear_muc_x()
-		self.muc_x=MucUserX(parent=self.node)
+		self.muc_x=MucUserX(parent=self.node,status=status)
 		return self.muc_x
 				
 	def muc_free(self):
