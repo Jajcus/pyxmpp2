@@ -1,3 +1,8 @@
+2004-09-22  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/jabberd/componentstream.py, pyxmpp/jabber/clientstream.py, pyxmpp/__init__.py, pyxmpp/clientstream.py, pyxmpp/stream.py, TODO.pylint, pylint.sh:
+	- stream.py split into pieces
+
 2004-09-21  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* pyxmpp/stanzaprocessor.py:
