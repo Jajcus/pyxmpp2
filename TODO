@@ -1,4 +1,4 @@
+- better error handling
+- documentation
 - full StartTLS support
 - jabber:component streams support
-- SASL authentication (at least PLAIN and DIGEST-MD5)
-- expiration of IQ reply handlers
