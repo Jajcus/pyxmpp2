@@ -2,23 +2,53 @@
 PyXMPP -- Python Jabber/XMPPP implementation
 ============================================
 
-\(c) 2003-2004 Jacek Konieczny <jajcus@jajcus.net>
+Introduction
+------------
 
-This is PyXMPP - a python XMPP (RFC 3920,3921) and Jabber
-(http://www.jabber.org/protocol/) implementation. It is based on libxml2 -
+PyXMPP is a Python XMPP (RFC 3920,3921) and Jabber
+(http://www.jabber.org/protocol/) implementation. It is based on libxml2 --
 fast and fully-featured XML parser.
 
-The goal is to make full-featured library for core XMPP/Jabber protocol support
-(higher level protocols may be implemented in applications) for Jabber/XMPP
-clients, servers and services. Currently it is mainly developed for CJC
-(Console Jabber Client) and Jajcus' Jabber to IRC Gateway, so the client-side
-of protocol and basic component interface are the most complete.
+PyXMPP provides most core features of the XMPP protocol and several JSF-defined
+extensions. PyXMPP provides building blocks for creating Jabber clients and
+components. Developer uses them to setup XMPP streams, handle incoming events
+and create outgoing stanzas (XMPP "packets").
+
+Features
+--------
+
+- nearly complete XMPP Core (RFC 3920) protocol for client connections
+  (includes SASL, TLS and Strinprep)
+- mostly complete XMPP IM (RFC 3921) protocol (lacks privacy lists)
+- XMPP error objects including translations to and from legacy codes for
+  backward compatibility (`JEP-0086
+  <http://www.jabber.org/jeps/jep-0086.html>`__).
+- legacy authentication ("digest" and "plain") (`JEP-0078
+  <http://www.jabber.org/jeps/jep-0078.html>`__). 
+- component protocol (`JEP-0114 <http://www.jabber.org/jeps/jep-0114.html>`__). 
+- Service Discovery (`JEP-0030 <http://www.jabber.org/jeps/jep-0091.html>`__).
+- vCards -- both Jabber "vcard-temp" and RFC 2426
+- basic parts of the Multi-User Chat protocol (`JEP-0045
+  <http://www.jabber.org/jeps/jep-0045.html>`__)
+- delayed delivery timestamps (`JEP-0091 <http://www.jabber.org/jeps/jep-0091.html>`__).
+
+Requirements
+------------
 
 For PyXMPP you will need:
-  - Python 2.3 (maybe it will work in 2.4 too)
-  - recent libxml2 release (2.6.x) with python bindings. (http://xmlsoft.org/)
-  - dnspython (http://www.pythondns.org/). PyXMPP is tested with version 1.3.2.
-  - M2Crypto (http://sandbox.rulemaker.net/ngps/m2/) for TLS support.
+
+  - `Python <http://www.python.org/>`__. PyXMPP was designed for Python 2.3,
+    2.4 shoud work too.
+  - `libxml2 <http://xmlsoft.org/>`__. Recent release (2.6.x) with python
+    bindings and all developement files (usually in separate libxml2-devel
+    package) is required.
+  - `dnspython <http://www.pythondns.org/>`__. PyXMPP is tested with version
+    1.3.2.
+  - `M2Crypto <http://sandbox.rulemaker.net/ngps/m2/>`__ for TLS support. Tested
+    with M2Crypto-0.13/swig-1.3.21.
+
+Installation
+------------
 
 To build the package just invoke::
 
@@ -32,4 +62,31 @@ If you had some older version of PyXMPP it is better to uninstall it (delete
 pyxmpp subdirectory os your site-packages directory) before installing this one
 or things may not work correctly.
 
-:Status: $Id$
+Contact
+-------
+
+PyXMPP was written and is maintained by Jacek Konieczny <jajcus@jajcus.net>.
+
+To report bugs or request features use `the project page on the JabberStudio
+<http://jabberstudio.org/projects/pyxmpp>`__.  
+
+For discussion you may join `the PyXMPP mailing list
+<http://lists.bnet.pl/mailman/listinfo/pyxmpp>`__.
+
+Download
+--------
+
+Latest releases of PyXMPP may be downloaded from `the files section of the project page
+<http://jabberstudio.org/projects/pyxmpp/files/>`__. There are also
+some `SVN snapshots <http://pyxmpp.jabberstudio.org/snapshots/` available.
+
+You can also checkout latest sources directly from the SVN repository::
+svn checkout svn://jabberstudio.org/pyxmpp/svn/trunk pyxmpp
+
+License
+-------
+
+PyXMPP is free software, licensed under the GNU LGPL. See the
+COPYING file for details.
+
+.. $Id$
