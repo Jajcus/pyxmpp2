@@ -97,6 +97,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 		realms=[]
 		nonce=None
 		charset="iso-8859-1"
+		realm=None
 		while challenge:
 			m=param_re.match(challenge)
 			if not m:
