@@ -16,10 +16,10 @@ doc:
 	$(MAKE) -C doc
 
 www:
-	$(MAKE) -C www
+	$(MAKE) -C doc www
 
 publish:
-	$(MAKE) -C publish
+	$(MAKE) -C doc publish
 
 pylint:	TODO.pylint
 
