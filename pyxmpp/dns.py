@@ -3,7 +3,13 @@ import random
 import struct
 import sys
 import string
-from types import StringType
+from types import StringType,UnicodeType
+
+try:
+	from encodings import idna
+	IDNA_AVAILABLE=1
+except:
+	IDNA_AVAILABLE=0
 
 class ResolverError(Exception):
 	pass
@@ -27,6 +33,11 @@ resolve_errors={
 	}
 
 def domain_str2bin(name):
+	if type(name) is UnicodeType:
+		if IDNA_AVAILABLE:
+			name=idna.ToASCII(name)
+		else:
+			name=str(name)
 	ret=""
 	for label in name.split("."):
 		if not label:
@@ -438,6 +449,7 @@ class Message:
 		if self.ra:
 			flags|=0x0080
 		flags|=(self.rcode&0x0f)
+		print >>file("debug.log","a"),`("!HHHHHH",self.id,flags,qdcount,ancount,nscount,arcount)`,`payload`
 		return struct.pack("!HHHHHH",self.id,flags,qdcount,ancount,nscount,arcount)+payload
 
 def parse_question(packet,offset):
