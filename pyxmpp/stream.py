@@ -190,9 +190,10 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 				s.connect(sockaddr)
 				self.state_change("connected",sockaddr)
 			except socket.error, msg:
-				self.debug("Connect to %r failed" % sockaddr)
+				self.debug("Connect to %r failed" % (sockaddr,))
 				if s:
 					s.close()
+					s=None
 				continue
 			break
 		if not s:
