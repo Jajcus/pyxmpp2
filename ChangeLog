@@ -1,5 +1,8 @@
 2004-06-09  Jacek Konieczny  <jajcus@bnet.pl>
 
+	* pyxmpp/jid.py:
+	- when JID() argument is JID instance return it unchanged (natural behaviour for immutable type)
+
 	* pyxmpp/xmppstringprep.py:
 	- stringprep prepared string caching
 
