@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: disco.py,v 1.12 2004/09/19 17:25:41 jajcus Exp $"
+__revision__="$Id: disco.py,v 1.13 2004/09/24 08:17:24 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import sys
@@ -36,7 +36,7 @@ class DiscoError(StandardError):
     pass
 
 class DiscoItem:
-    def __init__(self,disco,xmlnode_or_jid,node,name=None,action=None):
+    def __init__(self,disco,xmlnode_or_jid,node=None,name=None,action=None):
         self.disco=disco
         if isinstance(xmlnode_or_jid,JID):
             if disco:
@@ -203,10 +203,10 @@ class DiscoItems:
         self.xmlnode=None
         self.xpath_ctxt=None
         if isinstance(xmlnode_or_node,libxml2.xmlNode):
-            ns=xmlnode.ns()
+            ns=xmlnode_or_node.ns()
             if ns.getContent() != DISCO_ITEMS_NS:
                 raise RosterError,"Bad disco-items namespace"
-            self.xmlnode=xmlnode.docCopyNode(common_doc,1)
+            self.xmlnode=xmlnode_node_or_node.docCopyNode(common_doc,1)
             common_root.addChild(self.xmlnode)
             self.ns=self.xmlnode.ns()
         else:
@@ -228,12 +228,12 @@ class DiscoItems:
             self.xpath_ctxt.xpathFreeContext()
             self.xpath_ctxt=None
 
-    def identities(self):
+    def items(self):
         ret=[]
-        l=self.xpath_ctxt.xpathEval("d:identity")
+        l=self.xpath_ctxt.xpathEval("d:item")
         if l is not None:
             for i in l:
-                ret.append(DiscoIdentity(i))
+                ret.append(DiscoItem(self,i))
         return ret
 
     def has_item(self,jid,node=None):
