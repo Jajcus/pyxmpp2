@@ -642,7 +642,7 @@ class VCardKey:
 
 class VCard:
 	components={
-			"VERSION": (VCardString,"optional"),
+			#"VERSION": (VCardString,"optional"),
 			"FN": (VCardString,"required"),
 			"N": (VCardName,"required"),
 			"NICKNAME": (VCardString,"multi"),
@@ -787,6 +787,7 @@ class VCard:
 		return "<vCard of %r>" % (self.content["FN"].value,)
 	def rfc2426(self):
 		ret="begin:VCARD\r\n"
+		ret+="version:3.0\r\n"
 		for name,value in self.content.items():
 			if value is None:
 				continue
