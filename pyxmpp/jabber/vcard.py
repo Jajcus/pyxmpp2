@@ -59,8 +59,12 @@ def rfc2425encode(name,value,parameters={},charset="utf-8"):
 		value=value[70:]
 	ret+=value+"\r\n"
 	return ret
+
+class VCardField:
+	def __repr__(self):
+		return "<%s %r>" % (self.__class__,self.rfc2426())
 	
-class VCardString:
+class VCardString(VCardField):
 	def __init__(self,name,value,rfc2425parameters={}):
 		self.name=name
 		if isinstance(value,libxml2.xmlNode):
@@ -78,12 +82,16 @@ class VCardString:
 	def xml(self,parent):
 		return parent.newTextChild(get_node_ns(parent),
 				to_utf8(self.name.upper()),to_utf8(self.value))
+	def __unicode__(self):
+		return self.value
+	def __str__(self):
+		return self.value.encode("utf-8")
 
 class VCardXString(VCardString):
 	def rfc2426(self):
 		return rfc2425encode("x-"+self.name,self.value)
 
-class VCardJID:
+class VCardJID(VCardField):
 	def __init__(self,name,value,rfc2425parameters={}):
 		self.name=name
 		if isinstance(value,libxml2.xmlNode):
@@ -96,8 +104,12 @@ class VCardJID:
 		return rfc2425encode("x-jabberid",self.value.as_unicode())
 	def xml(self,parent):
 		return parent.newTextChild(get_node_ns(parent),to_utf8(self.name.upper()),self.value.as_utf8())
+	def __unicode__(self):
+		return self.value.as_unicode()
+	def __str__(self):
+		return self.value.as_string()
 
-class VCardName:
+class VCardName(VCardField):
 	def __init__(self,name,value,rfc2425parameters={}):
 		self.name=name
 		if self.name.upper()!="N":
@@ -150,8 +162,23 @@ class VCardName:
 		n.newTextChild(ns,"PREFIX",to_utf8(self.prefix))
 		n.newTextChild(ns,"SUFFIX",to_utf8(self.suffix))
 		return n
+	def __unicode__(self):
+		r=[]
+		if self.prefix:
+			r.append(self.prefix.replace(u",",u" "))
+		if self.given:
+			r.append(self.given.replace(u",",u" "))
+		if self.middle:
+			r.append(self.middle.replace(u",",u" "))
+		if self.family:
+			r.append(self.family.replace(u",",u" "))
+		if self.suffix:
+			r.append(self.suffix.replace(u",",u" "))
+		return string.join(r,u" ")
+	def __str__(self):
+		return self.__unicode__().encode("utf-8")
 
-class VCardImage:
+class VCardImage(VCardField):
 	def __init__(self,name,value,rfc2425parameters={}):
 		self.name=name
 		if isinstance(value,libxml2.xmlNode):
@@ -203,8 +230,17 @@ class VCardImage:
 				n.newTextChild(n.ns(),"TYPE",self.type)
 			n.newTextChild(ns,"BINVAL",binascii.b2a_base64(self.image))
 		return n
+	def __unicode__(self):
+		if self.uri:
+			return self.uri
+		if self.type:
+			return u"(%s data)" % (self.type,)
+		return u"(binary data)"
+	def __str__(self):
+		return self.__unicode__().encode("utf-8")
 
-class VCardAdr:
+
+class VCardAdr(VCardField):
 	def __init__(self,name,value,rfc2425parameters={}):
 		self.name=name
 		if self.name.upper()!="ADR":
@@ -277,7 +313,7 @@ class VCardAdr:
 		n.newTextChild(ns,"CTRY",to_utf8(self.ctry))
 		return n
 
-class VCardLabel:
+class VCardLabel(VCardField):
 	def __init__(self,name,value,rfc2425parameters={}):
 		self.name=name
 		if self.name.upper()!="LABEL":
@@ -330,7 +366,7 @@ class VCardLabel:
 			n.newTextChild(ns,"LINE",l)
 		return n
 
-class VCardTel:
+class VCardTel(VCardField):
 	def __init__(self,name,value,rfc2425parameters={}):
 		self.name=name
 		if self.name.upper()!="TEL":
@@ -378,7 +414,7 @@ class VCardTel:
 		n.newTextChild(ns,"NUMBER",to_utf8(self.number))
 		return n
 
-class VCardEmail:
+class VCardEmail(VCardField):
 	def __init__(self,name,value,rfc2425parameters={}):
 		self.name=name
 		if self.name.upper()!="EMAIL":
@@ -423,7 +459,7 @@ class VCardEmail:
 		n.newTextChild(ns,"USERID",to_utf8(self.address))
 		return n
 
-class VCardGeo:
+class VCardGeo(VCardField):
 	def __init__(self,name,value,rfc2425parameters={}):
 		self.name=name
 		if self.name.upper()!="GEO":
@@ -459,7 +495,7 @@ class VCardGeo:
 		n.newTextChild(ns,"LON",to_utf8(self.lon))
 		return n
 
-class VCardOrg:
+class VCardOrg(VCardField):
 	def __init__(self,name,value,rfc2425parameters={}):
 		self.name=name
 		if self.name.upper()!="ORG":
@@ -502,7 +538,7 @@ class VCardOrg:
 		n.newTextChild(ns,"ORGUNIT",to_utf8(self.unit))
 		return n
 
-class VCardCategories:
+class VCardCategories(VCardField):
 	def __init__(self,name,value,rfc2425parameters={}):
 		self.name=name
 		if self.name.upper()!="CATEGORIES":
@@ -535,7 +571,7 @@ class VCardCategories:
 			n.newTextChild(ns,"KEYWORD",to_utf8(k))
 		return n
 
-class VCardSound:
+class VCardSound(VCardField):
 	def __init__(self,name,value,rfc2425parameters={}):
 		self.name=name
 		if isinstance(value,libxml2.xmlNode):
@@ -590,7 +626,7 @@ class VCardSound:
 			n.newTextChild(ns,"BINVAL",binascii.b2a_base64(self.image))
 		return n
 
-class VCardPrivacy:
+class VCardPrivacy(VCardField):
 	def __init__(self,name,value,rfc2425parameters={}):
 		self.name=name
 		if isinstance(value,libxml2.xmlNode):
@@ -626,7 +662,7 @@ class VCardPrivacy:
 			return n
 		return None
 
-class VCardKey:
+class VCardKey(VCardField):
 	def __init__(self,name,value,rfc2425parameters={}):
 		self.name=name
 		if isinstance(value,libxml2.xmlNode):
