@@ -13,11 +13,6 @@ class Merger:
         slot=output_doc.xpathEval('//*[@id="main"]')[0]
         content=self.content_doc.xpathEval('//*[@class="document"]/*')
         for node in content:
-            print >>sys.stderr,"------"
-            print >>sys.stderr,"node ns: ",node.ns().getContent()
-            print >>sys.stderr,"slot ns: ",slot.ns().getContent()
-            print >>sys.stderr,node.serialize()
-            print >>sys.stderr,"------"
             nn=slot.addChild(node.copyNode(True))
         output_doc.getRootElement().reconciliateNs(output_doc)
         return output_doc
