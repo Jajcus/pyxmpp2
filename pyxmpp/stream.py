@@ -376,6 +376,8 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		else:
 			self.eof=1
 			self.disconnect()
+		if self.eof:
+			self.stream_end(None)
 
 	def process_node(self,node):
 		ns_uri=node.ns().getContent()
