@@ -1,3 +1,8 @@
+2004-05-26  Jacek Konieczny  <jajcus@bnet.pl>
+
+	* pyxmpp/stanza.py:
+	- get_node() fixed
+
 2004-05-16  Jacek Konieczny  <jajcus@bnet.pl>
 
 	* Makefile: *** Version: 0.4 ***
