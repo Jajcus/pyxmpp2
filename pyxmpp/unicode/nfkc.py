@@ -46,9 +46,6 @@ def decompose(c):
 		return [c]
 	if d.startswith("<"):
 		d=d[d.index(">")+1:]
-		print "Compatibility decomposition: %r -> %r" % (c,d)
-	else:
-		print "Canonical decomposition: %r -> %r" % (c,d)
 	
 	ret=[]
 	for c in d.split():
@@ -67,23 +64,18 @@ def hangul_compose(l):
 	for i in range(1,ll):
 		lch=l[i]
 		ch=ord(lch[2])
-		print "i: %r, last: %r, ch: %r, l: %r" % (i,last,ch,l)
 
 		LIndex=last-LBase
-		print "LIndex: %r" % (LIndex,)
 		if 0<=LIndex and LIndex<LCount:
 			VIndex=ch-VBase
-			print "VIndex: %r" % (VIndex,)
 			if 0<=VIndex and VIndex<VCount:
 				last=(SBase+(LIndex*VCount+VIndex)*TCount)
 				result[-1]=(0,lch[1],unichr(last))
 				continue
 
 		SIndex=last-SBase
-		print "SIndex: %r" % (SIndex,)
 		if 0<=SIndex and SIndex<SCount and (SIndex%TCount)==0:
 			TIndex=ch-TBase
-			print "TIndex: %r" % (TIndex,)
 			if 0<=TIndex and TIndex<=TCount:
 				last+=TIndex
 				result[-1]=(0,lch[1],unichr(last))
@@ -109,10 +101,8 @@ def compose(l):
 	i=0
 	while i<len(l):
 		C=l[i]
-		print "%i: C=%r, l=%r, Li=%r" % (i,C,l,Li)
 		if Li is not None and i>0 and ((l[i-1][0]!=0 and l[i-1][0]!=C[0]) or Li==i-1):
 			L=l[Li]
-			print "trying to compose %r and %r" % (C,L)
 			LC=composetwo(L[2],C[2])
 			if LC:
 				if combining_3_2_0.has_key(LC):
@@ -122,8 +112,6 @@ def compose(l):
 				l[Li]=cc,C[1],LC
 				l[i:]=l[i+1:]
 		else:
-			if Li is not None:
-				print "not composing %r and %r" % (C,l[Li])
 			LC=None
 		if LC is None:
 			if C[0]==0:
@@ -137,8 +125,6 @@ def NFKC(input):
 	for c in input:
 		decomp+=decompose(c)
 	
-	print "Decomposition:",`decomp`
-
 	cdecomp=[]
 	tmp=[]
 	i=0
@@ -158,10 +144,7 @@ def NFKC(input):
 	tmp.sort()
 	cdecomp+=tmp
 
-	print "Canonical decomposition:",`cdecomp`
-
 	ret=compose(cdecomp)
 	
 	ret=string.join(ret,"")
-	print "Result:",`ret`
 	return ret
