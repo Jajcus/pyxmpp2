@@ -6,8 +6,8 @@ import sys
 
 class Merger:
     def __init__(self,model_file,auto_file):
-        self.model_doc=libxml2.parseFile(sys.argv[1])
-        self.auto_doc=libxml2.parseFile(sys.argv[2])
+        self.model_doc=libxml2.parseFile(model_file)
+        self.auto_doc=libxml2.parseFile(auto_file)
         self.xmi_id_map={}
         self.auto_xmi_id_map={}
         self.old_elements={}
