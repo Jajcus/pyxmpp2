@@ -50,7 +50,10 @@ class PasswordManager:
 class Reply:
 	def base64(self):
 		if self.data is not None:
-			return b2a_base64(self.data)
+			ret=b2a_base64(self.data)
+			if ret[-1]=='\n':
+				ret=ret[:-1]
+			return ret
 		else:
 			return None
 class Response(Reply):
