@@ -17,7 +17,7 @@
 
 """General XMPP Stanza handling."""
 
-__revision__="$Id: stanza.py,v 1.20 2004/09/16 19:57:26 jajcus Exp $"
+__revision__="$Id: stanza.py,v 1.21 2004/09/19 16:06:28 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -70,14 +70,16 @@ class Stanza:
             - `stanza_type`: staza type: one of: "get", "set", "result" or "error".
             - `stanza_id`: stanza id -- value of stanza's "id" attribute. If
               not given, then unique for the session value is generated. 
-            - `error_cond`: error condition name. Ignored if `typ` is not
-              "error".
+            - `error`: error object. Ignored if `stanza_type` is not "error".
+            - `error_cond`: error condition name. Ignored if `stanza_type` is not
+              "error" or `error` is not None.
         :Types:
             - `name_or_node`: `unicode` or `libxml2.xmlNode` or `Stanza`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
             - `stanza_id`: `unicode`
+            - `error`: `StanzaErrorNode`
             - `error_cond`: `unicode`"""
         self._error=None
         self.node=None
@@ -110,9 +112,12 @@ class Stanza:
         if stanza_id:
             self.node.setProp("id",stanza_id)
 
-        if (self.get_type()=="error" and error_cond):
+        if self.get_type()=="error":
             from pyxmpp.error import StanzaErrorNode
-            self._error=StanzaErrorNode(error_cond,parent=self.node)
+            if error:
+                self._error=StanzaErrorNode(error,parent=self.node,copy=1)
+            elif error_cond:
+                self._error=StanzaErrorNode(error_cond,parent=self.node)
 
     def __del__(self):
         if self.node:

@@ -17,7 +17,7 @@
 
 """Iq XMPP stanza handling"""
 
-__revision__="$Id: iq.py,v 1.17 2004/09/16 19:57:26 jajcus Exp $"
+__revision__="$Id: iq.py,v 1.18 2004/09/19 16:06:28 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -34,7 +34,7 @@ class Iq(Stanza):
 
         :Parameters:
             - `node`: XML node to_jid be wrapped into the `Iq` object
-              or other Presence object to_jid be copied. If not given then new
+              or other Iq object to be copied. If not given then new
               presence stanza is created using following parameters.
             - `from_jid`: sender JID.
             - `to_jid`: recipient JID.
@@ -43,7 +43,7 @@ class Iq(Stanza):
               given, then unique for the session value is generated. 
             - `error_cond`: error condition name. Ignored if `stanza_type` is not "error".
         :Types:
-            - `name_or_node`: `unicode` or `libxml2.xmlNode` or `Iq`
+            - `node`: `unicode` or `libxml2.xmlNode` or `Iq`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`

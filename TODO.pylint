@@ -1,7 +1,5 @@
 ************* Module pyxmpp.xmppstringprep
-W0403: 24: Uses of a deprecated module 'stringprep'
-************* Module pyxmpp.presence
-W0301: 96: Line too long (114/100)
+ignore that: W0403: 24: Uses of a deprecated module 'stringprep'
 ************* Module pyxmpp.jid
 ignore that: W0232: 51:JID: Class has no __init__ method
 ignore that: E0201:228:JID.as_unicode: Access to undefined member 'node'
@@ -18,64 +16,30 @@ ignore that: E0201:240:JID.bare: Access to undefined member 'domain'
 ignore that: E0201:254:JID.__eq__: Access to undefined member 'domain'
 ignore that: E0201:266:JID.__hash__: Access to undefined member 'domain'
 ************* Module pyxmpp.xmlextra
-W0613: 78:StreamHandler.stanza_start: Unused argument 'doc'
-W0613: 89:StreamHandler.stanza_end: Unused argument 'doc'
-W0613:104:StreamHandler.stanza: Unused argument 'doc'
+ignore that: W0613: 78:StreamHandler.stanza_start: Unused argument 'doc'
+ignore that: W0613: 89:StreamHandler.stanza_end: Unused argument 'doc'
+ignore that: W0613:104:StreamHandler.stanza: Unused argument 'doc'
 ************* Module pyxmpp.dns
-W0141:266:RR_A: Missing docstring
-W0141:273:RR_A.format_data: Missing docstring
-W0141:276:RR_A.bin_format_data: Missing docstring
-W0142:280:RR_A.parse_bin_data: Empty docstring
-W0613:280:RR_A.parse_bin_data: Unused argument 'length'
-W0613:280:RR_A.parse_bin_data: Unused argument 'cls'
-W0141:293:RR_NS: Missing docstring
-W0141:300:RR_NS.format_data: Missing docstring
-W0141:303:RR_NS.bin_format_data: Missing docstring
-W0141:306:RR_NS.parse_bin_data: Missing docstring
-W0613:306:RR_NS.parse_bin_data: Unused argument 'length'
-W0141:314:RR_CNAME: Missing docstring
-W0141:321:RR_CNAME.format_data: Missing docstring
-W0141:324:RR_CNAME.bin_format_data: Missing docstring
-W0141:327:RR_CNAME.parse_bin_data: Missing docstring
-W0613:327:RR_CNAME.parse_bin_data: Unused argument 'length'
-W0141:335:RR_SOA: Missing docstring
-W0141:348:RR_SOA.format_data: Missing docstring
-W0141:352:RR_SOA.bin_format_data: Missing docstring
-W0141:358:RR_SOA.parse_bin_data: Missing docstring
-W0613:358:RR_SOA.parse_bin_data: Unused argument 'length'
-W0141:371:RR_SRV: Missing docstring
-W0141:381:RR_SRV.format_data: Missing docstring
-W0141:384:RR_SRV.bin_format_data: Missing docstring
-W0111:394:RR_SRV.__gt__: Too many return statements (11/6)
-W0111:420:RR_SRV.__lt__: Too many return statements (11/6)
-W0141:446:RR_SRV.parse_bin_data: Missing docstring
-W0613:446:RR_SRV.parse_bin_data: Unused argument 'length'
-W0613:446:RR_SRV.parse_bin_data: Unused argument 'cls'
-W0141:461:Message: Missing docstring
-W0141:524:Message.is_query: Missing docstring
-W0141:527:Message.is_response: Missing docstring
-W0141:530:Message.bin_format: Missing docstring
-W0112:530:Message.bin_format: Too many branches (13/12)
-W0141:582:parse_question: Missing docstring
-W0141:591:parse_message: Missing docstring
-W0114:591:parse_message: Too many local variables (22/15)
-W0612:610:parse_message: Unused variable 'i'
+ignore that: W0613:298:RR_A.parse_bin_data: Unused argument 'length'
+ignore that: W0613:298:RR_A.parse_bin_data: Unused argument 'cls'
+ignore that: W0613:359:RR_NS.parse_bin_data: Unused argument 'length'
+ignore that: W0613:416:RR_CNAME.parse_bin_data: Unused argument 'length'
+ignore that: W0613:495:RR_SOA.parse_bin_data: Unused argument 'length'
+ignore that: W0613:596:RR_SRV.parse_bin_data: Unused argument 'length'
+ignore that: W0613:596:RR_SRV.parse_bin_data: Unused argument 'cls'
+ignore that: W0612:866:parse_message: Unused variable 'i'
 ************* Module pyxmpp._xmlextra
 I0001:  0: Unable to run raw checkers on built-in module pyxmpp._xmlextra
-W0141:  0: Missing docstring
 W0103:  0: Missing required attribute "__revision__"
 W0103:  0: Missing required attribute "__docformat__"
-************* Module pyxmpp.stanza
-W0613: 60:Stanza.__init__: Unused argument 'error'
 ************* Module pyxmpp.resolver
 W0141:  0: Missing docstring
 W0403: 28: Uses of a deprecated module 'string'
 W0141: 43:load_resolv_conf: Missing docstring
 W0141: 68:query: Missing docstring
 W0141: 82:do_query: Missing docstring
-W0114: 82:do_query: Too many local variables (22/15)
 W0621:119:do_query: Redefining name 'query' from outer scope (line 68)
-W0112: 82:do_query: Too many branches (22/12)
+W0112: 82:do_query: Too many branches (22/15)
 W0612:102:do_query: Unused variable 'canonname'
 W0141:144:query_ns: Missing docstring
 W0622:161:query_ns: Redefining built-in 'id'
@@ -185,14 +149,11 @@ W0611: 24: Unused import traceback
 W0302:  0: Too many lines in module (1763)
 W0231:179:Stream.__init__: __init__ method from base class 'xmlextra.StreamHandler' is not called
 W0612:299:Stream._connect: Unused variable 'canonname'
-W0112:282:Stream._connect: Too many branches (13/12)
-W0112:411:Stream.stream_start: Too many branches (13/12)
 W0613:466:Stream.stream_end: Unused argument 'doc'
 W0613:492:Stream.stanza_end: Unused argument 'doc'
 W0613:501:Stream.stanza: Unused argument 'doc'
 W0612:723:Stream._loop_iter: Unused variable 'ofd'
 W0612:951:Stream.__try_handlers: Unused variable 'prio'
-W0112:1245:Stream._got_features: Too many branches (15/12)
 W0111:1337:Stream._process_sasl_node: Too many return statements (9/6)
 W0201:237:Stream._reset: Attribute 'features' defined outside __init__
 W0201:233:Stream._reset: Attribute 'message_handlers' defined outside __init__
@@ -236,28 +197,28 @@ W0301:115: Line too long (104/100)
 W0141:  0: Missing docstring
 W0141:173:ErrorNodeError: Missing docstring
 W0141:176:ErrorNode: Missing docstring
-W0112:177:ErrorNode.__init__: Too many branches (15/12)
-W0141:238:ErrorNode.free: Missing docstring
-W0141:244:ErrorNode.free_borrowed: Missing docstring
-W0141:247:ErrorNode.is_legacy: Missing docstring
-W0141:250:ErrorNode.xpath_eval: Missing docstring
-W0141:261:ErrorNode.get_condition: Missing docstring
-W0141:276:ErrorNode.get_text: Missing docstring
-W0141:285:ErrorNode.add_custom_condition: Missing docstring
-W0141:291:ErrorNode.upgrade: Missing docstring
-W0133:297:ErrorNode.upgrade: Invalid name "KeyError" (should match [a-z_][a-z0-9_]*$)
-W0622:297:ErrorNode.upgrade: Redefining built-in 'KeyError'
-W0612:297:ErrorNode.upgrade: Unused variable 'KeyError'
-W0141:325:ErrorNode.downgrade: Missing docstring
-W0612:330:ErrorNode.downgrade: Unused variable 'typ'
-W0141:338:ErrorNode.serialize: Missing docstring
-W0141:341:StreamErrorNode: Missing docstring
-W0613:342:StreamErrorNode.__init__: Unused argument 'ns'
-W0141:356:StreamErrorNode.get_message: Missing docstring
-W0141:368:StanzaErrorNode: Missing docstring
-W0141:389:StanzaErrorNode.get_type: Missing docstring
-W0141:394:StanzaErrorNode.upgrade: Missing docstring
-W0141:404:StanzaErrorNode.get_message: Missing docstring
+W0112:177:ErrorNode.__init__: Too many branches (16/15)
+W0141:240:ErrorNode.free: Missing docstring
+W0141:246:ErrorNode.free_borrowed: Missing docstring
+W0141:249:ErrorNode.is_legacy: Missing docstring
+W0141:252:ErrorNode.xpath_eval: Missing docstring
+W0141:263:ErrorNode.get_condition: Missing docstring
+W0141:278:ErrorNode.get_text: Missing docstring
+W0141:287:ErrorNode.add_custom_condition: Missing docstring
+W0622:299:ErrorNode.upgrade: Redefining built-in 'KeyError'
+W0141:293:ErrorNode.upgrade: Missing docstring
+W0133:299:ErrorNode.upgrade: Invalid name "KeyError" (should match [a-z_][a-z0-9_]*$)
+W0612:299:ErrorNode.upgrade: Unused variable 'KeyError'
+W0141:327:ErrorNode.downgrade: Missing docstring
+W0612:332:ErrorNode.downgrade: Unused variable 'typ'
+W0141:340:ErrorNode.serialize: Missing docstring
+W0141:343:StreamErrorNode: Missing docstring
+W0613:344:StreamErrorNode.__init__: Unused argument 'ns'
+W0141:358:StreamErrorNode.get_message: Missing docstring
+W0141:370:StanzaErrorNode: Missing docstring
+W0141:391:StanzaErrorNode.get_type: Missing docstring
+W0141:396:StanzaErrorNode.upgrade: Missing docstring
+W0141:406:StanzaErrorNode.get_message: Missing docstring
 W0611: 24: Unused import from_utf8
 ************* Module pyxmpp.version
 W0141:  0: Missing docstring
@@ -422,10 +383,9 @@ W0141: 81:DigestMD5ClientAuthenticator: Missing docstring
 W0221: 85:DigestMD5ClientAuthenticator.start: Arguments number differs from overriden method
 W0141: 85:DigestMD5ClientAuthenticator.start: Missing docstring
 W0141:103:DigestMD5ClientAuthenticator.challenge: Missing docstring
-W0114:103:DigestMD5ClientAuthenticator.challenge: Too many local variables (22/15)
 E0602:175:DigestMD5ClientAuthenticator.challenge: Undefined variable 'charser'
 W0111:103:DigestMD5ClientAuthenticator.challenge: Too many return statements (14/6)
-W0112:103:DigestMD5ClientAuthenticator.challenge: Too many branches (32/12)
+W0112:103:DigestMD5ClientAuthenticator.challenge: Too many branches (32/15)
 W0115:103:DigestMD5ClientAuthenticator.challenge: Too many statements (109/50)
 W0141:244:DigestMD5ClientAuthenticator.final_challenge: Missing docstring
 W0141:274:DigestMD5ClientAuthenticator.finish: Missing docstring
@@ -441,9 +401,9 @@ W0141:284:DigestMD5ServerAuthenticator: Missing docstring
 W0141:288:DigestMD5ServerAuthenticator.start: Missing docstring
 W0613:288:DigestMD5ServerAuthenticator.start: Unused argument 'response'
 W0141:309:DigestMD5ServerAuthenticator.response: Missing docstring
-W0114:309:DigestMD5ServerAuthenticator.response: Too many local variables (26/15)
+W0114:309:DigestMD5ServerAuthenticator.response: Too many local variables (26/25)
 W0111:309:DigestMD5ServerAuthenticator.response: Too many return statements (16/6)
-W0112:309:DigestMD5ServerAuthenticator.response: Too many branches (35/12)
+W0112:309:DigestMD5ServerAuthenticator.response: Too many branches (35/15)
 W0115:309:DigestMD5ServerAuthenticator.response: Too many statements (112/50)
 W0201:300:DigestMD5ServerAuthenticator.start: Attribute 'nonce' defined outside __init__
 W0201:392:DigestMD5ServerAuthenticator.response: Attribute 'username' defined outside __init__
@@ -665,12 +625,11 @@ W0141:211:VCardImage.rfc2426: Missing docstring
 W0141:220:VCardImage.xml: Missing docstring
 W0141:240:VCardAdr: Missing docstring
 W0102:241:VCardAdr.__init__: Dangerous default value {} as argument
-W0112:241:VCardAdr.__init__: Too many branches (18/12)
+W0112:241:VCardAdr.__init__: Too many branches (18/15)
 W0141:293:VCardAdr.rfc2426: Missing docstring
 W0141:298:VCardAdr.xml: Missing docstring
 W0141:313:VCardLabel: Missing docstring
 W0102:314:VCardLabel.__init__: Dangerous default value {} as argument
-W0112:314:VCardLabel.__init__: Too many branches (13/12)
 W0141:353:VCardLabel.rfc2426: Missing docstring
 W0141:356:VCardLabel.xml: Missing docstring
 W0141:366:VCardTel: Missing docstring
@@ -699,7 +658,6 @@ W0141:564:VCardCategories.xml: Missing docstring
 W0141:571:VCardSound: Missing docstring
 W0102:572:VCardSound.__init__: Dangerous default value {} as argument
 E0602:588:VCardSound.__init__: Undefined variable 'Value'
-W0112:572:VCardSound.__init__: Too many branches (14/12)
 W0141:610:VCardSound.rfc2426: Missing docstring
 W0141:615:VCardSound.xml: Missing docstring
 E0201:599:VCardSound.__init__: Access to undefined member 'image'
@@ -714,14 +672,13 @@ W0102:663:VCardKey.__init__: Dangerous default value {} as argument
 W0141:687:VCardKey.rfc2426: Missing docstring
 W0141:693:VCardKey.xml: Missing docstring
 W0141:701:VCard: Missing docstring
-W0112:734:VCard.__init__: Too many branches (40/12)
+W0112:734:VCard.__init__: Too many branches (40/15)
 W0115:734:VCard.__init__: Too many statements (94/50)
 W0141:834:VCard.process_rfc2425_record: Missing docstring
 W0612:841:VCard.process_rfc2425_record: Unused variable 'group'
 W0141:868:VCard.rfc2426: Missing docstring
 W0612:871:VCard.rfc2426: Unused variable 'name'
 W0141:881:VCard.xml: Missing docstring
-W0112:881:VCard.xml: Too many branches (13/12)
 W0612:899:VCard.xml: Unused variable 'name'
 E0201:810:VCard.__init__: Access to undefined member 'n'
 E0201:811:VCard.__init__: Access to undefined member 'n'
@@ -739,17 +696,17 @@ W0401:  0: Cyclic import (pyxmpp.error -> pyxmpp.stanza)
 
 Report
 ======
-5822 statements analysed.
+5798 statements analysed.
 
 Statistics by type
 ------------------
 
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-module   33     33         =          42.42       0.00     
-class    112    112        =          44.64       0.00     
+module   33     33         =          45.45       0.00     
+class    112    112        =          50.00       0.00     
 method   0      0          =          0.00        0.00     
-function 601    601        =          59.73       0.67     
+function 602    602        =          63.12       0.66     
 
 
 Raw metrics
@@ -757,10 +714,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      6378   69.89 6377     +1         
-docstring 1808   19.81 1807     +1         
-comment   510    5.59  510      =          
-empty     430    4.71  430      =          
+code      6354   67.45 6354     =          
+docstring 2094   22.23 2094     =          
+comment   510    5.41  510      =          
+empty     462    4.90  462      =          
 
 
 External dependencies
@@ -800,26 +757,25 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0141      322        
+W0141      296        
 W0611      71         
 W0201      69         
-W0613      49         
+W0613      48         
 E0201      37         
 W0102      20         
 E0602      20         
 W0612      14         
-W0112      13         
-W0301      10         
 W0622      9          
+W0301      9          
 W0133      9          
 W0311      8          
 W0221      8          
 W0403      6          
 W0231      6          
-W0111      6          
+W0112      6          
 W0511      4          
 W0232      4          
-W0114      4          
+W0111      4          
 W0103      4          
 W0404      3          
 W0115      3          
@@ -827,7 +783,7 @@ W0621      2
 W0302      2          
 W0151      2          
 W0401      1          
-W0142      1          
+W0114      1          
 
 
 Total errors / warnings
@@ -835,8 +791,8 @@ Total errors / warnings
 
 type     number previous difference 
 ::::::::::::::::::::::::::::::::::::
-warnings 650    654      -4         
-errors   57     57       =          
+warnings 609    609      =          
+errors   57     58       -1         
 
 
 % errors / warnings by module
@@ -844,39 +800,37 @@ errors   57     57       =
 
 module                         error warning 
 :::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.vcard            26.32 13.54   
-pyxmpp.jid                     22.81 0.15    
-pyxmpp.jabber.muc              15.79 6.00    
-pyxmpp.jabber.disco            12.28 6.00    
-pyxmpp.sasl.core               10.53 6.00    
-pyxmpp.jabber.client           5.26  2.31    
-pyxmpp.jabber.delay            3.51  1.85    
-pyxmpp.sasl.digest_md5         1.75  8.62    
-pyxmpp.jabberd.component       1.75  4.46    
-pyxmpp.jabber.clientstream     0.00  6.92    
-pyxmpp.stream                  0.00  6.62    
-pyxmpp.clientstream            0.00  6.00    
-pyxmpp.dns                     0.00  5.85    
-pyxmpp.client                  0.00  5.85    
-pyxmpp.resolver                0.00  4.92    
-pyxmpp.jabberd.componentstream 0.00  4.62    
-pyxmpp.error                   0.00  4.00    
-pyxmpp.sasl.plain              0.00  2.00    
-pyxmpp.sasl                    0.00  1.38    
-pyxmpp.expdict                 0.00  0.62    
-pyxmpp.xmlextra                0.00  0.46    
-pyxmpp.version                 0.00  0.46    
-pyxmpp._xmlextra               0.00  0.46    
-pyxmpp.xmppstringprep          0.00  0.15    
-pyxmpp.stanza                  0.00  0.15    
-pyxmpp.presence                0.00  0.15    
-pyxmpp.message                 0.00  0.15    
-pyxmpp.jabberd                 0.00  0.15    
-pyxmpp.iq                      0.00  0.15    
+pyxmpp.jabber.vcard            26.32 13.96   
+pyxmpp.jid                     22.81 0.16    
+pyxmpp.jabber.muc              15.79 6.40    
+pyxmpp.jabber.disco            12.28 6.40    
+pyxmpp.sasl.core               10.53 6.40    
+pyxmpp.jabber.client           5.26  2.46    
+pyxmpp.jabber.delay            3.51  1.97    
+pyxmpp.sasl.digest_md5         1.75  9.03    
+pyxmpp.jabberd.component       1.75  4.76    
+pyxmpp.jabber.clientstream     0.00  7.39    
+pyxmpp.stream                  0.00  6.57    
+pyxmpp.clientstream            0.00  6.40    
+pyxmpp.client                  0.00  6.24    
+pyxmpp.resolver                0.00  5.09    
+pyxmpp.jabberd.componentstream 0.00  4.93    
+pyxmpp.error                   0.00  4.27    
+pyxmpp.sasl.plain              0.00  2.13    
+pyxmpp.sasl                    0.00  1.48    
+pyxmpp.dns                     0.00  1.31    
+pyxmpp.expdict                 0.00  0.66    
+pyxmpp.xmlextra                0.00  0.49    
+pyxmpp.version                 0.00  0.49    
+pyxmpp._xmlextra               0.00  0.33    
+pyxmpp.xmppstringprep          0.00  0.16    
+pyxmpp.message                 0.00  0.16    
+pyxmpp.jabberd                 0.00  0.16    
+pyxmpp.iq                      0.00  0.16    
 
 
 Global evaluation
 -----------------
-Your code has been rated at 8.39/10 (previous run: 8.39/10)
+Your code has been rated at 8.46/10 (previous run: 8.45/10)
 That's pretty good. Good work mate.
 

@@ -17,7 +17,7 @@
 
 """Presence XMPP stanza handling"""
 
-__revision__="$Id: presence.py,v 1.24 2004/09/19 08:38:29 jajcus Exp $"
+__revision__="$Id: presence.py,v 1.25 2004/09/19 16:06:28 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -51,7 +51,7 @@ class Presence(Stanza):
 
         :Parameters:
             - `node`: XML node to_jid be wrapped into the `Presence` object
-              or other Presence object to_jid be copied. If not given then new
+              or other Presence object to be copied. If not given then new
               presence stanza is created using following parameters.
             - `from_jid`: sender JID.
             - `to_jid`: recipient JID.
@@ -65,7 +65,7 @@ class Presence(Stanza):
             - `priority`: presence priority.
             - `error_cond`: error condition name. Ignored if `stanza_type` is not "error"
         :Types:
-            - `name_or_node`: `unicode` or `libxml2.xmlNode` or `Stanza`
+            - `node`: `unicode` or `libxml2.xmlNode` or `Stanza`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`

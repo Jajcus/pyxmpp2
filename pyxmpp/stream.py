@@ -17,7 +17,7 @@
 
 """Core XMPP stream functionality"""
 
-__revision__="$Id: stream.py,v 1.69 2004/09/16 19:57:26 jajcus Exp $"
+__revision__="$Id: stream.py,v 1.70 2004/09/19 16:06:28 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -507,13 +507,13 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
         """
         self._process_node(node)
 
-    def error(self,desc):
+    def error(self,descr):
         """Handle stream XML parse error.
         
         :Parameters:
-            - `desc`: error description
+            - `descr`: error description
         """
-        raise StreamParseError,desc
+        raise StreamParseError,descr
 
     def _send_stream_end(self):
         """Send stream end tag."""

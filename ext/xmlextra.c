@@ -1423,7 +1423,7 @@ static PyTypeObject PreparsingReaderType = {
 	0,          /*tp_hash */
 };
 
-static PyMethodDef libxmlMethods[] = {
+static PyMethodDef xmlextraMethods[] = {
 	{(char *)"replace_ns", replace_ns, METH_VARARGS, NULL },
 	{(char *)"remove_ns", remove_ns, METH_VARARGS, NULL },
 #if 0
@@ -1442,9 +1442,13 @@ PyObject *m, *d;
 	SaxReaderType.ob_type = &PyType_Type;
 #endif
 	PreparsingReaderType.ob_type = &PyType_Type;
-	m = Py_InitModule((char *) "_xmlextra", libxmlMethods);
+	m = Py_InitModule((char *) "_xmlextra", xmlextraMethods);
 	d = PyModule_GetDict(m);
 	MyError = PyErr_NewException("_xmlextra.error", NULL, NULL);
 	PyDict_SetItemString(d, "error", MyError);
+	PyDict_SetItemString(d, "__revision__", PyString_FromString("$Id: xmlextra.c,v 1.5 2004/09/19 16:06:21 jajcus Exp $"));
+	PyDict_SetItemString(d, "__docformat__", PyString_FromString("restructuredtext en"));
+	PyDict_SetItemString(d, "__doc__", 
+			PyString_FromString("Special libxml2 extensions for PyXMPP internal use."));
 	initialized = 1;
 }

@@ -17,7 +17,7 @@
 
 """A simple implementation of a part of the DNS protocol."""
 
-__revision__="$Id: dns.py,v 1.11 2004/09/19 08:38:29 jajcus Exp $"
+__revision__="$Id: dns.py,v 1.12 2004/09/19 16:06:28 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import random
@@ -137,8 +137,8 @@ class RR:
         - `name`: `str`
         - `ttl`: `int`
         - `cls`: `int`
-        - `rr_types_by_name`: `dict`
-        - `rr_types_by_code`: `dict`
+        - `_rr_types_by_name`: `dict`
+        - `_rr_types_by_code`: `dict`
     """
     code=0
     type="?"
@@ -538,7 +538,6 @@ class RR_SRV(RR):
         :Parameters:
             - `name`: domain name of the record.
             - `ttl`: TTL value of the record.
-            - `cls`: class name or code of the record.
             - `priority`: priority value of the SRV record.
             - `weight`: weight value of the SRV record.
             - `port`: port number value of the SRV record.
@@ -563,6 +562,12 @@ class RR_SRV(RR):
         :returntype: `str`"""
         return struct.pack("!HHH",self.priority,self.weight,self.port)+domain_str2bin(self.target)
 
+    def __cmp__(self,other):
+        return cmp(
+                (self.name,self.target,self.port,self.priority,self.weight),
+                (other.name,other.target,other.port,other.priority,other.weight)
+            )
+
     def __eq__(self,other):
         return (self.name==other.name
                 and self.target==other.target
@@ -571,53 +576,19 @@ class RR_SRV(RR):
                 and self.priority==other.priority)
 
     def __gt__(self,other):
-        if self.name>other.name:
-            return 1
-        elif self.name<other.name:
-            return 0
-        if self.target>other.target:
-            return 1
-        elif self.target<other.target:
-            return 0
-        if self.port>other.port:
-            return 1
-        elif self.port<other.port:
-            return 0
-        if self.priority>other.priority:
-            return 1
-        elif self.priority<other.priority:
-            return 0
-        if self.weight>other.weight:
-            return 1
-        elif self.weight>other.weight:
-            return 0
-        return 0
+        return cmp(
+                (self.name,self.target,self.port,self.priority,self.weight),
+                (other.name,other.target,other.port,other.priority,other.weight)
+            ) > 0
 
     def __le__(self,other):
         return not self.__gt__(other)
 
     def __lt__(self,other):
-        if self.name<other.name:
-            return 1
-        elif self.name>other.name:
-            return 0
-        if self.target<other.target:
-            return 1
-        elif self.target>other.target:
-            return 0
-        if self.port<other.port:
-            return 1
-        elif self.port>other.port:
-            return 0
-        if self.priority<other.priority:
-            return 1
-        elif self.priority>other.priority:
-            return 0
-        if self.weight>other.weight:
-            return 1
-        elif self.weight<other.weight:
-            return 0
-        return 0
+        return cmp(
+                (self.name,self.target,self.port,self.priority,self.weight),
+                (other.name,other.target,other.port,other.priority,other.weight)
+            ) < 0
 
     def __ge__(self,other):
         return not self.__lt__(other)
@@ -655,8 +626,66 @@ _add_query_type("AXFR",252)
 
 
 class Message:
-    def __init__(self,msg_id,qr,opcode=0,aa=0,tc=0,rd=0,ra=0,rcode=0,
+    """DNS protocol message.
+    
+    :Ivariables:
+        - `id`: a message id.
+        - `qr`: query/response flag.
+        - `opcode`: opcode value.
+        - `aa`: authoritative answer flag.
+        - `tc`: packet truncated flag.
+        - `rd`: recursion desired flag.
+        - `ra`: recursion available flag.
+        - `rcode`: rcode value.
+        - `questions`: the question section.
+        - `answers`: the answer section.
+        - `authorities`: the authority section.
+        - `additionals`: the additional section.
+    :Types:
+        - `id`: `int`
+        - `qr`: `bool`
+        - `opcode`: `int`
+        - `aa`: `bool`
+        - `tc`: `bool`
+        - `rd`: `bool`
+        - `ra`: `bool`
+        - `rcode`: `int`
+        - `questions`: `list` of (name,qtype,class) tuples, where name is a domain name
+          to query, qtype is an RR type or "*" or "AXFR" and class is class name
+        - `answers`: `list` of `RR` objects
+        - `authorities`: `list` of `RR` objects
+        - `additionals`: `list` of `RR` objects"""
+    def __init__(self,msg_id,qr,opcode=0,aa=False,tc=False,rd=False,ra=False,rcode=0,
             questions=None,answers=None,authorities=None,additionals=None):
+        """Initialize the `Message` object.
+
+        :Patameters:
+            - `msg_id`: a message id.
+            - `qr`: query/response flag.
+            - `opcode`: opcode value.
+            - `aa`: authoritative answer flag.
+            - `tc`: packet truncated flag.
+            - `rd`: recursion desired flag.
+            - `ra`: recursion available flag.
+            - `rcode`: rcode value.
+            - `questions`: the question section.
+            - `answers`: the answer section.
+            - `authorities`: the authority section.
+            - `additionals`: the additional section.
+        :Types:
+            - `msg_id`: `int`
+            - `qr`: `bool`
+            - `opcode`: `int`
+            - `aa`: `bool`
+            - `tc`: `bool`
+            - `rd`: `bool`
+            - `ra`: `bool`
+            - `rcode`: `int`
+            - `questions`: `list` of (name,qtype,class) tuples, where name is a domain name
+              to query, qtype is an RR type or "*" or "AXFR" and class is class name
+            - `answers`: `list` of `RR` objects
+            - `authorities`: `list` of `RR` objects
+            - `additionals`: `list` of `RR` objects"""
         if msg_id is None:
             self.id=random.randrange(0,65536)
         else:
@@ -669,19 +698,19 @@ class Message:
         self.ra=ra
         self.rcode=rcode
         if questions:
-            self.questions=questions
+            self.questions=list(questions)
         else:
             self.questions=[]
         if answers:
-            self.answers=answers
+            self.answers=list(answers)
         else:
             self.answers=[]
         if authorities:
-            self.authorities=authorities
+            self.authorities=list(authorities)
         else:
             self.authorities=[]
         if additionals:
-            self.additionals=additionals
+            self.additionals=list(additionals)
         else:
             self.additionals=[]
 
@@ -718,12 +747,25 @@ class Message:
         return ret
 
     def is_query(self):
+        """Check the message query/response flag.
+
+        :return: `True` if the message is a query."""
         return not self.qr
 
     def is_response(self):
+        """Check the message query/response flag.
+
+        :return: `True` if the message is a response."""
         return self.qr
 
     def bin_format(self,maxsize=512):
+        """Convert message to the "wire" format.
+
+        :Parameters:
+            - `maxsize`: the maximum size of the packet to be created.
+
+        :return: The binary representaion of the message.
+        :returntype: `str`"""
         payload=""
         qdcount=0
         for name,qtype,cls in self.questions:
@@ -776,6 +818,18 @@ class Message:
         return struct.pack("!HHHHHH",self.id,flags,qdcount,ancount,nscount,arcount)+payload
 
 def parse_question(packet,offset):
+    """Parse a question section field of a DNS message packet.
+
+    :Parameters:
+        - `packet`: the message packet.
+        - `offset`: offset of the first byte of the field.
+        
+    :Types:
+        - `packet`: `str`
+        - `offset`: `int`
+
+    :return: the question and the offset of the next field.
+    :returntype: `tuple` of (name,qtype,class) tuple and `int`"""
     name,offset=domain_bin2str(packet,offset)
     if offset+4>len(packet):
         raise DataTruncated
@@ -785,6 +839,12 @@ def parse_question(packet,offset):
     return (name,query_types_by_code[typ],classes_by_code[cls]),offset+4
 
 def parse_message(packet):
+    """Parse a DNS message packet.
+    :Parameters:
+        - `packet`: the message packet.
+        
+    :return: new message object.
+    :returntype: `Message`"""
     if len(packet)<12:
         raise DataTruncated
     msg_id,flags,qdcount,ancount,nscount,arcount=struct.unpack(

@@ -17,7 +17,7 @@
 
 """Message XMPP stanza handling"""
 
-__revision__="$Id: message.py,v 1.20 2004/09/16 19:57:26 jajcus Exp $"
+__revision__="$Id: message.py,v 1.21 2004/09/19 16:06:28 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -35,7 +35,7 @@ class Message(Stanza):
 
         :Parameters:
             - `node`: XML node to_jid be wrapped into the `Message` object
-              or other Presence object to_jid be copied. If not given then new
+              or other Message object to be copied. If not given then new
               presence stanza is created using following parameters.
             - `from_jid`: sender JID.
             - `to_jid`: recipient JID.
@@ -47,7 +47,7 @@ class Message(Stanza):
             - `thread`: message thread id.
             - `error_cond`: error condition name. Ignored if `stanza_type` is not "error".
         :Types:
-            - `name_or_node`: `unicode` or `libxml2.xmlNode` or `Stanza`
+            - `node`: `unicode` or `libxml2.xmlNode` or `Stanza`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`

@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-__revision__="$Id: error.py,v 1.22 2004/09/13 21:14:53 jajcus Exp $"
+__revision__="$Id: error.py,v 1.23 2004/09/19 16:06:28 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -217,7 +217,9 @@ class ErrorNode:
                 raise ErrorNodeError,"ErrorNodes may only be copied"
             self.ns=node_or_cond.ns.getContent()
             self.node=node_or_cond.node.docCopyNode(common_doc,1)
-            common_root.addChild(self.node)
+            if not parent:
+                parent=common_root
+            parent.addChild(self.node)
         elif ns is None:
             raise ErrorNodeError,"Condition namespace not given"
         else:
