@@ -1,0 +1,1041 @@
+<?xml version="1.0"?>
+<XMI xmlns:UML="org.omg/standards/UML">
+  <XMI.header>
+  <XMI.documentation>
+   <XMI.exporter>umbrello uml modeller http://uml.sf.net</XMI.exporter>
+   <XMI.exporterVersion>1.2.90</XMI.exporterVersion>
+   <XMI.exporterEncoding>UnicodeUTF8</XMI.exporterEncoding>
+  </XMI.documentation>
+  <XMI.model xmi.name="umbrelloNlJygc" href="/tmp/kde-jacek/umbrelloNlJygc.tmp"/>
+  <XMI.metamodel xmi.name="UML" href="UML.xml" xmi.version="1.3"/>
+ </XMI.header>
+  <XMI.content>
+    <Model>
+      <Stereotype visibility="public" xmi.id="1" name="classmethod"/>
+      <Stereotype visibility="public" xmi.id="2" name="staticmethod"/>
+    </Model>
+    <Model>
+      <Stereotype visibility="public" xmi.id="/Stereotype:classmethod" name="classmethod"/>
+      <Stereotype visibility="public" xmi.id="/Stereotype:staticmethod" name="staticmethod"/>
+      <Package xmi.id="pyxmpp" name="pyxmpp">
+        <Package xmi.id="pyxmpp.client" name="client">
+          <Class xmi.id="pyxmpp.client.Client" name="Client" comment="Base class for an XMPP-IM client.  This class does not provide any JSF extensions to the XMPP protocol, including legacy authentication methods.">
+            <Operation xmi.id="pyxmpp.client.Client.__init__" name="__init__" visibility="public" comment="Initialize a Client object."/>
+            <Operation xmi.id="pyxmpp.client.Client.authenticated" name="authenticated" visibility="public" comment="Handle &quot;authenticated&quot; event. May be overriden in derived classes. This one does nothing."/>
+            <Operation xmi.id="pyxmpp.client.Client.authorized" name="authorized" visibility="public" comment="Handle &quot;authorized&quot; event. May be overriden in derived classes. This one requests an IM session."/>
+            <Operation xmi.id="pyxmpp.client.Client.connect" name="connect" visibility="public" comment="Connect to the server and set up the stream.  Set self.stream and notify self.state_changed when connection succeeds."/>
+            <Operation xmi.id="pyxmpp.client.Client.connected" name="connected" visibility="public" comment="Handle &quot;connected&quot; event. May be overriden in derived classes. This one does nothing."/>
+            <Operation xmi.id="pyxmpp.client.Client.disconnect" name="disconnect" visibility="public" comment="Disconnect from the server."/>
+            <Operation xmi.id="pyxmpp.client.Client.disconnected" name="disconnected" visibility="public" comment="Handle &quot;disconnected&quot; event. May be overriden in derived classes. This one does nothing."/>
+            <Operation xmi.id="pyxmpp.client.Client.get_stream" name="get_stream" visibility="public" comment="Get the connected stream object."/>
+            <Operation xmi.id="pyxmpp.client.Client.idle" name="idle" visibility="public" comment="Do some &quot;housekeeping&quot; work like cache expiration or timeout handling. Should be called periodically from the application main loop. May be overriden in derived classes."/>
+            <Operation xmi.id="pyxmpp.client.Client.loop" name="loop" visibility="public" comment="Simple &quot;main loop&quot; for the client.  By default just call the pyxmpp.Stream.loop_iter method of self.stream, which handles stream input and self.idle for some &quot;housekeeping&quot; work until the stream is closed.  This usually will be replaced by something more sophisticated. E.g. handling of other input sources."/>
+            <Operation xmi.id="pyxmpp.client.Client.request_roster" name="request_roster" visibility="public" comment="Request the user's roster."/>
+            <Operation xmi.id="pyxmpp.client.Client.request_session" name="request_session" visibility="public" comment="Request an IM session."/>
+            <Operation xmi.id="pyxmpp.client.Client.roster_updated" name="roster_updated" visibility="public" comment="Handle roster update event. May be overriden in derived classes. This one does nothing."/>
+            <Operation xmi.id="pyxmpp.client.Client.session_started" name="session_started" visibility="public" comment="Handle session started event. May be overriden in derived classes. This one sends the initial presence and requests the user's roster."/>
+            <Operation xmi.id="pyxmpp.client.Client.socket" name="socket" visibility="public" comment="Get the socket object of the active connection."/>
+            <Operation xmi.id="pyxmpp.client.Client.stream_closed" name="stream_closed" visibility="public" comment="Handle stream closure event. May be overriden in derived classes. This one does nothing."/>
+            <Operation xmi.id="pyxmpp.client.Client.stream_created" name="stream_created" visibility="public" comment="Handle stream creation event. May be overriden in derived classes. This one does nothing."/>
+            <Operation xmi.id="pyxmpp.client.Client.stream_error" name="stream_error" visibility="public" comment="Handle stream error received. May be overriden in derived classes. This one passes an error messages to logging facilities."/>
+            <Operation xmi.id="pyxmpp.client.Client.stream_state_changed" name="stream_state_changed" visibility="public" comment="Handle any stream state change. May be overriden in derived classes. This one does nothing."/>
+            <Operation xmi.id="pyxmpp.client.Client.__roster_error" name="__roster_error" visibility="private" comment="Process roster request failure."/>
+            <Operation xmi.id="pyxmpp.client.Client.__roster_push" name="__roster_push" visibility="private" comment="Process a &quot;roster push&quot; (change notification) received."/>
+            <Operation xmi.id="pyxmpp.client.Client.__roster_result" name="__roster_result" visibility="private" comment="Process roster request success."/>
+            <Operation xmi.id="pyxmpp.client.Client.__roster_timeout" name="__roster_timeout" visibility="private" comment="Process roster request time out."/>
+            <Operation xmi.id="pyxmpp.client.Client.__session_error" name="__session_error" visibility="private" comment="Process session request failure."/>
+            <Operation xmi.id="pyxmpp.client.Client.__session_result" name="__session_result" visibility="private" comment="Process session request success."/>
+            <Operation xmi.id="pyxmpp.client.Client.__session_timeout" name="__session_timeout" visibility="private" comment="Process session request time out."/>
+            <Operation xmi.id="pyxmpp.client.Client.__stream_state_change" name="__stream_state_change" visibility="private" comment="Handle stream state changes.  Call apopriate methods of self."/>
+            <Attribute xmi.id="pyxmpp.client.Client.auth_methods" name="auth_methods" visibility="public" comment="methods allowed for stream authentication. SASL mechanism names should be preceded with &quot;sasl:&quot; prefix."/>
+            <Attribute xmi.id="pyxmpp.client.Client.jid" name="jid" visibility="public" comment="configured JID of the client (current actual JID is avialable as self.stream.jid)."/>
+            <Attribute xmi.id="pyxmpp.client.Client.keepalive" name="keepalive" visibility="public" comment="keepalive interval for the stream or 0 when keepalive is disabled."/>
+            <Attribute xmi.id="pyxmpp.client.Client.lock" name="lock" visibility="public" comment="lock for synchronizing Client attributes access."/>
+            <Attribute xmi.id="pyxmpp.client.Client.password" name="password" visibility="public" comment="authentication password."/>
+            <Attribute xmi.id="pyxmpp.client.Client.port" name="port" visibility="public" comment="port number on the server to use if non-standard and not discoverable by SRV lookups."/>
+            <Attribute xmi.id="pyxmpp.client.Client.roster" name="roster" visibility="public" comment="user's roster or None if the roster is not yet retrieved."/>
+            <Attribute xmi.id="pyxmpp.client.Client.server" name="server" visibility="public" comment="server to use if non-standard and not discoverable by SRV lookups."/>
+            <Attribute xmi.id="pyxmpp.client.Client.session_established" name="session_established" visibility="public" comment="True when an IM session is established."/>
+            <Attribute xmi.id="pyxmpp.client.Client.state_changed" name="state_changed" visibility="public" comment="condition notified the the object state changes (stream becomes connected, session established etc.)."/>
+            <Attribute xmi.id="pyxmpp.client.Client.stream" name="stream" visibility="public" comment="current stream when the client is connected, None otherwise."/>
+          </Class>
+          <Class xmi.id="pyxmpp.client.ClientError" name="ClientError" comment="Raised on a client error."/>
+          <Class xmi.id="pyxmpp.client.FatalClientError" name="FatalClientError" comment="Raised on a fatal client error."/>
+        </Package>
+        <Package xmi.id="pyxmpp.clientstream" name="clientstream">
+          <Class xmi.id="pyxmpp.clientstream.ClientStream" name="ClientStream" comment="Handles XMPP-IM client connection stream.  Both client and server side of the connection is supported. This class handles client SASL authentication, authorisation and resource binding.  This class is not ready for handling of legacy Jabber servers, as it doesn't provide legacy authentication.">
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream.__init__" name="__init__" visibility="public" comment="Initialize the ClientStream object."/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream.accept" name="accept" visibility="public" comment="Accept an incoming client connection.  [server only]"/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream.check_authzid" name="check_authzid" visibility="public" comment="Check authorization id provided by the client.  [server only]"/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream.choose_realm" name="choose_realm" visibility="public" comment="Choose authentication realm from the list provided by the server.  [client only]  Use domain of the own JID if no realm list was provided or the domain is on the list or the first realm on the list otherwise."/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream.connect" name="connect" visibility="public" comment="Establish a client connection to a server.  [client only]"/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream.do_bind" name="do_bind" visibility="public" comment="Do the resource binding requested by a client connected.  [server only]"/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream.fix_in_stanza" name="fix_in_stanza" visibility="public" comment="Fix an incoming stanza.  Ona server replace the sender address with authorized client JID."/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream.fix_out_stanza" name="fix_out_stanza" visibility="public" comment="Fix outgoing stanza.  On a client clear the sender JID. On a server set the sender address to the own JID if the address is not set yet."/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream.get_password" name="get_password" visibility="public" comment="Get a user password for the SASL authentication."/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream.get_realms" name="get_realms" visibility="public" comment="Get realms available for client authentication.  [server only]"/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream.get_serv_host" name="get_serv_host" visibility="public" comment="Get the service host name for SASL authentication."/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream.get_serv_name" name="get_serv_name" visibility="public" comment="Get the service name for SASL authentication."/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream.get_serv_type" name="get_serv_type" visibility="public" comment="Get the server name for SASL authentication."/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream._connect" name="_connect" visibility="private" comment="Same as ClientStream.connect but assume self.lock is acquired."/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream._get_stream_features" name="_get_stream_features" visibility="private" comment="Include resource binding feature in the stream features list.  [server only]"/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream._post_connect" name="_post_connect" visibility="private" comment="Initialize authentication when the connection is established and we are the initiator."/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream._reset" name="_reset" visibility="private" comment="Reset ClientStream object state, making the object ready to handle new connections."/>
+            <Operation xmi.id="pyxmpp.clientstream.ClientStream._try_auth" name="_try_auth" visibility="private" comment="Try to authenticate using the first one of allowed authentication methods left.  [client only]"/>
+            <Attribute xmi.id="pyxmpp.clientstream.ClientStream.auth_methods" name="auth_methods" visibility="public" comment="allowed authentication methods."/>
+            <Attribute xmi.id="pyxmpp.clientstream.ClientStream.my_jid" name="my_jid" visibility="public" comment="requested local JID. Please notice that this may differ from me, which is actual authorized JID after the resource binding."/>
+            <Attribute xmi.id="pyxmpp.clientstream.ClientStream.password" name="password" visibility="public" comment="user's password."/>
+            <Attribute xmi.id="pyxmpp.clientstream.ClientStream.port" name="port" visibility="public" comment="port number to use."/>
+            <Attribute xmi.id="pyxmpp.clientstream.ClientStream.server" name="server" visibility="public" comment="server to use."/>
+          </Class>
+          <Class xmi.id="pyxmpp.clientstream.ClientStreamError" name="ClientStreamError" comment="Raised on a client stream error."/>
+          <Class xmi.id="pyxmpp.clientstream.FatalClientStreamError" name="FatalClientStreamError" comment="Raised on a fatal client stream error."/>
+        </Package>
+        <Package xmi.id="pyxmpp.error" name="error">
+          <Class xmi.id="pyxmpp.error.ErrorNode" name="ErrorNode" comment="Base class for both XMPP stream and stanza errors">
+            <Operation xmi.id="pyxmpp.error.ErrorNode.__init__" name="__init__" visibility="public" comment="Initialize an ErrorNode object."/>
+            <Operation xmi.id="pyxmpp.error.ErrorNode.add_custom_condition" name="add_custom_condition" visibility="public" comment="Add custom condition element to the error."/>
+            <Operation xmi.id="pyxmpp.error.ErrorNode.downgrade" name="downgrade" visibility="public" comment="Downgrade an XMPP error element to the legacy format.  Add a numeric code attribute according to the condition name."/>
+            <Operation xmi.id="pyxmpp.error.ErrorNode.free" name="free" visibility="public" comment="Free the associated XML node."/>
+            <Operation xmi.id="pyxmpp.error.ErrorNode.free_borrowed" name="free_borrowed" visibility="public" comment="Free the associated &quot;borrowed&quot; XML node."/>
+            <Operation xmi.id="pyxmpp.error.ErrorNode.get_condition" name="get_condition" visibility="public" comment="Get the condition element of the error."/>
+            <Operation xmi.id="pyxmpp.error.ErrorNode.get_text" name="get_text" visibility="public" comment="Get the description text from the error element."/>
+            <Operation xmi.id="pyxmpp.error.ErrorNode.is_legacy" name="is_legacy" visibility="public" comment="Check if the error node is a legacy error element."/>
+            <Operation xmi.id="pyxmpp.error.ErrorNode.serialize" name="serialize" visibility="public" comment="Serialize the element node."/>
+            <Operation xmi.id="pyxmpp.error.ErrorNode.upgrade" name="upgrade" visibility="public" comment="Upgrade a legacy error element to the XMPP compliant one.  Use the error code provided to select the condition and the &lt;error/&gt; CDATA for the error text."/>
+            <Operation xmi.id="pyxmpp.error.ErrorNode.xpath_eval" name="xpath_eval" visibility="public" comment="Evaluate XPath expression on the error element."/>
+            <Operation xmi.id="pyxmpp.error.ErrorNode.__from_node" name="__from_node" visibility="private" comment="Initialize an ErrorNode object from an XML node."/>
+          </Class>
+          <Class xmi.id="pyxmpp.error.ErrorNodeError" name="ErrorNodeError" comment="Raised on error with XMPP error handling."/>
+          <Class xmi.id="pyxmpp.error.StanzaErrorNode" name="StanzaErrorNode" comment="Stanza error element.">
+            <Operation xmi.id="pyxmpp.error.StanzaErrorNode.__init__" name="__init__" visibility="public" comment="Initialize a StreamErrorNode object."/>
+            <Operation xmi.id="pyxmpp.error.StanzaErrorNode.get_message" name="get_message" visibility="public" comment="Get the message for the error."/>
+            <Operation xmi.id="pyxmpp.error.StanzaErrorNode.get_type" name="get_type" visibility="public" comment="Get the error type."/>
+            <Operation xmi.id="pyxmpp.error.StanzaErrorNode.upgrade" name="upgrade" visibility="public" comment="Upgrade a legacy error element to the XMPP compliant one.  Use the error code provided to select the condition and the &lt;error/&gt; CDATA for the error text."/>
+          </Class>
+          <Class xmi.id="pyxmpp.error.StreamErrorNode" name="StreamErrorNode" comment="Stream error element.">
+            <Operation xmi.id="pyxmpp.error.StreamErrorNode.__init__" name="__init__" visibility="public" comment="Initialize a StreamErrorNode object."/>
+            <Operation xmi.id="pyxmpp.error.StreamErrorNode.get_message" name="get_message" visibility="public" comment="Get the message for the error."/>
+          </Class>
+        </Package>
+        <Package xmi.id="pyxmpp.expdict" name="expdict">
+          <Class xmi.id="pyxmpp.expdict.ExpiringDictionary" name="ExpiringDictionary" comment="An extension to standard Python dictionary objects which implements item expiration.  Each item in ExpiringDictionary has its expiration time assigned, after which the item is removed from the mapping.">
+            <Operation xmi.id="pyxmpp.expdict.ExpiringDictionary.__init__" name="__init__" visibility="public" comment="Initialize an ExpiringDictionary object."/>
+            <Operation xmi.id="pyxmpp.expdict.ExpiringDictionary.expire" name="expire" visibility="public" comment="Do the expiration of dictionary items.  Remove items that expired by now from the dictionary."/>
+            <Operation xmi.id="pyxmpp.expdict.ExpiringDictionary.set_item" name="set_item" visibility="public" comment="Set item of the dictionary."/>
+            <Operation xmi.id="pyxmpp.expdict.ExpiringDictionary._expire_item" name="_expire_item" visibility="private" comment="Do the expiration of a dictionary item.  Remove the item if it has expired by now."/>
+            <Attribute xmi.id="pyxmpp.expdict.ExpiringDictionary._default_timeout" name="_default_timeout" visibility="private" comment="the default timeout value (in seconds from now)."/>
+            <Attribute xmi.id="pyxmpp.expdict.ExpiringDictionary._lock" name="_lock" visibility="private" comment="access synchronization lock."/>
+            <Attribute xmi.id="pyxmpp.expdict.ExpiringDictionary._timeouts" name="_timeouts" visibility="private" comment="a dictionary with timeout values and timeout callback for stored objects."/>
+          </Class>
+        </Package>
+        <Package xmi.id="pyxmpp.iq" name="iq">
+          <Class xmi.id="pyxmpp.iq.Iq" name="Iq" comment="Wraper object for &lt;iq /&gt; stanzas.">
+            <Operation xmi.id="pyxmpp.iq.Iq.__init__" name="__init__" visibility="public" comment="Initialize an Iq object."/>
+            <Operation xmi.id="pyxmpp.iq.Iq.copy" name="copy" visibility="public" comment="Create a deep copy of the iq stanza."/>
+            <Operation xmi.id="pyxmpp.iq.Iq.get_query" name="get_query" visibility="public" comment="Get the payload element of the stanza."/>
+            <Operation xmi.id="pyxmpp.iq.Iq.get_query_ns" name="get_query_ns" visibility="public" comment="Get a namespace of the stanza payload."/>
+            <Operation xmi.id="pyxmpp.iq.Iq.make_error_response" name="make_error_response" visibility="public" comment="Create error response for the a &quot;get&quot; or &quot;set&quot; iq stanza."/>
+            <Operation xmi.id="pyxmpp.iq.Iq.make_result_response" name="make_result_response" visibility="public" comment="Create result response for the a &quot;get&quot; or &quot;set&quot; iq stanza."/>
+            <Operation xmi.id="pyxmpp.iq.Iq.new_query" name="new_query" visibility="public" comment="Create new payload element for the stanza."/>
+          </Class>
+        </Package>
+        <Package xmi.id="pyxmpp.jabber" name="jabber">
+          <Package xmi.id="pyxmpp.jabber.client" name="client">
+            <Class xmi.id="pyxmpp.jabber.client.JabberClient" name="JabberClient" comment="Base class for a Jabber client.">
+              <Operation xmi.id="pyxmpp.jabber.client.JabberClient.__init__" name="__init__" visibility="public" comment="Initialize a JabberClient object."/>
+              <Operation xmi.id="pyxmpp.jabber.client.JabberClient.authorized" name="authorized" visibility="public" comment="Handle &quot;authorized&quot; event. May be overriden in derived classes. By default: request an IM session and setup Disco handlers."/>
+              <Operation xmi.id="pyxmpp.jabber.client.JabberClient.connect" name="connect" visibility="public" comment="Connect to the server and set up the stream.  Set self.stream and notify self.state_changed when connection succeeds. Additionally, initialize Disco items and info of the client."/>
+              <Operation xmi.id="pyxmpp.jabber.client.JabberClient.disco_get_info" name="disco_get_info" visibility="public" comment="Return Disco#info data for a node."/>
+              <Operation xmi.id="pyxmpp.jabber.client.JabberClient.disco_get_items" name="disco_get_items" visibility="public" comment="Return Disco#items data for a node."/>
+              <Operation xmi.id="pyxmpp.jabber.client.JabberClient.__disco_info" name="__disco_info" visibility="private" comment="Handle a disco#info request.  self.disco_get_info method will be used to prepare the query response."/>
+              <Operation xmi.id="pyxmpp.jabber.client.JabberClient.__disco_items" name="__disco_items" visibility="private" comment="Handle a disco#items request.  self.disco_get_items method will be used to prepare the query response."/>
+            </Class>
+          </Package>
+          <Package xmi.id="pyxmpp.jabber.clientstream" name="clientstream">
+            <Class xmi.id="pyxmpp.jabber.clientstream.LegacyAuthenticationError" name="LegacyAuthenticationError" comment="Raised on a legacy authentication error."/>
+            <Class xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream" name="LegacyClientStream" comment="Handles Jabber (both XMPP and legacy protocol) client connection stream.  Both client and server side of the connection is supported. This class handles client SASL and legacy authentication, authorisation and XMPP resource binding.">
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream.__init__" name="__init__" visibility="public" comment="Initialize a LegacyClientStream object."/>
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream.auth_error" name="auth_error" visibility="public" comment="Handle legacy authentication error.  [client only]"/>
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream.auth_finish" name="auth_finish" visibility="public" comment="Handle success of the legacy authentication."/>
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream.auth_in_stage1" name="auth_in_stage1" visibility="public" comment="Handle the first stage (&lt;iq type='get'/&gt;) of legacy (&quot;plain&quot; or &quot;digest&quot;) authentication.  [server only]"/>
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream.auth_in_stage2" name="auth_in_stage2" visibility="public" comment="Handle the second stage (&lt;iq type='set'/&gt;) of legacy (&quot;plain&quot; or &quot;digest&quot;) authentication.  [server only]"/>
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream.auth_stage2" name="auth_stage2" visibility="public" comment="Handle the first stage authentication response (result of the &lt;iq type=&quot;get&quot;/&gt;).  [client only]"/>
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream.auth_timeout" name="auth_timeout" visibility="public" comment="Handle legacy authentication timeout.  [client only]"/>
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream._auth_stage1" name="_auth_stage1" visibility="private" comment="Do the first stage (&lt;iq type='get'/&gt;) of legacy (&quot;plain&quot; or &quot;digest&quot;) authentication.  [client only]"/>
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream._digest_auth_in_stage2" name="_digest_auth_in_stage2" visibility="private" comment="Handle the second stage (&lt;iq type='set'/&gt;) of legacy &quot;digest&quot; authentication.  [server only]"/>
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream._digest_auth_stage2" name="_digest_auth_stage2" visibility="private" comment="Do the second stage (&lt;iq type='set'/&gt;) of legacy &quot;digest&quot; authentication.  [client only]"/>
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream._plain_auth_in_stage2" name="_plain_auth_in_stage2" visibility="private" comment="Handle the second stage (&lt;iq type='set'/&gt;) of legacy &quot;plain&quot; authentication.  [server only]"/>
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream._plain_auth_stage2" name="_plain_auth_stage2" visibility="private" comment="Do the second stage (&lt;iq type='set'/&gt;) of legacy &quot;plain&quot; authentication.  [client only]"/>
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream._post_auth" name="_post_auth" visibility="private" comment="Unregister legacy authentication handlers after successfull authentication."/>
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream._post_connect" name="_post_connect" visibility="private" comment="Initialize authentication when the connection is established and we are the initiator."/>
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream._reset" name="_reset" visibility="private" comment="Reset the LegacyClientStream object state, making the object ready to handle new connections."/>
+              <Operation xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream._try_auth" name="_try_auth" visibility="private" comment="Try to authenticate using the first one of allowed authentication methods left.  [client only]"/>
+            </Class>
+          </Package>
+          <Package xmi.id="pyxmpp.jabber.delay" name="delay">
+            <Class xmi.id="pyxmpp.jabber.delay.Delay" name="Delay" comment="Delayed delivery tag.  Represents 'jabber:x:delay' (JEP-0091) element of a Jabber stanza.">
+              <Operation xmi.id="pyxmpp.jabber.delay.Delay.__init__" name="__init__" visibility="public" comment="Initialize the Delay object."/>
+              <Operation xmi.id="pyxmpp.jabber.delay.Delay.as_xml" name="as_xml" visibility="public" comment="Return XML representation of the Delay object.  If the parent is not given then the element will be standalone node in pyxmpp.stanza.common_doc context."/>
+              <Operation xmi.id="pyxmpp.jabber.delay.Delay.datetime_local" name="datetime_local" visibility="public" comment="Get the timestamp as a local time."/>
+              <Operation xmi.id="pyxmpp.jabber.delay.Delay.datetime_utc" name="datetime_utc" visibility="public" comment="Get the timestamp as a UTC."/>
+              <Operation xmi.id="pyxmpp.jabber.delay.Delay.from_xml" name="from_xml" visibility="public" comment="Initialize Delay object from an XML node."/>
+              <Attribute xmi.id="pyxmpp.jabber.delay.Delay.delay_from" name="delay_from" visibility="public" comment="the &quot;from&quot; value of the delay element"/>
+              <Attribute xmi.id="pyxmpp.jabber.delay.Delay.reason" name="reason" visibility="public" comment="the &quot;reason&quot; (content) of the delay element"/>
+              <Attribute xmi.id="pyxmpp.jabber.delay.Delay.timestamp" name="timestamp" visibility="public" comment="the UTC timestamp as naive datetime object"/>
+            </Class>
+          </Package>
+          <Package xmi.id="pyxmpp.jabber.disco" name="disco">
+            <Class xmi.id="pyxmpp.jabber.disco.DiscoError" name="DiscoError" comment="Raised on disco related error"/>
+            <Class xmi.id="pyxmpp.jabber.disco.DiscoIdentity" name="DiscoIdentity" comment="An &lt;identity/&gt; element of disco#info reply.  Identifies an item by its name, category and type.">
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoIdentity.__init__" name="__init__" visibility="public" comment="Initialize an DiscoIdentity object."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoIdentity.category" name="category" visibility="public" comment="Get the category of the item."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoIdentity.name" name="name" visibility="public" comment="Get the name of the item."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoIdentity.remove" name="remove" visibility="public" comment="Remove self from the containing DiscoInfo object."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoIdentity.set_category" name="set_category" visibility="public" comment="Set the category of the item."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoIdentity.set_name" name="set_name" visibility="public" comment="Set the name of the item."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoIdentity.set_type" name="set_type" visibility="public" comment="Set the type of the item."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoIdentity.type" name="type" visibility="public" comment="Get the type of the item."/>
+              <Attribute xmi.id="pyxmpp.jabber.disco.DiscoIdentity.disco" name="disco" visibility="public" comment="the disco reply this is the part of."/>
+              <Attribute xmi.id="pyxmpp.jabber.disco.DiscoIdentity.xmlnode" name="xmlnode" visibility="public" comment="XML element describing the identity."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.disco.DiscoInfo" name="DiscoInfo" comment="A disco#info response object.">
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoInfo.__init__" name="__init__" visibility="public" comment="Ininitalize an DiscoInfo object.  Wrap an existing disco#info XML element or create a new one."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoInfo.add_feature" name="add_feature" visibility="public" comment="Add a feature to self."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoInfo.features" name="features" visibility="public" comment="Get the features contained in self."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoInfo.has_feature" name="has_feature" visibility="public" comment="Check if self contains the named feature."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoInfo.identities" name="identities" visibility="public" comment="List the identity objects contained in self."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoInfo.identity_is" name="identity_is" visibility="public" comment="Check if the item described by self belongs to the given category  and type."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoInfo.remove_feature" name="remove_feature" visibility="public" comment="Remove a feature from self."/>
+              <Attribute xmi.id="pyxmpp.jabber.disco.DiscoInfo.xmlnode" name="xmlnode" visibility="public" comment="XML element listing the items."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.disco.DiscoItem" name="DiscoItem" comment="An item of disco#items reply.">
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoItem.__init__" name="__init__" visibility="public" comment="Initialize an DiscoItem object."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoItem.action" name="action" visibility="public" comment="Get the action attribute of the item."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoItem.jid" name="jid" visibility="public" comment="Get the JID of the item."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoItem.name" name="name" visibility="public" comment="Get the name of the item."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoItem.node" name="node" visibility="public" comment="Get the node of the item."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoItem.remove" name="remove" visibility="public" comment="Remove self from the containing DiscoItems object."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoItem.set_action" name="set_action" visibility="public" comment="Set the action of the item."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoItem.set_jid" name="set_jid" visibility="public" comment="Set the JID of the item."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoItem.set_name" name="set_name" visibility="public" comment="Set the name of the item."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoItem.set_node" name="set_node" visibility="public" comment="Set the node of the item."/>
+              <Attribute xmi.id="pyxmpp.jabber.disco.DiscoItem.disco" name="disco" visibility="public" comment="the disco reply this is the part of."/>
+              <Attribute xmi.id="pyxmpp.jabber.disco.DiscoItem.xmlnode" name="xmlnode" visibility="public" comment="XML element describing the item."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.disco.DiscoItems" name="DiscoItems" comment="A disco#items response or publish-request object.">
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoItems.__init__" name="__init__" visibility="public" comment="Ininitalize an DiscoItems object.  Wrap an existing disco#items XML element or create a new one."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoItems.has_item" name="has_item" visibility="public" comment="Check if self contains an item."/>
+              <Operation xmi.id="pyxmpp.jabber.disco.DiscoItems.items" name="items" visibility="public" comment="Get the items contained in self."/>
+              <Attribute xmi.id="pyxmpp.jabber.disco.DiscoItems.xmlnode" name="xmlnode" visibility="public" comment="XML element listing the items."/>
+            </Class>
+          </Package>
+          <Package xmi.id="pyxmpp.jabber.muc" name="muc">
+            <Class xmi.id="pyxmpp.jabber.muc.MucRoomHandler" name="MucRoomHandler" comment="Base class for MUC room handlers.  Methods of this class will be called for various events in the room.">
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomHandler.__init__" name="__init__" visibility="public" comment="Initialize a MucRoomHandler object."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomHandler.affiliation_changed" name="affiliation_changed" visibility="public" comment="Called when a affiliation of an user has been changed.  user MucRoomUser object describing the user (after update). old_aff is user's affiliation before update. new_aff is user's affiliation after update. stanza the stanza received."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomHandler.assign_state" name="assign_state" visibility="public" comment="Assign a state object to this MucRoomHandler instance."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomHandler.error" name="error" visibility="public" comment="Called when an error stanza is received."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomHandler.message_received" name="message_received" visibility="public" comment="Called when groupchat message has been received."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomHandler.nick_change" name="nick_change" visibility="public" comment="Called when user nick change is started."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomHandler.nick_changed" name="nick_changed" visibility="public" comment="Called after a user nick has been changed."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomHandler.presence_changed" name="presence_changed" visibility="public" comment="Called whenever user's presence changes (includes nick, role or affiliation changes)."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomHandler.role_changed" name="role_changed" visibility="public" comment="Called when a role of an user has been changed."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomHandler.subject_changed" name="subject_changed" visibility="public" comment="Called when the room subject has been changed."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomHandler.user_joined" name="user_joined" visibility="public" comment="Called when a new participant joins the room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomHandler.user_left" name="user_left" visibility="public" comment="Called when a participant leaves the room."/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomHandler.room_state" name="room_state" visibility="public" comment="MucRoomState object describing room state and its participants."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.muc.MucRoomManager" name="MucRoomManager" comment="Manage collection of MucRoomState objects and dispatch events.">
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomManager.__init__" name="__init__" visibility="public" comment="Initialize a MucRoomManager object."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomManager.forget" name="forget" visibility="public" comment="Remove a room from the list of managed rooms."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomManager.get_room_state" name="get_room_state" visibility="public" comment="Get the room state object of a room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomManager.join" name="join" visibility="public" comment="Create and return a new room state object and request joining to a MUC room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomManager.set_handlers" name="set_handlers" visibility="public" comment="Assign MUC stanza handlers to the self.stream."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomManager.set_stream" name="set_stream" visibility="public" comment="Change the stream assigned to self."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomManager.__error_message" name="__error_message" visibility="private" comment="Process an error message from a MUC room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomManager.__groupchat_message" name="__groupchat_message" visibility="private" comment="Process a groupchat message from a MUC room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomManager.__presence_available" name="__presence_available" visibility="private" comment="Process an available presence from a MUC room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomManager.__presence_error" name="__presence_error" visibility="private" comment="Process an presence error from a MUC room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomManager.__presence_unavailable" name="__presence_unavailable" visibility="private" comment="Process an unavailable presence from a MUC room."/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomManager.rooms" name="rooms" visibility="public" comment="a dictionary containing known MUC rooms. Unicode room JIDs are the keys."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.muc.MucRoomState" name="MucRoomState" comment="Describes the state of a MUC room, handles room events and provides an interface for room actions.">
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomState.__init__" name="__init__" visibility="public" comment="Initialize a MucRoomState object."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomState.change_nick" name="change_nick" visibility="public" comment="Send a nick change request to the room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomState.get_nick" name="get_nick" visibility="public" comment="Get own nick."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomState.get_room_jid" name="get_room_jid" visibility="public" comment="Get own room JID or a room JID for given nick."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomState.get_user" name="get_user" visibility="public" comment="Get a room user with given nick or JID."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomState.join" name="join" visibility="public" comment="Send a join request for the room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomState.leave" name="leave" visibility="public" comment="Send a leave request for the room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomState.process_available_presence" name="process_available_presence" visibility="public" comment="Process &lt;presence/&gt; received from the room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomState.process_error_message" name="process_error_message" visibility="public" comment="Process &lt;message type=&quot;error&quot;/&gt; received from the room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomState.process_error_presence" name="process_error_presence" visibility="public" comment="Process &lt;presence type=&quot;error&quot;/&gt; received from the room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomState.process_groupchat_message" name="process_groupchat_message" visibility="public" comment="Process &lt;message type=&quot;groupchat&quot;/&gt; received from the room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomState.process_unavailable_presence" name="process_unavailable_presence" visibility="public" comment="Process &lt;presence type=&quot;unavailable&quot;/&gt; received from the room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomState.send_message" name="send_message" visibility="public" comment="Send a message to the room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomState.set_stream" name="set_stream" visibility="public" comment="Called when current stream changes.  Mark the room not joined and inform self.handler that it was left."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomState.set_subject" name="set_subject" visibility="public" comment="Send a subject change request to the room."/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomState.handler" name="handler" visibility="public" comment="MucRoomHandler object containing callbacks to be called."/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomState.joined" name="joined" visibility="public" comment="True if the channel is joined."/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomState.manager" name="manager" visibility="public" comment="MucRoomManager object managing this room."/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomState.me" name="me" visibility="public" comment="MucRoomUser instance of the owner."/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomState.own_jid" name="own_jid" visibility="public" comment="real jid of the owner (client using this class)."/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomState.room_jid" name="room_jid" visibility="public" comment="room jid of the owner."/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomState.subject" name="subject" visibility="public" comment="current subject of the room."/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomState.users" name="users" visibility="public" comment="dictionary of users in the room. Nicknames are the keys."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.muc.MucRoomUser" name="MucRoomUser" comment="Describes a user of a MUC room.  The attributes of this object should not be changed directly.">
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomUser.__init__" name="__init__" visibility="public" comment="Initialize a MucRoomUser object.  When presence_or_user_or_jid is a JID user's role and affiliation are set to &quot;none&quot;."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomUser.same_as" name="same_as" visibility="public" comment="Check if two MucRoomUser objects describe the same user in the same room."/>
+              <Operation xmi.id="pyxmpp.jabber.muc.MucRoomUser.update_presence" name="update_presence" visibility="public" comment="Update user information."/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomUser.affiliation" name="affiliation" visibility="public" comment="user's affiliation."/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomUser.nick" name="nick" visibility="public" comment="user's nick (resource part of room_jid)"/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomUser.presence" name="presence" visibility="public" comment="last presence stanza received for the user."/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomUser.real_jid" name="real_jid" visibility="public" comment="user's real jid or None if not available."/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomUser.role" name="role" visibility="public" comment="user's role."/>
+              <Attribute xmi.id="pyxmpp.jabber.muc.MucRoomUser.room_jid" name="room_jid" visibility="public" comment="user's room jid."/>
+            </Class>
+          </Package>
+          <Package xmi.id="pyxmpp.jabber.muccore" name="muccore">
+            <Class xmi.id="pyxmpp.jabber.muccore.MucAdminQuery" name="MucAdminQuery" comment="Wrapper for http://www.jabber.org/protocol/muc#admin namespaced IQ stanza payload &quot;query&quot; elements and usually describing administrative actions or their results.  Not implemented yet."/>
+            <Class xmi.id="pyxmpp.jabber.muccore.MucIq" name="MucIq" comment="Extend Iq with MUC related interface.">
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucIq.__init__" name="__init__" visibility="public" comment="Initialize an Iq object."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucIq.copy" name="copy" visibility="public" comment="Return a copy of self."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucIq.free" name="free" visibility="public" comment="Free the data associated with this MucIq object."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucIq.make_kick_request" name="make_kick_request" visibility="public" comment="Make the iq stanza a MUC room participant kick request."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.muccore.MucItem" name="MucItem" comment="MUC &lt;item/&gt; element -- describes a room occupant.">
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucItem.__init__" name="__init__" visibility="public" comment="Initialize a MucItem object."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucItem.as_xml" name="as_xml" visibility="public" comment="Create XML representation of self."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucItem.__from_node" name="__from_node" visibility="private" comment="Initialize a MucItem object from an XML node."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucItem.__init" name="__init" visibility="private" comment="Initialize a `MucItem` object from a set of attributes. :Parameters:     - `affiliation`: affiliation of the user.     - `role`: role of the user.     - `jid`: JID of the user.     - `nick`: nickname of the user.     - `actor`: actor modyfying the user data.     - `reason`: reason of change of the user data. :Types:     - `affiliation`: `str`     - `role`: `str`     - `jid`: `JID`     - `nick`: `unicode`     - `actor`: `JID`     - `reason`: `unicode`"/>
+              <Attribute xmi.id="pyxmpp.jabber.muccore.MucItem.actor" name="actor" visibility="public" comment="actor modyfying the user data."/>
+              <Attribute xmi.id="pyxmpp.jabber.muccore.MucItem.affiliation" name="affiliation" visibility="public" comment="affiliation of the user."/>
+              <Attribute xmi.id="pyxmpp.jabber.muccore.MucItem.jid" name="jid" visibility="public" comment="JID of the user."/>
+              <Attribute xmi.id="pyxmpp.jabber.muccore.MucItem.nick" name="nick" visibility="public" comment="nickname of the user."/>
+              <Attribute xmi.id="pyxmpp.jabber.muccore.MucItem.reason" name="reason" visibility="public" comment="reason of change of the user data."/>
+              <Attribute xmi.id="pyxmpp.jabber.muccore.MucItem.role" name="role" visibility="public" comment="role of the user."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.muccore.MucItemBase" name="MucItemBase" comment="Base class for &lt;status/&gt; and &lt;item/&gt; element wrappers."/>
+            <Class xmi.id="pyxmpp.jabber.muccore.MucOwnerX" name="MucOwnerX" comment="Wrapper for http://www.jabber.org/protocol/muc#owner namespaced stanza payload &quot;x&quot; elements and usually containing information about a room user.">
+              <Attribute xmi.id="pyxmpp.jabber.muccore.MucOwnerX.node" name="node" visibility="public" comment="wrapped XML node."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.muccore.MucPresence" name="MucPresence" comment="Extend Presence with MUC related interface.">
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucPresence.__init__" name="__init__" visibility="public" comment="Initialize a MucPresence object."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucPresence.copy" name="copy" visibility="public" comment="Return a copy of self."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucPresence.free" name="free" visibility="public" comment="Free the data associated with this MucPresence object."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucPresence.get_join_info" name="get_join_info" visibility="public" comment="If self is a MUC room join request return the information contained."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucPresence.make_join_request" name="make_join_request" visibility="public" comment="Make the presence stanza a MUC room join request."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.muccore.MucStanzaExt" name="MucStanzaExt" comment="Base class for MUC specific stanza extensions. Used together with one of stanza classes (Iq, Message or Presence).">
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucStanzaExt.__init__" name="__init__" visibility="public" comment="Initialize a MucStanzaExt derived object."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucStanzaExt.clear_muc_child" name="clear_muc_child" visibility="public" comment="Remove the MUC specific stanza payload element."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucStanzaExt.get_muc_child" name="get_muc_child" visibility="public" comment="Get the MUC specific payload element."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucStanzaExt.make_muc_admin_quey" name="make_muc_admin_quey" visibility="public" comment="Create &lt;query xmlns=&quot;...muc#admin&quot;/&gt; element in the stanza."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucStanzaExt.make_muc_userinfo" name="make_muc_userinfo" visibility="public" comment="Create &lt;x xmlns=&quot;...muc#user&quot;/&gt; element in the stanza."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucStanzaExt.muc_free" name="muc_free" visibility="public" comment="Free MUC specific data."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.muccore.MucStatus" name="MucStatus" comment="MUC &lt;item/&gt; element - describes special meaning of a stanza">
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucStatus.__init__" name="__init__" visibility="public" comment="Initialize a MucStatus element."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucStatus.as_xml" name="as_xml" visibility="public" comment="Create XML representation of self."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucStatus.__from_node" name="__from_node" visibility="private" comment="Initialize a MucStatus element from an XML node."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucStatus.__init" name="__init" visibility="private" comment="Initialize a MucStatus element from a status code."/>
+              <Attribute xmi.id="pyxmpp.jabber.muccore.MucStatus.code" name="code" visibility="public" comment="staus code, as defined in JEP 45"/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.muccore.MucUserX" name="MucUserX" comment="Wrapper for http://www.jabber.org/protocol/muc#user namespaced stanza payload &quot;x&quot; elements and usually containing information about a room user.">
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucUserX.add_item" name="add_item" visibility="public" comment="Add an item to self."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucUserX.clear" name="clear" visibility="public" comment="Clear the content of self.node removing all &lt;item/&gt;, &lt;status/&gt;, etc."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucUserX.get_items" name="get_items" visibility="public" comment="Get a list of objects describing the content of self."/>
+              <Attribute xmi.id="pyxmpp.jabber.muccore.MucUserX.node" name="node" visibility="public" comment="wrapped XML node"/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.muccore.MucX" name="MucX" comment="Wrapper for http://www.jabber.org/protocol/muc namespaced stanza payload &quot;x&quot; elements."/>
+            <Class xmi.id="pyxmpp.jabber.muccore.MucXBase" name="MucXBase" comment="Base class for MUC-specific stanza payload - wrapper around an XML element.">
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucXBase.__init__" name="__init__" visibility="public" comment="Copy MucXBase object or create a new one, possibly based on or wrapping an XML node."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucXBase.free" name="free" visibility="public" comment="Unlink and free the XML node owned by self."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucXBase.free_borrowed" name="free_borrowed" visibility="public" comment="Detach the XML node borrowed by self."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucXBase.serialize" name="serialize" visibility="public" comment="Serialize self as XML."/>
+              <Operation xmi.id="pyxmpp.jabber.muccore.MucXBase.xpath_eval" name="xpath_eval" visibility="public" comment="Evaluate XPath expression in context of self.node."/>
+              <Attribute xmi.id="pyxmpp.jabber.muccore.MucXBase.node" name="node" visibility="public" comment="the wrapped XML node"/>
+            </Class>
+          </Package>
+          <Package xmi.id="pyxmpp.jabber.vcard" name="vcard">
+            <Class xmi.id="pyxmpp.jabber.vcard.Empty" name="Empty" comment="Exception raised when parsing empty vcard element. Such element will be ignored."/>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCard" name="VCard" comment="Jabber (vcard-temp) or RFC2426 vCard.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCard.__init__" name="__init__" visibility="public" comment="Initialize a VCard object from data which may be XML node or an RFC2426 string."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCard.rfc2426" name="rfc2426" visibility="public" comment="Get the RFC2426 representation of self."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCard.xml" name="xml" visibility="public" comment="Get the XML representation of self.  New document will be created if not parent and no doc is given."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCard.__from_rfc2426" name="__from_rfc2426" visibility="private" comment="Initialize a VCard object from an RFC2426 string."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCard.__from_xml" name="__from_xml" visibility="private" comment="Initialize a VCard object from XML node."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCard.__make_fn" name="__make_fn" visibility="private" comment="Initialize the mandatory self.fn from self.n.  This is a workaround for buggy clients which set only one of them."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCard._process_rfc2425_record" name="_process_rfc2425_record" visibility="private" comment="Parse single RFC2425 record and update attributes of self."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.adr" name="adr" visibility="public" comment="address(es)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.bday" name="bday" visibility="public" comment="birthday date(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.categories" name="categories" visibility="public" comment="categories."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.class" name="class" visibility="public" comment="class(es)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.desc" name="desc" visibility="public" comment="description."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.email" name="email" visibility="public" comment="e-mail address(es)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.fn" name="fn" visibility="public" comment="full name."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.geo" name="geo" visibility="public" comment="geolocation(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.jabberid" name="jabberid" visibility="public" comment="JID(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.key" name="key" visibility="public" comment="key(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.label" name="label" visibility="public" comment="address label(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.logo" name="logo" visibility="public" comment="logo(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.mailer" name="mailer" visibility="public" comment="mailer(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.n" name="n" visibility="public" comment="structural name."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.nickname" name="nickname" visibility="public" comment="nickname(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.note" name="note" visibility="public" comment="note(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.org" name="org" visibility="public" comment="organization(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.photo" name="photo" visibility="public" comment="photo(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.prodid" name="prodid" visibility="public" comment="product id(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.rev" name="rev" visibility="public" comment="revision(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.role" name="role" visibility="public" comment="role(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.sort-string" name="sort-string" visibility="public" comment="sort string(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.sound" name="sound" visibility="public" comment="sound(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.tel" name="tel" visibility="public" comment="phone number(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.title" name="title" visibility="public" comment="title(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.tz" name="tz" visibility="public" comment="timezone(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.uid" name="uid" visibility="public" comment="user identifier(s)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCard.url" name="url" visibility="public" comment="URL(s)."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardAdr" name="VCardAdr" comment="Address vCard field.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardAdr.__init__" name="__init__" visibility="public" comment="Initialize a VCardAdr object."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardAdr.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardAdr.xml" name="xml" visibility="public" comment="Create vcard-tmp XML representation of the field."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardAdr.__from_xml" name="__from_xml" visibility="private" comment="Initialize a VCardAdr object from and XML element."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardAdr.ctry" name="ctry" visibility="public" comment="the country."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardAdr.extadr" name="extadr" visibility="public" comment="the extended address."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardAdr.locality" name="locality" visibility="public" comment="the locality (e.g. city)."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardAdr.pcode" name="pcode" visibility="public" comment="the postal code."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardAdr.pobox" name="pobox" visibility="public" comment="the post office box."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardAdr.region" name="region" visibility="public" comment="the region."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardAdr.street" name="street" visibility="public" comment="the street address."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardCategories" name="VCardCategories" comment="Categories vCard field.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardCategories.__init__" name="__init__" visibility="public" comment="Initialize a VCardCategories object."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardCategories.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardCategories.xml" name="xml" visibility="public" comment="Create vcard-tmp XML representation of the field."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardCategories.name" name="name" visibility="public" comment="organization name."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardCategories.unit" name="unit" visibility="public" comment="organizational unit."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardEmail" name="VCardEmail" comment="E-mail vCard field.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardEmail.__init__" name="__init__" visibility="public" comment="Initialize a VCardEmail object."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardEmail.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardEmail.xml" name="xml" visibility="public" comment="Create vcard-tmp XML representation of the field."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardEmail.address" name="address" visibility="public" comment="e-mail address."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardEmail.type" name="type" visibility="public" comment="type of the address."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardField" name="VCardField" comment="Base class for vCard fields.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardField.__init__" name="__init__" visibility="public" comment="Initialize a VCardField object.  Set its name."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardField.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardField.name" name="name" visibility="public" comment="name of the field."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardGeo" name="VCardGeo" comment="Geographical location vCard field.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardGeo.__init__" name="__init__" visibility="public" comment="Initialize a VCardGeo object."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardGeo.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardGeo.xml" name="xml" visibility="public" comment="Create vcard-tmp XML representation of the field."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardGeo.lat" name="lat" visibility="public" comment="the latitude."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardGeo.lon" name="lon" visibility="public" comment="the longitude."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardImage" name="VCardImage" comment="Image vCard field.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardImage.__init__" name="__init__" visibility="public" comment="Initialize a VCardImage object."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardImage.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardImage.xml" name="xml" visibility="public" comment="Create vcard-tmp XML representation of the field."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardImage.image" name="image" visibility="public" comment="image binary data (when uri is None)"/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardImage.type" name="type" visibility="public" comment="optional image type"/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardImage.uri" name="uri" visibility="public" comment="image URI (when image is None)"/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardJID" name="VCardJID" comment="JID vCard field.  This field is not defined in RFC 2426, so it will be named 'x-jabberid' in RFC 2425 output.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardJID.__init__" name="__init__" visibility="public" comment="Initialize a VCardJID object."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardJID.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardJID.xml" name="xml" visibility="public" comment="Create vcard-tmp XML representation of the field."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardJID.value" name="value" visibility="public" comment="field value."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardKey" name="VCardKey" comment="Key vCard field.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardKey.__init__" name="__init__" visibility="public" comment="Initialize a VCardKey object."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardKey.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardKey.xml" name="xml" visibility="public" comment="Create vcard-tmp XML representation of the field."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardKey.cred" name="cred" visibility="public" comment="key data."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardKey.type" name="type" visibility="public" comment="key type."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardLabel" name="VCardLabel" comment="Address label vCard field.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardLabel.__init__" name="__init__" visibility="public" comment="Initialize a VCardLabel object."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardLabel.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardLabel.xml" name="xml" visibility="public" comment="Create vcard-tmp XML representation of the field."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardLabel.lines" name="lines" visibility="public" comment="list of label text lines."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardLabel.type" name="type" visibility="public" comment="type of the label."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardName" name="VCardName" comment="Name vCard field.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardName.__init__" name="__init__" visibility="public" comment="Initialize a VCardName object."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardName.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardName.xml" name="xml" visibility="public" comment="Create vcard-tmp XML representation of the field."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardName.family" name="family" visibility="public" comment="family name."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardName.given" name="given" visibility="public" comment="given name."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardName.middle" name="middle" visibility="public" comment="middle name."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardName.prefix" name="prefix" visibility="public" comment="name prefix."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardName.suffix" name="suffix" visibility="public" comment="name suffix."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardOrg" name="VCardOrg" comment="Organization vCard field.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardOrg.__init__" name="__init__" visibility="public" comment="Initialize a VCardOrg object."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardOrg.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardOrg.xml" name="xml" visibility="public" comment="Create vcard-tmp XML representation of the field."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardOrg.name" name="name" visibility="public" comment="organization name."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardOrg.unit" name="unit" visibility="public" comment="organizational unit."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardPrivacy" name="VCardPrivacy" comment="Privacy vCard field.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardPrivacy.__init__" name="__init__" visibility="public" comment="Initialize a VCardPrivacy object."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardPrivacy.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardPrivacy.xml" name="xml" visibility="public" comment="Create vcard-tmp XML representation of the field."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardSound" name="VCardSound" comment="Sound vCard field.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardSound.__init__" name="__init__" visibility="public" comment="Initialize a VCardSound object."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardSound.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardSound.xml" name="xml" visibility="public" comment="Create vcard-tmp XML representation of the field."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardSound.phonetic" name="phonetic" visibility="public" comment="phonetic transcription"/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardSound.sound" name="sound" visibility="public" comment="binary sound data (when uri is None)"/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardSound.uri" name="uri" visibility="public" comment="sound URI (when sound is None)"/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardString" name="VCardString" comment="Generic class for all standard text fields in the vCard.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardString.__init__" name="__init__" visibility="public" comment="Initialize a VCardString object."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardString.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardString.xml" name="xml" visibility="public" comment="Create vcard-tmp XML representation of the field."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardString.value" name="value" visibility="public" comment="field value."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardTel" name="VCardTel" comment="Telephone vCard field.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardTel.__init__" name="__init__" visibility="public" comment="Initialize a VCardTel object."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardTel.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardTel.xml" name="xml" visibility="public" comment="Create vcard-tmp XML representation of the field."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardTel.number" name="number" visibility="public" comment="phone number."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardTel.type" name="type" visibility="public" comment="type of the phone number."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabber.vcard.VCardXString" name="VCardXString" comment="Generic class for all text vCard fields not defined in RFC 2426.  In the RFC 2425 representation field name will be prefixed with 'x-'.">
+              <Operation xmi.id="pyxmpp.jabber.vcard.VCardXString.rfc2426" name="rfc2426" visibility="public" comment="RFC2426-encode the field content."/>
+              <Attribute xmi.id="pyxmpp.jabber.vcard.VCardXString.value" name="value" visibility="public" comment="field value."/>
+            </Class>
+          </Package>
+        </Package>
+        <Package xmi.id="pyxmpp.jabberd" name="jabberd">
+          <Package xmi.id="pyxmpp.jabberd.component" name="component">
+            <Class xmi.id="pyxmpp.jabberd.component.Component" name="Component" comment="Jabber external component (&quot;jabber:component:accept&quot; protocol) interface implementation.  Override this class to build your components.">
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.__init__" name="__init__" visibility="public" comment="Initialize a Component object."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.authenticated" name="authenticated" visibility="public" comment="Handle successful authentication event.  A good place to register stanza handlers and disco features.  [should be overriden in derived classes]  By default: set disco#info and disco#items handlers."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.authorized" name="authorized" visibility="public" comment="Handle successful authorization event."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.connect" name="connect" visibility="public" comment="Establish a connection with the server.  Set self.stream to the pyxmpp.jabberd.ComponentStream when initial connection succeeds."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.connected" name="connected" visibility="public" comment="Handle stream connection event.  [may be overriden in derived classes]  By default: do nothing."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.disco_get_info" name="disco_get_info" visibility="public" comment="Get disco#info data for a node.  [may be overriden in derived classes]  By default: return self.disco_info if no specific node name is provided."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.disco_get_items" name="disco_get_items" visibility="public" comment="Get disco#items data for a node.  [may be overriden in derived classes]  By default: return self.disco_items if no specific node name is provided."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.disconnect" name="disconnect" visibility="public" comment="Disconnect from the server."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.disconnected" name="disconnected" visibility="public" comment="Handle stream disconnection (connection closed by peer) event.  [may be overriden in derived classes]  By default: do nothing."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.get_stream" name="get_stream" visibility="public" comment="Get the stream of the component in a safe way."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.idle" name="idle" visibility="public" comment="Do some &quot;housekeeping&quot; work like &lt;iq/&gt; result expiration. Should be called on a regular basis, usually when the component is idle."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.loop" name="loop" visibility="public" comment="Simple 'main loop' for a component.  This usually will be replaced by something more sophisticated. E.g. handling of other input sources."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.socket" name="socket" visibility="public" comment="Get the socket of the connection to the server."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.stream_closed" name="stream_closed" visibility="public" comment="Handle stream closure event.  [may be overriden in derived classes]  By default: do nothing."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.stream_created" name="stream_created" visibility="public" comment="Handle stream creation event.  [may be overriden in derived classes]  By default: do nothing."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.stream_error" name="stream_error" visibility="public" comment="Handle a stream error received.  [may be overriden in derived classes]  By default: just log it. The stream will be closed anyway."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.stream_state_changed" name="stream_state_changed" visibility="public" comment="Handle a stream state change.  [may be overriden in derived classes]  By default: do nothing."/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.__disco_info" name="__disco_info" visibility="private" comment="Handle a disco-info query.  Types:  iq: pyxmpp.Iq"/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.__disco_items" name="__disco_items" visibility="private" comment="Handle a disco-items query.  Types:  iq: pyxmpp.Iq"/>
+              <Operation xmi.id="pyxmpp.jabberd.component.Component.__stream_state_change" name="__stream_state_change" visibility="private" comment="Handle various stream state changes and call right methods of self."/>
+              <Attribute xmi.id="pyxmpp.jabberd.component.Component.disco_category" name="disco_category" visibility="public" comment="disco category to be used to create disco_identity."/>
+              <Attribute xmi.id="pyxmpp.jabberd.component.Component.disco_identity" name="disco_identity" visibility="public" comment="disco identity (part of disco info) announced by the component. Created when a stream is connected."/>
+              <Attribute xmi.id="pyxmpp.jabberd.component.Component.disco_info" name="disco_info" visibility="public" comment="disco info announced by the component. Created when a stream is connected."/>
+              <Attribute xmi.id="pyxmpp.jabberd.component.Component.disco_items" name="disco_items" visibility="public" comment="disco items announced by the component. Created when a stream is connected."/>
+              <Attribute xmi.id="pyxmpp.jabberd.component.Component.disco_type" name="disco_type" visibility="public" comment="disco type to be used to create disco_identity."/>
+              <Attribute xmi.id="pyxmpp.jabberd.component.Component.jid" name="jid" visibility="public" comment="component JID (should contain only the domain part)."/>
+              <Attribute xmi.id="pyxmpp.jabberd.component.Component.keepalive" name="keepalive" visibility="public" comment="keepalive interval for the stream."/>
+              <Attribute xmi.id="pyxmpp.jabberd.component.Component.port" name="port" visibility="public" comment="port number on the server to which the commonent will connect."/>
+              <Attribute xmi.id="pyxmpp.jabberd.component.Component.secret" name="secret" visibility="public" comment="the authentication secret."/>
+              <Attribute xmi.id="pyxmpp.jabberd.component.Component.server" name="server" visibility="public" comment="server to which the commonent will connect."/>
+              <Attribute xmi.id="pyxmpp.jabberd.component.Component.stream" name="stream" visibility="public" comment="the XMPP stream object for the active connection or None if no connection is active."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabberd.component.ComponentError" name="ComponentError" comment="Raised on component error."/>
+          </Package>
+          <Package xmi.id="pyxmpp.jabberd.componentstream" name="componentstream">
+            <Class xmi.id="pyxmpp.jabberd.componentstream.ComponentStream" name="ComponentStream" comment="Handles jabberd component (jabber:component:accept) connection stream.">
+              <Operation xmi.id="pyxmpp.jabberd.componentstream.ComponentStream.__init__" name="__init__" visibility="public" comment="Initialize a ComponentStream object."/>
+              <Operation xmi.id="pyxmpp.jabberd.componentstream.ComponentStream.accept" name="accept" visibility="public" comment="Accept an incoming component connection.  [server only]"/>
+              <Operation xmi.id="pyxmpp.jabberd.componentstream.ComponentStream.connect" name="connect" visibility="public" comment="Establish a client connection to a server.  [component only]"/>
+              <Operation xmi.id="pyxmpp.jabberd.componentstream.ComponentStream.stream_start" name="stream_start" visibility="public" comment="Process &lt;stream:stream&gt; (stream start) tag received from peer.  Call Stream.stream_start, but ignore any HostMismatch error."/>
+              <Operation xmi.id="pyxmpp.jabberd.componentstream.ComponentStream._auth" name="_auth" visibility="private" comment="Authenticate on the server.  [component only]"/>
+              <Operation xmi.id="pyxmpp.jabberd.componentstream.ComponentStream._compute_handshake" name="_compute_handshake" visibility="private" comment="Compute the authentication handshake value."/>
+              <Operation xmi.id="pyxmpp.jabberd.componentstream.ComponentStream._connect" name="_connect" visibility="private" comment="Same as ComponentStream.connect but assume self.lock is acquired."/>
+              <Operation xmi.id="pyxmpp.jabberd.componentstream.ComponentStream._post_connect" name="_post_connect" visibility="private" comment="Initialize authentication when the connection is established and we are the initiator."/>
+              <Operation xmi.id="pyxmpp.jabberd.componentstream.ComponentStream._process_node" name="_process_node" visibility="private" comment="Process first level element of the stream.  Handle component handshake (authentication) element, and treat elements in &quot;jabber:component:accept&quot;, &quot;jabber:client&quot; and &quot;jabber:server&quot; equally (pass to self.process_stanza). All other elements are passed to Stream._process_node."/>
+              <Operation xmi.id="pyxmpp.jabberd.componentstream.ComponentStream._reset" name="_reset" visibility="private" comment="Reset ComponentStream object state, making the object ready to handle new connections."/>
+              <Attribute xmi.id="pyxmpp.jabberd.componentstream.ComponentStream.port" name="port" visibility="public" comment="port number to use."/>
+              <Attribute xmi.id="pyxmpp.jabberd.componentstream.ComponentStream.secret" name="secret" visibility="public" comment="authentication secret."/>
+              <Attribute xmi.id="pyxmpp.jabberd.componentstream.ComponentStream.server" name="server" visibility="public" comment="server to use."/>
+            </Class>
+            <Class xmi.id="pyxmpp.jabberd.componentstream.ComponentStreamError" name="ComponentStreamError" comment="Raised on a component error."/>
+            <Class xmi.id="pyxmpp.jabberd.componentstream.FatalComponentStreamError" name="FatalComponentStreamError" comment="Raised on a fatal component error."/>
+          </Package>
+        </Package>
+        <Package xmi.id="pyxmpp.jid" name="jid">
+          <Class xmi.id="pyxmpp.jid.JID" name="JID" comment="JID.  JID objects are immutable. They are also cached for better performance.">
+            <Operation xmi.id="pyxmpp.jid.JID.__new__" name="__new__" visibility="public" comment="Create a new JID object or take one from the cache." stereotype="/Stereotype:staticmethod"/>
+            <Operation xmi.id="pyxmpp.jid.JID.as_string" name="as_string" visibility="public" comment="UTF-8 encoded JID representation."/>
+            <Operation xmi.id="pyxmpp.jid.JID.as_unicode" name="as_unicode" visibility="public" comment="Unicode string JID representation."/>
+            <Operation xmi.id="pyxmpp.jid.JID.as_utf8" name="as_utf8" visibility="public" comment="UTF-8 encoded JID representation."/>
+            <Operation xmi.id="pyxmpp.jid.JID.bare" name="bare" visibility="public" comment="Make bare JID made by removing resource from current self."/>
+            <Operation xmi.id="pyxmpp.jid.JID.__from_string" name="__from_string" visibility="private" comment="Initialize JID object from UTF-8 string."/>
+            <Operation xmi.id="pyxmpp.jid.JID.__from_unicode" name="__from_unicode" visibility="private" comment="Initialize JID object from Unicode string."/>
+            <Operation xmi.id="pyxmpp.jid.JID.__set_domain" name="__set_domain" visibility="private" comment="Initialize self.domain"/>
+            <Operation xmi.id="pyxmpp.jid.JID.__set_node" name="__set_node" visibility="private" comment="Initialize self.node"/>
+            <Operation xmi.id="pyxmpp.jid.JID.__set_resource" name="__set_resource" visibility="private" comment="Initialize self.resource"/>
+            <Attribute xmi.id="pyxmpp.jid.JID.domain" name="domain" visibility="public" comment="domain part of the JID"/>
+            <Attribute xmi.id="pyxmpp.jid.JID.node" name="node" visibility="public" comment="node part of the JID"/>
+            <Attribute xmi.id="pyxmpp.jid.JID.resource" name="resource" visibility="public" comment="resource part of the JID"/>
+          </Class>
+          <Class xmi.id="pyxmpp.jid.JIDError" name="JIDError" comment="Exception raised when invalid JID is used"/>
+        </Package>
+        <Package xmi.id="pyxmpp.message" name="message">
+          <Class xmi.id="pyxmpp.message.Message" name="Message" comment="Wraper object for &lt;message /&gt; stanzas.">
+            <Operation xmi.id="pyxmpp.message.Message.__init__" name="__init__" visibility="public" comment="Initialize a Message object."/>
+            <Operation xmi.id="pyxmpp.message.Message.copy" name="copy" visibility="public" comment="Create a deep copy of the message stanza."/>
+            <Operation xmi.id="pyxmpp.message.Message.get_body" name="get_body" visibility="public" comment="Get the body of the message."/>
+            <Operation xmi.id="pyxmpp.message.Message.get_subject" name="get_subject" visibility="public" comment="Get the message subject."/>
+            <Operation xmi.id="pyxmpp.message.Message.get_thread" name="get_thread" visibility="public" comment="Get the thread-id subject."/>
+            <Operation xmi.id="pyxmpp.message.Message.make_error_response" name="make_error_response" visibility="public" comment="Create error response for any non-error message stanza."/>
+          </Class>
+        </Package>
+        <Package xmi.id="pyxmpp.presence" name="presence">
+          <Class xmi.id="pyxmpp.presence.Presence" name="Presence" comment="Wraper object for &lt;presence /&gt; stanzas.">
+            <Operation xmi.id="pyxmpp.presence.Presence.__init__" name="__init__" visibility="public" comment="Initialize a Presence object."/>
+            <Operation xmi.id="pyxmpp.presence.Presence.copy" name="copy" visibility="public" comment="Create a deep copy of the presence stanza."/>
+            <Operation xmi.id="pyxmpp.presence.Presence.get_priority" name="get_priority" visibility="public" comment="Get presence priority."/>
+            <Operation xmi.id="pyxmpp.presence.Presence.get_show" name="get_show" visibility="public" comment="Get presence &quot;show&quot; field."/>
+            <Operation xmi.id="pyxmpp.presence.Presence.get_status" name="get_status" visibility="public" comment="Get presence status description."/>
+            <Operation xmi.id="pyxmpp.presence.Presence.make_accept_response" name="make_accept_response" visibility="public" comment="Create &quot;accept&quot; response for the &quot;subscribe&quot;/&quot;subscribed&quot;/&quot;unsubscribe&quot;/&quot;unsubscribed&quot; presence stanza."/>
+            <Operation xmi.id="pyxmpp.presence.Presence.make_deny_response" name="make_deny_response" visibility="public" comment="Create &quot;deny&quot; response for the &quot;subscribe&quot;/&quot;subscribed&quot;/&quot;unsubscribe&quot;/&quot;unsubscribed&quot; presence stanza."/>
+            <Operation xmi.id="pyxmpp.presence.Presence.make_error_response" name="make_error_response" visibility="public" comment="Create error response for the any non-error presence stanza."/>
+            <Operation xmi.id="pyxmpp.presence.Presence.set_priority" name="set_priority" visibility="public" comment="Change presence priority."/>
+            <Operation xmi.id="pyxmpp.presence.Presence.set_show" name="set_show" visibility="public" comment="Change presence &quot;show&quot; field."/>
+            <Operation xmi.id="pyxmpp.presence.Presence.set_status" name="set_status" visibility="public" comment="Change presence status description."/>
+          </Class>
+        </Package>
+        <Package xmi.id="pyxmpp.resolver" name="resolver"/>
+        <Package xmi.id="pyxmpp.roster" name="roster">
+          <Class xmi.id="pyxmpp.roster.Roster" name="Roster" comment="Class representing XMPP-IM roster">
+            <Operation xmi.id="pyxmpp.roster.Roster.__init__" name="__init__" visibility="public" comment="Initialize Roster object.  node should be an XML representation of the roster (e.g. as sent from server in response to roster request).  When node is None empty roster will be created.  If server is true the object is considered server-side roster.  If strict is False, than invalid items in the XML will be ignored."/>
+            <Operation xmi.id="pyxmpp.roster.Roster.add_item" name="add_item" visibility="public" comment="Add an item to the roster.  The item_or_jid argument may be a RosterItem object or a JID. If it is a JID then subscription, name, groups and ask may also be specified."/>
+            <Operation xmi.id="pyxmpp.roster.Roster.as_xml" name="as_xml" visibility="public" comment="Return XML representation of the roster.  If parent is given (e.g. IQ stanza node) the roster node will be created as its child.  The item will be standalone node in common_doc context overwise."/>
+            <Operation xmi.id="pyxmpp.roster.Roster.from_xml" name="from_xml" visibility="public" comment="Initialize Roster object from XML node.  If strict is False, than invalid items in the XML will be ignored."/>
+            <Operation xmi.id="pyxmpp.roster.Roster.groups" name="groups" visibility="public" comment="Return a list of groups in the roster."/>
+            <Operation xmi.id="pyxmpp.roster.Roster.item_by_jid" name="item_by_jid" visibility="public" comment="Return roster item with given jid."/>
+            <Operation xmi.id="pyxmpp.roster.Roster.items" name="items" visibility="public" comment="Return a list of items in the roster."/>
+            <Operation xmi.id="pyxmpp.roster.Roster.items_by_group" name="items_by_group" visibility="public" comment="Return a list of groups with given name.  If case_sensitive is False the matching will be case insensitive."/>
+            <Operation xmi.id="pyxmpp.roster.Roster.items_by_name" name="items_by_name" visibility="public" comment="Return a list of items with given name.  If case_sensitive is False the matching will be case insensitive."/>
+            <Operation xmi.id="pyxmpp.roster.Roster.rm_item" name="rm_item" visibility="public" comment="Remove item from the roster."/>
+            <Operation xmi.id="pyxmpp.roster.Roster.update" name="update" visibility="public" comment="Apply an update request to the roster.  query should be a query included in a &quot;roster push&quot; IQ received."/>
+          </Class>
+          <Class xmi.id="pyxmpp.roster.RosterItem" name="RosterItem" comment="Roster item.  Represents part of a roster, or roster update request.">
+            <Operation xmi.id="pyxmpp.roster.RosterItem.__init__" name="__init__" visibility="public" comment="Initialize a roster item from XML node or jid and optional attributes."/>
+            <Operation xmi.id="pyxmpp.roster.RosterItem.as_xml" name="as_xml" visibility="public" comment="Return XML representation of the roster item.  If parent is given the item will be created as its child. The item will be standalone node in common_doc context overwise."/>
+            <Operation xmi.id="pyxmpp.roster.RosterItem.from_xml" name="from_xml" visibility="public" comment="Initialize RosterItem from XML node."/>
+            <Operation xmi.id="pyxmpp.roster.RosterItem.make_roster_push" name="make_roster_push" visibility="public" comment="Make &quot;roster push&quot; IQ stanza from the item representing roster update request."/>
+          </Class>
+        </Package>
+        <Package xmi.id="pyxmpp.sasl" name="sasl">
+          <Package xmi.id="pyxmpp.sasl.core" name="core">
+            <Class xmi.id="pyxmpp.sasl.core.Challenge" name="Challenge" comment="The challenge SASL message (server's challenge for the client).">
+              <Operation xmi.id="pyxmpp.sasl.core.Challenge.__init__" name="__init__" visibility="public" comment="Initialize the Challenge object."/>
+            </Class>
+            <Class xmi.id="pyxmpp.sasl.core.ClientAuthenticator" name="ClientAuthenticator" comment="Base class for client authenticators.  A client authenticator class is a client-side implementation of a SASL mechanism. One ClientAuthenticator object may be used for one client authentication process.">
+              <Operation xmi.id="pyxmpp.sasl.core.ClientAuthenticator.__init__" name="__init__" visibility="public" comment="Initialize a ClientAuthenticator object."/>
+              <Operation xmi.id="pyxmpp.sasl.core.ClientAuthenticator.challenge" name="challenge" visibility="public" comment="Process the server's challenge."/>
+              <Operation xmi.id="pyxmpp.sasl.core.ClientAuthenticator.finish" name="finish" visibility="public" comment="Handle authentication succes information from the server."/>
+              <Operation xmi.id="pyxmpp.sasl.core.ClientAuthenticator.start" name="start" visibility="public" comment="Start the authentication process."/>
+            </Class>
+            <Class xmi.id="pyxmpp.sasl.core.Failure" name="Failure" comment="The failure SASL message.">
+              <Operation xmi.id="pyxmpp.sasl.core.Failure.__init__" name="__init__" visibility="public" comment="Initialize the Failure object."/>
+              <Attribute xmi.id="pyxmpp.sasl.core.Failure.reason" name="reason" visibility="public" comment="the failure reason."/>
+            </Class>
+            <Class xmi.id="pyxmpp.sasl.core.PasswordManager" name="PasswordManager" comment="Base class for password managers.  Password manager is an object responsible for providing or verification of authentication credentials.  All the methods of PasswordManager class may be overriden in derived classes for specific authentication and authorization policy.">
+              <Operation xmi.id="pyxmpp.sasl.core.PasswordManager.__init__" name="__init__" visibility="public" comment="Initialize a PasswordManager object."/>
+              <Operation xmi.id="pyxmpp.sasl.core.PasswordManager.check_authzid" name="check_authzid" visibility="public" comment="Check if the authenticated entity is allowed to use given authorization id.  [server only]  By default return True if the authzid is None or empty or it is equal to extra_info[&quot;username&quot;] (if the latter is present)."/>
+              <Operation xmi.id="pyxmpp.sasl.core.PasswordManager.check_password" name="check_password" visibility="public" comment="Check the password validity.  [server only]  Used by plain-text authentication mechanisms.  Retrieve a &quot;plain&quot; password for the username and realm using self.get_password and compare it with the password provided.  May be overrided e.g. to check the password against some external authentication mechanism (PAM, LDAP, etc.)."/>
+              <Operation xmi.id="pyxmpp.sasl.core.PasswordManager.choose_realm" name="choose_realm" visibility="public" comment="Choose an authentication realm from the list provided by the server.  [client only]  By default return the first realm from the list or None if the list is empty."/>
+              <Operation xmi.id="pyxmpp.sasl.core.PasswordManager.generate_nonce" name="generate_nonce" visibility="public" comment="Generate a random string for digest authentication challenges.  The string should be cryptographicaly secure random pattern."/>
+              <Operation xmi.id="pyxmpp.sasl.core.PasswordManager.get_password" name="get_password" visibility="public" comment="Get the password for user authentication.  [both client or server]  By default returns (None, None) providing no password. Should be overriden in derived classes."/>
+              <Operation xmi.id="pyxmpp.sasl.core.PasswordManager.get_realms" name="get_realms" visibility="public" comment="Get available realms list.  [server only]"/>
+              <Operation xmi.id="pyxmpp.sasl.core.PasswordManager.get_serv_host" name="get_serv_host" visibility="public" comment="Return the host name for DIGEST-MD5 'digest-uri' field.  Should be overriden in derived classes."/>
+              <Operation xmi.id="pyxmpp.sasl.core.PasswordManager.get_serv_name" name="get_serv_name" visibility="public" comment="Return the service name for DIGEST-MD5 'digest-uri' field.  Should be overriden in derived classes."/>
+              <Operation xmi.id="pyxmpp.sasl.core.PasswordManager.get_serv_type" name="get_serv_type" visibility="public" comment="Return the service type for DIGEST-MD5 'digest-uri' field.  Should be overriden in derived classes."/>
+            </Class>
+            <Class xmi.id="pyxmpp.sasl.core.Reply" name="Reply" comment="Base class for SASL authentication reply objects.">
+              <Operation xmi.id="pyxmpp.sasl.core.Reply.__init__" name="__init__" visibility="public" comment="Initialize the Reply object."/>
+              <Operation xmi.id="pyxmpp.sasl.core.Reply.base64" name="base64" visibility="public" comment="Base64-encode the data contained in the reply."/>
+              <Attribute xmi.id="pyxmpp.sasl.core.Reply.data" name="data" visibility="public" comment="optional reply data."/>
+            </Class>
+            <Class xmi.id="pyxmpp.sasl.core.Response" name="Response" comment="The response SASL message (clients's reply the the server's challenge).">
+              <Operation xmi.id="pyxmpp.sasl.core.Response.__init__" name="__init__" visibility="public" comment="Initialize the Response object."/>
+            </Class>
+            <Class xmi.id="pyxmpp.sasl.core.ServerAuthenticator" name="ServerAuthenticator" comment="Base class for server authenticators.  A server authenticator class is a server-side implementation of a SASL mechanism. One ServerAuthenticator object may be used for one client authentication process.">
+              <Operation xmi.id="pyxmpp.sasl.core.ServerAuthenticator.__init__" name="__init__" visibility="public" comment="Initialize a ServerAuthenticator object."/>
+              <Operation xmi.id="pyxmpp.sasl.core.ServerAuthenticator.response" name="response" visibility="public" comment="Process a response from a client."/>
+              <Operation xmi.id="pyxmpp.sasl.core.ServerAuthenticator.start" name="start" visibility="public" comment="Start the authentication process."/>
+            </Class>
+            <Class xmi.id="pyxmpp.sasl.core.Success" name="Success" comment="The success SASL message (sent by the server on authentication success).">
+              <Operation xmi.id="pyxmpp.sasl.core.Success.__init__" name="__init__" visibility="public" comment="Initialize the Success object."/>
+            </Class>
+          </Package>
+          <Package xmi.id="pyxmpp.sasl.digest_md5" name="digest_md5">
+            <Class xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ClientAuthenticator" name="DigestMD5ClientAuthenticator" comment="Provides PLAIN SASL authentication for a client.">
+              <Operation xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ClientAuthenticator.__init__" name="__init__" visibility="public" comment="Initialize a DigestMD5ClientAuthenticator object."/>
+              <Operation xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ClientAuthenticator.challenge" name="challenge" visibility="public" comment="Process a challenge and return the response."/>
+              <Operation xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ClientAuthenticator.finish" name="finish" visibility="public" comment="Process success indicator from the server.  Process any addicional data passed with the success. Fail if the server was not authenticated."/>
+              <Operation xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ClientAuthenticator.start" name="start" visibility="public" comment="Start the authentication process initializing client state."/>
+              <Operation xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ClientAuthenticator._final_challenge" name="_final_challenge" visibility="private" comment="Process the second challenge from the server and return the response."/>
+              <Operation xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ClientAuthenticator._get_password" name="_get_password" visibility="private" comment="Retrieve user's password from the password manager.  Set self.password to the password and self.pformat to its format name ('plain' or 'md5:user:realm:pass')."/>
+              <Operation xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ClientAuthenticator._get_realm" name="_get_realm" visibility="private" comment="Choose a realm from the list specified by the server."/>
+              <Operation xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ClientAuthenticator._make_response" name="_make_response" visibility="private" comment="Make a response for the first challenge from the server."/>
+              <Attribute xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ClientAuthenticator.password" name="password" visibility="public" comment="current authentication password"/>
+              <Attribute xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ClientAuthenticator.pformat" name="pformat" visibility="public" comment="current authentication password format"/>
+              <Attribute xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ClientAuthenticator.realm" name="realm" visibility="public" comment="current authentication realm"/>
+            </Class>
+            <Class xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ServerAuthenticator" name="DigestMD5ServerAuthenticator" comment="Provides DIGEST-MD5 SASL authentication for a server.">
+              <Operation xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ServerAuthenticator.__init__" name="__init__" visibility="public" comment="Initialize a DigestMD5ServerAuthenticator object."/>
+              <Operation xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ServerAuthenticator.response" name="response" visibility="public" comment="Process a client reponse."/>
+              <Operation xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ServerAuthenticator.start" name="start" visibility="public" comment="Start the authentication process."/>
+              <Operation xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ServerAuthenticator._check_params" name="_check_params" visibility="private" comment="Check parameters of a client reponse and pass them to further processing."/>
+              <Operation xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ServerAuthenticator._make_final_challenge" name="_make_final_challenge" visibility="private" comment="Send the second challenge in reply to the client response."/>
+              <Operation xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ServerAuthenticator._parse_response" name="_parse_response" visibility="private" comment="Parse a client reponse and pass to further processing."/>
+            </Class>
+          </Package>
+          <Package xmi.id="pyxmpp.sasl.plain" name="plain">
+            <Class xmi.id="pyxmpp.sasl.plain.PlainClientAuthenticator" name="PlainClientAuthenticator" comment="Provides PLAIN SASL authentication for a client.">
+              <Operation xmi.id="pyxmpp.sasl.plain.PlainClientAuthenticator.__init__" name="__init__" visibility="public" comment="Initialize a PlainClientAuthenticator object."/>
+              <Operation xmi.id="pyxmpp.sasl.plain.PlainClientAuthenticator.challenge" name="challenge" visibility="public" comment="Process the challenge and return the response."/>
+              <Operation xmi.id="pyxmpp.sasl.plain.PlainClientAuthenticator.finish" name="finish" visibility="public" comment="Handle authentication succes information from the server."/>
+              <Operation xmi.id="pyxmpp.sasl.plain.PlainClientAuthenticator.start" name="start" visibility="public" comment="Start the authentication process and return the initial response."/>
+            </Class>
+            <Class xmi.id="pyxmpp.sasl.plain.PlainServerAuthenticator" name="PlainServerAuthenticator" comment="Provides PLAIN SASL authentication for a server.">
+              <Operation xmi.id="pyxmpp.sasl.plain.PlainServerAuthenticator.__init__" name="__init__" visibility="public" comment="Initialize a PlainServerAuthenticator object."/>
+              <Operation xmi.id="pyxmpp.sasl.plain.PlainServerAuthenticator.response" name="response" visibility="public" comment="Process a client reponse."/>
+              <Operation xmi.id="pyxmpp.sasl.plain.PlainServerAuthenticator.start" name="start" visibility="public" comment="Start the authentication process."/>
+            </Class>
+          </Package>
+        </Package>
+        <Package xmi.id="pyxmpp.stanza" name="stanza">
+          <Class xmi.id="pyxmpp.stanza.Stanza" name="Stanza" comment="Base class for all XMPP stanzas.">
+            <Operation xmi.id="pyxmpp.stanza.Stanza.__init__" name="__init__" visibility="public" comment="Initialize a Stanza object."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.add_content" name="add_content" visibility="public" comment="Add an XML node to the stanza's payload."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.add_new_content" name="add_new_content" visibility="public" comment="Add a new XML element to the stanza payload."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.copy" name="copy" visibility="public" comment="Create a deep copy of the stanza."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.free" name="free" visibility="public" comment="Free the node associated with this Stanza object."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.get_error" name="get_error" visibility="public" comment="Get stanza error information."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.get_from" name="get_from" visibility="public" comment="Get &quot;from&quot; attribute of the stanza."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.get_id" name="get_id" visibility="public" comment="Get &quot;id&quot; attribute of the stanza."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.get_node" name="get_node" visibility="public" comment="Return the XML node wrapped into self."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.get_to" name="get_to" visibility="public" comment="Get &quot;to&quot; attribute of the stanza."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.get_type" name="get_type" visibility="public" comment="Get &quot;type&quot; attribute of the stanza."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.serialize" name="serialize" visibility="public" comment="Serialize the stanza into an UTF-8 encoded XML string."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.set_content" name="set_content" visibility="public" comment="Set stanza content to an XML node."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.set_from" name="set_from" visibility="public" comment="Set &quot;from&quot; attribute of the stanza."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.set_id" name="set_id" visibility="public" comment="Set &quot;id&quot; attribute of the stanza."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.set_new_content" name="set_new_content" visibility="public" comment="Set stanza payload to a new XML element."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.set_to" name="set_to" visibility="public" comment="Set &quot;to&quot; attribute of the stanza."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.set_type" name="set_type" visibility="public" comment="Set &quot;type&quot; attribute of the stanza."/>
+            <Operation xmi.id="pyxmpp.stanza.Stanza.xpath_eval" name="xpath_eval" visibility="public" comment="Evaluate an XPath expression on the stanza XML node."/>
+            <Attribute xmi.id="pyxmpp.stanza.Stanza.node" name="node" visibility="public" comment="stanza XML node."/>
+            <Attribute xmi.id="pyxmpp.stanza.Stanza._error" name="_error" visibility="private" comment="pyxmpp.error.StanzaErrorNode describing the error associated with the stanza of type &quot;error&quot;."/>
+          </Class>
+          <Class xmi.id="pyxmpp.stanza.StanzaError" name="StanzaError" comment="Raised on ivalid stanza objects usage."/>
+        </Package>
+        <Package xmi.id="pyxmpp.stanzaprocessor" name="stanzaprocessor">
+          <Class xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor" name="StanzaProcessor" comment="Universal stanza handler/router class.  Provides facilities to set up custom handlers for various types of stanzas.">
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.__init__" name="__init__" visibility="public" comment="Initialize a StanzaProcessor object."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.check_to" name="check_to" visibility="public" comment="Check &quot;to&quot; attribute of received stream header.  Should be overriden in derived classes which require other logic for handling that attribute."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.fix_in_stanza" name="fix_in_stanza" visibility="public" comment="Modify incoming stanza before processing it.  This implementation does nothig. It should be overriden in derived classes if needed."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.fix_out_stanza" name="fix_out_stanza" visibility="public" comment="Modify outgoing stanza before sending into the stream.  This implementation does nothig. It should be overriden in derived classes if needed."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.process_iq" name="process_iq" visibility="public" comment="Process IQ stanza received.  If a matching handler is available pass the stanza to it. Otherwise ignore it if it is &quot;error&quot; or &quot;result&quot; stanza or return &quot;feature-not-implemented&quot; error."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.process_message" name="process_message" visibility="public" comment="Process message stanza.  Pass it to a handler of the stanza's type and payload namespace. If no handler for the actual stanza type succeeds then hadlers for type &quot;normal&quot; are used."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.process_presence" name="process_presence" visibility="public" comment="Process presence stanza.  Pass it to a handler of the stanza's type and payload namespace."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.process_stanza" name="process_stanza" visibility="public" comment="Process stanza received from the stream.  First &quot;fix&quot; the stanza with self.fix_in_stanza(), then pass it to self.route_stanza() if it is not directed to self.me and self.process_all_stanzas is not True. Otherwise stanza is passwd to self.process_iq(), self.process_message() or self.process_presence() appropriately."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.route_stanza" name="route_stanza" visibility="public" comment="Process stanza not addressed to us.  Return &quot;recipient-unavailable&quot; return if it is not &quot;error&quot; nor &quot;result&quot; stanza.  This method should be overriden in derived classes if they are supposed to handle stanzas not addressed directly to local stream endpoint."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.send" name="send" visibility="public" comment="Send a stanza somwhere. This one does nothing. Should be overriden in derived classes."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.set_iq_get_handler" name="set_iq_get_handler" visibility="public" comment="Set &lt;iq type=&quot;get&quot;/&gt; handler.  Only one handler may be defined per one namespaced element. If a handler for the element was already set it will be lost after calling this method."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.set_iq_set_handler" name="set_iq_set_handler" visibility="public" comment="Set &lt;iq type=&quot;set&quot;/&gt; handler.  Only one handler may be defined per one namespaced element. If a handler for the element was already set it will be lost after calling this method."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.set_message_handler" name="set_message_handler" visibility="public" comment="Set a handler for &lt;message/&gt; stanzas.  Multiple &lt;message /&gt; handlers with the same type/namespace/priority may be set. Order of calling handlers with the same priority is not defined. Handlers will be called in priority order until one of them returns True."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.set_presence_handler" name="set_presence_handler" visibility="public" comment="Set a handler for &lt;presence/&gt; stanzas.  Multiple &lt;presence /&gt; handlers with the same type/namespace/priority may be set. Order of calling handlers with the same priority is not defined. Handlers will be called in priority order until one of them returns True."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.set_response_handlers" name="set_response_handlers" visibility="public" comment="Set response handler for an IQ &quot;get&quot; or &quot;set&quot; stanza.  This should be called before the stanza is sent."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.unset_iq_get_handler" name="unset_iq_get_handler" visibility="public" comment="Remove &lt;iq type=&quot;get&quot;/&gt; handler."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.unset_iq_set_handler" name="unset_iq_set_handler" visibility="public" comment="Remove &lt;iq type=&quot;set&quot;/&gt; handler."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.__add_handler" name="__add_handler" visibility="private" comment="Add a handler function to a prioritized handler list."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.__try_handlers" name="__try_handlers" visibility="private" comment="Search the handler list for handlers matching given stanza type and payload namespace. Run the handlers found ordering them by priority until the first one which returns True."/>
+            <Operation xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor._set_response_handlers" name="_set_response_handlers" visibility="private" comment="Same as Stream.set_response_handlers but assume self.lock is acquired."/>
+            <Attribute xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.initiator" name="initiator" visibility="public" comment="True if local stream endpoint is the initiating entity."/>
+            <Attribute xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.lock" name="lock" visibility="public" comment="lock object used to synchronize access to the StanzaProcessor object."/>
+            <Attribute xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.me" name="me" visibility="public" comment="local JID."/>
+            <Attribute xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.peer" name="peer" visibility="public" comment="remote stream endpoint JID."/>
+            <Attribute xmi.id="pyxmpp.stanzaprocessor.StanzaProcessor.process_all_stanzas" name="process_all_stanzas" visibility="public" comment="when True then all stanzas received are considered local."/>
+          </Class>
+        </Package>
+        <Package xmi.id="pyxmpp.stream" name="stream">
+          <Class xmi.id="pyxmpp.stream.Stream" name="Stream" comment="Generic XMPP stream class.  Responsible for establishing connection, parsing the stream, StartTLS encryption and SASL authentication negotiation and usage, dispatching received stanzas to apopriate handlers and sending application's stanzas.  Whenever we say &quot;stream&quot; here we actually mean two streams (incoming and outgoing) of one connections, as defined by the XMPP specification.">
+            <Operation xmi.id="pyxmpp.stream.Stream.__init__" name="__init__" visibility="public" comment="Initialize Stream object"/>
+            <Operation xmi.id="pyxmpp.stream.Stream._got_features" name="_got_features" visibility="private" comment="Process incoming &lt;stream:features/&gt; element.  [initiating entity only]  The received features node is available in self.features."/>
+            <Operation xmi.id="pyxmpp.stream.Stream._make_stream_features" name="_make_stream_features" visibility="private" comment="Create the &lt;features/&gt; element for the stream.  [receving entity only]"/>
+            <Operation xmi.id="pyxmpp.stream.Stream._process_node" name="_process_node" visibility="private" comment="Process first level element of the stream.  The element may be stream error or features, StartTLS request/response, SASL request/response or a stanza."/>
+            <Operation xmi.id="pyxmpp.stream.Stream._reset" name="_reset" visibility="private" comment="Reset Stream object state making it ready to handle new connections."/>
+            <Attribute xmi.id="pyxmpp.stream.Stream.features" name="features" visibility="public" comment="stream features as annouced by the initiator."/>
+            <Attribute xmi.id="pyxmpp.stream.Stream.initiator" name="initiator" visibility="public" comment="True if local stream endpoint is the initiating entity."/>
+            <Attribute xmi.id="pyxmpp.stream.Stream.lock" name="lock" visibility="public" comment="RLock object used to synchronize access to Stream object."/>
+            <Attribute xmi.id="pyxmpp.stream.Stream.me" name="me" visibility="public" comment="local stream endpoint JID."/>
+            <Attribute xmi.id="pyxmpp.stream.Stream.peer" name="peer" visibility="public" comment="remote stream endpoint JID."/>
+            <Attribute xmi.id="pyxmpp.stream.Stream.process_all_stanzas" name="process_all_stanzas" visibility="public" comment="when True then all stanzas received are considered local."/>
+            <Attribute xmi.id="pyxmpp.stream.Stream.tls" name="tls" visibility="public" comment="TLS connection object."/>
+            <Attribute xmi.id="pyxmpp.stream.Stream._reader" name="_reader" visibility="private" comment="the stream reader object (push parser) for the stream."/>
+          </Class>
+        </Package>
+        <Package xmi.id="pyxmpp.streambase" name="streambase">
+          <Class xmi.id="pyxmpp.streambase.FatalStreamError" name="FatalStreamError" comment="Base class for all fatal Stream exceptions.  When FatalStreamError is raised the stream is no longer usable."/>
+          <Class xmi.id="pyxmpp.streambase.HostMismatch" name="HostMismatch" comment="Exception raised when the connected host name is other then requested."/>
+          <Class xmi.id="pyxmpp.streambase.StreamAuthenticationError" name="StreamAuthenticationError" comment="Raised when stream authentication fails."/>
+          <Class xmi.id="pyxmpp.streambase.StreamBase" name="StreamBase" comment="Base class for a generic XMPP stream.  Responsible for establishing connection, parsing the stream, dispatching received stanzas to apopriate handlers and sending application's stanzas. This doesn't provide any authentication or encryption (both required by the XMPP specification) and is not usable on its own.  Whenever we say &quot;stream&quot; here we actually mean two streams (incoming and outgoing) of one connections, as defined by the XMPP specification.">
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.__init__" name="__init__" visibility="public" comment="Initialize Stream object"/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.accept" name="accept" visibility="public" comment="Accept incoming connection.  [receiving entity only]"/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.bind" name="bind" visibility="public" comment="Bind to a resource.  [initiating entity only]  XMPP stream is authenticated for bare JID only. To use the full JID it must be bound to a resource."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.check_to" name="check_to" visibility="public" comment="Check &quot;to&quot; attribute of received stream header.  Should be overriden in derived classes which require other logic for handling that attribute."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.close" name="close" visibility="public" comment="Forcibly close the connection and clear the stream state."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.connect" name="connect" visibility="public" comment="Establish XMPP connection with given address.  [initiating entity only]"/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.connected" name="connected" visibility="public" comment="Check if stream is connected."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.disconnect" name="disconnect" visibility="public" comment="Gracefully close the connection."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.error" name="error" visibility="public" comment="Handle stream XML parse error."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.fileno" name="fileno" visibility="public" comment="Return filedescriptor of the stream socket."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.generate_id" name="generate_id" visibility="public" comment="Generate a random and unique stream ID."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.idle" name="idle" visibility="public" comment="Do some housekeeping (cache expiration, timeout handling).  This method should be called periodically from the application's main loop."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.loop" name="loop" visibility="public" comment="Simple &quot;main loop&quot; for the stream."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.loop_iter" name="loop_iter" visibility="public" comment="Single iteration of a simple &quot;main loop&quot; for the stream."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.process" name="process" visibility="public" comment="Process stream's pending events.  Should be called whenever there is input available on self.fileno() socket descriptor. Is called by self.loop_iter."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.process_stream_error" name="process_stream_error" visibility="public" comment="Process stream error element received."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.send" name="send" visibility="public" comment="Write stanza to the stream."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.stanza" name="stanza" visibility="public" comment="Process stanza (first level child element of the stream)."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.stanza_end" name="stanza_end" visibility="public" comment="Process stanza (first level child element of the stream) end tag."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.stanza_start" name="stanza_start" visibility="public" comment="Process stanza (first level child element of the stream) start tag -- do nothing."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.state_change" name="state_change" visibility="public" comment="Called when connection state is changed.  This method is supposed to be overriden in derived classes or replaced by an application.  It may be used to display the connection progress."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.stream_end" name="stream_end" visibility="public" comment="Process &lt;/stream:stream&gt; (stream end) tag received from peer."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.stream_start" name="stream_start" visibility="public" comment="Process &lt;stream:stream&gt; (stream start) tag received from peer."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase.write_raw" name="write_raw" visibility="public" comment="Write raw data to the stream socket."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._accept" name="_accept" visibility="private" comment="Same as Stream.accept but assume self.lock is acquired."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._bind_error" name="_bind_error" visibility="private" comment="Handle resource binding success.  [initiating entity only]"/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._bind_success" name="_bind_success" visibility="private" comment="Handle resource binding success.  [initiating entity only]  Set self.me to the full JID negotiated."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._close" name="_close" visibility="private" comment="Same as Stream.close but assume self.lock is acquired."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._connect" name="_connect" visibility="private" comment="Same as Stream.connect but assume self.lock is acquired."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._connect_socket" name="_connect_socket" visibility="private" comment="Initialize stream on outgoing connection."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._disconnect" name="_disconnect" visibility="private" comment="Same as Stream.disconnect but assume self.lock is acquired."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._feed_reader" name="_feed_reader" visibility="private" comment="Feed the stream reader with data received.  If data is None or empty, then stream end (peer disconnected) is assumed and the stream is closed."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._got_features" name="_got_features" visibility="private" comment="Process incoming &lt;stream:features/&gt; element.  [initiating entity only]  The received features node is available in self.features."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._idle" name="_idle" visibility="private" comment="Same as Stream.idle but assume self.lock is acquired."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._loop_iter" name="_loop_iter" visibility="private" comment="Same as Stream.loop_iter but assume self.lock is acquired."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._make_reader" name="_make_reader" visibility="private" comment="Create ne xmlextra.StreamReader instace as self._reader."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._make_stream_features" name="_make_stream_features" visibility="private" comment="Create the &lt;features/&gt; element for the stream.  [receving entity only]"/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._post_auth" name="_post_auth" visibility="private" comment="Called when connection is authenticated.  This method is supposed to be overriden in derived classes."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._post_connect" name="_post_connect" visibility="private" comment="Called when connection is established.  This method is supposed to be overriden in derived classes."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._process" name="_process" visibility="private" comment="Same as Stream.process but assume self.lock is acquired."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._process_node" name="_process_node" visibility="private" comment="Process first level element of the stream.  The element may be stream error or features, StartTLS request/response, SASL request/response or a stanza."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._process_stream_node" name="_process_stream_node" visibility="private" comment="Process first level stream-namespaced element of the stream.  The element may be stream error or stream features."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._read" name="_read" visibility="private" comment="Read data pending on the stream socket and pass it to the parser."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._reset" name="_reset" visibility="private" comment="Reset Stream object state making it ready to handle new connections."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._restart_stream" name="_restart_stream" visibility="private" comment="Restart the stream as needed after SASL and StartTLS negotiation."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._send" name="_send" visibility="private" comment="Same as Stream.send but assume self.lock is acquired."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._send_stream_end" name="_send_stream_end" visibility="private" comment="Send stream end tag."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._send_stream_error" name="_send_stream_error" visibility="private" comment="Send stream error element."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._send_stream_features" name="_send_stream_features" visibility="private" comment="Send stream &lt;features/&gt;.  [receiving entity only]"/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._send_stream_start" name="_send_stream_start" visibility="private" comment="Send stream start tag."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._write_node" name="_write_node" visibility="private" comment="Write XML node to the stream."/>
+            <Operation xmi.id="pyxmpp.streambase.StreamBase._write_raw" name="_write_raw" visibility="private" comment="Same as Stream.write_raw but assume self.lock is acquired."/>
+            <Attribute xmi.id="pyxmpp.streambase.StreamBase.features" name="features" visibility="public" comment="stream features as annouced by the initiator."/>
+            <Attribute xmi.id="pyxmpp.streambase.StreamBase.initiator" name="initiator" visibility="public" comment="True if local stream endpoint is the initiating entity."/>
+            <Attribute xmi.id="pyxmpp.streambase.StreamBase.lock" name="lock" visibility="public" comment="RLock object used to synchronize access to Stream object."/>
+            <Attribute xmi.id="pyxmpp.streambase.StreamBase.me" name="me" visibility="public" comment="local stream endpoint JID."/>
+            <Attribute xmi.id="pyxmpp.streambase.StreamBase.peer" name="peer" visibility="public" comment="remote stream endpoint JID."/>
+            <Attribute xmi.id="pyxmpp.streambase.StreamBase.process_all_stanzas" name="process_all_stanzas" visibility="public" comment="when True then all stanzas received are considered local."/>
+            <Attribute xmi.id="pyxmpp.streambase.StreamBase._reader" name="_reader" visibility="private" comment="the stream reader object (push parser) for the stream."/>
+          </Class>
+          <Class xmi.id="pyxmpp.streambase.StreamEncryptionRequired" name="StreamEncryptionRequired" comment="Exception raised when stream encryption is requested, but not used."/>
+          <Class xmi.id="pyxmpp.streambase.StreamError" name="StreamError" comment="Base class for all stream errors."/>
+          <Class xmi.id="pyxmpp.streambase.StreamParseError" name="StreamParseError" comment="Raised when invalid XML is received in an XMPP stream."/>
+        </Package>
+        <Package xmi.id="pyxmpp.streamsasl" name="streamsasl">
+          <Class xmi.id="pyxmpp.streamsasl.SASLAuthenticationFailed" name="SASLAuthenticationFailed" comment="Raised when stream SASL authentication fails."/>
+          <Class xmi.id="pyxmpp.streamsasl.SASLMechanismNotAvailable" name="SASLMechanismNotAvailable" comment="Raised when none of SASL authentication mechanisms requested is available."/>
+          <Class xmi.id="pyxmpp.streamsasl.SASLNotAvailable" name="SASLNotAvailable" comment="Raised when SASL authentication is requested, but not available."/>
+          <Class xmi.id="pyxmpp.streamsasl.StreamSASLMixIn" name="StreamSASLMixIn" comment="SASL authentication mix-in class for XMPP stream.">
+            <Operation xmi.id="pyxmpp.streamsasl.StreamSASLMixIn.__init__" name="__init__" visibility="public" comment="Initialize Stream object"/>
+            <Operation xmi.id="pyxmpp.streamsasl.StreamSASLMixIn._handle_sasl_features" name="_handle_sasl_features" visibility="private" comment="Process incoming &lt;stream:features/&gt; element.  [initiating entity only]  The received features node is available in self.features."/>
+            <Operation xmi.id="pyxmpp.streamsasl.StreamSASLMixIn._make_stream_sasl_features" name="_make_stream_sasl_features" visibility="private" comment="Add SASL features to the &lt;features/&gt; element of the stream.  [receving entity only]"/>
+            <Operation xmi.id="pyxmpp.streamsasl.StreamSASLMixIn._process_node_sasl" name="_process_node_sasl" visibility="private" comment="Process incoming stream element. Pass it to _process_sasl_node if it is in the SASL namespace."/>
+            <Operation xmi.id="pyxmpp.streamsasl.StreamSASLMixIn._process_sasl_abort" name="_process_sasl_abort" visibility="private" comment="Process incoming &lt;sasl:abort/&gt; element.  [receiving entity only]"/>
+            <Operation xmi.id="pyxmpp.streamsasl.StreamSASLMixIn._process_sasl_auth" name="_process_sasl_auth" visibility="private" comment="Process incoming &lt;sasl:auth/&gt; element.  [receiving entity only]"/>
+            <Operation xmi.id="pyxmpp.streamsasl.StreamSASLMixIn._process_sasl_challenge" name="_process_sasl_challenge" visibility="private" comment="Process incoming &lt;sasl:challenge/&gt; element.  [initiating entity only]"/>
+            <Operation xmi.id="pyxmpp.streamsasl.StreamSASLMixIn._process_sasl_failure" name="_process_sasl_failure" visibility="private" comment="Process incoming &lt;sasl:failure/&gt; element.  [initiating entity only]"/>
+            <Operation xmi.id="pyxmpp.streamsasl.StreamSASLMixIn._process_sasl_node" name="_process_sasl_node" visibility="private" comment="Process stream element in the SASL namespace."/>
+            <Operation xmi.id="pyxmpp.streamsasl.StreamSASLMixIn._process_sasl_response" name="_process_sasl_response" visibility="private" comment="Process incoming &lt;sasl:response/&gt; element.  [receiving entity only]"/>
+            <Operation xmi.id="pyxmpp.streamsasl.StreamSASLMixIn._process_sasl_success" name="_process_sasl_success" visibility="private" comment="Process incoming &lt;sasl:success/&gt; element.  [initiating entity only]"/>
+            <Operation xmi.id="pyxmpp.streamsasl.StreamSASLMixIn._reset_sasl" name="_reset_sasl" visibility="private" comment="Reset StreamSASLMixIn object state making it ready to handle new connections."/>
+            <Operation xmi.id="pyxmpp.streamsasl.StreamSASLMixIn._sasl_authenticate" name="_sasl_authenticate" visibility="private" comment="Start SASL authentication process.  [initiating entity only]"/>
+          </Class>
+        </Package>
+        <Package xmi.id="pyxmpp.streamtls" name="streamtls">
+          <Class xmi.id="pyxmpp.streamtls.StreamTLSMixIn" name="StreamTLSMixIn" comment="Mix-in class providing TLS support for an XMPP stream.">
+            <Operation xmi.id="pyxmpp.streamtls.StreamTLSMixIn.__init__" name="__init__" visibility="public" comment="Initialize TLS support of a Stream object"/>
+            <Operation xmi.id="pyxmpp.streamtls.StreamTLSMixIn.get_tls_connection" name="get_tls_connection" visibility="public" comment="Get the TLS connection object for the stream."/>
+            <Operation xmi.id="pyxmpp.streamtls.StreamTLSMixIn._handle_tls_features" name="_handle_tls_features" visibility="private" comment="Process incoming StartTLS related element of &lt;stream:features/&gt;.  [initiating entity only]  The received features node is available in self.features."/>
+            <Operation xmi.id="pyxmpp.streamtls.StreamTLSMixIn._make_stream_tls_features" name="_make_stream_tls_features" visibility="private" comment="Update the &lt;features/&gt; with StartTLS feature.  [receving entity only]"/>
+            <Operation xmi.id="pyxmpp.streamtls.StreamTLSMixIn._make_tls_connection" name="_make_tls_connection" visibility="private" comment="Initiate TLS connection.  [initiating entity only]"/>
+            <Operation xmi.id="pyxmpp.streamtls.StreamTLSMixIn._process" name="_process" visibility="private" comment="Same as Stream.process but assume self.lock is acquired."/>
+            <Operation xmi.id="pyxmpp.streamtls.StreamTLSMixIn._process_node_tls" name="_process_node_tls" visibility="private" comment="Process incoming stream element. Pass it to _process_tls_node if it is in TLS namespace."/>
+            <Operation xmi.id="pyxmpp.streamtls.StreamTLSMixIn._process_tls_node" name="_process_tls_node" visibility="private" comment="Process stream element in the TLS namespace."/>
+            <Operation xmi.id="pyxmpp.streamtls.StreamTLSMixIn._read" name="_read" visibility="private" comment="Read data pending on the stream socket and pass it to the parser."/>
+            <Operation xmi.id="pyxmpp.streamtls.StreamTLSMixIn._read_tls" name="_read_tls" visibility="private" comment="Read data pending on the stream socket and pass it to the parser."/>
+            <Operation xmi.id="pyxmpp.streamtls.StreamTLSMixIn._request_tls" name="_request_tls" visibility="private" comment="Request a TLS-encrypted connection.  [initiating entity only]"/>
+            <Operation xmi.id="pyxmpp.streamtls.StreamTLSMixIn._reset_tls" name="_reset_tls" visibility="private" comment="Reset StreamTLSMixIn object state making it ready to handle new connections."/>
+            <Operation xmi.id="pyxmpp.streamtls.StreamTLSMixIn._tls_verify_callback" name="_tls_verify_callback" visibility="private" comment="Certificate verification callback for TLS connections."/>
+            <Operation xmi.id="pyxmpp.streamtls.StreamTLSMixIn._write_raw" name="_write_raw" visibility="private" comment="Same as Stream.write_raw but assume self.lock is acquired."/>
+            <Attribute xmi.id="pyxmpp.streamtls.StreamTLSMixIn.tls" name="tls" visibility="public" comment="TLS connection object."/>
+          </Class>
+          <Class xmi.id="pyxmpp.streamtls.TLSError" name="TLSError" comment="Raised on TLS error during stream processing."/>
+          <Class xmi.id="pyxmpp.streamtls.TLSNegotiationFailed" name="TLSNegotiationFailed" comment="Raised when stream TLS negotiation fails."/>
+          <Class xmi.id="pyxmpp.streamtls.TLSSettings" name="TLSSettings" comment="Storage for TLS-related settings of an XMPP stream.">
+            <Operation xmi.id="pyxmpp.streamtls.TLSSettings.__init__" name="__init__" visibility="public" comment="Initialize the TLSSettings object."/>
+            <Attribute xmi.id="pyxmpp.streamtls.TLSSettings.cacert_file" name="cacert_file" visibility="public" comment="path to a file with trusted CA certificates"/>
+            <Attribute xmi.id="pyxmpp.streamtls.TLSSettings.cert_file" name="cert_file" visibility="public" comment="path to own X.509 certificate"/>
+            <Attribute xmi.id="pyxmpp.streamtls.TLSSettings.key_file" name="key_file" visibility="public" comment="path to the private key for own X.509 certificate"/>
+            <Attribute xmi.id="pyxmpp.streamtls.TLSSettings.require" name="require" visibility="public" comment="is TLS required"/>
+            <Attribute xmi.id="pyxmpp.streamtls.TLSSettings.verify_callback" name="verify_callback" visibility="public" comment="callback function for certificate verification. See M2Crypto documentation for details."/>
+            <Attribute xmi.id="pyxmpp.streamtls.TLSSettings.verify_peer" name="verify_peer" visibility="public" comment="should the peer's certificate be verified"/>
+          </Class>
+        </Package>
+        <Package xmi.id="pyxmpp.utils" name="utils"/>
+        <Package xmi.id="pyxmpp.version" name="version"/>
+        <Package xmi.id="pyxmpp.xmlextra" name="xmlextra">
+          <Class xmi.id="pyxmpp.xmlextra.StreamHandler" name="StreamHandler" comment="Base class for stream handler.">
+            <Operation xmi.id="pyxmpp.xmlextra.StreamHandler.error" name="error" visibility="public" comment="Called when an error is encountered in the stream."/>
+            <Operation xmi.id="pyxmpp.xmlextra.StreamHandler.stanza" name="stanza" visibility="public" comment="Called when the end tag of a direct child of the root element is encountered in the stream.  Please note, that node will be removed from the document and freed after this method returns. If it is needed after that a copy must be made before the method returns."/>
+            <Operation xmi.id="pyxmpp.xmlextra.StreamHandler.stanza_end" name="stanza_end" visibility="public" comment="Called when the end tag of a direct child of the root element is encountered in the stream.  Please note, that node will be removed from the document and freed after this method returns. If it is needed after that a copy must be made before the method returns."/>
+            <Operation xmi.id="pyxmpp.xmlextra.StreamHandler.stanza_start" name="stanza_start" visibility="public" comment="Called when the start tag of a direct child of the root element is encountered in the stream."/>
+            <Operation xmi.id="pyxmpp.xmlextra.StreamHandler.stream_end" name="stream_end" visibility="public" comment="Called when the end tag of root element is encountered in the stream."/>
+            <Operation xmi.id="pyxmpp.xmlextra.StreamHandler.stream_start" name="stream_start" visibility="public" comment="Called when the start tag of root element is encountered in the stream."/>
+            <Operation xmi.id="pyxmpp.xmlextra.StreamHandler._stanza" name="_stanza" visibility="private" comment="Process complete stanza."/>
+            <Operation xmi.id="pyxmpp.xmlextra.StreamHandler._stanza_end" name="_stanza_end" visibility="private" comment="Process stanza end."/>
+            <Operation xmi.id="pyxmpp.xmlextra.StreamHandler._stanza_start" name="_stanza_start" visibility="private" comment="Process stanza start."/>
+            <Operation xmi.id="pyxmpp.xmlextra.StreamHandler._stream_end" name="_stream_end" visibility="private" comment="Process stream end."/>
+            <Operation xmi.id="pyxmpp.xmlextra.StreamHandler._stream_start" name="_stream_start" visibility="private" comment="Process stream start."/>
+          </Class>
+          <Class xmi.id="pyxmpp.xmlextra.StreamParseError" name="StreamParseError" comment="Exception raised when invalid XML is being processed."/>
+          <Class xmi.id="pyxmpp.xmlextra.StreamReader" name="StreamReader" comment="A simple push-parser interface for XML streams.">
+            <Operation xmi.id="pyxmpp.xmlextra.StreamReader.__init__" name="__init__" visibility="public" comment="Initialize StreamReader object."/>
+            <Operation xmi.id="pyxmpp.xmlextra.StreamReader.doc" name="doc" visibility="public" comment="Get the document being parsed."/>
+            <Operation xmi.id="pyxmpp.xmlextra.StreamReader.feed" name="feed" visibility="public" comment="Pass a string to the stream parser.  Parameters:  s: string to parse.  Types:  s: str"/>
+          </Class>
+        </Package>
+        <Package xmi.id="pyxmpp.xmppstringprep" name="xmppstringprep">
+          <Class xmi.id="pyxmpp.xmppstringprep.LookupFunction" name="LookupFunction" comment="Class for looking up RFC 3454 tables using function.">
+            <Operation xmi.id="pyxmpp.xmppstringprep.LookupFunction.__init__" name="__init__" visibility="public" comment="Initialize LookupFunction object."/>
+            <Attribute xmi.id="pyxmpp.xmppstringprep.LookupFunction.lookup" name="lookup" visibility="public" comment="the lookup function."/>
+          </Class>
+          <Class xmi.id="pyxmpp.xmppstringprep.LookupTable" name="LookupTable" comment="Class for looking up RFC 3454 tables using a dictionary and/or list of ranges.">
+            <Operation xmi.id="pyxmpp.xmppstringprep.LookupTable.__init__" name="__init__" visibility="public" comment="Initialize LookupTable object."/>
+            <Operation xmi.id="pyxmpp.xmppstringprep.LookupTable.lookup" name="lookup" visibility="public" comment="Do Unicode character lookup."/>
+          </Class>
+          <Class xmi.id="pyxmpp.xmppstringprep.Profile" name="Profile" comment="Base class for stringprep profiles.">
+            <Operation xmi.id="pyxmpp.xmppstringprep.Profile.__init__" name="__init__" visibility="public" comment="Initialize Profile object."/>
+            <Operation xmi.id="pyxmpp.xmppstringprep.Profile.check_bidi" name="check_bidi" visibility="public" comment="Checks if sting is valid for bidirectional printing."/>
+            <Operation xmi.id="pyxmpp.xmppstringprep.Profile.check_unassigned" name="check_unassigned" visibility="public" comment="Checks for unassigned character codes."/>
+            <Operation xmi.id="pyxmpp.xmppstringprep.Profile.map" name="map" visibility="public" comment="Mapping part of string preparation."/>
+            <Operation xmi.id="pyxmpp.xmppstringprep.Profile.prepare" name="prepare" visibility="public" comment="Complete string preparation procedure for 'stored' strings. (includes checks for unassigned codes)"/>
+            <Operation xmi.id="pyxmpp.xmppstringprep.Profile.prepare_query" name="prepare_query" visibility="public" comment="Complete string preparation procedure for 'query' strings. (without checks for unassigned codes)"/>
+            <Operation xmi.id="pyxmpp.xmppstringprep.Profile.prohibit" name="prohibit" visibility="public" comment="Checks for prohibited characters."/>
+          </Class>
+          <Class xmi.id="pyxmpp.xmppstringprep.StringprepError" name="StringprepError" comment="Exception raised when string preparation results in error."/>
+        </Package>
+      </Package>
+      <Generalization xmi.id="pyxmpp.client.ClientError(exceptions.StandardError)" child="pyxmpp.client.ClientError" parent="exceptions.StandardError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.client.FatalClientError(pyxmpp.client.ClientError)" child="pyxmpp.client.FatalClientError" parent="pyxmpp.client.ClientError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.clientstream.ClientStream(pyxmpp.stream.Stream)" child="pyxmpp.clientstream.ClientStream" parent="pyxmpp.stream.Stream" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.clientstream.ClientStreamError(pyxmpp.streambase.StreamError)" child="pyxmpp.clientstream.ClientStreamError" parent="pyxmpp.streambase.StreamError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.clientstream.FatalClientStreamError(pyxmpp.streambase.FatalStreamError)" child="pyxmpp.clientstream.FatalClientStreamError" parent="pyxmpp.streambase.FatalStreamError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.error.ErrorNodeError(exceptions.RuntimeError)" child="pyxmpp.error.ErrorNodeError" parent="exceptions.RuntimeError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.error.StanzaErrorNode(pyxmpp.error.ErrorNode)" child="pyxmpp.error.StanzaErrorNode" parent="pyxmpp.error.ErrorNode" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.error.StreamErrorNode(pyxmpp.error.ErrorNode)" child="pyxmpp.error.StreamErrorNode" parent="pyxmpp.error.ErrorNode" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.expdict.ExpiringDictionary(__builtin__.dict)" child="pyxmpp.expdict.ExpiringDictionary" parent="__builtin__.dict" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.iq.Iq(pyxmpp.stanza.Stanza)" child="pyxmpp.iq.Iq" parent="pyxmpp.stanza.Stanza" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.client.JabberClient(pyxmpp.client.Client)" child="pyxmpp.jabber.client.JabberClient" parent="pyxmpp.client.Client" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.clientstream.LegacyAuthenticationError(pyxmpp.clientstream.ClientStreamError)" child="pyxmpp.jabber.clientstream.LegacyAuthenticationError" parent="pyxmpp.clientstream.ClientStreamError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.clientstream.LegacyClientStream(pyxmpp.clientstream.ClientStream)" child="pyxmpp.jabber.clientstream.LegacyClientStream" parent="pyxmpp.clientstream.ClientStream" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.disco.DiscoError(exceptions.StandardError)" child="pyxmpp.jabber.disco.DiscoError" parent="exceptions.StandardError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.muccore.MucAdminQuery(pyxmpp.jabber.muccore.MucUserX)" child="pyxmpp.jabber.muccore.MucAdminQuery" parent="pyxmpp.jabber.muccore.MucUserX" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.muccore.MucIq(pyxmpp.iq.Iq)" child="pyxmpp.jabber.muccore.MucIq" parent="pyxmpp.iq.Iq" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.muccore.MucIq(pyxmpp.jabber.muccore.MucStanzaExt)" child="pyxmpp.jabber.muccore.MucIq" parent="pyxmpp.jabber.muccore.MucStanzaExt" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.muccore.MucItem(pyxmpp.jabber.muccore.MucItemBase)" child="pyxmpp.jabber.muccore.MucItem" parent="pyxmpp.jabber.muccore.MucItemBase" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.muccore.MucOwnerX(pyxmpp.jabber.muccore.MucXBase)" child="pyxmpp.jabber.muccore.MucOwnerX" parent="pyxmpp.jabber.muccore.MucXBase" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.muccore.MucPresence(pyxmpp.jabber.muccore.MucStanzaExt)" child="pyxmpp.jabber.muccore.MucPresence" parent="pyxmpp.jabber.muccore.MucStanzaExt" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.muccore.MucPresence(pyxmpp.presence.Presence)" child="pyxmpp.jabber.muccore.MucPresence" parent="pyxmpp.presence.Presence" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.muccore.MucStatus(pyxmpp.jabber.muccore.MucItemBase)" child="pyxmpp.jabber.muccore.MucStatus" parent="pyxmpp.jabber.muccore.MucItemBase" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.muccore.MucUserX(pyxmpp.jabber.muccore.MucXBase)" child="pyxmpp.jabber.muccore.MucUserX" parent="pyxmpp.jabber.muccore.MucXBase" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.muccore.MucX(pyxmpp.jabber.muccore.MucXBase)" child="pyxmpp.jabber.muccore.MucX" parent="pyxmpp.jabber.muccore.MucXBase" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.Empty(exceptions.Exception)" child="pyxmpp.jabber.vcard.Empty" parent="exceptions.Exception" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.VCardAdr(pyxmpp.jabber.vcard.VCardField)" child="pyxmpp.jabber.vcard.VCardAdr" parent="pyxmpp.jabber.vcard.VCardField" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.VCardCategories(pyxmpp.jabber.vcard.VCardField)" child="pyxmpp.jabber.vcard.VCardCategories" parent="pyxmpp.jabber.vcard.VCardField" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.VCardEmail(pyxmpp.jabber.vcard.VCardField)" child="pyxmpp.jabber.vcard.VCardEmail" parent="pyxmpp.jabber.vcard.VCardField" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.VCardGeo(pyxmpp.jabber.vcard.VCardField)" child="pyxmpp.jabber.vcard.VCardGeo" parent="pyxmpp.jabber.vcard.VCardField" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.VCardImage(pyxmpp.jabber.vcard.VCardField)" child="pyxmpp.jabber.vcard.VCardImage" parent="pyxmpp.jabber.vcard.VCardField" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.VCardJID(pyxmpp.jabber.vcard.VCardField)" child="pyxmpp.jabber.vcard.VCardJID" parent="pyxmpp.jabber.vcard.VCardField" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.VCardKey(pyxmpp.jabber.vcard.VCardField)" child="pyxmpp.jabber.vcard.VCardKey" parent="pyxmpp.jabber.vcard.VCardField" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.VCardLabel(pyxmpp.jabber.vcard.VCardField)" child="pyxmpp.jabber.vcard.VCardLabel" parent="pyxmpp.jabber.vcard.VCardField" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.VCardName(pyxmpp.jabber.vcard.VCardField)" child="pyxmpp.jabber.vcard.VCardName" parent="pyxmpp.jabber.vcard.VCardField" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.VCardOrg(pyxmpp.jabber.vcard.VCardField)" child="pyxmpp.jabber.vcard.VCardOrg" parent="pyxmpp.jabber.vcard.VCardField" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.VCardPrivacy(pyxmpp.jabber.vcard.VCardField)" child="pyxmpp.jabber.vcard.VCardPrivacy" parent="pyxmpp.jabber.vcard.VCardField" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.VCardSound(pyxmpp.jabber.vcard.VCardField)" child="pyxmpp.jabber.vcard.VCardSound" parent="pyxmpp.jabber.vcard.VCardField" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.VCardString(pyxmpp.jabber.vcard.VCardField)" child="pyxmpp.jabber.vcard.VCardString" parent="pyxmpp.jabber.vcard.VCardField" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.VCardTel(pyxmpp.jabber.vcard.VCardField)" child="pyxmpp.jabber.vcard.VCardTel" parent="pyxmpp.jabber.vcard.VCardField" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabber.vcard.VCardXString(pyxmpp.jabber.vcard.VCardString)" child="pyxmpp.jabber.vcard.VCardXString" parent="pyxmpp.jabber.vcard.VCardString" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabberd.component.ComponentError(exceptions.Exception)" child="pyxmpp.jabberd.component.ComponentError" parent="exceptions.Exception" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabberd.componentstream.ComponentStream(pyxmpp.stream.Stream)" child="pyxmpp.jabberd.componentstream.ComponentStream" parent="pyxmpp.stream.Stream" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabberd.componentstream.ComponentStreamError(pyxmpp.streambase.StreamError)" child="pyxmpp.jabberd.componentstream.ComponentStreamError" parent="pyxmpp.streambase.StreamError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabberd.componentstream.FatalComponentStreamError(pyxmpp.jabberd.componentstream.ComponentStreamError)" child="pyxmpp.jabberd.componentstream.FatalComponentStreamError" parent="pyxmpp.jabberd.componentstream.ComponentStreamError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jabberd.componentstream.FatalComponentStreamError(pyxmpp.streambase.FatalStreamError)" child="pyxmpp.jabberd.componentstream.FatalComponentStreamError" parent="pyxmpp.streambase.FatalStreamError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jid.JID(__builtin__.object)" child="pyxmpp.jid.JID" parent="__builtin__.object" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.jid.JIDError(exceptions.ValueError)" child="pyxmpp.jid.JIDError" parent="exceptions.ValueError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.message.Message(pyxmpp.stanza.Stanza)" child="pyxmpp.message.Message" parent="pyxmpp.stanza.Stanza" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.presence.Presence(pyxmpp.stanza.Stanza)" child="pyxmpp.presence.Presence" parent="pyxmpp.stanza.Stanza" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.sasl.core.Challenge(pyxmpp.sasl.core.Reply)" child="pyxmpp.sasl.core.Challenge" parent="pyxmpp.sasl.core.Reply" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.sasl.core.Failure(pyxmpp.sasl.core.Reply)" child="pyxmpp.sasl.core.Failure" parent="pyxmpp.sasl.core.Reply" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.sasl.core.Response(pyxmpp.sasl.core.Reply)" child="pyxmpp.sasl.core.Response" parent="pyxmpp.sasl.core.Reply" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.sasl.core.Success(pyxmpp.sasl.core.Reply)" child="pyxmpp.sasl.core.Success" parent="pyxmpp.sasl.core.Reply" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ClientAuthenticator(pyxmpp.sasl.core.ClientAuthenticator)" child="pyxmpp.sasl.digest_md5.DigestMD5ClientAuthenticator" parent="pyxmpp.sasl.core.ClientAuthenticator" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.sasl.digest_md5.DigestMD5ServerAuthenticator(pyxmpp.sasl.core.ServerAuthenticator)" child="pyxmpp.sasl.digest_md5.DigestMD5ServerAuthenticator" parent="pyxmpp.sasl.core.ServerAuthenticator" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.sasl.plain.PlainClientAuthenticator(pyxmpp.sasl.core.ClientAuthenticator)" child="pyxmpp.sasl.plain.PlainClientAuthenticator" parent="pyxmpp.sasl.core.ClientAuthenticator" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.sasl.plain.PlainServerAuthenticator(pyxmpp.sasl.core.ServerAuthenticator)" child="pyxmpp.sasl.plain.PlainServerAuthenticator" parent="pyxmpp.sasl.core.ServerAuthenticator" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.stanza.StanzaError(exceptions.ValueError)" child="pyxmpp.stanza.StanzaError" parent="exceptions.ValueError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.stream.Stream(pyxmpp.streambase.StreamBase)" child="pyxmpp.stream.Stream" parent="pyxmpp.streambase.StreamBase" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.stream.Stream(pyxmpp.streamsasl.StreamSASLMixIn)" child="pyxmpp.stream.Stream" parent="pyxmpp.streamsasl.StreamSASLMixIn" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.stream.Stream(pyxmpp.streamtls.StreamTLSMixIn)" child="pyxmpp.stream.Stream" parent="pyxmpp.streamtls.StreamTLSMixIn" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.streambase.FatalStreamError(pyxmpp.streambase.StreamError)" child="pyxmpp.streambase.FatalStreamError" parent="pyxmpp.streambase.StreamError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.streambase.HostMismatch(pyxmpp.streambase.StreamError)" child="pyxmpp.streambase.HostMismatch" parent="pyxmpp.streambase.StreamError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.streambase.StreamAuthenticationError(pyxmpp.streambase.FatalStreamError)" child="pyxmpp.streambase.StreamAuthenticationError" parent="pyxmpp.streambase.FatalStreamError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.streambase.StreamBase(pyxmpp.stanzaprocessor.StanzaProcessor)" child="pyxmpp.streambase.StreamBase" parent="pyxmpp.stanzaprocessor.StanzaProcessor" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.streambase.StreamBase(pyxmpp.xmlextra.StreamHandler)" child="pyxmpp.streambase.StreamBase" parent="pyxmpp.xmlextra.StreamHandler" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.streambase.StreamEncryptionRequired(pyxmpp.streambase.StreamError)" child="pyxmpp.streambase.StreamEncryptionRequired" parent="pyxmpp.streambase.StreamError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.streambase.StreamError(exceptions.StandardError)" child="pyxmpp.streambase.StreamError" parent="exceptions.StandardError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.streambase.StreamParseError(pyxmpp.streambase.FatalStreamError)" child="pyxmpp.streambase.StreamParseError" parent="pyxmpp.streambase.FatalStreamError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.streamsasl.SASLAuthenticationFailed(pyxmpp.streambase.StreamAuthenticationError)" child="pyxmpp.streamsasl.SASLAuthenticationFailed" parent="pyxmpp.streambase.StreamAuthenticationError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.streamsasl.SASLMechanismNotAvailable(pyxmpp.streambase.StreamAuthenticationError)" child="pyxmpp.streamsasl.SASLMechanismNotAvailable" parent="pyxmpp.streambase.StreamAuthenticationError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.streamsasl.SASLNotAvailable(pyxmpp.streambase.StreamAuthenticationError)" child="pyxmpp.streamsasl.SASLNotAvailable" parent="pyxmpp.streambase.StreamAuthenticationError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.streamsasl.StreamSASLMixIn(pyxmpp.sasl.core.PasswordManager)" child="pyxmpp.streamsasl.StreamSASLMixIn" parent="pyxmpp.sasl.core.PasswordManager" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.streamtls.TLSError(pyxmpp.streambase.FatalStreamError)" child="pyxmpp.streamtls.TLSError" parent="pyxmpp.streambase.FatalStreamError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.streamtls.TLSNegotiationFailed(pyxmpp.streambase.FatalStreamError)" child="pyxmpp.streamtls.TLSNegotiationFailed" parent="pyxmpp.streambase.FatalStreamError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.xmlextra.StreamParseError(exceptions.StandardError)" child="pyxmpp.xmlextra.StreamParseError" parent="exceptions.StandardError" visibility="public"/>
+      <Generalization xmi.id="pyxmpp.xmppstringprep.StringprepError(exceptions.StandardError)" child="pyxmpp.xmppstringprep.StringprepError" parent="exceptions.StandardError" visibility="public"/>
+    </Model>
+  </XMI.content>
+  <XMI.extensions xmi.extender="umbrello">
+  <docsettings viewid="1" documentation="" uniqueid="13"/>
+  <codegeneration>
+   <codegenerator language="Python"/>
+  </codegeneration>
+ </XMI.extensions>
+</XMI>
+
