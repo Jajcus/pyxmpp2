@@ -1,0 +1,47 @@
+<vCard xmlns='vcard-temp'>
+  <FN>Peter Saint-Andre</FN>
+  <N>
+    <FAMILY>Saint-Andre</FAMILY>
+    <GIVEN>Peter</GIVEN>
+    <MIDDLE/>
+  </N>
+  <NICKNAME>stpeter</NICKNAME>
+  <URL>http://www.jabber.org/people/stpeter.php</URL>
+  <BDAY>1966-08-06</BDAY>
+  <ORG>
+    <ORGNAME>Jabber Software Foundation</ORGNAME>
+    <ORGUNIT/>
+  </ORG>
+  <TITLE>Executive Director</TITLE>
+  <ROLE>Patron Saint</ROLE>
+  <TEL><VOICE/><WORK/><NUMBER>303-308-3282</NUMBER></TEL>
+  <TEL><FAX/><WORK/><NUMBER/></TEL>
+  <TEL><MSG/><WORK/><NUMBER/></TEL>
+  <ADR>
+    <WORK/>
+    <EXTADD>Suite 600</EXTADD>
+    <STREET>1899 Wynkoop Street</STREET>
+    <LOCALITY>Denver</LOCALITY>
+    <REGION>CO</REGION>
+    <PCODE>80202</PCODE>
+    <CTRY>USA</CTRY>
+  </ADR>
+  <TEL><VOICE/><HOME/><NUMBER>303-555-1212</NUMBER></TEL>
+  <TEL><FAX/><HOME/><NUMBER/></TEL>
+  <TEL><MSG/><HOME/><NUMBER/></TEL>
+  <ADR>
+    <HOME/>
+    <EXTADD/>
+    <STREET/>
+    <LOCALITY>Denver</LOCALITY>
+    <REGION>CO</REGION>
+    <PCODE>80209</PCODE>
+    <CTRY>USA</CTRY>
+  </ADR>
+  <EMAIL><INTERNET/><PREF/><USERID>stpeter@jabber.org</USERID></EMAIL>
+  <JABBERID>stpeter@jabber.org</JABBERID>
+  <DESC>
+    More information about me is located on my
+    personal website: http://www.saint-andre.com/
+  </DESC>
+</vCard>
