@@ -1,12 +1,14 @@
 #!/usr/bin/python 
 
+import sys
+import os
 import string
 import unicodedata
 
 try:
 	input=open("UnicodeData-3.2.0.txt","r")
 except:
-	print >>sys.stderr,"Normalization test data not available - trying to download"
+	print >>sys.stderr,"Unicode data not available - trying to download"
 	os.system("wget http://www.unicode.org/Public/3.2-Update/UnicodeData-3.2.0.txt")
 	input=open("UnicodeData-3.2.0.txt","r")
 

@@ -1,11 +1,13 @@
 #!/usr/bin/python 
 
+import sys
+import os
 import string
 
 try:
 	input=open("CompositionExclusions-3.2.0.txt","r")
 except:
-	print >>sys.stderr,"Normalization test data not available - trying to download"
+	print >>sys.stderr,"Composition Exclusion data not available - trying to download"
 	os.system("wget http://www.unicode.org/Public/3.2-Update/CompositionExclusions-3.2.0.txt")
 	input=open("CompositionExclusions-3.2.0.txt","r")
 
