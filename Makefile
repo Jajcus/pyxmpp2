@@ -11,14 +11,16 @@ all: version
 	cd examples && chmod a+x *.py
 	cd tests && ln -sf ../build/lib*/pyxmpp .
 	cd tests && chmod a+x *.py
-
+	
 version:
-	if test -n "$(RELEASE)" ; then \
-		SNAPSHOT="" ; \
-	else \
-		SNAPSHOT=.`find . -name "*.py" '!' -name "version.py" -printf '%TY%Tm%Td_%TH%TM\n' | sort -r | head -1` ; \
-	fi ; \
-	echo "version='$(BASE_VERSION)$$SNAPSHOT'" > pyxmpp/version.py ; \
+	if test -f "CVS/Entries" ; then \
+		if test -n "$(RELEASE)" ; then \
+			SNAPSHOT="" ; \
+		else \
+			SNAPSHOT=.`find . -name "*.py" '!' -name "version.py" -printf '%TY%Tm%Td_%TH%TM\n' | sort -r | head -1` ; \
+		fi ; \
+		echo "version='$(BASE_VERSION)$$SNAPSHOT'" > pyxmpp/version.py ; \
+	fi
 
 dist: all
 	python setup.py sdist
