@@ -2,8 +2,7 @@
 from types import ListType
 import string
 import stringprep
-
-from pyxmpp.unicode.nfkc import NFKC
+import unicodedata
 
 """ Stringprep (RFC3454) implementation with nodeprep and resourceprep profiles."""
 
@@ -50,6 +49,11 @@ C_8=LookupFunction(stringprep.in_table_c8)
 C_9=LookupFunction(stringprep.in_table_c9)
 D_1=LookupFunction(stringprep.in_table_d1)
 D_2=LookupFunction(stringprep.in_table_d2)
+
+def NFKC(input):
+    if type(input) is ListType:
+        input=string.join(input,u"")
+    return unicodedata.normalize("NFKC",input)
 
 class StringprepError(StandardError):
     """Exception raised when string preparation results in error."""
