@@ -232,7 +232,6 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		pass
 
 	def stanza_end(self,doc,node):
-		print >>sys.stderr,"Got node:",`node.serialize()`
 		self.process_node(node)
 
 	def error(self,desc):
@@ -337,27 +336,33 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 	def idle(self):
 		self.iq_response_handlers.expire()
 
+	def fileno(self):
+		return self.socket.fileno()
+
 	def loop(self,timeout):
 		import select
 		while not self.eof and self.socket is not None:
 			id,od,ed=select.select([self.socket],[],[self.socket],timeout)
-			try:
-				if self.socket in id or self.socket in ed:
-					self.debug("data on input")
-					self.read(self.socket.fileno())
-				else:
-					self.debug("input timeout")
-					self.idle()
-			except (FatalStreamError,KeyboardInterrupt,SystemExit),e:
-				self.close()
-				raise
-			except:
-				traceback.print_exc(file=sys.stderr)
+			if self.socket in id or self.socket in ed:
+				self.debug("data on input")
+				self.process()
+			else:
+				self.debug("input timeout")
+				self.idle()
 
-	def read(self,fd):
+	def process(self):
+		try:
+			self.read()
+		except (FatalStreamError,KeyboardInterrupt,SystemExit),e:
+			self.close()
+			raise
+		except:
+			traceback.print_exc(file=sys.stderr)
+
+	def read(self):
 		if self.eof:
 			return
-		r=os.read(fd,1024)
+		r=os.read(self.socket.fileno(),1024)
 		self.debug("IN: %r" % (r,))
 		if r:
 			try:
@@ -626,6 +631,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 			
 		self.auth_method_used="sasl:"+mechanism
 		self.authenticator=sasl.ServerAuthenticator(mechanism,self)
+		self.authenticator.debug=self.debug
 		
 		r=self.authenticator.start(base64.decodestring(content))
 	
@@ -789,6 +795,7 @@ class Stream(sasl.PasswordManager,xmlextra.StreamHandler):
 		self.auth_method_used="sasl:"+mechanism
 				
 		self.authenticator=sasl.ClientAuthenticator(mechanism,self)
+		self.authenticator.debug=self.debug
 	
 		initial_response=self.authenticator.start(username,authzid)
 		if not isinstance(initial_response,sasl.Response):

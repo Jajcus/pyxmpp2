@@ -27,10 +27,10 @@ from stanza import common_doc
 from jid import JID
 from utils import to_utf8,from_utf8
 
-class ClientError(StreamError):
+class ClientStreamError(StreamError):
 	pass
 
-class FatalClientError(FatalStreamError):
+class FatalClientStreamError(FatalStreamError):
 	pass
 
 class LegacyAuthenticationError(StreamAuthenticationError):
@@ -62,14 +62,13 @@ class ClientStream(Stream):
 	def reset(self):
 		Stream.reset(self)
 		self.auth_methods_left=[]
-		self.session_established=0
 		self.available_auth_methods=None
 		self.features_timeout=None
 		self.auth_stanza=None
 
 	def connect(self,server=None,port=None):
 		if not self.jid.node or not self.jid.resource:
-			raise ClientError,"Client JID must have username and resource"
+			raise ClientStreamError,"Client JID must have username and resource"
 		if server:
 			self.server=server
 		if port:
@@ -94,29 +93,6 @@ class ClientStream(Stream):
 		if not self.initiator:
 			self.unset_iq_get_handler("query","jabber:iq:auth")
 			self.unset_iq_set_handler("query","jabber:iq:auth")
-
-	def request_session(self):
-		if not self.version:
-			self.session_established=1
-			self.session_started()
-		else:
-			iq=Iq(type="set")
-			iq.new_query("urn:ietf:params:xml:ns:xmpp-session","session")
-			self.set_response_handlers(iq,self.session_result,self.session_error)
-			self.send(iq)
-		
-	def session_timeout(self,k,v):
-		raise FatalClientError("Timeout while tryin to establish a session")
-		
-	def session_error(self,iq):
-		raise FatalClientError("Failed establish session")
-	
-	def session_result(self,iq):
-		self.session_established=1
-		self.session_started()
-	
-	def session_started(self):
-		pass
 
 	def idle(self):
 		Stream.idle(self)

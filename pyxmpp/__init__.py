@@ -16,7 +16,8 @@
 #
 
 from stream import Stream,StreamError,FatalStreamError,StreamParseError
-from client import ClientStream
+from clientstream import ClientStream,ClientStreamError
+from client import Client,ClientError
 from iq import Iq
 from presence import Presence
 from message import Message
