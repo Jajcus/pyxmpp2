@@ -17,12 +17,11 @@
 
 """Dictionary with item expiration."""
 
-__revision__="$Id: expdict.py,v 1.6 2004/09/25 15:42:19 jajcus Exp $"
+__revision__="$Id: expdict.py,v 1.7 2004/09/25 16:29:14 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import time
 import threading
-from types import TupleType,IntType,FloatType
 
 class ExpiringDictionary(dict):
     """An extension to standard Python dictionary objects which implements item
@@ -50,6 +49,7 @@ class ExpiringDictionary(dict):
             - `default_timeout`: default timeout value for stored objects.
         :Types:
             - `default_timeout`: `int`"""
+        dict.__init__(self)
         self._timeouts={}
         self._default_timeout=default_timeout
         self._lock=threading.RLock()
@@ -71,7 +71,7 @@ class ExpiringDictionary(dict):
             self._lock.release()
 
     def __setitem__(self,key,value):
-        return self.setitem(key,value)
+        return self.set_item(key,value)
 
     def set_item(self,key,value,timeout=None,timeout_callback=None):
         """Set item of the dictionary.
@@ -121,12 +121,12 @@ class ExpiringDictionary(dict):
         if timeout<=time.time():
             if callback:
                 try:
-                    callback(k,self[k])
+                    callback(key,self[key])
                 except TypeError:
                     try:
-                        callback(k)
+                        callback(key)
                     except TypeError:
                         callback()
-            del self[k]
+            del self[key]
 
 # vi: sts=4 et sw=4
