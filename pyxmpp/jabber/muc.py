@@ -35,6 +35,7 @@ affiliations=("admin","member","none","outcast","owner")
 roles=("moderator","none","participant","visitor")
 
 class MucXBase:
+	element="x"
 	ns=None
 	def __init__(self,node=None,copy=1,parent=None):
 		if self.ns==None:
@@ -61,10 +62,10 @@ class MucXBase:
 			raise ErrorNodeError,"Bad MucX constructor argument"
 		else:
 			if parent:
-				self.node=parent.newChild(None,"x",None)
+				self.node=parent.newChild(None,self.element,None)
 				self.borrowed=1
 			else:
-				self.node=common_root.newChild(None,"x",None)
+				self.node=common_root.newChild(None,self.element,None)
 			ns=self.node.newNs(self.ns,None)
 			self.node.setNs(ns)
 		
@@ -110,10 +111,14 @@ class MucItem(MucItemBase):
 			self.__init(node_or_affiliation,role,jid,nick,actor,reason)
 
 	def __init(self,affiliation,role,jid=None,nick=None,actor=None,reason=None):
-		if affiliation not in affiliations:
+		if not affiliation:
+			affiliation=None
+		elif affiliation not in affiliations:
 			raise ValueError,"Bad affiliation"
 		self.affiliation=affiliation
-		if role not in roles:
+		if not role:
+			role=None
+		elif role not in roles:
 			raise ValueError,"Bad role"
 		self.role=role
 		if jid:
@@ -192,10 +197,10 @@ class MucUserX(MucXBase):
 		if not self.node.children:
 			return []
 		ret=[]
-		n=self.children
+		n=self.node.children
 		while n:
 			ns=n.ns()
-			if ns and ns.getContent()!=MUC_USER_NS:
+			if ns and ns.getContent()!=self.ns:
 				pass
 			elif n.name=="item":
 				ret.append(MucItem(n))
@@ -221,20 +226,24 @@ class MucUserX(MucXBase):
 			raise TypeError,"Bad item type for muc#user"
 		item.make_node(self.node)
 
+class MucAdminQuery(MucUserX):
+	ns=MUC_ADMIN_NS
+	element="query"
+
 class MucStanzaExt:
 	def __init__(self):
 		if not hasattr(self,"node"):
 			raise RuntimeError,"Abstract class called"
-		self.muc_x=None
+		self.muc_child=None
 
-	def get_muc_x(self):
-		if self.muc_x:
-			return self.muc_x
+	def get_muc_child(self):
+		if self.muc_child:
+			return self.muc_child
 		if not self.node.children:
 			return None
 		n=self.node.children
 		while n:
-			if n.name!="x":
+			if n.name not in ("x","query"):
 				n=n.next
 				continue
 			ns=n.ns()
@@ -242,29 +251,29 @@ class MucStanzaExt:
 				n=n.next
 				continue
 			ns_uri=ns.getContent()
-			if ns_uri==MUC_NS:
-				self.muc_x=MucX(n)
-				return self.muc_x
-			if ns_uri==MUC_USER_NS:
-				self.muc_x=MucUserX(n)
-				return self.muc_x
-			if ns_uri==MUC_ADMIN_NS:
-				self.muc_x=MucAdminX(n)
-				return self.muc_x
-			if ns_uri==MUC_OWNER_NS:
-				self.muc_x=MucOwnerX(n)
-				return self.muc_x
+			if (n.name,ns_uri)==("x",MUC_NS):
+				self.muc_child=MucX(n)
+				return self.muc_child
+			if (n.name,ns_uri)==("x",MUC_USER_NS):
+				self.muc_child=MucUserX(n)
+				return self.muc_child
+			if (n.name,ns_uri)==("query",MUC_ADMIN_NS):
+				self.muc_child=MucAdminQuery(n)
+				return self.muc_child
+			if (n.name,ns_uri)==("query",MUC_OWNER_NS):
+				self.muc_child=MucOwnerX(n)
+				return self.muc_child
 			n=n.next
 
-	def clear_muc_x(self):
-		if self.muc_x:
-			self.muc_x.free_borrowed()
-			self.muc_x=None
+	def clear_muc_child(self):
+		if self.muc_child:
+			self.muc_child.free_borrowed()
+			self.muc_child=None
 		if not self.node.children:
 			return
 		n=self.node.children
 		while n:
-			if n.name!="x":
+			if n.name not in ("x","query"):
 				n=n.next
 				continue
 			ns=n.ns()
@@ -278,13 +287,18 @@ class MucStanzaExt:
 			n=n.next
 
 	def make_muc_userinfo(self):
-		self.clear_muc_x()
-		self.muc_x=MucUserX(parent=self.node)
-		return self.muc_x
+		self.clear_muc_child()
+		self.muc_child=MucUserX(parent=self.node)
+		return self.muc_child
+	
+	def make_muc_admin_quey(self):
+		self.clear_muc_child()
+		self.muc_child=MucAdminQuery(parent=self.node)
+		return self.muc_child
 				
 	def muc_free(self):
-		if self.muc_x:
-			self.muc_x.free_borrowed()
+		if self.muc_child:
+			self.muc_child.free_borrowed()
 
 class MucPresence(Presence,MucStanzaExt):
 	def __init__(self,node=None,**kw):
@@ -296,11 +310,11 @@ class MucPresence(Presence,MucStanzaExt):
 		return MucPresence(self)
 
 	def make_join_request(self):
-		self.clear_muc_x()
-		self.muc_x=MucX(parent=self.node)
+		self.clear_muc_child()
+		self.muc_child=MucX(parent=self.node)
 
 	def get_join_info(self):
-		x=self.get_muc_x()
+		x=self.get_muc_child()
 		if not x:
 			return None
 		if not isinstance(x,MucX):
@@ -310,3 +324,23 @@ class MucPresence(Presence,MucStanzaExt):
 	def free(self):
 		self.muc_free()
 		Presence.free(self)
+
+class MucIq(Iq,MucStanzaExt):
+	def __init__(self,node=None,**kw):
+		self.node=None
+		MucStanzaExt.__init__(self)
+		apply(Iq.__init__,[self,node],kw)
+
+	def copy(self):
+		return MucIq(self)
+
+	def make_kick_request(self,nick,reason):
+		self.clear_muc_child()
+		self.muc_child=MucAdminQuery(parent=self.node)
+		item=MucItem("none","none",nick=nick,reason=reason)
+		self.muc_child.add_item(item)
+		return self.muc_child
+
+	def free(self):
+		self.muc_free()
+		Iq.free(self)
