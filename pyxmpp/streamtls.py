@@ -132,8 +132,15 @@ class StreamTLSMixIn:
 
     def _write_raw(self,data):
         """Same as `Stream.write_raw` but assume `self.lock` is acquired."""
+        logging.getLogger("pyxmpp.Stream.out").debug("OUT: %r",data)
         try:
-            StreamBase._write_raw(self,data)
+            try:
+                self.socket.send(data)
+            except TypeError:
+                # workarund for M2Crypto 0.13.1 'feature'
+                self.socket.send(self.socket,data)
+        except (IOError,OSError),e:
+            raise FatalStreamError("IO Error: "+str(e))
         except SSLError,e:
             raise TLSError("TLS Error: "+str(e))
 
@@ -142,7 +149,11 @@ class StreamTLSMixIn:
         if self.eof:
             return
         try:
-            r=self.socket.read()
+            try:
+                r=self.socket.read()
+            except TypeError:
+                # workarund for M2Crypto 0.13.1 'feature'
+                r=self.socket.read(self.socket)
             if r is None:
                 return
         except socket.error,e:
