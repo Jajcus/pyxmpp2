@@ -426,9 +426,9 @@ class DiscoItems:
         else:
             raise ValueError,"Invalid node name"
         if '"' not in jid:
-            expr='d:feature[@jid="%s"%s]' % (jid,node_expr)
+            expr='d:item[@jid="%s"%s]' % (jid,node_expr)
         elif "'" not in jid:
-            expr="d:feature[@jid='%s'%s]" % (jid,node_expr)
+            expr="d:item[@jid='%s'%s]" % (jid,node_expr)
         else:
             raise ValueError,"Invalid jid name"
 
