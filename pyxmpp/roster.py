@@ -97,7 +97,7 @@ class RosterItem(StanzaPayloadObject):
                 continue
             group=n.getContent()
             if group:
-                groups.append(group)
+                groups.append(from_utf8(group))
             n=n.next
         self.jid=jid
         self.name=name
@@ -124,7 +124,7 @@ class RosterItem(StanzaPayloadObject):
         if self.ask:
             xmlnode.setProp("ask",to_utf8(self.ask))
         for g in self.groups:
-            xmlnode.newTextChild(None,"group",g)
+            xmlnode.newTextChild(None, "group", to_utf8(g))
 
     def __str__(self):
         n=self.as_xml(doc=common_doc)
