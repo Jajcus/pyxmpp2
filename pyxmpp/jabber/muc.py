@@ -465,8 +465,9 @@ class MucRoomState:
         """
         Send a leave request for the room.
         """
-        p=MucPresence(to_jid=self.room_jid,stanza_type="unavailable")
-        self.manager.stream.send(p)
+        if self.joined:
+            p=MucPresence(to_jid=self.room_jid,stanza_type="unavailable")
+            self.manager.stream.send(p)
 
     def send_message(self,body):
         """
@@ -838,11 +839,18 @@ class MucRoomManager:
         :return: the room state object created.
         :returntype: `MucRoomState`
         """
+        
         if not room.node or room.resource:
             raise ValueError,"Invalid room JID"
-        rs=MucRoomState(self,self.stream.me,
-                JID(room.node,room.domain,nick),handler)
-        self.rooms[rs.room_jid.bare().as_unicode()]=rs
+
+        room_jid = JID(room.node, room.domain, nick)
+            
+        cur_rs = self.rooms.get(room_jid.bare().as_unicode())
+        if cur_rs and cur_rs.joined:
+            raise RuntimeError,"Room already joined"
+            
+        rs=MucRoomState(self, self.stream.me, room_jid, handler)
+        self.rooms[room_jid.bare().as_unicode()]=rs
         rs.join()
         return rs
 
