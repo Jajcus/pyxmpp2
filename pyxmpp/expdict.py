@@ -103,7 +103,7 @@ class ExpiringDictionary(dict):
         Remove items that expired by now from the dictionary."""
         self._lock.acquire()
         try:
-            for k in self._timeouts.iterkeys():
+            for k in self._timeouts.keys():
                 self._expire_item(k)
         finally:
             self._lock.release()
