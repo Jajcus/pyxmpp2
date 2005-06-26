@@ -12,6 +12,7 @@ input_xml = """<?xml version="1.0" ?>
    <b xmlns="http://pyxmpp.jabberstudio.org/xmlns/test2">
      <c/>
      <prefix:d/>
+     <g xmlns="http://pyxmpp.jabberstudio.org/xmlns/test3" type="ble"/>
    </b>
    <prefix:e/>
    <f/>
@@ -20,12 +21,29 @@ input_xml = """<?xml version="1.0" ?>
 input_doc = libxml2.parseDoc(input_xml)
 input_root = input_doc.getRootElement()
 
+input_xml2 = """<?xml version="1.0" ?>
+<root xmlns:prefix="http://pyxmpp.jabberstudio.org/xmlns/test1">
+   <a> <a1/> <a2/> </a>
+   <b xmlns="http://pyxmpp.jabberstudio.org/xmlns/test2">
+     <c/>
+     <prefix:d/>
+     <g xmlns="http://pyxmpp.jabberstudio.org/xmlns/test3" type="ble"/>
+   </b>
+   <prefix:e/>
+   <f/>
+</root>
+"""
+input_doc2 = libxml2.parseDoc(input_xml2)
+input_root2 = input_doc2.getRootElement()
+
+
 output_xml = """<?xml version="1.0" ?>
 <root xmlns="http://pyxmpp.jabberstudio.org/xmlns/common" xmlns:prefix="http://pyxmpp.jabberstudio.org/xmlns/test1">
    <a> <a1/> <a2/> </a>
    <b xmlns="http://pyxmpp.jabberstudio.org/xmlns/test2">
      <c/>
      <prefix:d/>
+     <g xmlns="http://pyxmpp.jabberstudio.org/xmlns/test3" type="ble"/>
    </b>
    <prefix:e/>
    <f/>
@@ -55,7 +73,30 @@ class TestReplaceNs(unittest.TestCase):
                 if n1_ns.content == input_ns.content:
                     xmlextra.replace_ns(n1, n1_ns, common_ns)
             n = n.next
-        #print doc.serialize()
+        self.failUnless(xml_elements_equal(root, output_root))
+ 
+    def test_replace_null_ns(self):
+        doc = libxml2.newDoc("1.0")
+        
+        root = doc.newChild(None, "root", None)
+        common_ns = root.newNs(xmlextra.COMMON_NS, None)
+        root.setNs(common_ns)
+        doc.setRootElement(root)
+        
+        n = input_doc2.getRootElement()
+        input_ns = n.ns()
+        n = n.children
+        while n:
+            n1 = n.docCopyNode(doc, 1)
+            root.addChild(n1)
+            if n1.type == 'element':
+                try:
+                    n1_ns = n1.ns()
+                except libxml2.treeError:
+                    n1_ns = None
+                if n1_ns is None:
+                    xmlextra.replace_ns(n1, n1_ns, common_ns)
+            n = n.next
         self.failUnless(xml_elements_equal(root, output_root))
         
     def test_safe_serialize(self):
