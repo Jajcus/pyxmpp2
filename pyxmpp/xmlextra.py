@@ -325,16 +325,24 @@ except ImportError:
 
         Both old_ns and new_ns may be None meaning no namespace set."""
 
-        old_ns_uri = old_ns.content
-        old_ns_prefix = old_ns.name
+        if old_ns is not None:
+            old_ns_uri = old_ns.content
+            old_ns_prefix = old_ns.name
+        else:
+            old_ns_uri = None
+            old_ns_prefix = None
 
         ns = _get_ns(node)
-        if ns and ns.content == old_ns_uri and ns.name == old_ns_prefix:
+        if ns is None and old_ns is None:
+            node.setNs(new_ns)
+        elif ns and ns.content == old_ns_uri and ns.name == old_ns_prefix:
             node.setNs(new_ns)
 
         p = node.properties
         while p:
             ns = _get_ns(p)
+            if ns is None and old_ns is None:
+                p.setNs(new_ns)
             if ns and ns.content == old_ns_uri and ns.name == old_ns_prefix:
                 p.setNs(new_ns)
             p = p.next
