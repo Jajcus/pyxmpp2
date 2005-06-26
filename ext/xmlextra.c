@@ -169,14 +169,31 @@ PyObject *pyobj_tree,*pyobj_old_ns,*pyobj_new_ns;
 xmlNodePtr tree,node;
 xmlAttrPtr attr;
 xmlNsPtr new_ns,old_ns;
+xmlNsPtr nsDef;
 
 	if (!PyArg_ParseTuple(args, "OOO", &pyobj_tree,&pyobj_old_ns,&pyobj_new_ns)) return NULL;
 	tree = (xmlNodePtr) PyxmlNode_Get(pyobj_tree);
 	old_ns = (xmlNsPtr) PyxmlNode_Get(pyobj_old_ns);
 	new_ns = (xmlNsPtr) PyxmlNode_Get(pyobj_new_ns);
 	node = tree;
-	
+
 	while (node != NULL) {
+
+		/* 
+		 * If old_ns is None and default namespace is redefined here, then skip this node and its children.
+		 */
+		if (old_ns == NULL) {
+			nsDef=node->nsDef;
+			while(nsDef != NULL) {
+				if (nsDef->prefix == NULL) break;
+				nsDef=nsDef->next;
+			}
+			if (nsDef != NULL) {
+				node = node->next;
+				continue;
+			}
+		}
+		
 		/*
 		 * Check if the namespace is in use by the node
 		 */
