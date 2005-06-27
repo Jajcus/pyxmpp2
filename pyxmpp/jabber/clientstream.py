@@ -28,13 +28,21 @@ import logging
 
 from pyxmpp.iq import Iq
 from pyxmpp.utils import to_utf8,from_utf8
+from pyxmpp.jid import JID
 
 from pyxmpp.clientstream import ClientStreamError
 from pyxmpp.clientstream import ClientStream
 
+from pyxmpp.jabber.register import Register
+
 class LegacyAuthenticationError(ClientStreamError):
     """Raised on a legacy authentication error."""
     pass
+
+class RegistrationError(ClientStreamError):
+    """Raised on a in-band registration error."""
+    pass
+
 
 class LegacyClientStream(ClientStream):
     """Handles Jabber (both XMPP and legacy protocol) client connection stream.
@@ -56,6 +64,7 @@ class LegacyClientStream(ClientStream):
               in the list should be prefixed with "sasl:" string.
             - `tls_settings`: settings for StartTLS -- `TLSSettings` instance.
             - `keepalive`: keepalive output interval. 0 to disable.
+            - `registration_form`: the registration form sent (when registering in-band).
         :Types:
             - `jid`: `pyxmpp.JID`
             - `password`: `unicode`
@@ -64,6 +73,7 @@ class LegacyClientStream(ClientStream):
             - `auth_methods`: sequence of `str`
             - `tls_settings`: `pyxmpp.TLSSettings`
             - `keepalive`: `int`
+            - `registration_form`: `pyxmpp.jabber.dataforms.Form`
         """
         (self.authenticated,self.available_auth_methods,self.auth_stanza,
                 self.peer_authenticated,self.auth_method_used)=(None,)*5
@@ -75,18 +85,26 @@ class LegacyClientStream(ClientStream):
         """Reset the `LegacyClientStream` object state, making the object ready
         to handle new connections."""
         ClientStream._reset(self)
-        self.available_auth_methods=None
-        self.auth_stanza=None
+        self.available_auth_methods = None
+        self.auth_stanza = None
+        self.registration_callback = None
 
     def _post_connect(self):
         """Initialize authentication when the connection is established
         and we are the initiator."""
         if not self.initiator:
+            self._start_auth()
             if "plain" in self.auth_methods or "digest" in self.auth_methods:
                 self.set_iq_get_handler("query","jabber:iq:auth",
                             self.auth_in_stage1)
                 self.set_iq_set_handler("query","jabber:iq:auth",
                             self.auth_in_stage2)
+        elif self.registration_callback:
+                iq = Iq(stanza_type = "get")
+                iq.set_content(Register())
+                self.set_response_handlers(iq, self.registration_form, self.registration_error)
+                self.send(iq)
+                return
         ClientStream._post_connect(self)
 
     def _post_auth(self):
@@ -360,6 +378,78 @@ class LegacyClientStream(ClientStream):
             self.authenticated=True
             self.state_change("authorized",self.my_jid)
             self._post_auth()
+        finally:
+            self.lock.release()
+
+    def registration_error(self, stanza):
+        """Handle in-band registration error.
+        
+        [client only]
+        
+        :Parameters:
+            - `stanza`: the error stanza received or `None` on timeout.
+        :Types:
+            - `stanza`: `pyxmpp.stanza.Stanza`"""
+        self.lock.acquire()
+        try:
+            err=stanza.get_error()
+            ae=err.xpath_eval("e:*",{"e":"jabber:iq:auth:error"})
+            if ae:
+                ae=ae[0].name
+            else:
+                ae=err.get_condition().name
+            raise RegistrationError,("Authentication error condition: %s" % (ae,))
+        finally:
+            self.lock.release()
+
+    def registration_form(self, stanza):
+        """Handle registration form received.
+        
+        [client only]
+
+        Call self.registration_callback with the registration form received
+        as the argument. Use the value returned by the callback will be a
+        filled-in form.
+        
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `pyxmpp.iq.Iq`"""
+        self.lock.acquire()
+        try:
+            register = Register(stanza.get_query())
+            form = self.registration_callback(register.get_form())
+            self.registration_form = form
+            iq = Iq(stanza_type = "set")
+            iq.set_content(register.submit_form(form))
+            self.set_response_handlers(iq, self.registration_success, self.registration_error)
+            self.send(iq)
+        finally:
+            self.lock.release()
+
+    def registration_success(self, stanza):
+        """Handle registration success.
+        
+        [client only]
+
+        Clean up registration stuff, change state to "registered" and initialize
+        authentication.
+        
+        :Parameters:
+            - `stanza`: the stanza received.
+        :Types:
+            - `stanza`: `pyxmpp.iq.Iq`"""
+        self.lock.acquire()
+        try:
+            self.state_change("registered", self.registration_form)
+            if ('FORM_TYPE' in self.registration_form 
+                    and self.registration_form['FORM_TYPE'].value == 'jabber:iq:register'):
+                if 'username' in self.registration_form:
+                    self.my_jid = JID(self.registration_form['username'].value, self.my_jid.domain, self.my_jid.resource)
+                if 'password' in self.registration_form:
+                    self.password = self.registration_form['password']
+            self.registration_callback = None
+            self._post_connect()
         finally:
             self.lock.release()
 

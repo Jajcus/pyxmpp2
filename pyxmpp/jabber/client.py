@@ -1,4 +1,3 @@
-#
 # (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -46,9 +45,11 @@ class JabberClient(Client):
         - `disco_info`: default Disco#info reply for a query to an empty node --
           provides information about the client and its supported fetures.
         - `disco_identity`: default identity of the default `disco_info`.
+        - `register`: when `True` than registration will be started instead of authentication.
     :Types:
         - `disco_items`: `DiscoItems`
         - `disco_info`: `DiscoInfo`
+        - `register`: `bool`
     """
     def __init__(self,jid=None, password=None, server=None, port=5222,
             auth_methods=("sasl:DIGEST-MD5","digest"),
@@ -72,7 +73,7 @@ class JabberClient(Client):
               replies. The default of u'client' should be the right choice in
               most cases.
             - `disco_type`: type of the client identity in the disco#info
-              replies. Use `the types registered by Jabber Registrar <http://www.jabber.org/registrar/disco-categories.html>`__ 
+              replies. Use `the types registered by Jabber Registrar <http://www.jabber.org/registrar/disco-categories.html>`__
         :Types:
             - `jid`: `pyxmpp.JID`
             - `password`: `unicode`
@@ -100,14 +101,15 @@ class JabberClient(Client):
 
 # public methods
 
-    def connect(self, register=False):
+    def connect(self, register = False):
         """Connect to the server and set up the stream.
 
         Set `self.stream` and notify `self.state_changed` when connection
         succeeds. Additionally, initialize Disco items and info of the client.
         """
-        _unused = register
-        Client.connect(self)
+        Client.connect(self, register)
+        if register:
+            self.stream.registration_callback = self.fill_in_registration_form
 
     def register_feature(self, feature_name):
         """Register a feature to be announced by Service Discovery.
@@ -229,5 +231,32 @@ class JabberClient(Client):
         if not node and self.disco_items:
             return self.disco_items
         return None
+
+    def fill_in_registration_form(self, form):
+        """Fill-in the registration form provided by the server.
+
+        :Parameters:
+            - `form`: the registration form.
+        :Types:
+            - `form`: `pyxmpp.jabber.dataforms.Form`
+
+        :return: filled-in form.
+        :returntype: `pyxmpp.jabber.dataforms.Form`"""
+        self.__logger.debug(u"default registration callback started. auto-filling-in the form...")
+        if not 'FORM_TYPE' in form or 'jabber:iq:register' not in form['FORM_TYPE'].values:
+            raise RuntimeError, "Unknown form type: %r %r" % (form, form['FORM_TYPE'])
+        for field in form:
+            if field.name == u"username":
+                self.__logger.debug(u"Setting username to %r" % (self.jid.node,))
+                field.value = self.jid.node
+            elif field.name == u"password":
+                self.__logger.debug(u"Setting password to %r" % (self.password,))
+                field.value = self.password
+            elif field.required:
+                self.__logger.debug(u"Unknown required field: %r" % (field.name,))
+                raise RuntimeError, "Unsupported required registration form field %r" % (field.name,)
+            else:
+                self.__logger.debug(u"Unknown field: %r" % (field.name,))
+        return form
 
 # vi: sts=4 et sw=4

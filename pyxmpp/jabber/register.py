@@ -27,6 +27,7 @@ __docformat__="restructuredtext en"
 import libxml2
 import time
 import datetime
+import logging
 
 from pyxmpp.jid import JID
 
@@ -127,6 +128,7 @@ class Register(StanzaPayloadObject):
         :Types:
             - `node`: `libxml2.xmlNode`
         """
+        self.__logger=logging.getLogger("pyxmpp.jabber.Register")
         self.form = None
         self.registered = False
         self.instructions = None
@@ -143,6 +145,8 @@ class Register(StanzaPayloadObject):
             - `xmlnode`: the jabber:x:register XML element.
         :Types:
             - `xmlnode`: `libxml2.xmlNode`"""
+
+        self.__logger.debug("Converting jabber:iq:register element from XML")
         if xmlnode.type!="element":
             raise ValueError,"XML node is not a jabber:iq:register element (not an element)"
         ns=get_node_ns_uri(xmlnode)
@@ -163,7 +167,11 @@ class Register(StanzaPayloadObject):
             elif name == "remove":
                 self.remove = True
             elif name in legacy_fields and not getattr(self, name):
-                setattr(self, name, from_utf8(element.getContent()))
+                value = from_utf8(element.getContent())
+                if value is None:
+                    value = u""
+                self.__logger.debug(u"Setting legacy field %r to %r" % (name, value))
+                setattr(self, name, value)
 
     def complete_xml_element(self, xmlnode, doc):
         """Complete the XML node with `self` content.
@@ -208,7 +216,7 @@ class Register(StanzaPayloadObject):
             return self.form.type
 
         form = Form(form_type, instructions = self.instructions)
-        form.add_field("form_type", [u"jabber:iq:register"], "hidden")
+        form.add_field("FORM_TYPE", [u"jabber:iq:register"], "hidden")
         for field in legacy_fields:
             field_type, field_label = legacy_fields[field]
             value = getattr(self, field)
@@ -246,7 +254,7 @@ class Register(StanzaPayloadObject):
         for field in legacy_fields:
             value = getattr(self, field)
             try:
-                form_value = form['field']
+                form_value = form[field].value
             except KeyError:
                 if value:
                     raise ValueError, "Required field with no value!"

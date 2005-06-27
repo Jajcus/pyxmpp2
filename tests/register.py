@@ -25,6 +25,19 @@ class TestRegister(unittest.TestCase):
         self.failUnlessEqual(register.username, u"")
         self.failUnlessEqual(register.password, u"")
         self.failUnlessEqual(register.email, u"")
+        
+    def test_jep77_example2_get_form(self):
+        register = self.parse_stanza(jep77_example2)
+        form = register.get_form()
+        self.failUnlessEqual(form["FORM_TYPE"].value, "jabber:iq:register")
+        self.failUnlessEqual(form.instructions.strip(), u"Choose a username and password for use with this service.\n       Please also provide your email address.")
+        self.failUnless("username" in form)
+        self.failUnless(form["username"].required)
+        self.failUnless("password" in form)
+        self.failUnless(form["password"].required)
+        self.failUnless("email" in form)
+        self.failUnless(form["email"].required)
+
     def test_jep77_example3(self):
         register = self.parse_stanza(jep77_example3)
         self.failUnless(register.registered)

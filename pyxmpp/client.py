@@ -118,42 +118,40 @@ class Client:
 
 # public methods
 
-    def connect(self,register=False):
+    def connect(self, register = False):
         """Connect to the server and set up the stream.
 
         Set `self.stream` and notify `self.state_changed` when connection
         succeeds."""
         if not self.jid:
-            raise ClientError,"Cannot connect: no or bad JID given"
+            raise ClientError, "Cannot connect: no or bad JID given"
         if not register and not self.password:
-            raise ClientError,"Cannot connect: no password given"
-        if register:
-            raise NotImplementedError,"In-band registration not implemented yet"
+            raise ClientError, "Cannot connect: no password given"
         self.lock.acquire()
         try:
-            stream=self.stream
-            self.stream=None
+            stream = self.stream
+            self.stream = None
             if stream:
                 stream.close()
 
             self.__logger.debug("Creating client stream: %r, auth_methods=%r"
-                    % (self.stream_class,self.auth_methods))
-            stream=self.stream_class(jid=self.jid,
-                    password=self.password,
-                    server=self.server,
-                    port=self.port,
-                    auth_methods=self.auth_methods,
-                    tls_settings=self.tls_settings,
-                    keepalive=self.keepalive)
-            stream.process_stream_error=self.stream_error
+                    % (self.stream_class, self.auth_methods))
+            stream=self.stream_class(jid = self.jid,
+                    password = self.password,
+                    server = self.server,
+                    port = self.port,
+                    auth_methods = self.auth_methods,
+                    tls_settings = self.tls_settings,
+                    keepalive = self.keepalive)
+            stream.process_stream_error = self.stream_error
             self.stream_created(stream)
-            stream.state_change=self.__stream_state_change
+            stream.state_change = self.__stream_state_change
             stream.connect()
-            self.stream=stream
+            self.stream = stream
             self.state_changed.notify()
             self.state_changed.release()
         except:
-            self.stream=None
+            self.stream = None
             self.state_changed.release()
             raise
 
