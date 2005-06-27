@@ -417,15 +417,30 @@ class LegacyClientStream(ClientStream):
             - `stanza`: `pyxmpp.iq.Iq`"""
         self.lock.acquire()
         try:
-            register = Register(stanza.get_query())
-            form = self.registration_callback(register.get_form())
+            self.__register = Register(stanza.get_query())
+            self.registration_callback(self.__register.get_form())
+        finally:
+            self.lock.release()
+
+    def submit_registration_form(self, form):
+        """Submit a registration form.
+        
+        [client only]
+
+        :Parameters:
+            - `form`: the filled-in form.
+        :Types:
+            - `form`: `pyxmpp.jabber.dataforms.Form`"""
+        self.lock.acquire()
+        try:
             self.registration_form = form
             iq = Iq(stanza_type = "set")
-            iq.set_content(register.submit_form(form))
+            iq.set_content(self.__register.submit_form(form))
             self.set_response_handlers(iq, self.registration_success, self.registration_error)
             self.send(iq)
         finally:
             self.lock.release()
+
 
     def registration_success(self, stanza):
         """Handle registration success.

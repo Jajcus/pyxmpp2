@@ -129,6 +129,15 @@ class JabberClient(Client):
             - `feature_name`: `unicode`"""
         self.disco_info.remove_feature(feature_name)
 
+    def submit_registration_form(self, form):
+        """Submit a registration form
+
+        :Parameters:
+            - `form`: the form to submit
+        :Types:
+            - `form`: `pyxmpp.jabber.dataforms.Form`"""
+        self.stream.submit_registration_form(form)
+
 # private methods
     def __disco_info(self,iq):
         """Handle a disco#info request.
@@ -235,13 +244,14 @@ class JabberClient(Client):
     def fill_in_registration_form(self, form):
         """Fill-in the registration form provided by the server.
 
+        This default implementation fills-in "username" and "passwords"
+        fields only and instantly submits the form.
+
         :Parameters:
             - `form`: the registration form.
         :Types:
             - `form`: `pyxmpp.jabber.dataforms.Form`
-
-        :return: filled-in form.
-        :returntype: `pyxmpp.jabber.dataforms.Form`"""
+        """
         self.__logger.debug(u"default registration callback started. auto-filling-in the form...")
         if not 'FORM_TYPE' in form or 'jabber:iq:register' not in form['FORM_TYPE'].values:
             raise RuntimeError, "Unknown form type: %r %r" % (form, form['FORM_TYPE'])
@@ -257,6 +267,6 @@ class JabberClient(Client):
                 raise RuntimeError, "Unsupported required registration form field %r" % (field.name,)
             else:
                 self.__logger.debug(u"Unknown field: %r" % (field.name,))
-        return form
+        self.submit_registration_form(form)
 
 # vi: sts=4 et sw=4
