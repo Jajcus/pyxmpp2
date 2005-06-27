@@ -418,7 +418,7 @@ class LegacyClientStream(ClientStream):
         self.lock.acquire()
         try:
             self.__register = Register(stanza.get_query())
-            self.registration_callback(self.__register.get_form())
+            self.registration_callback(stanza, self.__register.get_form())
         finally:
             self.lock.release()
 

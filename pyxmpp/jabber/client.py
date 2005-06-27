@@ -147,7 +147,7 @@ class JabberClient(Client):
         :Parameters:
             - `iq`: the IQ stanza received.
         :Types:
-            - `iq`: `pyxmpp.Iq`"""
+            - `iq`: `pyxmpp.iq.Iq`"""
         q=iq.get_query()
         if q.hasProp("node"):
             node=from_utf8(q.prop("node"))
@@ -174,7 +174,7 @@ class JabberClient(Client):
         :Parameters:
             - `iq`: the IQ stanza received.
         :Types:
-            - `iq`: `pyxmpp.Iq`"""
+            - `iq`: `pyxmpp.iq.Iq`"""
         q=iq.get_query()
         if q.hasProp("node"):
             node=from_utf8(q.prop("node"))
@@ -211,7 +211,7 @@ class JabberClient(Client):
             - `iq`: the request stanza received.
         :Types:
             - `node`: `unicode`
-            - `iq`: `pyxmpp.Iq`
+            - `iq`: `pyxmpp.iq.Iq`
 
         :return: self.disco_info if `node` is empty or `None` otherwise.
         :returntype: `DiscoInfo`"""
@@ -230,7 +230,7 @@ class JabberClient(Client):
             - `iq`: the request stanza received.
         :Types:
             - `node`: `unicode`
-            - `iq`: `pyxmpp.Iq`
+            - `iq`: `pyxmpp.iq.Iq`
 
         :return: self.disco_info if `node` is empty or `None` otherwise.
         :returntype: `DiscoInfo`"""
@@ -241,15 +241,17 @@ class JabberClient(Client):
             return self.disco_items
         return None
 
-    def fill_in_registration_form(self, form):
+    def fill_in_registration_form(self, stanza, form):
         """Fill-in the registration form provided by the server.
 
         This default implementation fills-in "username" and "passwords"
         fields only and instantly submits the form.
 
         :Parameters:
+            - `stanza`: the stanza received.
             - `form`: the registration form.
         :Types:
+            - `stanza`: `pyxmpp.iq.Iq`
             - `form`: `pyxmpp.jabber.dataforms.Form`
         """
         self.__logger.debug(u"default registration callback started. auto-filling-in the form...")

@@ -181,20 +181,21 @@ class Field(StanzaPayloadObject):
         values = self.values
         t = self.type
         l = len(values)
-        if t == "boolean":
-            if l == 0:
-                return None
-            elif l == 1:
-                v = values[0]
-                if v == "0":
-                    return False
-                elif v == "1":
-                    return True
-            raise ValueError, "Bad boolean value"
-        elif t.startswith("jid-"):
-            values = [JID(v) for v in values]
-        if t.endswith("-multi"):
-            return values
+        if t is not None:
+            if t == "boolean":
+                if l == 0:
+                    return None
+                elif l == 1:
+                    v = values[0]
+                    if v == "0":
+                        return False
+                    elif v == "1":
+                        return True
+                raise ValueError, "Bad boolean value"
+            elif t.startswith("jid-"):
+                values = [JID(v) for v in values]
+            if t.endswith("-multi"):
+                return values
         if l == 0:
             return None
         elif l == 1:

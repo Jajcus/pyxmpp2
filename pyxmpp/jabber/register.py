@@ -60,6 +60,8 @@ legacy_fields = {
         "key": ("text-single", u"Session key for transaction (obsolete)"),
         }
 
+# TODO: canceled forms
+
 class Register(StanzaPayloadObject):
     """
     Delayed delivery tag.
@@ -248,10 +250,11 @@ class Register(StanzaPayloadObject):
             result.form = form.make_submit()
             return result
 
-        if "jabber:iq:register" not in form["FORM_TYPE"].values:
+        if "FORM_TYPE" not in form or "jabber:iq:register" not in form["FORM_TYPE"].values:
             raise ValueError, "FORM_TYPE is not jabber:iq:register"
             
         for field in legacy_fields:
+            self.__logger.debug(u"submitted field %r" % (field, ))
             value = getattr(self, field)
             try:
                 form_value = form[field].value
