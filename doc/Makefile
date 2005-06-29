@@ -5,6 +5,8 @@ EPYDOC=epydoc
 
 WEBFILES=www/index.html www/CHANGES.html www/ChangeLog.html \
 	www/style.css
+
+RST2HTML=rst2html
 	
 all: doc
 
@@ -58,10 +60,10 @@ check-docutils:
 	fi
 	
 index.html: ../README
-	rst2html --rfc-references --initial-header-level=2 ../README > index.html
+	$(RST2HTML) --rfc-references --initial-header-level=2 ../README > index.html
 
 CHANGES.html: ../CHANGES
-	rst2html --rfc-references --initial-header-level=2 --no-doc-title ../CHANGES > CHANGES.html
+	$(RST2HTML) --rfc-references --initial-header-level=2 --no-doc-title ../CHANGES > CHANGES.html
 
 ChangeLog.html: ../ChangeLog
 	echo -ne '<div class="document">\n<h2>ChangeLog</h2>\n<pre>' > ChangeLog.html
