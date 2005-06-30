@@ -118,7 +118,7 @@ class VCardString(VCardField):
         - `value`: field value.
     :Types:
         - `value`: `unicode`"""
-    def __init__(self,name,value,rfc2425parameters=None):
+    def __init__(self,name, value, rfc2425parameters = None, empty_ok = False):
         """Initialize a `VCardString` object.
 
         :Parameters:
@@ -139,7 +139,7 @@ class VCardString(VCardField):
                 self.value=u""
         else:
             self.value=value
-        if not self.value:
+        if not self.value and not empty_ok:
             raise Empty,"Empty string value"
     def rfc2426(self):
         """RFC2426-encode the field content.
@@ -1394,8 +1394,8 @@ class VCard(StanzaPayloadObject):
             s.append(self.n.family)
         if self.n.suffix:
             s.append(self.n.suffix)
-        s=" ".join(s)
-        self.content["FN"]=VCardString("FN",s)
+        s=u" ".join(s)
+        self.content["FN"]=VCardString("FN", s, empty_ok = True)
 
     def __from_xml(self,data):
         """Initialize a VCard object from XML node.
