@@ -507,7 +507,7 @@ class VCardAdr(VCardField):
                 continue
             if n.name=='POBOX':
                 self.pobox=unicode(n.getContent(),"utf-8","replace")
-            elif n.name=='EXTADR':
+            elif n.name in ('EXTADR', 'EXTADD'):
                 self.extadr=unicode(n.getContent(),"utf-8","replace")
             elif n.name=='STREET':
                 self.street=unicode(n.getContent(),"utf-8","replace")
@@ -553,7 +553,7 @@ class VCardAdr(VCardField):
             if t in self.type:
                 n.newChild(None,t.upper(),None)
         n.newTextChild(None,"POBOX",to_utf8(self.pobox))
-        n.newTextChild(None,"EXTADR",to_utf8(self.extadr))
+        n.newTextChild(None,"EXTADD",to_utf8(self.extadr))
         n.newTextChild(None,"STREET",to_utf8(self.street))
         n.newTextChild(None,"LOCALITY",to_utf8(self.locality))
         n.newTextChild(None,"REGION",to_utf8(self.region))

@@ -10,7 +10,7 @@ Birthday: u'1966-08-06'
 Address:
   Type: ['work']
   POBox: ''
-  Extended: ''
+  Extended: u'Suite 600'
   Street: u'1899 Wynkoop Street'
   Locality: u'Denver'
   Region: u'CO'
@@ -19,7 +19,7 @@ Address:
 Address:
   Type: ['home']
   POBox: ''
-  Extended: ''
+  Extended: u''
   Street: u''
   Locality: u'Denver'
   Region: u'CO'
