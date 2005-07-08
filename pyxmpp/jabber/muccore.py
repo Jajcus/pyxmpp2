@@ -152,8 +152,70 @@ class MucX(MucXBase):
     ns=MUC_NS
     def __init__(self, xmlnode=None, copy=True, parent=None):
         MucXBase.__init__(self,xmlnode=xmlnode, copy=copy, parent=parent)
-    # FIXME: set/get password/history
 
+    def set_history(self, hist):
+        if hist.maxchars and hist.maxchars < 0:
+            raise ValueError, "History parameter maxchars must be positive"
+        if hist.maxstanzas and hist.maxstanzas < 0:
+            raise ValueError, "History parameter maxstanzas must be positive"
+        if hist.maxseconds and hist.maxseconds < 0:
+            raise ValueError, "History parameter maxseconds must be positive"
+            
+        hnode=self.xmlnode.newChild(self.xmlnode.ns(), "history", None)
+        
+        if hist.maxchars:
+            hnode.unsetProp("maxchars")
+        else:
+            hnode.setProp("maxchars", to_utf8(str(hist.maxchars)))
+        if hist.maxstanzas:
+            hnode.unsetProp("maxstanzas")
+        else:
+            hnode.setProp("maxstanzas", to_utf8(str(hist.maxstanzas)))
+        if hist.maxseconds:
+            hnode.unsetProp("maxseconds")
+        else:
+            hnode.setProp("maxseconds", to_utf8(str(hist.maxseconds)))
+        if hist.since:
+            hnode.unsetProp("since")
+        else:
+            hnode.setProp("since", hist.since)
+
+    def get_history(self):
+        if self.xmlnode.getchildren():
+            for child in self.xmlnode.getchildren():
+                if child.tag=="history":
+                    maxchars = atoi(child.prop("maxchars").from_utf8())
+                    maxstanzas = atoi(child.prop("maxstanzas").from_utf8())
+                    maxseconds = atoi(child.prop("maxseconds").from_utf8())
+                    since = child.prop("since").from_utf8()
+                    return HistoryParameters(maxchars, maxstanzas, maxseconds, since)
+
+    def set_password(self, password):
+        if self.xmlnode.get_children():
+            for child in self.xmlnode.get_children():
+                if child.name=="password" and get_node_ns_uri(child)==MUC_NS:
+                    child.unlinkNode()
+                    child.freeNode()
+            
+        if password:
+            self.xmlnode.newTextChild(self.xmlnode.ns(), "password", to_utf8(password))
+            
+
+    def get_password(self):
+        if self.xmlnode.getchildren():
+            for child in self.xmlnode.get_children():
+                    if child.name=="password" and libxml2.get_node_ns_uri(child)==MUC_NS:
+                        return child.getContent().from_utf8()
+        return None
+
+class HistoryParameters(object):
+    def __init__(self, maxchars=None, maxstanzas=None, maxseconds=None, since=None):
+        self.maxchars=maxchars
+        self.maxstanzas=maxstanzas
+        self.maxseconds=maxseconds
+        self.since=since
+
+        
 class MucItemBase(object):
     """
     Base class for <status/> and <item/> element wrappers.
@@ -594,12 +656,16 @@ class MucPresence(Presence,MucStanzaExt):
         """
         return MucPresence(self)
 
-    def make_join_request(self):
+    def make_join_request(self, history=None, password=None):
         """
         Make the presence stanza a MUC room join request.
         """
         self.clear_muc_child()
         self.muc_child=MucX(parent=self.xmlnode)
+        if history:
+            self.muc_child.set_history(history)
+        if password:
+            self.muc_child.set_password(password)
 
     def get_join_info(self):
         """If `self` is a MUC room join request return the information contained.

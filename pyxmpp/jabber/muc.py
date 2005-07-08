@@ -453,14 +453,21 @@ class MucRoomState:
             self.handler.user_left(self.me,None)
         self.joined=False
 
-    def join(self):
+    def join(self, history=None, password=None):
         """
         Send a join request for the room.
+
+        :Parameters:
+            - `history`: the parameters for history control
+            - `password`: password for the room, if any
+        :Types:
+            - `history`: `HistoryParameters`
+            - `password`: `unicode`
         """
         if self.joined:
             raise RuntimeError,"Room is already joined"
         p=MucPresence(to_jid=self.room_jid)
-        p.make_join_request()
+        p.make_join_request(history, password)
         self.manager.stream.send(p)
 
     def leave(self):
@@ -825,7 +832,7 @@ class MucRoomManager:
         self.stream.set_presence_handler("unavailable",self.__presence_unavailable,None,priority)
         self.stream.set_presence_handler("error",self.__presence_error,None,priority)
 
-    def join(self,room,nick,handler):
+    def join(self,room,nick,handler,history=None,password=None):
         """
         Create and return a new room state object and request joining
         to a MUC room.
@@ -834,10 +841,14 @@ class MucRoomManager:
             - `room`: the name of a room to be joined
             - `nick`: the nickname to be used in the room
             - `handler`: is an object to handle room events.
+            - `history`: the parameters for history control
+            - `password`: password for the room, if any
         :Types:
             - `room`: `JID`
             - `nick`: `unicode`
             - `handler`: `MucRoomHandler`
+            - `history`: `HistoryParameters`
+            - `password`: `unicode`
 
         :return: the room state object created.
         :returntype: `MucRoomState`
@@ -854,7 +865,7 @@ class MucRoomManager:
             
         rs=MucRoomState(self, self.stream.me, room_jid, handler)
         self.rooms[room_jid.bare().as_unicode()]=rs
-        rs.join()
+        rs.join(history, password)
         return rs
 
     def get_room_state(self,room):
