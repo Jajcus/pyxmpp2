@@ -26,7 +26,7 @@ __docformat__="restructuredtext en"
 import libxml2
 
 from pyxmpp.utils import to_utf8,from_utf8
-from pyxmpp.xmlextra import common_doc, common_root, common_ns
+from pyxmpp.xmlextra import common_doc, common_root, common_ns, get_node_ns_uri
 from pyxmpp.presence import Presence
 from pyxmpp.error import ErrorNodeError
 from pyxmpp.iq import Iq
@@ -153,67 +153,96 @@ class MucX(MucXBase):
     def __init__(self, xmlnode=None, copy=True, parent=None):
         MucXBase.__init__(self,xmlnode=xmlnode, copy=copy, parent=parent)
 
-    def set_history(self, hist):
-        if hist.maxchars and hist.maxchars < 0:
+    def set_history(self, parameters):
+        for element in xml_element_iter(xmlnode.children):
+            if get_node_ns_uri(child) == MUC_NS and element.name == "history":
+                element.unlinkNode()
+                element.freeNode()
+                break
+                
+        if parameters.maxchars and parameters.maxchars < 0:
             raise ValueError, "History parameter maxchars must be positive"
-        if hist.maxstanzas and hist.maxstanzas < 0:
+        if parameters.maxstanzas and parameters.maxstanzas < 0:
             raise ValueError, "History parameter maxstanzas must be positive"
-        if hist.maxseconds and hist.maxseconds < 0:
+        if parameters.maxseconds and parameters.maxseconds < 0:
             raise ValueError, "History parameter maxseconds must be positive"
             
         hnode=self.xmlnode.newChild(self.xmlnode.ns(), "history", None)
         
-        if hist.maxchars:
-            hnode.unsetProp("maxchars")
-        else:
-            hnode.setProp("maxchars", to_utf8(str(hist.maxchars)))
-        if hist.maxstanzas:
-            hnode.unsetProp("maxstanzas")
-        else:
-            hnode.setProp("maxstanzas", to_utf8(str(hist.maxstanzas)))
-        if hist.maxseconds:
-            hnode.unsetProp("maxseconds")
-        else:
-            hnode.setProp("maxseconds", to_utf8(str(hist.maxseconds)))
-        if hist.since:
-            hnode.unsetProp("since")
-        else:
-            hnode.setProp("since", hist.since)
+        if parameters.maxchars is not None:
+            hnode.setProp("maxchars", str(parameters.maxchars))
+        if parameters.maxstanzas is not None:
+            hnode.setProp("maxstanzas", str(parameters.maxstanzas))
+        if parameters.maxseconds is not None:
+            hnode.setProp("maxseconds", str(parameters.maxseconds))
+        if parameters.since is not None:
+            hnode.setProp("since", parameters.since.strftime("%Y-%m-%dT%H:%M:%SZ"))
 
     def get_history(self):
-        if self.xmlnode.getchildren():
-            for child in self.xmlnode.getchildren():
-                if child.tag=="history":
-                    maxchars = atoi(child.prop("maxchars").from_utf8())
-                    maxstanzas = atoi(child.prop("maxstanzas").from_utf8())
-                    maxseconds = atoi(child.prop("maxseconds").from_utf8())
-                    since = child.prop("since").from_utf8()
-                    return HistoryParameters(maxchars, maxstanzas, maxseconds, since)
+        for element in xml_element_iter(xmlnode.children):
+            if get_node_ns_uri(child) == MUC_NS and element.name == "history":
+                maxchars = from_utf8(child.prop("maxchars"))
+                if maxchars is not None:
+                    maxchars = int(maxchars)
+                maxstanzas = from_utf8(child.prop("maxstanzas"))
+                if maxstanzas is not None:
+                    maxstanzas = int(maxstanzas)
+                maxseconds = from_utf8(child.prop("maxseconds"))
+                if maxseconds is not None:
+                    maxseconds = int(maxseconds)
+                # TODO: since -- requires parsing of Jabber dateTime profile
+                since = None
+                return HistoryParameters(maxchars, maxstanzas, maxseconds, since)
 
     def set_password(self, password):
-        if self.xmlnode.get_children():
-            for child in self.xmlnode.get_children():
-                if child.name=="password" and get_node_ns_uri(child)==MUC_NS:
-                    child.unlinkNode()
-                    child.freeNode()
+        for element in xml_element_iter(xmlnode.children):
+            if get_node_ns_uri(child) == MUC_NS and element.name == "password":
+                element.unlinkNode()
+                element.freeNode()
+                break
             
-        if password:
+        if password is not None:
             self.xmlnode.newTextChild(self.xmlnode.ns(), "password", to_utf8(password))
             
-
     def get_password(self):
-        if self.xmlnode.getchildren():
-            for child in self.xmlnode.get_children():
-                    if child.name=="password" and libxml2.get_node_ns_uri(child)==MUC_NS:
-                        return child.getContent().from_utf8()
+        for element in xml_element_iter(xmlnode.children):
+            if get_node_ns_uri(child) == MUC_NS and element.name == "password":
+                return from_utf8(child.getContent())
         return None
 
 class HistoryParameters(object):
-    def __init__(self, maxchars=None, maxstanzas=None, maxseconds=None, since=None):
-        self.maxchars=maxchars
-        self.maxstanzas=maxstanzas
-        self.maxseconds=maxseconds
-        self.since=since
+    """Provides parameters for MUC history management
+
+    :Ivariables:
+        - `maxchars`: limit of the total number of characters in history.
+        - `maxstanzas`: limit of the total number of messages in history.
+        - `seconds`: send only messages received in the last `seconds` seconds.
+        - `since`: Send only the messages received since the dateTime (UTC)
+          specified.
+    :Types:
+        - `maxchars`: `int`
+        - `maxstanzas`: `int`
+        - `seconds`: `int`
+        - `since`: `datetime.datetime`
+    """
+    def __init__(self, maxchars = None, maxstanzas = None, maxseconds = None, since = None):
+        """Initializes a `HistoryParameters` object.
+        
+        :Parameters:
+            - `maxchars`: limit of the total number of characters in history.
+            - `maxstanzas`: limit of the total number of messages in history.
+            - `seconds`: send only messages received in the last `seconds` seconds.
+            - `since`: Send only the messages received since the dateTime specified.
+        :Types:
+            - `maxchars`: `int`
+            - `maxstanzas`: `int`
+            - `seconds`: `int`
+            - `since`: `datetime.datetime`
+        """
+        self.maxchars = maxchars
+        self.maxstanzas = maxstanzas
+        self.maxseconds = maxseconds
+        self.since = since
 
         
 class MucItemBase(object):
@@ -656,15 +685,37 @@ class MucPresence(Presence,MucStanzaExt):
         """
         return MucPresence(self)
 
-    def make_join_request(self, history=None, password=None):
+    def make_join_request(self, password = None, history_maxchars = None,
+            history_maxstanzas = None, history_seconds = None, 
+            history_since = None):
         """
         Make the presence stanza a MUC room join request.
+
+        :Parameters:
+            - `password`: password to the room.
+            - `history_maxchars`: limit of the total number of characters in
+              history.
+            - `history_maxstanzas`: limit of the total number of messages in
+              history.
+            - `history_seconds`: send only messages received in the last
+              `seconds` seconds.
+            - `history_since`: Send only the messages received since the
+              dateTime specified (UTC).
+        :Types:
+            - `password`: `unicode`
+            - `history_maxchars`: `int`
+            - `history_maxstanzas`: `int`
+            - `history_seconds`: `int`
+            - `history_since`: `datetime.datetime`
         """
         self.clear_muc_child()
         self.muc_child=MucX(parent=self.xmlnode)
-        if history:
+        if (history_maxchars or history_maxstanzas
+                or history_seconds or history_since):
+            history = HistoryParams(history_maxchars, history_maxstanzas,
+                    history_seconds, history_since)
             self.muc_child.set_history(history)
-        if password:
+        if password is not None:
             self.muc_child.set_password(password)
 
     def get_join_info(self):

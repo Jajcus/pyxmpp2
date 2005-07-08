@@ -40,13 +40,31 @@ I0011: 17: Locally disabling 'W0201'
 ************* Module pyxmpp.sasl.core
 W0511:188: FIXME: use some better RNG (/dev/urandom maybe)
 ************* Module pyxmpp.jabber.muc
-W0511:620: TODO: kicks
-W0511:672: TODO: ProtocolError
-W0511:679: TODO: ProtocolError
+W0302:  0: Too many lines in module (1020)
+W0511:639: TODO: kicks
+W0511:691: TODO: ProtocolError
+W0511:698: TODO: ProtocolError
 ************* Module pyxmpp.jabber.muccore
-W0511:155: FIXME: set/get password/history
-W0511:397: FIXME: alt,decline,invite,password
-W0511:438: FIXME: implement
+W0511:193: TODO: since -- requires parsing of Jabber dateTime profile
+W0511:488: FIXME: alt,decline,invite,password
+W0511:529: FIXME: implement
+W0131:156:MucX.set_history: Missing docstring
+E0602:157:MucX.set_history: Undefined variable 'xml_element_iter'
+E0602:157:MucX.set_history: Undefined variable 'xmlnode'
+E0602:158:MucX.set_history: Undefined variable 'child'
+W0131:181:MucX.get_history: Missing docstring
+E0602:182:MucX.get_history: Undefined variable 'xml_element_iter'
+E0602:182:MucX.get_history: Undefined variable 'xmlnode'
+E0602:183:MucX.get_history: Undefined variable 'child'
+W0131:197:MucX.set_password: Missing docstring
+E0602:198:MucX.set_password: Undefined variable 'xml_element_iter'
+E0602:198:MucX.set_password: Undefined variable 'xmlnode'
+E0602:199:MucX.set_password: Undefined variable 'child'
+W0131:207:MucX.get_password: Missing docstring
+E0602:208:MucX.get_password: Undefined variable 'xml_element_iter'
+E0602:208:MucX.get_password: Undefined variable 'xmlnode'
+E0602:209:MucX.get_password: Undefined variable 'child'
+E0602:715:MucPresence.make_join_request: Undefined variable 'HistoryParams'
 ************* Module pyxmpp.jabber.all
 I0011: 17: Locally disabling 'W0611'
 ************* Module pyxmpp.jabber.simple
@@ -61,7 +79,7 @@ W0511:1326: FIXME: agent field
 
 Report
 ======
-6745 statements analysed.
+6804 statements analysed.
 
 Duplication
 -----------
@@ -77,10 +95,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      7418   47.83 7418     =          
-docstring 6337   40.86 6337     =          
-comment   770    4.97  770      =          
-empty     983    6.34  983      =          
+code      7483   47.80 7418     +65.00     
+docstring 6414   40.97 6337     +77.00     
+comment   770    4.92  770      =          
+empty     989    6.32  983      +6.00      
 
 
 External dependencies
@@ -125,8 +143,8 @@ Statistics by type
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 module   45     45         =          97.78       0.00     
-class    124    124        =          100.00      0.00     
-method   675    675        =          98.52       0.74     
+class    125    124        +1.00      100.00      0.00     
+method   680    675        +5.00      97.94       0.74     
 function 47     47         =          93.62       0.00     
 
 
@@ -137,22 +155,22 @@ type       number previous difference
 ::::::::::::::::::::::::::::::::::::::
 convention 0      0        =          
 refactor   0      0        =          
-warning    14     14       =          
-error      0      1        -1.00      
+warning    19     14       +5.00      
+error      13     0        +13.00     
 
 
 % errors / warnings by module
 -----------------------------
 
-module                error warning refactor convention 
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp._xmlextra      0.00  28.57   0.00     0.00       
-pyxmpp.jabber.muccore 0.00  21.43   0.00     0.00       
-pyxmpp.jabber.muc     0.00  21.43   0.00     0.00       
-pyxmpp.sasl.core      0.00  7.14    0.00     0.00       
-pyxmpp.jabber.vcard   0.00  7.14    0.00     0.00       
-pyxmpp.clientstream   0.00  7.14    0.00     0.00       
-pyxmpp.cache          0.00  7.14    0.00     0.00       
+module                error  warning refactor convention 
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+pyxmpp.jabber.muccore 100.00 36.84   0.00     0.00       
+pyxmpp.jabber.muc     0.00   21.05   0.00     0.00       
+pyxmpp._xmlextra      0.00   21.05   0.00     0.00       
+pyxmpp.sasl.core      0.00   5.26    0.00     0.00       
+pyxmpp.jabber.vcard   0.00   5.26    0.00     0.00       
+pyxmpp.clientstream   0.00   5.26    0.00     0.00       
+pyxmpp.cache          0.00   5.26    0.00     0.00       
 
 
 Messages
@@ -160,12 +178,14 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
+E0602      13         
 W0511      10         
-W0131      3          
+W0131      7          
+W0302      1          
 W0103      1          
 
 
 Global evaluation
 -----------------
-Your code has been rated at 9.98/10 (previous run: 9.97/10)
+Your code has been rated at 9.88/10 (previous run: 9.98/10)
 

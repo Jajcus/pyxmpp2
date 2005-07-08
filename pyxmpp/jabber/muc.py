@@ -453,21 +453,33 @@ class MucRoomState:
             self.handler.user_left(self.me,None)
         self.joined=False
 
-    def join(self, history=None, password=None):
+    def join(self, password=None, history_maxchars = None,
+            history_maxstanzas = None, history_seconds = None, history_since = None):
         """
         Send a join request for the room.
 
         :Parameters:
-            - `history`: the parameters for history control
-            - `password`: password for the room, if any
+            - `password`: password to the room.
+            - `history_maxchars`: limit of the total number of characters in
+              history.
+            - `history_maxstanzas`: limit of the total number of messages in
+              history.
+            - `history_seconds`: send only messages received in the last
+              `seconds` seconds.
+            - `history_since`: Send only the messages received since the
+              dateTime specified (UTC).
         :Types:
-            - `history`: `HistoryParameters`
             - `password`: `unicode`
+            - `history_maxchars`: `int`
+            - `history_maxstanzas`: `int`
+            - `history_seconds`: `int`
+            - `history_since`: `datetime.datetime`
         """
         if self.joined:
             raise RuntimeError,"Room is already joined"
         p=MucPresence(to_jid=self.room_jid)
-        p.make_join_request(history, password)
+        p.make_join_request(password, history_maxchars, history_maxstanzas,
+                history_seconds, history_since)
         self.manager.stream.send(p)
 
     def leave(self):
@@ -832,7 +844,8 @@ class MucRoomManager:
         self.stream.set_presence_handler("unavailable",self.__presence_unavailable,None,priority)
         self.stream.set_presence_handler("error",self.__presence_error,None,priority)
 
-    def join(self,room,nick,handler,history=None,password=None):
+    def join(self, room, nick, handler, password = None, history_maxchars = None,
+            history_maxstanzas = None, history_seconds = None, history_since = None):
         """
         Create and return a new room state object and request joining
         to a MUC room.
@@ -841,14 +854,26 @@ class MucRoomManager:
             - `room`: the name of a room to be joined
             - `nick`: the nickname to be used in the room
             - `handler`: is an object to handle room events.
-            - `history`: the parameters for history control
             - `password`: password for the room, if any
+            - `history_maxchars`: limit of the total number of characters in
+              history.
+            - `history_maxstanzas`: limit of the total number of messages in
+              history.
+            - `history_seconds`: send only messages received in the last
+              `seconds` seconds.
+            - `history_since`: Send only the messages received since the
+              dateTime specified (UTC).
+
         :Types:
             - `room`: `JID`
             - `nick`: `unicode`
             - `handler`: `MucRoomHandler`
             - `history`: `HistoryParameters`
             - `password`: `unicode`
+            - `history_maxchars`: `int`
+            - `history_maxstanzas`: `int`
+            - `history_seconds`: `int`
+            - `history_since`: `datetime.datetime`
 
         :return: the room state object created.
         :returntype: `MucRoomState`
@@ -865,7 +890,8 @@ class MucRoomManager:
             
         rs=MucRoomState(self, self.stream.me, room_jid, handler)
         self.rooms[room_jid.bare().as_unicode()]=rs
-        rs.join(history, password)
+        rs.join(password, history_maxchars, history_maxstanzas,
+            history_seconds, history_since)
         return rs
 
     def get_room_state(self,room):
