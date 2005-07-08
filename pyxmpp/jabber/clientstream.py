@@ -75,8 +75,9 @@ class LegacyClientStream(ClientStream):
             - `keepalive`: `int`
             - `registration_form`: `pyxmpp.jabber.dataforms.Form`
         """
-        (self.authenticated,self.available_auth_methods,self.auth_stanza,
-                self.peer_authenticated,self.auth_method_used)=(None,)*5
+        (self.authenticated, self.available_auth_methods, self.auth_stanza,
+                self.peer_authenticated, self.auth_method_used,
+                self.registration_callback, self.registration_form, self.__register) = (None,) * 8
         ClientStream.__init__(self,jid,password,server,port,
                             auth_methods,tls_settings,keepalive)
         self.__logger=logging.getLogger("pyxmpp.jabber.LegacyClientStream")
@@ -93,18 +94,17 @@ class LegacyClientStream(ClientStream):
         """Initialize authentication when the connection is established
         and we are the initiator."""
         if not self.initiator:
-            self._start_auth()
             if "plain" in self.auth_methods or "digest" in self.auth_methods:
                 self.set_iq_get_handler("query","jabber:iq:auth",
                             self.auth_in_stage1)
                 self.set_iq_set_handler("query","jabber:iq:auth",
                             self.auth_in_stage2)
         elif self.registration_callback:
-                iq = Iq(stanza_type = "get")
-                iq.set_content(Register())
-                self.set_response_handlers(iq, self.registration_form, self.registration_error)
-                self.send(iq)
-                return
+            iq = Iq(stanza_type = "get")
+            iq.set_content(Register())
+            self.set_response_handlers(iq, self.registration_form_received, self.registration_error)
+            self.send(iq)
+            return
         ClientStream._post_connect(self)
 
     def _post_auth(self):
@@ -402,7 +402,7 @@ class LegacyClientStream(ClientStream):
         finally:
             self.lock.release()
 
-    def registration_form(self, stanza):
+    def registration_form_received(self, stanza):
         """Handle registration form received.
         
         [client only]
@@ -428,19 +428,23 @@ class LegacyClientStream(ClientStream):
         [client only]
 
         :Parameters:
-            - `form`: the filled-in form.
+            - `form`: the filled-in form. When form is `None` or its type is
+              "cancel" the registration is to be canceled.
+
         :Types:
             - `form`: `pyxmpp.jabber.dataforms.Form`"""
         self.lock.acquire()
         try:
-            self.registration_form = form
-            iq = Iq(stanza_type = "set")
-            iq.set_content(self.__register.submit_form(form))
-            self.set_response_handlers(iq, self.registration_success, self.registration_error)
-            self.send(iq)
+            if form and form.type!="cancel":
+                self.registration_form = form
+                iq = Iq(stanza_type = "set")
+                iq.set_content(self.__register.submit_form(form))
+                self.set_response_handlers(iq, self.registration_success, self.registration_error)
+                self.send(iq)
+            else:
+                self.__register = None
         finally:
             self.lock.release()
-
 
     def registration_success(self, stanza):
         """Handle registration success.
@@ -454,13 +458,15 @@ class LegacyClientStream(ClientStream):
             - `stanza`: the stanza received.
         :Types:
             - `stanza`: `pyxmpp.iq.Iq`"""
+        _unused = stanza
         self.lock.acquire()
         try:
             self.state_change("registered", self.registration_form)
             if ('FORM_TYPE' in self.registration_form 
                     and self.registration_form['FORM_TYPE'].value == 'jabber:iq:register'):
                 if 'username' in self.registration_form:
-                    self.my_jid = JID(self.registration_form['username'].value, self.my_jid.domain, self.my_jid.resource)
+                    self.my_jid = JID(self.registration_form['username'].value,
+                            self.my_jid.domain, self.my_jid.resource)
                 if 'password' in self.registration_form:
                     self.password = self.registration_form['password']
             self.registration_callback = None

@@ -25,11 +25,7 @@ __revision__="$Id: delay.py 567 2005-03-29 20:08:55Z jajcus $"
 __docformat__="restructuredtext en"
 
 import libxml2
-import time
-import datetime
 import logging
-
-from pyxmpp.jid import JID
 
 from pyxmpp.utils import to_utf8,from_utf8
 from pyxmpp.xmlextra import get_node_ns_uri
@@ -59,8 +55,6 @@ legacy_fields = {
         "text": ("text-single", u"Free-form text field (obsolete)"), 
         "key": ("text-single", u"Session key for transaction (obsolete)"),
         }
-
-# TODO: canceled forms
 
 class Register(StanzaPayloadObject):
     """
@@ -227,7 +221,8 @@ class Register(StanzaPayloadObject):
             if form_type == "form":
                 if not value:
                     value = None
-                form.add_field(name = field, field_type = field_type, label = field_label, value = value, required = True)
+                form.add_field(name = field, field_type = field_type, label = field_label,
+                        value = value, required = True)
             else:
                 form.add_field(name = field, value = value)
         return form
@@ -240,8 +235,8 @@ class Register(StanzaPayloadObject):
         :Parameters:
             - `form`: The form to submit. Its type doesn't have to be "submit"
               (a "submit" form will be created here), so it could be the form
-              obtained from `get_form` just with the data entered
-        
+              obtained from `get_form` just with the data entered.
+
         :return: new registration element
         :returntype: `Register`"""
         

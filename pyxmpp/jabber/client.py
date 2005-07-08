@@ -109,7 +109,7 @@ class JabberClient(Client):
         """
         Client.connect(self, register)
         if register:
-            self.stream.registration_callback = self.fill_in_registration_form
+            self.stream.registration_callback = self.process_registration_form
 
     def register_feature(self, feature_name):
         """Register a feature to be announced by Service Discovery.
@@ -241,7 +241,7 @@ class JabberClient(Client):
             return self.disco_items
         return None
 
-    def fill_in_registration_form(self, stanza, form):
+    def process_registration_form(self, stanza, form):
         """Fill-in the registration form provided by the server.
 
         This default implementation fills-in "username" and "passwords"
@@ -254,6 +254,7 @@ class JabberClient(Client):
             - `stanza`: `pyxmpp.iq.Iq`
             - `form`: `pyxmpp.jabber.dataforms.Form`
         """
+        _unused = stanza
         self.__logger.debug(u"default registration callback started. auto-filling-in the form...")
         if not 'FORM_TYPE' in form or 'jabber:iq:register' not in form['FORM_TYPE'].values:
             raise RuntimeError, "Unknown form type: %r %r" % (form, form['FORM_TYPE'])
