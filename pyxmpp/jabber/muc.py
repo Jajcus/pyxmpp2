@@ -64,7 +64,7 @@ class MucRoomHandler:
             - `state_obj`: `MucRoomState`"""
         self.room_state=state_obj
 
-    def room_created(self,stanza):
+    def room_created(self, stanza):
         """
         Called when the room has been created.
 
@@ -78,13 +78,14 @@ class MucRoomHandler:
         :Types:
             - `stanza`: `pyxmpp.stanza.Stanza`
         """
+        _unused = stanza
         self.room_state.request_instant_room() 
 
     def configuration_form_received(self,form):
         """
         Called when a requested configuration form is received.
 
-        The form, after filling-in shoul be passed to TODO: `self.room_state.configure_room`.
+        The form, after filling-in shoul be passed to `self.room_state.configure_room`.
 
         :Parameters:
             - `form`: the configuration form.
@@ -405,6 +406,7 @@ class MucRoomState:
         self.users={}
         self.me=MucRoomUser(room_jid)
         self.configured = None
+        self.configuration_form = None
         handler.assign_state(self)
         self.__logger=logging.getLogger("pyxmpp.jabber.MucRoomState")
 
@@ -700,7 +702,7 @@ class MucRoomState:
         :returntype: `unicode`
         """
         iq = Iq(to_jid = self.room_jid.bare(), stanza_type = "get")
-        query = iq.new_query(MUC_OWNER_NS, "query")
+        iq.new_query(MUC_OWNER_NS, "query")
         self.manager.stream.set_response_handlers(
                 iq, self.process_configuration_form_success, self.process_configuration_form_error)
         self.manager.stream.send(iq)
@@ -715,6 +717,7 @@ class MucRoomState:
         :Types:
             - `stanza`: `Presence`
         """
+        _unused = stanza
         self.configured = True
         self.handler.room_configured()
 

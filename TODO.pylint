@@ -1,7 +1,5 @@
 ************* Module pyxmpp.xmppstringprep
 I0011: 18: Locally disabling 'W0402'
-E0602:161:Profile.prepare: Undefined variable 'ListType'
-E0602:193:Profile.prepare_query: Undefined variable 'ListType'
 ************* Module pyxmpp.cache
 W0511:563: TODO: optimize somehow.
 ************* Module pyxmpp.streamsasl
@@ -42,7 +40,9 @@ I0011: 17: Locally disabling 'W0201'
 ************* Module pyxmpp.sasl.core
 W0511:188: FIXME: use some better RNG (/dev/urandom maybe)
 ************* Module pyxmpp.jabber.muc
-W0511:551: TODO: kicks
+W0511:620: TODO: kicks
+W0511:672: TODO: ProtocolError
+W0511:679: TODO: ProtocolError
 ************* Module pyxmpp.jabber.muccore
 W0511:155: FIXME: set/get password/history
 W0511:397: FIXME: alt,decline,invite,password
@@ -56,12 +56,12 @@ I0011: 17: Locally disabling 'E0201'
 I0011: 17: Locally disabling 'W0201'
 ************* Module pyxmpp.jabber.vcard
 I0011: 17: Locally disabling 'W0302'
-W0511:1325: FIXME: agent field
+W0511:1326: FIXME: agent field
 
 
 Report
 ======
-6466 statements analysed.
+6745 statements analysed.
 
 Duplication
 -----------
@@ -77,10 +77,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      7115   48.05 7121     -6.00      
-docstring 5997   40.50 5997     =          
-comment   754    5.09  751      +3.00      
-empty     940    6.35  939      +1.00      
+code      7418   47.83 7418     =          
+docstring 6337   40.86 6337     =          
+comment   770    4.97  770      =          
+empty     983    6.34  983      =          
 
 
 External dependencies
@@ -89,10 +89,10 @@ External dependencies
 
     stringprep (pyxmpp.xmppstringprep)
     random (pyxmpp.streambase,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.sasl.core,pyxmpp.sasl)
-    logging (pyxmpp.streamsasl,pyxmpp.streambase,pyxmpp.clientstream,pyxmpp.client,pyxmpp.stream,pyxmpp.streamtls,pyxmpp.stanzaprocessor,pyxmpp.jabberd.component,pyxmpp.jabberd.componentstream,pyxmpp.sasl.plain,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.client)
+    logging (pyxmpp.streamsasl,pyxmpp.streambase,pyxmpp.clientstream,pyxmpp.client,pyxmpp.stream,pyxmpp.streamtls,pyxmpp.stanzaprocessor,pyxmpp.jabberd.component,pyxmpp.jabberd.componentstream,pyxmpp.sasl.plain,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.client,pyxmpp.jabber.register)
     socket (pyxmpp.streambase,pyxmpp.resolver,pyxmpp.streamtls)
-    re (pyxmpp.jid,pyxmpp.xmlextra,pyxmpp.utils,pyxmpp.resolver,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
-    libxml2 (pyxmpp.roster,pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.utils,pyxmpp.stanza,pyxmpp.message,pyxmpp.objects,pyxmpp.stanzaprocessor,pyxmpp.iq,pyxmpp.error,pyxmpp.jabber.dataforms,pyxmpp.jabber.muccore,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard)
+    re (pyxmpp.jid,pyxmpp.xmlextra,pyxmpp.resolver,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
+    libxml2 (pyxmpp.roster,pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.stanza,pyxmpp.message,pyxmpp.objects,pyxmpp.stanzaprocessor,pyxmpp.iq,pyxmpp.error,pyxmpp.jabber.dataforms,pyxmpp.jabber.muccore,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard,pyxmpp.jabber.register)
     base64 (pyxmpp.streamsasl,pyxmpp.jabber.vcard)
     weakref (pyxmpp.jid,pyxmpp.jabber.muc)
     threading (pyxmpp.cache,pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.client,pyxmpp.expdict,pyxmpp.stanzaprocessor,pyxmpp.jabberd.component)
@@ -108,6 +108,7 @@ External dependencies
       \-resolver (pyxmpp.resolver)
     encodings 
       \-idna (pyxmpp.jid,pyxmpp.resolver)
+    copy (pyxmpp.jabber.dataforms)
     os (pyxmpp.streambase)
 
 
@@ -123,10 +124,10 @@ Statistics by type
 
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-module   44     44         =          97.73       0.00     
-class    122    122        =          100.00      0.00     
-method   651    651        =          98.46       0.77     
-function 45     45         =          93.33       0.00     
+module   45     45         =          97.78       0.00     
+class    124    124        =          100.00      0.00     
+method   675    675        =          98.52       0.74     
+function 47     47         =          93.62       0.00     
 
 
 Total errors / warnings
@@ -134,25 +135,24 @@ Total errors / warnings
 
 type       number previous difference 
 ::::::::::::::::::::::::::::::::::::::
-convention 0      1        -1.00      
+convention 0      0        =          
 refactor   0      0        =          
-warning    12     20       -8.00      
-error      2      2        =          
+warning    14     14       =          
+error      0      1        -1.00      
 
 
 % errors / warnings by module
 -----------------------------
 
-module                error  warning refactor convention 
-:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.xmppstringprep 100.00 0.00    0.00     0.00       
-pyxmpp._xmlextra      0.00   33.33   0.00     0.00       
-pyxmpp.jabber.muccore 0.00   25.00   0.00     0.00       
-pyxmpp.sasl.core      0.00   8.33    0.00     0.00       
-pyxmpp.jabber.vcard   0.00   8.33    0.00     0.00       
-pyxmpp.jabber.muc     0.00   8.33    0.00     0.00       
-pyxmpp.clientstream   0.00   8.33    0.00     0.00       
-pyxmpp.cache          0.00   8.33    0.00     0.00       
+module                error warning refactor convention 
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+pyxmpp._xmlextra      0.00  28.57   0.00     0.00       
+pyxmpp.jabber.muccore 0.00  21.43   0.00     0.00       
+pyxmpp.jabber.muc     0.00  21.43   0.00     0.00       
+pyxmpp.sasl.core      0.00  7.14    0.00     0.00       
+pyxmpp.jabber.vcard   0.00  7.14    0.00     0.00       
+pyxmpp.clientstream   0.00  7.14    0.00     0.00       
+pyxmpp.cache          0.00  7.14    0.00     0.00       
 
 
 Messages
@@ -160,13 +160,12 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-W0511      8          
+W0511      10         
 W0131      3          
-E0602      2          
 W0103      1          
 
 
 Global evaluation
 -----------------
-Your code has been rated at 9.97/10 (previous run: 9.95/10)
+Your code has been rated at 9.98/10 (previous run: 9.97/10)
 

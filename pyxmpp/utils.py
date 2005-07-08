@@ -25,7 +25,6 @@ import sys
 if sys.hexversion<0x02030000:
     raise ImportError,"Python 2.3 or newer is required"
 
-import re
 import time
 import datetime
 
