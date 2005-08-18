@@ -362,8 +362,10 @@ class StreamTLSMixIn:
                             return 0
                     else:
                         return 0
-            ok=cb(self, ctx,cert,errnum,depth,ok)
-            return ok
+            if cb:
+                return cb(self, ctx,cert,errnum,depth,ok)
+            else:
+                return ok
         except:
             self.__logger.exception("Exception cought")
             raise
