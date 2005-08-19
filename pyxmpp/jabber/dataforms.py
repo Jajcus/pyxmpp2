@@ -187,9 +187,9 @@ class Field(StanzaPayloadObject):
                     return None
                 elif l == 1:
                     v = values[0]
-                    if v == "0":
+                    if v in ("0","false"):
                         return False
-                    elif v == "1":
+                    elif v in ("1","true"):
                         return True
                 raise ValueError, "Bad boolean value"
             elif t.startswith("jid-"):
