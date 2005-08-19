@@ -121,7 +121,7 @@ class ExpiringDictionary(dict):
         if timeout<=time.time():
             if callback:
                 try:
-                    callback(key,self[key])
+                    callback(key,dict.__getitem__(self,key))
                 except TypeError:
                     try:
                         callback(key)
