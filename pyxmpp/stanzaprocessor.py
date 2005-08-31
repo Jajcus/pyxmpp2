@@ -221,6 +221,8 @@ class StanzaProcessor:
 
         :Parameters:
             - `stanza`: the stanza received.
+
+        :returns: `True` when stanza was handled
         """
 
         self.fix_in_stanza(stanza)
@@ -231,14 +233,15 @@ class StanzaProcessor:
 
         if stanza.stanza_type=="iq":
             if self.process_iq(stanza):
-                return
+                return True
         elif stanza.stanza_type=="message":
             if self.process_message(stanza):
-                return
+                return True
         elif stanza.stanza_type=="presence":
             if self.process_presence(stanza):
-                return
+                return True
         self.__logger.debug("Unhandled %r stanza: %r" % (stanza.stanza_type,stanza.serialize()))
+        return False
 
     def check_to(self,to):
         """Check "to" attribute of received stream header.
