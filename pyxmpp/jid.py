@@ -27,6 +27,7 @@ __docformat__="restructuredtext en"
 
 import re
 import weakref
+import warnings
 
 from encodings import idna
 
@@ -206,7 +207,8 @@ class JID(object):
         object.__setattr__(self,"resource",s)
 
     def __str__(self):
-        return self.as_string()
+        warnings.warn("JIDs should not be used as strings", DeprecationWarning, stacklevel=2)
+        return self.as_utf8()
 
     def __unicode__(self):
         return self.as_unicode()
@@ -223,7 +225,11 @@ class JID(object):
     def as_string(self):
         """UTF-8 encoded JID representation.
 
+        *Deprecated* Always use Unicode objects, or `as_utf8` if you really want.
+
         :return: UTF-8 encoded JID."""
+        warnings.warn("JID.as_string() is deprecated. Use unicode() or `as_utf8` instead.",
+                 DeprecationWarning, stacklevel=1)
         return self.as_utf8()
 
     def as_unicode(self):

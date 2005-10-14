@@ -106,7 +106,7 @@ class Presence(Stanza):
         if status:
             self.xmlnode.newTextChild(common_ns,"status",to_utf8(status))
         if priority and priority!=0:
-            self.xmlnode.newTextChild(common_ns,"priority",to_utf8(str(priority)))
+            self.xmlnode.newTextChild(common_ns,"priority",to_utf8(unicode(priority)))
 
     def copy(self):
         """Create a deep copy of the presence stanza.

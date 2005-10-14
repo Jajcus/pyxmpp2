@@ -93,9 +93,9 @@ class JabberClient(Client):
         self.disco_info=DiscoInfo()
         self.disco_identity=DiscoIdentity(self.disco_info,
                             disco_name, disco_category, disco_type)
-        self.register_feature("dnssrv")
-        self.register_feature("stringprep")
-        self.register_feature("urn:ietf:params:xml:ns:xmpp-sasl#c2s")
+        self.register_feature(u"dnssrv")
+        self.register_feature(u"stringprep")
+        self.register_feature(u"urn:ietf:params:xml:ns:xmpp-sasl#c2s")
         self.cache = CacheSuite(max_items = 1000)
         self.__logger = logging.getLogger("pyxmpp.jabber.JabberClient")
 

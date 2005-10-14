@@ -377,28 +377,28 @@ jep4_example2_fields = [
     # name, type, values, label, options, required, desc
     (u"FORM_TYPE", u"hidden", [u"jabber:bot"], None, [], False, None),
     (None, u"fixed", [u"Section 1: Bot Info"], None, [], False, None),
-    ("botname", 'text-single', [], 'The name of your bot', [], False, None),
-    ("description", "text-multi", [], 'Helpful description of your bot', [], False, None),
-    ('public', 'boolean', [], 'Public bot?', [], True, None),
-    ('password', 'text-private', [], 'Password for special access', [], False, None),
-    (None, 'fixed', ['Section 2: Features'], None, [], False, None),
-    ('features', 'list-multi', [], 'What features will the bot support?', [
-            ('Contests', 'contests'),
-            ('News', 'news'),
-            ('Polls', 'polls'),
-            ('Reminders', 'reminders'),
-            ('Search', 'search'),
+    ("botname", 'text-single', [], u'The name of your bot', [], False, None),
+    ("description", "text-multi", [], u'Helpful description of your bot', [], False, None),
+    ('public', 'boolean', [], u'Public bot?', [], True, None),
+    ('password', 'text-private', [], u'Password for special access', [], False, None),
+    (None, 'fixed', [u'Section 2: Features'], None, [], False, None),
+    ('features', 'list-multi', [], u'What features will the bot support?', [
+            (u'Contests', u'contests'),
+            (u'News', u'news'),
+            (u'Polls', u'polls'),
+            (u'Reminders', u'reminders'),
+            (u'Search', u'search'),
             ], False, None),
-    (None, 'fixed', ['Section 3: Subscriber List'], None, [], False, None),
-    ('maxsubs', 'list-single', ['20'], 'Maximum number of subscribers', [
-            ('10', '10'),
-            ('20', '20'),
-            ('30', '30'),
-            ('50', '50'),
-            ('100', '100'),
-            ('None', 'none')], False, None),
-    (None, 'fixed', ['Section 4: Invitations'], None, [], False, None),
-    ('invitelist', 'jid-multi', [], 'People to invite', [], False, u'Tell all your friends about your new bot!'),
+    (None, 'fixed', [u'Section 3: Subscriber List'], None, [], False, None),
+    ('maxsubs', 'list-single', [u'20'], u'Maximum number of subscribers', [
+            (u'10', u'10'),
+            (u'20', u'20'),
+            (u'30', u'30'),
+            (u'50', u'50'),
+            (u'100', u'100'),
+            (u'None', u'none')], False, None),
+    (None, 'fixed', [u'Section 4: Invitations'], None, [], False, None),
+    ('invitelist', 'jid-multi', [], u'People to invite', [], False, u'Tell all your friends about your new bot!'),
     ]
 jep4_example2_reported = []
 jep4_example2_items = []
@@ -440,16 +440,16 @@ jep4_example3_info = ("submit", None, None)
 jep4_example3_fields = [
     # name, type, values, label, options, required, desc
     ('FORM_TYPE', 'hidden', ['jabber:bot'], None, [], False, None),
-    ('botname', 'text-single', ['The Jabber Google Bot'], None, [], False, None),
-    ('description', 'text-multi', ['This bot enables you to send requests to',
-        'Google and receive the search results right',
-        'in your Jabber client. It\' really cool!',
-        'It even supports Google News!'], None, [], False, None),
-    ('public', 'boolean', ['0'], None, [], False, None),
-    ('password', 'text-private', ['v3r0na'],  None, [], False, None),
-    ('features', 'list-multi', ['news', 'search'], None, [], False, None),
-    ('maxsubs', 'list-single', ['50'], None, [], False, None),
-    ('invitelist', 'jid-multi', ['juliet@capulet.com', 'benvolio@montague.net'], None, [], False, None),
+    ('botname', 'text-single', [u'The Jabber Google Bot'], None, [], False, None),
+    ('description', 'text-multi', [u'This bot enables you to send requests to',
+        u'Google and receive the search results right',
+        u'in your Jabber client. It\' really cool!',
+        u'It even supports Google News!'], None, [], False, None),
+    ('public', 'boolean', [u'0'], None, [], False, None),
+    ('password', 'text-private', [u'v3r0na'],  None, [], False, None),
+    ('features', 'list-multi', [u'news', u'search'], None, [], False, None),
+    ('maxsubs', 'list-single', [u'50'], None, [], False, None),
+    ('invitelist', 'jid-multi', [u'juliet@capulet.com', u'benvolio@montague.net'], None, [], False, None),
     ]
 jep4_example3_reported = []
 jep4_example3_items = []
@@ -464,7 +464,7 @@ jep4_example3_parsed_values = {
     'password': u'v3r0na',
     'features': [u'news', u'search'],
     'maxsubs': u'50',
-    'invitelist': [JID('juliet@capulet.com'), JID('benvolio@montague.net')],
+    'invitelist': [JID(u'juliet@capulet.com'), JID(u'benvolio@montague.net')],
     }
 
 jep4_example8 = """

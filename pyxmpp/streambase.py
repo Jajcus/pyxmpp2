@@ -826,7 +826,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         the full JID it must be bound to a resource.
         """
         iq=Iq(stanza_type="set")
-        q=iq.new_query(BIND_NS,"bind")
+        q=iq.new_query(BIND_NS, u"bind")
         if resource:
             q.newTextChild(None,"resource",to_utf8(resource))
         self.state_change("binding",resource)

@@ -27,6 +27,7 @@ if sys.hexversion<0x02030000:
 
 import time
 import datetime
+import warnings
 
 def to_utf8(s):
     """
@@ -37,8 +38,11 @@ def to_utf8(s):
         return None
     elif type(s) is unicode:
         return s.encode("utf-8")
+    elif type(s) is str:
+        warnings.warn("Use of 8-bit strings instead of unicode in PyXMPP API is deprecated.", DeprecationWarning, stacklevel=2)
+        return s
     else:
-        return str(s)
+        return unicode(s).encode("utf-8")
 
 def from_utf8(s):
     """

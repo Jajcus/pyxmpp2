@@ -353,7 +353,7 @@ class StreamTLSMixIn:
 
             if ok and depth==0:
                 cn=cert.get_subject().CN
-                if str(cn)!=str(self.peer):
+                if str(cn) != self.peer.as_utf8():
                     self.__logger.debug(u"Common name does not match peer name (%s != %s)"
                             % (cn,self.peer))
                     if cb:

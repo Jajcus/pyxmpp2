@@ -346,8 +346,8 @@ class Stanza:
         ctxt.xpathRegisterNs("ns",COMMON_NS)
         if namespaces:
             for prefix,uri in namespaces.items():
-                ctxt.xpathRegisterNs(to_utf8(prefix),uri)
-        ret=ctxt.xpathEval(to_utf8(expr))
+                ctxt.xpathRegisterNs(unicode(prefix),uri)
+        ret=ctxt.xpathEval(unicode(expr))
         ctxt.xpathFreeContext()
         return ret
 

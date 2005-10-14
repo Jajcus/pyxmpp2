@@ -28,9 +28,9 @@ class TestMessage(unittest.TestCase):
         self.failUnlessEqual(m.get_to(), JID("dest@example.com"))
         self.failUnlessEqual(m.get_type(), "normal")
         self.failUnlessEqual(m.get_id(), "1")
-        self.failUnlessEqual(m.get_subject(), "Subject")
-        self.failUnlessEqual(m.get_body(), "The body")
-        self.failUnlessEqual(m.get_thread(), "thread-id")
+        self.failUnlessEqual(m.get_subject(), u"Subject")
+        self.failUnlessEqual(m.get_body(), u"The body")
+        self.failUnlessEqual(m.get_thread(), u"thread-id")
         nodes = m.xpath_eval("t:payload", {"t": "http://pyxmpp.jabberstudio.org/xmlns/test"})
         self.failUnless(nodes)
         self.failUnlessEqual(nodes[0].name, "payload")
@@ -72,7 +72,7 @@ class TestMessage(unittest.TestCase):
                 stanza_id = u"1",
                 subject = u"Subject",
                 body = u"The body",
-                thread = "thread-id")
+                thread = u"thread-id")
         n = m.xmlnode.newChild(None, "payload", None)
         ns = n.newNs("http://pyxmpp.jabberstudio.org/xmlns/test", "t")
         n.setNs(ns)
