@@ -39,7 +39,6 @@ def to_utf8(s):
     elif type(s) is unicode:
         return s.encode("utf-8")
     elif type(s) is str:
-        warnings.warn("Use of 8-bit strings instead of unicode in PyXMPP API is deprecated.", DeprecationWarning, stacklevel=2)
         return s
     else:
         return unicode(s).encode("utf-8")
