@@ -21,6 +21,13 @@ from distutils.core import setup, Extension
 if python_only:
     ext_modules = None
 else:
+    # set reasonable defaults, just in case
+    if sys.platform == 'win32':
+        include_dirs = [r'd:\libs\include', r'd:\libs\include\libxml']
+        library_dirs = [r'd:\libs\lib']
+    else:
+        include_dirs = ['/usr/include/libxml2','/usr/local/include/libxml2']
+        library_dirs = []
     ext_modules = [
         Extension(
             'pyxmpp._xmlextra',
@@ -28,8 +35,9 @@ else:
             'ext/xmlextra.c',
             ],
             libraries =     ['xml2'],
-            include_dirs =  ['libxml2addon','/usr/include/libxml2','/usr/local/include/libxml2'],
-            extra_compile_args = ['-g2'],
+            library_dirs = library_dirs,
+            include_dirs =  include_dirs,
+            extra_compile_args = [],
         ),
     ]
 

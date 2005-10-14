@@ -1,0 +1,45 @@
+Notes on how to compile Python extensions on windows without the Microsoft compiler. I assume some basic skills in Windows. Most of this is simply copied from http://sebsauvage.net/python/mingw.html.
+
+Steps:
+
+   1. Get and install MinGW gcc
+   2. Create libpython2?.a
+   3. Get and install required libxml2 libraries and dependencies.
+   4. Compile/install the extension with distutils. 
+
+
+Get and install MinGW gcc
+Get MinGW gcc from http://mingw.org (Minimalist GNU For Windows). The only required packages are MSYS and msysDTK.
+
+
+Create libpython2?.a
+To create Python extensions, you need to link against the Python library. Unfortunately, most Python distributions are provided with Python2?.lib, a library in Microsoft Visual C++ format. GCC expects a .a file (libpython2?.a to be precise). Here's how to convert python2?.lib to libpython2?.a:
+
+   1. Download pexports from http://starship.python.net/crew/kernr/mingw32/.
+   2. Extract files and make sure the bin directory is in your path.
+   3. Locate Python2?.dll (Found mine under C:\WINNT\system32).
+   4. Run:
+ 
+pexports python2?.dll > python2?.def 
+
+      This will extract all symbols from python2?.dll and write them into python2?.def.
+   5. Run:
+ 
+dlltool --dllname python2?.dll --def python2?.def --output-lib libpython2?.a
+
+      This will create libpython2?.a (dlltool is part of MinGW utilities).
+   6. Copy libpython2?.a to {your install}\python2?\libs\ (in the same directory as python22.lib). This trick should work for all Python versions, including future releases of Python. You can also use this trick to convert other libraries. (Will see about that soon) 
+
+
+Get and install required libxml2 libraries and dependencies
+Download Win32 binaries for libxml2, zlib and iconv from http://www.zlatkovic.com/libxml.en.html. Unpack the archives preserving directory structure and put them into some directory (e.g. d:\libs). If you exctract the libs in another directory, you will need to supply its locations to distutils (setup.py script).
+As libxml2 comes with .lib compiled for MSVC, you must create .a import library just the same as in case of libpython2x.a and put resulting libxml2.a in the same directory as libxml2.lib exists.
+
+
+Compile/install the extension with distutils
+Compile it:
+python setup.py build -cmingw32
+Install it:
+python setup.py install --skip-build
+Make binary distribution
+python setup.py build -cmingw32 bdist_wininst
