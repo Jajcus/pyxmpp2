@@ -89,9 +89,11 @@ class JID(object):
         if obj is None:
             obj=object.__new__(cls)
 
+        if node_or_jid:
+            node_or_jid = unicode(node_or_jid)
         if (node_or_jid and
                 ((u"@" in node_or_jid) or (u"/" in node_or_jid))):
-            obj.__from_string(node_or_jid)
+            obj.__from_unicode(node_or_jid)
             cls.cache[node_or_jid]=obj
         else:
             if domain is None and resource is None:
@@ -111,15 +113,6 @@ class JID(object):
 
     def __setattr__(self,name,value):
         raise RuntimeError,"JID objects are immutable!"
-
-    def __from_string(self,s,check=True):
-        """Initialize JID object from UTF-8 string.
-
-        :Parameters:
-            - `s`: the JID string
-            - `check`: when `False` then the JID is not checked for
-              specification compliance."""
-        return self.__from_unicode(from_utf8(s),check)
 
     def __from_unicode(self,s,check=True):
         """Initialize JID object from Unicode string.
@@ -157,13 +150,15 @@ class JID(object):
         """Initialize `self.node`
 
         :Parameters:
-            - `s`: Unicode or UTF-8 node part of the JID
+            - `s`: Node part of the JID
+        :Types:
+            - `s`: unicode
 
         :raise JIDError: if the node name is too long.
         :raise pyxmpp.xmppstringprep.StringprepError: if the
             node name fails Nodeprep preparation."""
         if s:
-            s=from_utf8(s)
+            s = unicode(s)
             s=nodeprep.prepare(s)
             if len(s.encode("utf-8"))>1023:
                 raise JIDError,"Node name too long"
@@ -179,10 +174,10 @@ class JID(object):
 
         :raise JIDError: if the domain name is too long."""
 
-        if s:
-            s=from_utf8(s)
         if s is None:
             raise JIDError,"Domain must be given"
+        if s:
+            s = unicode(s)
         s=idna.nameprep(s)
         if len(s.encode("utf-8"))>1023:
             raise JIDError,"Domain name too long"
@@ -198,7 +193,7 @@ class JID(object):
         :raise pyxmpp.xmppstringprep.StringprepError: if the
             node name fails Resourceprep preparation."""
         if s:
-            s=from_utf8(s)
+            s = unicode(s)
             s=resourceprep.prepare(s)
             if len(s.encode("utf-8"))>1023:
                 raise JIDError,"Resource name too long"
