@@ -77,7 +77,7 @@ class RosterItem(StanzaPayloadObject):
         ns=get_node_ns_uri(node)
         if ns and ns!=ROSTER_NS or node.name!="item":
             raise ValueError,"XML node is not a roster item"
-        jid=JID(node.prop("jid"))
+        jid=JID(node.prop("jid").decode("utf-8"))
         subscription=node.prop("subscription")
         if subscription not in ("none","from","to","both","remove"):
             subscription="none"
