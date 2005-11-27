@@ -33,6 +33,7 @@ from pyxmpp.iq import Iq
 from pyxmpp.jid import JID
 from pyxmpp import xmlextra
 from pyxmpp.objects import StanzaPayloadWrapperObject
+from pyxmpp.xmlextra import xml_element_iter
 
 MUC_NS="http://jabber.org/protocol/muc"
 MUC_USER_NS=MUC_NS+"#user"
@@ -154,7 +155,7 @@ class MucX(MucXBase):
         MucXBase.__init__(self,xmlnode=xmlnode, copy=copy, parent=parent)
 
     def set_history(self, parameters):
-        for element in xml_element_iter(xmlnode.children):
+        for element in xml_element_iter(self.xmlnode.children):
             if get_node_ns_uri(child) == MUC_NS and element.name == "history":
                 element.unlinkNode()
                 element.freeNode()
@@ -710,9 +711,9 @@ class MucPresence(Presence,MucStanzaExt):
         """
         self.clear_muc_child()
         self.muc_child=MucX(parent=self.xmlnode)
-        if (history_maxchars or history_maxstanzas
-                or history_seconds or history_since):
-            history = HistoryParams(history_maxchars, history_maxstanzas,
+        if (history_maxchars is not None or history_maxstanzas is not None
+                or history_seconds is not None or history_since is not None):
+            history = HistoryParameters(history_maxchars, history_maxstanzas,
                     history_seconds, history_since)
             self.muc_child.set_history(history)
         if password is not None:
