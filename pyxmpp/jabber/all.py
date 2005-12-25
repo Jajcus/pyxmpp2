@@ -35,6 +35,7 @@ from pyxmpp.jabber.client import JabberClient as Client
 from pyxmpp.jabber.disco import DISCO_NS,DISCO_INFO_NS,DISCO_ITEMS_NS
 from pyxmpp.jabber.disco import DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
 from pyxmpp.jabber.vcard import VCARD_NS,VCard
+from pyxmpp.jabber.register import Register
 
 for name in dir():
     if not name.startswith("__") and name!="pyxmpp":
