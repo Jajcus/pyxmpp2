@@ -209,7 +209,7 @@ class Register(StanzaPayloadObject):
         if self.form:
             if self.form.type != form_type:
                 raise ValueError, "Bad form type in the jabber:iq:register element"
-            return self.form.type
+            return self.form
 
         form = Form(form_type, instructions = self.instructions)
         form.add_field("FORM_TYPE", [u"jabber:iq:register"], "hidden")
