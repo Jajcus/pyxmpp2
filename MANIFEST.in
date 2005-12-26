@@ -1,9 +1,18 @@
 include Makefile
-include COPYING TODO DONE ChangeLog CHANGES
+include COPYING TODO ChangeLog CHANGES README README.WIN32
 include examples/*.py
 include tests/*.py
 include tests/Makefile
 include tests/data/*
 include utils/*.py
-include doc
-include utils
+include doc/*.html
+include doc/Makefile
+include doc/doc-tstamp
+include doc/www/*.html
+include doc/www/*.css
+include doc/www/api/*.css
+include doc/www/api/*.html
+include doc/www/api/private/*
+include doc/www/api/public/*
+include utils/*.py
+auxtools/htmlmerge.py
