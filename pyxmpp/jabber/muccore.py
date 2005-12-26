@@ -155,10 +155,16 @@ class MucX(MucXBase):
         MucXBase.__init__(self,xmlnode=xmlnode, copy=copy, parent=parent)
 
     def set_history(self, parameters):
-        for element in xml_element_iter(self.xmlnode.children):
-            if get_node_ns_uri(child) == MUC_NS and element.name == "history":
-                element.unlinkNode()
-                element.freeNode()
+        """
+        Set history parameters.
+
+        Types:
+            - `parameters`: `HistoryParameters`
+        """
+        for child in xml_element_iter(self.xmlnode.children):
+            if get_node_ns_uri(child) == MUC_NS and child.name == "history":
+                child.unlinkNode()
+                child.freeNode()
                 break
                 
         if parameters.maxchars and parameters.maxchars < 0:
@@ -180,8 +186,11 @@ class MucX(MucXBase):
             hnode.setProp("since", parameters.since.strftime("%Y-%m-%dT%H:%M:%SZ"))
 
     def get_history(self):
-        for element in xml_element_iter(xmlnode.children):
-            if get_node_ns_uri(child) == MUC_NS and element.name == "history":
+        """Return history parameters carried by the stanza.
+        
+        :returntype: `HistoryParameters`"""
+        for child in xml_element_iter(self.xmlnode.children):
+            if get_node_ns_uri(child) == MUC_NS and child.name == "history":
                 maxchars = from_utf8(child.prop("maxchars"))
                 if maxchars is not None:
                     maxchars = int(maxchars)
@@ -196,18 +205,28 @@ class MucX(MucXBase):
                 return HistoryParameters(maxchars, maxstanzas, maxseconds, since)
 
     def set_password(self, password):
-        for element in xml_element_iter(xmlnode.children):
-            if get_node_ns_uri(child) == MUC_NS and element.name == "password":
-                element.unlinkNode()
-                element.freeNode()
+        """Set password for the MUC request.
+        
+        :Parameters:
+            - `password`: password
+        :Types:
+            - `password`: `unicode`"""
+        for child in xml_element_iter(self.xmlnode.children):
+            if get_node_ns_uri(child) == MUC_NS and child.name == "password":
+                child.unlinkNode()
+                child.freeNode()
                 break
             
         if password is not None:
             self.xmlnode.newTextChild(self.xmlnode.ns(), "password", to_utf8(password))
             
     def get_password(self):
-        for element in xml_element_iter(xmlnode.children):
-            if get_node_ns_uri(child) == MUC_NS and element.name == "password":
+        """Get password from the MUC request.
+
+        :returntype: `unicode`
+        """
+        for child in xml_element_iter(self.xmlnode.children):
+            if get_node_ns_uri(child) == MUC_NS and child.name == "password":
                 return from_utf8(child.getContent())
         return None
 
