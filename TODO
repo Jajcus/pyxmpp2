@@ -9,7 +9,7 @@ xmpp-im:
 - privacy lists
 
 other:
+- jabber:iq:version
 - jabberd 2.0 component stream support
-- Data Forms (JEP-4)
-- jabber:iq:register (legacy in-band registration)
 - jabber:iq:search
+- add Zope3 interfaces support (with no strict requirement for zope.interface)
