@@ -51,7 +51,7 @@ class Delay(StanzaPayloadObject):
 
     xml_element_name = "x"
     xml_element_namespace = DELAY_NS
-    
+
     def __init__(self,node_or_datetime,delay_from=None,reason=None,utc=True):
         """
         Initialize the Delay object.

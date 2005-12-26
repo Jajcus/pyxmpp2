@@ -41,17 +41,17 @@ class StreamHandler:
     """Base class for stream handler."""
     def __init__(self):
         pass
-        
+
     def _stream_start(self,_doc):
         """Process stream start."""
         doc=libxml2.xmlDoc(_doc)
         self.stream_start(doc)
-    
+
     def _stream_end(self,_doc):
         """Process stream end."""
         doc=libxml2.xmlDoc(_doc)
         self.stream_end(doc)
-        
+
     def _stanza(self,_doc,_node):
         """Process complete stanza."""
         doc=libxml2.xmlDoc(_doc)
@@ -67,7 +67,7 @@ class StreamHandler:
         :Types:
             - `doc`: `libxml2.xmlDoc`"""
         print >>sys.stderr,"Unhandled stream start:",`doc.serialize()`
-        
+
     def stream_end(self,doc):
         """Called when the end tag of root element is encountered
         in the stream.
@@ -77,7 +77,7 @@ class StreamHandler:
         :Types:
             - `doc`: `libxml2.xmlDoc`"""
         print >>sys.stderr,"Unhandled stream end",`doc.serialize()`
-    
+
     def stanza(self, _unused, node):
         """Called when the end tag of a direct child of the root
         element is encountered in the stream.
@@ -93,7 +93,7 @@ class StreamHandler:
             - `_unused`: `libxml2.xmlDoc`
             - `node`: `libxml2.xmlNode`"""
         print >>sys.stderr,"Unhandled stanza",`node.serialize()`
-        
+
     def error(self,descr):
         """Called when an error is encountered in the stream.
 
@@ -109,7 +109,7 @@ try:
 #-------------------------------------------------------
     from pyxmpp import _xmlextra
     from pyxmpp._xmlextra import error
-        
+
     _create_reader = _xmlextra.sax_reader_new
 
     def replace_ns(node, old_ns,new_ns):
@@ -147,7 +147,7 @@ try:
 
 except ImportError:
 #########################################################################
-# Pure python implementation (slow workarounds for libxml2 limitations) 
+# Pure python implementation (slow workarounds for libxml2 limitations)
 #-----------------------------------------------------------------------
     class error(Exception):
         """Exception raised on a stream parse error."""
@@ -172,14 +172,14 @@ except ImportError:
             :Types:
                 - `handler`: `StreamHandler`
             """
-            self._handler = handler 
+            self._handler = handler
             self._head = ""
             self._tail = ""
             self._current = ""
             self._level = 0
             self._doc = None
             self._root = None
-            
+
         def cdataBlock(self, data):
             ""
             if self._level>1:
@@ -291,13 +291,13 @@ except ImportError:
             """Feed the parser with a chunk of data. Apropriate methods
             of `self.handler` will be called whenever something interesting is
             found.
-            
+
             :Parameters:
                 - `data`: the chunk of data to parse.
             :Types:
                 - `data`: `str`"""
             return self.parser.parseChunk(data, len(data), 0)
-        
+
     _create_reader = _PythonReader
 
     def _get_ns(node):
@@ -367,17 +367,17 @@ except ImportError:
     pure_python = True
 
 ###########################################################
-# Common code                                    
+# Common code
 #-------------
 
 def get_node_ns(xmlnode):
     """Namespace of an XML node.
-    
+
     :Parameters:
         - `xmlnode`: the XML node to query.
     :Types:
         - `xmlnode`: `libxml2.xmlNode`
-        
+
     :return: namespace of the node or `None`
     :returntype: `libxml2.xmlNs`"""
     try:
@@ -386,13 +386,13 @@ def get_node_ns(xmlnode):
         return None
 
 def get_node_ns_uri(xmlnode):
-    """Return namespace URI of an XML node.     
+    """Return namespace URI of an XML node.
 
     :Parameters:
         - `xmlnode`: the XML node to query.
     :Types:
         - `xmlnode`: `libxml2.xmlNode`
-        
+
     :return: namespace URI of the node or `None`
     :returntype: `unicode`"""
     ns=get_node_ns(xmlnode)

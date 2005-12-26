@@ -48,7 +48,7 @@ valid_string_re=re.compile(r"^[\w\d \t]*$")
 
 def rfc2425encode(name,value,parameters=None,charset="utf-8"):
     """Encodes a vCard field into an RFC2425 line.
-    
+
     :Parameters:
         - `name`: field type name
         - `value`: field value
@@ -1106,7 +1106,7 @@ class VCardPrivacy(VCardField):
     """Privacy vCard field.
 
     :Ivariables:
-        - `value`: privacy information about the vcard data ("public", "private" 
+        - `value`: privacy information about the vcard data ("public", "private"
           or "confidental")
     :Types:
         - `value`: `str` """
@@ -1340,7 +1340,7 @@ class VCard(StanzaPayloadObject):
     def __init__(self,data):
         """Initialize a VCard object from data which may be XML node
         or an RFC2426 string.
-        
+
         :Parameters:
             - `data`: vcard to parse.
         :Types:
@@ -1349,7 +1349,7 @@ class VCard(StanzaPayloadObject):
         # to make pylint happy
         self.n = None
         del self.n
-        
+
         self.content={}
         if isinstance(data,libxml2.xmlNode):
             self.__from_xml(data)
@@ -1399,7 +1399,7 @@ class VCard(StanzaPayloadObject):
 
     def __from_xml(self,data):
         """Initialize a VCard object from XML node.
-        
+
         :Parameters:
             - `data`: vcard to parse.
         :Types:
@@ -1441,7 +1441,7 @@ class VCard(StanzaPayloadObject):
 
     def __from_rfc2426(self,data):
         """Initialize a VCard object from an RFC2426 string.
-        
+
         :Parameters:
             - `data`: vcard to parse.
         :Types:

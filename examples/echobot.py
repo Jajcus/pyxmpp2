@@ -30,13 +30,13 @@ class Client(JabberClient):
         # and identity data
         JabberClient.__init__(self, jid, password,
                 disco_name="PyXMPP example: echo bot", disco_type="bot")
-                
+
         # register features to be announced via Service Discovery
         self.disco_info.add_feature("jabber:iq:version")
 
     def stream_state_changed(self,state,arg):
         """This one is called when the state of stream connecting the component
-        to a server changes. This will usually be used to let the user 
+        to a server changes. This will usually be used to let the user
         know what is going on."""
         print "*** State changed: %s %r ***" % (state,arg)
 
@@ -64,7 +64,7 @@ class Client(JabberClient):
 
     def get_version(self,iq):
         """Handler for jabber:iq:version queries.
-        
+
         jabber:iq:version queries are not supported directly by PyXMPP, so the
         XML node is accessed directly through the libxml2 API.  This should be
         used very carefully!"""
@@ -82,7 +82,7 @@ class Client(JabberClient):
         'headline', also sets own presence status to the message body. Please
         note that all message types but 'error' will be passed to the handler
         for 'normal' message unless some dedicated handler process them.
-        
+
         :returns: `True` to indicate, that the stanza should not be processed
         any further."""
         subject=stanza.get_subject()
@@ -150,16 +150,16 @@ class Client(JabberClient):
         p=stanza.make_accept_response()
         self.stream.send(p)
         return True
-    
+
     def print_roster_item(self,item):
         if item.name:
             name=item.name
         else:
             name=u""
-        print (u'%s "%s" subscription=%s groups=%s' 
-                % (unicode(item.jid), name, item.subscription, 
+        print (u'%s "%s" subscription=%s groups=%s'
+                % (unicode(item.jid), name, item.subscription,
                     u",".join(item.groups)) )
-    
+
     def roster_updated(self,item=None):
         if not item:
             print u"My roster:"
@@ -169,7 +169,7 @@ class Client(JabberClient):
         print u"Roster item updated:"
         self.print_roster_item(item)
 
-# XMPP protocol is Unicode-based to properly display data received 
+# XMPP protocol is Unicode-based to properly display data received
 # _must_ convert it to local encoding or UnicodeException may be raised
 locale.setlocale(locale.LC_CTYPE,"")
 encoding=locale.getlocale()[1]
@@ -179,7 +179,7 @@ sys.stdout=codecs.getwriter(encoding)(sys.stdout,errors="replace")
 sys.stderr=codecs.getwriter(encoding)(sys.stderr,errors="replace")
 
 
-# PyXMPP uses `logging` module for its debug output 
+# PyXMPP uses `logging` module for its debug output
 # applications should set it up as needed
 logger=logging.getLogger()
 logger.addHandler(logging.StreamHandler())

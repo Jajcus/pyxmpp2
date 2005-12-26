@@ -30,7 +30,7 @@ called when the object is available or an event occurs.
 As python is not a strongly-typed language so the parameter and attribute types
 shown in this documentation are not enforced, but those types are expected by
 the package and others may simply not work or stop working in future releases
-of PyXMPP. 
+of PyXMPP.
 
 Module hierarchy
 ................

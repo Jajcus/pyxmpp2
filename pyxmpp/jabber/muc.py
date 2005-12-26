@@ -57,7 +57,7 @@ class MucRoomHandler:
 
     def assign_state(self,state_obj):
         """Assign a state object to this `MucRoomHandler` instance.
-        
+
         :Parameters:
             - `state_obj`: the state object.
         :Types:
@@ -79,7 +79,7 @@ class MucRoomHandler:
             - `stanza`: `pyxmpp.stanza.Stanza`
         """
         _unused = stanza
-        self.room_state.request_instant_room() 
+        self.room_state.request_instant_room()
 
     def configuration_form_received(self,form):
         """
@@ -323,7 +323,7 @@ class MucRoomUser:
     def update_presence(self,presence):
         """
         Update user information.
-        
+
         :Parameters:
             - `presence`: a presence stanza with user information update.
         :Types:
@@ -355,12 +355,12 @@ class MucRoomUser:
     def same_as(self,other):
         """Check if two `MucRoomUser` objects describe the same user in the
         same room.
-        
+
         :Parameters:
             - `other`: the user object to compare `self` with.
         :Types:
             - `other`: `MucRoomUser`
-           
+
         :return: `True` if the two object describe the same user.
         :returntype: `bool`"""
         return self.room_jid==other.room_jid
@@ -757,7 +757,7 @@ class MucRoomState:
         Do nothing if the provided form is of type 'cancel'.
 
         :Parameters:
-            - `form`: the configuration parameters. Should be a 'submit' form made by filling-in 
+            - `form`: the configuration parameters. Should be a 'submit' form made by filling-in
               the configuration form retireved using `self.request_configuration_form` or
               a 'cancel' form.
         :Types:
@@ -766,7 +766,7 @@ class MucRoomState:
         :return: id of the request stanza or `None` if a 'cancel' form was provieded.
         :returntype: `unicode`
         """
-        
+
         if form.type == "cancel":
             return None
         elif form.type != "submit":
@@ -790,7 +790,7 @@ class MucRoomState:
             raise RuntimeError, "Instant room may be requested for unconfigured room only"
         form = Form("submit")
         return self.configure_room(form)
-    
+
 class MucRoomManager:
     """
     Manage collection of MucRoomState objects and dispatch events.
@@ -804,7 +804,7 @@ class MucRoomManager:
     def __init__(self,stream):
         """
         Initialize a `MucRoomManager` object.
-        
+
         :Parameters:
             - `stream`: a stream to be initially assigned to `self`.
         :Types:
@@ -877,16 +877,16 @@ class MucRoomManager:
         :return: the room state object created.
         :returntype: `MucRoomState`
         """
-        
+
         if not room.node or room.resource:
             raise ValueError,"Invalid room JID"
 
         room_jid = JID(room.node, room.domain, nick)
-            
+
         cur_rs = self.rooms.get(room_jid.bare().as_unicode())
         if cur_rs and cur_rs.joined:
             raise RuntimeError,"Room already joined"
-            
+
         rs=MucRoomState(self, self.stream.me, room_jid, handler)
         self.rooms[room_jid.bare().as_unicode()]=rs
         rs.join(password, history_maxchars, history_maxstanzas,
@@ -900,7 +900,7 @@ class MucRoomManager:
             - `room`: JID or the room which state is requested.
         :Types:
             - `room`: `JID`
-            
+
         :return: the state object.
         :returntype: `MucRoomState`"""
         return self.rooms.get(room.bare().as_unicode())

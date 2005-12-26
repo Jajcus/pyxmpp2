@@ -57,7 +57,7 @@ class MucXBase(StanzaPayloadWrapperObject):
         """
         Copy MucXBase object or create a new one, possibly
         based on or wrapping an XML node.
-        
+
         :Parameters:
             - `xmlnode`: is the object to copy or an XML node to wrap.
             - `copy`: when `True` a copy of the XML node provided will be included
@@ -166,16 +166,16 @@ class MucX(MucXBase):
                 child.unlinkNode()
                 child.freeNode()
                 break
-                
+
         if parameters.maxchars and parameters.maxchars < 0:
             raise ValueError, "History parameter maxchars must be positive"
         if parameters.maxstanzas and parameters.maxstanzas < 0:
             raise ValueError, "History parameter maxstanzas must be positive"
         if parameters.maxseconds and parameters.maxseconds < 0:
             raise ValueError, "History parameter maxseconds must be positive"
-            
+
         hnode=self.xmlnode.newChild(self.xmlnode.ns(), "history", None)
-        
+
         if parameters.maxchars is not None:
             hnode.setProp("maxchars", str(parameters.maxchars))
         if parameters.maxstanzas is not None:
@@ -187,7 +187,7 @@ class MucX(MucXBase):
 
     def get_history(self):
         """Return history parameters carried by the stanza.
-        
+
         :returntype: `HistoryParameters`"""
         for child in xml_element_iter(self.xmlnode.children):
             if get_node_ns_uri(child) == MUC_NS and child.name == "history":
@@ -206,7 +206,7 @@ class MucX(MucXBase):
 
     def set_password(self, password):
         """Set password for the MUC request.
-        
+
         :Parameters:
             - `password`: password
         :Types:
@@ -216,10 +216,10 @@ class MucX(MucXBase):
                 child.unlinkNode()
                 child.freeNode()
                 break
-            
+
         if password is not None:
             self.xmlnode.newTextChild(self.xmlnode.ns(), "password", to_utf8(password))
-            
+
     def get_password(self):
         """Get password from the MUC request.
 
@@ -247,7 +247,7 @@ class HistoryParameters(object):
     """
     def __init__(self, maxchars = None, maxstanzas = None, maxseconds = None, since = None):
         """Initializes a `HistoryParameters` object.
-        
+
         :Parameters:
             - `maxchars`: limit of the total number of characters in history.
             - `maxstanzas`: limit of the total number of messages in history.
@@ -264,7 +264,7 @@ class HistoryParameters(object):
         self.maxseconds = maxseconds
         self.since = since
 
-        
+
 class MucItemBase(object):
     """
     Base class for <status/> and <item/> element wrappers.
@@ -321,7 +321,7 @@ class MucItem(MucItemBase):
 
     def __init(self,affiliation,role,jid=None,nick=None,actor=None,reason=None):
         """Initialize a `MucItem` object from a set of attributes.
-        
+
         :Parameters:
             - `affiliation`: affiliation of the user.
             - `role`: role of the user.
@@ -525,7 +525,7 @@ class MucUserX(MucXBase):
             n=n.next
     def add_item(self,item):
         """Add an item to `self`.
-        
+
         :Parameters:
             - `item`: the item to add.
         :Types:
@@ -706,7 +706,7 @@ class MucPresence(Presence,MucStanzaExt):
         return MucPresence(self)
 
     def make_join_request(self, password = None, history_maxchars = None,
-            history_maxstanzas = None, history_seconds = None, 
+            history_maxstanzas = None, history_seconds = None,
             history_since = None):
         """
         Make the presence stanza a MUC room join request.

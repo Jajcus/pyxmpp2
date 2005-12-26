@@ -47,7 +47,7 @@ class TestMessage(unittest.TestCase):
         self.failUnlessEqual(m.get_thread(), None)
         nodes = m.xpath_eval("t:payload",{"t":"http://pyxmpp.jabberstudio.org/xmlns/test"})
         self.failIf(nodes)
-    
+
     def test_message_full_from_xml(self):
         m = Message(message1_node)
         self.check_message_full(m)
@@ -63,7 +63,7 @@ class TestMessage(unittest.TestCase):
         self.check_message_empty( Message(node) )
         node, doc = self.xml_to_xml(doc)
         self.check_message_empty( Message(node) )
- 
+
     def test_message_full(self):
         m = Message(
                 from_jid = JID("source@example.com/res"),
@@ -82,7 +82,7 @@ class TestMessage(unittest.TestCase):
         self.check_message_full( Message(node) )
         xml = self.xml_to_xml(doc)
         self.check_message_full( Message(node) )
-   
+
     def stanza_to_xml(self, stanza):
         d = libxml2.newDoc("1.0")
         r = d.newChild(None, "root", None)
@@ -91,14 +91,14 @@ class TestMessage(unittest.TestCase):
         d.setRootElement(r)
         xml = stanza.xmlnode.docCopyNode(d, 1)
         r.addChild(xml)
-        return xml,d 
+        return xml,d
 
     def xml_to_xml(self, xml):
         d = libxml2.parseDoc(xml.serialize())
         r = d.getRootElement()
         xml = r.children
         return xml, d
-       
+
 def suite():
      suite = unittest.TestSuite()
      suite.addTest(unittest.makeSuite(TestMessage))
@@ -107,4 +107,4 @@ def suite():
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(suite())
 
-# vi: sts=4 et sw=4 encoding=utf-8
+# vi: sts=4 et sw=4

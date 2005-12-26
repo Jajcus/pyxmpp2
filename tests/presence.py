@@ -77,7 +77,7 @@ class TestPresence(unittest.TestCase):
         self.check_presence_empty( Presence(node) )
         node, doc = self.xml_to_xml(doc)
         self.check_presence_empty( Presence(node) )
- 
+
     def test_presence_full(self):
         p = Presence(
                 from_jid = JID("source@example.com/res"),
@@ -96,7 +96,7 @@ class TestPresence(unittest.TestCase):
         self.check_presence_full( Presence(node) )
         xml = self.xml_to_xml(doc)
         self.check_presence_full( Presence(node) )
-   
+
     def stanza_to_xml(self, stanza):
         d = libxml2.newDoc("1.0")
         r = d.newChild(None, "root", None)
@@ -105,14 +105,14 @@ class TestPresence(unittest.TestCase):
         d.setRootElement(r)
         xml = stanza.xmlnode.docCopyNode(d, 1)
         r.addChild(xml)
-        return xml,d 
+        return xml,d
 
     def xml_to_xml(self, xml):
         d = libxml2.parseDoc(xml.serialize())
         r = d.getRootElement()
         xml = r.children
         return xml, d
-       
+
 def suite():
      suite = unittest.TestSuite()
      suite.addTest(unittest.makeSuite(TestPresence))
@@ -121,4 +121,4 @@ def suite():
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(suite())
 
-# vi: sts=4 et sw=4 encoding=utf-8
+# vi: sts=4 et sw=4

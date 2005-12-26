@@ -20,3 +20,4 @@ if not jid.resource:
     jid=JID(jid.node,jid.domain,"send_message")
 recpt=JID(recpt)
 send_message(jid,password,recpt,body,subject)
+# vi: sts=4 et sw=4

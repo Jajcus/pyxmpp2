@@ -37,19 +37,19 @@ class TestForm(unittest.TestCase):
         self.check_form_iter(form, jep4_example2_fields)
 
     def test_jep4_example2_build_inc(self):
-        form = self.build_form_inc("form", u"Bot Configuration", 
+        form = self.build_form_inc("form", u"Bot Configuration",
                 u"Fill out this form to configure your new bot!", jep4_example2_fields)
         self.check_form_info(form, jep4_example2_info)
         self.check_form_iter(form, jep4_example2_fields)
 
     def test_jep4_example2_build_direct(self):
-        form = self.build_form_direct("form", u"Bot Configuration", 
+        form = self.build_form_direct("form", u"Bot Configuration",
                 u"Fill out this form to configure your new bot!", jep4_example2_fields)
         self.check_form_info(form, jep4_example2_info)
         self.check_form_iter(form, jep4_example2_fields)
 
     def test_jep4_example2_as_xml(self):
-        form = self.build_form_inc("form", u"Bot Configuration", 
+        form = self.build_form_inc("form", u"Bot Configuration",
                 u"Fill out this form to configure your new bot!", jep4_example2_fields)
         xml = form.as_xml().serialize()
         form = self.parse_form(xml)
@@ -61,9 +61,9 @@ class TestForm(unittest.TestCase):
         form['public'].value = True
         sform = form.make_submit()
         self.check_form_info(sform, ("submit", None, None))
-        submitted_fields = [ 
-                    (f[0], None, f[2], None, [], False, None) 
-                        for f in jep4_example2_fields 
+        submitted_fields = [
+                    (f[0], None, f[2], None, [], False, None)
+                        for f in jep4_example2_fields
                             if f[1]!="fixed" and (f[5] or f[2])
                 ]
         sform['public'].value = None
@@ -74,9 +74,9 @@ class TestForm(unittest.TestCase):
         form['public'].value = True
         sform = form.make_submit( keep_types = True )
         self.check_form_info(sform, ("submit", None, None))
-        submitted_fields = [ 
-                    (f[0], f[1], f[2], None, [], False, None) 
-                        for f in jep4_example2_fields 
+        submitted_fields = [
+                    (f[0], f[1], f[2], None, [], False, None)
+                        for f in jep4_example2_fields
                             if f[1]!="fixed" and (f[5] or f[2])
                 ]
         sform['public'].value = None
@@ -256,7 +256,7 @@ class TestForm(unittest.TestCase):
         self.failUnlessEqual(form.type, form_type)
         self.failUnlessEqual(form.title, title)
         self.failUnlessEqual(form.instructions, instructions)
-        
+
     def check_form_iter(self, form, field_data):
         form_iter = iter(form)
         for name, ftype, values, label, options, required, desc in field_data:
@@ -305,7 +305,7 @@ class TestForm(unittest.TestCase):
         doc = libxml2.parseDoc(xml)
         root = doc.getRootElement()
         return Form(root)
-        
+
 def suite():
      suite = unittest.TestSuite()
      suite.addTest(unittest.makeSuite(TestForm))
@@ -560,4 +560,4 @@ jep4_example8_items = [
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(suite())
 
-# vi: sts=4 et sw=4 encoding=utf-8
+# vi: sts=4 et sw=4

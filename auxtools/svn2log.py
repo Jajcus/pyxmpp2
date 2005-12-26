@@ -14,7 +14,7 @@
 #    3. The name of the University may not be used to endorse or promote
 #       products derived from this software without specific prior
 #       written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE UNIVERSITY ``AS IS'' AND ANY EXPRESS OR
 # IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 # OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
@@ -63,7 +63,7 @@ def child(e, n):
   for c in e.children:
     if c.name == n: return c
   die("<%s> doesn't have <%s> child" % (e.name, n))
-  
+
 def convert_path(n):
   for src in reloc.keys():
     n = string.replace(n, src, reloc[src])
@@ -143,7 +143,7 @@ class Entry:
                           (time.strftime("%Y-%m-%d %H:%M +0000", time.localtime(self.beg_tm)), \
                            self.rev, convert_user(self.author)))
     out.write(self.msg)
-  
+
   def can_join(self, other):
     return self.author == other.author and abs(self.tm - other.tm) < max_join_delta
 
@@ -170,7 +170,7 @@ def process_entry(e):
         paths.append(nam + " (added)")
       else:
         paths.append(nam)
- 
+
   if paths != []:
     return Entry(tm, rev, author, "\t* %s\n" % wrap_text(", ".join(paths) + ": " + msg, "\t  ", 65))
 
@@ -181,9 +181,9 @@ def process(fin, fout):
   root = parser.parse(fin)
 
   if root.name != "log": die("root is not <log>")
-  
+
   cur = None
-  
+
   for logentry in root.children:
     if logentry.name != "logentry": die("non <logentry> <log> child")
     e = process_entry(logentry)
@@ -195,7 +195,7 @@ def process(fin, fout):
           cur.dump(fout)
           cur = e
       else: cur = e
-        
+
   if cur != None: cur.dump(fout)
 
 def usage():
@@ -205,7 +205,7 @@ Convert specified subversion xml logfile to GNU-style ChangeLog.
 
 Options:
   -p, --prefix=REGEXP  set root directory of project (it will be striped off
-                       from ChangeLog entries, paths outside it will be 
+                       from ChangeLog entries, paths outside it will be
                        ignored)
   -x, --exclude=DIR    exclude DIR from ChangeLog (relative to prefix)
   -o, --output         set output file (defaults to 'ChangeLog')
@@ -230,7 +230,7 @@ mark    Marcus Blah <mb@example.org>
 Typical usage of this script is something like this:
 
   svn log -v --xml | %s -p '/foo/(branches/[^/]+|trunk)' -u aux/users
-  
+
 Please send bug reports and comments to author:
   Michal Moskal <malekith@pld-linux.org>
 
@@ -241,7 +241,7 @@ def utf_open(name, mode):
 
 def process_opts():
   try:
-    opts, args = getopt.gnu_getopt(sys.argv[1:], "o:u:p:x:d:r:d:D:Fh", 
+    opts, args = getopt.gnu_getopt(sys.argv[1:], "o:u:p:x:d:r:d:D:Fh",
                                    ["users=", "prefix=", "domain=", "delta=",
                                     "exclude=", "help", "output=", "relocate=",
                                     "list-format"])
@@ -267,7 +267,7 @@ def process_opts():
       f = utf_open(a, "r")
       for line in f.xreadlines():
         w = line.split()
-        if len(line) < 1 or line[0] == '#' or len(w) < 2: 
+        if len(line) < 1 or line[0] == '#' or len(w) < 2:
           continue
         users[w[0]] = " ".join(w[1:])
     elif o in ("--relocate", "-r"):
@@ -296,3 +296,4 @@ if __name__ == "__main__":
   except AttributeError:
     pass
   process_opts()
+# vi: sts=4 et sw=4

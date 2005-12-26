@@ -16,7 +16,8 @@ class Merger:
             nn=slot.addChild(node.copyNode(True))
         output_doc.getRootElement().reconciliateNs(output_doc)
         return output_doc
-    
+
 m=Merger(sys.argv[1],sys.argv[2])
 out=m.merge()
 print out.serialize(format=True)
+# vi: sts=4 et sw=4

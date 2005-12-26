@@ -105,7 +105,7 @@ class DiscoItem(CachedPropertyObject, StanzaPayloadWrapperObject):
         self.xpath_ctxt=common_doc.xpathNewContext()
         self.xpath_ctxt.setContextNode(self.xmlnode)
         self.xpath_ctxt.xpathRegisterNs("d",DISCO_ITEMS_NS)
-        
+
     def __del__(self):
         if self.disco is None:
             if self.xmlnode:
@@ -116,7 +116,7 @@ class DiscoItem(CachedPropertyObject, StanzaPayloadWrapperObject):
             self.disco.invalidate_items()
         if self.xpath_ctxt:
             self.xpath_ctxt.xpathFreeContext()
-            
+
     def __str__(self):
         return self.xmlnode.serialize()
 
@@ -312,7 +312,7 @@ class DiscoIdentity(CachedPropertyObject, StanzaPayloadWrapperObject):
             self.disco.invalidate_identities()
         if self.xpath_ctxt:
             self.xpath_ctxt.xpathFreeContext()
-            
+
     def __str__(self):
         return self.xmlnode.serialize()
 
@@ -414,7 +414,7 @@ class DiscoItems(CachedPropertyObject, StanzaPayloadWrapperObject):
     """
     def __init__(self,xmlnode_or_node=None):
         """Initialize an `DiscoItems` object.
-        
+
         Wrap an existing disco#items XML element or create a new one.
 
         :Parameters:
@@ -531,7 +531,7 @@ class DiscoItems(CachedPropertyObject, StanzaPayloadWrapperObject):
             - `node`: `unicode`
             - `name`: `unicode`
             - `action`: `unicode`
-            
+
         :returns: the item created.
         :returntype: `DiscoItem`."""
         return DiscoItem(self,jid,node,name,action)
@@ -545,7 +545,7 @@ class DiscoItems(CachedPropertyObject, StanzaPayloadWrapperObject):
         :Types:
             - `jid`: `JID`
             - `node`: `libxml2.xmlNode`
-            
+
         :return: `True` if the item is found in `self`.
         :returntype: `bool`"""
         l=self.xpath_ctxt.xpathEval("d:item")
@@ -573,7 +573,7 @@ class DiscoInfo(CachedPropertyObject, StanzaPayloadWrapperObject):
     """
     def __init__(self,xmlnode_or_node=None, parent=None, doc=None):
         """Initialize an `DiscoInfo` object.
-        
+
         Wrap an existing disco#info XML element or create a new one.
 
         :Parameters:
@@ -622,7 +622,7 @@ class DiscoInfo(CachedPropertyObject, StanzaPayloadWrapperObject):
 
         :return: the node name.
         :returntype: `unicode`"""
-        
+
         node=self.xmlnode.prop("node")
         if not node:
             self.node=None
@@ -667,7 +667,7 @@ class DiscoInfo(CachedPropertyObject, StanzaPayloadWrapperObject):
             - `var`: the feature name.
         :Types:
             - `var`: `unicode`
-            
+
         :return: `True` if the feature is found in `self`.
         :returntype: `bool`"""
         if not var:
@@ -757,9 +757,9 @@ class DiscoInfo(CachedPropertyObject, StanzaPayloadWrapperObject):
 
 
     def identity_is(self,item_category,item_type=None):
-        """Check if the item described by `self` belongs to the given category 
+        """Check if the item described by `self` belongs to the given category
         and type.
-        
+
         :Parameters:
             - `item_category`: the category name.
             - `item_type`: the type name. If `None` then only the category is
@@ -767,7 +767,7 @@ class DiscoInfo(CachedPropertyObject, StanzaPayloadWrapperObject):
         :Types:
             - `item_category`: unicode
             - `item_type`: unicode
-        
+
         :return: `True` if `self` contains at least one <identity/> object with
             given type and category.
         :returntype: `bool`"""
@@ -832,7 +832,7 @@ class DiscoInfo(CachedPropertyObject, StanzaPayloadWrapperObject):
             - `item_name`: `unicode`
             - `item_category`: `unicode`
             - `item_type`: `unicode`
-            
+
         :returns: the identity created.
         :returntype: `DiscoIdentity`"""
         return DiscoIdentity(self,item_name,item_category,item_type)
@@ -859,7 +859,7 @@ class DiscoCacheFetcherBase(cache.CacheFetcher):
         self.stream.set_response_handlers(iq,self.__response, self.__error,
                 self.__timeout)
         self.stream.send(iq)
-        
+
     def __response(self,stanza):
         """Handle successful disco response.
 
@@ -889,7 +889,7 @@ class DiscoCacheFetcherBase(cache.CacheFetcher):
     def __timeout(self,stanza):
         """Handle disco timeout."""
         pass
-    
+
 def register_disco_cache_fetchers(cache_suite,stream):
     """Register Service Discovery cache fetchers into given
     cache suite and using the stream provided.

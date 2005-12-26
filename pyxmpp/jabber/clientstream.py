@@ -149,7 +149,7 @@ class LegacyClientStream(ClientStream):
     def auth_in_stage1(self,stanza):
         """Handle the first stage (<iq type='get'/>) of legacy ("plain" or
         "digest") authentication.
-        
+
         [server only]"""
         self.lock.acquire()
         try:
@@ -174,7 +174,7 @@ class LegacyClientStream(ClientStream):
     def auth_in_stage2(self,stanza):
         """Handle the second stage (<iq type='set'/>) of legacy ("plain" or
         "digest") authentication.
-        
+
         [server only]"""
         self.lock.acquire()
         try:
@@ -215,7 +215,7 @@ class LegacyClientStream(ClientStream):
     def _auth_stage1(self):
         """Do the first stage (<iq type='get'/>) of legacy ("plain" or
         "digest") authentication.
-        
+
         [client only]"""
         iq=Iq(stanza_type="get")
         q=iq.new_query("jabber:iq:auth")
@@ -228,7 +228,7 @@ class LegacyClientStream(ClientStream):
 
     def auth_timeout(self):
         """Handle legacy authentication timeout.
-        
+
         [client only]"""
         self.lock.acquire()
         try:
@@ -240,7 +240,7 @@ class LegacyClientStream(ClientStream):
 
     def auth_error(self,stanza):
         """Handle legacy authentication error.
-        
+
         [client only]"""
         self.lock.acquire()
         try:
@@ -276,7 +276,7 @@ class LegacyClientStream(ClientStream):
     def _plain_auth_stage2(self, _unused):
         """Do the second stage (<iq type='set'/>) of legacy "plain"
         authentication.
-        
+
         [client only]"""
         iq=Iq(stanza_type="set")
         q=iq.new_query("jabber:iq:auth")
@@ -290,7 +290,7 @@ class LegacyClientStream(ClientStream):
     def _plain_auth_in_stage2(self, username, _unused, stanza):
         """Handle the second stage (<iq type='set'/>) of legacy "plain"
         authentication.
-        
+
         [server only]"""
         password=stanza.xpath_eval("a:query/a:password",{"a":"jabber:iq:auth"})
         if password:
@@ -318,7 +318,7 @@ class LegacyClientStream(ClientStream):
     def _digest_auth_stage2(self, _unused):
         """Do the second stage (<iq type='set'/>) of legacy "digest"
         authentication.
-        
+
         [client only]"""
         iq=Iq(stanza_type="set")
         q=iq.new_query("jabber:iq:auth")
@@ -333,7 +333,7 @@ class LegacyClientStream(ClientStream):
     def _digest_auth_in_stage2(self, username, _unused, stanza):
         """Handle the second stage (<iq type='set'/>) of legacy "digest"
         authentication.
-        
+
         [server only]"""
         digest=stanza.xpath_eval("a:query/a:digest",{"a":"jabber:iq:auth"})
         if digest:
@@ -381,9 +381,9 @@ class LegacyClientStream(ClientStream):
 
     def registration_error(self, stanza):
         """Handle in-band registration error.
-        
+
         [client only]
-        
+
         :Parameters:
             - `stanza`: the error stanza received or `None` on timeout.
         :Types:
@@ -402,13 +402,13 @@ class LegacyClientStream(ClientStream):
 
     def registration_form_received(self, stanza):
         """Handle registration form received.
-        
+
         [client only]
 
         Call self.registration_callback with the registration form received
         as the argument. Use the value returned by the callback will be a
         filled-in form.
-        
+
         :Parameters:
             - `stanza`: the stanza received.
         :Types:
@@ -422,7 +422,7 @@ class LegacyClientStream(ClientStream):
 
     def submit_registration_form(self, form):
         """Submit a registration form.
-        
+
         [client only]
 
         :Parameters:
@@ -446,12 +446,12 @@ class LegacyClientStream(ClientStream):
 
     def registration_success(self, stanza):
         """Handle registration success.
-        
+
         [client only]
 
         Clean up registration stuff, change state to "registered" and initialize
         authentication.
-        
+
         :Parameters:
             - `stanza`: the stanza received.
         :Types:
@@ -460,7 +460,7 @@ class LegacyClientStream(ClientStream):
         self.lock.acquire()
         try:
             self.state_change("registered", self.registration_form)
-            if ('FORM_TYPE' in self.registration_form 
+            if ('FORM_TYPE' in self.registration_form
                     and self.registration_form['FORM_TYPE'].value == 'jabber:iq:register'):
                 if 'username' in self.registration_form:
                     self.my_jid = JID(self.registration_form['username'].value,

@@ -39,7 +39,7 @@ class Component(pyxmpp.jabberd.Component):
         pyxmpp.jabberd.Component.__init__(self, jid, secret, server, port,
                 disco_name="PyXMPP example: echo component",
                 disco_category="x-service", disco_type="x-echo")
-                
+
         # register features to be announced via Service Discovery
         self.disco_info.add_feature("jabber:iq:version")
         self.disco_info.add_feature("jabber:iq:register")
@@ -55,7 +55,7 @@ class Component(pyxmpp.jabberd.Component):
         That is the best place to setup various handlers for the stream.
         Do not forget about calling the authenticated() method of the base
         class!"""
-        
+
         pyxmpp.jabberd.Component.authenticated(self)
 
         # set up handlers for supported <iq/> queries
@@ -73,7 +73,7 @@ class Component(pyxmpp.jabberd.Component):
 
     def get_version(self,iq):
         """Handler for jabber:iq:version queries.
-        
+
         jabber:iq:version queries are not supported directly by PyXMPP, so the
         XML node is accessed directly through the libxml2 API.  This should be
         used very carefully!"""
@@ -86,7 +86,7 @@ class Component(pyxmpp.jabberd.Component):
 
     def get_register(self,iq):
         """Handler for jabber:iq:register 'get' queries.
-        
+
         jabber:iq:register queries are also not supported directly by PyXMPP,
         see above."""
         to=iq.get_to()
@@ -104,7 +104,7 @@ class Component(pyxmpp.jabberd.Component):
 
     def set_register(self,iq):
         """Handler for jabber:iq:register 'set' queries.
-        
+
         This does not do anything usefull (registration data is ignored),
         but shows how to parse request and use Presence stanzas for
         subscription handling."""
@@ -150,7 +150,7 @@ class Component(pyxmpp.jabberd.Component):
         'headline'. Please note that all message types but 'error' will
         be passed to the handler for 'normal' message unless some dedicated
         handler process them.
-        
+
         :returns: `True` to indicate, that the stanza should not be processed
         any further."""
         if stanza.get_type()=="headline":
@@ -187,7 +187,7 @@ class Component(pyxmpp.jabberd.Component):
         self.stream.send(p)
         return True
 
-# PyXMPP uses `logging` module for its debug output 
+# PyXMPP uses `logging` module for its debug output
 # applications should set it up as needed
 logger=logging.getLogger()
 logger.addHandler(logging.StreamHandler())

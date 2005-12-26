@@ -26,7 +26,7 @@ def xml_elements_equal(a, b, ignore_level1_cdata = False):
         if ns1.content != ns2.content:
             print "Ns mismatch: %r, %r on %r, %r" % (ns1.content, ns2.content, a, b)
             return False
- 
+
     ap = a.properties
     bp = b.properties
     while 1:
@@ -40,7 +40,7 @@ def xml_elements_equal(a, b, ignore_level1_cdata = False):
             return False
         ap = ap.next
         bp = bp.next
-   
+
     ac = a.children
     bc = b.children
     while ac != None or bc != None:
@@ -83,7 +83,7 @@ class EventTemplate:
         if not xml_elements_equal(self.xml.getRootElement(),node):
             return False
         return True
-            
+
     def __repr__(self):
         return "<EventTemplate %r at %r: %r>" % (self.event, self.offset, self.xml.getRootElement().serialize())
 
@@ -125,22 +125,22 @@ class TestStreamReader(unittest.TestCase):
         del self.handler
         del self.reader
         self.whole_stream.freeDoc()
-        
+
     def test_1(self):
         self.do_test(1)
-        
+
     def test_2(self):
         self.do_test(2)
-        
+
     def test_10(self):
         self.do_test(10)
-        
+
     def test_100(self):
         self.do_test(100)
-        
+
     def test_1000(self):
         self.do_test(1000)
-        
+
     def do_test(self, chunk_length):
         while 1:
             data=self.file.read(chunk_length)
@@ -164,13 +164,13 @@ class TestStreamReader(unittest.TestCase):
         expected = self.expected_events.pop(0)
         self.failUnless(event==expected.event, "Got %r, expected %r" % (event, expected.event))
         if expected.offset < self.chunk_start:
-            self.fail("Delayed event: %r. Expected at: %i, found at %i:%i" 
+            self.fail("Delayed event: %r. Expected at: %i, found at %i:%i"
                     % (event, expected.offset, self.chunk_start, self.chunk_end))
         if expected.offset > self.chunk_end:
-            self.fail("Early event: %r. Expected at: %i, found at %i:%i" 
+            self.fail("Early event: %r. Expected at: %i, found at %i:%i"
                     % (event, expected.offset, self.chunk_start, self.chunk_end))
         if not expected.match(event,node):
-            self.fail("Unmatched event. Expected: %r, got: %r;%r" 
+            self.fail("Unmatched event. Expected: %r, got: %r;%r"
                     % (expected, event, node.serialize()))
         if event == "start":
             n = node.docCopyNode(self.whole_stream,1)
@@ -180,7 +180,7 @@ class TestStreamReader(unittest.TestCase):
             n = node.docCopyNode(self.whole_stream,1)
             r = self.whole_stream.getRootElement()
             r.addChild(n)
-            
+
 def suite():
     load_expected_events()
     load_whole_stream()
@@ -191,4 +191,4 @@ def suite():
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(suite())
 
-# vi: sts=4 et sw=4 encoding=utf-8
+# vi: sts=4 et sw=4

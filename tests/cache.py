@@ -47,49 +47,49 @@ class TestCacheItem(unittest.TestCase):
         state = item.update_state()
         self.failUnlessEqual(state,item.state)
         self.failUnlessEqual(item.state,"fresh")
-        
+
         sleep(0.01)
         # t+~0.01
         state = item.update_state()
         self.failUnlessEqual(state,item.state)
         self.failUnlessEqual(item.state,"fresh")
-        
+
         sleep(0.1)
         # t+~0.11
         state = item.update_state()
         self.failUnlessEqual(state,item.state)
         self.failUnlessEqual(item.state,"old")
- 
+
         sleep(0.01)
         # t+~0.12
         state = item.update_state()
         self.failUnlessEqual(state,item.state)
         self.failUnlessEqual(item.state,"old")
-        
+
         sleep(0.1)
         # t+~0.22
         state = item.update_state()
         self.failUnlessEqual(state,item.state)
         self.failUnlessEqual(item.state,"stale")
-       
+
         sleep(0.01)
         # t+~0.23
         state = item.update_state()
         self.failUnlessEqual(state,item.state)
         self.failUnlessEqual(item.state,"stale")
-       
+
         sleep(0.1)
         # t+~0.33
         state = item.update_state()
         self.failUnlessEqual(state,item.state)
         self.failUnlessEqual(item.state,"purged")
-        
+
         sleep(0.1)
         # t+~0.43
         state = item.update_state()
         self.failUnlessEqual(state,item.state)
         self.failUnlessEqual(item.state,"purged")
- 
+
 class TestCacheFetcher(unittest.TestCase):
     def setUp(self):
         self.cache = Cache(100)
@@ -102,13 +102,13 @@ class TestCacheFetcher(unittest.TestCase):
 
     def object_handler(self, address, value, state):
         self.event = ("success", address, value, state)
-        
+
     def error_handler(self, address, error_data):
         self.event = ("error", address, error_data)
-        
+
     def timeout_handler(self, address):
         self.event = ("timeout", address)
-        
+
     def test_fetcher_fetch(self):
         fetcher = self.make_fetcher()
         self.failUnlessRaises(RuntimeError,fetcher.fetch)
@@ -120,7 +120,7 @@ class TestCacheFetcher(unittest.TestCase):
         self.event = None
         fetcher.got_it("test_value")
         self.failUnlessEqual(self.event, None)
-    
+
     def test_success_other_state(self):
         fetcher = self.make_fetcher()
         fetcher.got_it("test_value","stale")
@@ -133,7 +133,7 @@ class TestCacheFetcher(unittest.TestCase):
         self.event = None
         fetcher.error("test_error")
         self.failUnlessEqual(self.event, None)
- 
+
     def test_timeout(self):
         fetcher = self.make_fetcher()
         fetcher.timeout()
@@ -178,7 +178,7 @@ class TestCache(unittest.TestCase):
         self.failUnless(gitem3 is item3, "gitem2=%r item2=%r" % (gitem2, item2))
         gitem1 = cache.get_item("test_addr1","new")
         self.failUnless(gitem1 is None, "gitem1=%r" % (gitem1,))
-        
+
     def test_max_items(self):
         cache = Cache(10)
         self.failUnlessEqual(cache.num_items(),0,"number of items: "+`cache.num_items()`)
@@ -297,7 +297,7 @@ class TestCache(unittest.TestCase):
         cache = Cache(100)
         cache.set_fetcher(self.Fetcher)
         cache.request_object(1, "fresh", self.object_handler,
-                self.error_handler, self.timeout_handler, 
+                self.error_handler, self.timeout_handler,
                 timeout=timedelta(seconds=0.1))
         self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.05)
@@ -315,10 +315,10 @@ class TestCache(unittest.TestCase):
 
     def object_handler(self, address, value, state):
         self.event = ("success", address, value, state)
-        
+
     def error_handler(self, address, error_data):
         self.event = ("error", address, error_data)
-        
+
     def timeout_handler(self, address):
         self.event = ("timeout", address)
 
@@ -341,13 +341,13 @@ class TestCacheSuite(unittest.TestCase):
                     self.got_it(self.cls(self.address))
                 else:
                     self.error("Negative address")
-                    
+
         class MyFetcher1(MyFetcher):
             cls = TestClass1
-        
+
         class MyFetcher2(MyFetcher):
             cls = TestClass2
-        
+
         self.Fetcher1 = MyFetcher1
         self.Fetcher2 = MyFetcher2
 
@@ -355,7 +355,7 @@ class TestCacheSuite(unittest.TestCase):
         cache = CacheSuite(100)
         cache.register_fetcher(TestClass1, self.Fetcher1)
         cache.register_fetcher(TestClass2, self.Fetcher2)
-        
+
         cache.request_object(TestClass1, 1, "fresh", self.object_handler,
                 self.error_handler, self.timeout_handler)
         self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
@@ -384,14 +384,14 @@ class TestCacheSuite(unittest.TestCase):
 
     def object_handler(self, address, value, state):
         self.event = ("success", address, value, state)
-        
+
     def error_handler(self, address, error_data):
         self.event = ("error", address, error_data)
-        
+
     def timeout_handler(self, address):
         self.event = ("timeout", address)
 
-     
+
 def suite():
      suite = unittest.TestSuite()
      suite.addTest(unittest.makeSuite(TestCacheItem))
@@ -403,4 +403,4 @@ def suite():
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(suite())
 
-# vi: sts=4 et sw=4 encoding=utf-8
+# vi: sts=4 et sw=4

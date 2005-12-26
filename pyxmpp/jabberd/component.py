@@ -86,9 +86,9 @@ class Component:
             - `disco_name`: disco identity name to be used in the
               disco#info responses.
             - `disco_category`: disco identity category to be used in the
-              disco#info responses.  Use `the categories registered by Jabber Registrar <http://www.jabber.org/registrar/disco-categories.html>`__ 
+              disco#info responses.  Use `the categories registered by Jabber Registrar <http://www.jabber.org/registrar/disco-categories.html>`__
             - `disco_type`: disco identity type to be used in the component's
-              disco#info responses.  Use `the types registered by Jabber Registrar <http://www.jabber.org/registrar/disco-categories.html>`__ 
+              disco#info responses.  Use `the types registered by Jabber Registrar <http://www.jabber.org/registrar/disco-categories.html>`__
             - `keepalive`: keepalive interval for the stream.
 
         :Types:

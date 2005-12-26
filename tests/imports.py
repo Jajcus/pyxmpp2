@@ -36,7 +36,7 @@ class TestImports(unittest.TestCase):
         from pyxmpp.jabberd import Component as n1
         import pyxmpp.jabberd.component as m2
         self.failUnless(n1 is m2.Component,"Component not imported correctly")
-     
+
 def suite():
      suite = unittest.TestSuite()
      suite.addTest(unittest.makeSuite(TestImports))
@@ -45,4 +45,4 @@ def suite():
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(suite())
 
-# vi: sts=4 et sw=4 encoding=utf-8
+# vi: sts=4 et sw=4

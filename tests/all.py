@@ -20,7 +20,7 @@ def usage():
     print "Usage:"
     print "  %s [-v <verbosity>] " % (sys.argv[0],)
     print "  %s -h"
-    
+
 def main(args=None):
     verbosity=1
     if args:
@@ -42,3 +42,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main(sys.argv[1:])
+# vi: sts=4 et sw=4

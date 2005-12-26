@@ -39,7 +39,7 @@ from pyxmpp.utils import from_utf8
 
 class JabberClient(Client):
     """Base class for a Jabber client.
-    
+
     :Ivariables:
         - `disco_items`: default Disco#items reply for a query to an empty node.
         - `disco_info`: default Disco#info reply for a query to an empty node --
@@ -143,7 +143,7 @@ class JabberClient(Client):
         """Handle a disco#info request.
 
         `self.disco_get_info` method will be used to prepare the query response.
-        
+
         :Parameters:
             - `iq`: the IQ stanza received.
         :Types:
@@ -170,7 +170,7 @@ class JabberClient(Client):
         """Handle a disco#items request.
 
         `self.disco_get_items` method will be used to prepare the query response.
-        
+
         :Parameters:
             - `iq`: the IQ stanza received.
         :Types:

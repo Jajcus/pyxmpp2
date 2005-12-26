@@ -145,7 +145,7 @@ class RosterItem(StanzaPayloadObject):
 
 class Roster(StanzaPayloadObject):
     """Class representing XMPP-IM roster.
-    
+
     :Ivariables:
         - `items_dict`: items indexed by JID.
     :Types:

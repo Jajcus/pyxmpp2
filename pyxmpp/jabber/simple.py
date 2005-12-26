@@ -65,7 +65,7 @@ def send_message(my_jid, my_password, to_jid, body, subject=None,
         - `message_type`: `str`
         - `server`: `unicode` or `str`
         - `port`: `int`
-    """    
+    """
     from pyxmpp.message import Message
     msg=Message(to_jid=to_jid,body=body,subject=subject,stanza_type=message_type)
     def fun(stream):

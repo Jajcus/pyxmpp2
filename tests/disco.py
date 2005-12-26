@@ -26,13 +26,13 @@ test_features=[
 #    u"http://dżabber.example.com/example-namespace",
     ];
 test_features.sort()
- 
+
 notest_features=[
     u"another-test-feature",
     u"http://jabber.org/protocol/disco#items",
     u"http://dżabber.example.com/another-example-namespace",
     ];
-       
+
 
 class TestDiscoInfo(unittest.TestCase):
     def test_xml_input(self):
@@ -42,7 +42,7 @@ class TestDiscoInfo(unittest.TestCase):
         txt+="\n"+`di.features`+"\n"
         should_be=file("data/disco_info_in.txt").read()
         self.failUnlessEqual(txt,should_be)
-        
+
     def build_disco_info(self,node=None):
         di=disco.DiscoInfo(node)
         for name,category,type in test_identities:
@@ -55,7 +55,7 @@ class TestDiscoInfo(unittest.TestCase):
 
     def test_building(self):
         self.build_disco_info()
-    
+
     def test_building_with_node(self):
         di=self.build_disco_info("test")
         self.failUnlessEqual(di.node,"test")
@@ -133,7 +133,7 @@ class TestDiscoItems(unittest.TestCase):
 
     def test_building(self):
         self.build_disco_items()
-    
+
     def test_building_with_node(self):
         di=self.build_disco_items("test")
         self.failUnlessEqual(di.node,"test")
@@ -150,7 +150,7 @@ class TestDiscoItems(unittest.TestCase):
             self.failUnless(di.has_item(jid,node),"Item (%r,%r) not found" % (jid,node))
         for jid,node in notest_items:
             self.failIf(di.has_item(jid,node),"Item (%r,%r) found" % (jid,node))
-        
+
 def suite():
      suite = unittest.TestSuite()
      suite.addTest(unittest.makeSuite(TestDiscoInfo))
@@ -160,4 +160,4 @@ def suite():
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(suite())
 
-# vi: sts=4 et sw=4 encoding=utf-8
+# vi: sts=4 et sw=4

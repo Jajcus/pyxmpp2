@@ -11,7 +11,7 @@ def main(module_list):
                'docformat':None, 'top':None, 'inheritance': None,
                'ignore_param_mismatch': 0, 'alphabetical': 1}
 
-    
+
     modules=_import(options['modules'],1)
 
     # Record the order of the modules in options.
@@ -32,7 +32,7 @@ def main(module_list):
 
 def escape(s):
     return str(s).replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace('"','&quot;').replace("'",'&apos;')
-           
+
 class _Progress:
     """
 
@@ -70,7 +70,7 @@ class _Progress:
         @param argument: The object that is about to be processed.
         """
         if self._verbosity <= 0: return
-        
+
         if self._verbosity==1:
             if self._item_num == 1 and self._total_items <= 70:
                 sys.stderr.write('  [')
@@ -96,10 +96,10 @@ class _Progress:
                     argument = os.path.join(d, file)
                 else:
                     fname = argument
-            
+
             print >>sys.stderr, TRACE_FORMAT % (self._item_num, argument)
         self._item_num += 1
-        
+
 
 def _import(module_names, verbosity):
     """
@@ -129,7 +129,7 @@ def _import(module_names, verbosity):
         print >>sys.stderr, 'Importing %s modules.' % len(module_names)
     modules = []
     progress = _Progress('Importing', verbosity, len(module_names))
-    
+
     for name in module_names:
         progress.report(name)
         # Import the module, and add it to the list.
@@ -171,7 +171,7 @@ def _make_docmap(modules, options):
         print  >>sys.stderr, ('Building API documentation for %d modules.'
                               % len(modules))
     progress = _Progress('Building docs for', verbosity, len(modules))
-    
+
     for module in modules:
         progress.report(module.__name__)
         # Add the module.  Catch any exceptions that get generated.
@@ -179,7 +179,7 @@ def _make_docmap(modules, options):
         except Exception, e:
             if options['debug']: raise
             else: _internal_error(e)
-        except:   
+        except:
             if options['debug']: raise
             else: _internal_error()
 
@@ -211,7 +211,7 @@ FOOTER="""
 class Formatter:
     def __init__(self,docmap):
         self.docmap=docmap
-        
+
     def format(self,modules=None):
         self.generalizations=[]
         ret=HEADER
@@ -234,7 +234,7 @@ class Formatter:
         ret+="\n".join(self.generalizations)+"\n"
         ret+=FOOTER
         return ret
-        
+
     def format_module(self,uid,recursive):
         if recursive:
             name=uid.shortname()
@@ -257,7 +257,7 @@ class Formatter:
         uid=link.target()
         doc=self.docmap[uid]
         descr=doc.descr()
-        ret=("        <UML:Class xmi.id='%s' name='%s' comment='%s'>\n" 
+        ret=("        <UML:Class xmi.id='%s' name='%s' comment='%s'>\n"
                 % (escape(uid),escape(name),escape(descr.to_plaintext(None))))
         for meth in doc.allmethods():
             ret+=self.format_method(meth,doc)
@@ -267,7 +267,7 @@ class Formatter:
         for base in doc.bases():
             buid=base.target()
             g=("      <UML:Generalization xmi.id='%s(%s)'"
-                    " child='%s' parent='%s' visibility='public'/>" 
+                    " child='%s' parent='%s' visibility='public'/>"
                     % (escape(uid),escape(buid),escape(uid),escape(buid)))
             self.generalizations.append(g)
         return ret
@@ -288,7 +288,7 @@ class Formatter:
             vis=" visibility='public'"
         else:
             vis=" visibility='private'"
-        return ("          <UML:Attribute xmi.id='%s' name='%s' %s%s />\n" % 
+        return ("          <UML:Attribute xmi.id='%s' name='%s' %s%s />\n" %
                 (escape(uid),escape(name),vis,descr))
 
     def format_method(self,link,container):
@@ -319,7 +319,8 @@ class Formatter:
             st=" stereotype='/Stereotype:staticmethod'"
         else:
             st=""
-        return ("          <UML:Operation xmi.id='%s' name='%s' %s%s%s />\n" % 
+        return ("          <UML:Operation xmi.id='%s' name='%s' %s%s%s />\n" %
                 (escape(uid),escape(name),vis,descr,st))
 
 main(sys.argv[1:])
+# vi: sts=4 et sw=4

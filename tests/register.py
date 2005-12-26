@@ -25,7 +25,7 @@ class TestRegister(unittest.TestCase):
         self.failUnlessEqual(register.username, u"")
         self.failUnlessEqual(register.password, u"")
         self.failUnlessEqual(register.email, u"")
-        
+
     def test_jep77_example2_get_form(self):
         register = self.parse_stanza(jep77_example2)
         form = register.get_form()
@@ -86,7 +86,7 @@ class TestRegister(unittest.TestCase):
         doc = libxml2.parseDoc(xml)
         root = doc.getRootElement()
         return Form(root)
- 
+
 def suite():
      suite = unittest.TestSuite()
      suite.addTest(unittest.makeSuite(TestRegister))
@@ -259,11 +259,11 @@ jep77_example17 = """
    </x>
  </iq>
 """
-    
+
 # end of test data
 ###################
 
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(suite())
 
-# vi: sts=4 et sw=4 encoding=utf-8
+# vi: sts=4 et sw=4

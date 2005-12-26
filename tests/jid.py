@@ -17,13 +17,13 @@ valid_jids=[
     (u"jajcus@jabber.bnet.pl/Test",
         (u"jajcus",u"jabber.bnet.pl",u"Test")),
     (u"Jajcus@jaBBer.bnet.pl/Test",
-        (u"jajcus",u"jabber.bnet.pl",u"Test")), 
+        (u"jajcus",u"jabber.bnet.pl",u"Test")),
     (u"Jajcus@jaBBer.bnet.pl/test",
-        (u"jajcus",u"jabber.bnet.pl",u"test")), 
+        (u"jajcus",u"jabber.bnet.pl",u"test")),
     (u"jajcuś@dżabber.example.com/Test",
-        (u"jajcuś",u"dżabber.example.com",u"Test")), 
+        (u"jajcuś",u"dżabber.example.com",u"Test")),
     (u"JAJCUŚ@DŻABBER.EXAMPLE.COM/TEST",
-        (u"jajcuś",u"dżabber.example.com",u"TEST")), 
+        (u"jajcuś",u"dżabber.example.com",u"TEST")),
     (u"%s@%s/%s" % (u"x"*1023,u"x"*1023,u"x"*1023),
         (u"x"*1023,u"x"*1023,u"x"*1023)),
 ]
@@ -35,10 +35,10 @@ valid_tuples=[
     ((None,u"example.com","Test"),u"example.com/Test"),
     ((u"jajcus",u"jabber.bnet.pl",None),u"jajcus@jabber.bnet.pl"),
     ((u"jajcus",u"jabber.bnet.pl",u"Test"),u"jajcus@jabber.bnet.pl/Test"),
-    ((u"Jajcus",u"jaBBer.bnet.pl",u"Test"),u"jajcus@jabber.bnet.pl/Test"), 
-    ((u"Jajcus",u"jaBBer.bnet.pl",u"test"),u"jajcus@jabber.bnet.pl/test"), 
-    ((u"jajcuś",u"dżabber.example.com",u"Test"),u"jajcuś@dżabber.example.com/Test"), 
-    ((u"JAJCUŚ",u"DŻABBER.EXAMPLE.COM",u"TEST"),u"jajcuś@dżabber.example.com/TEST"), 
+    ((u"Jajcus",u"jaBBer.bnet.pl",u"Test"),u"jajcus@jabber.bnet.pl/Test"),
+    ((u"Jajcus",u"jaBBer.bnet.pl",u"test"),u"jajcus@jabber.bnet.pl/test"),
+    ((u"jajcuś",u"dżabber.example.com",u"Test"),u"jajcuś@dżabber.example.com/Test"),
+    ((u"JAJCUŚ",u"DŻABBER.EXAMPLE.COM",u"TEST"),u"jajcuś@dżabber.example.com/TEST"),
 ]
 
 invalid_jids=[
@@ -58,24 +58,24 @@ invalid_jids=[
 ]
 
 comparisions_true=[
-    'JID(u"a@b.c") == JID(u"a@b.c")', 
-    'JID(u"a@b.c") == JID(u"A@b.c")', 
-    'JID(u"a@b.c") != JID(u"b@b.c")', 
-    'JID(u"a@b.c") < JID(u"b@b.c")', 
-    'JID(u"b@b.c") > JID(u"a@b.c")', 
-    'JID(u"a@b.c") > None', 
-    'JID(u"1@b.c") > None', 
+    'JID(u"a@b.c") == JID(u"a@b.c")',
+    'JID(u"a@b.c") == JID(u"A@b.c")',
+    'JID(u"a@b.c") != JID(u"b@b.c")',
+    'JID(u"a@b.c") < JID(u"b@b.c")',
+    'JID(u"b@b.c") > JID(u"a@b.c")',
+    'JID(u"a@b.c") > None',
+    'JID(u"1@b.c") > None',
     'None < JID(u"1@b.c")',
 ]
 
 comparisions_false=[
-    'JID(u"a@b.c") != JID(u"a@b.c")', 
-    'JID(u"a@b.c") != JID(u"A@b.c")', 
-    'JID(u"a@b.c") == JID(u"b@b.c")', 
-    'JID(u"a@b.c") > JID(u"b@b.c")', 
-    'JID(u"b@b.c") < JID(u"a@b.c")', 
-    'JID(u"a@b.c") < None', 
-    'JID(u"1@b.c") < None', 
+    'JID(u"a@b.c") != JID(u"a@b.c")',
+    'JID(u"a@b.c") != JID(u"A@b.c")',
+    'JID(u"a@b.c") == JID(u"b@b.c")',
+    'JID(u"a@b.c") > JID(u"b@b.c")',
+    'JID(u"b@b.c") < JID(u"a@b.c")',
+    'JID(u"a@b.c") < None',
+    'JID(u"1@b.c") < None',
     'None > JID(u"1@b.c")',
 ]
 
@@ -124,4 +124,4 @@ def suite():
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(suite())
 
-# vi: sts=4 et sw=4 encoding=utf-8
+# vi: sts=4 et sw=4

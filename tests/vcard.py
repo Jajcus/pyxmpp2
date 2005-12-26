@@ -4,7 +4,7 @@ import unittest
 
 import libxml2
 from pyxmpp.jabber import vcard
-    
+
 def vcard2txt(vcard):
     """Extract data from VCard object for text comparision.
     Separate function defined here to test the API (attribute access)."""
@@ -103,7 +103,7 @@ def vcard2txt(vcard):
 
 def xml_error_handler(ctx,error):
     pass
-    
+
 class TestVCard(unittest.TestCase):
     def setUp(self):
         libxml2.registerErrorHandler(xml_error_handler,None)

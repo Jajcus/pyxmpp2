@@ -56,12 +56,12 @@ output_root = output_doc.getRootElement()
 class TestReplaceNs(unittest.TestCase):
     def test_replace_ns(self):
         doc = libxml2.newDoc("1.0")
-        
+
         root = doc.newChild(None, "root", None)
         common_ns = root.newNs(xmlextra.COMMON_NS, None)
         root.setNs(common_ns)
         doc.setRootElement(root)
-        
+
         n = input_doc.getRootElement()
         input_ns = n.ns()
         n = n.children
@@ -74,15 +74,15 @@ class TestReplaceNs(unittest.TestCase):
                     xmlextra.replace_ns(n1, n1_ns, common_ns)
             n = n.next
         self.failUnless(xml_elements_equal(root, output_root))
- 
+
     def test_replace_null_ns(self):
         doc = libxml2.newDoc("1.0")
-        
+
         root = doc.newChild(None, "root", None)
         common_ns = root.newNs(xmlextra.COMMON_NS, None)
         root.setNs(common_ns)
         doc.setRootElement(root)
-        
+
         n = input_doc2.getRootElement()
         input_ns = n.ns()
         n = n.children
@@ -98,14 +98,14 @@ class TestReplaceNs(unittest.TestCase):
                     xmlextra.replace_ns(n1, n1_ns, common_ns)
             n = n.next
         self.failUnless(xml_elements_equal(root, output_root))
-        
+
     def test_safe_serialize(self):
         s1 = """<a xmlns="http://pyxmpp.jabberstudio.org/xmlns/test"><b a1="v1" xmlns="http://pyxmpp.jabberstudio.org/xmlns/test1" a2="v2"/></a>"""
         doc1 = libxml2.parseDoc(s1)
         root1 = doc1.getRootElement()
         el1 = root1.children
         el1.setNs(root1.ns())
-        
+
         #s = el1.serialize()
         s = xmlextra.safe_serialize(el1)
 
@@ -114,7 +114,7 @@ class TestReplaceNs(unittest.TestCase):
         doc2 = libxml2.parseDoc(s2)
         root2 = doc2.getRootElement()
         self.failUnless(xml_elements_equal(root1, root2))
-    
+
 
 def suite():
      suite = unittest.TestSuite()
@@ -124,4 +124,4 @@ def suite():
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(suite())
 
-# vi: sts=4 et sw=4 encoding=utf-8
+# vi: sts=4 et sw=4

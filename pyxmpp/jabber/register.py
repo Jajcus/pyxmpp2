@@ -38,21 +38,21 @@ REGISTER_NS="jabber:iq:register"
 
 legacy_fields = {
         "username": ("text-single", u"Account name associated with the user"),
-        "nick": ("text-single", u"Familiar name of the user"), 
+        "nick": ("text-single", u"Familiar name of the user"),
         "password": ("text-private", u"Password or secret for the user"),
-        "name": ("text-single", u"Full name of the user"), 
-        "first": ("text-single", u"First name or given name of the user"), 
-        "last": ("text-single", u"Last name, surname, or family name of the user"), 
-        "email": ("text-single", u"Email address of the user"), 
-        "address": ("text-single", u"Street portion of a physical or mailing address"), 
-        "city": ("text-single", u"Locality portion of a physical or mailing address"), 
-        "state": ("text-single", u"Region portion of a physical or mailing address"), 
-        "zip": ("text-single", u"Postal code portion of a physical or mailing address"), 
-        "phone": ("text-single", u"Telephone number of the user"), 
-        "url": ("text-single", u"URL to web page describing the user"), 
-        "date": ("text-single", u"Some date (e.g., birth date, hire date, sign-up date)"), 
-        "misc": ("text-single", u"Free-form text field (obsolete)"), 
-        "text": ("text-single", u"Free-form text field (obsolete)"), 
+        "name": ("text-single", u"Full name of the user"),
+        "first": ("text-single", u"First name or given name of the user"),
+        "last": ("text-single", u"Last name, surname, or family name of the user"),
+        "email": ("text-single", u"Email address of the user"),
+        "address": ("text-single", u"Street portion of a physical or mailing address"),
+        "city": ("text-single", u"Locality portion of a physical or mailing address"),
+        "state": ("text-single", u"Region portion of a physical or mailing address"),
+        "zip": ("text-single", u"Postal code portion of a physical or mailing address"),
+        "phone": ("text-single", u"Telephone number of the user"),
+        "url": ("text-single", u"URL to web page describing the user"),
+        "date": ("text-single", u"Some date (e.g., birth date, hire date, sign-up date)"),
+        "misc": ("text-single", u"Free-form text field (obsolete)"),
+        "text": ("text-single", u"Free-form text field (obsolete)"),
         "key": ("text-single", u"Session key for transaction (obsolete)"),
         }
 
@@ -148,7 +148,7 @@ class Register(StanzaPayloadObject):
         ns=get_node_ns_uri(xmlnode)
         if ns and ns!=REGISTER_NS or xmlnode.name!="query":
             raise ValueError,"XML node is not a jabber:iq:register element"
-            
+
         for element in xml_element_iter(xmlnode.children):
             ns = get_node_ns_uri(element)
             if ns == DATAFORM_NS and element.name == "x" and not self.form:
@@ -181,7 +181,7 @@ class Register(StanzaPayloadObject):
             - `doc`: `libxml2.xmlDoc`"""
         ns = xmlnode.ns()
         if self.instructions is not None:
-            xmlnode.newTextChild(ns, "instructions", to_utf8(self.instructions)) 
+            xmlnode.newTextChild(ns, "instructions", to_utf8(self.instructions))
         if self.form:
             self.form.as_xml(xmlnode, doc)
         if self.remove:
@@ -192,8 +192,8 @@ class Register(StanzaPayloadObject):
             for field in legacy_fields:
                 value = getattr(self, field)
                 if value is not None:
-                    xmlnode.newTextChild(ns, field, to_utf8(value)) 
-    
+                    xmlnode.newTextChild(ns, field, to_utf8(value))
+
     def get_form(self, form_type = "form"):
         """Return Data Form for the `Register` object.
 
@@ -204,7 +204,7 @@ class Register(StanzaPayloadObject):
               returned. If "sumbit", then a form with submitted data.
         :Types:
             - `form_type`: `unicode`
-        
+
         :return: `self.form` or a form created from the legacy fields
         :returntype: `pyxmpp.jabber.dataforms.Form`"""
 
@@ -241,7 +241,7 @@ class Register(StanzaPayloadObject):
 
         :return: new registration element
         :returntype: `Register`"""
-        
+
         result = Register()
         if self.form:
             result.form = form.make_submit()
@@ -249,7 +249,7 @@ class Register(StanzaPayloadObject):
 
         if "FORM_TYPE" not in form or "jabber:iq:register" not in form["FORM_TYPE"].values:
             raise ValueError, "FORM_TYPE is not jabber:iq:register"
-            
+
         for field in legacy_fields:
             self.__logger.debug(u"submitted field %r" % (field, ))
             value = getattr(self, field)
@@ -263,5 +263,5 @@ class Register(StanzaPayloadObject):
 
         return result
 
-                
+
 # vi: sts=4 et sw=4

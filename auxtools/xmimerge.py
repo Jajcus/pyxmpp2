@@ -32,7 +32,7 @@ class Merger:
                 new_root.addChild(n.docCopyNode(self.output_doc,True))
             n=n.next
         return self.output_doc
-        
+
     def merge_xmi_content(self,target,old_content):
         self.old_elements={}
         n=old_content.children
@@ -67,7 +67,7 @@ class Merger:
             if n.type!="element":
                 n=n.next
                 continue
-            
+
             new_node=target.addChild(n.docCopyNode(self.output_doc,False))
             p=n.get_properties()
             while p:
@@ -82,7 +82,7 @@ class Merger:
                     val=old_val
                 new_node.setProp(p.name,val)
                 p=p.next
-                
+
             npath="%s/%s:%s" % (path,n.name,n.prop("name"))
             auto_xmi_id=n.prop("xmi.id")
             xmi_id=self.xmi_id_map.get(npath)
@@ -120,3 +120,4 @@ class Merger:
 m=Merger(sys.argv[1],sys.argv[2])
 out=m.merge()
 print out.serialize(format=True)
+# vi: sts=4 et sw=4

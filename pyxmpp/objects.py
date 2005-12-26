@@ -44,11 +44,11 @@ class StanzaPayloadObject(object):
     """
     xml_element_name = None
     xml_element_namespace = None
-    
+
     def as_xml(self, parent = None, doc = None):
         """Get the XML representation of `self`.
 
-        New document will be created if no `parent` and no `doc` is given. 
+        New document will be created if no `parent` and no `doc` is given.
 
         :Parameters:
             - `parent`: the parent for the XML element.
@@ -87,9 +87,9 @@ class StanzaPayloadObject(object):
             xmlnode = doc1.newChild(None,self.xml_element_name, None)
             ns = xmlnode.newNs(self.xml_element_namespace, None)
             xmlnode.setNs(ns)
-            
+
         self.complete_xml_element(xmlnode, doc1)
-        
+
         if doc or parent:
             return xmlnode
         doc1.setRootElement(xmlnode)
@@ -123,11 +123,11 @@ class StanzaPayloadWrapperObject(object):
     :Types:
         - `xmlnode`: `libxml2.xmlNode`
     """
-    
+
     def as_xml(self, parent = None, doc = None):
         """Get the XML representation of `self`.
 
-        New document will be created if no `parent` and no `doc` is given. 
+        New document will be created if no `parent` and no `doc` is given.
 
         :Parameters:
             - `parent`: the parent for the XML element.
@@ -186,3 +186,4 @@ class CachedPropertyObject(object):
 
 
 
+# vi: sts=4 et sw=4

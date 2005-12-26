@@ -142,7 +142,7 @@ class CacheFetcher:
     """Base class for cache object fetchers -- classes responsible for
     retrieving objects from network.
 
-    An instance of a fetcher class is created for each object requested and 
+    An instance of a fetcher class is created for each object requested and
     not found in the cache, then `fetch` method is called to initialize
     the asynchronous retrieval process. Fetcher object's `got_it` method
     should be called on a successfull retrieval and `error` otherwise.
@@ -211,11 +211,11 @@ class CacheFetcher:
         self.cache.remove_fetcher(self)
         if self.active:
             self._deactivated()
-    
+
     def _deactivated(self):
         """Mark the fetcher inactive after it is removed from the cache."""
         self.active = False
-        
+
     def fetch(self):
         """Start the retrieval process.
 
@@ -285,7 +285,7 @@ class CacheFetcher:
     def _try_backup_item(self):
         """Check if a backup item is available in cache and call
         the item handler if it is.
-        
+
         :return: `True` if backup item was found.
         :returntype: `bool`"""
         if not self._backup_state:
@@ -322,7 +322,7 @@ class Cache:
           0 then items are never purged because of their age.
         - `max_items`: maximum number of items to store.
         - `_items`: dictionary of stored items.
-        - `_items_list`: list of stored items with the most suitable for 
+        - `_items_list`: list of stored items with the most suitable for
           purging first.
         - `_fetcher`: fetcher class for this cache.
         - `_active_fetchers`: list of active fetchers sorted by the time of
@@ -342,7 +342,7 @@ class Cache:
     def __init__(self, max_items, default_freshness_period = _hour,
             default_expiration_period = 12*_hour, default_purge_period = 24*_hour):
         """Initialize a `Cache` object.
-        
+
             :Parameters:
                 - `default_freshness_period`: default freshness period (in seconds).
                 - `default_expiration_period`: default expiration period (in seconds).
@@ -366,10 +366,10 @@ class Cache:
         self._purged = 0
         self._lock = threading.RLock()
 
-    def request_object(self, address, state, object_handler, 
+    def request_object(self, address, state, object_handler,
             error_handler = None, timeout_handler = None,
             backup_state = None, timeout = timedelta(minutes=60),
-            freshness_period = None, expiration_period = None, 
+            freshness_period = None, expiration_period = None,
             purge_period = None):
         """Request an object with given address and state not worse than
         `state`. The object will be taken from cache if available, and
@@ -447,7 +447,7 @@ class Cache:
                 expiration_period = self.default_expiration_period
             if purge_period is None:
                 purge_period = self.default_purge_period
-            
+
             fetcher = self._fetcher(self, address, freshness_period,
                     expiration_period, purge_period, object_handler, error_handler,
                     timeout_handler, timeout, backup_state)
@@ -509,7 +509,7 @@ class Cache:
         :Types:
             - `address`: any hashable
             - `state`: `str`
-           
+
         :return: the item or `None` if it was not found.
         :returntype: `CacheItem`"""
         self._lock.acquire()
@@ -529,12 +529,12 @@ class Cache:
 
         Update item's state and remove the item from the cache
         if its new state is 'purged'
-        
+
         :Parameters:
             - `item`: item to update.
         :Types:
             - `item`: `CacheItem`
-            
+
         :return: new state of the item.
         :returntype: `str`"""
 
@@ -561,7 +561,7 @@ class Cache:
         """Remove purged and overlimit items from the cache.
 
         TODO: optimize somehow.
-        
+
         Leave no more than 75% of `self.max_items` items in the cache."""
         self._lock.acquire()
         try:
@@ -674,7 +674,7 @@ class CacheSuite:
     def __init__(self, max_items, default_freshness_period = _hour,
             default_expiration_period = 12*_hour, default_purge_period = 24*_hour):
         """Initialize a `Cache` object.
-        
+
             :Parameters:
                 - `default_freshness_period`: default freshness period (in seconds).
                 - `default_expiration_period`: default expiration period (in seconds).
@@ -694,7 +694,7 @@ class CacheSuite:
         self._caches = {}
         self._lock = threading.RLock()
 
-    def request_object(self, object_class, address, state, object_handler, 
+    def request_object(self, object_class, address, state, object_handler,
             error_handler = None, timeout_handler = None,
             backup_state = None, timeout = None,
             freshness_period = None, expiration_period = None, purge_period = None):
@@ -756,7 +756,7 @@ class CacheSuite:
         try:
             if object_class not in self._caches:
                 raise TypeError, "No cache for %r" % (object_class,)
-      
+
             self._caches[object_class].request_object(address, state, object_handler,
                     error_handler, timeout_handler, backup_state, timeout,
                     freshness_period, expiration_period, purge_period)
@@ -812,5 +812,5 @@ class CacheSuite:
             cache.set_fetcher(None)
         finally:
             self._lock.release()
-               
+
 # vi: sts=4 et sw=4

@@ -44,7 +44,7 @@ class Option(StanzaPayloadObject):
     """
     xml_element_name = "option"
     xml_element_namespace = DATAFORM_NS
-    
+
     def __init__(self, values, label = None):
         """Initialize an `Option` object.
 
@@ -103,7 +103,7 @@ class Field(StanzaPayloadObject):
         - `value`: field value parsed according to the form type.
         - `label`: field label (human-readable description).
         - `type`: field type ("boolean", "fixed", "hidden", "jid-multi",
-          "jid-single", "list-multi", "list-single", "text-multi", 
+          "jid-single", "list-multi", "list-single", "text-multi",
           "text-private" or "text-single").
         - `options`: field options (for "list-multi" or "list-single" fields).
         - `required`: `True` when the field is required.
@@ -119,15 +119,15 @@ class Field(StanzaPayloadObject):
         - `options`: `Option`
         - `required`: `boolean`
         - `desc`: `unicode`
-    """ 
+    """
     xml_element_name = "field"
     xml_element_namespace = DATAFORM_NS
     allowed_types = ("boolean", "fixed", "hidden", "jid-multi",
-                "jid-single", "list-multi", "list-single", "text-multi", 
+                "jid-single", "list-multi", "list-single", "text-multi",
                 "text-private", "text-single")
     def __init__(self, name = None, values = None, field_type = None, label = None,
             options = None, required = False, desc = None, value = None):
-        """Initialize a `Field` object. 
+        """Initialize a `Field` object.
 
         :Parameters:
             - `name`: field name.
@@ -151,7 +151,7 @@ class Field(StanzaPayloadObject):
               for "jid-multi", `list` of `unicode` for "list-multi" and "text-multi"
               and `unicode` for other field types.
         """
-        self.name = name 
+        self.name = name
         if field_type is not None and field_type not in self.allowed_types:
             raise ValueError, "Invalid form field type: %r" % (field_type,)
         self.type = field_type
@@ -337,7 +337,7 @@ class Item(StanzaPayloadObject):
     """
     xml_element_name = "item"
     xml_element_namespace = DATAFORM_NS
-    
+
     def __init__(self, fields = None):
         """Initialize an `Item` object.
 
@@ -358,7 +358,7 @@ class Item(StanzaPayloadObject):
             if f.name == name_or_index:
                 return f
         raise KeyError, name_or_index
-     
+
     def __contains__(self, name):
         for f in self.fields:
             if f.name == name:
@@ -369,7 +369,7 @@ class Item(StanzaPayloadObject):
         for field in self.fields:
             yield field
 
-    def add_field(self, name = None, values = None, field_type = None, 
+    def add_field(self, name = None, values = None, field_type = None,
             label = None, options = None, required = False, desc = None, value = None):
         """Add a field to the item.
 
@@ -467,7 +467,7 @@ class Form(StanzaPayloadObject):
     allowed_types = ("form", "submit", "cancel", "result")
     xml_element_name = "x"
     xml_element_namespace = DATAFORM_NS
-    
+
     def __init__(self, xmlnode_or_type = "form", title = None, instructions = None,
             fields = None, reported_fields = None, items = None):
         """Initialize a `Form` object.
@@ -655,7 +655,7 @@ class Form(StanzaPayloadObject):
         self.items = []
         self.title = None
         self.instructions = None
-        if (xmlnode.type != "element" or xmlnode.name != "x" 
+        if (xmlnode.type != "element" or xmlnode.name != "x"
                 or xmlnode.ns().content != DATAFORM_NS):
             raise ValueError, "Not a form: %r" % (xmlnode.serialize(),)
         self.type = xmlnode.prop("type")
@@ -679,7 +679,7 @@ class Form(StanzaPayloadObject):
 
     def __get_reported(self, xmlnode):
         """Parse the <reported/> element of the form.
-        
+
         :Parameters:
             - `xmlnode`: the element to parse.
         :Types:
@@ -691,3 +691,4 @@ class Form(StanzaPayloadObject):
             elif child.name == "field":
                 self.reported_fields.append(Field._new_from_xml(child))
             child = child.next
+# vi: sts=4 et sw=4

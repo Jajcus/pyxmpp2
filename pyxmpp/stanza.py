@@ -163,7 +163,7 @@ class Stanza:
             return JID(from_utf8(self.xmlnode.prop("from")))
         else:
             return None
-            
+
     get_from_jid=get_from
 
     def get_to(self):
