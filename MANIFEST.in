@@ -15,4 +15,5 @@ include doc/www/api/*.html
 include doc/www/api/private/*
 include doc/www/api/public/*
 include utils/*.py
-auxtools/htmlmerge.py
+include auxtools/htmlmerge.py
+include ext/Copyright-libxml2
