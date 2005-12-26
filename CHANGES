@@ -5,6 +5,14 @@ Those are mentioned here as are not backward compatible.
 I want the api to be stable and consistent in the next release and later,
 so I do all the big changes now (I would have to do them at some time anyway).
 
+2005-10-14
+
+	Usage of non-unicode strings in PyXMPP API is deprecated. No
+	no implicit conversion is made where utf-8 string would previously be
+	accepted (e.g. JID constructor). Sometimes deprecation warning will be
+	raised when string is used instead of unicode.
+
+
 2005-03-20
 
 	"common_doc", "common_root", and "common_ns" can no longer be imported
