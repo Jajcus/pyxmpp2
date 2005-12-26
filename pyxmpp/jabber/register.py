@@ -122,7 +122,7 @@ class Register(StanzaPayloadObject):
         :Parameters:
             - `xmlnode`: an optional XML node to parse.
         :Types:
-            - `node`: `libxml2.xmlNode`
+            - `xmlnode`: `libxml2.xmlNode`
         """
         self.__logger=logging.getLogger("pyxmpp.jabber.Register")
         self.form = None
@@ -200,8 +200,10 @@ class Register(StanzaPayloadObject):
         Convert legacy fields to a data form if `self.form` is `None`, return `self.form` otherwise.
 
         :Parameters:
-            - `stanza_type`: If "form", then a form to fill-in should be
+            - `form_type`: If "form", then a form to fill-in should be
               returned. If "sumbit", then a form with submitted data.
+        :Types:
+            - `form_type`: `unicode`
         
         :return: `self.form` or a form created from the legacy fields
         :returntype: `pyxmpp.jabber.dataforms.Form`"""

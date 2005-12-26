@@ -31,7 +31,6 @@ import warnings
 
 from encodings import idna
 
-from pyxmpp.utils import from_utf8
 from pyxmpp.xmppstringprep import nodeprep,resourceprep
 
 node_invalid_re=re.compile(ur"[" u'"' ur"&'/:<>@\s\x00-\x19]",re.UNICODE)

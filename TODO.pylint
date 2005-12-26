@@ -13,12 +13,6 @@ I0011: 17: Locally disabling 'W0132'
 I0011: 17: Locally disabling 'W0611'
 ************* Module pyxmpp.streambase
 I0011: 17: Locally disabling 'W0201'
-************* Module pyxmpp._xmlextra
-I0001:  0: Unable to run raw checkers on built-in module pyxmpp._xmlextra
-W0103:  0: Missing required attribute "__revision__"
-W0131:  0:remove_ns: Missing docstring
-W0131:  0:replace_ns: Missing docstring
-W0131:  0:sax_reader_new: Missing docstring
 ************* Module pyxmpp.clientstream
 I0011: 17: Locally disabling 'W0221'
 W0511:349: FIXME: that should be the hostname choosen from SRV records found.
@@ -32,39 +26,21 @@ I0011: 17: Locally disabling 'W0201'
 ************* Module pyxmpp.version
 I0011:  1: Locally disabling 'W0103'
 I0011:  1: Locally disabling 'W0131'
-************* Module pyxmpp.jabberd.all
-I0011: 17: Locally disabling 'W0611'
-************* Module pyxmpp.jabberd.componentstream
-I0011: 17: Locally disabling 'W0221'
-I0011: 17: Locally disabling 'W0201'
-************* Module pyxmpp.sasl.core
-W0511:188: FIXME: use some better RNG (/dev/urandom maybe)
+************* Module pyxmpp._xmlextra
+I0001:  0: Unable to run raw checkers on built-in module pyxmpp._xmlextra
+W0103:  0: Missing required attribute "__revision__"
+W0131:  0:remove_ns: Missing docstring
+W0131:  0:replace_ns: Missing docstring
+W0131:  0:sax_reader_new: Missing docstring
 ************* Module pyxmpp.jabber.muc
 W0302:  0: Too many lines in module (1020)
 W0511:639: TODO: kicks
 W0511:691: TODO: ProtocolError
 W0511:698: TODO: ProtocolError
 ************* Module pyxmpp.jabber.muccore
-W0511:193: TODO: since -- requires parsing of Jabber dateTime profile
-W0511:488: FIXME: alt,decline,invite,password
-W0511:529: FIXME: implement
-W0131:156:MucX.set_history: Missing docstring
-E0602:157:MucX.set_history: Undefined variable 'xml_element_iter'
-E0602:157:MucX.set_history: Undefined variable 'xmlnode'
-E0602:158:MucX.set_history: Undefined variable 'child'
-W0131:181:MucX.get_history: Missing docstring
-E0602:182:MucX.get_history: Undefined variable 'xml_element_iter'
-E0602:182:MucX.get_history: Undefined variable 'xmlnode'
-E0602:183:MucX.get_history: Undefined variable 'child'
-W0131:197:MucX.set_password: Missing docstring
-E0602:198:MucX.set_password: Undefined variable 'xml_element_iter'
-E0602:198:MucX.set_password: Undefined variable 'xmlnode'
-E0602:199:MucX.set_password: Undefined variable 'child'
-W0131:207:MucX.get_password: Missing docstring
-E0602:208:MucX.get_password: Undefined variable 'xml_element_iter'
-E0602:208:MucX.get_password: Undefined variable 'xmlnode'
-E0602:209:MucX.get_password: Undefined variable 'child'
-E0602:715:MucPresence.make_join_request: Undefined variable 'HistoryParams'
+W0511:203: TODO: since -- requires parsing of Jabber dateTime profile
+W0511:508: FIXME: alt,decline,invite,password
+W0511:549: FIXME: implement
 ************* Module pyxmpp.jabber.all
 I0011: 17: Locally disabling 'W0611'
 ************* Module pyxmpp.jabber.simple
@@ -75,11 +51,18 @@ I0011: 17: Locally disabling 'W0201'
 ************* Module pyxmpp.jabber.vcard
 I0011: 17: Locally disabling 'W0302'
 W0511:1326: FIXME: agent field
+************* Module pyxmpp.jabberd.all
+I0011: 17: Locally disabling 'W0611'
+************* Module pyxmpp.jabberd.componentstream
+I0011: 17: Locally disabling 'W0221'
+I0011: 17: Locally disabling 'W0201'
+************* Module pyxmpp.sasl.core
+W0511:188: FIXME: use some better RNG (/dev/urandom maybe)
 
 
 Report
 ======
-6804 statements analysed.
+6811 statements analysed.
 
 Duplication
 -----------
@@ -95,10 +78,10 @@ Raw metrics
 
 type      number %     previous difference 
 :::::::::::::::::::::::::::::::::::::::::::
-code      7483   47.80 7418     +65.00     
-docstring 6414   40.97 6337     +77.00     
-comment   770    4.92  770      =          
-empty     989    6.32  983      +6.00      
+code      7493   47.76 7493     =          
+docstring 6433   41.01 6433     =          
+comment   770    4.91  770      =          
+empty     992    6.32  992      =          
 
 
 External dependencies
@@ -107,9 +90,9 @@ External dependencies
 
     stringprep (pyxmpp.xmppstringprep)
     random (pyxmpp.streambase,pyxmpp.stanza,pyxmpp.resolver,pyxmpp.sasl.core,pyxmpp.sasl)
-    logging (pyxmpp.streamsasl,pyxmpp.streambase,pyxmpp.clientstream,pyxmpp.client,pyxmpp.stream,pyxmpp.streamtls,pyxmpp.stanzaprocessor,pyxmpp.jabberd.component,pyxmpp.jabberd.componentstream,pyxmpp.sasl.plain,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.client,pyxmpp.jabber.register)
+    logging (pyxmpp.streamsasl,pyxmpp.streambase,pyxmpp.clientstream,pyxmpp.client,pyxmpp.stream,pyxmpp.streamtls,pyxmpp.stanzaprocessor,pyxmpp.jabber.muc,pyxmpp.jabber.clientstream,pyxmpp.jabber.client,pyxmpp.jabber.register,pyxmpp.jabberd.component,pyxmpp.jabberd.componentstream,pyxmpp.sasl.plain,pyxmpp.sasl.core,pyxmpp.sasl.digest_md5)
     socket (pyxmpp.streambase,pyxmpp.resolver,pyxmpp.streamtls)
-    re (pyxmpp.jid,pyxmpp.xmlextra,pyxmpp.resolver,pyxmpp.sasl.digest_md5,pyxmpp.jabber.vcard)
+    warnings (pyxmpp.jid)
     libxml2 (pyxmpp.roster,pyxmpp.presence,pyxmpp.xmlextra,pyxmpp.streambase,pyxmpp.stanza,pyxmpp.message,pyxmpp.objects,pyxmpp.stanzaprocessor,pyxmpp.iq,pyxmpp.error,pyxmpp.jabber.dataforms,pyxmpp.jabber.muccore,pyxmpp.jabber.delay,pyxmpp.jabber.disco,pyxmpp.jabber.vcard,pyxmpp.jabber.register)
     base64 (pyxmpp.streamsasl,pyxmpp.jabber.vcard)
     weakref (pyxmpp.jid,pyxmpp.jabber.muc)
@@ -126,6 +109,7 @@ External dependencies
       \-resolver (pyxmpp.resolver)
     encodings 
       \-idna (pyxmpp.jid,pyxmpp.resolver)
+    re (pyxmpp.jid,pyxmpp.xmlextra,pyxmpp.resolver,pyxmpp.jabber.vcard,pyxmpp.sasl.digest_md5)
     copy (pyxmpp.jabber.dataforms)
     os (pyxmpp.streambase)
 
@@ -143,8 +127,8 @@ Statistics by type
 type     number old number difference %documented %badname 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 module   45     45         =          97.78       0.00     
-class    125    124        +1.00      100.00      0.00     
-method   680    675        +5.00      97.94       0.74     
+class    125    125        =          100.00      0.00     
+method   679    679        =          98.53       0.74     
 function 47     47         =          93.62       0.00     
 
 
@@ -155,22 +139,22 @@ type       number previous difference
 ::::::::::::::::::::::::::::::::::::::
 convention 0      0        =          
 refactor   0      0        =          
-warning    19     14       +5.00      
-error      13     0        +13.00     
+warning    15     15       =          
+error      0      3        -3.00      
 
 
 % errors / warnings by module
 -----------------------------
 
-module                error  warning refactor convention 
-:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-pyxmpp.jabber.muccore 100.00 36.84   0.00     0.00       
-pyxmpp.jabber.muc     0.00   21.05   0.00     0.00       
-pyxmpp._xmlextra      0.00   21.05   0.00     0.00       
-pyxmpp.sasl.core      0.00   5.26    0.00     0.00       
-pyxmpp.jabber.vcard   0.00   5.26    0.00     0.00       
-pyxmpp.clientstream   0.00   5.26    0.00     0.00       
-pyxmpp.cache          0.00   5.26    0.00     0.00       
+module                error warning refactor convention 
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+pyxmpp.jabber.muc     0.00  26.67   0.00     0.00       
+pyxmpp._xmlextra      0.00  26.67   0.00     0.00       
+pyxmpp.jabber.muccore 0.00  20.00   0.00     0.00       
+pyxmpp.sasl.core      0.00  6.67    0.00     0.00       
+pyxmpp.jabber.vcard   0.00  6.67    0.00     0.00       
+pyxmpp.clientstream   0.00  6.67    0.00     0.00       
+pyxmpp.cache          0.00  6.67    0.00     0.00       
 
 
 Messages
@@ -178,14 +162,13 @@ Messages
 
 message id occurences 
 ::::::::::::::::::::::
-E0602      13         
 W0511      10         
-W0131      7          
+W0131      3          
 W0302      1          
 W0103      1          
 
 
 Global evaluation
 -----------------
-Your code has been rated at 9.88/10 (previous run: 9.98/10)
+Your code has been rated at 9.98/10 (previous run: 9.96/10)
 

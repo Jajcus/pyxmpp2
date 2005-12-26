@@ -49,11 +49,11 @@ class Option(StanzaPayloadObject):
         """Initialize an `Option` object.
 
         :Parameters:
-            - `value`: option value.
+            - `values`: option values.
             - `label`: option label (human-readable description).
         :Types:
             - `label`: `unicode`
-            - `value`: `unicode`
+            - `values`: `list` of `unicode`
         """
         self.label = label
         self.values = values
@@ -580,7 +580,7 @@ class Form(StanzaPayloadObject):
         Remove uneeded information from the form. The information removed
         includes: title, instructions, field labels, fixed fields etc.
 
-        :Raise: `ValueError` when any required field has no value.
+        :raise ValueError: when any required field has no value.
 
         :Parameters:
             - `keep_types`: when `True` field type information will be included

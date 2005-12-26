@@ -465,7 +465,7 @@ class MucRoomState:
             - `history_maxstanzas`: limit of the total number of messages in
               history.
             - `history_seconds`: send only messages received in the last
-              `seconds` seconds.
+              `history_seconds` seconds.
             - `history_since`: Send only the messages received since the
               dateTime specified (UTC).
         :Types:
@@ -860,7 +860,7 @@ class MucRoomManager:
             - `history_maxstanzas`: limit of the total number of messages in
               history.
             - `history_seconds`: send only messages received in the last
-              `seconds` seconds.
+              `history_seconds` seconds.
             - `history_since`: Send only the messages received since the
               dateTime specified (UTC).
 
@@ -868,7 +868,6 @@ class MucRoomManager:
             - `room`: `JID`
             - `nick`: `unicode`
             - `handler`: `MucRoomHandler`
-            - `history`: `HistoryParameters`
             - `password`: `unicode`
             - `history_maxchars`: `int`
             - `history_maxstanzas`: `int`

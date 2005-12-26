@@ -27,7 +27,6 @@ if sys.hexversion<0x02030000:
 
 import time
 import datetime
-import warnings
 
 def to_utf8(s):
     """

@@ -406,6 +406,7 @@ def xml_node_iter(nodelist):
     (not only the elements).
 
     Usually used to iterade over node's children like this::
+
         xml_node_iter(node.children)
 
     :Parameters:
@@ -422,6 +423,7 @@ def xml_element_iter(nodelist):
     """Iterate over sibling XML elements. Non-element nodes will be skipped.
 
     Usually used to iterade over node's children like this::
+
         xml_node_iter(node.children)
 
     :Parameters:
@@ -439,6 +441,7 @@ def xml_element_ns_iter(nodelist, ns_uri):
     """Iterate over sibling XML elements. Only elements in the given namespace will be returned.
 
     Usually used to iterade over node's children like this::
+
         xml_node_iter(node.children)
 
     :Parameters:

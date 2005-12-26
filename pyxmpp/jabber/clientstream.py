@@ -64,7 +64,6 @@ class LegacyClientStream(ClientStream):
               in the list should be prefixed with "sasl:" string.
             - `tls_settings`: settings for StartTLS -- `TLSSettings` instance.
             - `keepalive`: keepalive output interval. 0 to disable.
-            - `registration_form`: the registration form sent (when registering in-band).
         :Types:
             - `jid`: `pyxmpp.JID`
             - `password`: `unicode`
@@ -73,7 +72,6 @@ class LegacyClientStream(ClientStream):
             - `auth_methods`: sequence of `str`
             - `tls_settings`: `pyxmpp.TLSSettings`
             - `keepalive`: `int`
-            - `registration_form`: `pyxmpp.jabber.dataforms.Form`
         """
         (self.authenticated, self.available_auth_methods, self.auth_stanza,
                 self.peer_authenticated, self.auth_method_used,

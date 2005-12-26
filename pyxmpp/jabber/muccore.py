@@ -251,12 +251,12 @@ class HistoryParameters(object):
         :Parameters:
             - `maxchars`: limit of the total number of characters in history.
             - `maxstanzas`: limit of the total number of messages in history.
-            - `seconds`: send only messages received in the last `seconds` seconds.
+            - `maxseconds`: send only messages received in the last `seconds` seconds.
             - `since`: Send only the messages received since the dateTime specified.
         :Types:
             - `maxchars`: `int`
             - `maxstanzas`: `int`
-            - `seconds`: `int`
+            - `maxseconds`: `int`
             - `since`: `datetime.datetime`
         """
         self.maxchars = maxchars
