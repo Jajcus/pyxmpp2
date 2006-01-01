@@ -99,7 +99,7 @@ class Delay(StanzaPayloadObject):
         tm=time.strptime(stamp,"%Y%m%dT%H:%M:%S")
         tm=tm[0:8]+(0,)
         self.timestamp=datetime.datetime.fromtimestamp(time.mktime(tm))
-        delay_from=xmlnode.prop("from")
+        delay_from=from_utf8(xmlnode.prop("from"))
         if delay_from:
             self.delay_from=JID(delay_from)
         else:
