@@ -63,13 +63,19 @@ class TestReplaceNs(unittest.TestCase):
         doc.setRootElement(root)
 
         n = input_doc.getRootElement()
-        input_ns = n.ns()
+        try:
+            input_ns = n.ns()
+        except libxml2.treeError:
+            input_ns = None
         n = n.children
         while n:
             n1 = n.docCopyNode(doc, 1)
             root.addChild(n1)
             if n1.type == 'element':
-                n1_ns = n1.ns()
+                try:
+                    n1_ns = n1.ns()
+                except libxml2.treeError:
+                    ns1_ns = None
                 if n1_ns.content == input_ns.content:
                     xmlextra.replace_ns(n1, n1_ns, common_ns)
             n = n.next
@@ -84,7 +90,10 @@ class TestReplaceNs(unittest.TestCase):
         doc.setRootElement(root)
 
         n = input_doc2.getRootElement()
-        input_ns = n.ns()
+        try:
+            input_ns = n.ns()
+        except libxml2.treeError:
+            input_ns = None
         n = n.children
         while n:
             n1 = n.docCopyNode(doc, 1)
@@ -104,7 +113,11 @@ class TestReplaceNs(unittest.TestCase):
         doc1 = libxml2.parseDoc(s1)
         root1 = doc1.getRootElement()
         el1 = root1.children
-        el1.setNs(root1.ns())
+        try:
+            root1_ns = root1.ns()
+        except libxml2.treeError:
+            root1_ns = None
+        el1.setNs(root1_ns)
 
         #s = el1.serialize()
         s = xmlextra.safe_serialize(el1)
