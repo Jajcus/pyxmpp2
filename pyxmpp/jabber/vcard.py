@@ -1302,7 +1302,7 @@ class VCard(StanzaPayloadObject):
         - `desc`: `list` of `VCardXString`
     """
 
-    xml_element_name = "query"
+    xml_element_name = "vCard"
     xml_element_namespace = VCARD_NS
 
     components={
