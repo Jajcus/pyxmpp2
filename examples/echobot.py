@@ -54,7 +54,7 @@ class Client(JabberClient):
 
         # set up handlers for <presence/> stanzas
         self.stream.set_presence_handler(None, self.presence)
-        self.stream.set_presence_handler("noavailable", self.presence)
+        self.stream.set_presence_handler("unavailable", self.presence)
         self.stream.set_presence_handler("subscribe", self.presence_control)
         self.stream.set_presence_handler("subscribed", self.presence_control)
         self.stream.set_presence_handler("unsubscribe", self.presence_control)
