@@ -390,10 +390,10 @@ class Client:
 
     def session_started(self):
         """Handle session started event. May be overriden in derived classes.
-        This one sends the initial presence and requests the user's roster."""
+        This one requests the user's roster and sends the initial presence."""
+        self.request_roster()
         p=Presence()
         self.stream.send(p)
-        self.request_roster()
 
     def stream_error(self,err):
         """Handle stream error received. May be overriden in derived classes.
