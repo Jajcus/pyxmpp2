@@ -231,6 +231,9 @@ class Roster(StanzaPayloadObject):
     def __iter__(self):
         return self.items_dict.itervalues()
 
+    def __contains__(self, jid):
+        return jid in self.items_dict
+
     def get_items(self):
         """Return a list of items in the roster."""
         return self.items_dict.values()
