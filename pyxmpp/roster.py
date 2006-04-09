@@ -146,10 +146,15 @@ class RosterItem(StanzaPayloadObject):
 class Roster(StanzaPayloadObject):
     """Class representing XMPP-IM roster.
 
+    Iteration over `Roster` object iterates over roster items.
+
     :Ivariables:
         - `items_dict`: items indexed by JID.
+    :Properties:
+        - `items`: roster items.
     :Types:
-        - `items_dict`: `dict` of `JID` -> `RosterItem`"""
+        - `items_dict`: `dict` of `JID` -> `RosterItem`
+        - `items`: `list` of `RosterItem`"""
 
     xml_element_name = "query"
     xml_element_namespace = ROSTER_NS
@@ -222,10 +227,15 @@ class Roster(StanzaPayloadObject):
         n.unlinkNode()
         n.freeNode()
         return r
+    
+    def __iter__(self):
+        return self.items_dict.itervalues()
 
     def get_items(self):
         """Return a list of items in the roster."""
         return self.items_dict.values()
+
+    items = property(get_items)
 
     def get_groups(self):
         """Return a list of groups in the roster."""
