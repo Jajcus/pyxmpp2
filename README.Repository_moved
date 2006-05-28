@@ -1,0 +1,13 @@
+--- IMPORTANT ---
+
+SVN repository for PyXMPP has been moved. The new URL is:
+
+	http://pyxmpp.jajcus.net/svn/pyxmpp/
+
+To switch your working copy to the new repository do:
+
+svn switch --relocate svn://svn.jabberstudio.org/pyxmpp/svn/ http://pyxmpp.jajcus.net/svn/pyxmpp/
+
+For more current information about PyXMPP see the new web site:
+
+	http://pyxmpp.jajcus.net
