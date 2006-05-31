@@ -80,21 +80,20 @@ Contact
 
 PyXMPP was written and is maintained by Jacek Konieczny <jajcus@jajcus.net>.
 
-To report bugs or request features use `the project page on the JabberStudio
-<http://jabberstudio.org/projects/pyxmpp>`__.  
+To report bugs or request features use `the Trac <http://pyxmpp.jajcus.net/trac/>`__.  
 
 For discussion you may join `the PyXMPP mailing list
-<http://lists.bnet.pl/mailman/listinfo/pyxmpp>`__.
+<http://lists.jajcus.net/mailman/listinfo/pyxmpp>`__.
 
 Download
 --------
 
-Latest releases of PyXMPP may be downloaded from `the files section of the project page
-<http://jabberstudio.org/projects/pyxmpp/releases/>`__. There are also
-some `SVN snapshots <http://pyxmpp.jabberstudio.org/snapshots/>`__ available.
+Latest releases of PyXMPP may be downloaded from `the files downloads directory
+<http://pyxmpp.jajcus.net/downloads/>`__. There are also
+some `SVN snapshots <http://pyxmpp.jajcus.net/downloads/snapshots/>`__ available.
 
 You can also checkout latest sources directly from the SVN repository::
-svn checkout svn://svn.jabberstudio.org/pyxmpp/svn/trunk pyxmpp
+svn checkout http://pyxmpp.jajcus.net/svn/pyxmpp/trunk pyxmpp
 
 Licence
 -------

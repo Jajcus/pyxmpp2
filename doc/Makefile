@@ -12,9 +12,6 @@ all: doc
 
 www: $(WEBFILES) doc
 
-publish: www
-	rsync -e ssh -rav --exclude .svn www/ ssh.jabberstudio.org:/var/projects/pyxmpp/www
-
 doc: doc-tstamp check-epydoc check-docutils
 
 update-doc:
@@ -25,7 +22,7 @@ doc-tstamp:
 	$(MAKE) -C ..
 	rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp .
 	$(EPYDOC) --html --show-imports --no-frames --ignore-param-mismatch \
-		-o www/api -n PyXMPP -u http://pyxmpp.jabberstudio.org/ pyxmpp
+		-o www/api -n PyXMPP -u http://pyxmpp.jajcus.net/ pyxmpp
 	touch doc-tstamp
 	-rm -f pyxmpp 2>/dev/null
 
