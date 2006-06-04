@@ -11,7 +11,7 @@ message1 = """
 <subject>Subject</subject>
 <body>The body</body>
 <thread>thread-id</thread>
-<payload xmlns="http://pyxmpp.jabberstudio.org/xmlns/test"><abc/></payload>
+<payload xmlns="http://pyxmpp.jajcus.net/xmlns/test"><abc/></payload>
 </message>"""
 
 message1_doc = libxml2.parseDoc(message1)
@@ -31,7 +31,7 @@ class TestMessage(unittest.TestCase):
         self.failUnlessEqual(m.get_subject(), u"Subject")
         self.failUnlessEqual(m.get_body(), u"The body")
         self.failUnlessEqual(m.get_thread(), u"thread-id")
-        nodes = m.xpath_eval("t:payload", {"t": "http://pyxmpp.jabberstudio.org/xmlns/test"})
+        nodes = m.xpath_eval("t:payload", {"t": "http://pyxmpp.jajcus.net/xmlns/test"})
         self.failUnless(nodes)
         self.failUnlessEqual(nodes[0].name, "payload")
         self.failUnless(nodes[0].children)
@@ -45,7 +45,7 @@ class TestMessage(unittest.TestCase):
         self.failUnlessEqual(m.get_subject(), None)
         self.failUnlessEqual(m.get_body(), None)
         self.failUnlessEqual(m.get_thread(), None)
-        nodes = m.xpath_eval("t:payload",{"t":"http://pyxmpp.jabberstudio.org/xmlns/test"})
+        nodes = m.xpath_eval("t:payload",{"t":"http://pyxmpp.jajcus.net/xmlns/test"})
         self.failIf(nodes)
 
     def test_message_full_from_xml(self):
@@ -74,7 +74,7 @@ class TestMessage(unittest.TestCase):
                 body = u"The body",
                 thread = u"thread-id")
         n = m.xmlnode.newChild(None, "payload", None)
-        ns = n.newNs("http://pyxmpp.jabberstudio.org/xmlns/test", "t")
+        ns = n.newNs("http://pyxmpp.jajcus.net/xmlns/test", "t")
         n.setNs(ns)
         n.newChild(ns, "abc", None)
         self.check_message_full( m )

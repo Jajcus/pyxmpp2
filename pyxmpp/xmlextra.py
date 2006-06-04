@@ -28,7 +28,7 @@ import re
 
 common_doc = libxml2.newDoc("1.0")
 common_root = common_doc.newChild(None,"root",None)
-COMMON_NS = "http://pyxmpp.jabberstudio.org/xmlns/common"
+COMMON_NS = "http://pyxmpp.jajcus.net/xmlns/common"
 common_ns = common_root.newNs(COMMON_NS, None)
 common_root.setNs(common_ns)
 common_doc.setRootElement(common_root)

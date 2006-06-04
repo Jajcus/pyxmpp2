@@ -50,7 +50,7 @@ setup(
     description =   'XMPP/Jabber implementation for Python',
     author =    'Jacek Konieczny',
     author_email =  'jajcus@jajcus.net',
-    url =       'http://pyxmpp.jabberstudio.org/',
+    url =       'http://pyxmpp.jajcus.net/',
     classifiers = [
             "Development Status :: 4 - Beta",
             "Intended Audience :: Developers",

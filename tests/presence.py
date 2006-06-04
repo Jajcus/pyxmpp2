@@ -11,7 +11,7 @@ presence1 = """
 <show>away</show>
 <status>The Status</status>
 <priority>10</priority>
-<payload xmlns="http://pyxmpp.jabberstudio.org/xmlns/test"><abc/></payload>
+<payload xmlns="http://pyxmpp.jajcus.net/xmlns/test"><abc/></payload>
 </presence>"""
 presence1_doc = libxml2.parseDoc(presence1)
 presence1_node = presence1_doc.getRootElement()
@@ -33,7 +33,7 @@ class TestPresence(unittest.TestCase):
         self.failUnlessEqual(p.get_show(), "away")
         self.failUnlessEqual(p.get_status(), "The Status")
         self.failUnlessEqual(p.get_priority(), 10)
-        nodes = p.xpath_eval("t:payload", {"t": "http://pyxmpp.jabberstudio.org/xmlns/test"})
+        nodes = p.xpath_eval("t:payload", {"t": "http://pyxmpp.jajcus.net/xmlns/test"})
         self.failUnless(nodes)
         self.failUnlessEqual(nodes[0].name, "payload")
         self.failUnless(nodes[0].children)
@@ -47,7 +47,7 @@ class TestPresence(unittest.TestCase):
         self.failUnlessEqual(p.get_show(), None)
         self.failUnlessEqual(p.get_status(), None)
         self.failUnlessEqual(p.get_priority(), 0)
-        nodes = p.xpath_eval("t:payload",{"t":"http://pyxmpp.jabberstudio.org/xmlns/test"})
+        nodes = p.xpath_eval("t:payload",{"t":"http://pyxmpp.jajcus.net/xmlns/test"})
         self.failIf(nodes)
 
     def check_presence_subscribe(self, p):
@@ -88,7 +88,7 @@ class TestPresence(unittest.TestCase):
                 status = u"The Status",
                 priority = "10")
         n = p.xmlnode.newChild(None, "payload", None)
-        ns = n.newNs("http://pyxmpp.jabberstudio.org/xmlns/test", "t")
+        ns = n.newNs("http://pyxmpp.jajcus.net/xmlns/test", "t")
         n.setNs(ns)
         n.newChild(ns, "abc", None)
         self.check_presence_full(p)

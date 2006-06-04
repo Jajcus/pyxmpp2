@@ -173,7 +173,7 @@ legacy_codes={
 
 STANZA_ERROR_NS='urn:ietf:params:xml:ns:xmpp-stanzas'
 STREAM_ERROR_NS='urn:ietf:params:xml:ns:xmpp-streams'
-PYXMPP_ERROR_NS='http://pyxmpp.jabberstudio.org/xmlns/errors'
+PYXMPP_ERROR_NS='http://pyxmpp.jajcus.net/xmlns/errors'
 STREAM_NS="http://etherx.jabber.org/streams"
 
 class ErrorNodeError(RuntimeError):
