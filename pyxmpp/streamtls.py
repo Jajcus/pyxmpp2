@@ -140,7 +140,7 @@ class StreamTLSMixIn:
             except TypeError:
                 # workarund for M2Crypto 0.13.1 'feature'
                 self.socket.send(self.socket,data)
-        except (IOError,OSError),e:
+        except (IOError,OSError,socket.error),e:
             raise FatalStreamError("IO Error: "+str(e))
         except SSLError,e:
             raise TLSError("TLS Error: "+str(e))

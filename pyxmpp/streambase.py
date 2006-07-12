@@ -525,7 +525,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         logging.getLogger("pyxmpp.Stream.out").debug("OUT: %r",data)
         try:
             self.socket.send(data)
-        except (IOError,OSError),e:
+        except (IOError,OSError,socket.error),e:
             raise FatalStreamError("IO Error: "+str(e))
 
     def _write_node(self,xmlnode):
@@ -661,7 +661,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
                 raise StreamParseError(unicode(e))
             except:
                 raise
-        except (IOError,OSError),e:
+        except (IOError,OSError,socket.error),e:
             self.close()
             raise FatalStreamError("IO Error: "+str(e))
         except (FatalStreamError,KeyboardInterrupt,SystemExit),e:
