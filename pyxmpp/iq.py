@@ -95,8 +95,8 @@ class Iq(Stanza):
             plus payload of `self`.
         :returntype: `Iq`"""
 
-        if self.get_type() not in ("set","get"):
-            raise StanzaError,"Errors may only be generated for 'set' or 'get' iq"
+        if self.get_type() in ("result", "error"):
+            raise StanzaError,"Errors may not be generated for 'result' and 'error' iq"
 
         iq=Iq(stanza_type="error",from_jid=self.get_to(),to_jid=self.get_from(),
             stanza_id=self.get_id(),error_cond=cond)

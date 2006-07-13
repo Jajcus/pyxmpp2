@@ -108,7 +108,7 @@ class StanzaProcessor:
             self._iq_set_handlers[(el,ns)](stanza)
             return 1
         else:
-            r=stanza.make_error_response("feature-not-implemented")
+            r=stanza.make_error_response("bad-request")
             self.send(r)
             return 1
 
