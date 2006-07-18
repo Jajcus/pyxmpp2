@@ -845,7 +845,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         Set `self.me` to the full JID negotiated."""
         jid_n=stanza.xpath_eval("bind:bind/bind:jid",{"bind":BIND_NS})
         if jid_n:
-            self.me=JID(jid_n[0].getContent())
+            self.me=JID(jid_n[0].getContent().decode("utf-8"))
         self.state_change("authorized",self.me)
 
     def _bind_error(self,stanza):
