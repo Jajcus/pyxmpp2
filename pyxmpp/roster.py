@@ -148,6 +148,10 @@ class Roster(StanzaPayloadObject):
 
     Iteration over `Roster` object iterates over roster items.
 
+    ``for item in roster: ...`` may be used to iterate over roster items,
+    ``roster[jid]`` to get roster item by jid, ``jid in roster`` to test roster
+    for jid presence.
+
     :Ivariables:
         - `items_dict`: items indexed by JID.
     :Properties:
