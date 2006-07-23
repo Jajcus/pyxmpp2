@@ -53,6 +53,13 @@ For PyXMPP you will need:
 Installation
 ------------
 
+To make sure you have all the requirements listed above or to prepare limited
+(without the binary extension) build of PyXMPP you may want to run::
+
+	python configure.py
+
+You may manually pick the limited or full build of PyXMPP by editing the build.cfg file.
+
 To build the package just invoke::
 
 	python setup.py build
