@@ -234,6 +234,9 @@ class Roster(StanzaPayloadObject):
     def __contains__(self, jid):
         return jid in self.items_dict
 
+    def __getitem__(self, jid):
+        return self.items_dict[jid]
+
     def get_items(self):
         """Return a list of items in the roster."""
         return self.items_dict.values()
@@ -252,21 +255,21 @@ class Roster(StanzaPayloadObject):
                 r[None]=True
         return r.keys()
 
-    def get_items_by_name(self,name,case_sensitive=True):
+    def get_items_by_name(self, name, case_sensitive = True):
         """
         Return a list of items with given `name`.
 
         If `case_sensitive` is False the matching will be case insensitive.
         """
         if not case_sensitive and name:
-            name=name.lower()
-        r=[]
+            name = name.lower()
+        r = []
         for it in self.items_dict.values():
-            if it.name==name:
+            if it.name == name:
                 r.append(it)
             elif it.name is None:
                 continue
-            elif not case_sensitive and it.name.lower()==name:
+            elif not case_sensitive and it.name.lower() == name:
                 r.append(it)
         return r
 
