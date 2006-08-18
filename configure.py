@@ -6,8 +6,10 @@ import os
 
 cfg_python_only = False
 
-
-os.chdir(os.path.dirname(__file__))
+d = os.path.dirname(__file__)
+if not d:
+    d = "."
+os.chdir(d)
 
 print "Checking for python version...", sys.version.replace("\n", " ")
 if sys.hexversion < 0x02030000:
