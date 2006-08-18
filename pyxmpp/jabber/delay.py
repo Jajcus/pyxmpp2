@@ -148,7 +148,7 @@ class Delay(StanzaPayloadObject):
         return r
 
     def __cmp__(self,other):
-        return self.timestamp.__cmp__(other.timestamp)
+        return cmp(timestamp, other.timestamp)
 
 def get_delays(stanza):
     """Get jabber:x:delay elements from the stanza.
