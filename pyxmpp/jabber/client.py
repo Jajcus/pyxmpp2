@@ -1,4 +1,4 @@
-# (C) Copyright 2003-2005 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2006 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
