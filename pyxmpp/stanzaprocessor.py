@@ -410,7 +410,7 @@ class StanzaProcessor:
         """Set a handler for <presence/> stanzas.
 
         :Parameters:
-            - `typ`: presence type. `None` will be treated the same as "available".
+            - `typ`: presence type. "available" will be treated the same as `None`.
             - `namespace`: payload namespace. If `None` that presence with any
               payload (or even with no payload) will match.
             - `priority`: priority value for the handler. Handlers with lower
