@@ -29,6 +29,7 @@ import logging
 import threading
 
 from pyxmpp.expdict import ExpiringDictionary
+from pyxmpp.exceptions import ProtocolError, BadRequestProtocolError
 
 class StanzaProcessor:
     """Universal stanza handler/router class.
@@ -59,7 +60,7 @@ class StanzaProcessor:
         self.__logger=logging.getLogger("pyxmpp.Stream")
         self.lock=threading.RLock()
 
-    def process_iq(self,stanza):
+    def process_iq(self, stanza):
         """Process IQ stanza received.
 
         :Parameters:
@@ -84,33 +85,29 @@ class StanzaProcessor:
                     and self._iq_response_handlers.has_key((sid,None))):
                 key=(sid,None)
             else:
-                return 0
+                return False
             res_handler,err_handler=self._iq_response_handlers[key]
             if stanza.get_type()=="result":
                 res_handler(stanza)
             else:
                 err_handler(stanza)
             del self._iq_response_handlers[key]
-            return 1
+            return True
 
         q=stanza.get_query()
         if not q:
-            r=stanza.make_error_response("bad-request")
-            self.send(r)
-            return 1
+            raise BadRequestProtocolError, "Stanza with no child element"
         el=q.name
         ns=q.ns().getContent()
 
         if typ=="get" and self._iq_get_handlers.has_key((el,ns)):
             self._iq_get_handlers[(el,ns)](stanza)
-            return 1
+            return True
         elif typ=="set" and self._iq_set_handlers.has_key((el,ns)):
             self._iq_set_handlers[(el,ns)](stanza)
-            return 1
+            return True
         else:
-            r=stanza.make_error_response("bad-request")
-            self.send(r)
-            return 1
+            raise BadRequestProtocolError, "Unknown IQ stanza type"
 
     def __try_handlers(self,handler_list,typ,stanza):
         """ Search the handler list for handlers matching
@@ -165,14 +162,14 @@ class StanzaProcessor:
 
         if not self.initiator and not self.peer_authenticated:
             self.__logger.debug("Ignoring message - peer not authenticated yet")
-            return 1
+            return True
 
         typ=stanza.get_type()
         if self.__try_handlers(self._message_handlers,typ,stanza):
-            return 1
+            return True
         if typ!="error":
             return self.__try_handlers(self._message_handlers,"normal",stanza)
-        return 0
+        return False
 
     def process_presence(self,stanza):
         """Process presence stanza.
@@ -185,7 +182,7 @@ class StanzaProcessor:
 
         if not self.initiator and not self.peer_authenticated:
             self.__logger.debug("Ignoring presence - peer not authenticated yet")
-            return 1
+            return True
 
         typ=stanza.get_type()
         if not typ:
@@ -206,9 +203,9 @@ class StanzaProcessor:
             - `stanza`: presence stanza to be processed
         """
         if stanza.get_type() not in ("error","result"):
-            r=stanza.make_error_response("recipient-unavailable")
+            r = stanza.make_error_response("recipient-unavailable")
             self.send(r)
-        return 1
+        return True
 
     def process_stanza(self,stanza):
         """Process stanza received from the stream.
@@ -231,15 +228,25 @@ class StanzaProcessor:
         if not self.process_all_stanzas and to and to!=self.me and to.bare()!=self.me.bare():
             return self.route_stanza(stanza)
 
-        if stanza.stanza_type=="iq":
-            if self.process_iq(stanza):
-                return True
-        elif stanza.stanza_type=="message":
-            if self.process_message(stanza):
-                return True
-        elif stanza.stanza_type=="presence":
-            if self.process_presence(stanza):
-                return True
+        try:
+            if stanza.stanza_type=="iq":
+                if self.process_iq(stanza):
+                    return True
+            elif stanza.stanza_type=="message":
+                if self.process_message(stanza):
+                    return True
+            elif stanza.stanza_type=="presence":
+                if self.process_presence(stanza):
+                    return True
+        except ProtocolError, e:
+            typ = stanza.get_type()
+            if typ != 'error' and (typ != 'result' or stanza.stanza_type != 'iq'):
+                r = stanza.make_error_response(e.xmpp_name)
+                self.send(r)
+                e.log_reported()
+            else:
+                e.log_ignored()
+
         self.__logger.debug("Unhandled %r stanza: %r" % (stanza.stanza_type,stanza.serialize()))
         return False
 
