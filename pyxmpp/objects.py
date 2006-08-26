@@ -165,25 +165,4 @@ class StanzaPayloadWrapperObject(object):
                 return xmlnode
             return doc1
 
-class CachedPropertyObject(object):
-    """Base class for many PyXMPP objects which provides cached attribute access
-    to many object's properites.
-
-    For unknown attribute read access get_<attribute> method will be called. On
-    write access to an attribute set_<attribute> method will be called if defined
-    in the object's class."""
-    def __getattr__(self,name):
-        try:
-            getattr(self.__class__,"get_"+name)(self)
-            return self.__dict__[name]
-        except (AttributeError,KeyError):
-            raise AttributeError,"This object has no attribute %r" % (name,)
-    def __setattr__(self,name,value):
-        try:
-            self.__dict__["set_"+name](value)
-        except KeyError:
-            self.__dict__[name]=value
-
-
-
 # vi: sts=4 et sw=4

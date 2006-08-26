@@ -24,6 +24,8 @@ Normative reference:
 __revision__="$Id$"
 __docformat__="restructuredtext en"
 
+import warnings
+
 import libxml2
 
 from pyxmpp.xmlextra import common_doc,common_root
@@ -32,7 +34,7 @@ from pyxmpp.jid import JID
 from pyxmpp import cache
 
 from pyxmpp.utils import to_utf8
-from pyxmpp.objects import CachedPropertyObject, StanzaPayloadWrapperObject
+from pyxmpp.objects import StanzaPayloadWrapperObject
 
 DISCO_NS="http://jabber.org/protocol/disco"
 DISCO_ITEMS_NS=DISCO_NS+"#items"
@@ -42,14 +44,14 @@ class DiscoError(StandardError):
     """Raised on disco related error"""
     pass
 
-class DiscoItem(CachedPropertyObject, StanzaPayloadWrapperObject):
+class DiscoItem(StanzaPayloadWrapperObject):
     """An item of disco#items reply.
 
     :Ivariables:
-        - `jid`: the JID of the item (cached).
-        - `node`: node name of the item (cached).
-        - `name`: name of the item (cached).
-        - `action`: action of the item (cached).
+        - `jid`: the JID of the item.
+        - `node`: node name of the item.
+        - `name`: name of the item.
+        - `action`: action of the item.
         - `disco`: the disco reply this is the part of.
         - `xmlnode`: XML element describing the item.
     :Types:
@@ -80,7 +82,6 @@ class DiscoItem(CachedPropertyObject, StanzaPayloadWrapperObject):
         self.disco=disco
         if isinstance(xmlnode_or_jid,JID):
             if disco:
-                disco.invalidate_items()
                 self.xmlnode=disco.xmlnode.newChild(None,"item",None)
             else:
                 self.xmlnode=common_root.newChild(None,"item",None)
@@ -94,7 +95,6 @@ class DiscoItem(CachedPropertyObject, StanzaPayloadWrapperObject):
             if disco is None:
                 self.xmlnode=xmlnode_or_jid.copyNode(1)
             else:
-                disco.invalidate_items()
                 self.xmlnode=xmlnode_or_jid
             if name:
                 self.set_name(name)
@@ -112,8 +112,6 @@ class DiscoItem(CachedPropertyObject, StanzaPayloadWrapperObject):
                 self.xmlnode.unlinkNode()
                 self.xmlnode.freeNode()
                 self.xmlnode=None
-        else:
-            self.disco.invalidate_items()
         if self.xpath_ctxt:
             self.xpath_ctxt.xpathFreeContext()
 
@@ -124,7 +122,6 @@ class DiscoItem(CachedPropertyObject, StanzaPayloadWrapperObject):
         """Remove `self` from the containing `DiscoItems` object."""
         if self.disco is None:
             return
-        self.disco.invalidate_items()
         self.xmlnode.unlinkNode()
         oldns=self.xmlnode.ns()
         ns=self.xmlnode.newNs(oldns.getContent(),None)
@@ -137,14 +134,12 @@ class DiscoItem(CachedPropertyObject, StanzaPayloadWrapperObject):
 
         :return: the name of the item or `None`.
         :returntype: `unicode`"""
-        name=self.xmlnode.prop("name")
+        name = self.xmlnode.prop("name")
         if name is None:
-            self.name=None
             return None
-        self.name=unicode(name,"utf-8")
-        return self.name
+        return name.decode("utf-8")
 
-    def set_name(self,name):
+    def set_name(self, name):
         """Set the name of the item.
 
         :Parameters:
@@ -154,23 +149,21 @@ class DiscoItem(CachedPropertyObject, StanzaPayloadWrapperObject):
         if name is None:
             if self.xmlnode.hasProp("name"):
                 self.xmlnode.unsetProp("name")
-            self.name=None
             return
-        name=unicode(name)
-        self.xmlnode.setProp("name",name.encode("utf-8"))
-        self.name=name
+        name = unicode(name)
+        self.xmlnode.setProp("name", name.encode("utf-8"))
+
+    name = property(get_name, set_name)
 
     def get_node(self):
         """Get the node of the item.
 
         :return: the node of the item or `None`.
         :returntype: `unicode`"""
-        node=self.xmlnode.prop("node")
+        node = self.xmlnode.prop("node")
         if node is None:
-            self.node=None
             return None
-        self.node=unicode(node,"utf-8")
-        return self.node
+        return node.decode("utf-8")
 
     def set_node(self,node):
         """Set the node of the item.
@@ -183,11 +176,11 @@ class DiscoItem(CachedPropertyObject, StanzaPayloadWrapperObject):
         if node is None:
             if self.xmlnode.hasProp("node"):
                 self.xmlnode.unsetProp("node")
-            self.node=None
             return
-        node=unicode(node)
-        self.xmlnode.setProp("node",node.encode("utf-8"))
-        self.node=node
+        node = unicode(node)
+        self.xmlnode.setProp("node", node.encode("utf-8"))
+
+    node = property(get_node, set_node)
 
     def get_action(self):
         """Get the action attribute of the item.
@@ -196,10 +189,8 @@ class DiscoItem(CachedPropertyObject, StanzaPayloadWrapperObject):
         :returntype: `unicode`"""
         action=self.xmlnode.prop("action")
         if action is None:
-            self.action=None
             return None
-        self.action=unicode(action,"utf-8")
-        return self.action
+        return action.decode("utf-8")
 
     def set_action(self,action):
         """Set the action of the item.
@@ -212,21 +203,21 @@ class DiscoItem(CachedPropertyObject, StanzaPayloadWrapperObject):
         if action is None:
             if self.xmlnode.hasProp("action"):
                 self.xmlnode.unsetProp("action")
-            self.action=None
             return
         if action not in ("remove","update"):
-            raise DiscoError,"Action must be 'update' or 'remove'"
-        action=unicode(action)
-        self.xmlnode.setProp("action",action.encode("utf-8"))
-        self.action=action
+            raise ValueError, "Action must be 'update' or 'remove'"
+        action = unicode(action)
+        self.xmlnode.setProp("action", action.encode("utf-8"))
+
+    action = property(get_action, set_action)
 
     def get_jid(self):
         """Get the JID of the item.
 
         :return: the JID of the item.
         :returntype: `JID`"""
-        self.jid=JID(unicode(self.xmlnode.prop("jid"),"utf-8"))
-        return self.jid
+        jid = self.xmlnode.prop("jid")
+        return JID( jid.decode("utf-8") )
 
     def set_jid(self,jid):
         """Set the JID of the item.
@@ -236,10 +227,11 @@ class DiscoItem(CachedPropertyObject, StanzaPayloadWrapperObject):
         :Types:
             - `jid`: `JID`
         """
-        self.xmlnode.setProp("jid",jid.as_unicode().encode("utf-8"))
-        self.jid=jid
+        self.xmlnode.setProp("jid", jid.as_unicode().encode("utf-8"))
 
-class DiscoIdentity(CachedPropertyObject, StanzaPayloadWrapperObject):
+    jid = property(get_jid, set_jid)
+
+class DiscoIdentity(StanzaPayloadWrapperObject):
     """An <identity/> element of disco#info reply.
 
     Identifies an item by its name, category and type.
@@ -271,7 +263,6 @@ class DiscoIdentity(CachedPropertyObject, StanzaPayloadWrapperObject):
         """
         self.disco=disco
         if disco and replace:
-            disco.invalidate_identities()
             old=disco.xpath_ctxt.xpathEval("d:identity")
             if old:
                 for n in old:
@@ -281,7 +272,6 @@ class DiscoIdentity(CachedPropertyObject, StanzaPayloadWrapperObject):
             if disco is None:
                 self.xmlnode=xmlnode_or_name.copyNode(1)
             else:
-                disco.invalidate_identities()
                 self.xmlnode=xmlnode_or_name
         elif not item_category:
             raise ValueError,"DiscoInfo requires category"
@@ -289,7 +279,6 @@ class DiscoIdentity(CachedPropertyObject, StanzaPayloadWrapperObject):
             raise ValueError,"DiscoInfo requires type"
         else:
             if disco:
-                disco.invalidate_identities()
                 self.xmlnode=disco.xmlnode.newChild(None,"identity",None)
             else:
                 self.xmlnode=common_root.newChild(None,"identity",None)
@@ -308,8 +297,6 @@ class DiscoIdentity(CachedPropertyObject, StanzaPayloadWrapperObject):
                 self.xmlnode.unlinkNode()
                 self.xmlnode.freeNode()
                 self.xmlnode=None
-        else:
-            self.disco.invalidate_identities()
         if self.xpath_ctxt:
             self.xpath_ctxt.xpathFreeContext()
 
@@ -320,7 +307,6 @@ class DiscoIdentity(CachedPropertyObject, StanzaPayloadWrapperObject):
         """Remove `self` from the containing `DiscoInfo` object."""
         if self.disco is None:
             return
-        self.disco.invalidate_identities()
         self.xmlnode.unlinkNode()
         oldns=self.xmlnode.ns()
         ns=self.xmlnode.newNs(oldns.getContent(),None)
@@ -333,11 +319,10 @@ class DiscoIdentity(CachedPropertyObject, StanzaPayloadWrapperObject):
 
         :return: the name of the item or `None`.
         :returntype: `unicode`"""
-        var=self.xmlnode.prop("name")
+        var = self.xmlnode.prop("name")
         if not var:
-            var=""
-        self.name=unicode(var,"utf-8")
-        return self.name
+            var = ""
+        return var.decode("utf-8")
 
     def set_name(self,name):
         """Set the name of the item.
@@ -347,23 +332,23 @@ class DiscoIdentity(CachedPropertyObject, StanzaPayloadWrapperObject):
         :Types:
             - `name`: `unicode` """
         if not name:
-            raise ValueError,"name is required in DiscoIdentity"
-        name=unicode(name)
-        self.xmlnode.setProp("name",name.encode("utf-8"))
-        self.name=name
+            raise ValueError, "name is required in DiscoIdentity"
+        name = unicode(name)
+        self.xmlnode.setProp("name", name.encode("utf-8"))
+
+    name = property(get_name, set_name)
 
     def get_category(self):
         """Get the category of the item.
 
         :return: the category of the item.
         :returntype: `unicode`"""
-        var=self.xmlnode.prop("category")
+        var = self.xmlnode.prop("category")
         if not var:
-            var="?"
-        self.category=unicode(var,"utf-8")
-        return self.category
+            var = "?"
+        return var.decode("utf-8")
 
-    def set_category(self,category):
+    def set_category(self, category):
         """Set the category of the item.
 
         :Parameters:
@@ -371,23 +356,23 @@ class DiscoIdentity(CachedPropertyObject, StanzaPayloadWrapperObject):
         :Types:
             - `category`: `unicode` """
         if not category:
-            raise ValueError,"Category is required in DiscoIdentity"
-        category=unicode(category)
-        self.xmlnode.setProp("category",category.encode("utf-8"))
-        self.category=category
+            raise ValueError, "Category is required in DiscoIdentity"
+        category = unicode(category)
+        self.xmlnode.setProp("category", category.encode("utf-8"))
+
+    category = property(get_category, set_category)
 
     def get_type(self):
         """Get the type of the item.
 
         :return: the type of the item.
         :returntype: `unicode`"""
-        item_type=self.xmlnode.prop("type")
+        item_type = self.xmlnode.prop("type")
         if not item_type:
-            item_type="?"
-        self.type=unicode(item_type,"utf-8")
-        return self.type
+            item_type = "?"
+        return item_type.decode("utf-8")
 
-    def set_type(self,item_type):
+    def set_type(self, item_type):
         """Set the type of the item.
 
         :Parameters:
@@ -396,16 +381,17 @@ class DiscoIdentity(CachedPropertyObject, StanzaPayloadWrapperObject):
             - `item_type`: `unicode` """
         if not item_type:
             raise ValueError,"Type is required in DiscoIdentity"
-        item_type=unicode(item_type)
-        self.xmlnode.setProp("type",item_type.encode("utf-8"))
-        self.type=item_type
+        item_type = unicode(item_type)
+        self.xmlnode.setProp("type", item_type.encode("utf-8"))
 
-class DiscoItems(CachedPropertyObject, StanzaPayloadWrapperObject):
+    type = property(get_type, set_type)
+
+class DiscoItems(StanzaPayloadWrapperObject):
     """A disco#items response or publish-request object.
 
     :Ivariables:
-        - `node`: node name of the disco#items element (cached).
-        - `items`: items in the disco#items element (cached).
+        - `node`: node name of the disco#items element.
+        - `items`: items in the disco#items element.
         - `xmlnode`: XML element listing the items.
     :Types:
         - `node`: `unicode`
@@ -454,14 +440,12 @@ class DiscoItems(CachedPropertyObject, StanzaPayloadWrapperObject):
 
         :return: the node name.
         :returntype: `unicode`"""
-        node=self.xmlnode.prop("node")
+        node = self.xmlnode.prop("node")
         if not node:
-            self.node=None
             return None
-        self.node=unicode(node,"utf-8")
-        return self.node
+        return node.decode("utf-8")
 
-    def set_node(self,node):
+    def set_node(self, node):
         """Set the node of the disco#item element.
 
         :Parameters:
@@ -472,11 +456,11 @@ class DiscoItems(CachedPropertyObject, StanzaPayloadWrapperObject):
         if node is None:
             if self.xmlnode.hasProp("node"):
                 self.xmlnode.unsetProp("node")
-            self.node=None
             return
-        node=unicode(node)
-        self.xmlnode.setProp("node",node.encode("utf-8"))
-        self.node=node
+        node = unicode(node)
+        self.xmlnode.setProp("node", node.encode("utf-8"))
+
+    node = property(get_node, set_node)
 
     def get_items(self):
         """Get the items contained in `self`.
@@ -487,11 +471,10 @@ class DiscoItems(CachedPropertyObject, StanzaPayloadWrapperObject):
         l=self.xpath_ctxt.xpathEval("d:item")
         if l is not None:
             for i in l:
-                ret.append(DiscoItem(self,i))
-        self.items=tuple(ret) # make it immutable
+                ret.append(DiscoItem(self, i))
         return ret
 
-    def set_items(self,item_list):
+    def set_items(self, item_list):
         """Set items in the disco#items object.
 
         All previous items are removed.
@@ -504,19 +487,17 @@ class DiscoItems(CachedPropertyObject, StanzaPayloadWrapperObject):
         """
         for item in self.items:
             item.remove()
-        del self.items
         for item in item_list:
             try:
                 self.add_item(item.jid,item.node,item.name,item.action)
             except AttributeError:
                 self.add_item(*item)
 
+    items = property(get_items, set_items, doc = "List of `DiscoItems`")
+
     def invalidate_items(self):
         """Clear cached item list."""
-        try:
-            del self.items
-        except AttributeError:
-            pass
+        warnings.warn("DiscoItems.invalidate_items() is deprecated and not needed any more.", DeprecationWarning, stacklevel=1)
 
     def add_item(self,jid,node=None,name=None,action=None):
         """Add a new item to the `DiscoItems` object.
@@ -557,7 +538,7 @@ class DiscoItems(CachedPropertyObject, StanzaPayloadWrapperObject):
                 return True
         return False
 
-class DiscoInfo(CachedPropertyObject, StanzaPayloadWrapperObject):
+class DiscoInfo(StanzaPayloadWrapperObject):
     """A disco#info response object.
 
     :Ivariables:
@@ -625,10 +606,8 @@ class DiscoInfo(CachedPropertyObject, StanzaPayloadWrapperObject):
 
         node=self.xmlnode.prop("node")
         if not node:
-            self.node=None
             return None
-        self.node=unicode(node,"utf-8")
-        return self.node
+        return node.decode("utf-8")
 
     def set_node(self,node):
         """Set the node of the disco#info element.
@@ -641,24 +620,41 @@ class DiscoInfo(CachedPropertyObject, StanzaPayloadWrapperObject):
         if node is None:
             if self.xmlnode.hasProp("node"):
                 self.xmlnode.unsetProp("node")
-            self.node=None
             return
-        node=unicode(node)
-        self.xmlnode.setProp("node",node.encode("utf-8"))
-        self.node=node
+        node = unicode(node)
+        self.xmlnode.setProp("node", node.encode("utf-8"))
+
+    node = property(get_node, set_node)
 
     def get_features(self):
         """Get the features contained in `self`.
 
         :return: the list of features.
         :returntype: `list` of `unicode`"""
-        l=self.xpath_ctxt.xpathEval("d:feature")
-        ret=[]
+        l = self.xpath_ctxt.xpathEval("d:feature")
+        ret = []
         for f in l:
             if f.hasProp("var"):
-                ret.append(unicode(f.prop("var"),"utf-8"))
-        self.features=tuple(ret) # made it immutable
+                ret.append( f.prop("var").decode("utf-8") )
         return ret
+
+    def set_features(self, features):
+        """Set features in the disco#info object.
+
+        All existing features are removed from `self`.
+
+        :Parameters:
+            - `features`: list of features.
+        :Types:
+            - `features`: sequence of `unicode`
+        """
+        for var in self.features:
+            self.remove_feature(var)
+
+        for var in features:
+            self.add_feature(var)
+
+    features = property(get_features, set_features)
 
     def has_feature(self,var):
         """Check if `self` contains the named feature.
@@ -685,26 +681,9 @@ class DiscoInfo(CachedPropertyObject, StanzaPayloadWrapperObject):
         else:
             return False
 
-    def set_features(self,features):
-        """Set features in the disco#info object.
-
-        All existing features are removed from `self`.
-
-        :Parameters:
-            - `features`: list of features.
-        :Types:
-            - `features`: sequence of `unicode`
-        """
-        self.invalidate_features()
-        for var in features:
-            self.add_feature(var)
-
     def invalidate_features(self):
         """Clear cached feature list."""
-        try:
-            del self.features
-        except AttributeError:
-            pass
+        warnings.warn("DiscoInfo.invalidate_features() is deprecated and not needed any more.", DeprecationWarning, stacklevel=1)
 
     def add_feature(self,var):
         """Add a feature to `self`.
@@ -715,8 +694,8 @@ class DiscoInfo(CachedPropertyObject, StanzaPayloadWrapperObject):
             - `var`: `unicode`"""
         if self.has_feature(var):
             return
-        n=self.xmlnode.newChild(None,"feature",None)
-        n.setProp("var",to_utf8(var))
+        n=self.xmlnode.newChild(None, "feature", None)
+        n.setProp("var", to_utf8(var))
 
     def remove_feature(self,var):
         """Remove a feature from `self`.
@@ -752,9 +731,28 @@ class DiscoInfo(CachedPropertyObject, StanzaPayloadWrapperObject):
         if l is not None:
             for i in l:
                 ret.append(DiscoIdentity(self,i))
-        self.identities=tuple(ret) # make it immutable
         return ret
 
+    def set_identities(self,identities):
+        """Set identities in the disco#info object.
+
+        Remove all existing identities from `self`.
+
+        :Parameters:
+            - `identities`: list of identities or identity properties
+              (jid,node,category,type,name).
+        :Types:
+            - `identities`: sequence of `DiscoIdentity` or sequence of sequences
+        """
+        for identity in self.identities:
+            identity.remove()
+        for identity in identities:
+            try:
+                self.add_identity(identity.item_name,identity.item_category,identity.item_type)
+            except AttributeError:
+                self.add_identity(*identity)
+
+    identities = property(get_identities, set_identities)
 
     def identity_is(self,item_category,item_type=None):
         """Check if the item described by `self` belongs to the given category
@@ -794,32 +792,9 @@ class DiscoInfo(CachedPropertyObject, StanzaPayloadWrapperObject):
         else:
             return False
 
-    def set_identities(self,identities):
-        """Set identities in the disco#info object.
-
-        Remove all existing identities from `self`.
-
-        :Parameters:
-            - `identities`: list of identities or identity properties
-              (jid,node,category,type,name).
-        :Types:
-            - `identities`: sequence of `DiscoIdentity` or sequence of sequences
-        """
-        for identity in self.identities:
-            identity.remove()
-        del self.identities
-        for identity in identities:
-            try:
-                self.add_identity(identity.item_name,identity.item_category,identity.item_type)
-            except AttributeError:
-                self.add_identity(*identity)
-
     def invalidate_identities(self):
         """Clear cached identity list."""
-        try:
-            del self.identities
-        except AttributeError:
-            pass
+        warnings.warn("DiscoInfo.invalidate_identities() is deprecated and not needed any more.", DeprecationWarning, stacklevel=1)
 
     def add_identity(self,item_name,item_category=None,item_type=None):
         """Add an identity to the `DiscoInfo` object.

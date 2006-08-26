@@ -58,23 +58,6 @@ with XML stanza or set of keyword arguments (from_jid, to_jid, stanza_type,
 etc.) to create such XML stanza. Most of the constructors will also accept
 instance of their own class to create a copy of it.
 
-Property access
-...............
-
-Elements of XMPP protocol (like various stanza, roster or JSF extensions'
-objects) have various properties, like addresses, values, types etc. Those
-are values of apropriate elements or attributes in the XML protocol. In PyXMPP
-such elements are stored as parsed XML nodes (subtrees) or just the properties,
-however the API is supposed to consistent, whatever is the internal
-representation (which may change sometimes).
-
-Common properties are accessible as object attributes and/or via get_* and
-set_* functions. Attributes access gives direct access to the internal
-storage or the cached value and will be usually faster, but for object using
-XML node as internal representation only get_* functions result is always
-up-to-date (attribute value may become invalid after the node is modified
-directly using `libxml2` API).
-
 Common methods
 ..............
 

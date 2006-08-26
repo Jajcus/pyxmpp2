@@ -5,6 +5,13 @@ Those are mentioned here as are not backward compatible.
 I want the api to be stable and consistent in the next release and later,
 so I do all the big changes now (I would have to do them at some time anyway).
 
+2006-08-26
+
+	CachedPropertyObject class removed and its usage in pyxmpp.jabber.disco
+	Now all the DiscoItem/DiscoInfo/DiscoItems attributes are regular properties
+	calling set_*, get_* funtions on every access. 
+	The old cached properties were giving no speed gain and only complicated things.
+
 2005-10-14
 
 	Usage of non-unicode strings in PyXMPP API is deprecated. No
