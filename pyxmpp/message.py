@@ -25,7 +25,7 @@ __revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import libxml2
-from pyxmpp.stanza import Stanza,StanzaError
+from pyxmpp.stanza import Stanza
 from pyxmpp.utils import to_utf8,from_utf8
 from pyxmpp.xmlextra import common_ns
 
@@ -66,11 +66,11 @@ class Message(Stanza):
         if isinstance(xmlnode,Message):
             pass
         elif isinstance(xmlnode,Stanza):
-            raise TypeError,"Couldn't make Message from other Stanza"
+            raise TypeError, "Couldn't make Message from other Stanza"
         elif isinstance(xmlnode,libxml2.xmlNode):
             pass
         elif xmlnode is not None:
-            raise TypeError,"Couldn't make Message from %r" % (type(xmlnode),)
+            raise TypeError, "Couldn't make Message from %r" % (type(xmlnode),)
 
         if xmlnode is None:
             xmlnode="message"
@@ -136,7 +136,7 @@ class Message(Stanza):
         :returntype: `unicode`"""
 
         if self.get_type() == "error":
-            raise StanzaError,"Errors may not be generated in response to errors"
+            raise ValueError, "Errors may not be generated in response to errors"
 
         m=Message(stanza_type="error",from_jid=self.get_to(),to_jid=self.get_from(),
             stanza_id=self.get_id(),error_cond=cond)

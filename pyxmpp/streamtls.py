@@ -32,6 +32,7 @@ import logging
 
 from pyxmpp.streambase import StreamBase,STREAM_NS
 from pyxmpp.streambase import FatalStreamError,StreamEncryptionRequired
+from pyxmpp.exceptions import TLSNegotiationFailed, TLSError
 
 try:
     from M2Crypto import SSL
@@ -45,14 +46,6 @@ except ImportError:
         pass
 
 TLS_NS="urn:ietf:params:xml:ns:xmpp-tls"
-
-class TLSNegotiationFailed(FatalStreamError):
-    """Raised when stream TLS negotiation fails."""
-    pass
-
-class TLSError(FatalStreamError):
-    """Raised on TLS error during stream processing."""
-    pass
 
 class TLSSettings:
     """Storage for TLS-related settings of an XMPP stream.

@@ -31,10 +31,7 @@ from pyxmpp import xmlextra
 from pyxmpp.utils import from_utf8,to_utf8
 from pyxmpp.jid import JID
 from pyxmpp.xmlextra import common_doc, common_ns, COMMON_NS
-
-class StanzaError(ValueError):
-    """Raised on ivalid stanza objects usage."""
-    pass
+from pyxmpp.exceptions import ProtocolError, JIDMalformedProtocolError
 
 random.seed()
 last_id=random.randrange(1000000)
@@ -160,7 +157,10 @@ class Stanza:
         :return: value of the "from" attribute (sender JID) or None.
         :returntype: `unicode`"""
         if self.xmlnode.hasProp("from"):
-            return JID(from_utf8(self.xmlnode.prop("from")))
+            try:
+                return JID(from_utf8(self.xmlnode.prop("from")))
+            except JIDError:
+                raise JIDMalformedProtocolError, "Bad JID in the 'from' attribute"
         else:
             return None
 
@@ -172,7 +172,10 @@ class Stanza:
         :return: value of the "to" attribute (recipient JID) or None.
         :returntype: `unicode`"""
         if self.xmlnode.hasProp("to"):
-            return JID(from_utf8(self.xmlnode.prop("to")))
+            try:
+                return JID(from_utf8(self.xmlnode.prop("to")))
+            except JIDError:
+                raise JIDMalformedProtocolError, "Bad JID in the 'to' attribute"
         else:
             return None
 
@@ -211,7 +214,7 @@ class Stanza:
             return self._error
         n=self.xpath_eval(u"ns:error")
         if not n:
-            raise StanzaError,"This stanza contains no error"
+            raise ProtocolError, (None, "This stanza contains no error")
         from pyxmpp.error import StanzaErrorNode
         self._error=StanzaErrorNode(n[0],copy=0)
         return self._error

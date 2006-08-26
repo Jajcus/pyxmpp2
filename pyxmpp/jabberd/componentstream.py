@@ -28,18 +28,10 @@ import sha
 import logging
 
 from pyxmpp.stream import Stream
-from pyxmpp.streambase import StreamError,FatalStreamError
 from pyxmpp.streambase import stanza_factory,HostMismatch
 from pyxmpp.xmlextra import common_doc,common_root
 from pyxmpp.utils import to_utf8
-
-class ComponentStreamError(StreamError):
-    """Raised on a component error."""
-    pass
-
-class FatalComponentStreamError(ComponentStreamError,FatalStreamError):
-    """Raised on a fatal component error."""
-    pass
+from pyxmpp.exceptions import StreamError,FatalStreamError,ComponentStreamError,FatalComponentStreamError
 
 class ComponentStream(Stream):
     """Handles jabberd component (jabber:component:accept) connection stream.
@@ -101,13 +93,13 @@ class ComponentStream(Stream):
     def _connect(self,server=None,port=None):
         """Same as `ComponentStream.connect` but assume `self.lock` is acquired."""
         if self.me.node or self.me.resource:
-            raise ComponentStreamError,"Component JID may have only domain defined"
+            raise Value, "Component JID may have only domain defined"
         if not server:
             server=self.server
         if not port:
             port=self.port
         if not server or not port:
-            raise ComponentStreamError,"Server or port not given"
+            raise ValueError, "Server or port not given"
         Stream._connect(self,server,port,None,self.me)
 
     def accept(self,sock):

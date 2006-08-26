@@ -27,7 +27,7 @@ __docformat__="restructuredtext en"
 import libxml2
 
 from pyxmpp.utils import to_utf8,from_utf8
-from pyxmpp.stanza import Stanza,StanzaError
+from pyxmpp.stanza import Stanza
 from pyxmpp.xmlextra import common_ns
 
 presence_types=("available","unavailable","probe","subscribe","unsubscribe","subscribed",
@@ -90,7 +90,7 @@ class Presence(Stanza):
             raise TypeError,"Couldn't make Presence from %r" % (type(xmlnode),)
 
         if stanza_type and stanza_type not in presence_types:
-            raise StanzaError,"Invalid presence type: %r" % (type,)
+            raise ValueError, "Invalid presence type: %r" % (type,)
 
         if stanza_type=="available":
             stanza_type=None
@@ -206,7 +206,7 @@ class Presence(Stanza):
                 return
         priority=int(priority)
         if priority<-128 or priority>127:
-            raise ValueError,"Bad priority value"
+            raise ValueError, "Bad priority value"
         priority=str(priority)
         if n:
             n[0].setContent(priority)
@@ -221,7 +221,7 @@ class Presence(Stanza):
         :returntype: `Presence`"""
 
         if self.get_type() not in ("subscribe","subscribed","unsubscribe","unsubscribed"):
-            raise StanzaError,("Results may only be generated for 'subscribe',"
+            raise ValueError, ("Results may only be generated for 'subscribe',"
                 "'subscribed','unsubscribe' or 'unsubscribed' presence")
 
         pr=Presence(stanza_type=accept_responses[self.get_type()],
@@ -235,7 +235,7 @@ class Presence(Stanza):
         :return: new presence stanza.
         :returntype: `Presence`"""
         if self.get_type() not in ("subscribe","subscribed","unsubscribe","unsubscribed"):
-            raise StanzaError,("Results may only be generated for 'subscribe',"
+            raise ValueError, ("Results may only be generated for 'subscribe',"
                 "'subscribed','unsubscribe' or 'unsubscribed' presence")
 
         pr=Presence(stanza_type=accept_responses[self.get_type()],
@@ -254,7 +254,7 @@ class Presence(Stanza):
         :returntype: `Presence`"""
 
         if self.get_type() == "error":
-            raise StanzaError,"Errors may not be generated in response to errors"
+            raise ValueError, "Errors may not be generated in response to errors"
 
         p=Presence(stanza_type="error",from_jid=self.get_to(),to_jid=self.get_from(),
             stanza_id=self.get_id(),error_cond=cond)

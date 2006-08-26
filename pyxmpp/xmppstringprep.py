@@ -28,6 +28,7 @@ __docformat__="restructuredtext en"
 
 import stringprep
 import unicodedata
+from pyxmpp.exceptions import StringprepError
 
 class LookupFunction:
     """Class for looking up RFC 3454 tables using function.
@@ -112,10 +113,6 @@ def nfkc(data):
     if type(data) is list:
         data=u"".join(data)
     return unicodedata.normalize("NFKC",data)
-
-class StringprepError(StandardError):
-    """Exception raised when string preparation results in error."""
-    pass
 
 class Profile:
     """Base class for stringprep profiles."""

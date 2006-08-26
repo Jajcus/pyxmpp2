@@ -28,18 +28,12 @@ __docformat__="restructuredtext en"
 import logging
 
 from pyxmpp.stream import Stream
-from pyxmpp.streambase import StreamError,StreamAuthenticationError,BIND_NS,FatalStreamError
+from pyxmpp.streambase import BIND_NS
 from pyxmpp.streamsasl import SASLNotAvailable,SASLMechanismNotAvailable
 from pyxmpp.jid import JID
 from pyxmpp.utils import to_utf8
-
-class ClientStreamError(StreamError):
-    """Raised on a client stream error."""
-    pass
-
-class FatalClientStreamError(FatalStreamError):
-    """Raised on a fatal client stream error."""
-    pass
+from pyxmpp.exceptions import StreamError,StreamAuthenticationError,FatalStreamError
+from pyxmpp.exceptions import ClientStreamError, FatalClientStreamError
 
 class ClientStream(Stream):
     """Handles XMPP-IM client connection stream.

@@ -32,6 +32,7 @@ import warnings
 from encodings import idna
 
 from pyxmpp.xmppstringprep import nodeprep,resourceprep
+from pyxmpp.exceptions import JIDError
 
 node_invalid_re=re.compile(ur"[" u'"' ur"&'/:<>@\s\x00-\x19]",re.UNICODE)
 resource_invalid_re=re.compile(ur"[\s\x00-\x19]",re.UNICODE)
@@ -47,10 +48,6 @@ def are_domains_equal(a,b):
     a=idna.ToASCII(a)
     b=idna.ToASCII(b)
     return a.lower()==b.lower()
-
-class JIDError(ValueError):
-    "Exception raised when invalid JID is used"
-    pass
 
 class JID(object):
     """JID.

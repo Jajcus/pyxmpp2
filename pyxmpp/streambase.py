@@ -38,7 +38,7 @@ import logging
 from pyxmpp import xmlextra
 from pyxmpp.expdict import ExpiringDictionary
 from pyxmpp.utils import to_utf8
-from pyxmpp.stanza import Stanza,StanzaError
+from pyxmpp.stanza import Stanza
 from pyxmpp.error import StreamErrorNode
 from pyxmpp.iq import Iq
 from pyxmpp.presence import Presence
@@ -46,35 +46,11 @@ from pyxmpp.message import Message
 from pyxmpp.jid import JID
 from pyxmpp import resolver
 from pyxmpp.stanzaprocessor import StanzaProcessor
+from pyxmpp.exceptions import StreamError, StreamEncryptionRequired, HostMismatch, ProtocolError
+from pyxmpp.exceptions import FatalStreamError, StreamParseError, StreamAuthenticationError
 
 STREAM_NS="http://etherx.jabber.org/streams"
 BIND_NS="urn:ietf:params:xml:ns:xmpp-bind"
-
-class StreamError(StandardError):
-    """Base class for all stream errors."""
-    pass
-
-class StreamEncryptionRequired(StreamError):
-    """Exception raised when stream encryption is requested, but not used."""
-    pass
-
-class HostMismatch(StreamError):
-    """Exception raised when the connected host name is other then requested."""
-    pass
-
-class FatalStreamError(StreamError):
-    """Base class for all fatal Stream exceptions.
-
-    When `FatalStreamError` is raised the stream is no longer usable."""
-    pass
-
-class StreamParseError(FatalStreamError):
-    """Raised when invalid XML is received in an XMPP stream."""
-    pass
-
-class StreamAuthenticationError(FatalStreamError):
-    """Raised when stream authentication fails."""
-    pass
 
 def stanza_factory(xmlnode):
     """Creates Iq, Message or Presence object for XML stanza `xmlnode`"""
@@ -564,9 +540,9 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         """Same as `Stream.send` but assume `self.lock` is acquired."""
         if not self.version:
             try:
-                err=stanza.get_error()
-            except StanzaError:
-                err=None
+                err = stanza.get_error()
+            except ProtocolError:
+                err = None
             if err:
                 err.downgrade()
         self.fix_out_stanza(stanza)

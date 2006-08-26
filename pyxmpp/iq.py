@@ -27,7 +27,7 @@ __docformat__="restructuredtext en"
 import libxml2
 
 from pyxmpp.xmlextra import get_node_ns_uri
-from pyxmpp.stanza import Stanza,StanzaError,gen_id
+from pyxmpp.stanza import Stanza, gen_id
 
 class Iq(Stanza):
     """Wraper object for <iq /> stanzas."""
@@ -63,13 +63,13 @@ class Iq(Stanza):
         elif xmlnode is not None:
             raise TypeError,"Couldn't make Iq from %r" % (type(xmlnode),)
         elif not stanza_type:
-            raise StanzaError,"type is required for Iq"
+            raise ValueError, "type is required for Iq"
         else:
             if not stanza_id and stanza_type in ("get", "set"):
                 stanza_id=gen_id()
 
         if not xmlnode and stanza_type not in ("get","set","result","error"):
-            raise StanzaError,"Invalid Iq type: %r" % (stanza_type,)
+            raise ValueError, "Invalid Iq type: %r" % (stanza_type,)
 
         if xmlnode is None:
             xmlnode="iq"
@@ -96,7 +96,7 @@ class Iq(Stanza):
         :returntype: `Iq`"""
 
         if self.get_type() in ("result", "error"):
-            raise StanzaError,"Errors may not be generated for 'result' and 'error' iq"
+            raise ValueError, "Errors may not be generated for 'result' and 'error' iq"
 
         iq=Iq(stanza_type="error",from_jid=self.get_to(),to_jid=self.get_from(),
             stanza_id=self.get_id(),error_cond=cond)
@@ -114,7 +114,7 @@ class Iq(Stanza):
         :returntype: `Iq`"""
 
         if self.get_type() not in ("set","get"):
-            raise StanzaError,"Results may only be generated for 'set' or 'get' iq"
+            raise ValueError, "Results may only be generated for 'set' or 'get' iq"
 
         iq=Iq(stanza_type="result", from_jid=self.get_to(),
                 to_jid=self.get_from(), stanza_id=self.get_id())

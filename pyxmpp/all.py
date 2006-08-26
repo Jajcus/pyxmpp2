@@ -39,11 +39,11 @@ from pyxmpp.iq import Iq
 from pyxmpp.presence import Presence
 from pyxmpp.message import Message
 from pyxmpp.jid import JID,JIDError
-from pyxmpp.stanza import StanzaError
 from pyxmpp.roster import Roster,RosterItem
+from pyxmpp.exceptions import *
 
 for name in dir():
-    if not name.startswith("__") and name!="pyxmpp":
+    if not name.startswith("_") and name != "pyxmpp":
         setattr(pyxmpp,name,globals()[name])
 
 # vi: sts=4 et sw=4

@@ -31,14 +31,7 @@ from pyxmpp.clientstream import ClientStream
 from pyxmpp.iq import Iq
 from pyxmpp.presence import Presence
 from pyxmpp.roster import Roster
-
-class ClientError(StandardError):
-    """Raised on a client error."""
-    pass
-
-class FatalClientError(ClientError):
-    """Raised on a fatal client error."""
-    pass
+from pyxmpp.exceptions import ClientError, FatalClientError
 
 class Client:
     """Base class for an XMPP-IM client.

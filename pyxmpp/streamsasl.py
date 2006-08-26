@@ -30,22 +30,9 @@ import logging
 
 from pyxmpp.jid import JID
 from pyxmpp import sasl
-from pyxmpp.streambase import StreamAuthenticationError
+from pyxmpp.exceptions import StreamAuthenticationError, SASLNotAvailable, SASLMechanismNotAvailable, SASLAuthenticationFailed
 
 SASL_NS="urn:ietf:params:xml:ns:xmpp-sasl"
-
-class SASLNotAvailable(StreamAuthenticationError):
-    """Raised when SASL authentication is requested, but not available."""
-    pass
-
-class SASLMechanismNotAvailable(StreamAuthenticationError):
-    """Raised when none of SASL authentication mechanisms requested is
-    available."""
-    pass
-
-class SASLAuthenticationFailed(StreamAuthenticationError):
-    """Raised when stream SASL authentication fails."""
-    pass
 
 class StreamSASLMixIn(sasl.PasswordManager):
     """SASL authentication mix-in class for XMPP stream."""

@@ -28,7 +28,6 @@ import libxml2
 from pyxmpp.utils import to_utf8,from_utf8
 from pyxmpp.xmlextra import common_doc, common_root, common_ns, get_node_ns_uri
 from pyxmpp.presence import Presence
-from pyxmpp.error import ErrorNodeError
 from pyxmpp.iq import Iq
 from pyxmpp.jid import JID
 from pyxmpp import xmlextra
@@ -84,11 +83,11 @@ class MucXBase(StanzaPayloadWrapperObject):
                 xmlextra.replace_ns(self.xmlnode, ns, common_ns)
         elif isinstance(xmlnode,MucXBase):
             if not copy:
-                raise ErrorNodeError,"MucXBase may only be copied"
+                raise TypeError, "MucXBase may only be copied"
             self.xmlnode=xmlnode.xmlnode.docCopyNode(common_doc,1)
             common_root.addChild(self.xmlnode)
         elif xmlnode is not None:
-            raise ErrorNodeError,"Bad MucX constructor argument"
+            raise TypeError, "Bad MucX constructor argument"
         else:
             if parent:
                 self.xmlnode=parent.newChild(None,self.element,None)

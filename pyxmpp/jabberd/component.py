@@ -32,10 +32,6 @@ from pyxmpp.utils import from_utf8
 from pyxmpp.jabber.disco import DiscoItems,DiscoInfo,DiscoIdentity
 from pyxmpp.stanza import Stanza
 
-class ComponentError(Exception):
-    """Raised on component error."""
-    pass
-
 class Component:
     """Jabber external component ("jabber:component:accept" protocol) interface
     implementation.
@@ -124,16 +120,16 @@ class Component:
         Set `self.stream` to the `pyxmpp.jabberd.ComponentStream` when
         initial connection succeeds.
 
-        :raise ComponentError: when some of the component properties
+        :raise ValueError: when some of the component properties
           (`self.jid`, `self.secret`,`self.server` or `self.port`) are wrong."""
         if not self.jid or self.jid.node or self.jid.resource:
-            raise ComponentError,"Cannot connect: no or bad JID given"
+            raise ValueError,"Cannot connect: no or bad JID given"
         if not self.secret:
-            raise ComponentError,"Cannot connect: no secret given"
+            raise ValueError,"Cannot connect: no secret given"
         if not self.server:
-            raise ComponentError,"Cannot connect: no server given"
+            raise ValueError,"Cannot connect: no server given"
         if not self.port:
-            raise ComponentError,"Cannot connect: no port given"
+            raise ValueError,"Cannot connect: no port given"
 
         self.lock.acquire()
         try:

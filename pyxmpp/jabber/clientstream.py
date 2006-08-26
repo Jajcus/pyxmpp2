@@ -29,20 +29,10 @@ import logging
 from pyxmpp.iq import Iq
 from pyxmpp.utils import to_utf8,from_utf8
 from pyxmpp.jid import JID
-
-from pyxmpp.clientstream import ClientStreamError
 from pyxmpp.clientstream import ClientStream
-
 from pyxmpp.jabber.register import Register
 
-class LegacyAuthenticationError(ClientStreamError):
-    """Raised on a legacy authentication error."""
-    pass
-
-class RegistrationError(ClientStreamError):
-    """Raised on a in-band registration error."""
-    pass
-
+from pyxmpp.exceptions import ClientStreamError, LegacyAuthenticationError, RegistrationError
 
 class LegacyClientStream(ClientStream):
     """Handles Jabber (both XMPP and legacy protocol) client connection stream.

@@ -30,6 +30,7 @@ import libxml2
 from pyxmpp.utils import from_utf8, to_utf8
 from pyxmpp.xmlextra import common_doc, common_root, common_ns
 from pyxmpp import xmlextra
+from pyxmpp.exceptions import ProtocolError
 
 stream_errors={
             u"bad-format":
@@ -176,10 +177,6 @@ STREAM_ERROR_NS='urn:ietf:params:xml:ns:xmpp-streams'
 PYXMPP_ERROR_NS='http://pyxmpp.jajcus.net/xmlns/errors'
 STREAM_NS="http://etherx.jabber.org/streams"
 
-class ErrorNodeError(RuntimeError):
-    """Raised on error with XMPP error handling."""
-    pass
-
 class ErrorNode:
     """Base class for both XMPP stream and stanza errors"""
     def __init__(self,xmlnode_or_cond,ns=None,copy=True,parent=None):
@@ -206,14 +203,14 @@ class ErrorNode:
             self.__from_xml(xmlnode_or_cond,ns,copy,parent)
         elif isinstance(xmlnode_or_cond,ErrorNode):
             if not copy:
-                raise ErrorNodeError,"ErrorNodes may only be copied"
+                raise TypeError, "ErrorNodes may only be copied"
             self.ns=from_utf8(xmlnode_or_cond.ns.getContent())
             self.xmlnode=xmlnode_or_cond.xmlnode.docCopyNode(common_doc,1)
             if not parent:
                 parent=common_root
             parent.addChild(self.xmlnode)
         elif ns is None:
-            raise ErrorNodeError,"Condition namespace not given"
+            raise ValueError, "Condition namespace not given"
         else:
             if parent:
                 self.xmlnode=parent.newChild(common_ns,"error",None)
@@ -249,9 +246,8 @@ class ErrorNode:
                     break
                 ns=None
                 c=c.next
-
             if ns==None:
-                raise ErrorNodeError,"Bad error namespace"
+                raise ProtocolError, "Bad error namespace"
         self.ns=from_utf8(ns)
         if copy:
             self.xmlnode=xmlnode.docCopyNode(common_doc,1)
@@ -447,10 +443,10 @@ class StreamErrorNode(ErrorNode):
             - `copy`: `bool`
             - `parent`: `libxml2.xmlNode`"""
         if type(xmlnode_or_cond) is str:
-            xmlnode_or_cond=unicode(xmlnode_or_cond,"utf-8")
+            xmlnode_or_cond = xmlnode_or_cond.decode("utf-8")
         if type(xmlnode_or_cond) is unicode:
             if not stream_errors.has_key(xmlnode_or_cond):
-                raise ErrorNodeError,"Bad error condition"
+                raise ValueError, "Bad error condition"
         ErrorNode.__init__(self,xmlnode_or_cond,STREAM_ERROR_NS,copy=copy,parent=parent)
 
     def get_message(self):
@@ -491,7 +487,7 @@ class StanzaErrorNode(ErrorNode):
             xmlnode_or_cond=unicode(xmlnode_or_cond,"utf-8")
         if type(xmlnode_or_cond) is unicode:
             if not stanza_errors.has_key(xmlnode_or_cond):
-                raise ErrorNodeError,"Bad error condition"
+                raise ValueError, "Bad error condition"
 
         ErrorNode.__init__(self,xmlnode_or_cond,STANZA_ERROR_NS,copy=copy,parent=parent)
 

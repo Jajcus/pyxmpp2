@@ -29,20 +29,16 @@ import warnings
 import libxml2
 
 from pyxmpp.xmlextra import common_doc,common_root
-from pyxmpp.stanza import StanzaError
 from pyxmpp.jid import JID
 from pyxmpp import cache
 
 from pyxmpp.utils import to_utf8
 from pyxmpp.objects import StanzaPayloadWrapperObject
+from pyxmpp.exceptions import ProtocolError
 
 DISCO_NS="http://jabber.org/protocol/disco"
 DISCO_ITEMS_NS=DISCO_NS+"#items"
 DISCO_INFO_NS=DISCO_NS+"#info"
-
-class DiscoError(StandardError):
-    """Raised on disco related error"""
-    pass
 
 class DiscoItem(StanzaPayloadWrapperObject):
     """An item of disco#items reply.
@@ -413,7 +409,7 @@ class DiscoItems(StanzaPayloadWrapperObject):
         if isinstance(xmlnode_or_node,libxml2.xmlNode):
             ns=xmlnode_or_node.ns()
             if ns.getContent() != DISCO_ITEMS_NS:
-                raise DiscoError,"Bad disco-items namespace"
+                raise ValueError, "Bad disco-items namespace"
             self.xmlnode=xmlnode_or_node.docCopyNode(common_doc,1)
             common_root.addChild(self.xmlnode)
             self.ns=self.xmlnode.ns()
@@ -576,7 +572,7 @@ class DiscoInfo(StanzaPayloadWrapperObject):
         if isinstance(xmlnode_or_node,libxml2.xmlNode):
             ns=xmlnode_or_node.ns()
             if ns.getContent() != DISCO_INFO_NS:
-                raise DiscoError,"Bad disco-info namespace"
+                raise ValueError, "Bad disco-info namespace"
             self.xmlnode=xmlnode_or_node.docCopyNode(doc,1)
             parent.addChild(self.xmlnode)
         else:
@@ -673,7 +669,7 @@ class DiscoInfo(StanzaPayloadWrapperObject):
         elif "'" not in var:
             expr=u"d:feature[@var='%s']" % (var,)
         else:
-            raise DiscoError,"Invalid feature name"
+            raise ValueError, "Invalid feature name"
 
         l=self.xpath_ctxt.xpathEval(to_utf8(expr))
         if l:
@@ -711,7 +707,7 @@ class DiscoInfo(StanzaPayloadWrapperObject):
         elif "'" not in var:
             expr="d:feature[@var='%s']" % (var,)
         else:
-            raise DiscoError,"Invalid feature name"
+            raise ValueError, "Invalid feature name"
 
         l=self.xpath_ctxt.xpathEval(expr)
         if not l:
@@ -770,7 +766,7 @@ class DiscoInfo(StanzaPayloadWrapperObject):
             given type and category.
         :returntype: `bool`"""
         if not item_category:
-            raise ValueError,"bad category"
+            raise ValueError, "bad category"
         if not item_type:
             type_expr=u""
         elif '"' not in item_type:
@@ -778,13 +774,13 @@ class DiscoInfo(StanzaPayloadWrapperObject):
         elif "'" not in type:
             type_expr=u" and @type='%s'" % (item_type,)
         else:
-            raise ValueError,"Invalid type name"
+            raise ValueError, "Invalid type name"
         if '"' not in item_category:
             expr=u'd:identity[@category="%s"%s]' % (item_category,type_expr)
         elif "'" not in item_category:
             expr=u"d:identity[@category='%s'%s]" % (item_category,type_expr)
         else:
-            raise ValueError,"Invalid category name"
+            raise ValueError, "Invalid category name"
 
         l=self.xpath_ctxt.xpathEval(to_utf8(expr))
         if l:
@@ -845,7 +841,7 @@ class DiscoCacheFetcherBase(cache.CacheFetcher):
         try:
             d=self.disco_class(stanza.get_query())
             self.got_it(d)
-        except DiscoError,e:
+        except ValueError,e:
             self.error(e)
 
     def __error(self,stanza):
@@ -857,7 +853,7 @@ class DiscoCacheFetcherBase(cache.CacheFetcher):
             - `stanza`: `pyxmpp.stanza.Stanza`"""
         try:
             self.error(stanza.get_error())
-        except StanzaError:
+        except ProtocolError:
             from pyxmpp.error import StanzaErrorNode
             self.error(StanzaErrorNode("undefined-condition"))
 
