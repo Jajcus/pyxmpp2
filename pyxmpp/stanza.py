@@ -51,13 +51,16 @@ class Stanza:
         - `xmlnode`: stanza XML node.
         - `_error`: `pyxmpp.error.StanzaErrorNode` describing the error associated with
           the stanza of type "error".
+        - `stream`: stream on which the stanza was received or `None`. May be
+          used to send replies or get some session-related parameters.
     :Types:
         - `xmlnode`: `libxml2.xmlNode`
         - `_error`: `pyxmpp.error.StanzaErrorNode`"""
     stanza_type="Unknown"
 
     def __init__(self, name_or_xmlnode, from_jid=None, to_jid=None,
-            stanza_type=None, stanza_id=None, error=None, error_cond=None):
+            stanza_type=None, stanza_id=None, error=None, error_cond=None,
+            stream = None):
         """Initialize a Stanza object.
 
         :Parameters:
@@ -119,6 +122,7 @@ class Stanza:
                 self._error=StanzaErrorNode(error,parent=self.xmlnode,copy=1)
             elif error_cond:
                 self._error=StanzaErrorNode(error_cond,parent=self.xmlnode)
+        self.stream = stream
 
     def __del__(self):
         if self.xmlnode:

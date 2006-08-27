@@ -32,8 +32,8 @@ from pyxmpp.stanza import Stanza, gen_id
 class Iq(Stanza):
     """Wraper object for <iq /> stanzas."""
     stanza_type="iq"
-    def __init__(self,xmlnode=None,from_jid=None,to_jid=None,stanza_type=None,stanza_id=None,
-            error=None,error_cond=None):
+    def __init__(self, xmlnode = None, from_jid = None, to_jid = None, stanza_type = None,
+            stanza_id = None, error = None, error_cond=None, stream = None):
         """Initialize an `Iq` object.
 
         :Parameters:
@@ -74,9 +74,9 @@ class Iq(Stanza):
         if xmlnode is None:
             xmlnode="iq"
 
-        Stanza.__init__(self, xmlnode, from_jid=from_jid, to_jid=to_jid,
-            stanza_type=stanza_type, stanza_id=stanza_id, error=error,
-            error_cond=error_cond)
+        Stanza.__init__(self, xmlnode, from_jid = from_jid, to_jid = to_jid,
+            stanza_type = stanza_type, stanza_id = stanza_id, error = error,
+            error_cond = error_cond, stream = stream)
 
     def copy(self):
         """Create a deep copy of the iq stanza.

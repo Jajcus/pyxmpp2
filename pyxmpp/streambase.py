@@ -52,16 +52,16 @@ from pyxmpp.exceptions import FatalStreamError, StreamParseError, StreamAuthenti
 STREAM_NS="http://etherx.jabber.org/streams"
 BIND_NS="urn:ietf:params:xml:ns:xmpp-bind"
 
-def stanza_factory(xmlnode):
+def stanza_factory(xmlnode, stream = None):
     """Creates Iq, Message or Presence object for XML stanza `xmlnode`"""
     if xmlnode.name=="iq":
-        return Iq(xmlnode)
+        return Iq(xmlnode, stream = stream)
     if xmlnode.name=="message":
-        return Message(xmlnode)
+        return Message(xmlnode, stream = stream)
     if xmlnode.name=="presence":
-        return Presence(xmlnode)
+        return Presence(xmlnode, stream = stream)
     else:
-        return Stanza(xmlnode)
+        return Stanza(xmlnode, stream = stream)
 
 class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
     """Base class for a generic XMPP stream.
@@ -701,7 +701,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
             return
 
         if ns_uri==self.default_ns_uri:
-            stanza=stanza_factory(xmlnode)
+            stanza=stanza_factory(xmlnode, self)
             self.lock.release()
             try:
                 self.process_stanza(stanza)

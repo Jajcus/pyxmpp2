@@ -34,8 +34,8 @@ message_types=("normal","chat","headline","error","groupchat")
 class Message(Stanza):
     """Wraper object for <message /> stanzas."""
     stanza_type="message"
-    def __init__(self,xmlnode=None,from_jid=None,to_jid=None,stanza_type=None,stanza_id=None,
-            subject=None, body=None, thread=None,error=None,error_cond=None):
+    def __init__(self, xmlnode = None, from_jid = None, to_jid = None, stanza_type = None, stanza_id = None,
+            subject = None, body = None, thread = None, error = None, error_cond = None, stream = None):
         """Initialize a `Message` object.
 
         :Parameters:
@@ -75,8 +75,8 @@ class Message(Stanza):
         if xmlnode is None:
             xmlnode="message"
 
-        Stanza.__init__(self, xmlnode, from_jid=from_jid, to_jid=to_jid,
-                stanza_type=stanza_type,stanza_id=stanza_id, error=error, error_cond=error_cond)
+        Stanza.__init__(self, xmlnode, from_jid = from_jid, to_jid = to_jid, stanza_type = stanza_type,
+                stanza_id = stanza_id, error = error, error_cond = error_cond, stream = stream)
 
         if subject is not None:
             self.xmlnode.newTextChild(common_ns,"subject",to_utf8(subject))

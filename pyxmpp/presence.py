@@ -50,8 +50,9 @@ deny_responses={
 class Presence(Stanza):
     """Wraper object for <presence /> stanzas."""
     stanza_type="presence"
-    def __init__(self,xmlnode=None,from_jid=None,to_jid=None,stanza_type=None,stanza_id=None,
-            show=None,status=None,priority=0,error=None,error_cond=None):
+    def __init__(self, xmlnode = None, from_jid = None, to_jid = None, stanza_type = None, 
+            stanza_id = None, show = None, status = None, priority = 0,
+            error = None, error_cond = None, stream = None):
         """Initialize a `Presence` object.
 
         :Parameters:
@@ -98,8 +99,8 @@ class Presence(Stanza):
         if xmlnode is None:
             xmlnode="presence"
 
-        Stanza.__init__(self, xmlnode, from_jid=from_jid, to_jid=to_jid, stanza_type=stanza_type,
-                stanza_id=stanza_id, error=error, error_cond=error_cond)
+        Stanza.__init__(self, xmlnode, from_jid = from_jid, to_jid = to_jid, stanza_type = stanza_type,
+                stanza_id = stanza_id, error = error, error_cond = error_cond, stream = stream)
 
         if show:
             self.xmlnode.newTextChild(common_ns,"show",to_utf8(show))
