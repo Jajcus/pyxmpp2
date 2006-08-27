@@ -40,9 +40,9 @@ class LegacyClientStream(ClientStream):
     Both client and server side of the connection is supported. This class handles
     client SASL and legacy authentication, authorisation and XMPP resource binding.
     """
-    def __init__(self,jid,password=None,server=None,port=5222,
-            auth_methods=("sasl:DIGEST-MD5","digest"),
-            tls_settings=None,keepalive=0):
+    def __init__(self, jid, password = None, server = None, port = 5222,
+            auth_methods = ("sasl:DIGEST-MD5", "digest"),
+            tls_settings = None, keepalive = 0, owner = None):
         """Initialize a LegacyClientStream object.
 
         :Parameters:
@@ -54,6 +54,7 @@ class LegacyClientStream(ClientStream):
               in the list should be prefixed with "sasl:" string.
             - `tls_settings`: settings for StartTLS -- `TLSSettings` instance.
             - `keepalive`: keepalive output interval. 0 to disable.
+            - `owner`: `Client`, `Component` or similar object "owning" this stream.
         :Types:
             - `jid`: `pyxmpp.JID`
             - `password`: `unicode`
@@ -66,8 +67,8 @@ class LegacyClientStream(ClientStream):
         (self.authenticated, self.available_auth_methods, self.auth_stanza,
                 self.peer_authenticated, self.auth_method_used,
                 self.registration_callback, self.registration_form, self.__register) = (None,) * 8
-        ClientStream.__init__(self,jid,password,server,port,
-                            auth_methods,tls_settings,keepalive)
+        ClientStream.__init__(self, jid, password, server, port,
+                            auth_methods, tls_settings, keepalive, owner)
         self.__logger=logging.getLogger("pyxmpp.jabber.LegacyClientStream")
 
     def _reset(self):

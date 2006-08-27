@@ -58,9 +58,9 @@ class ClientStream(Stream):
         - `password`: `str`
         - `auth_methods`: `list` of `str`
     """
-    def __init__(self,jid,password=None,server=None,port=None,
-            auth_methods=("sasl:DIGEST-MD5",),
-            tls_settings=None,keepalive=0):
+    def __init__(self, jid, password=None, server=None, port=None,
+            auth_methods = ("sasl:DIGEST-MD5",),
+            tls_settings = None, keepalive = 0, owner = None):
         """Initialize the ClientStream object.
 
         :Parameters:
@@ -72,6 +72,7 @@ class ClientStream(Stream):
               in the list should be prefixed with "sasl:" string.
             - `tls_settings`: settings for StartTLS -- `TLSSettings` instance.
             - `keepalive`: keepalive output interval. 0 to disable.
+            - `owner`: `Client`, `Component` or similar object "owning" this stream.
         :Types:
             - `jid`: `pyxmpp.JID`
             - `password`: `unicode`
@@ -87,10 +88,11 @@ class ClientStream(Stream):
                 continue
             m=m[5:].upper()
             sasl_mechanisms.append(m)
-        Stream.__init__(self,"jabber:client",
-                    sasl_mechanisms=sasl_mechanisms,
-                    tls_settings=tls_settings,
-                    keepalive=keepalive)
+        Stream.__init__(self, "jabber:client",
+                    sasl_mechanisms = sasl_mechanisms,
+                    tls_settings = tls_settings,
+                    keepalive = keepalive,
+                    owner = owner)
         self.server=server
         self.port=port
         self.password=password

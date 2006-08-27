@@ -135,7 +135,8 @@ class Client:
                     port = self.port,
                     auth_methods = self.auth_methods,
                     tls_settings = self.tls_settings,
-                    keepalive = self.keepalive)
+                    keepalive = self.keepalive,
+                    owner = self)
             stream.process_stream_error = self.stream_error
             self.stream_created(stream)
             stream.state_change = self.__stream_state_change

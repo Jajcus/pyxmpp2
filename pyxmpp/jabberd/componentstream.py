@@ -45,7 +45,7 @@ class ComponentStream(Stream):
         - `port`: `int`
         - `secret`: `unicode`"""
 
-    def __init__(self,jid,secret,server,port,keepalive=0):
+    def __init__(self, jid, secret, server, port, keepalive = 0, owner = None):
         """Initialize a `ComponentStream` object.
 
         :Parameters:
@@ -53,11 +53,14 @@ class ComponentStream(Stream):
             - `secret`: authentication secret.
             - `server`: server address.
             - `port`: TCP port number on the server.
-            - `keepalive`: keepalive interval. 0 to disable."""
-        Stream.__init__(self,"jabber:component:accept",
-                    sasl_mechanisms=[],
-                    tls_settings=None,
-                    keepalive=keepalive)
+            - `keepalive`: keepalive interval. 0 to disable.
+            - `owner`: `Client`, `Component` or similar object "owning" this stream.
+        """
+        Stream.__init__(self, "jabber:component:accept",
+                    sasl_mechanisms = [],
+                    tls_settings = None,
+                    keepalive = keepalive,
+                    owner = owner)
         self.server=server
         self.port=port
         self.me=jid

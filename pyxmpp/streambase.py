@@ -83,9 +83,10 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         - `process_all_stanzas`: when `True` then all stanzas received are
           considered local.
         - `initiator`: `True` if local stream endpoint is the initiating entity.
+        - `owner`: `Client`, `Component` or similar object "owning" this stream.
         - `_reader`: the stream reader object (push parser) for the stream.
     """
-    def __init__(self,default_ns,extra_ns=(),keepalive=0):
+    def __init__(self, default_ns, extra_ns = (), keepalive = 0, owner = None):
         """Initialize Stream object
 
         :Parameters:
@@ -94,6 +95,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
           - `extra_ns`: sequence of extra namespace URIs to be defined for
             the stream.
           - `keepalive`: keepalive output interval. 0 to disable.
+          - `owner`: `Client`, `Component` or similar object "owning" this stream.
         """
         StanzaProcessor.__init__(self)
         xmlextra.StreamHandler.__init__(self)
@@ -107,6 +109,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         self.process_all_stanzas=False
         self.port=None
         self._reset()
+        self.owner = owner
         self.__logger=logging.getLogger("pyxmpp.Stream")
 
     def _reset(self):

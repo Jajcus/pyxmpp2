@@ -139,11 +139,12 @@ class Component:
                 stream.close()
 
             self.__logger.debug("Creating component stream: %r" % (self.stream_class,))
-            stream=self.stream_class(jid=self.jid,
-                    secret=self.secret,
-                    server=self.server,
-                    port=self.port,
-                    keepalive=self.keepalive)
+            stream=self.stream_class(jid = self.jid,
+                    secret = self.secret,
+                    server = self.server,
+                    port = self.port,
+                    keepalive = self.keepalive,
+                    owner = self)
             stream.process_stream_error=self.stream_error
             self.stream_created(stream)
             stream.state_change=self.__stream_state_change

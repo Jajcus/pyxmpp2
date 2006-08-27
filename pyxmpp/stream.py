@@ -53,8 +53,8 @@ class Stream(StreamTLSMixIn,StreamSASLMixIn,StreamBase):
         - `initiator`: `True` if local stream endpoint is the initiating entity.
         - `_reader`: the stream reader object (push parser) for the stream.
     """
-    def __init__(self,default_ns,extra_ns=(),sasl_mechanisms=(),
-                    tls_settings=None,keepalive=0):
+    def __init__(self, default_ns, extra_ns = (), sasl_mechanisms = (),
+                    tls_settings = None, keepalive = 0, owner = None):
         """Initialize Stream object
 
         :Parameters:
@@ -66,12 +66,12 @@ class Stream(StreamTLSMixIn,StreamSASLMixIn,StreamBase):
             authentication. Currently "PLAIN" and "DIGEST-MD5" are supported.
           - `tls_settings`: settings for StartTLS -- `TLSSettings` instance.
           - `keepalive`: keepalive output interval. 0 to disable.
-
+          - `owner`: `Client`, `Component` or similar object "owning" this stream.
         """
-        StreamBase.__init__(self,default_ns,extra_ns,keepalive)
-        StreamTLSMixIn.__init__(self,tls_settings)
-        StreamSASLMixIn.__init__(self,sasl_mechanisms)
-        self.__logger=logging.getLogger("pyxmpp.Stream")
+        StreamBase.__init__(self, default_ns, extra_ns, keepalive, owner)
+        StreamTLSMixIn.__init__(self, tls_settings)
+        StreamSASLMixIn.__init__(self, sasl_mechanisms)
+        self.__logger = logging.getLogger("pyxmpp.Stream")
 
     def _reset(self):
         """Reset `Stream` object state making it ready to handle new
