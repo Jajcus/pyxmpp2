@@ -30,6 +30,7 @@ import threading
 
 from pyxmpp.expdict import ExpiringDictionary
 from pyxmpp.exceptions import ProtocolError, BadRequestProtocolError
+from pyxmpp.stanza import Stanza
 
 class StanzaProcessor:
     """Universal stanza handler/router class.
@@ -60,6 +61,33 @@ class StanzaProcessor:
         self.__logger=logging.getLogger("pyxmpp.Stream")
         self.lock=threading.RLock()
 
+    def process_response(self, response):
+        """Examines out the response returned by a stanza handler and sends all
+        stanzas provided.
+
+        :Returns:
+           - `True`: if `response` is `Stanza`, iterable or `True` (meaning the stanza was processed).
+           - `False`: when `response` is `False` or `None`
+        :returntype: `bool`
+        """
+
+        if response is None or response is False:
+            return False
+
+        if isinstance(response, Stanza):
+            self.send(response)
+            return True
+
+        try:
+            response = iter(response)
+        except TypeError:
+            return bool(response)
+
+        for stanza in response:
+            if isinstance(stanza, Stanza):
+                self.send(stanza)
+        return True
+
     def process_iq(self, stanza):
         """Process IQ stanza received.
 
@@ -86,12 +114,13 @@ class StanzaProcessor:
                 key=(sid,None)
             else:
                 return False
-            res_handler,err_handler=self._iq_response_handlers[key]
+            res_handler, err_handler = self._iq_response_handlers[key]
             if stanza.get_type()=="result":
-                res_handler(stanza)
+                response = res_handler(stanza)
             else:
-                err_handler(stanza)
+                response = err_handler(stanza)
             del self._iq_response_handlers[key]
+            self.process_response(response)
             return True
 
         q=stanza.get_query()
@@ -101,10 +130,12 @@ class StanzaProcessor:
         ns=q.ns().getContent()
 
         if typ=="get" and self._iq_get_handlers.has_key((el,ns)):
-            self._iq_get_handlers[(el,ns)](stanza)
+            response = self._iq_get_handlers[(el,ns)](stanza)
+            self.process_response(response)
             return True
         elif typ=="set" and self._iq_set_handlers.has_key((el,ns)):
-            self._iq_set_handlers[(el,ns)](stanza)
+            response = self._iq_set_handlers[(el,ns)](stanza)
+            self.process_response(response)
             return True
         else:
             raise BadRequestProtocolError, "Unknown IQ stanza type"
@@ -145,7 +176,8 @@ class StanzaProcessor:
                 continue
             if ns is not None and ns not in namespaces:
                 continue
-            if handler(stanza):
+            response = handler(stanza)
+            if self.process_response(response):
                 return True
         return False
 
@@ -270,10 +302,14 @@ class StanzaProcessor:
             - `iq`: an IQ stanza
             - `res_handler`: result handler for the stanza. Will be called
               when matching <iq type="result"/> is received. Its only
-              argument will be the stanza received.
+              argument will be the stanza received. The handler may return
+              a stanza or list of stanzas which should be sent in response.
             - `err_handler`: error handler for the stanza. Will be called
               when matching <iq type="error"/> is received. Its only
-              argument will be the stanza received.
+              argument will be the stanza received. The handler may return
+              a stanza or list of stanzas which should be sent in response
+              but this feature should rather not be used (it is better not to
+              respond to 'error' stanzas).
             - `timeout_handler`: timeout handler for the stanza. Will be called
               when no matching <iq type="result"/> or <iq type="error"/> is
               received in next `timeout` seconds. The handler should accept
@@ -310,7 +346,8 @@ class StanzaProcessor:
             - `namespace`: payload element namespace URI
             - `handler`: function to be called when a stanza
               with defined element is received. Its only argument
-              will be the stanza received.
+              will be the stanza received. The handler may return a stanza or
+              list of stanzas which should be sent in response.
 
         Only one handler may be defined per one namespaced element.
         If a handler for the element was already set it will be lost
@@ -344,7 +381,9 @@ class StanzaProcessor:
             - `namespace`: payload element namespace URI
             - `handler`: function to be called when a stanza
               with defined element is received. Its only argument
-              will be the stanza received.
+              will be the stanza received. The handler may return a stanza or
+              list of stanzas which should be sent in response.
+
 
         Only one handler may be defined per one namespaced element.
         If a handler for the element was already set it will be lost
@@ -382,7 +421,7 @@ class StanzaProcessor:
         handler_list.append((priority,typ,namespace,handler))
         handler_list.sort()
 
-    def set_message_handler(self,typ,handler,namespace=None,priority=100):
+    def set_message_handler(self, typ, handler, namespace=None, priority=100):
         """Set a handler for <message/> stanzas.
 
         :Parameters:
@@ -393,10 +432,15 @@ class StanzaProcessor:
               payload (or even with no payload) will match.
             - `priority`: priority value for the handler. Handlers with lower
               priority value are tried first.
+            - `handler`: function to be called when a message stanza
+              with defined type and payload namespace is received. Its only
+              argument will be the stanza received. The handler may return a
+              stanza or list of stanzas which should be sent in response.
 
         Multiple <message /> handlers with the same type/namespace/priority may
         be set. Order of calling handlers with the same priority is not defined.
-        Handlers will be called in priority order until one of them returns True.
+        Handlers will be called in priority order until one of them returns True or
+        any stanza(s) to send (even empty list will do).
         """
         self.lock.acquire()
         try:
@@ -415,10 +459,15 @@ class StanzaProcessor:
               payload (or even with no payload) will match.
             - `priority`: priority value for the handler. Handlers with lower
               priority value are tried first.
+            - `handler`: function to be called when a presence stanza
+              with defined type and payload namespace is received. Its only
+              argument will be the stanza received. The handler may return a
+              stanza or list of stanzas which should be sent in response.
 
         Multiple <presence /> handlers with the same type/namespace/priority may
         be set. Order of calling handlers with the same priority is not defined.
-        Handlers will be called in priority order until one of them returns True.
+        Handlers will be called in priority order until one of them returns
+        True or any stanza(s) to send (even empty list will do).
         """
         self.lock.acquire()
         try:

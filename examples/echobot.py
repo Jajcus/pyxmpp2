@@ -73,8 +73,7 @@ class Client(JabberClient):
         q=iq.new_query("jabber:iq:version")
         q.newTextChild(q.ns(),"name","Echo component")
         q.newTextChild(q.ns(),"version","1.0")
-        self.stream.send(iq)
-        return True
+        return iq
 
     def message(self,stanza):
         """Message handler for the component.
@@ -109,11 +108,10 @@ class Client(JabberClient):
             stanza_type=stanza.get_type(),
             subject=subject,
             body=body)
-        self.stream.send(m)
         if body:
-            p=Presence(status=body)
-            self.stream.send(p)
-        return True
+            p = Presence(status=body)
+            return [m, p]
+        return m
 
     def presence(self,stanza):
         """Handle 'available' (without 'type') and 'unavailable' <presence/>."""
@@ -148,9 +146,8 @@ class Client(JabberClient):
             msg+=u" has canceled our subscription of his presence."
 
         print msg
-        p=stanza.make_accept_response()
-        self.stream.send(p)
-        return True
+
+        return stanza.make_accept_response()
 
     def print_roster_item(self,item):
         if item.name:
