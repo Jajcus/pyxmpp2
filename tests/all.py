@@ -5,7 +5,7 @@ import sys
 import getopt
 
 all_modules=["vcard","jid","disco","imports","cache","stream_reader", "ns_operations",
-    "message", "presence", "dataforms"]
+    "message", "presence", "dataforms", "interface"]
 
 def suite(modules=None):
      if not modules:
