@@ -1,5 +1,6 @@
 include Makefile
 include COPYING TODO ChangeLog CHANGES README README.WIN32
+include configure.py  build.cfg
 include examples/*.py
 include tests/*.py
 include tests/Makefile
