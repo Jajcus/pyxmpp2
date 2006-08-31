@@ -32,6 +32,8 @@ from pyxmpp.iq import Iq
 from pyxmpp.presence import Presence
 from pyxmpp.roster import Roster
 from pyxmpp.exceptions import ClientError, FatalClientError
+from pyxmpp.interfaces import IPresenceHandlersProvider, IMessageHandlersProvider
+from pyxmpp.interfaces import IIqHandlersProvider, IStanzaHandlersProvider
 
 class Client:
     """Base class for an XMPP-IM client.
@@ -58,6 +60,11 @@ class Client:
         - `lock`: lock for synchronizing `Client` attributes access.
         - `state_changed`: condition notified the the object state changes
           (stream becomes connected, session established etc.).
+        - `interface_providers`: list of object providing interfaces that
+          could be used by the Client object. Initialized to [`self`] by
+          the constructor if not set earlier. Put objects providing 
+          `IPresenceHandlersProvider`, `IMessageHandlersProvider`,
+          `IIqHandlersProvider` or `IStanzaHandlersProvider` into this list.
     :Types:
         - `jid`: `pyxmpp.JID`
         - `password`: `unicode`
@@ -70,6 +77,7 @@ class Client:
         - `session_established`: `bool`
         - `lock`: `threading.RLock`
         - `state_changed`: `threading.Condition`
+        - `interface_providers`: `list`
     """
     def __init__(self,jid=None,password=None,server=None,port=5222,
             auth_methods=("sasl:DIGEST-MD5",),
@@ -107,6 +115,8 @@ class Client:
         self.session_established=False
         self.roster=None
         self.stream_class=ClientStream
+        if not hasattr(self, "interface_providers"):
+            self.interface_providers = [self]
         self.__logger=logging.getLogger("pyxmpp.Client")
 
 # public methods
@@ -193,7 +203,7 @@ class Client:
             self.session_established=1
             self.state_changed.notify()
             self.state_changed.release()
-            self.session_started()
+            self._session_started()
         else:
             iq=Iq(stanza_type="set")
             iq.new_query("urn:ietf:params:xml:ns:xmpp-session","session")
@@ -267,6 +277,25 @@ class Client:
         self.session_established=True
         self.state_changed.notify()
         self.state_changed.release()
+        self._session_started()
+
+    def _session_started(self):
+        """Called when session is started.
+        
+        Activates objects from `self.interface_provides` by installing
+        their stanza handlers, etc."""
+        for ob in self.interface_providers:
+            if IPresenceHandlersProvider.providedBy(ob):
+                for handler_data in ob.get_presence_handlers():
+                    self.stream.set_presence_handler(*handler_data)
+            if IMessageHandlersProvider.providedBy(ob):
+                for handler_data in ob.get_message_handlers():
+                    self.stream.set_message_handler(*handler_data)
+            if IIqHandlersProvider.providedBy(ob):
+                for handler_data in ob.get_iq_get_handlers():
+                    self.stream.set_iq_get_handler(*handler_data)
+                for handler_data in ob.get_iq_set_handlers():
+                    self.stream.set_iq_set_handler(*handler_data)
         self.session_started()
 
     def __roster_timeout(self):

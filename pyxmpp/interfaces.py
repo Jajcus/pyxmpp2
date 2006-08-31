@@ -47,5 +47,12 @@ class IIqHandlersProvider(Interface):
 class IStanzaHandlersProvider(IPresenceHandlersProvider, IMessageHandlersProvider, IIqHandlersProvider):
     pass
 
+class IFeaturesProvider(Interface):
+    def get_features():
+        """Return iterable of namespaces (features) supported, for disco#info
+        query response."""
+
+
+__all__ = [ name for name in dir() if name.startswith("I") and name != "Interface" ]
 
 # vi: sts=4 et sw=4

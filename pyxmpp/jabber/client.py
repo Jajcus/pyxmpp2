@@ -36,6 +36,7 @@ from pyxmpp.client import Client
 from pyxmpp.stanza import Stanza
 from pyxmpp.cache import CacheSuite
 from pyxmpp.utils import from_utf8
+from pyxmpp.interfaces import IFeaturesProvider
 
 class JabberClient(Client):
     """Base class for a Jabber client.
@@ -192,6 +193,17 @@ class JabberClient(Client):
             resp=iq.make_error_response("item-not-found")
         self.__logger.debug("Disco-items response: %s" % (resp.serialize(),))
         self.stream.send(resp)
+
+    def _session_started(self):
+        """Called when session is started.
+        
+        Activates objects from `self.interface_provides` by installing
+        their disco features."""
+        Client._session_started(self)
+        for ob in self.interface_providers:
+            if IFeaturesProvider.providedBy(ob):
+                for ns in ob.get_features():
+                    self.register_feature(ns)
 
 # methods to override
 

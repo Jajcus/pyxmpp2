@@ -5,6 +5,17 @@ Those are mentioned here as are not backward compatible.
 I want the api to be stable and consistent in the next release and later,
 so I do all the big changes now (I would have to do them at some time anyway).
 
+2006-08-31
+
+	Interface API for better externalisation of various components. First
+	introduced to the Client classes -- one may create different classes
+	to handle different stanza types and namespaces, annotate them with
+	interfaces implemented (IFeaturesProvider, IPresenceHandlersProvider,
+	IMessageHandlersProvider or IIqHandlersProvider) and list their
+	instances in a Client object's interface_providers attribute.
+
+	See the echocomponent.py example to see how to use that.
+
 2006-08-26
 	
 	Exception handling improvements, part one.
