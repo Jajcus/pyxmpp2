@@ -34,6 +34,7 @@ from pyxmpp.utils import to_utf8,from_utf8
 from pyxmpp.xmlextra import get_node_ns_uri
 from pyxmpp.utils import datetime_utc_to_local,datetime_local_to_utc
 from pyxmpp.objects import StanzaPayloadObject
+from pyxmpp.exceptions import BadRequestProtocolError, JIDMalformedProtocolError, JIDError
 
 DELAY_NS="jabber:x:delay"
 
@@ -96,15 +97,21 @@ class Delay(StanzaPayloadObject):
             stamp=stamp[:-1]
         if "-" in stamp:
             stamp=stamp.split("-",1)[0]
-        tm=time.strptime(stamp,"%Y%m%dT%H:%M:%S")
+        try:
+            tm = time.strptime(stamp, "%Y%m%dT%H:%M:%S")
+        except ValueError:
+            raise BadRequestProtocolError, "Bad timestamp"
         tm=tm[0:8]+(0,)
         self.timestamp=datetime.datetime.fromtimestamp(time.mktime(tm))
         delay_from=from_utf8(xmlnode.prop("from"))
         if delay_from:
-            self.delay_from=JID(delay_from)
+            try:
+                self.delay_from = JID(delay_from)
+            except JIDError:
+                raise JIDMalformedProtocolError, "Bad JID in the jabber:x:delay 'from' attribute"
         else:
-            self.delay_from=None
-        self.reason=from_utf8(xmlnode.getContent())
+            self.delay_from = None
+        self.reason = from_utf8(xmlnode.getContent())
 
     def complete_xml_element(self, xmlnode, _unused):
         """Complete the XML node with `self` content.

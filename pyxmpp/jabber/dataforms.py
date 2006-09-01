@@ -29,6 +29,7 @@ from pyxmpp.objects import StanzaPayloadObject
 from pyxmpp.utils import from_utf8, to_utf8
 from pyxmpp.xmlextra import xml_element_ns_iter
 from pyxmpp.jid import JID
+from pyxmpp.exceptions import BadRequestProtocolError
 
 DATAFORM_NS = "jabber:x:data"
 
@@ -308,7 +309,7 @@ class Field(StanzaPayloadObject):
                 options.append(Option._new_from_xml(child))
             child = child.next
         if field_type and not field_type.endswith("-multi") and len(values) > 1:
-            raise ValueError, "Multiple values for a single-value field"
+            raise BadRequestProtocolError, "Multiple values for a single-value field"
         return cls(name, values, field_type, label, options, required, desc)
     _new_from_xml = classmethod(_new_from_xml)
 
@@ -657,10 +658,10 @@ class Form(StanzaPayloadObject):
         self.instructions = None
         if (xmlnode.type != "element" or xmlnode.name != "x"
                 or xmlnode.ns().content != DATAFORM_NS):
-            raise ValueError, "Not a form: %r" % (xmlnode.serialize(),)
+            raise ValueError, "Not a form: " + xmlnode.serialize() 
         self.type = xmlnode.prop("type")
         if not self.type in self.allowed_types:
-            raise ValueError, "Bad form type: %r" % (self.type,)
+            raise BadRequestProtocolError, "Bad form type: %r" % (self.type,)
         child = xmlnode.children
         while child:
             if child.type != "element" or child.ns().content != DATAFORM_NS:

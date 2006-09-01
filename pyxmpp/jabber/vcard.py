@@ -36,6 +36,7 @@ import pyxmpp.jid
 from pyxmpp.utils import to_utf8,from_utf8
 from pyxmpp.xmlextra import get_node_ns
 from pyxmpp.objects import StanzaPayloadObject
+from pyxmpp.exceptions import BadRequestProtocolError, JIDMalformedProtocolError, JIDError
 
 VCARD_NS="vcard-temp"
 
@@ -203,7 +204,10 @@ class VCardJID(VCardField):
         _unused = rfc2425parameters
         VCardField.__init__(self,name)
         if isinstance(value,libxml2.xmlNode):
-            self.value=pyxmpp.jid.JID(value.getContent())
+            try:
+                self.value=pyxmpp.jid.JID(value.getContent())
+            except JIDError:
+                raise JIDMalformedProtocolError, "JID malformed"
         else:
             self.value=pyxmpp.jid.JID(value)
         if not self.value:
@@ -292,7 +296,7 @@ class VCardName(VCardField):
                     empty=0
                 n=n.next
             if empty:
-                raise Empty,"Empty N value"
+                raise Empty, "Empty N value"
         else:
             v=value.split(";")
             value=[u""]*5
@@ -1406,9 +1410,9 @@ class VCard(StanzaPayloadObject):
             - `data`: `libxml2.xmlNode`"""
         ns=get_node_ns(data)
         if ns and ns.getContent()!=VCARD_NS:
-            raise ValueError,"Not in the %r namespace" % (VCARD_NS,)
+            raise ValueError, "Not in the %r namespace" % (VCARD_NS,)
         if data.name!="vCard":
-            raise ValueError,"Bad root element name: %r" % (data.name,)
+            raise ValueError, "Bad root element name: %r" % (data.name,)
         n=data.children
         dns=get_node_ns(data)
         while n:
