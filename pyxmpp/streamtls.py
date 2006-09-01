@@ -32,15 +32,21 @@ import logging
 
 from pyxmpp.streambase import StreamBase,STREAM_NS
 from pyxmpp.streambase import FatalStreamError,StreamEncryptionRequired
-from pyxmpp.exceptions import TLSNegotiationFailed, TLSError
+from pyxmpp.exceptions import TLSNegotiationFailed, TLSError, TLSNegotiatedButNotAvailableError
 
 try:
-    from M2Crypto import SSL
-    from M2Crypto.SSL import SSLError
-    import M2Crypto.SSL.cb
-    tls_available=1
+    import M2Crypto
+    if M2Crypto.version_info < (0, 16):
+        tls_available = 0
+    else:
+        from M2Crypto import SSL
+        from M2Crypto.SSL import SSLError
+        import M2Crypto.SSL.cb
+        tls_available = 1
 except ImportError:
-    tls_available=0
+    tls_available = 0
+
+if not tls_available:
     class SSLError(Exception):
         "dummy"
         pass
@@ -72,7 +78,10 @@ class TLSSettings:
             - `key_file`: path to the private key for own X.509 certificate
             - `cacert_file`: path to a file with trusted CA certificates
             - `verify_callback`: callback function for certificate
-              verification. See M2Crypto documentation for details."""
+              verification. The callback function must accept two arguments:
+              'ok' and 'store_context' and return True if a certificate is accepted.
+              See M2Crypto documentation for details. If no verify_callback is provided,
+              then default `Stream.tls_default_verify_callback` will be used."""
         self.require=require
         self.ctx=ctx
         self.verify_peer=verify_peer
@@ -128,11 +137,11 @@ class StreamTLSMixIn:
         """Same as `Stream.write_raw` but assume `self.lock` is acquired."""
         logging.getLogger("pyxmpp.Stream.out").debug("OUT: %r",data)
         try:
-            try:
-                self.socket.send(data)
-            except TypeError:
-                # workarund for M2Crypto 0.13.1 'feature'
-                self.socket.send(self.socket,data)
+            if self.tls:
+                self.tls.setblocking(True)
+            self.socket.send(data)
+            if self.tls:
+                self.tls.setblocking(False)
         except (IOError,OSError,socket.error),e:
             raise FatalStreamError("IO Error: "+str(e))
         except SSLError,e:
@@ -144,11 +153,7 @@ class StreamTLSMixIn:
             return
         while self.socket:
             try:
-                try:
-                    r=self.socket.read()
-                except TypeError:
-                    # workarund for M2Crypto 0.13.1 'feature'
-                    r=self.socket.read(self.socket)
+                r=self.socket.read()
                 if r is None:
                     return
             except socket.error,e:
@@ -216,8 +221,8 @@ class StreamTLSMixIn:
             if self.tls_settings and tls_n:
                 self.__logger.debug("StartTLS negotiated")
                 if not tls_available:
-                    raise FatalStreamError,("StartTLS negotiated, but not available"
-                            " (M2Crypto module required)")
+                    raise TLSNegotiatedButNotAvailableError,("StartTLS negotiated, but not available"
+                            " (M2Crypto >= 0.16 module required)")
                 if self.initiator:
                     self._request_tls()
             else:
@@ -279,12 +284,16 @@ class StreamTLSMixIn:
         else:
             ctx=SSL.Context('tlsv1')
 
-        ctx._pyxmpp_stream=self
+        verify_callback = self.tls_settings.verify_callback
+        if not verify_callback:
+            verify_callback = self.tls_default_verify_callback
+        
 
         if self.tls_settings.verify_peer:
-            ctx.set_verify(SSL.verify_peer,10,cert_verify_callback)
+            self.__logger.debug("verify_peer, verify_callback: %r", verify_callback)
+            ctx.set_verify(SSL.verify_peer, 10, verify_callback)
         else:
-            ctx.set_verify(SSL.verify_none,10)
+            ctx.set_verify(SSL.verify_none, 10)
 
         if self.tls_settings.cert_file:
             ctx.use_certificate_chain_file(self.tls_settings.cert_file)
@@ -315,50 +324,33 @@ class StreamTLSMixIn:
         except:
             pass
 
-    def _tls_verify_callback(self,ssl_ctx_ptr, x509_ptr, errnum, depth, ok):
-        """Certificate verification callback for TLS connections.
+    def tls_default_verify_callback(self, ok, store_context):
+        """Default certificate verification callback for TLS connections.
+
+        Will reject connection (return `False`) if M2Crypto finds any error
+        or when certificate CommonName doesn't match peer JID.
+
+        TODO: check otherName/idOnXMPP (or what it is called)
 
         :Parameters:
-            - `ssl_ctx_ptr`: TLS context pointer.
-            - `x509_ptr`: X.509 certificate pointer.
-            - `errnum`: error number.
-            - `depth`: verification depth.
-            - `ok`: current verification result.
+            - `ok`: current verification result (as decided by OpenSSL).
+            - `store_context`: certificate store context
 
         :return: computed verification result."""
         try:
-            self.__logger.debug("tls_verify_callback(depth=%i,ok=%i)" % (depth,ok))
-            from M2Crypto.SSL.Context import map as context_map
+            self.__logger.debug("tls_default_verify_callback(ok=%i, store=%r)" % (ok, store_context))
             from M2Crypto import X509,m2
-            ctx=context_map()[ssl_ctx_ptr]
-            cert=X509.X509(x509_ptr)
-            cb=self.tls_settings.verify_callback
 
-            if ctx.get_verify_depth() < depth:
-                self.__logger.debug(u"Certificate chain is too long (%i>%i)"
-                        % (depth,ctx.get_verify_depth()))
-                if cb:
-                    ok=cb(self,ctx,cert,m2.X509_V_ERR_CERT_CHAIN_TOO_LONG,depth,0)
-                    if not ok:
-                        return 0
-                else:
-                    return 0
+            depth = store_context.get_error_depth()
+            cert = store_context.get_current_cert()
+            cn = cert.get_subject().CN
 
+            self.__logger.debug("  depth: %i cert CN: %r" % (depth, cn))
             if ok and depth==0:
-                cn=cert.get_subject().CN
                 if str(cn) != self.peer.as_utf8():
-                    self.__logger.debug(u"Common name does not match peer name (%s != %s)"
-                            % (cn,self.peer))
-                    if cb:
-                        ok=cb(self,ctx,cert,TLS_ERR_BAD_CN,depth,0)
-                        if not ok:
-                            return 0
-                    else:
-                        return 0
-            if cb:
-                return cb(self, ctx,cert,errnum,depth,ok)
-            else:
-                return ok
+                    self.__logger.debug(u"Common name does not match peer name (%s != %s)" % (cn, self.peer.as_utf8))
+                    return False
+            return ok
         except:
             self.__logger.exception("Exception cought")
             raise
@@ -368,31 +360,5 @@ class StreamTLSMixIn:
 
         :return: `self.tls`"""
         return self.tls
-
-TLS_ERR_BAD_CN=1001
-
-def cert_verify_callback(ssl_ctx_ptr, x509_ptr, errnum, depth, ok):
-    """Pass control to the right verification function for a TLS connection.
-
-    M2Crypto doesn't associate verification callbacks with connection, so
-    we have one global callback, which finds and calls right callback.
-
-    :Parameters:
-        - `ssl_ctx_ptr`: TLS context pointer.
-        - `x509_ptr`: X.509 certificate pointer.
-        - `errnum`: error number.
-        - `depth`: verification depth.
-        - `ok`: current verification result.
-    """
-    from M2Crypto.SSL.Context import map as context_map
-    ctx=context_map()[ssl_ctx_ptr]
-    if hasattr(ctx,"_pyxmpp_stream"):
-        stream=ctx._pyxmpp_stream
-        if stream:
-            return stream._tls_verify_callback(ssl_ctx_ptr,
-                        x509_ptr, errnum, depth, ok)
-    print >>sys.stderr,"Falling back to M2Crypto default verify callback"
-    return M2Crypto.SSL.cb.ssl_verify_callback(ssl_ctx_ptr,
-                        x509_ptr, errnum, depth, ok)
 
 # vi: sts=4 et sw=4

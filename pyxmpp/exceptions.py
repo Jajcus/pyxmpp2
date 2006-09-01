@@ -68,6 +68,10 @@ class TLSError(FatalStreamError):
     """Raised on TLS error during stream processing."""
     pass
 
+class TLSNegotiatedButNotAvailableError(TLSError):
+    """Raised on TLS error during stream processing."""
+    pass
+
 class SASLNotAvailable(StreamAuthenticationError):
     """Raised when SASL authentication is requested, but not available."""
     pass
