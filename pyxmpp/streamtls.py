@@ -80,6 +80,8 @@ class TLSSettings:
             - `verify_callback`: callback function for certificate
               verification. The callback function must accept two arguments:
               'ok' and 'store_context' and return True if a certificate is accepted.
+              The verification callback should call Stream.tls_is_certificate_valid()
+              to check if certificate subject name matches stream peer JID.
               See M2Crypto documentation for details. If no verify_callback is provided,
               then default `Stream.tls_default_verify_callback` will be used."""
         self.require=require
@@ -324,6 +326,31 @@ class StreamTLSMixIn:
         except:
             pass
 
+    def tls_is_certificate_valid(self, store_context):
+        """Check subject name of the certificate and return True when
+        it is valid.
+
+        Only the certificate at depth 0 in the certificate chain (peer
+        certificate) is checked.
+
+        Currently only the Common Name is checked and certificate is considered
+        valid if CN is the same as the peer JID.
+
+        :Parameters:
+            - `store_context`: certificate store context, as passed to the
+              verification callback.
+
+        :returns: verification result. `True` if certificate subject name is valid.
+        """
+        depth = store_context.get_error_depth()
+        if depth > 0:
+            return True
+        cert = store_context.get_current_cert()
+        cn = cert.get_subject().CN
+        if str(cn) != self.peer.as_utf8():
+            return False
+        return True
+
     def tls_default_verify_callback(self, ok, store_context):
         """Default certificate verification callback for TLS connections.
 
@@ -344,12 +371,11 @@ class StreamTLSMixIn:
             depth = store_context.get_error_depth()
             cert = store_context.get_current_cert()
             cn = cert.get_subject().CN
-
+            
             self.__logger.debug("  depth: %i cert CN: %r" % (depth, cn))
-            if ok and depth==0:
-                if str(cn) != self.peer.as_utf8():
-                    self.__logger.debug(u"Common name does not match peer name (%s != %s)" % (cn, self.peer.as_utf8))
-                    return False
+            if ok and not tls_is_certificate_valid(store_context):
+                self.__logger.debug(u"Common name does not match peer name (%s != %s)" % (cn, self.peer.as_utf8))
+                return False
             return ok
         except:
             self.__logger.exception("Exception cought")
