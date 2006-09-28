@@ -341,7 +341,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         host=self.password_manager.get_serv_host().encode("us-ascii")
         serv_name=self.password_manager.get_serv_name().encode("us-ascii")
 
-        if serv_name:
+        if serv_name and serv_name != host:
             digest_uri="%s/%s/%s" % (serv_type,host,serv_name)
         else:
             digest_uri="%s/%s" % (serv_type,host)
