@@ -446,7 +446,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
     def finish(self,data):
         """Process success indicator from the server.
 
-        Process any addicional data passed with the success.
+        Process any addiitional data passed with the success.
         Fail if the server was not authenticated.
 
         :Parameters:
@@ -456,13 +456,20 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 
         :return: success or failure indicator.
         :returntype: `sasl.Success` or `sasl.Failure`"""
-        if self.rspauth_checked:
-            return Success(self.username,self.realm,self.authzid)
-        else:
-            self._final_challenge(data)
         if not self.response_auth:
             self.__logger.debug("Got success too early")
             return Failure("bad-success")
+        if self.rspauth_checked:
+            return Success(self.username,self.realm,self.authzid)
+        else:
+            r = self._final_challenge(data)
+            if isinstance(r, Failure):
+                return r
+            if self.rspauth_checked:
+                return Success(self.username,self.realm,self.authzid)
+            else:
+                self.__logger.debug("Something went wrong when processing additional data with success?")
+                return Failure("bad-success")
 
 class DigestMD5ServerAuthenticator(ServerAuthenticator):
     """Provides DIGEST-MD5 SASL authentication for a server."""
