@@ -40,10 +40,10 @@ try:
     from M2Crypto import SSL
     from M2Crypto.SSL import SSLError
     import M2Crypto.SSL.cb
+    print "version %s found. Hope it will work." % (M2Crypto.version,)
 except ImportError:
     print "not found"
     print >>sys.stderr, "Warning: You need M2Crypto (some good version) for StartTLS support in PyXMPP"
-print "version %s found. Hope it will work." % (M2Crypto.version,)
 
 print "Trying to build the binary extension...",
 build_cfg = file("build.cfg", "w")
