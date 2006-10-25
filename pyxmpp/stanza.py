@@ -218,7 +218,7 @@ class Stanza:
             return self._error
         n=self.xpath_eval(u"ns:error")
         if not n:
-            raise ProtocolError, (None, "This stanza contains no error")
+            raise ProtocolError, (None, "This stanza contains no error: %r" % (self.serialize(),))
         from pyxmpp.error import StanzaErrorNode
         self._error=StanzaErrorNode(n[0],copy=0)
         return self._error
