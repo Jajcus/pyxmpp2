@@ -162,7 +162,7 @@ class BadRequestProtocolError(ProtocolError):
         ProtocolError.__init__(self, "bad-request", message)
 
 class JIDMalformedProtocolError(ProtocolError, JIDError):
-    """Raised when stanza requests a feature which is not (yet) implemented."""
+    """Raised when invalid JID is encountered."""
     def __init__(self, message):
         ProtocolError.__init__(self, "jid-malformed", message)
 
