@@ -15,7 +15,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""Basic XHTML-IM client implementation.
+"""Basic XMPP-IM client implementation.
 
 Normative reference:
   - `RFC 3921 <http://www.ietf.org/rfc/rfc3921.txt>`__
