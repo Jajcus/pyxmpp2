@@ -744,7 +744,7 @@ class DiscoInfo(StanzaPayloadWrapperObject):
             identity.remove()
         for identity in identities:
             try:
-                self.add_identity(identity.item_name,identity.item_category,identity.item_type)
+                self.add_identity(identity.name,identity.category,identity.type)
             except AttributeError:
                 self.add_identity(*identity)
 
