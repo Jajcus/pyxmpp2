@@ -378,7 +378,7 @@ class StreamTLSMixIn:
                 return False
             return ok
         except:
-            self.__logger.exception("Exception cought")
+            self.__logger.exception("Exception caught")
             raise
 
     def get_tls_connection(self):
