@@ -29,7 +29,7 @@ import logging
 import threading
 
 from pyxmpp.expdict import ExpiringDictionary
-from pyxmpp.exceptions import ProtocolError, BadRequestProtocolError
+from pyxmpp.exceptions import ProtocolError, BadRequestProtocolError, FeatureNotImplementedProtocolError
 from pyxmpp.stanza import Stanza
 
 class StanzaProcessor:
@@ -129,14 +129,20 @@ class StanzaProcessor:
         el=q.name
         ns=q.ns().getContent()
 
-        if typ=="get" and self._iq_get_handlers.has_key((el,ns)):
-            response = self._iq_get_handlers[(el,ns)](stanza)
-            self.process_response(response)
-            return True
-        elif typ=="set" and self._iq_set_handlers.has_key((el,ns)):
-            response = self._iq_set_handlers[(el,ns)](stanza)
-            self.process_response(response)
-            return True
+        if typ=="get":
+            if self._iq_get_handlers.has_key((el,ns)):
+                response = self._iq_get_handlers[(el,ns)](stanza)
+                self.process_response(response)
+                return True
+            else:
+                raise FeatureNotImplementedProtocolError, "Not implemented"
+        elif typ=="set":
+            if self._iq_set_handlers.has_key((el,ns)):
+                response = self._iq_set_handlers[(el,ns)](stanza)
+                self.process_response(response)
+                return True
+            else:
+                raise FeatureNotImplementedProtocolError, "Not implemented"
         else:
             raise BadRequestProtocolError, "Unknown IQ stanza type"
 
