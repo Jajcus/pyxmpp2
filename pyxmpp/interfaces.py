@@ -22,19 +22,22 @@ __docformat__ = "restructuredtext en"
 
 from pyxmpp.interface import Interface, Attribute
 
-class IPresenceHandlersProvider(Interface):
+class IPyXMPPHelper(Interface):
+    """Base for all interfaces used as PyXMPP helpers."""
+
+class IPresenceHandlersProvider(IPyXMPPHelper):
     def get_presence_handlers():
         """Returns iterable over (presence_type, handler[, namespace[, priority]]) tuples.
 
         The tuples will be used as arguments for `Stream.set_presence_handler`."""
 
-class IMessageHandlersProvider(Interface):
+class IMessageHandlersProvider(IPyXMPPHelper):
      def get_message_handlers():
         """Returns iterable over (message_type, handler[, namespace[, priority]]) tuples.
 
         The tuples will be used as arguments for `Stream.set_message_handler`."""
  
-class IIqHandlersProvider(Interface):
+class IIqHandlersProvider(IPyXMPPHelper):
      def get_iq_get_handlers():
         """Returns iterable over (element_name, namespace) tuples.
 
@@ -47,7 +50,7 @@ class IIqHandlersProvider(Interface):
 class IStanzaHandlersProvider(IPresenceHandlersProvider, IMessageHandlersProvider, IIqHandlersProvider):
     pass
 
-class IFeaturesProvider(Interface):
+class IFeaturesProvider(IPyXMPPHelper):
     def get_features():
         """Return iterable of namespaces (features) supported, for disco#info
         query response."""

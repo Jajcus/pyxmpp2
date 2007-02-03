@@ -31,6 +31,6 @@ except ImportError:
     from pyxmpp.interface_micro_impl import Interface, Attribute, providedBy, implementedBy, implements
 
 
-__all__ = (Interface, Attribute, providedBy, implementedBy, implements)
+__all__ = ("Interface", "Attribute", "providedBy", "implementedBy", "implements")
 
 # vi: sts=4 et sw=4

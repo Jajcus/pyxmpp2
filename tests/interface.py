@@ -5,12 +5,12 @@ import unittest
 
 import pyxmpp.interface
 import pyxmpp.interface_micro_impl
+
 try:
     import zope.interface
     zope_interface_found = True
 except ImportError:
     zope_interface_found = False
-    
 
 class TestInterface(unittest.TestCase):
     interfaces_implementation = None
@@ -57,6 +57,17 @@ class TestInterface(unittest.TestCase):
         self.failUnless(I2.providedBy(o2))
         self.failIf(I2.providedBy(o1))
         self.failIf(I1.providedBy(o2))
+
+    def test_inheritance(self):
+        class I1(self.interfaces_implementation.Interface):
+            pass
+        class I2(I1):
+            pass
+        class C1(object):
+            self.interfaces_implementation.implements(I2)
+        o1 = C1()
+        self.failUnless(I1.providedBy(o1))
+        self.failUnless(issubclass(I2, I1))
 
 class TestPyXMPPInterface(TestInterface):
     interfaces_implementation = pyxmpp.interface

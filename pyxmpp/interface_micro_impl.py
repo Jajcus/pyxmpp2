@@ -51,10 +51,17 @@ def implements(*interfaces):
 
     locals["__implemented__"] = tuple(interfaces)
 
+def _whole_tree(cls):
+    yield cls
+    for base in cls.__bases__:
+        for b in _whole_tree(base):
+            yield b
+
 def implementedBy(cls):
     try:
         for interface in cls.__implemented__:
-            yield interface
+            for c in _whole_tree(interface):
+                yield c
     except AttributeError:
         pass
     for base in cls.__bases__:
@@ -82,23 +89,27 @@ class InterfaceClass(object):
                 __module__ = sys._getframe(1).f_globals['__name__']
         if __doc__ is not None:
             self.__doc__ = __doc__
-            if attrs is not None and "__doc__" in attrs:
-                del attrs["__doc__"]
+        if attrs is not None and "__doc__" in attrs:
+            del attrs["__doc__"]
         self.__module__ = __module__
         for base in bases:
             if not isinstance(base, InterfaceClass):
                 raise TypeError, 'Interface bases must be Interfaces'
         if attrs is not None:
-            for attr in attrs.values():
+            for aname, attr in attrs.items():
                 if not isinstance(attr, Attribute) and type(attr) is not FunctionType:
-                    raise TypeError, 'Interface attributes must be Attributes o functions'
+                    raise TypeError, 'Interface attributes must be Attributes o functions (%r found in %s)' % (attr, aname)
+        self.__bases__ = bases
         self.__attrs = attrs
         self.__name__ = name
         self.__identifier__ = "%s.%s" % (self.__module__, self.__name__)
         
     def providedBy(self, ob):
         """Is the interface implemented by an object"""
-        return self in providedBy(ob)
+        if self in providedBy(ob):
+            return True
+        return False
+
     def implementedBy(self, cls):
         """Do instances of the given class implement the interface?"""
         return self in implementedBy(cls)
