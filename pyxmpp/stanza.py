@@ -294,11 +294,12 @@ class Stanza:
         :Parameters:
             - `content`: XML node to be added to the payload.
         :Types:
-            - `content`: `libxml2.xmlNode` or UTF-8 `str`
+            - `content`: `libxml2.xmlNode`, UTF-8 `str` or an object with
+              "as_xml()" method.
         """
-        if hasattr(content,"as_xml"):
-            content.as_xml(parent=self.xmlnode,doc=common_doc)
-        if isinstance(content,libxml2.xmlNode):
+        if hasattr(content, "as_xml"):
+            content.as_xml(parent = self.xmlnode, doc = common_doc)
+        elif isinstance(content,libxml2.xmlNode):
             self.xmlnode.addChild(content.docCopyNode(common_doc,1))
         else:
             self.xmlnode.addContent(content)
