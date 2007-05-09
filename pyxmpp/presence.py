@@ -239,7 +239,7 @@ class Presence(Stanza):
             raise ValueError, ("Results may only be generated for 'subscribe',"
                 "'subscribed','unsubscribe' or 'unsubscribed' presence")
 
-        pr=Presence(stanza_type=accept_responses[self.get_type()],
+        pr=Presence(stanza_type=deny_responses[self.get_type()],
             from_jid=self.get_to(),to_jid=self.get_from(),stanza_id=self.get_id())
         return pr
 
