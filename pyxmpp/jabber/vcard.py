@@ -486,8 +486,8 @@ class VCardAdr(VCardField):
                 self.type=t.split(",")
             else:
                 self.type=["intl","postal","parcel","work"]
-            value=[""]*7
             v=value.split(";")
+            value=[""]*7
             value[:len(v)]=v
             (self.pobox,self.extadr,self.street,self.locality,
                     self.region,self.pcode,self.ctry)=value
