@@ -391,7 +391,7 @@ class VCardImage(VCardField):
             if (not self.uri and not self.image):
                 raise Empty,"Bad %s value in vcard" % (name,)
         else:
-            if rfc2425parameters.get("value").lower()=="uri":
+            if rfc2425parameters.get("value", "").lower()=="uri":
                 self.uri=value
                 self.type=None
             else:
@@ -1042,8 +1042,8 @@ class VCardSound(VCardField):
         VCardField.__init__(self,name)
         if not rfc2425parameters:
             rfc2425parameters={}
+        self.uri,self.sound,self.phonetic=[None]*3
         if isinstance(value,libxml2.xmlNode):
-            self.uri,self.sound,self.phonetic=[None]*3
             n=value.children
             vns=get_node_ns(value)
             while n:
