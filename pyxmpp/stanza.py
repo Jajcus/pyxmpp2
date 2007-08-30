@@ -159,7 +159,7 @@ class Stanza:
         """Get "from" attribute of the stanza.
 
         :return: value of the "from" attribute (sender JID) or None.
-        :returntype: `unicode`"""
+        :returntype: `JID`"""
         if self.xmlnode.hasProp("from"):
             try:
                 return JID(from_utf8(self.xmlnode.prop("from")))
@@ -174,7 +174,7 @@ class Stanza:
         """Get "to" attribute of the stanza.
 
         :return: value of the "to" attribute (recipient JID) or None.
-        :returntype: `unicode`"""
+        :returntype: `JID`"""
         if self.xmlnode.hasProp("to"):
             try:
                 return JID(from_utf8(self.xmlnode.prop("to")))
@@ -229,9 +229,9 @@ class Stanza:
         :Parameters:
             - `from_jid`: new value of the "from" attribute (sender JID).
         :Types:
-            - `from_jid`: `unicode`"""
+            - `from_jid`: `JID`"""
         if from_jid:
-            return self.xmlnode.setProp("from",to_utf8(from_jid))
+            return self.xmlnode.setProp("from", JID(from_jid).as_utf8())
         else:
             return self.xmlnode.unsetProp("from")
 
@@ -241,9 +241,9 @@ class Stanza:
         :Parameters:
             - `to_jid`: new value of the "to" attribute (recipient JID).
         :Types:
-            - `to_jid`: `unicode`"""
+            - `to_jid`: `JID`"""
         if to_jid:
-            return self.xmlnode.setProp("to",to_utf8(to_jid))
+            return self.xmlnode.setProp("to", JID(to_jid).as_utf8())
         else:
             return self.xmlnode.unsetProp("to")
 
