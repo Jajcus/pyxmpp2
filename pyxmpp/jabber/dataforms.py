@@ -25,6 +25,7 @@ __docformat__="restructuredtext en"
 
 import copy
 import libxml2
+import warnings
 from pyxmpp.objects import StanzaPayloadObject
 from pyxmpp.utils import from_utf8, to_utf8
 from pyxmpp.xmlextra import xml_element_ns_iter
@@ -46,18 +47,33 @@ class Option(StanzaPayloadObject):
     xml_element_name = "option"
     xml_element_namespace = DATAFORM_NS
 
-    def __init__(self, values, label = None):
+    def __init__(self, value = None, label = None, values = None):
         """Initialize an `Option` object.
 
         :Parameters:
-            - `values`: option values.
+            - `value`: option value (mandatory).
             - `label`: option label (human-readable description).
+            - `values`: for backward compatibility only.
         :Types:
             - `label`: `unicode`
-            - `values`: `list` of `unicode`
+            - `value`: `unicode`
         """
         self.label = label
-        self.values = values
+
+        if value:
+            self.value = value
+        elif values:
+            warnings.warn("Option constructor accepts only single value now.", DeprecationWarning, stacklevel=1)
+            self.value = values[0]
+        else:
+            raise TypeError, "value argument to pyxmpp.dataforms.Option is required"
+
+
+    @property
+    def values(self):
+        """Return list of option values (always single element). Obsolete. For
+        backwards compatibility only."""
+        return [self.value]
 
     def complete_xml_element(self, xmlnode, doc):
         """Complete the XML node with `self` content.
@@ -71,8 +87,7 @@ class Option(StanzaPayloadObject):
             - `doc`: `libxml2.xmlDoc`"""
         _unused = doc
         xmlnode.setProp("label", self.label.encode("utf-8"))
-        for value in self.values:
-            xmlnode.newTextChild(xmlnode.ns(), "value", value.encode("utf-8"))
+        xmlnode.newTextChild(xmlnode.ns(), "value", self.value.encode("utf-8"))
         return xmlnode
 
     def _new_from_xml(cls, xmlnode):
@@ -88,11 +103,14 @@ class Option(StanzaPayloadObject):
         """
         label = from_utf8(xmlnode.prop("label"))
         child = xmlnode.children
-        values = []
+        value = None
         for child in xml_element_ns_iter(xmlnode.children, DATAFORM_NS):
             if child.name == "value":
-                values.append(from_utf8(child.getContent()))
-        return cls(values, label)
+                value = from_utf8(child.getContent())
+                break
+        if value is None:
+            raise BadRequestProtocolError, "No value in <option/> element"
+        return cls(value, label)
     _new_from_xml = classmethod(_new_from_xml)
 
 class Field(StanzaPayloadObject):
@@ -226,24 +244,22 @@ class Field(StanzaPayloadObject):
             values = [JID(v).as_unicode() for v in values]
         self.values = values
 
-    def add_option(self, values, label):
+    def add_option(self, value, label):
         """Add an option for the field.
 
         :Parameters:
+            - `value`: option values.
             - `label`: option label (human-readable description).
-            - `values`: option values.
         :Types:
+            - `value`: `list` of `unicode`
             - `label`: `unicode`
-            - `values`: `list` of `unicode`
         """
-        if not values:
-            raise ValueError, "Option value must not be empty"
-        if self.type == "list-single":
-            if len(values)>1:
-                raise ValueError, "'list-single' options require a single value."
-        elif self.type != "list-multi":
+        if type(value) is list:
+            warnings.warn(".add_option() accepts single value now.", DeprecationWarning, stacklevel=1)
+            value = value[0]
+        if self.type not in ("list-multi", "list-single"):
             raise ValueError, "Options are allowed only for list types."
-        option = Option(values, label)
+        option = Option(value, label)
         self.options.append(option)
         return option
 
