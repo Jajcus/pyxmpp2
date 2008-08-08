@@ -41,7 +41,7 @@ class StreamSASLMixIn(sasl.PasswordManager):
 
         :Parameters:
           - `sasl_mechanisms`: sequence of SASL mechanisms allowed for
-            authentication. Currently "PLAIN" and "DIGEST-MD5" are supported.
+            authentication. Currently "PLAIN", "DIGEST-MD5" and "GSSAPI" are supported.
         """
         sasl.PasswordManager.__init__(self)
         if sasl_mechanisms:

@@ -31,6 +31,12 @@ from pyxmpp.sasl.plain import PlainClientAuthenticator,PlainServerAuthenticator
 from pyxmpp.sasl.digest_md5 import DigestMD5ClientAuthenticator,DigestMD5ServerAuthenticator
 
 safe_mechanisms_dict={"DIGEST-MD5":(DigestMD5ClientAuthenticator,DigestMD5ServerAuthenticator)}
+try:
+    from pyxmpp.sasl.gssapi import GSSAPIClientAuthenticator
+except ImportError:
+    pass # Kerberos not available
+else:
+    safe_mechanisms_dict["GSSAPI"] = (GSSAPIClientAuthenticator,None)
 unsafe_mechanisms_dict={"PLAIN":(PlainClientAuthenticator,PlainServerAuthenticator)}
 all_mechanisms_dict=safe_mechanisms_dict.copy()
 all_mechanisms_dict.update(unsafe_mechanisms_dict)
@@ -44,7 +50,7 @@ def client_authenticator_factory(mechanism,password_manager):
     password manager.
 
     :Parameters:
-        - `mechanism`: name of the SASL mechanism ("PLAIN" or "DIGEST-MD5").
+        - `mechanism`: name of the SASL mechanism ("PLAIN", "DIGEST-MD5" or "GSSAPI").
         - `password_manager`: name of the password manager object providing
           authentication credentials.
     :Types:
@@ -61,7 +67,7 @@ def server_authenticator_factory(mechanism,password_manager):
     password manager.
 
     :Parameters:
-        - `mechanism`: name of the SASL mechanism ("PLAIN" or "DIGEST-MD5").
+        - `mechanism`: name of the SASL mechanism ("PLAIN", "DIGEST-MD5" or "GSSAPI").
         - `password_manager`: name of the password manager object to be used
           for authentication credentials verification.
     :Types:

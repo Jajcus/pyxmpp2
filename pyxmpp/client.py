@@ -128,8 +128,6 @@ class Client:
         succeeds."""
         if not self.jid:
             raise ClientError, "Cannot connect: no or bad JID given"
-        if not register and not self.password:
-            raise ClientError, "Cannot connect: no password given"
         self.lock.acquire()
         try:
             stream = self.stream

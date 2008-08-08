@@ -63,7 +63,7 @@ class Stream(StreamTLSMixIn,StreamSASLMixIn,StreamBase):
           - `extra_ns`: sequence of extra namespace URIs to be defined for
             the stream.
           - `sasl_mechanisms`: sequence of SASL mechanisms allowed for
-            authentication. Currently "PLAIN" and "DIGEST-MD5" are supported.
+            authentication. Currently "PLAIN", "DIGEST-MD5" and "GSSAPI" are supported.
           - `tls_settings`: settings for StartTLS -- `TLSSettings` instance.
           - `keepalive`: keepalive output interval. 0 to disable.
           - `owner`: `Client`, `Component` or similar object "owning" this stream.
