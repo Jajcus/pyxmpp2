@@ -171,7 +171,7 @@ def _compute_response_auth(urp_hash,nonce,cnonce,nonce_count,authzid,digest_uri)
             cnonce,"auth",b2a_hex(_h_value(a2)) ) ))
 
 _param_re=re.compile(r'^(?P<var>[^=]+)\=(?P<val>(\"(([^"\\]+)|(\\\")'
-        r'|(\\\\))+\")|([^",]+))(\,(?P<rest>.*))?$')
+        r'|(\\\\))+\")|([^",]+))(\s*\,\s*(?P<rest>.*))?$')
 
 class DigestMD5ClientAuthenticator(ClientAuthenticator):
     """Provides PLAIN SASL authentication for a client.
