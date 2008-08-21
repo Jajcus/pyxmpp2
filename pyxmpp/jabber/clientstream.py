@@ -457,7 +457,7 @@ class LegacyClientStream(ClientStream):
                     self.my_jid = JID(self.registration_form['username'].value,
                             self.my_jid.domain, self.my_jid.resource)
                 if 'password' in self.registration_form:
-                    self.password = self.registration_form['password']
+                    self.password = self.registration_form['password'].value
             self.registration_callback = None
             self._post_connect()
         finally:
