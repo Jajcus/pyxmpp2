@@ -141,7 +141,8 @@ class StreamTLSMixIn:
         try:
             if self.tls:
                 self.tls.setblocking(True)
-            self.socket.send(data)
+            if self.socket:
+                self.socket.send(data)
             if self.tls:
                 self.tls.setblocking(False)
         except (IOError,OSError,socket.error),e:
@@ -264,7 +265,7 @@ class StreamTLSMixIn:
                 self._make_tls_connection()
                 self.socket=self.tls
             except SSLError,e:
-                self.tls=0
+                self.tls=None
                 raise TLSError("TLS Error: "+str(e))
             self.__logger.debug("Restarting XMPP stream")
             self._restart_stream()
@@ -311,6 +312,7 @@ class StreamTLSMixIn:
                 ctx.load_verify_locations(self.tls_settings.cacert_file)
         self.__logger.debug("Creating TLS connection")
         self.tls=SSL.Connection(ctx,self.socket)
+        self.socket=None
         self.__logger.debug("Setting up TLS connection")
         self.tls.setup_ssl()
         self.__logger.debug("Setting TLS connect state")
@@ -373,7 +375,7 @@ class StreamTLSMixIn:
             cn = cert.get_subject().CN
             
             self.__logger.debug("  depth: %i cert CN: %r" % (depth, cn))
-            if ok and not tls_is_certificate_valid(store_context):
+            if ok and not self.tls_is_certificate_valid(store_context):
                 self.__logger.debug(u"Common name does not match peer name (%s != %s)" % (cn, self.peer.as_utf8))
                 return False
             return ok
