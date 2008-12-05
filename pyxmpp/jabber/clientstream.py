@@ -23,7 +23,13 @@ Normative reference:
 __revision__="$Id$"
 __docformat__="restructuredtext en"
 
-import sha
+try:
+    import hashlib
+    sha_factory = hashlib.sha1
+except ImportError:
+    import sha
+    sha_factory = sha.new
+
 import logging
 
 from pyxmpp.iq import Iq
@@ -315,7 +321,9 @@ class LegacyClientStream(ClientStream):
         q=iq.new_query("jabber:iq:auth")
         q.newTextChild(None,"username",to_utf8(self.my_jid.node))
         q.newTextChild(None,"resource",to_utf8(self.my_jid.resource))
-        digest=sha.new(to_utf8(self.stream_id)+to_utf8(self.password)).hexdigest()
+
+        digest = sha_factory(to_utf8(self.stream_id)+to_utf8(self.password)).hexdigest()
+
         q.newTextChild(None,"digest",digest)
         self.send(iq)
         self.set_response_handlers(iq,self.auth_finish,self.auth_error)
@@ -343,7 +351,7 @@ class LegacyClientStream(ClientStream):
             self.send(iq)
             return
 
-        mydigest=sha.new(to_utf8(self.stream_id)+to_utf8(password)).hexdigest()
+        mydigest = sha_factory(to_utf8(self.stream_id)+to_utf8(password)).hexdigest()
 
         if mydigest==digest:
             iq=stanza.make_result_response()
