@@ -145,14 +145,18 @@ class ProtocolError(Error):
 
     def __init__(self, xmpp_name, message):
         self.args = (xmpp_name, message)
-        self.xmpp_name = xmpp_name
-        self.message = unicode(message)
+    @property
+    def xmpp_name(self):
+        return self.args[0]
+    @property
+    def message(self):
+        return self.args[1]
     def log_reported(self):
         self.logger_reported.debug(u"Protocol error detected: %s", self.message)
     def log_ignored(self):
         self.logger_ignored.debug(u"Protocol error detected: %s", self.message)
-    def __str__(self):
-        return str(self.message)
+    def __unicode__(self):
+        return str(self.args[1])
     def __repr__(self):
         return "<ProtocolError %r %r>" % (self.xmpp_name, self.message)
 
