@@ -6,7 +6,7 @@ EPYDOC=epydoc
 WEBFILES=www/index.html www/CHANGES.html www/ChangeLog.html \
 	www/style.css
 
-RST2HTML=rst2html
+RST2HTML=rst2html.py
 
 all: doc
 
@@ -21,7 +21,7 @@ update-doc:
 doc-tstamp:
 	$(MAKE) -C ..
 	rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp .
-	$(EPYDOC) --html --show-imports --no-frames --ignore-param-mismatch \
+	$(EPYDOC) --html --show-imports --no-frames \
 		-o www/api -n PyXMPP -u http://pyxmpp.jajcus.net/ pyxmpp
 	touch doc-tstamp
 	-rm -f pyxmpp 2>/dev/null
