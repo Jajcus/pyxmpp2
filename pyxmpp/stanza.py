@@ -86,8 +86,9 @@ class Stanza:
         self._error=None
         self.xmlnode=None
         if isinstance(name_or_xmlnode,Stanza):
-            self.xmlnode=name_or_xmlnode.xmlnode.copyNode(1)
+            self.xmlnode=name_or_xmlnode.xmlnode.docCopyNode(common_doc, True)
             common_doc.addChild(self.xmlnode)
+            self.xmlnode.reconciliateNs(common_doc)
         elif isinstance(name_or_xmlnode,libxml2.xmlNode):
             self.xmlnode=name_or_xmlnode.docCopyNode(common_doc,1)
             common_doc.addChild(self.xmlnode)
@@ -97,6 +98,7 @@ class Stanza:
                 ns = None
             if not ns or not ns.name:
                 xmlextra.replace_ns(self.xmlnode, ns, common_ns)
+            self.xmlnode.reconciliateNs(common_doc)
         else:
             self.xmlnode=common_doc.newChild(common_ns,name_or_xmlnode,None)
 
