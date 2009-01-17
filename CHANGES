@@ -2,7 +2,7 @@ Most Important API Changes
 --------------------------
 
 Those are mentioned here as are not backward compatible.
-I want the api to be stable and consistent in the next release and later,
+I want the API to be stable and consistent in the next release and later,
 so I do all the big changes now (I would have to do them at some time anyway).
 
 2006-08-31
