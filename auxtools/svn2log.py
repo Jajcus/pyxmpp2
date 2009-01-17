@@ -35,7 +35,7 @@ import getopt
 import string
 import codecs
 
-from xml.utils import qp_xml
+from xml.etree import ElementTree
 
 kill_prefix_rx = None
 default_domain = "localhost"
@@ -51,18 +51,15 @@ def die(msg):
   sys.stderr.write(msg + "\n")
   sys.exit(1)
 
-def attr(e, n):
-  return e.attrs[("", n)]
-
 def has_child(e, n):
-  for c in e.children:
-    if c.name == n: return 1
+  for c in e.getchildren():
+    if c.tag == n: return 1
   return 0
 
 def child(e, n):
-  for c in e.children:
-    if c.name == n: return c
-  die("<%s> doesn't have <%s> child" % (e.name, n))
+  for c in e.getchildren():
+    if c.tag == n: return c
+  die("<%s> doesn't have <%s> child" % (e.tag, n))
 
 def convert_path(n):
   for src in reloc.keys():
@@ -148,25 +145,25 @@ class Entry:
     return self.author == other.author and abs(self.tm - other.tm) < max_join_delta
 
 def process_entry(e):
-  rev = attr(e, "revision")
+  rev = e.get("revision")
   if has_child(e, "author"):
-    author = child(e, "author").textof()
+    author = child(e, "author").text
   else:
     author = "anonymous"
-  m = date_rx.search(child(e, "date").textof())
-  msg = child(e, "msg").textof()
+  m = date_rx.search(child(e, "date").text)
+  msg = child(e, "msg").text
   if m:
     tm = time.mktime(time.strptime(m.group(1), "%Y-%m-%dT%H:%M:%S"))
   else:
-    die("evil date: %s" % child(e, "date").textof())
+    die("evil date: %s" % child(e, "date").text)
   paths = []
-  for path in child(e, "paths").children:
-    if path.name != "path": die("<paths> has non-<path> child")
-    nam = convert_path(path.textof())
+  for path in child(e, "paths").getchildren():
+    if path.tag != "path": die("<paths> has non-<path> child")
+    nam = convert_path(path.text)
     if nam != None:
-      if attr(path, "action") == "D":
+      if path.get("action") == "D":
         paths.append(nam + " (removed)")
-      elif attr(path, "action") == "A":
+      elif path.get("action") == "A":
         paths.append(nam + " (added)")
       else:
         paths.append(nam)
@@ -177,15 +174,15 @@ def process_entry(e):
   return None
 
 def process(fin, fout):
-  parser = qp_xml.Parser()
-  root = parser.parse(fin)
+  tree = ElementTree.parse(fin)
+  root = tree.getroot()
 
-  if root.name != "log": die("root is not <log>")
+  if root.tag != "log": die("root is not <log>")
 
   cur = None
 
-  for logentry in root.children:
-    if logentry.name != "logentry": die("non <logentry> <log> child")
+  for logentry in root.getchildren():
+    if logentry.tag != "logentry": die("non <logentry> <log> child")
     e = process_entry(logentry)
     if e != None:
       if cur != None:
