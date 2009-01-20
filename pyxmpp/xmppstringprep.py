@@ -228,7 +228,7 @@ class Profile:
         has_ral=0
         for c in s:
             if D_1.lookup(c):
-                has_l=1
+                has_ral=1
             elif D_2.lookup(c):
                 has_l=1
         if has_l and has_ral:
