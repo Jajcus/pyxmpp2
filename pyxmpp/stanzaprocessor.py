@@ -109,7 +109,7 @@ class StanzaProcessor:
                 ufr=None
             if self._iq_response_handlers.has_key((sid,ufr)):
                 key=(sid,ufr)
-            elif ( (fr==self.peer or fr==self.me)
+            elif ( (fr == self.peer or fr == self.me or fr == self.me.bare())
                     and self._iq_response_handlers.has_key((sid,None))):
                 key=(sid,None)
             else:
