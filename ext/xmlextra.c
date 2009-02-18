@@ -442,6 +442,8 @@ PyObject *handler;
 static void sax_reader_free(PyObject *self) {
 SaxReaderObject *reader=(SaxReaderObject *)self;
 
+	xmlFreeDoc(reader->ctxt->myDoc);
+	reader->ctxt->myDoc = NULL;
 	xmlFreeParserCtxt(reader->ctxt);
 	Py_DECREF(reader->handler);
 	PyObject_Del(self);
