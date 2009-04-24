@@ -107,19 +107,21 @@ class StanzaProcessor:
                 ufr=fr.as_unicode()
             else:
                 ufr=None
-            if self._iq_response_handlers.has_key((sid,ufr)):
-                key=(sid,ufr)
-            elif ( (fr == self.peer or fr == self.me or fr == self.me.bare())
-                    and self._iq_response_handlers.has_key((sid,None))):
-                key=(sid,None)
-            else:
-                return False
-            res_handler, err_handler = self._iq_response_handlers[key]
-            if stanza.get_type()=="result":
+            res_handler = err_handler = None
+            try:
+                res_handler, err_handler = self._iq_response_handlers.pop((sid,ufr))
+            except KeyError:
+                if ( (fr==self.peer or fr==self.me or fr==self.me.bare()) ):
+                    try:
+                        res_handler, err_handler = self._iq_response_handlers.pop((sid,None))
+                    except KeyError:
+                        pass
+                if None is res_handler is err_handler:
+                    return False
+            if typ=="result":
                 response = res_handler(stanza)
             else:
                 response = err_handler(stanza)
-            del self._iq_response_handlers[key]
             self.process_response(response)
             return True
 

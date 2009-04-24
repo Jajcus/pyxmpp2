@@ -23,6 +23,10 @@ __docformat__="restructuredtext en"
 import time
 import threading
 
+__all__ = ['ExpiringDictionary']
+
+sentinel = object()
+
 class ExpiringDictionary(dict):
     """An extension to standard Python dictionary objects which implements item
     expiration.
@@ -67,6 +71,18 @@ class ExpiringDictionary(dict):
         try:
             self._expire_item(key)
             return dict.__getitem__(self,key)
+        finally:
+            self._lock.release()
+
+    def pop(self,key,default=sentinel):
+        self._lock.acquire()
+        try:
+            self._expire_item(key)
+            del self._timeouts[key]
+            if default is not sentinel:
+                return dict.pop(self,key,default)
+            else:
+                return dict.pop(self,key)
         finally:
             self._lock.release()
 
@@ -119,14 +135,15 @@ class ExpiringDictionary(dict):
             - `key`: any hashable value"""
         (timeout,callback)=self._timeouts[key]
         if timeout<=time.time():
+            item = dict.pop(self, key)
+            del self._timeouts[key]
             if callback:
                 try:
-                    callback(key,dict.__getitem__(self,key))
+                    callback(key,item)
                 except TypeError:
                     try:
                         callback(key)
                     except TypeError:
                         callback()
-            del self[key]
 
 # vi: sts=4 et sw=4
