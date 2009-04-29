@@ -24,7 +24,13 @@ Normative reference:
 __revision__="$Id$"
 __docformat__="restructuredtext en"
 
-import sha
+try:
+    import hashlib
+    sha_factory = hashlib.sha1
+except ImportError:
+    import sha
+    sha_factory = sha.new
+
 import logging
 
 from pyxmpp.stream import Stream
@@ -137,7 +143,7 @@ class ComponentStream(Stream):
 
         :return: the computed hash value.
         :returntype: `str`"""
-        return sha.new(to_utf8(self.stream_id)+to_utf8(self.secret)).hexdigest()
+        return sha_factory(to_utf8(self.stream_id)+to_utf8(self.secret)).hexdigest()
 
     def _auth(self):
         """Authenticate on the server.
