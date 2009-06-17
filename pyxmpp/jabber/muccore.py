@@ -404,7 +404,8 @@ class MucItem(MucItemBase):
         if self.reason:
             n.newTextChild(None,"reason",to_utf8(self.reason))
         n.setProp("affiliation",to_utf8(self.affiliation))
-        n.setProp("role",to_utf8(self.role))
+        if self.role:
+            n.setProp("role",to_utf8(self.role))
         if self.jid:
             n.setProp("jid",to_utf8(self.jid.as_unicode()))
         if self.nick:
