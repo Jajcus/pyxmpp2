@@ -72,7 +72,7 @@ class EchoHandler(object):
         if t:
             print u'Type: "%s".' % (t,)
         else:
-            print u'Type: "normal".' % (t,)
+            print u'Type: "normal".'
         if stanza.get_type()=="headline":
             # 'headline' messages should never be replied to
             return True
