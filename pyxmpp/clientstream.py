@@ -169,6 +169,9 @@ class ClientStream(Stream):
         methods left.
 
         [client only]"""
+        if not self.doc_out:
+            self.__logger.debug("try_auth: disconnecting already?")
+            return
         if self.authenticated:
             self.__logger.debug("try_auth: already authenticated")
             return
