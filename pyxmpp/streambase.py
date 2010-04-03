@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2006 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -604,6 +604,9 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         import select
         self.lock.release()
         try:
+            if not self.socket:
+                time.sleep(timeout)
+                return False
             try:
                 ifd, _unused, efd = select.select( [self.socket], [], [self.socket], timeout )
             except select.error,e:
