@@ -5,6 +5,15 @@ Those are mentioned here as are not backward compatible.
 I want the API to be stable and consistent in the next release and later,
 so I do all the big changes now (I would have to do them at some time anyway).
 
+2010-04-03
+
+	M2Crypto dependency dropped in favor of the 'ssl' module from the
+        standard Python library. TLS API has been changed a bit: certificate
+	verification callback now should expect one argument only (a dictionary
+	with certificate information)
+
+	Python 2.6 is now _required!
+
 2006-08-31
 
 	Interface API for better externalisation of various components. First

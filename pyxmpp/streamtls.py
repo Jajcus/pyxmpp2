@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2006 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -29,29 +29,30 @@ import socket
 import sys
 import errno
 import logging
+import ssl
+import warnings
+import inspect
+from ssl import SSLError
 
 from pyxmpp.streambase import StreamBase,STREAM_NS
 from pyxmpp.streambase import FatalStreamError,StreamEncryptionRequired
 from pyxmpp.exceptions import TLSNegotiationFailed, TLSError, TLSNegotiatedButNotAvailableError
-
-try:
-    import M2Crypto
-    if M2Crypto.version_info < (0, 16):
-        tls_available = 0
-    else:
-        from M2Crypto import SSL
-        from M2Crypto.SSL import SSLError
-        import M2Crypto.SSL.cb
-        tls_available = 1
-except ImportError:
-    tls_available = 0
-
-if not tls_available:
-    class SSLError(Exception):
-        "dummy"
-        pass
+from pyxmpp.jid import JID
 
 TLS_NS="urn:ietf:params:xml:ns:xmpp-tls"
+
+tls_available = True
+
+
+def _count_args(callable):
+    """Utility function to count expected arguments of a callable"""
+    vc_args = inspect.getargspec(callable)
+    count = len(vc_args.args)
+    if not hasattr(callable, "im_self"):
+        return count
+    if callable.im_self is None:
+        return count
+    return count - 1
 
 class TLSSettings:
     """Storage for TLS-related settings of an XMPP stream.
@@ -63,12 +64,12 @@ class TLSSettings:
             - `key_file`: path to the private key for own X.509 certificate
             - `cacert_file`: path to a file with trusted CA certificates
             - `verify_callback`: callback function for certificate
-              verification. See M2Crypto documentation for details."""
+              verification."""
 
     def __init__(self,
-            require=False,verify_peer=True,
-            cert_file=None,key_file=None,cacert_file=None,
-            verify_callback=None,ctx=None):
+            require = False, verify_peer = True,
+            cert_file = None, key_file = None, cacert_file = None,
+            verify_callback = None, ctx = None):
         """Initialize the TLSSettings object.
 
         :Parameters:
@@ -78,19 +79,26 @@ class TLSSettings:
             - `key_file`: path to the private key for own X.509 certificate
             - `cacert_file`: path to a file with trusted CA certificates
             - `verify_callback`: callback function for certificate
-              verification. The callback function must accept two arguments:
-              'ok' and 'store_context' and return True if a certificate is accepted.
-              The verification callback should call Stream.tls_is_certificate_valid()
-              to check if certificate subject name matches stream peer JID.
-              See M2Crypto documentation for details. If no verify_callback is provided,
-              then default `Stream.tls_default_verify_callback` will be used."""
-        self.require=require
-        self.ctx=ctx
-        self.verify_peer=verify_peer
-        self.cert_file=cert_file
-        self.cacert_file=cacert_file
-        self.key_file=key_file
-        self.verify_callback=verify_callback
+              verification. The callback function must accept a single
+              argument: the certificate to verify, as returned by
+              `ssl.SSLSocket.getpeercert()` and return True if a certificate is
+              accepted.  The verification callback should call
+              Stream.tls_is_certificate_valid() to check if certificate subject
+              name or alt subject name matches stream peer JID."""
+        if ctx is not None:
+             warnings.warn("ctx argument of TLSSettings is deprecated",
+                                                        DeprecationWarning)
+        self.require = require
+        self.verify_peer = verify_peer
+        self.cert_file = cert_file
+        self.cacert_file = cacert_file
+        self.key_file = key_file
+        if verify_callback:
+            if _count_args(verify_callback) > 1 :
+                warnings.warn("Two-argument TLS verify callback is deprecated",
+                                                        DeprecationWarning)
+                verify_callback = None
+        self.verify_callback = verify_callback
 
 class StreamTLSMixIn:
     """Mix-in class providing TLS support for an XMPP stream.
@@ -98,7 +106,7 @@ class StreamTLSMixIn:
     :Ivariables:
         - `tls`: TLS connection object.
     """
-    def __init__(self,tls_settings=None):
+    def __init__(self, tls_settings = None):
         """Initialize TLS support of a Stream object
 
         :Parameters:
@@ -106,16 +114,16 @@ class StreamTLSMixIn:
         :Types:
           - `tls_settings`: `TLSSettings`
         """
-        self.tls_settings=tls_settings
-        self.__logger=logging.getLogger("pyxmpp.StreamTLSMixIn")
+        self.tls_settings = tls_settings
+        self.__logger = logging.getLogger("pyxmpp.StreamTLSMixIn")
 
     def _reset_tls(self):
         """Reset `StreamTLSMixIn` object state making it ready to handle new
         connections."""
-        self.tls=None
-        self.tls_requested=False
+        self.tls = None
+        self.tls_requested = False
 
-    def _make_stream_tls_features(self,features):
+    def _make_stream_tls_features(self, features):
         """Update the <features/> with StartTLS feature.
 
         [receving entity only]
@@ -128,24 +136,26 @@ class StreamTLSMixIn:
         :returns: updated <features/> element node.
         :returntype: `libxml2.xmlNode`"""
         if self.tls_settings and not self.tls:
-            tls=features.newChild(None,"starttls",None)
-            ns=tls.newNs(TLS_NS,None)
+            tls = features.newChild(None, "starttls", None)
+            ns = tls.newNs(TLS_NS, None)
             tls.setNs(ns)
             if self.tls_settings.require:
-                tls.newChild(None,"required",None)
+                tls.newChild(None, "required", None)
         return features
 
     def _write_raw(self,data):
         """Same as `Stream.write_raw` but assume `self.lock` is acquired."""
         logging.getLogger("pyxmpp.Stream.out").debug("OUT: %r",data)
         try:
-            if self.tls:
-                self.tls.setblocking(True)
-            if self.socket:
-                self.socket.send(data)
-            if self.tls:
-                self.tls.setblocking(False)
-        except (IOError,OSError,socket.error),e:
+            while self.socket:
+                try:
+                    self.socket.send(data)
+                except SSLError, err:
+                    if err.args[0] == ssl.SSL_ERROR_WANT_WRITE:
+                        continue
+                    raise
+                break
+        except (IOError, OSError, socket.error),e:
             raise FatalStreamError("IO Error: "+str(e))
         except SSLError,e:
             raise TLSError("TLS Error: "+str(e))
@@ -156,11 +166,15 @@ class StreamTLSMixIn:
             return
         while self.socket:
             try:
-                r=self.socket.read()
+                r = self.socket.read()  # .recv() blocks in python 2.6.4
                 if r is None:
                     return
-            except socket.error,e:
-                if e.args[0]!=errno.EINTR:
+            except SSLError, err:
+                if err.args[0] == ssl.SSL_ERROR_WANT_READ:
+                    return
+                raise
+            except socket.error, err:
+                if err.args[0] != errno.EINTR:
                     raise
                 return
             self._feed_reader(r)
@@ -223,9 +237,6 @@ class StreamTLSMixIn:
                 raise FatalStreamError,"StartTLS required, but not supported by peer"
             if self.tls_settings and tls_n:
                 self.__logger.debug("StartTLS negotiated")
-                if not tls_available:
-                    raise TLSNegotiatedButNotAvailableError,("StartTLS negotiated, but not available"
-                            " (M2Crypto >= 0.16 module required)")
                 if self.initiator:
                     self._request_tls()
             else:
@@ -281,104 +292,65 @@ class StreamTLSMixIn:
             raise TLSError,"TLS is not available"
 
         self.state_change("tls connecting",self.peer)
-        self.__logger.debug("Creating TLS context")
-        if self.tls_settings.ctx:
-            ctx=self.tls_settings.ctx
-        else:
-            ctx=SSL.Context('tlsv1')
 
-        verify_callback = self.tls_settings.verify_callback
-        if not verify_callback:
-            verify_callback = self.tls_default_verify_callback
+        if not self.tls_settings.verify_callback:
+            self.tls_settings.verify_callback = self.tls_is_certificate_valid
         
+        self.__logger.debug("tls_settings: {0!r}".format(self.tls_settings.__dict__))
+        self.__logger.debug("Creating TLS connection")
 
         if self.tls_settings.verify_peer:
-            self.__logger.debug("verify_peer, verify_callback: %r", verify_callback)
-            ctx.set_verify(SSL.verify_peer, 10, verify_callback)
+            cert_reqs = ssl.CERT_REQUIRED
         else:
-            ctx.set_verify(SSL.verify_none, 10)
+            cert_reqs = ssl.CERT_NONE
 
-        if self.tls_settings.cert_file:
-            ctx.use_certificate_chain_file(self.tls_settings.cert_file)
-            if self.tls_settings.key_file:
-                ctx.use_PrivateKey_file(self.tls_settings.key_file)
-            else:
-                ctx.use_PrivateKey_file(self.tls_settings.cert_file)
-            ctx.check_private_key()
-        if self.tls_settings.cacert_file:
-            try:
-                ctx.load_verify_location(self.tls_settings.cacert_file)
-            except AttributeError:
-                ctx.load_verify_locations(self.tls_settings.cacert_file)
-        self.__logger.debug("Creating TLS connection")
-        self.tls=SSL.Connection(ctx,self.socket)
-        self.socket=None
-        self.__logger.debug("Setting up TLS connection")
-        self.tls.setup_ssl()
-        self.__logger.debug("Setting TLS connect state")
-        self.tls.set_connect_state()
+        self.tls = ssl.wrap_socket(self.socket,
+                    keyfile = self.tls_settings.key_file,
+                    certfile = self.tls_settings.cert_file,
+                    server_side = not self.initiator,
+                    cert_reqs = cert_reqs,
+                    ssl_version = ssl.PROTOCOL_TLSv1,
+                    ca_certs = self.tls_settings.cacert_file,
+                    do_handshake_on_connect = False,
+                    )
+        self.socket = None
         self.__logger.debug("Starting TLS handshake")
-        self.tls.connect_ssl()
-        self.state_change("tls connected",self.peer)
-        self.tls.setblocking(0)
+        self.tls.do_handshake()
+        self.tls.setblocking(False)
+        if self.tls_settings.verify_peer:
+            valid = self.tls_settings.verify_callback(self.tls.getpeercert())
+            if not valid:
+                raise SSLError, "Certificate verification failed"
+        self.socket = self.tls
+        self.state_change("tls connected", self.peer)
 
-        # clear any exception state left by some M2Crypto broken code
-        try:
-            raise Exception
-        except:
-            pass
-
-    def tls_is_certificate_valid(self, store_context):
-        """Check subject name of the certificate and return True when
-        it is valid.
-
-        Only the certificate at depth 0 in the certificate chain (peer
-        certificate) is checked.
-
-        Currently only the Common Name is checked and certificate is considered
-        valid if CN is the same as the peer JID.
-
-        :Parameters:
-            - `store_context`: certificate store context, as passed to the
-              verification callback.
-
-        :returns: verification result. `True` if certificate subject name is valid.
-        """
-        depth = store_context.get_error_depth()
-        if depth > 0:
-            return True
-        cert = store_context.get_current_cert()
-        cn = cert.get_subject().CN
-        if str(cn) != self.peer.as_utf8():
-            return False
-        return True
-
-    def tls_default_verify_callback(self, ok, store_context):
+    def tls_is_certificate_valid(self, cert):
         """Default certificate verification callback for TLS connections.
 
-        Will reject connection (return `False`) if M2Crypto finds any error
-        or when certificate CommonName doesn't match peer JID.
-
-        TODO: check otherName/idOnXMPP (or what it is called)
-
         :Parameters:
-            - `ok`: current verification result (as decided by OpenSSL).
-            - `store_context`: certificate store context
+            - `cert`: certificate information, as returned by `ssl.SSLSocket.getpeercert`
 
         :return: computed verification result."""
         try:
-            self.__logger.debug("tls_default_verify_callback(ok=%i, store=%r)" % (ok, store_context))
-            from M2Crypto import X509,m2
-
-            depth = store_context.get_error_depth()
-            cert = store_context.get_current_cert()
-            cn = cert.get_subject().CN
-            
-            self.__logger.debug("  depth: %i cert CN: %r" % (depth, cn))
-            if ok and not self.tls_is_certificate_valid(store_context):
-                self.__logger.debug(u"Common name does not match peer name (%s != %s)" % (cn, self.peer.as_utf8))
+            self.__logger.debug("tls_is_certificate_valid(cert = %r)" % (
+                                                                        cert,))
+            if not cert:
+                self.__logger.warning("No TLS certificate information received.")
                 return False
-            return ok
+            valid_hostname_found = False
+            if 'subject' in cert:
+                for rdns in cert['subject']:
+                    for key, value in rdns:
+                        if key == 'commonName' and JID(value) == self.peer:
+                            self.__logger.debug(" good commonName: {0}".format(value))
+                            valid_hostname_found = True
+            if 'subjectAltName' in cert:
+                for key, value in cert['subjectAltName']:
+                    if key == 'DNS' and JID(value) == self.peer:
+                        self.__logger.debug(" good subjectAltName({0}): {1}"
+                                                                    .format(key, value))
+                        valid_hostname_found = True
+            return valid_hostname_found
         except:
             self.__logger.exception("Exception caught")
             raise

@@ -15,6 +15,7 @@ from pyxmpp.all import JID,Iq,Presence,Message,StreamError
 from pyxmpp.jabber.client import JabberClient
 from pyxmpp.interface import implements
 from pyxmpp.interfaces import *
+from pyxmpp.streamtls import TLSSettings
 
 class EchoHandler(object):
     """Provides the actual 'echo' functionality.
@@ -172,15 +173,24 @@ class Client(JabberClient):
     authentication) and Service Discovery server. It also does server address
     and port discovery based on the JID provided."""
 
-    def __init__(self, jid, password):
+    def __init__(self, jid, password, tls_cacerts):
         # if bare JID is provided add a resource -- it is required
         if not jid.resource:
             jid=JID(jid.node, jid.domain, "Echobot")
 
+        if tls_cacerts:
+            if tls_cacerts == 'tls_noverify':
+                tls_settings = TLSSettings(require = True, verify_peer = False)
+            else:
+                tls_settings = TLSSettings(require = True, cacert_file = tls_cacerts)
+        else:
+            tls_settings = None
+
         # setup client with provided connection information
         # and identity data
         JabberClient.__init__(self, jid, password,
-                disco_name="PyXMPP example: echo bot", disco_type="bot")
+                disco_name="PyXMPP example: echo bot", disco_type="bot",
+                tls_settings = tls_settings)
 
         # add the separate components
         self.interface_providers = [
@@ -230,13 +240,14 @@ logger.setLevel(logging.INFO) # change to DEBUG for higher verbosity
 
 if len(sys.argv) < 3:
     print u"Usage:"
-    print "\t%s JID password" % (sys.argv[0],)
+    print "\t%s JID password ['tls_noverify'|cacert_file]" % (sys.argv[0],)
     print "example:"
     print "\t%s test@localhost verysecret" % (sys.argv[0],)
     sys.exit(1)
 
 print u"creating client..."
-c=Client(JID(sys.argv[1]), sys.argv[2])
+
+c=Client(JID(sys.argv[1]), sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else None)
 
 print u"connecting..."
 c.connect()
