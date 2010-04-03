@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2006 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -23,13 +23,7 @@ Normative reference:
 __revision__="$Id$"
 __docformat__="restructuredtext en"
 
-try:
-    import hashlib
-    sha_factory = hashlib.sha1
-except ImportError:
-    import sha
-    sha_factory = sha.new
-
+import hashlib
 import logging
 
 from pyxmpp.iq import Iq
@@ -322,7 +316,7 @@ class LegacyClientStream(ClientStream):
         q.newTextChild(None,"username",to_utf8(self.my_jid.node))
         q.newTextChild(None,"resource",to_utf8(self.my_jid.resource))
 
-        digest = sha_factory(to_utf8(self.stream_id)+to_utf8(self.password)).hexdigest()
+        digest = hashlib.sha1(to_utf8(self.stream_id)+to_utf8(self.password)).hexdigest()
 
         q.newTextChild(None,"digest",digest)
         self.send(iq)
@@ -351,7 +345,7 @@ class LegacyClientStream(ClientStream):
             self.send(iq)
             return
 
-        mydigest = sha_factory(to_utf8(self.stream_id)+to_utf8(password)).hexdigest()
+        mydigest = hashlib.sha1(to_utf8(self.stream_id)+to_utf8(password)).hexdigest()
 
         if mydigest==digest:
             iq=stanza.make_result_response()

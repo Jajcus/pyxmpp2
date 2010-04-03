@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2006 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -27,12 +27,7 @@ from binascii import b2a_hex
 import re
 import logging
 
-try:
-    import hashlib
-    md5_factory = hashlib.md5
-except:
-    import md5
-    md5_factory = md5.new
+import hashlib
 
 from pyxmpp.sasl.core import ClientAuthenticator,ServerAuthenticator
 from pyxmpp.sasl.core import Failure,Response,Challenge,Success,Failure
@@ -84,7 +79,7 @@ def _h_value(s):
 
     :return: MD5 sum of the string.
     :returntype: `str`"""
-    return md5_factory(s).digest()
+    return hashlib.md5(s).digest()
 
 def _kd_value(k,s):
     """KD function of the DIGEST-MD5 algorithm.

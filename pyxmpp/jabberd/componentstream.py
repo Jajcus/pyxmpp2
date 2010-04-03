@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2006 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -24,12 +24,7 @@ Normative reference:
 __revision__="$Id$"
 __docformat__="restructuredtext en"
 
-try:
-    import hashlib
-    sha_factory = hashlib.sha1
-except ImportError:
-    import sha
-    sha_factory = sha.new
+import hashlib
 
 import logging
 
@@ -143,7 +138,7 @@ class ComponentStream(Stream):
 
         :return: the computed hash value.
         :returntype: `str`"""
-        return sha_factory(to_utf8(self.stream_id)+to_utf8(self.secret)).hexdigest()
+        return hashlib.sha1(to_utf8(self.stream_id)+to_utf8(self.secret)).hexdigest()
 
     def _auth(self):
         """Authenticate on the server.
