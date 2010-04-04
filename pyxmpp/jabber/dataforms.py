@@ -90,6 +90,7 @@ class Option(StanzaPayloadObject):
         xmlnode.newTextChild(xmlnode.ns(), "value", self.value.encode("utf-8"))
         return xmlnode
 
+    @classmethod
     def _new_from_xml(cls, xmlnode):
         """Create a new `Option` object from an XML element.
 
@@ -111,7 +112,6 @@ class Option(StanzaPayloadObject):
         if value is None:
             raise BadRequestProtocolError, "No value in <option/> element"
         return cls(value, label)
-    _new_from_xml = classmethod(_new_from_xml)
 
 class Field(StanzaPayloadObject):
     """A data form field.
@@ -293,6 +293,7 @@ class Field(StanzaPayloadObject):
             xmlnode.newTextChild(xmlnode.ns(), "desc", to_utf8(self.desc))
         return xmlnode
 
+    @classmethod
     def _new_from_xml(cls, xmlnode):
         """Create a new `Field` object from an XML element.
 
@@ -327,7 +328,6 @@ class Field(StanzaPayloadObject):
         if field_type and not field_type.endswith("-multi") and len(values) > 1:
             raise BadRequestProtocolError, "Multiple values for a single-value field"
         return cls(name, values, field_type, label, options, required, desc)
-    _new_from_xml = classmethod(_new_from_xml)
 
 class Item(StanzaPayloadObject):
     """An item of multi-item form data (e.g. a search result).
@@ -432,6 +432,7 @@ class Item(StanzaPayloadObject):
         for field in self.fields:
             field.as_xml(xmlnode, doc)
 
+    @classmethod
     def _new_from_xml(cls, xmlnode):
         """Create a new `Item` object from an XML element.
 
@@ -452,7 +453,6 @@ class Item(StanzaPayloadObject):
                 fields.append(Field._new_from_xml(child))
             child = child.next
         return cls(fields)
-    _new_from_xml = classmethod(_new_from_xml)
 
 class Form(StanzaPayloadObject):
     """A JEP-0004 compliant data form.
