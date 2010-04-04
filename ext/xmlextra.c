@@ -270,6 +270,8 @@ typedef struct _sax_reader{
 	errorSAXFunc		error;
 	fatalErrorSAXFunc	fatalError;
 
+	warningSAXFunc          warning;
+
 	PyObject		*handler;
 	
 	int			eof;
@@ -388,6 +390,25 @@ PyObject *str,*obj;
 	else Py_DECREF(obj);
 }
 
+static void myWarning(void *ctx, const char *msg, ...){
+va_list vargs;
+xmlParserCtxtPtr ctxt=(xmlParserCtxtPtr) ctx;
+SaxReaderObject *reader=(SaxReaderObject *)ctxt->_private;
+PyObject *str,*obj;
+
+	va_start (vargs, msg);
+	str=PyString_FromFormatV(msg,vargs);
+	va_end (vargs);
+	if (str==NULL) {
+		reader->exception=1;
+		return;
+	}
+	obj=PyObject_CallMethod(reader->handler,"warning","O",str);
+	Py_DECREF(str);
+	if (obj==NULL) reader->exception=1;
+	else Py_DECREF(obj);
+}
+
 static PyObject * sax_reader_new(ATTRIBUTE_UNUSED PyObject *self, PyObject *args) {
 SaxReaderObject *reader;
 PyObject *handler;
@@ -408,6 +429,8 @@ PyObject *handler;
 	reader->sax.error=myError;
 	reader->fatalError=reader->sax.fatalError;
 	reader->sax.fatalError=myFatalError;
+	reader->warning=reader->sax.warning;
+	reader->sax.warning=myWarning;
 	
 	/* things processed only at specific levels */
 	reader->characters=reader->sax.characters;

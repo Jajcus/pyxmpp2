@@ -101,6 +101,17 @@ class StreamHandler:
             - `descr`: `str`"""
         raise StreamParseError,descr
 
+    def warning(self,desc):
+        """Called when an warning is encountered in the stream.
+
+        :Parameters:
+            - `descr`: description of the warning
+        :Types:
+            - `descr`: `str`"""
+        # we know vcard-temp is bad...
+        if not desc.startswith('xmlns: URI vcard-temp is not absolute'):
+            print "XML STREAM WARNING:",desc
+
 try:
 #########################################################################
 # C-extension based workarounds for libxml2 limitations
