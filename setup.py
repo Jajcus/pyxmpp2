@@ -60,7 +60,7 @@ setup(
             "Topic :: Software Development :: Libraries :: Python Modules",
         ],
     license =   'LGPL',
-    requires = ['libxml2-python', 'dnspython(>= 1.6.0)'],
+    requires = ['libxml2_python', 'dnspython(>= 1.6.0)'],
 
     ext_modules = ext_modules,
 
