@@ -39,10 +39,10 @@ class Option(StanzaPayloadObject):
 
     :Ivariables:
         - `label`: option label.
-        - `values`: option values.
+        - `value`: option value.
     :Types:
         - `label`: `unicode`
-        - `values`: `list` of `unicode`
+        - `value`: `unicode`
     """
     xml_element_name = "option"
     xml_element_namespace = DATAFORM_NS
