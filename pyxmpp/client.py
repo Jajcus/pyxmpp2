@@ -343,7 +343,8 @@ class Client:
         if fr and fr!=self.jid:
             resp=iq.make_error_response("forbidden")
             self.stream.send(resp)
-            raise ClientError("Got roster update from wrong source")
+            self.__logger.warning("Got roster update from wrong source")
+            return
         if not self.roster:
             raise ClientError("Roster update, but no roster")
         q=iq.get_query()
