@@ -279,7 +279,7 @@ class Stanza:
         :Parameters:
             - `content`: XML node to be included in the stanza.
         :Types:
-            - `content`: `libxml2.xmlNode` or UTF-8 `str`
+            - `content`: `libxml2.xmlNode` or unicode, or UTF-8 `str`
         """
         while self.xmlnode.children:
             self.xmlnode.children.unlinkNode()
@@ -287,6 +287,8 @@ class Stanza:
             content.as_xml(parent=self.xmlnode,doc=common_doc)
         elif isinstance(content,libxml2.xmlNode):
             self.xmlnode.addChild(content.docCopyNode(common_doc,1))
+        elif isinstance(content,unicode):
+            self.xmlnode.setContent(to_utf8(content))
         else:
             self.xmlnode.setContent(content)
 
@@ -296,13 +298,15 @@ class Stanza:
         :Parameters:
             - `content`: XML node to be added to the payload.
         :Types:
-            - `content`: `libxml2.xmlNode`, UTF-8 `str` or an object with
-              "as_xml()" method.
+            - `content`: `libxml2.xmlNode`, UTF-8 `str` or unicode, or
+               an object with "as_xml()" method.
         """
         if hasattr(content, "as_xml"):
             content.as_xml(parent = self.xmlnode, doc = common_doc)
         elif isinstance(content,libxml2.xmlNode):
             self.xmlnode.addChild(content.docCopyNode(common_doc,1))
+        elif isinstance(content,unicode):
+            self.xmlnode.addContent(to_utf8(content))
         else:
             self.xmlnode.addContent(content)
 

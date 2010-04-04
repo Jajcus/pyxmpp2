@@ -277,9 +277,9 @@ class Field(StanzaPayloadObject):
             raise ValueError, "Invalid form field type: %r" % (self.type,)
         xmlnode.setProp("type", self.type)
         if not self.label is None:
-            xmlnode.setProp("label", self.label)
+            xmlnode.setProp("label", to_utf8(self.label))
         if not self.name is None:
-            xmlnode.setProp("var", self.name)
+            xmlnode.setProp("var", to_utf8(self.name))
         if self.values:
             if self.type and len(self.values) > 1 and not self.type.endswith(u"-multi"):
                 raise ValueError, "Multiple values not allowed for %r field" % (self.type,)
@@ -645,9 +645,9 @@ class Form(StanzaPayloadObject):
             return
         ns = xmlnode.ns()
         if self.title is not None:
-            xmlnode.newTextChild(ns, "title", self.title)
+            xmlnode.newTextChild(ns, "title", to_utf8(self.title))
         if self.instructions is not None:
-            xmlnode.newTextChild(ns, "instructions", self.instructions)
+            xmlnode.newTextChild(ns, "instructions", to_utf8(self.instructions))
         for field in self.fields:
             field.as_xml(xmlnode, doc)
         if self.type != "result":
