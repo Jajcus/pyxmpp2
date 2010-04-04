@@ -86,7 +86,8 @@ class Option(StanzaPayloadObject):
             - `xmlnode`: `libxml2.xmlNode`
             - `doc`: `libxml2.xmlDoc`"""
         _unused = doc
-        xmlnode.setProp("label", self.label.encode("utf-8"))
+        if self.label is not None:
+            xmlnode.setProp("label", self.label.encode("utf-8"))
         xmlnode.newTextChild(xmlnode.ns(), "value", self.value.encode("utf-8"))
         return xmlnode
 
@@ -275,7 +276,8 @@ class Field(StanzaPayloadObject):
             - `doc`: `libxml2.xmlDoc`"""
         if self.type is not None and self.type not in self.allowed_types:
             raise ValueError, "Invalid form field type: %r" % (self.type,)
-        xmlnode.setProp("type", self.type)
+        if self.type is not None:
+            xmlnode.setProp("type", self.type)
         if not self.label is None:
             xmlnode.setProp("label", to_utf8(self.label))
         if not self.name is None:
