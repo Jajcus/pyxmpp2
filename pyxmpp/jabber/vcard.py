@@ -46,6 +46,13 @@ class Empty(Exception):
     pass
 
 valid_string_re=re.compile(r"^[\w\d \t]*$")
+non_quoted_semicolon_re=re.compile(r'(?<!\\);')
+
+def quote_semicolon(value):
+    return value.replace(r';', r'\;')
+
+def unquote_semicolon(value):
+    return value.replace(r'\;', r';')
 
 def rfc2425encode(name,value,parameters=None,charset="utf-8"):
     """Encodes a vCard field into an RFC2425 line.
@@ -298,17 +305,18 @@ class VCardName(VCardField):
             if empty:
                 raise Empty, "Empty N value"
         else:
-            v=value.split(";")
+            v=non_quoted_semicolon_re.split(value)
             value=[u""]*5
             value[:len(v)]=v
-            self.family,self.given,self.middle,self.prefix,self.suffix=value
+            self.family,self.given,self.middle,self.prefix,self.suffix=(
+                unquote_semicolon(val) for val in value)
     def rfc2426(self):
         """RFC2426-encode the field content.
 
         :return: the field in the RFC 2426 format.
         :returntype: `str`"""
-        return rfc2425encode("n",u"%s;%s;%s;%s;%s" %
-                (self.family,self.given,self.middle,self.prefix,self.suffix))
+        return rfc2425encode("n",u';'.join(quote_semicolon(val) for val in
+                (self.family,self.given,self.middle,self.prefix,self.suffix)))
     def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
@@ -486,11 +494,12 @@ class VCardAdr(VCardField):
                 self.type=t.split(",")
             else:
                 self.type=["intl","postal","parcel","work"]
-            v=value.split(";")
+            v=non_quoted_semicolon_re.split(value)
             value=[""]*7
             value[:len(v)]=v
             (self.pobox,self.extadr,self.street,self.locality,
-                    self.region,self.pcode,self.ctry)=value
+                    self.region,self.pcode,self.ctry)=(
+                unquote_semicolon(val) for val in value)
 
     def __from_xml(self,value):
         """Initialize a `VCardAdr` object from and XML element.
@@ -537,9 +546,9 @@ class VCardAdr(VCardField):
 
         :return: the field in the RFC 2426 format.
         :returntype: `str`"""
-        return rfc2425encode("adr",u"%s;%s;%s;%s;%s;%s;%s" %
+        return rfc2425encode("adr",u';'.join(quote_semicolon(val) for val in
                 (self.pobox,self.extadr,self.street,self.locality,
-                        self.region,self.pcode,self.ctry),
+                        self.region,self.pcode,self.ctry)),
                 {"type":",".join(self.type)})
 
     def as_xml(self,parent):
@@ -855,14 +864,14 @@ class VCardGeo(VCardField):
             if not self.lat or not self.lon:
                 raise ValueError,"Bad vcard GEO value"
         else:
-            self.lat,self.lon=value.split(";")
+            self.lat,self.lon=(unquote_semicolon(val) for val in non_quoted_semicolon_re.split(value))
     def rfc2426(self):
         """RFC2426-encode the field content.
 
         :return: the field in the RFC 2426 format.
         :returntype: `str`"""
-        return rfc2425encode("geo",u"%s;%s" %
-                (self.lat,self.lon))
+        return rfc2425encode("geo",u';'.join(quote_semicolon(val) for val in
+                (self.lat,self.lon)))
     def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 
@@ -923,11 +932,11 @@ class VCardOrg(VCardField):
             if not self.name:
                 raise Empty,"Bad vcard ORG value"
         else:
-            sp=value.split(";",1)
+            sp=non_quoted_semicolon_re.split(value,1)
             if len(sp)>1:
-                self.name,self.unit=sp
+                self.name,self.unit=(unquote_semicolon(val) for val in sp)
             else:
-                self.name=sp[0]
+                self.name=unquote_semicolon(sp[0])
                 self.unit=None
     def rfc2426(self):
         """RFC2426-encode the field content.
@@ -935,9 +944,10 @@ class VCardOrg(VCardField):
         :return: the field in the RFC 2426 format.
         :returntype: `str`"""
         if self.unit:
-            return rfc2425encode("org",u"%s;%s" % (self.name,self.unit))
+            return rfc2425encode("org",u';'.join(quote_semicolon(val) for val in
+                                      (self.name,self.unit)))
         else:
-            return rfc2425encode("org",u"%s" % (self.name,))
+            return rfc2425encode("org",unicode(quote_semicolon(self.name)))
     def as_xml(self,parent):
         """Create vcard-tmp XML representation of the field.
 

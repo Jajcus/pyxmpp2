@@ -124,6 +124,12 @@ class TestVCard(unittest.TestCase):
         vc=vcard.VCard(xmldata.getRootElement())
         should_be=file("data/vcard_without_n.txt").read()
         self.failUnlessEqual(vcard2txt(vc),should_be)
+    def test_xml_with_semicolon(self):
+        xmldata = libxml2.parseFile("data/vcard_with_semicolon.xml")
+        vc = vcard.VCard(xmldata.getRootElement())
+        first = vc.rfc2426()
+        second = vcard.VCard(first).rfc2426()
+        self.failUnlessEqual(first, second)
     def test_vcf_input1(self):
         input=file("data/vcard2.vcf").read()
         vc=vcard.VCard(input)
