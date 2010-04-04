@@ -52,6 +52,7 @@ setup(
             "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
             "Operating System :: POSIX",
             "Programming Language :: Python",
+            "Programming Language :: Python :: 2.6",
             "Programming Language :: C",
             "Topic :: Communications",
             "Topic :: Communications :: Chat",
@@ -59,7 +60,7 @@ setup(
             "Topic :: Software Development :: Libraries :: Python Modules",
         ],
     license =   'LGPL',
-    requires = ['libxml2', 'dnspython(>= 1.6.0)'],
+    requires = ['libxml2-python', 'dnspython(>= 1.6.0)'],
 
     ext_modules = ext_modules,
 
