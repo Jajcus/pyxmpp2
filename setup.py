@@ -45,6 +45,7 @@ setup(
     description =   'XMPP/Jabber implementation for Python',
     author =    'Jacek Konieczny',
     author_email =  'jajcus@jajcus.net',
+    download_url = 'http://pyxmpp.jajcus.net/downloads/pyxmpp-{0}.tar.gz'.format(version),
     url =       'http://pyxmpp.jajcus.net/',
     classifiers = [
             "Development Status :: 4 - Beta",
