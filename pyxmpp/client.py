@@ -340,7 +340,7 @@ class Client:
         :Types:
             - `iq`: `pyxmpp.Iq`"""
         fr=iq.get_from()
-        if fr and fr!=self.jid:
+        if fr and fr != self.jid and fr != self.jid.bare():
             resp=iq.make_error_response("forbidden")
             self.stream.send(resp)
             self.__logger.warning("Got roster update from wrong source")
