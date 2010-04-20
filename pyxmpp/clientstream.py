@@ -183,8 +183,14 @@ class ClientStream(Stream):
             if self.version:
                 self._auth_methods_left.pop(0)
                 try:
-                    self._sasl_authenticate(self.my_jid.node, None,
-                            mechanism=method[5:].upper())
+                    mechanism = method[5:].upper()
+                    # A bit hackish, but I'm not sure whether giving authzid won't mess something up
+                    if mechanism != "EXTERNAL":
+                        self._sasl_authenticate(self.my_jid.node, None,
+                                mechanism=mechanism)
+                    else:
+                        self._sasl_authenticate(self.my_jid.node, self.my_jid.bare().as_utf8(),
+                                mechanism=mechanism)
                 except (SASLMechanismNotAvailable,SASLNotAvailable):
                     self.__logger.debug("Skipping unavailable auth method: %s", (method,) )
                     return self._try_auth()

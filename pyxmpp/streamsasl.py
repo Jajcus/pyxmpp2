@@ -377,7 +377,10 @@ class StreamSASLMixIn(sasl.PasswordManager):
         xmlnode.setNs(ns)
         xmlnode.setProp("mechanism",mechanism)
         if initial_response.data:
-            xmlnode.setContent(initial_response.base64())
+            if initial_response.encode:
+                xmlnode.setContent(initial_response.base64())
+            else:
+                xmlnode.setContent(initial_response.data)
 
         self._write_raw(xmlnode.serialize(encoding="UTF-8"))
         xmlnode.unlinkNode()

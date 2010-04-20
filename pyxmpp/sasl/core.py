@@ -195,9 +195,11 @@ class Reply:
 
     :Ivariables:
         - `data`: optional reply data.
+        - `encode`: whether to base64 encode the data or not
     :Types:
-        - `data`: `str`"""
-    def __init__(self,data=""):
+        - `data`: `str`
+        - `encode`; `bool`"""
+    def __init__(self,data="", encode=True):
         """Initialize the `Reply` object.
 
         :Parameters:
@@ -205,6 +207,7 @@ class Reply:
         :Types:
             - `data`: `str`"""
         self.data=data
+        self.encode=encode
 
     def base64(self):
         """Base64-encode the data contained in the reply.
@@ -229,9 +232,9 @@ class Challenge(Reply):
 
 class Response(Reply):
     """The response SASL message (clients's reply the the server's challenge)."""
-    def __init__(self,data=""):
+    def __init__(self,data="", encode=True):
         """Initialize the `Response` object."""
-        Reply.__init__(self,data)
+        Reply.__init__(self,data, encode)
     def __repr__(self):
         return "<sasl.Response: %r>" % (self.data,)
 
@@ -242,14 +245,14 @@ class Failure(Reply):
         - `reason`: the failure reason.
     :Types:
         - `reason`: unicode."""
-    def __init__(self,reason):
+    def __init__(self,reason,encode=True):
         """Initialize the `Failure` object.
 
         :Parameters:
             - `reason`: the failure reason.
         :Types:
             - `reason`: unicode."""
-        Reply.__init__(self,"")
+        Reply.__init__(self,"",encode)
         self.reason=reason
     def __repr__(self):
         return "<sasl.Failure: %r>" % (self.reason,)

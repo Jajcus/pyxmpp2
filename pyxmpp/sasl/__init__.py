@@ -29,8 +29,10 @@ from pyxmpp.sasl.core import Reply,Response,Challenge,Success,Failure,PasswordMa
 
 from pyxmpp.sasl.plain import PlainClientAuthenticator,PlainServerAuthenticator
 from pyxmpp.sasl.digest_md5 import DigestMD5ClientAuthenticator,DigestMD5ServerAuthenticator
+from pyxmpp.sasl.external import ExternalClientAuthenticator
 
-safe_mechanisms_dict={"DIGEST-MD5":(DigestMD5ClientAuthenticator,DigestMD5ServerAuthenticator)}
+safe_mechanisms_dict={"DIGEST-MD5":(DigestMD5ClientAuthenticator,DigestMD5ServerAuthenticator),
+                      "EXTERNAL":(ExternalClientAuthenticator, None)}
 try:
     from pyxmpp.sasl.gssapi import GSSAPIClientAuthenticator
 except ImportError:
