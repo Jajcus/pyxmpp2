@@ -223,10 +223,11 @@ except ImportError:
                         try:
                             self._root.addChild(node1)
                             self._handler.stanza(self._doc, node1)
-                        except:
+                        except Exception, e:
                             node1.unlinkNode()
                             node1.freeNode()
                             del node1
+                            raise e
                     finally:
                         del node
                 finally:
