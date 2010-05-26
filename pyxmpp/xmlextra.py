@@ -25,6 +25,7 @@ import sys
 import libxml2
 import threading
 import re
+import logging
 
 from pyxmpp.exceptions import StreamParseError
 
@@ -34,6 +35,8 @@ COMMON_NS = "http://pyxmpp.jajcus.net/xmlns/common"
 common_ns = common_root.newNs(COMMON_NS, None)
 common_root.setNs(common_ns)
 common_doc.setRootElement(common_root)
+
+logger = logging.getLogger("pyxmpp.xmlextra")
 
 class StreamHandler:
     """Base class for stream handler."""
@@ -114,7 +117,7 @@ class StreamHandler:
         # this is also bad...
         if desc.startswith('xmlns: http://www.xmpp.org/extensions/xep-0084.html#'):
             return
-        print "XML STREAM WARNING:",desc
+        logger.warning("XML STREAM WARNING: {0}".format(desc))
 
 try:
 #########################################################################
