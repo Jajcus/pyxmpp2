@@ -109,8 +109,12 @@ class StreamHandler:
         :Types:
             - `descr`: `str`"""
         # we know vcard-temp is bad...
-        if not desc.startswith('xmlns: URI vcard-temp is not absolute'):
-            print "XML STREAM WARNING:",desc
+        if desc.startswith('xmlns: URI vcard-temp is not absolute'):
+            return
+        # this is also bad...
+        if desc.startswith('xmlns: http://www.xmpp.org/extensions/xep-0084.html#'):
+            return
+        print "XML STREAM WARNING:",desc
 
 try:
 #########################################################################
