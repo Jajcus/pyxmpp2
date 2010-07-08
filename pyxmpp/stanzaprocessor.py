@@ -453,7 +453,7 @@ class StanzaProcessor:
         self.lock.acquire()
         try:
             if not typ:
-                typ=="normal"
+                typ = "normal"
             self.__add_handler(self._message_handlers,typ,namespace,priority,handler)
         finally:
             self.lock.release()
