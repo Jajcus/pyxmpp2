@@ -35,20 +35,19 @@ TODO.pylint:
 	./auxtools/pylint.sh | tee TODO.pylint
 
 ChangeLog: 
-	test -f .svn/entries && make cl-stamp || :
+	test -d .git && make cl-stamp || :
 	
-cl-stamp: .svn/entries
-	TZ=UTC svn log -v --xml \
-		| auxtools/svn2log.py -p '/(branches/[^/]+|trunk)' -x ChangeLog -u auxtools/users -F
+cl-stamp: .git
+	git log > ChangeLog
 	touch cl-stamp
 
 cosmetics:
 	./auxtools/cosmetics.sh
 	
 version:
-	if test -d ".svn" ; then \
+	if test -d ".git" ; then \
 		echo "# pylint: disable-msg=W0103,W0131" > pyxmpp/version.py ; \
-		echo "version='$(VERSION)+svn'" >> pyxmpp/version.py ; \
+		echo "version='$(VERSION)+git'" >> pyxmpp/version.py ; \
 	fi
 
 dist: build ChangeLog
