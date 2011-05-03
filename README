@@ -5,9 +5,9 @@ PyXMPP -- Python Jabber/XMPP implementation
 Introduction
 ------------
 
-PyXMPP is a Python XMPP (RFC 3920,3921) and Jabber
-(http://www.jabber.org/protocol/) implementation. It is based on libxml2 --
-fast and fully-featured XML parser.
+PyXMPP is a Python XMPP (RFC 3920,3921) implementation, including some of the
+well-known extensions. It is based on libxml2 -- fast and fully-featured XML
+parser.
 
 PyXMPP provides most core features of the XMPP protocol and several JSF-defined
 extensions. PyXMPP provides building blocks for creating Jabber clients and
@@ -84,7 +84,7 @@ Contact
 
 PyXMPP was written and is maintained by Jacek Konieczny <jajcus@jajcus.net>.
 
-To report bugs or request features use `the Trac <http://pyxmpp.jajcus.net/trac/>`__.  
+To report bugs or request features use the `GitHub interface <https://github.com/Jajcus/pyxmpp/issues>`__.  
 
 For discussion you may join `the PyXMPP mailing list
 <http://lists.jajcus.net/mailman/listinfo/pyxmpp>`__.
@@ -92,17 +92,10 @@ For discussion you may join `the PyXMPP mailing list
 Download
 --------
 
-Latest releases of PyXMPP may be downloaded from `the files downloads directory
-<http://pyxmpp.jajcus.net/downloads/>`__. There are also
-some `SVN snapshots <http://pyxmpp.jajcus.net/downloads/snapshots/>`__ available.
-
-You can also checkout latest sources directly from the SVN repository::
-svn checkout http://pyxmpp.jajcus.net/svn/pyxmpp/trunk pyxmpp
+Current source code is available via GitHub at: https://github.com/Jajcus/pyxmpp
 
 Licence
 -------
 
 PyXMPP is free software, licenced under the GNU LGPL. See the
 COPYING file for details.
-
-.. $Id$
