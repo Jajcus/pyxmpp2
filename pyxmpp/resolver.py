@@ -34,6 +34,23 @@ import dns.exception
 import random
 from encodings import idna
 
+# check IPv6 support
+try:
+    socket.socket(AF_INET6)
+except socket.error:
+    default_address_family = AF_INET
+else:
+    default_address_family = AF_UNSPEC
+
+def set_default_address_family(family):
+    """Select default address family.
+
+    :Parameters:
+      - `family`: `AF_INET` for IPv4, `AF_INET6` for IPv6 and `AF_UNSPEC` for
+        dual stack."""
+    global default_address_family
+    default_address_family = family
+
 service_aliases={"xmpp-server": ("jabber-server","jabber")}
 
 # should match all valid IP addresses, but can pass some false-positives,
@@ -124,7 +141,7 @@ def resolve_srv(domain,service, proto="tcp"):
         return [(rr.target.to_text(),rr.port) for rr in reorder_srv(r)]
     return None
 
-def getaddrinfo(host, port, family= AF_UNSPEC,
+def getaddrinfo(host, port, family = None,
                 socktype = socket.SOCK_STREAM, proto = 0, allow_cname = True):
     """Resolve host and port into addrinfo struct.
 
@@ -133,8 +150,8 @@ def getaddrinfo(host, port, family= AF_UNSPEC,
     :Parameters:
         - `host`: service domain name.
         - `port`: service port number or name.
-        - `family`: address family (`AF_INET` for IPv4, 
-           `AF_INET6` for IPv6 or `AF_UNSPEC` for either).
+        - `family`: address family (`AF_INET` for IPv4, `AF_INET6` for IPv6 or
+          `AF_UNSPEC` for either, `None` for the auto-configured default).
         - `socktype`: socket type.
         - `proto`: protocol number or name.
         - `allow_cname`: when False CNAME responses are not allowed.
@@ -148,6 +165,8 @@ def getaddrinfo(host, port, family= AF_UNSPEC,
 
     :return: list of (family, socktype, proto, canonname, sockaddr).
     :returntype: `list` of (`int`, `int`, `int`, `str`, (`str`, `int`))"""
+    if family is None:
+        family = default_address_family
     ret=[]
     if proto==0:
         proto=socket.getprotobyname("tcp")

@@ -196,7 +196,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
             if type(addr) in (str, unicode):
                 self.state_change("resolving",addr)
             s=None
-            for res in resolver.getaddrinfo(addr,port,0,socket.SOCK_STREAM):
+            for res in resolver.getaddrinfo(addr, port, None, socket.SOCK_STREAM):
                 family, socktype, proto, _unused, sockaddr = res
                 try:
                     s=socket.socket(family,socktype,proto)
