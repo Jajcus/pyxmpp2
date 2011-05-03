@@ -2,3 +2,7 @@
 build
 tests/pyxmpp
 examples/pyxmpp
+ChangeLog
+MANIFEST
+cl-stamp
+dist/
