@@ -1,0 +1,4 @@
+*.pyc
+build
+tests/pyxmpp
+examples/pyxmpp
