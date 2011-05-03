@@ -23,7 +23,6 @@ import pyxmpp.jabberd.all
 
 (imports all important names into pyxmpp.jabberd namespace)"""
 
-__revision__="$Id: __init__.py 477 2004-12-29 13:25:42Z jajcus $"
 __docformat__="restructuredtext en"
 
 import pyxmpp.jabberd

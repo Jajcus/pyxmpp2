@@ -21,7 +21,6 @@ Normative reference:
   - `XEP-0178 <http://xmpp.org/extensions/xep-0178.html#c2s>__`
 """
 
-__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import base64

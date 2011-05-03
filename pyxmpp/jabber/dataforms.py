@@ -20,7 +20,6 @@ Normative reference:
   - `JEP 4 <http://www.jabber.org/jeps/jep-0004.html>`__
 """
 
-__revision__="$Id: disco.py 513 2005-01-09 16:34:00Z jajcus $"
 __docformat__="restructuredtext en"
 
 import copy

@@ -23,7 +23,6 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id: xmppstringprep.py,v 1.16 2004/10/07 22:28:04 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import stringprep

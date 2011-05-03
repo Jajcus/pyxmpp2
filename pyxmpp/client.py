@@ -21,7 +21,6 @@ Normative reference:
   - `RFC 3921 <http://www.ietf.org/rfc/rfc3921.txt>`__
 """
 
-__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import threading

@@ -20,7 +20,6 @@ Normative reference:
   - `JEP 78 <http://www.jabber.org/jeps/jep-0078.html>`__
 """
 
-__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import hashlib

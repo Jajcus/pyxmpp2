@@ -1505,7 +1505,6 @@ PyObject *m, *d;
 	d = PyModule_GetDict(m);
 	MyError = PyErr_NewException("_xmlextra.error", NULL, NULL);
 	PyDict_SetItemString(d, "error", MyError);
-	PyDict_SetItemString(d, "__revision__", PyString_FromString("$Id: xmlextra.c,v 1.6 2004/10/04 13:01:18 jajcus Exp $"));
 	PyDict_SetItemString(d, "__docformat__", PyString_FromString("restructuredtext en"));
 	PyDict_SetItemString(d, "__doc__", 
 			PyString_FromString("Special libxml2 extensions for PyXMPP internal use."));

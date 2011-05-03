@@ -18,7 +18,6 @@
 
 """Simple API for simple things like sendig messages or single stanzas."""
 
-__revision__="$Id: client.py 528 2005-01-20 21:14:53Z jajcus $"
 __docformat__="restructuredtext en"
 
 def xmpp_do(jid,password,function,server=None,port=None):

@@ -25,7 +25,6 @@ import pyxmpp.all
 
 """PyXMPP - Jabber/XMPP protocol implementation"""
 
-__revision__="$Id: __init__.py 477 2004-12-29 13:25:42Z jajcus $"
 __docformat__="restructuredtext en"
 
 import pyxmpp

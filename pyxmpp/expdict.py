@@ -17,7 +17,6 @@
 
 """Dictionary with item expiration."""
 
-__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import time

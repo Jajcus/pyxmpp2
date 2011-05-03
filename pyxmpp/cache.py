@@ -21,7 +21,6 @@ This package provides facilities to retrieve and transparently cache
 cachable objects like Service Discovery responses or e.g. client version
 informations."""
 
-__revision__ = "$Id$"
 __docformat__ = "restructuredtext en"
 
 import threading

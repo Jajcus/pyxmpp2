@@ -24,7 +24,6 @@ Normative reference:
 """
 
 
-__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import base64

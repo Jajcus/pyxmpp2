@@ -19,7 +19,6 @@
 Normative reference:
   - `RFC 2222 <http://www.ietf.org/rfc/rfc2222.txt>`__
 """
-__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import random

@@ -17,7 +17,6 @@
 
 """JSF defined XMPP extension and legacy Jabber protocol elements"""
 
-__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 # vi: sts=4 et sw=4

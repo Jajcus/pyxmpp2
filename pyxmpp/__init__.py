@@ -66,7 +66,6 @@ method as_xml() providing their XML representations.
 """
 
 
-__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 # vi: sts=4 et sw=4

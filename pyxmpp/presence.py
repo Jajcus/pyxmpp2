@@ -21,7 +21,6 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
-__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import libxml2

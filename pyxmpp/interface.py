@@ -23,7 +23,6 @@ defined here.
 
 When full ZopeInterfaces API is needed impoer zope.interface instead of this module."""
 
-__revision__="$Id: utils.py 647 2006-08-26 18:27:39Z jajcus $"
 
 try:
     from zope.interface import Interface, Attribute, providedBy, implementedBy, implements

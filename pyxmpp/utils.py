@@ -17,7 +17,6 @@
 
 """Utility functions for the pyxmpp package."""
 
-__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import sys

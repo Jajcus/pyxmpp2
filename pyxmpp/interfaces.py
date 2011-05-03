@@ -17,7 +17,6 @@
 
 """Interfaces for flexible API extensions."""
 
-__revision__ = "$Id: error.py 647 2006-08-26 18:27:39Z jajcus $"
 __docformat__ = "restructuredtext en"
 
 from pyxmpp.interface import Interface, Attribute

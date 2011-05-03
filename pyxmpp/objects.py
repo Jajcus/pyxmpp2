@@ -18,7 +18,6 @@
 
 """General base classes for PyXMPP objects."""
 
-__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import libxml2

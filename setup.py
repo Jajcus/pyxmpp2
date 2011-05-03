@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# $Id: setup.py,v 1.14 2004/06/02 21:20:16 jajcus Exp $
 
 import os.path
 import sys

@@ -22,7 +22,6 @@ Normative reference:
   - `JEP 86 <http://www.jabber.org/jeps/jep-0086.html>`__
 """
 
-__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import libxml2

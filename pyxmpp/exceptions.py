@@ -20,7 +20,6 @@
 This module defines all exceptions raised by PyXMPP.
 """
 
-__revision__="$Id: error.py 647 2006-08-26 18:27:39Z jajcus $"
 __docformat__="restructuredtext en"
 
 import logging

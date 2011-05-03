@@ -20,7 +20,6 @@ Normative reference:
   - `RFC 2831 <http://www.ietf.org/rfc/rfc2831.txt>`__
 """
 
-__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 from binascii import b2a_hex

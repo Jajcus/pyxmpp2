@@ -21,7 +21,6 @@ Normative reference:
   - `JEP 77 <http://www.jabber.org/jeps/jep-0077.html>`__
 """
 
-__revision__="$Id: delay.py 567 2005-03-29 20:08:55Z jajcus $"
 __docformat__="restructuredtext en"
 
 import libxml2

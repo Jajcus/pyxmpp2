@@ -20,7 +20,6 @@ Normative reference:
   - `RFC 4752 <http://www.ietf.org/rfc/rfc4752.txt>`__
 """
 
-__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import base64

@@ -21,7 +21,6 @@ This is minimal Zope Interfaces API implementation, as required by PyXMPP, not a
 
 If zope.interface package is available it will be used instead of this one. Never import this module directly."""
 
-__revision__="$Id: utils.py 647 2006-08-26 18:27:39Z jajcus $"
 __docformat__="restructuredtext en"
 
 import sys

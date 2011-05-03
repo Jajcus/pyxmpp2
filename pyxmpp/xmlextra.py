@@ -18,7 +18,6 @@
 
 """Extension to libxml2 for XMPP stream and stanza processing"""
 
-__revision__="$Id: xmlextra.py,v 1.15 2004/10/11 18:33:51 jajcus Exp $"
 __docformat__="restructuredtext en"
 
 import sys

@@ -21,7 +21,6 @@ Normative reference:
   - `JEP 30 <http://www.jabber.org/jeps/jep-0030.html>`__
 """
 
-__revision__="$Id$"
 __docformat__="restructuredtext en"
 
 import warnings
