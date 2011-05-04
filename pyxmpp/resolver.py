@@ -104,11 +104,12 @@ def reorder_srv(records):
             tmp.append(rr)
             continue
         ret+=shuffle_srv(tmp)
+        tmp = [rr]
     if tmp:
         ret+=shuffle_srv(tmp)
     return ret
 
-def resolve_srv(domain,service, proto="tcp"):
+def resolve_srv(domain, service, proto="tcp"):
     """Resolve service domain to server name and port number using SRV records.
 
     A built-in service alias table will be used to lookup also some obsolete
