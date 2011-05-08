@@ -50,7 +50,7 @@ version:
 		echo "version='$(VERSION)+git'" >> pyxmpp/version.py ; \
 	fi
 
-dist: build ChangeLog
+dist: build ChangeLog doc
 	-rm -f MANIFEST
 	echo "version='$(VERSION)$(SNAPSHOT)'" > pyxmpp/version.py
 	python setup.py sdist
