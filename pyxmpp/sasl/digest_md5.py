@@ -338,8 +338,8 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         params.append('qop=auth')
 
         serv_type=self.password_manager.get_serv_type().encode("us-ascii")
-        host=self.password_manager.get_serv_host().encode("us-ascii")
-        serv_name=self.password_manager.get_serv_name().encode("us-ascii")
+        host=self.password_manager.get_serv_host().encode("idna")
+        serv_name=self.password_manager.get_serv_name().encode("utf-8")
 
         if serv_name and serv_name != host:
             digest_uri="%s/%s/%s" % (serv_type,host,serv_name)

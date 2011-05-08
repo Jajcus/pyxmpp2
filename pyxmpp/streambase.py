@@ -36,7 +36,7 @@ import logging
 
 from pyxmpp import xmlextra
 from pyxmpp.expdict import ExpiringDictionary
-from pyxmpp.utils import to_utf8
+from pyxmpp.utils import to_utf8, from_utf8
 from pyxmpp.stanza import Stanza
 from pyxmpp.error import StreamErrorNode
 from pyxmpp.iq import Iq
@@ -184,7 +184,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
     def _connect(self, addr, port, service = None, to = None):
         """Same as `Stream.connect` but assume `self.lock` is acquired."""
         if to is None:
-            to = str(addr)
+            to = from_utf8(addr)
         allow_cname = True
         if service is not None:
             self.state_change("resolving srv", (addr, service))
@@ -239,7 +239,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
         self.addr=addr
         self.port=port
-        self._connect_socket(s,to)
+        self._connect_socket(s, to)
         self.last_keepalive=time.time()
 
     def accept(self,sock,myname):
@@ -354,9 +354,9 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         to_from_mismatch=0
         if self.initiator:
             self.stream_id=r.prop("id")
-            peer=r.prop("from")
+            peer = from_utf8(r.prop("from"))
             if peer:
-                peer=JID(peer)
+                peer = JID(peer)
             if self.peer:
                 if peer and peer!=self.peer:
                     self.__logger.debug("peer hostname mismatch:"
@@ -365,7 +365,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
             else:
                 self.peer=peer
         else:
-            to=r.prop("to")
+            to = from_utf8(r.prop("to"))
             if to:
                 to=self.check_to(to)
                 if not to:

@@ -31,7 +31,6 @@ import dns.resolver
 import dns.name
 import dns.exception
 import random
-from encodings import idna
 import logging
 
 from .exceptions import DNSError, UnexpectedCNAMEError
@@ -136,7 +135,8 @@ def resolve_srv(domain, service, proto="tcp"):
         for a in service_aliases[service]:
             names_to_try.append(u"_%s._%s.%s" % (a,proto,domain))
     for name in names_to_try:
-        name = idna.ToASCII(name)
+        if isinstance(name, unicode):
+            name = name.encode("idna")
         try:
             r = dns.resolver.query(name, 'SRV')
         except dns.exception.DNSException, err:
@@ -188,7 +188,8 @@ def getaddrinfo(host, port, family = None,
         return [(AF_INET, socktype, proto, host, (host, port))]
     if ipv6_re.match(host) and family in (AF_UNSPEC, AF_INET6):
         return [(AF_INET6, socktype, proto, host, (host, port))]
-    host=idna.ToASCII(host)
+    if isinstance(host, unicode):
+        host = host.encode("idna")
     rtypes = []
     if family in (AF_UNSPEC, AF_INET6):
         rtypes.append(("AAAA", AF_INET6))
