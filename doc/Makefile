@@ -6,7 +6,7 @@ EPYDOC=epydoc
 WEBFILES=www/index.html www/CHANGES.html www/ChangeLog.html \
 	www/style.css
 
-RST2HTML=rst2html.py
+RST2HTML=rst2html
 
 all: doc
 
