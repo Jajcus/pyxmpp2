@@ -55,6 +55,14 @@ class StreamParseError(FatalStreamError):
     """Raised when invalid XML is received in an XMPP stream."""
     pass
 
+class DNSError(FatalStreamError):
+    """Raised when no host name could be resolved for the target."""
+    pass
+
+class UnexpectedCNAMEError(DNSError):
+    """Raised when CNAME record was found when A or AAAA was expected."""
+    pass
+
 class StreamAuthenticationError(FatalStreamError):
     """Raised when stream authentication fails."""
     pass

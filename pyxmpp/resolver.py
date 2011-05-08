@@ -32,6 +32,11 @@ import dns.name
 import dns.exception
 import random
 from encodings import idna
+import logging
+
+from .exceptions import DNSError, UnexpectedCNAMEError
+
+logger = logging.getLogger("pyxmpp.resolver")
 
 # check IPv6 support
 try:
@@ -131,10 +136,12 @@ def resolve_srv(domain, service, proto="tcp"):
         for a in service_aliases[service]:
             names_to_try.append(u"_%s._%s.%s" % (a,proto,domain))
     for name in names_to_try:
-        name=idna.ToASCII(name)
+        name = idna.ToASCII(name)
         try:
-            r=dns.resolver.query(name, 'SRV')
-        except dns.exception.DNSException:
+            r = dns.resolver.query(name, 'SRV')
+        except dns.exception.DNSException, err:
+            logger.warning("Could not resolve %r: %s", name, 
+                                                    err.__class__.__name__)
             continue
         if not r:
             continue
@@ -145,7 +152,8 @@ def getaddrinfo(host, port, family = None,
                 socktype = socket.SOCK_STREAM, proto = 0, allow_cname = True):
     """Resolve host and port into addrinfo struct.
 
-    Does the same thing as socket.getaddrinfo, but using `dns.resolver`.
+    Does the same thing as socket.getaddrinfo, but using `dns.resolver`,
+    so the cache content from the SRV query can be used.
 
     :Parameters:
         - `host`: service domain name.
@@ -196,14 +204,16 @@ def getaddrinfo(host, port, family = None,
         except dns.exception.DNSException, err:
             exception = err
             continue
-        if not allow_cname and r.rrset.name!=dns.name.from_text(host):
-            raise ValueError,"Unexpected CNAME record found for %s" % (host,)
+        if not allow_cname and r.rrset.name != dns.name.from_text(host):
+            raise UnexpectedCNAMEError, (
+                    "Unexpected CNAME record found for %r" % (host,))
         if r:
             for rr in r:
                 ret.append((rfamily, socktype, proto, r.rrset.name,
                                                         (rr.to_text(),port)))
     if not ret and exception:
-        raise exception
+        raise DNSError, "Could not resolve %r: %s" % (host,
+                                                exception.__class__.__name__)
     return ret
 
 # vi: sts=4 et sw=4

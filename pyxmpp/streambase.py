@@ -45,7 +45,9 @@ from pyxmpp.message import Message
 from pyxmpp.jid import JID
 from pyxmpp import resolver
 from pyxmpp.stanzaprocessor import StanzaProcessor
-from pyxmpp.exceptions import StreamError, StreamEncryptionRequired, HostMismatch, ProtocolError
+from pyxmpp.exceptions import StreamError, StreamEncryptionRequired
+from pyxmpp.exceptions import HostMismatch, ProtocolError
+from pyxmpp.exceptions import DNSError, UnexpectedCNAMEError
 from pyxmpp.exceptions import FatalStreamError, StreamParseError, StreamAuthenticationError
 
 STREAM_NS="http://etherx.jabber.org/streams"
@@ -179,30 +181,48 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         finally:
             self.lock.release()
 
-    def _connect(self,addr,port,service=None,to=None):
+    def _connect(self, addr, port, service = None, to = None):
         """Same as `Stream.connect` but assume `self.lock` is acquired."""
         if to is None:
-            to=str(addr)
+            to = str(addr)
+        allow_cname = True
         if service is not None:
-            self.state_change("resolving srv",(addr,service))
-            addrs=resolver.resolve_srv(addr,service)
+            self.state_change("resolving srv", (addr, service))
+            addrs = resolver.resolve_srv(addr, service)
             if not addrs:
-                addrs=[(addr,port)]
+                addrs = [(addr, port)]
+            else:
+                allow_cname = False
         else:
-            addrs=[(addr,port)]
-        msg=None
-        for addr,port in addrs:
+            addrs=[(addr, port)]
+        exception = None
+        for addr, port in addrs:
             if type(addr) in (str, unicode):
-                self.state_change("resolving",addr)
+                self.state_change("resolving", addr)
             s=None
-            for res in resolver.getaddrinfo(addr, port, None, socket.SOCK_STREAM):
+            while True:
+                try:
+                    addresses = resolver.getaddrinfo(addr, port, None,
+                                socket.SOCK_STREAM, allow_cname = allow_cname)
+                    break
+                except UnexpectedCNAMEError, err:
+                    self.__logger.warning(str(err))
+                    allow_cname = True
+                    continue
+                except DNSError, err:
+                    self.__logger.debug(str(err))
+                    exception = err
+                    addresses = []
+                    break
+            for res in addresses:
                 family, socktype, proto, _unused, sockaddr = res
                 try:
                     s=socket.socket(family,socktype,proto)
                     self.state_change("connecting",sockaddr)
                     s.connect(sockaddr)
                     self.state_change("connected",sockaddr)
-                except socket.error, msg:
+                except socket.error, err:
+                    exception = err
                     self.__logger.debug("Connect to %r failed" % (sockaddr,))
                     if s:
                         s.close()
@@ -212,8 +232,8 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
             if s:
                 break
         if not s:
-            if msg:
-                raise socket.error, msg
+            if exception:
+                raise exception
             else:
                 raise FatalStreamError,"Cannot connect"
 
