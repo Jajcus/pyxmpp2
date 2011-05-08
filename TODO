@@ -12,4 +12,3 @@ other:
 - jabber:iq:version
 - jabberd 2.0 component stream support
 - jabber:iq:search
-- add Zope3 interfaces support (with no strict requirement for zope.interface)
