@@ -148,7 +148,9 @@ class StreamTLSMixIn:
         try:
             while self.socket:
                 try:
-                    self.socket.send(data)
+                    while data:
+                        sent = self.socket.send(data)
+                        data = data[sent:]
                 except SSLError, err:
                     if err.args[0] == ssl.SSL_ERROR_WANT_WRITE:
                         continue

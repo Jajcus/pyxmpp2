@@ -522,7 +522,9 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         """Same as `Stream.write_raw` but assume `self.lock` is acquired."""
         logging.getLogger("pyxmpp.Stream.out").debug("OUT: %r",data)
         try:
-            self.socket.send(data)
+            while data:
+                sent = self.socket.send(data)
+                data = data[sent:]
         except (IOError,OSError,socket.error),e:
             raise FatalStreamError("IO Error: "+str(e))
 
