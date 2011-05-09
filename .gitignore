@@ -1,7 +1,7 @@
 *.pyc
 build
-tests/pyxmpp
-examples/pyxmpp
+tests/pyxmpp2
+examples/pyxmpp2
 ChangeLog
 MANIFEST
 cl-stamp
