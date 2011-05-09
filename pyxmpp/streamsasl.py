@@ -22,14 +22,16 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import base64
 import logging
 
-from pyxmpp.jid import JID
-from pyxmpp import sasl
-from pyxmpp.exceptions import StreamAuthenticationError, SASLNotAvailable, SASLMechanismNotAvailable, SASLAuthenticationFailed
+from .jid import JID
+from . import sasl
+from .exceptions import StreamAuthenticationError, SASLNotAvailable, SASLMechanismNotAvailable, SASLAuthenticationFailed
 
 SASL_NS="urn:ietf:params:xml:ns:xmpp-sasl"
 

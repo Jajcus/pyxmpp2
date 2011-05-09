@@ -3,8 +3,8 @@
 
 import unittest
 import libxml2
-from pyxmpp.presence import Presence
-from pyxmpp.jid import JID
+from pyxmpp2.presence import Presence
+from pyxmpp2.jid import JID
 
 presence1 = """
 <presence xmlns="jabber:client" from='source@example.com/res' to='dest@example.com' id='1'>

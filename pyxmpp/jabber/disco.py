@@ -21,19 +21,21 @@ Normative reference:
   - `JEP 30 <http://www.jabber.org/jeps/jep-0030.html>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import warnings
 
 import libxml2
 
-from pyxmpp.xmlextra import common_doc,common_root
-from pyxmpp.jid import JID
-from pyxmpp import cache
+from ..xmlextra import common_doc,common_root
+from ..jid import JID
+from .. import cache
 
-from pyxmpp.utils import to_utf8
-from pyxmpp.objects import StanzaPayloadWrapperObject
-from pyxmpp.exceptions import ProtocolError
+from ..utils import to_utf8
+from ..objects import StanzaPayloadWrapperObject
+from ..exceptions import ProtocolError
 
 DISCO_NS="http://jabber.org/protocol/disco"
 DISCO_ITEMS_NS=DISCO_NS+"#items"
@@ -821,7 +823,7 @@ class DiscoCacheFetcherBase(cache.CacheFetcher):
     disco_class=None
     def fetch(self):
         """Initialize the Service Discovery process."""
-        from pyxmpp.iq import Iq
+        from ..iq import Iq
         jid,node = self.address
         iq = Iq(to_jid = jid, stanza_type = "get")
         disco = self.disco_class(node)
@@ -853,7 +855,7 @@ class DiscoCacheFetcherBase(cache.CacheFetcher):
         try:
             self.error(stanza.get_error())
         except ProtocolError:
-            from pyxmpp.error import StanzaErrorNode
+            from ..error import StanzaErrorNode
             self.error(StanzaErrorNode("undefined-condition"))
 
     def __timeout(self,stanza):

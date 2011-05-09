@@ -21,17 +21,19 @@ Normative reference:
   - `JEP 114 <http://www.jabber.org/jeps/jep-0114.html>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import hashlib
 
 import logging
 
-from pyxmpp.stream import Stream
-from pyxmpp.streambase import stanza_factory,HostMismatch
-from pyxmpp.xmlextra import common_doc,common_root
-from pyxmpp.utils import to_utf8
-from pyxmpp.exceptions import StreamError,FatalStreamError,ComponentStreamError,FatalComponentStreamError
+from ..stream import Stream
+from ..streambase import stanza_factory,HostMismatch
+from ..xmlextra import common_doc,common_root
+from ..utils import to_utf8
+from ..exceptions import StreamError,FatalStreamError,ComponentStreamError,FatalComponentStreamError
 
 class ComponentStream(Stream):
     """Handles jabberd component (jabber:component:accept) connection stream.

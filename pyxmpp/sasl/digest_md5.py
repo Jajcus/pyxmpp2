@@ -20,6 +20,8 @@ Normative reference:
   - `RFC 2831 <http://www.ietf.org/rfc/rfc2831.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 from binascii import b2a_hex
@@ -28,10 +30,10 @@ import logging
 
 import hashlib
 
-from pyxmpp.sasl.core import ClientAuthenticator,ServerAuthenticator
-from pyxmpp.sasl.core import Failure,Response,Challenge,Success,Failure
+from .core import ClientAuthenticator,ServerAuthenticator
+from .core import Failure,Response,Challenge,Success,Failure
 
-from pyxmpp.utils import to_utf8,from_utf8
+from ..utils import to_utf8,from_utf8
 
 quote_re=re.compile(r"(?<!\\)\\(.)")
 

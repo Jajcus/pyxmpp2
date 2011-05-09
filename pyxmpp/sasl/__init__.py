@@ -20,20 +20,22 @@ Normative reference:
   - `RFC 2222 <http://www.ietf.org/rfc/rfc2222.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import random
 
-from pyxmpp.sasl.core import Reply,Response,Challenge,Success,Failure,PasswordManager
+from .core import Reply,Response,Challenge,Success,Failure,PasswordManager
 
-from pyxmpp.sasl.plain import PlainClientAuthenticator,PlainServerAuthenticator
-from pyxmpp.sasl.digest_md5 import DigestMD5ClientAuthenticator,DigestMD5ServerAuthenticator
-from pyxmpp.sasl.external import ExternalClientAuthenticator
+from .plain import PlainClientAuthenticator,PlainServerAuthenticator
+from .digest_md5 import DigestMD5ClientAuthenticator,DigestMD5ServerAuthenticator
+from .external import ExternalClientAuthenticator
 
 safe_mechanisms_dict={"DIGEST-MD5":(DigestMD5ClientAuthenticator,DigestMD5ServerAuthenticator),
                       "EXTERNAL":(ExternalClientAuthenticator, None)}
 try:
-    from pyxmpp.sasl.gssapi import GSSAPIClientAuthenticator
+    from .gssapi import GSSAPIClientAuthenticator
 except ImportError:
     pass # Kerberos not available
 else:

@@ -22,6 +22,8 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import socket
@@ -33,10 +35,10 @@ import warnings
 import inspect
 from ssl import SSLError
 
-from pyxmpp.streambase import StreamBase,STREAM_NS
-from pyxmpp.streambase import FatalStreamError,StreamEncryptionRequired
-from pyxmpp.exceptions import TLSNegotiationFailed, TLSError, TLSNegotiatedButNotAvailableError
-from pyxmpp.jid import JID
+from .streambase import StreamBase,STREAM_NS
+from .streambase import FatalStreamError,StreamEncryptionRequired
+from .exceptions import TLSNegotiationFailed, TLSError, TLSNegotiatedButNotAvailableError
+from .jid import JID
 
 TLS_NS="urn:ietf:params:xml:ns:xmpp-tls"
 

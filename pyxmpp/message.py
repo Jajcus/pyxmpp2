@@ -21,12 +21,14 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import libxml2
-from pyxmpp.stanza import Stanza
-from pyxmpp.utils import to_utf8,from_utf8
-from pyxmpp.xmlextra import common_ns
+from .stanza import Stanza
+from .utils import to_utf8,from_utf8
+from .xmlextra import common_ns
 
 message_types=("normal","chat","headline","error","groupchat")
 

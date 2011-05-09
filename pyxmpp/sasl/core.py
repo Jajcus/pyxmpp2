@@ -19,6 +19,9 @@
 Normative reference:
   - `RFC 2222 <http://www.ietf.org/rfc/rfc2222.txt>`__
 """
+
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import random

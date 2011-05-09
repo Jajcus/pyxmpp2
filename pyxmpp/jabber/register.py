@@ -21,17 +21,19 @@ Normative reference:
   - `JEP 77 <http://www.jabber.org/jeps/jep-0077.html>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import libxml2
 import logging
 
-from pyxmpp.utils import to_utf8,from_utf8
-from pyxmpp.xmlextra import get_node_ns_uri
-from pyxmpp.objects import StanzaPayloadObject
-from pyxmpp.xmlextra import xml_element_iter
+from ..utils import to_utf8,from_utf8
+from ..xmlextra import get_node_ns_uri
+from ..objects import StanzaPayloadObject
+from ..xmlextra import xml_element_iter
 
-from pyxmpp.jabber.dataforms import DATAFORM_NS, Form
+from .dataforms import DATAFORM_NS, Form
 
 REGISTER_NS="jabber:iq:register"
 

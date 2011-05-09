@@ -22,29 +22,17 @@ else:
     else:
         include_dirs = ['/usr/include/libxml2','/usr/local/include/libxml2']
         library_dirs = []
-    ext_modules = [
-        Extension(
-            'pyxmpp._xmlextra',
-            [
-            'ext/xmlextra.c',
-            ],
-            libraries =     ['xml2'],
-            library_dirs = library_dirs,
-            include_dirs =  include_dirs,
-            extra_compile_args = [],
-        ),
-    ]
 
 
 #-- Let distutils do the rest
 setup(
     #-- Package description
-    name =      'pyxmpp',
+    name =      'pyxmpp2',
     version =   version,
     description =   'XMPP/Jabber implementation for Python',
     author =    'Jacek Konieczny',
     author_email =  'jajcus@jajcus.net',
-    download_url = 'https://github.com/downloads/Jajcus/pyxmpp/pyxmpp-{0}.tar.gz'.format(version),
+    download_url = 'https://github.com/downloads/Jajcus/pyxmpp2/pyxmpp-{0}.tar.gz'.format(version),
     url =       'http://pyxmpp.jajcus.net/',
     classifiers = [
             "Development Status :: 4 - Beta",
@@ -60,16 +48,14 @@ setup(
             "Topic :: Software Development :: Libraries :: Python Modules",
         ],
     license =   'LGPL',
-    requires = ['libxml2_python', 'dnspython(>= 1.6.0)'],
-
-    ext_modules = ext_modules,
-
+    requires = ['dnspython(>= 1.6.0)'],
+    package_dir = {'pyxmpp2': 'pyxmpp'},
     #-- Python modules
     packages = [
-        'pyxmpp',
-        'pyxmpp.jabber',
-        'pyxmpp.jabberd',
-        'pyxmpp.sasl',
+        'pyxmpp2',
+        'pyxmpp2.jabber',
+        'pyxmpp2.jabberd',
+        'pyxmpp2.sasl',
     ],
 )
 

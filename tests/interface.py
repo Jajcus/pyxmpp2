@@ -3,8 +3,8 @@
 
 import unittest
 
-import pyxmpp.interface
-import pyxmpp.interface_micro_impl
+import pyxmpp2.interface
+import pyxmpp2.interface_micro_impl
 
 try:
     import zope.interface

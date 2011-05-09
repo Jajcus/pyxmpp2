@@ -20,18 +20,20 @@ Normative reference:
   - `JEP 45 <http://www.jabber.org/jeps/jep-0045.html>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import libxml2
 
-from pyxmpp.utils import to_utf8,from_utf8
-from pyxmpp.xmlextra import common_doc, common_root, common_ns, get_node_ns_uri
-from pyxmpp.presence import Presence
-from pyxmpp.iq import Iq
-from pyxmpp.jid import JID
-from pyxmpp import xmlextra
-from pyxmpp.objects import StanzaPayloadWrapperObject
-from pyxmpp.xmlextra import xml_element_iter
+from ..utils import to_utf8,from_utf8
+from ..xmlextra import common_doc, common_root, common_ns, get_node_ns_uri
+from ..presence import Presence
+from ..iq import Iq
+from ..jid import JID
+from .. import xmlextra
+from ..objects import StanzaPayloadWrapperObject
+from ..xmlextra import xml_element_iter
 
 MUC_NS="http://jabber.org/protocol/muc"
 MUC_USER_NS=MUC_NS+"#user"

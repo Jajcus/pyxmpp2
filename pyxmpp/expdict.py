@@ -17,6 +17,8 @@
 
 """Dictionary with item expiration."""
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import time

@@ -20,16 +20,18 @@ Normative reference:
   - `JEP 4 <http://www.jabber.org/jeps/jep-0004.html>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import copy
 import libxml2
 import warnings
-from pyxmpp.objects import StanzaPayloadObject
-from pyxmpp.utils import from_utf8, to_utf8
-from pyxmpp.xmlextra import xml_element_ns_iter
-from pyxmpp.jid import JID
-from pyxmpp.exceptions import BadRequestProtocolError
+from ..objects import StanzaPayloadObject
+from ..utils import from_utf8, to_utf8
+from ..xmlextra import xml_element_ns_iter
+from ..jid import JID
+from ..exceptions import BadRequestProtocolError
 
 DATAFORM_NS = "jabber:x:data"
 

@@ -23,11 +23,13 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import stringprep
 import unicodedata
-from pyxmpp.exceptions import StringprepError
+from .exceptions import StringprepError
 
 class LookupFunction:
     """Class for looking up RFC 3454 tables using function.

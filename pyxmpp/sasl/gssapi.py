@@ -20,6 +20,8 @@ Normative reference:
   - `RFC 4752 <http://www.ietf.org/rfc/rfc4752.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import base64
@@ -27,7 +29,7 @@ import kerberos
 
 import logging
 
-from pyxmpp.sasl.core import (ClientAuthenticator,Failure,Response,Challenge,Success)
+from .core import (ClientAuthenticator,Failure,Response,Challenge,Success)
 
 class GSSAPIClientAuthenticator(ClientAuthenticator):
     """Provides client-side GSSAPI SASL (Kerberos 5) authentication."""

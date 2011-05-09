@@ -13,8 +13,8 @@ import logging
 import locale
 import codecs
 
-from pyxmpp.all import JID,Iq,Presence,Message,StreamError
-from pyxmpp.jabber.client import JabberClient
+from pyxmpp2.all import JID,Iq,Presence,Message,StreamError
+from pyxmpp2.jabber.client import JabberClient
 
 class Client(JabberClient):
     """Simple bot (client) example. Uses `pyxmpp.jabber.client.JabberClient`

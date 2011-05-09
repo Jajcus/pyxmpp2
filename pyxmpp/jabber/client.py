@@ -23,19 +23,21 @@ Normative reference:
   - `JEP 30 <http://www.jabber.org/jeps/jep-0030.html>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import logging
 
-from pyxmpp.jabber.clientstream import LegacyClientStream
-from pyxmpp.jabber.disco import DISCO_ITEMS_NS,DISCO_INFO_NS
-from pyxmpp.jabber.disco import DiscoInfo,DiscoItems,DiscoIdentity
-from pyxmpp.jabber import disco
-from pyxmpp.client import Client
-from pyxmpp.stanza import Stanza
-from pyxmpp.cache import CacheSuite
-from pyxmpp.utils import from_utf8
-from pyxmpp.interfaces import IFeaturesProvider
+from .clientstream import LegacyClientStream
+from .disco import DISCO_ITEMS_NS,DISCO_INFO_NS
+from .disco import DiscoInfo,DiscoItems,DiscoIdentity
+from . import disco
+from ..client import Client
+from ..stanza import Stanza
+from ..cache import CacheSuite
+from ..utils import from_utf8
+from ..interfaces import IFeaturesProvider
 
 class JabberClient(Client):
     """Base class for a Jabber client.

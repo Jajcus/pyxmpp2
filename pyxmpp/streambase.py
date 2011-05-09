@@ -22,6 +22,8 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import libxml2
@@ -34,21 +36,21 @@ import errno
 import logging
 
 
-from pyxmpp import xmlextra
-from pyxmpp.expdict import ExpiringDictionary
-from pyxmpp.utils import to_utf8, from_utf8
-from pyxmpp.stanza import Stanza
-from pyxmpp.error import StreamErrorNode
-from pyxmpp.iq import Iq
-from pyxmpp.presence import Presence
-from pyxmpp.message import Message
-from pyxmpp.jid import JID
-from pyxmpp import resolver
-from pyxmpp.stanzaprocessor import StanzaProcessor
-from pyxmpp.exceptions import StreamError, StreamEncryptionRequired
-from pyxmpp.exceptions import HostMismatch, ProtocolError
-from pyxmpp.exceptions import DNSError, UnexpectedCNAMEError
-from pyxmpp.exceptions import FatalStreamError, StreamParseError, StreamAuthenticationError
+from . import xmlextra
+from .expdict import ExpiringDictionary
+from .utils import to_utf8, from_utf8
+from .stanza import Stanza
+from .error import StreamErrorNode
+from .iq import Iq
+from .presence import Presence
+from .message import Message
+from .jid import JID
+from . import resolver
+from .stanzaprocessor import StanzaProcessor
+from .exceptions import StreamError, StreamEncryptionRequired
+from .exceptions import HostMismatch, ProtocolError
+from .exceptions import DNSError, UnexpectedCNAMEError
+from .exceptions import FatalStreamError, StreamParseError, StreamAuthenticationError
 
 STREAM_NS="http://etherx.jabber.org/streams"
 BIND_NS="urn:ietf:params:xml:ns:xmpp-bind"

@@ -21,16 +21,18 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import libxml2
 import random
 
-from pyxmpp import xmlextra
-from pyxmpp.utils import from_utf8,to_utf8
-from pyxmpp.jid import JID
-from pyxmpp.xmlextra import common_doc, common_ns, COMMON_NS
-from pyxmpp.exceptions import ProtocolError, JIDMalformedProtocolError
+from . import xmlextra
+from .utils import from_utf8,to_utf8
+from .jid import JID
+from .xmlextra import common_doc, common_ns, COMMON_NS
+from .exceptions import ProtocolError, JIDMalformedProtocolError
 
 random.seed()
 last_id=random.randrange(1000000)
@@ -118,7 +120,7 @@ class Stanza:
             self.xmlnode.setProp("id",stanza_id)
 
         if self.get_type()=="error":
-            from pyxmpp.error import StanzaErrorNode
+            from .error import StanzaErrorNode
             if error:
                 self._error=StanzaErrorNode(error,parent=self.xmlnode,copy=1)
             elif error_cond:
@@ -220,7 +222,7 @@ class Stanza:
         n=self.xpath_eval(u"ns:error")
         if not n:
             raise ProtocolError, (None, "This stanza contains no error: %r" % (self.serialize(),))
-        from pyxmpp.error import StanzaErrorNode
+        from .error import StanzaErrorNode
         self._error=StanzaErrorNode(n[0],copy=0)
         return self._error
 

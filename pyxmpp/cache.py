@@ -21,6 +21,8 @@ This package provides facilities to retrieve and transparently cache
 cachable objects like Service Discovery responses or e.g. client version
 informations."""
 
+from __future__ import absolute_import
+
 __docformat__ = "restructuredtext en"
 
 import threading

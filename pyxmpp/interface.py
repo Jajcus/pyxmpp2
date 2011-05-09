@@ -23,11 +23,12 @@ defined here.
 
 When full ZopeInterfaces API is needed impoer zope.interface instead of this module."""
 
+from __future__ import absolute_import
 
 try:
     from zope.interface import Interface, Attribute, providedBy, implementedBy, implements
 except ImportError:
-    from pyxmpp.interface_micro_impl import Interface, Attribute, providedBy, implementedBy, implements
+    from .interface_micro_impl import Interface, Attribute, providedBy, implementedBy, implements
 
 
 __all__ = ("Interface", "Attribute", "providedBy", "implementedBy", "implements")

@@ -16,7 +16,7 @@
 #
 # pylint: disable-msg=W0611
 
-"""Convenience module containing most important objects from pyxmpp.jabber
+"""Convenience module containing most important objects from ..jabber
 package.
 
 Suggested usage::
@@ -24,17 +24,19 @@ import pyxmpp.jabber.all
 
 (imports all important names into pyxmpp.jabber namespace)"""
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import pyxmpp
 import pyxmpp.jabber
 
-from pyxmpp.jabber.clientstream import LegacyClientStream
-from pyxmpp.jabber.client import JabberClient as Client
-from pyxmpp.jabber.disco import DISCO_NS,DISCO_INFO_NS,DISCO_ITEMS_NS
-from pyxmpp.jabber.disco import DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
-from pyxmpp.jabber.vcard import VCARD_NS,VCard
-from pyxmpp.jabber.register import Register
+from .clientstream import LegacyClientStream
+from .client import JabberClient as Client
+from .disco import DISCO_NS,DISCO_INFO_NS,DISCO_ITEMS_NS
+from .disco import DiscoInfo,DiscoItems,DiscoItem,DiscoIdentity
+from .vcard import VCARD_NS,VCard
+from .register import Register
 
 for name in dir():
     if not name.startswith("__") and name!="pyxmpp":

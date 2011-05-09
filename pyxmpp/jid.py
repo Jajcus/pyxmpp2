@@ -22,6 +22,8 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__ = "restructuredtext en"
 
 import re
@@ -30,8 +32,8 @@ import warnings
 
 from encodings import idna
 
-from pyxmpp.xmppstringprep import nodeprep,resourceprep
-from pyxmpp.exceptions import JIDError
+from .xmppstringprep import nodeprep,resourceprep
+from .exceptions import JIDError
 
 node_invalid_re = re.compile(ur"[" u'"' ur"&'/:<>@\s\x00-\x19]", re.UNICODE)
 resource_invalid_re = re.compile(ur"[\s\x00-\x19]", re.UNICODE)

@@ -20,21 +20,23 @@ Normative reference:
   - `JEP 45 <http://www.jabber.org/jeps/jep-0045.html>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import logging
 
-from pyxmpp.presence import Presence
-from pyxmpp.message import Message
-from pyxmpp.iq import Iq
-from pyxmpp.jid import JID
+from ..presence import Presence
+from ..message import Message
+from ..iq import Iq
+from ..jid import JID
 
-from pyxmpp.xmlextra import xml_element_ns_iter
+from ..xmlextra import xml_element_ns_iter
 
-from pyxmpp.jabber.muccore import MucPresence,MucUserX,MucItem,MucStatus
-from pyxmpp.jabber.muccore import MUC_OWNER_NS
+from .muccore import MucPresence,MucUserX,MucItem,MucStatus
+from .muccore import MUC_OWNER_NS
 
-from pyxmpp.jabber.dataforms import DATAFORM_NS, Form
+from .dataforms import DATAFORM_NS, Form
 
 import weakref
 

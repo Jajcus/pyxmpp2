@@ -24,8 +24,8 @@
 import sys
 import logging
 
-from pyxmpp.all import JID,Iq,Presence,Message,StreamError,FeatureNotImplementedProtocolError
-import pyxmpp.jabberd.all
+from pyxmpp2.all import JID,Iq,Presence,Message,StreamError,FeatureNotImplementedProtocolError
+import pyxmpp2.jabberd.all
 
 class Component(pyxmpp.jabberd.Component):
     """Simple component example. Uses `pyxmpp.jabberd.compontent.Component` class

@@ -21,18 +21,20 @@ Normative reference:
   - `RFC 3921 <http://www.ietf.org/rfc/rfc3921.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import threading
 import logging
 
-from pyxmpp.clientstream import ClientStream
-from pyxmpp.iq import Iq
-from pyxmpp.presence import Presence
-from pyxmpp.roster import Roster
-from pyxmpp.exceptions import ClientError, FatalClientError
-from pyxmpp.interfaces import IPresenceHandlersProvider, IMessageHandlersProvider
-from pyxmpp.interfaces import IIqHandlersProvider, IStanzaHandlersProvider
+from .clientstream import ClientStream
+from .iq import Iq
+from .presence import Presence
+from .roster import Roster
+from .exceptions import ClientError, FatalClientError
+from .interfaces import IPresenceHandlersProvider, IMessageHandlersProvider
+from .interfaces import IIqHandlersProvider, IStanzaHandlersProvider
 
 class Client:
     """Base class for an XMPP-IM client.

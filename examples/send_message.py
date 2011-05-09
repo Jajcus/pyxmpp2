@@ -4,8 +4,8 @@
 
 import sys
 
-from pyxmpp.jid import JID
-from pyxmpp.jabber.simple import send_message
+from pyxmpp2.jid import JID
+from pyxmpp2.jabber.simple import send_message
 
 if len(sys.argv)!=6:
     print u"Usage:"

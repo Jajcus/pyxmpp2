@@ -23,12 +23,14 @@ import pyxmpp.jabberd.all
 
 (imports all important names into pyxmpp.jabberd namespace)"""
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import pyxmpp.jabberd
 
-from pyxmpp.jabberd.componentstream import ComponentStream
-from pyxmpp.jabberd.component import Component
+from .componentstream import ComponentStream
+from .component import Component
 
 for name in dir():
     if not name.startswith("__") and name!="pyxmpp":

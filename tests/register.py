@@ -3,9 +3,9 @@
 
 import unittest
 import libxml2
-from pyxmpp.jabber.dataforms import Form, Field, Option
-from pyxmpp.jabber.register import Register, REGISTER_NS
-from pyxmpp.iq import Iq
+from pyxmpp2.jabber.dataforms import Form, Field, Option
+from pyxmpp2.jabber.register import Register, REGISTER_NS
+from pyxmpp2.iq import Iq
 
 legacy_fields = ( "username", "nick", "password", "name", "first", "last", "email", "address",
         "city", "state", "zip", "phone", "url", "date", "misc", "text", "key" )

@@ -20,13 +20,15 @@ Normative reference:
   - `RFC 2595 <http://www.ietf.org/rfc/rfc2595.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import logging
 
-from pyxmpp.utils import to_utf8,from_utf8
-from pyxmpp.sasl.core import ClientAuthenticator,ServerAuthenticator
-from pyxmpp.sasl.core import Success,Failure,Challenge,Response
+from ..utils import to_utf8,from_utf8
+from .core import ClientAuthenticator,ServerAuthenticator
+from .core import Success,Failure,Challenge,Response
 
 class PlainClientAuthenticator(ClientAuthenticator):
     """Provides PLAIN SASL authentication for a client."""

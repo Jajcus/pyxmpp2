@@ -11,11 +11,11 @@ import logging
 import locale
 import codecs
 
-from pyxmpp.all import JID,Iq,Presence,Message,StreamError
-from pyxmpp.jabber.client import JabberClient
-from pyxmpp.interface import implements
-from pyxmpp.interfaces import *
-from pyxmpp.streamtls import TLSSettings
+from pyxmpp2.all import JID,Iq,Presence,Message,StreamError
+from pyxmpp2.jabber.client import JabberClient
+from pyxmpp2.interface import implements
+from pyxmpp2.interfaces import *
+from pyxmpp2.streamtls import TLSSettings
 
 class EchoHandler(object):
     """Provides the actual 'echo' functionality.

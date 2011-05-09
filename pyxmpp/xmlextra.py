@@ -18,6 +18,8 @@
 
 """Extension to libxml2 for XMPP stream and stanza processing"""
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import sys
@@ -26,7 +28,7 @@ import threading
 import re
 import logging
 
-from pyxmpp.exceptions import StreamParseError
+from .exceptions import StreamParseError
 
 common_doc = libxml2.newDoc("1.0")
 common_root = common_doc.newChild(None,"root",None)
@@ -122,8 +124,8 @@ try:
 #########################################################################
 # C-extension based workarounds for libxml2 limitations
 #-------------------------------------------------------
-    from pyxmpp import _xmlextra
-    from pyxmpp._xmlextra import error
+    from . import _xmlextra
+    from ._xmlextra import error
 
     _create_reader = _xmlextra.sax_reader_new
 

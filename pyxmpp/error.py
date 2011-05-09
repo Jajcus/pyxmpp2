@@ -22,14 +22,16 @@ Normative reference:
   - `JEP 86 <http://www.jabber.org/jeps/jep-0086.html>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import libxml2
 
-from pyxmpp.utils import from_utf8, to_utf8
-from pyxmpp.xmlextra import common_doc, common_root, common_ns
-from pyxmpp import xmlextra
-from pyxmpp.exceptions import ProtocolError
+from .utils import from_utf8, to_utf8
+from .xmlextra import common_doc, common_root, common_ns
+from . import xmlextra
+from .exceptions import ProtocolError
 
 stream_errors={
             u"bad-format":

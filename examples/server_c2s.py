@@ -7,8 +7,8 @@ import traceback
 import socket
 import logging
 
-from pyxmpp.all import JID,Iq,Presence,Message,StreamError
-from pyxmpp.jabber.all import LegacyClientStream
+from pyxmpp2.all import JID,Iq,Presence,Message,StreamError
+from pyxmpp2.jabber.all import LegacyClientStream
 
 accounts={
         u'test': '123',

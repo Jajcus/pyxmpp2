@@ -25,21 +25,23 @@ import pyxmpp.all
 
 """PyXMPP - Jabber/XMPP protocol implementation"""
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
-import pyxmpp
+import pyxmpp2
 
-from pyxmpp.stream import Stream
-from pyxmpp.streambase import StreamError,FatalStreamError,StreamParseError
-from pyxmpp.streamtls import StreamEncryptionRequired,tls_available,TLSSettings
-from pyxmpp.clientstream import ClientStream,ClientStreamError
-from pyxmpp.client import Client,ClientError
-from pyxmpp.iq import Iq
-from pyxmpp.presence import Presence
-from pyxmpp.message import Message
-from pyxmpp.jid import JID,JIDError
-from pyxmpp.roster import Roster,RosterItem
-from pyxmpp.exceptions import *
+from .stream import Stream
+from .streambase import StreamError,FatalStreamError,StreamParseError
+from .streamtls import StreamEncryptionRequired,tls_available,TLSSettings
+from .clientstream import ClientStream,ClientStreamError
+from .client import Client,ClientError
+from .iq import Iq
+from .presence import Presence
+from .message import Message
+from .jid import JID,JIDError
+from .roster import Roster,RosterItem
+from .exceptions import *
 
 for name in dir():
     if not name.startswith("_") and name != "pyxmpp":

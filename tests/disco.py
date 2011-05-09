@@ -3,8 +3,8 @@
 
 import unittest
 import libxml2
-from pyxmpp.jabber import disco
-from pyxmpp.jid import JID
+from pyxmpp2.jabber import disco
+from pyxmpp2.jid import JID
 
 test_identities=[
         (u"Test",u"category",u"type"),

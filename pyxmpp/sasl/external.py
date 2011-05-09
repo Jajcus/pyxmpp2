@@ -21,13 +21,15 @@ Normative reference:
   - `XEP-0178 <http://xmpp.org/extensions/xep-0178.html#c2s>__`
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import base64
 
 import logging
 
-from pyxmpp.sasl.core import (ClientAuthenticator,Failure,Response,Challenge,Success)
+from .core import (ClientAuthenticator,Failure,Response,Challenge,Success)
 
 class ExternalClientAuthenticator(ClientAuthenticator):
     """Provides client-side External SASL (TLS-Identify) authentication."""

@@ -23,6 +23,8 @@ Normative reference:
   - `RFC 2426 <http://www.ietf.org/rfc/rfc2426.txt>`__
 """
 
+from __future__ import absolute_import
+
 
 __docformat__="restructuredtext en"
 
@@ -32,10 +34,10 @@ import libxml2
 import re
 
 import pyxmpp.jid
-from pyxmpp.utils import to_utf8,from_utf8
-from pyxmpp.xmlextra import get_node_ns
-from pyxmpp.objects import StanzaPayloadObject
-from pyxmpp.exceptions import BadRequestProtocolError, JIDMalformedProtocolError, JIDError
+from ..utils import to_utf8,from_utf8
+from ..xmlextra import get_node_ns
+from ..objects import StanzaPayloadObject
+from ..exceptions import BadRequestProtocolError, JIDMalformedProtocolError, JIDError
 
 VCARD_NS="vcard-temp"
 

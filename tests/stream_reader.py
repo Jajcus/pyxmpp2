@@ -3,9 +3,9 @@
 
 import unittest
 import libxml2
-from pyxmpp import xmlextra
-from pyxmpp.jid import JID,JIDError
-from pyxmpp import xmppstringprep
+from pyxmpp2 import xmlextra
+from pyxmpp2.jid import JID,JIDError
+from pyxmpp2 import xmppstringprep
 
 def xml_elements_equal(a, b, ignore_level1_cdata = False):
     if a.name!=b.name:

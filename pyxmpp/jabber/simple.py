@@ -18,6 +18,8 @@
 
 """Simple API for simple things like sendig messages or single stanzas."""
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 def xmpp_do(jid,password,function,server=None,port=None):
@@ -25,7 +27,7 @@ def xmpp_do(jid,password,function,server=None,port=None):
     function when stream is ready for IM. The function will be called
     with one argument -- the XMPP stream. After function returns the stream is
     closed."""
-    from pyxmpp.jabber.client import JabberClient
+    from .client import JabberClient
     class Client(JabberClient):
         """The simplest client implementation."""
         def session_started(self):
@@ -65,7 +67,7 @@ def send_message(my_jid, my_password, to_jid, body, subject=None,
         - `server`: `unicode` or `str`
         - `port`: `int`
     """
-    from pyxmpp.message import Message
+    from ..message import Message
     msg=Message(to_jid=to_jid,body=body,subject=subject,stanza_type=message_type)
     def fun(stream):
         """Send a mesage `msg` via a stream."""

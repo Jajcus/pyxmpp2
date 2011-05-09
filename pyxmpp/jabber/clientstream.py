@@ -20,18 +20,20 @@ Normative reference:
   - `JEP 78 <http://www.jabber.org/jeps/jep-0078.html>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import hashlib
 import logging
 
-from pyxmpp.iq import Iq
-from pyxmpp.utils import to_utf8,from_utf8
-from pyxmpp.jid import JID
-from pyxmpp.clientstream import ClientStream
-from pyxmpp.jabber.register import Register
+from ..iq import Iq
+from ..utils import to_utf8,from_utf8
+from ..jid import JID
+from ..clientstream import ClientStream
+from .register import Register
 
-from pyxmpp.exceptions import ClientStreamError, LegacyAuthenticationError, RegistrationError
+from ..exceptions import ClientStreamError, LegacyAuthenticationError, RegistrationError
 
 class LegacyClientStream(ClientStream):
     """Handles Jabber (both XMPP and legacy protocol) client connection stream.

@@ -21,19 +21,21 @@ Normative reference:
   - `JEP 91 <http://www.jabber.org/jeps/jep-0091.html>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import libxml2
 import time
 import datetime
 
-from pyxmpp.jid import JID
+from ..jid import JID
 
-from pyxmpp.utils import to_utf8,from_utf8
-from pyxmpp.xmlextra import get_node_ns_uri
-from pyxmpp.utils import datetime_utc_to_local,datetime_local_to_utc
-from pyxmpp.objects import StanzaPayloadObject
-from pyxmpp.exceptions import BadRequestProtocolError, JIDMalformedProtocolError, JIDError
+from ..utils import to_utf8,from_utf8
+from ..xmlextra import get_node_ns_uri
+from ..utils import datetime_utc_to_local,datetime_local_to_utc
+from ..objects import StanzaPayloadObject
+from ..exceptions import BadRequestProtocolError, JIDMalformedProtocolError, JIDError
 
 DELAY_NS="jabber:x:delay"
 

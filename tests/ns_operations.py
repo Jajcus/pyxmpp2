@@ -3,7 +3,7 @@
 
 import unittest
 import libxml2
-from pyxmpp import xmlextra
+from pyxmpp2 import xmlextra
 from stream_reader import xml_elements_equal
 
 input_xml = """<?xml version="1.0" ?>

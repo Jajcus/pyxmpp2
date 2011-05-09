@@ -20,6 +20,8 @@
 This module defines all exceptions raised by PyXMPP.
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import logging

@@ -17,9 +17,11 @@
 
 """Interfaces for flexible API extensions."""
 
+from __future__ import absolute_import
+
 __docformat__ = "restructuredtext en"
 
-from pyxmpp.interface import Interface, Attribute
+from .interface import Interface, Attribute
 
 class IPyXMPPHelper(Interface):
     """Base for all interfaces used as PyXMPP helpers."""

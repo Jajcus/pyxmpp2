@@ -21,13 +21,15 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import logging
 
-from pyxmpp.streambase import StreamBase
-from pyxmpp.streamtls import StreamTLSMixIn
-from pyxmpp.streamsasl import StreamSASLMixIn
+from .streambase import StreamBase
+from .streamtls import StreamTLSMixIn
+from .streamsasl import StreamSASLMixIn
 
 class Stream(StreamTLSMixIn,StreamSASLMixIn,StreamBase):
     """Generic XMPP stream class.

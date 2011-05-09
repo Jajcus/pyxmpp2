@@ -21,15 +21,17 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import libxml2
 import logging
 import threading
 
-from pyxmpp.expdict import ExpiringDictionary
-from pyxmpp.exceptions import ProtocolError, BadRequestProtocolError, FeatureNotImplementedProtocolError
-from pyxmpp.stanza import Stanza
+from .expdict import ExpiringDictionary
+from .exceptions import ProtocolError, BadRequestProtocolError, FeatureNotImplementedProtocolError
+from .stanza import Stanza
 
 class StanzaProcessor:
     """Universal stanza handler/router class.

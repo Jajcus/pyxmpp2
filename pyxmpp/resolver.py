@@ -22,6 +22,8 @@ Normative reference:
   - `RFC 2782 <http://www.ietf.org/rfc/rfc2782.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import re

@@ -3,7 +3,7 @@
 import unittest
 
 import libxml2
-from pyxmpp.jabber import vcard
+from pyxmpp2.jabber import vcard
 
 def vcard2txt(vcard):
     """Extract data from VCard object for text comparision.

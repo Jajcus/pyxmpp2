@@ -3,8 +3,8 @@
 
 import unittest
 import libxml2
-from pyxmpp.jabber.dataforms import Form, Field, Option
-from pyxmpp.jid import JID
+from pyxmpp2.jabber.dataforms import Form, Field, Option
+from pyxmpp2.jid import JID
 
 
 class TestForm(unittest.TestCase):

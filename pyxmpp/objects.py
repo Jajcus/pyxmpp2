@@ -18,10 +18,12 @@
 
 """General base classes for PyXMPP objects."""
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import libxml2
-from pyxmpp.xmlextra import common_doc
+from .xmlextra import common_doc
 
 class StanzaPayloadObject(object):
     """Base class for objects that may be used as XMPP stanza payload and don't keep

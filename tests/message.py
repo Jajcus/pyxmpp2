@@ -3,8 +3,8 @@
 
 import unittest
 import libxml2
-from pyxmpp.message import Message
-from pyxmpp.jid import JID
+from pyxmpp2.message import Message
+from pyxmpp2.jid import JID
 
 message1 = """
 <message xmlns="jabber:client" from='source@example.com/res' to='dest@example.com' type='normal' id='1'>

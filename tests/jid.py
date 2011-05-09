@@ -2,8 +2,8 @@
 # -*- coding: UTF-8 -*-
 
 import unittest
-from pyxmpp.jid import JID,JIDError
-from pyxmpp import xmppstringprep
+from pyxmpp2.jid import JID,JIDError
+from pyxmpp2 import xmppstringprep
 
 valid_jids=[
     (u"a@b/c",

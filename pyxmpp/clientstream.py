@@ -22,17 +22,19 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import logging
 
-from pyxmpp.stream import Stream
-from pyxmpp.streambase import BIND_NS
-from pyxmpp.streamsasl import SASLNotAvailable,SASLMechanismNotAvailable
-from pyxmpp.jid import JID
-from pyxmpp.utils import to_utf8
-from pyxmpp.exceptions import StreamError,StreamAuthenticationError,FatalStreamError
-from pyxmpp.exceptions import ClientStreamError, FatalClientStreamError
+from .stream import Stream
+from .streambase import BIND_NS
+from .streamsasl import SASLNotAvailable,SASLMechanismNotAvailable
+from .jid import JID
+from .utils import to_utf8
+from .exceptions import StreamError,StreamAuthenticationError,FatalStreamError
+from .exceptions import ClientStreamError, FatalClientStreamError
 
 class ClientStream(Stream):
     """Handles XMPP-IM client connection stream.

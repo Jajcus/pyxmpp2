@@ -21,15 +21,17 @@ Normative reference:
   - `JEP 114 <http://www.jabber.org/jeps/jep-0114.html>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import threading
 import logging
 
-from pyxmpp.jabberd.componentstream import ComponentStream
-from pyxmpp.utils import from_utf8
-from pyxmpp.jabber.disco import DiscoItems,DiscoInfo,DiscoIdentity
-from pyxmpp.stanza import Stanza
+from .componentstream import ComponentStream
+from ..utils import from_utf8
+from ..jabber.disco import DiscoItems,DiscoInfo,DiscoIdentity
+from ..stanza import Stanza
 
 class Component:
     """Jabber external component ("jabber:component:accept" protocol) interface

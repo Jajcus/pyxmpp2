@@ -21,12 +21,14 @@ Normative reference:
   - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
+from __future__ import absolute_import
+
 __docformat__="restructuredtext en"
 
 import libxml2
 
-from pyxmpp.xmlextra import get_node_ns_uri
-from pyxmpp.stanza import Stanza, gen_id
+from .xmlextra import get_node_ns_uri
+from .stanza import Stanza, gen_id
 
 class Iq(Stanza):
     """Wraper object for <iq /> stanzas."""

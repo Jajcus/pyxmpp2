@@ -9,9 +9,9 @@ all: build test
 
 build: version
 	umask 022 ; python setup.py build
-	-cd examples ; rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp .
+	-cd examples ; rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp2 .
 	-cd examples ; chmod a+x *.py
-	-cd tests ; rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp .
+	-cd tests ; rm -f pyxmpp 2>/dev/null ; ln -s ../build/lib*/pyxmpp2 .
 	-cd tests ; chmod a+x *.py
 
 test:

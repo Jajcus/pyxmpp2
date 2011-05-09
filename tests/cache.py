@@ -5,7 +5,7 @@ import unittest
 import libxml2
 import threading
 
-from pyxmpp.cache import Cache,CacheSuite,CacheFetcher,CacheItem
+from pyxmpp2.cache import Cache,CacheSuite,CacheFetcher,CacheItem
 from datetime import timedelta,datetime
 from time import sleep
 

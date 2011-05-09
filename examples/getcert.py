@@ -9,9 +9,9 @@ import locale
 import codecs
 import ssl
 
-from pyxmpp.jabber.client import JabberClient
-from pyxmpp.streamtls import TLSSettings
-from pyxmpp.jid import JID
+from pyxmpp2.jabber.client import JabberClient
+from pyxmpp2.streamtls import TLSSettings
+from pyxmpp2.jid import JID
 
 class Client(JabberClient):
     """Simple client which extracts server certificate."""
