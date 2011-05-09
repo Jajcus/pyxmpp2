@@ -1,101 +1,69 @@
 #!/usr/bin/python -u
 # -*- coding: UTF-8 -*-
 
+import sys
+
 import unittest
-import libxml2
-from pyxmpp2 import xmlextra
-from pyxmpp2.jid import JID,JIDError
+from xml.etree import ElementTree
+
+from pyxmpp2 import xmppparser
+from pyxmpp2.jid import JID, JIDError
 from pyxmpp2 import xmppstringprep
 
 def xml_elements_equal(a, b, ignore_level1_cdata = False):
-    if a.name!=b.name:
-        print "Name mismatch: %r, %r" % (a.name, b.name)
+    if a.tag != b.tag:
         return False
-    try:
-        ns1 = a.ns()
-    except libxml2.treeError:
-        ns1 = None
-    try:
-        ns2 = b.ns()
-    except libxml2.treeError:
-        ns2 = None
-    if ns1 or ns2:
-        if None in (ns1,ns2):
-            print "Ns mismatch: %r, %r" % (ns1, ns2)
-            return False
-        if ns1.content != ns2.content:
-            print "Ns mismatch: %r, %r on %r, %r" % (ns1.content, ns2.content, a, b)
+    a_attrs = a.items()
+    a_attrs.sort()
+    b_attrs = b.items()
+    b_attrs.sort()
+
+    if not ignore_level1_cdata:
+        if a.text != b.text:
             return False
 
-    ap = a.properties
-    bp = b.properties
-    while 1:
-        if (ap, bp) == (None, None):
-            break
-        if None in (ap, bp):
-            return False
-        if ap.name != bp.name:
-            return False
-        if ap.content != bp.content:
-            return False
-        ap = ap.next
-        bp = bp.next
+    if a_attrs != b_attrs:
+        return False
 
-    ac = a.children
-    bc = b.children
-    while ac != None or bc != None:
-        if ignore_level1_cdata:
-            if ac and ac.type!='element':
-                ac=ac.next
-                continue
-            if bc and bc.type!='element':
-                bc=bc.next
-                continue
-        if None in (ac, bc):
+    if len(a) != len(b):
+        return False
+    for ac, bc in zip(a, b):
+        if ac.tag != bc.tag:
             return False
-        if ac.type != bc.type:
-            return False
-        if ac.type == 'element':
-            if not xml_elements_equal(ac, bc):
+        if not ignore_level1_cdata:
+            if a.text != b.text:
                 return False
-        elif ac.content != bc.content:
+        if not xml_elements_equal(ac, bc):
             return False
-        ac = ac.next
-        bc = bc.next
     return True
 
 class EventTemplate:
     def __init__(self, template):
         self.event, offset, xml = template.split(None,2)
         self.offset = int(offset)
-        self.xml = libxml2.parseDoc(eval(xml))
-
-    def __del__(self):
-        self.xml.freeDoc()
+        self.xml = ElementTree.XML(eval(xml))
 
     def match(self, event, node):
-        if self.event!=event:
+        if self.event != event:
             return False
-        if event=="end":
+        if event == "end":
             return True
-        if node.type!='element':
-            return False
-        if not xml_elements_equal(self.xml.getRootElement(),node):
+        if not xml_elements_equal(self.xml, node):
             return False
         return True
 
     def __repr__(self):
-        return "<EventTemplate %r at %r: %r>" % (self.event, self.offset, self.xml.getRootElement().serialize())
+        return "<EventTemplate %r at %r: %r>" % (self.event, self.offset, ElementTree.dump(self.xml))
 
-class StreamHandler(xmlextra.StreamHandler):
+class StreamHandler(xmppparser.StreamHandler):
     def __init__(self, test_case):
         self.test_case = test_case
-    def stream_start(self, doc):
-        self.test_case.event("start", doc.getRootElement())
-    def stream_end(self, doc):
+    def stream_start(self, element):
+        self.test_case.event("start", element)
+    def stream_end(self, element):
         self.test_case.event("end", None)
-    def stanza(self, doc, node):
-        self.test_case.event("node", node)
+    def stanza(self, element):
+        self.test_case.event("node", element)
 
 expected_events = []
 whole_stream = None
@@ -104,27 +72,27 @@ def load_expected_events():
     for l in file("data/stream_info.txt"):
         if l.startswith("#"):
             continue
-        l=l.strip()
+        l = l.strip()
         expected_events.append(EventTemplate(l))
 
 def load_whole_stream():
     global whole_stream
-    whole_stream = libxml2.parseFile("data/stream.xml")
+    whole_stream = ElementTree.parse("data/stream.xml")
 
 class TestStreamReader(unittest.TestCase):
     def setUp(self):
         self.expected_events = list(expected_events)
         self.handler = StreamHandler(self)
-        self.reader = xmlextra.StreamReader(self.handler)
+        self.reader = xmppparser.StreamReader(self.handler)
         self.file = file("data/stream.xml")
         self.chunk_start = 0
         self.chunk_end = 0
-        self.whole_stream = libxml2.newDoc("1.0")
+        self.whole_stream = ElementTree.ElementTree()
 
     def tearDown(self):
         del self.handler
         del self.reader
-        self.whole_stream.freeDoc()
+        del self.whole_stream
 
     def test_1(self):
         self.do_test(1)
@@ -143,24 +111,22 @@ class TestStreamReader(unittest.TestCase):
 
     def do_test(self, chunk_length):
         while 1:
-            data=self.file.read(chunk_length)
+            data = self.file.read(chunk_length)
             if not data:
                 break
             self.chunk_end += len(data)
-            r=self.reader.feed(data)
-            while r:
-                r=self.reader.feed()
-            if r is None:
+            self.reader.feed(data)
+            if not data:
                 self.event("end", None)
                 break
             self.chunk_start = self.chunk_end
-        r1 = self.whole_stream.getRootElement()
-        r2 = whole_stream.getRootElement()
+        r1 = self.whole_stream.getroot()
+        r2 = whole_stream.getroot()
         if not xml_elements_equal(r1, r2, True):
             self.fail("Whole stream invalid. Got: %r, Expected: %r"
-                    % (self.whole_stream.serialize(), whole_stream.serialize()))
+                    % (ElementTree.tostring(r1), ElementTree.tostring(r2)))
 
-    def event(self, event, node):
+    def event(self, event, element):
         expected = self.expected_events.pop(0)
         self.failUnless(event==expected.event, "Got %r, expected %r" % (event, expected.event))
         if expected.offset < self.chunk_start:
@@ -169,17 +135,14 @@ class TestStreamReader(unittest.TestCase):
         if expected.offset > self.chunk_end:
             self.fail("Early event: %r. Expected at: %i, found at %i:%i"
                     % (event, expected.offset, self.chunk_start, self.chunk_end))
-        if not expected.match(event,node):
+        if not expected.match(event,element):
             self.fail("Unmatched event. Expected: %r, got: %r;%r"
-                    % (expected, event, node.serialize()))
+                    % (expected, event, ElementTree.dump(element)))
         if event == "start":
-            n = node.docCopyNode(self.whole_stream,1)
-            self.whole_stream.addChild(n)
-            self.whole_stream.setRootElement(n)
+            self.whole_stream._setroot(element)
         elif event == "node":
-            n = node.docCopyNode(self.whole_stream,1)
-            r = self.whole_stream.getRootElement()
-            r.addChild(n)
+            r = self.whole_stream.getroot()
+            r.append(element)
 
 def suite():
     load_expected_events()
