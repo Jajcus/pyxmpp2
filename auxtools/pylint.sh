@@ -9,10 +9,10 @@ auxdir=`pwd`
 cd ..
 #make >&2
 topdir=`pwd`
-cd build/lib.*
+cd build/lib
 
 if [ -n "$1" ] ; then
 	pylint --rcfile $auxdir/pylintrc $1
 else
-	pylint --rcfile $auxdir/pylintrc pyxmpp
+	pylint --rcfile $auxdir/pylintrc pyxmpp2
 fi
