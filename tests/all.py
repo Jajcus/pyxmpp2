@@ -4,8 +4,8 @@ import unittest
 import sys
 import getopt
 
-all_modules=["vcard","jid","disco","imports","cache","stream_reader", "ns_operations",
-    "message", "presence", "dataforms", "interface"]
+all_modules=["vcard", "jid", "disco", "cache","stream_reader", 
+                    "message", "presence", "dataforms", "interface"]
 
 def suite(modules=None):
      if not modules:
