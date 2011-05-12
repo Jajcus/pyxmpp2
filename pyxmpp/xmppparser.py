@@ -19,11 +19,9 @@
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
-import sys
 import threading
-import re
 import logging
 
 from xml.etree import ElementTree
@@ -36,6 +34,7 @@ logger = logging.getLogger("pyxmpp.xmppparser")
 
 class StreamHandler(object):
     """Base class for stream handler."""
+    # pylint: disable-msg=R0201
     def stream_start(self, element):
         """Called when the start tag of root element is encountered
         in the stream.
@@ -82,7 +81,7 @@ class StreamHandler(object):
             - `descr`: description of the warning
         :Types:
             - `descr`: `unicode`"""
-        logger.warning("XML STREAM WARNING: {0}".format(desc))
+        logger.warning("XML STREAM WARNING: {0}".format(descr))
 
 class ParserTarget(object):
     """Element tree parser events handler for the XMPP stream parser."""
@@ -102,10 +101,21 @@ class ParserTarget(object):
         self._root = None
 
     def data(self, data):
+        """Handle XML text data.
+
+        Ignore the data outside the root element and directly under the root,
+        pass all other text to the tree builder, so it will be included in the
+        stanzas."""
         if self._level > 1:
             return self._builder.data(data)
 
     def start(self, tag, attrs):
+        """Handle the start tag.
+        
+        Call the handler's 'stream_start' methods with 
+        an empty root element if it is top level.
+        
+        For lower level tags use `ElementTree.TreeBuilder` to collect them."""
         if self._level == 0:
             self._root = ElementTree.Element(tag, attrs)
             self._handler.stream_start(self._root)
@@ -115,9 +125,20 @@ class ParserTarget(object):
         return self._builder.start(tag, attrs)
 
     def close(self):
+        """Handle the stream end."""
         pass
 
     def end(self, tag):
+        """Handle an end tag.
+        
+        Call the handler's 'stream_end' method with 
+        an the root element (built by the `start` method).
+        
+        On the first level below root, sent the built element tree
+        to the handler via the 'stanza methods'.
+        
+        Any tag below will be just added to the tree builder.
+        """
         self._level -= 1
         if self._level < 0:
             self._handler.error(u"Unexpected end tag for: {0!r}".format(tag))
@@ -135,7 +156,8 @@ class ParserTarget(object):
 
 class StreamReader(object):
     """XML stream reader."""
-    def __init__(self,handler):
+    # pylint: disable-msg=R0903
+    def __init__(self, handler):
         """Initialize the reader.
 
         :Parameters:
@@ -168,49 +190,5 @@ class StreamReader(object):
                     self.parser.close()
             finally:
                 self.in_use = 0
-
-evil_characters_re = re.compile(r"[\000-\010\013\014\016-\037]", re.UNICODE)
-utf8_replacement_char = u"\ufffd".encode("utf-8")
-
-def remove_evil_characters(data):
-    """Remove control characters (not allowed in XML) from a string."""
-    if isinstance(data, unicode):
-        return evil_characters_re.sub(u"\ufffd", data)
-    else:
-        return evil_characters_re.sub(utf8_replacement_char, data)
-
-bad_nsdef_replace_re=re.compile(r"^([^<]*\<[^><]*\s+)(xmlns=((\"[^\"]*\")|(\'[^\']*\')))")
-
-'''
-def safe_serialize(element):
-    """Serialize an XML element making sure the result is sane.
-
-    Remove control characters and invalid namespace declarations from the
-    result string.
-
-    :Parameters:
-        - `element`: the XML element to serialize.
-    :Types:
-        - `element`: `ElementTree.Element`
-
-    :return: UTF-8 encoded serialized and sanitized element.
-    :returntype: `string`"""
-    try:
-        ns = xmlnode.ns()
-    except libxml2.treeError:
-        ns = None
-    try:
-        nsdef = xmlnode.nsDefs()
-    except libxml2.treeError:
-        nsdef = None
-    s=xmlnode.serialize(encoding="UTF-8")
-    while nsdef:
-        if nsdef.name is None and (not ns or (nsdef.name, nsdef.content)!=(ns.name, ns.content)):
-            s = bad_nsdef_replace_re.sub("\\1",s,1)
-            break
-        nsdef = nsdef.next
-    s=remove_evil_characters(s)
-    return s
-'''
 
 # vi: sts=4 et sw=4
