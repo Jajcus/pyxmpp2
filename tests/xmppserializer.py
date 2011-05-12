@@ -76,7 +76,6 @@ class TestXMPPSerializer(unittest.TestCase):
                             "</message>")
         output += serializer.emit_stanza(stanza)
         output += serializer.emit_tail()
-        print output
         xml = ElementTree.XML(output)
         self.failUnlessEqual(len(xml), 1)
         self.failUnlessEqual(len(xml[0]), 2)
