@@ -42,7 +42,24 @@ def remove_evil_characters(data):
     return EVIL_CHARACTERS_RE.sub(u"\ufffd", data)
 
 class XMPPSerializer(object):
+    """Implementation of the XMPP serializer.
+
+    Single instance of this class should be used for a single stream and never
+    reused. It will keep track of prefixes declared on the root element and 
+    used later."""
     def __init__(self, stanza_namespace, extra_prefixes = None):
+        """
+        :Parameters:
+            - `stanza_namespace`: the default namespace used for XMPP stanzas.
+            E.g. 'jabber:client' for c2s connections.
+            - `extra_prefixes`: mapping of namespaces to prefixes (not the
+              other way) to be used on the stream. These prefixes will be
+              declared on the root element and used in all descendants. That
+              may be used to optimize the stream for size.
+        :Types:
+            - `stanza_namespace`: `unicode`
+            - `extra_prefixxes`: `unicode` to `unicode` mapping.
+        """
         self.stanza_namespace = stanza_namespace
         self._prefixes = dict(STANDARD_PREFIXES)
         if extra_prefixes:
@@ -53,6 +70,19 @@ class XMPPSerializer(object):
         self._next_id = 1
 
     def add_prefix(self, namespace, prefix):
+        """Add a new namespace prefix.
+
+        If the root element has not yet been emitted the prefix will
+        be declared there, otherwise the prefix will be declared on the
+        top-most element using this namespace in every stanza.
+
+        :Parameters:
+            - `namespace`: the namespace URI
+            - `prefix`: the prefix string
+        :Types:
+            - `namespace`: `unicode`
+            - `prefix`: `unicode`
+        """
         if namespace in (self.stanza_namespace, STREAM_NS):
             raise ValueError, ("Cannot add custom prefix for"
                                         " stream or stanza namespace")
@@ -62,6 +92,17 @@ class XMPPSerializer(object):
         self._prefixes[namespace] = prefix
 
     def emit_head(self, stream_from, stream_to, version = u'1.0'):
+        """Return the opening tag of the stream root element.
+
+        :Parameters:
+            - `stream_from`: the 'from' attribute of the stream. May be `None`.
+            - `stream_to`: the 'to' attribute of the stream. May be `None`.
+            - `version`: the 'version' of the stream.
+        :Types:
+            - `stream_from`: `unicode`
+            - `stream_to`: `unicode`
+            - `version`: `unicode`
+        """
         tag = u"<{0}:stream version={1}".format(self._prefixes[STREAM_NS],
                                                         quoteattr(version))
         if stream_from:
@@ -79,9 +120,26 @@ class XMPPSerializer(object):
         return tag
 
     def emit_tail(self):
+        """Return the end tag of the stream root element."""
         return u"</{0}:stream>".format(self._root_prefixes[STREAM_NS])
 
     def _make_prefixed(self, name, declared_prefixes, declarations):
+        """Return namespace-prefixed tag or attribute name.
+        
+        Add appropriate declaration to `declarations` when neccessary.
+        
+        :Parameters:
+            - `name`: ElementTree 'qname' ('{namespace-uri}local-name')
+              to convert
+            - `declared_prefixes`: mapping of prefixes already declared 
+              at this scope
+            - `declarations`: XMLNS declarations on the current element.
+        :Types:
+            - `name`: `unicode`
+            - `declared_prefixes`: `unicode` to `unicode` dictionary
+            - `declarations`: `unicode` to `unicode` dictionary
+
+        :Returntype: `unicode`"""
         if name.startswith(u"{"):
             namespace, name = name[1:].split(u"}", 1)
             if namespace in STANZA_NAMESPACES:
@@ -110,6 +168,21 @@ class XMPPSerializer(object):
             return name
 
     def _emit_element(self, element, level, declared_prefixes):
+        """"Recursive XML element serializer.
+
+        :Parameters:
+            - `element`: the element to serialize
+            - `level`: nest level (0 - root element, 1 - stanzas, etc.)
+            - `declared_prefixes`: namespace to prefix mapping of already
+                declared prefixes.
+        :Types:
+            - `element`: `ElementTree.Element`
+            - `level`: `int`
+            - `declared_prefixes`: `unicode` to `unicode` dictionary
+
+        :Return: serialized element
+        :Returntype: `unicode`
+        """
         declarations = {}
         declared_prefixes = dict(declared_prefixes)
         name = element.tag
@@ -151,6 +224,20 @@ class XMPPSerializer(object):
         return start_tag + text + u''.join(children) + end_tag + tail
 
     def emit_stanza(self, element):
+        """"Serialize a stanza.
+
+        Must be called after `self.emit_head`.
+
+        :Parameters:
+            - `element`: the element to serialize
+        :Types:
+            - `element`: `ElementTree.Element`
+
+        :Return: serialized element
+        :Returntype: `unicode`
+        """
+        if not self._head_emitted:
+            raise RuntimeError, ".emit_head() must be called first."
         string = self._emit_element(element, level = 1, 
                                     declared_prefixes = self._root_prefixes)
         return remove_evil_characters(string)
