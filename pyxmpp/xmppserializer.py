@@ -24,6 +24,7 @@ namespace (which may be one of, at least, two different namespaces:
 
 from __future__ import absolute_import
 
+import threading
 import re
 from xml.sax.saxutils import escape, quoteattr
 
@@ -242,7 +243,11 @@ class XMPPSerializer(object):
                                     declared_prefixes = self._root_prefixes)
         return remove_evil_characters(string)
 
-_SERIALIZER = None
+
+# thread local data to store XMPPSerializer instance used by the `serialize`
+# function
+_THREAD = threading.local()
+_THREAD.serializer = None
 
 def serialize(element):
     """Serialize an XMPP element.
@@ -257,11 +262,11 @@ def serialize(element):
         :Return: serialized element
         :Returntype: `unicode`
     """
-    global _SERIALIZER
-    if _SERIALIZER is None:
-        _SERIALIZER = XMPPSerializer("jabber:client")
-        _SERIALIZER.emit_head(None, None)
-    return _SERIALIZER.emit_stanza(element)
-
+    # pylint: disable-msg=W0603
+    global _THREAD
+    if _THREAD.serializer is None:
+        _THREAD.serializer = XMPPSerializer("jabber:client")
+        _THREAD.serializer.emit_head(None, None)
+    return _THREAD.serializer.emit_stanza(element)
 
 # vi: sts=4 et sw=4
