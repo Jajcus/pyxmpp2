@@ -24,6 +24,8 @@ namespace (which may be one of, at least, two different namespaces:
 
 from __future__ import absolute_import
 
+from xml.sax.saxutils import escape, quoteattr
+
 from .constants import STANZA_NAMESPACES, STREAM_NS
 
 __docformat__ = "restructuredtext en"
@@ -54,24 +56,18 @@ class XMPPSerializer(object):
                                         " before stream head has been emitted")
         self._prefixes[namespace] = prefix
 
-    def _escape(self, string):
-        return string.replace('&', '&amp;').replace('<', '&lt;'
-                        ).replace('>', '&gt;').replace('"', '&quot;')
-
     def emit_head(self, stream_from, stream_to, version = u'1.0'):
-        tag = u"<{0}:stream version='{1}'".format(self._prefixes[STREAM_NS],
-                                                        self._escape(version))
+        tag = u"<{0}:stream version={1}".format(self._prefixes[STREAM_NS],
+                                                        quoteattr(version))
         if stream_from:
-            tag += u" from='{0}'".format(self._escape(stream_from))
+            tag += u" from={0}".format(quoteattr(stream_from))
         if stream_to:
-            tag += u" to='{0}'".format(self._escape(stream_to))
+            tag += u" to={0}".format(quoteattr(stream_to))
         for namespace, prefix in self._prefixes.items():
             if prefix:
-                tag += u' xmlns:{0}="{1}"'.format(prefix, self._escape(
-                                                                namespace))
+                tag += u' xmlns:{0}={1}'.format(prefix, quoteattr(namespace))
             else:
-                tag += u' xmlns="{1}"'.format(prefix, self._escape(
-                                                                namespace))
+                tag += u' xmlns={1}'.format(prefix, quoteattr(namespace))
         tag += u">"
         self._root_prefixes = dict(self._prefixes)
         self._head_emitted = True
@@ -118,13 +114,13 @@ class XMPPSerializer(object):
         for name, value in element.items():
             prefixed = self._make_prefixed(name, declared_prefixes,
                                                                 declarations)
-            start_tag += u' {0}="{1}"'.format(prefixed, self._escape(value))
+            start_tag += u' {0}={1}'.format(prefixed, quoteattr(value))
         for namespace, prefix in declarations.items():
             if prefix:
-                start_tag += u' xmlns:{0}="{1}"'.format(prefix, self._escape(
+                start_tag += u' xmlns:{0}={1}'.format(prefix, quoteattr(
                                                                 namespace))
             else:
-                start_tag += u' xmlns="{1}"'.format(prefix, self._escape(
+                start_tag += u' xmlns={1}'.format(prefix, quoteattr(
                                                                 namespace))
             for d_namespace, d_prefix in declared_prefixes.items():
                 if (not prefix and not d_prefix) or d_prefix == prefix:
@@ -140,11 +136,11 @@ class XMPPSerializer(object):
         else:
             start_tag += u">"
             if level > 0 and element.text:
-                text = self._escape(element.text)
+                text = escape(element.text)
             else:
                 text = u""
         if level > 1 and element.tail:
-            tail = self._escape(element.tail)
+            tail = escape(element.tail)
         else:
             tail = u""
         return start_tag + text + u''.join(children) + end_tag + tail
