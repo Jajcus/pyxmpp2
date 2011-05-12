@@ -24,17 +24,22 @@ namespace (which may be one of, at least, two different namespaces:
 
 from __future__ import absolute_import
 
+import re
 from xml.sax.saxutils import escape, quoteattr
 
 from .constants import STANZA_NAMESPACES, STREAM_NS
 
 __docformat__ = "restructuredtext en"
 
-XML_HEAD = b'<?xml version="1.0" encoding="UTF-8"?>\n'
-
 STANDARD_PREFIXES = {
         STREAM_NS: u'stream',
     }
+
+EVIL_CHARACTERS_RE = re.compile(r"[\000-\010\013\014\016-\037]", re.UNICODE)
+
+def remove_evil_characters(data):
+    """Remove control characters (not allowed in XML) from a string."""
+    return EVIL_CHARACTERS_RE.sub(u"\ufffd", data)
 
 class XMPPSerializer(object):
     def __init__(self, stanza_namespace, extra_prefixes = None):
@@ -71,10 +76,10 @@ class XMPPSerializer(object):
         tag += u">"
         self._root_prefixes = dict(self._prefixes)
         self._head_emitted = True
-        return XML_HEAD + tag.encode("utf-8")
+        return tag
 
     def emit_tail(self):
-        return "</{0}:stream>".format(self._root_prefixes[STREAM_NS])
+        return u"</{0}:stream>".format(self._root_prefixes[STREAM_NS])
 
     def _make_prefixed(self, name, declared_prefixes, declarations):
         if name.startswith(u"{"):
@@ -148,6 +153,6 @@ class XMPPSerializer(object):
     def emit_stanza(self, element):
         string = self._emit_element(element, level = 1, 
                                     declared_prefixes = self._root_prefixes)
-        return string.encode("utf-8")
+        return remove_evil_characters(string)
 
 # vi: sts=4 et sw=4
