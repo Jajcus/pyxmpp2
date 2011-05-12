@@ -242,4 +242,26 @@ class XMPPSerializer(object):
                                     declared_prefixes = self._root_prefixes)
         return remove_evil_characters(string)
 
+_SERIALIZER = None
+
+def serialize(element):
+    """Serialize an XMPP element.
+
+    Utility function for debugging or logging.
+
+        :Parameters:
+            - `element`: the element to serialize
+        :Types:
+            - `element`: `ElementTree.Element`
+
+        :Return: serialized element
+        :Returntype: `unicode`
+    """
+    global _SERIALIZER
+    if _SERIALIZER is None:
+        _SERIALIZER = XMPPSerializer("jabber:client")
+        _SERIALIZER.emit_head(None, None)
+    return _SERIALIZER.emit_stanza(element)
+
+
 # vi: sts=4 et sw=4
