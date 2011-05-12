@@ -14,7 +14,6 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-# pylint: disable-msg=W0232, E0201
 
 """jid -- Jabber ID handling
 
@@ -26,17 +25,13 @@ from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 
-import re
 import weakref
 import warnings
 
 from encodings import idna
 
-from .xmppstringprep import nodeprep,resourceprep
+from .xmppstringprep import nodeprep, resourceprep
 from .exceptions import JIDError
-
-node_invalid_re = re.compile(ur"[" u'"' ur"&'/:<>@\s\x00-\x19]", re.UNICODE)
-resource_invalid_re = re.compile(ur"[\s\x00-\x19]", re.UNICODE)
 
 def are_domains_equal(domain1, domain2):
     """Compare two International Domain Names.
@@ -62,6 +57,7 @@ class JID(object):
     """
     cache = weakref.WeakValueDictionary()
     __slots__ = ("node", "domain", "resource", "__weakref__",)
+    
     def __new__(cls, node_or_jid = None, domain = None, resource = None,
                                                                 check = True):
         """Create a new JID object or take one from the cache.
@@ -92,7 +88,7 @@ class JID(object):
             cls.cache[node_or_jid] = obj
         else:
             if domain is None and resource is None:
-                raise JIDError,"At least domain must be given"
+                raise JIDError, "At least domain must be given"
             if check:
                 node = cls.__prepare_node(node_or_jid)
                 domain = cls.__prepare_domain(domain)
@@ -104,8 +100,15 @@ class JID(object):
         object.__setattr__(obj, "resource", resource)
         return obj
     
-    def __setattr__(self,name,value):
-        raise RuntimeError,"JID objects are immutable!"
+    def __setattr__(self, name, value):
+        raise RuntimeError, "JID objects are immutable!"
+
+    def __attribute_declarations__(self):
+        # to make pylint happy
+        self.node = u""
+        self.domain = u""
+        self.resource = u""
+
 
     @classmethod
     def __from_unicode(cls, data, check = True):
@@ -222,8 +225,8 @@ class JID(object):
         *Deprecated* Always use Unicode objects, or `as_utf8` if you really want.
 
         :return: UTF-8 encoded JID."""
-        warnings.warn("JID.as_string() is deprecated. Use unicode() or `as_utf8` instead.",
-                 DeprecationWarning, stacklevel=1)
+        warnings.warn("JID.as_string() is deprecated. Use unicode()"
+                " or `as_utf8` instead.", DeprecationWarning, stacklevel=1)
         return self.as_utf8()
 
     def as_unicode(self):
@@ -251,16 +254,16 @@ class JID(object):
         elif type(other) in (str, unicode):
             try:
                 other = JID(other)
-            except:
+            except StandardError:
                 return False
-        elif not isinstance(other,JID):
+        elif not isinstance(other, JID):
             return False
 
         return (self.node == other.node
             and are_domains_equal(self.domain, other.domain)
             and self.resource == other.resource)
 
-    def __ne__(self,other):
+    def __ne__(self, other):
         return not self.__eq__(other)
 
     def __cmp__(self, other):

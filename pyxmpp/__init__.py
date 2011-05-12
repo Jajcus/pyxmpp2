@@ -65,7 +65,6 @@ Most objects describing elements of the XMPP protocol or its extensions have
 method as_xml() providing their XML representations.
 """
 
-
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
 # vi: sts=4 et sw=4
