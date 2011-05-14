@@ -166,7 +166,7 @@ class XMPPSerializer(object):
             declarations[namespace] = prefix
             declared_prefixes[namespace] = prefix
         else:
-            if level == 2:
+            if level is not None and level <= 2:
                 prefix = None
             else:
                 used_prefixes = set(self._prefixes.values()) 
