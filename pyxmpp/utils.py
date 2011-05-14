@@ -22,6 +22,21 @@ from __future__ import absolute_import
 __docformat__ = "restructuredtext en"
 
 def xml_elements_equal(element1, element2, ignore_level1_cdata = False):
+    """Check if two XML elements are equal.
+
+    :Parameters:
+        - `element1`: the first element to compare
+        - `element2`: the other element to compare
+        - `ignore_level1_cdata`: if direct text children of the elements
+          should be ignored for the comparision
+    :Types:
+        - `element1`: `ElementTree.Element`
+        - `element2`: `ElementTree.Element`
+        - `ignore_level1_cdata`: `bool`
+
+    :Returntype: `bool`
+    """
+    # pylint: disable-msg=R0911
     if element1.tag != element2.tag:
         return False
     attrs1 = element1.items()
@@ -51,8 +66,8 @@ def xml_elements_equal(element1, element2, ignore_level1_cdata = False):
 import time
 import datetime
 
-minute = datetime.timedelta(minutes = 1)
-nulldelta = datetime.timedelta()
+_MINUTE = datetime.timedelta(minutes = 1)
+_NULLDELTA = datetime.timedelta()
 
 def datetime_utc_to_local(utc):
     """
@@ -61,6 +76,7 @@ def datetime_utc_to_local(utc):
     It seems standard Python 2.3 library doesn't provide any better way to
     do that.
     """
+    # pylint: disable-msg=C0103
     ts = time.time()
     cur = datetime.datetime.fromtimestamp(ts)
     cur_utc = datetime.datetime.utcfromtimestamp(ts)
@@ -69,16 +85,16 @@ def datetime_utc_to_local(utc):
     t = utc
 
     d = datetime.timedelta(hours = 2)
-    while d > minute:
+    while d > _MINUTE:
         local = t + offset
         tm = local.timetuple()
         tm = tm[0:8] + (0, )
         ts = time.mktime(tm)
         u = datetime.datetime.utcfromtimestamp(ts)
         diff = u - utc
-        if diff < minute and diff >- minute:
+        if diff < _MINUTE and diff > -_MINUTE:
             break
-        if diff > nulldelta:
+        if diff > _NULLDELTA:
             offset -= d
         else:
             offset += d
