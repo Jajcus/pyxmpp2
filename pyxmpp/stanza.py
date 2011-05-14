@@ -33,6 +33,7 @@ import copy
 from .exceptions import ProtocolError, JIDMalformedProtocolError
 from .jid import JID
 from .stanzapayload import StanzaPayload, XMLPayload
+from .xmppserializer import serialize
 
 random.seed()
 last_id = random.randrange(1000000)
@@ -98,19 +99,26 @@ class Stanza(object):
             - `error`: `pyxmpp.error.StanzaErrorElement`
             - `error_cond`: `unicode`"""
         self._error = None
+        self._from_jid = None
+        self._to_jid = None
+        self._stanza_type = None
+        self._stanza_id = None
         if isinstance(element, ElementTree.Element):
             self._element = element
             self._dirty = False
+            self._decode_attributes()
             if element.tag.startswith("{"):
-                self._namespace, self.stanza_type = element.tag[1:].split("}")
+                self._namespace, self.element_name = element.tag[1:].split("}")
             else:
                 self._namespace = "jabber:client"
                 self.element_name = element.tag
+            self._payload = None
         else:
             self._element = None
             self._dirty = True
             self.element_name = unicode(element)
             self._namespace = "jabber:client"
+            self._payload = []
 
         self._ns_prefix = "{{{0}}}".format(self._namespace)
         self._element_qname = self._ns_prefix + self.element_name
@@ -127,21 +135,33 @@ class Stanza(object):
         if stanza_id:
             self.stanza_id = stanza_id
 
-        if self.type == "error":
+        if self.stanza_type == "error":
             from .error import StanzaErrorElement
             if error:
                 self._error = StanzaErrorElement(error)
             elif error_cond:
                 self._error = StanzaErrorElement(error_cond)
 
-        self._stream = weakref.ref(stream)
+        if stream is not None:
+                self._stream = weakref.ref(stream)
+    
+    def _decode_attributes(self):
+        from_jid = self._element.get('from')
+        if from_jid:
+            self._from_jid = JID(from_jid)
+        to_jid = self._element.get('to')
+        if to_jid:
+            self._to_jid = JID(to_jid)
+        self._stanza_type = self._element.get('type')
+        self._stanza_id = self._element.get('id')
 
     def copy(self):
         """Create a deep copy of the stanza.
 
         :returntype: `Stanza`"""
         result = Stanza(self.element_name, self.from_jid, self.to_jid, 
-                                self.type, self.id, self.error, self.stream)
+                        self.stanza_type, self.stanza_id, self.error,
+                        self.stream)
         for payload in self._payload:
             result.add_payload(payload.copy())
         return result
@@ -151,7 +171,7 @@ class Stanza(object):
 
         :return: serialized stanza.
         :returntype: `str`"""
-        return serialize(self.get_element())
+        return serialize(self.get_xml())
 
     def as_xml(self):
         """Return the XML stanza representation.
@@ -160,9 +180,21 @@ class Stanza(object):
         which can be freely modified without affecting the stanza.
 
         :returntype: `ElementTree.Element`"""
+        attrs = {}
+        if self._from_jid:
+            attrs['from'] = unicode(self._from_jid)
+        if self._to_jid:
+            attrs['to'] = unicode(self._to_jid)
+        if self._stanza_type:
+            attrs['type'] = self._stanza_type
+        if self._stanza_id:
+            attrs['id'] = self._stanza_id
         element = ElementTree.Element(self._element_qname, attrs)
+        if self._payload is None:
+            self.decode_payload()
         for payload in self._payload:
             element.append(payload.as_xml())
+        return element
 
     def get_xml(self):
         """Return the XML stanza representation.
@@ -190,7 +222,7 @@ class Stanza(object):
         For the `Stanza` class stanza namespace child elements will also be
         included as the payload. For subclasses these are not considered
         payload."""
-        if self.payload is not None:
+        if self._payload is not None:
             # already decoded
             return
         if self._element is None:
@@ -201,7 +233,7 @@ class Stanza(object):
                 if child.tag.startswith(self._ns_prefix):
                     continue
             payload.append(XMLPayload(child))
-        self.payload = payload
+        self._payload = payload
 
     @property
     def from_jid(self):
@@ -209,7 +241,7 @@ class Stanza(object):
 
     @from_jid.setter
     def from_jid(self, from_jid):
-        self._from_jid = from_jid
+        self._from_jid = JID(from_jid)
         self._dirty = True
 
     @property
@@ -218,7 +250,7 @@ class Stanza(object):
 
     @to_jid.setter
     def to_jid(self, to_jid):
-        self._to_jid = to_jid
+        self._to_jid = JID(to_jid)
         self._dirty = True
 
     @property
@@ -227,7 +259,7 @@ class Stanza(object):
 
     @stanza_type.setter
     def stanza_type(self, stanza_type):
-        self._stanza_type = stanza_type
+        self._stanza_type = unicode(stanza_type)
         self._dirty = True
 
     @property
@@ -236,7 +268,7 @@ class Stanza(object):
 
     @stanza_id.setter
     def stanza_id(self, stanza_id):
-        self._stanza_id = stanza_id
+        self._stanza_id = unicode(stanza_id)
         self._dirty = True
 
     @property
