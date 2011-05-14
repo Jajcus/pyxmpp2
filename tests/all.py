@@ -4,7 +4,7 @@ import unittest
 import sys
 import getopt
 
-all_modules=[ "jid", "stream_reader", "xmppserializer", 
+all_modules=[ "jid", "stream_reader", "xmppserializer", "stanza",
              "cache", 
 #          "vcard", "disco", "message", "presence", "dataforms", "interface"
                 ]
