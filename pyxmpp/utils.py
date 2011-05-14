@@ -19,47 +19,40 @@
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
-import sys
+def xml_elements_equal(element1, element2, ignore_level1_cdata = False):
+    if element1.tag != element2.tag:
+        return False
+    attrs1 = element1.items()
+    attrs1.sort()
+    attrs2 = element2.items()
+    attrs2.sort()
 
-if sys.hexversion<0x02030000:
-    raise ImportError,"Python 2.3 or newer is required"
+    if not ignore_level1_cdata:
+        if element1.text != element2.text:
+            return False
+
+    if attrs1 != attrs2:
+        return False
+
+    if len(element1) != len(element2):
+        return False
+    for child1, child2 in zip(element1, element2):
+        if child1.tag != child2.tag:
+            return False
+        if not ignore_level1_cdata:
+            if element1.text != element2.text:
+                return False
+        if not xml_elements_equal(child1, child2):
+            return False
+    return True
 
 import time
 import datetime
 
-def to_utf8(s):
-    """
-    Convevert `s` to UTF-8 if it is Unicode, leave unchanged
-    if it is string or None and convert to string overwise
-    """
-    if s is None:
-        return None
-    elif type(s) is unicode:
-        return s.encode("utf-8")
-    elif type(s) is str:
-        return s
-    else:
-        return unicode(s).encode("utf-8")
-
-def from_utf8(s):
-    """
-    Convert `s` to Unicode or leave unchanged if it is None.
-
-    Regular strings are assumed to be UTF-8 encoded
-    """
-    if s is None:
-        return None
-    elif type(s) is unicode:
-        return s
-    elif type(s) is str:
-        return unicode(s,"utf-8")
-    else:
-        return unicode(s)
-
-minute=datetime.timedelta(minutes=1)
-nulldelta=datetime.timedelta()
+minute = datetime.timedelta(minutes = 1)
+nulldelta = datetime.timedelta()
 
 def datetime_utc_to_local(utc):
     """
@@ -68,28 +61,28 @@ def datetime_utc_to_local(utc):
     It seems standard Python 2.3 library doesn't provide any better way to
     do that.
     """
-    ts=time.time()
-    cur=datetime.datetime.fromtimestamp(ts)
-    cur_utc=datetime.datetime.utcfromtimestamp(ts)
+    ts = time.time()
+    cur = datetime.datetime.fromtimestamp(ts)
+    cur_utc = datetime.datetime.utcfromtimestamp(ts)
 
-    offset=cur-cur_utc
-    t=utc
+    offset = cur - cur_utc
+    t = utc
 
-    d=datetime.timedelta(hours=2)
-    while d>minute:
-        local=t+offset
-        tm=local.timetuple()
-        tm=tm[0:8]+(0,)
-        ts=time.mktime(tm)
-        u=datetime.datetime.utcfromtimestamp(ts)
-        diff=u-utc
-        if diff<minute and diff>-minute:
+    d = datetime.timedelta(hours = 2)
+    while d > minute:
+        local = t + offset
+        tm = local.timetuple()
+        tm = tm[0:8] + (0, )
+        ts = time.mktime(tm)
+        u = datetime.datetime.utcfromtimestamp(ts)
+        diff = u - utc
+        if diff < minute and diff >- minute:
             break
-        if diff>nulldelta:
-            offset-=d
+        if diff > nulldelta:
+            offset -= d
         else:
-            offset+=d
-        d/=2
+            offset += d
+        d /= 2
     return local
 
 def datetime_local_to_utc(local):
@@ -97,7 +90,7 @@ def datetime_local_to_utc(local):
     Simple function to convert naive `datetime.datetime` object containing
     local time to a naive `datetime.datetime` object with UTC time.
     """
-    ts=time.mktime(local.timetuple())
-    return datetime.datetime.utcfromtimestamp(ts)
+    timestamp = time.mktime(local.timetuple())
+    return datetime.datetime.utcfromtimestamp(timestamp)
 
 # vi: sts=4 et sw=4

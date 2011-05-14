@@ -10,32 +10,7 @@ from pyxmpp2 import xmppparser
 from pyxmpp2.jid import JID, JIDError
 from pyxmpp2 import xmppstringprep
 
-def xml_elements_equal(a, b, ignore_level1_cdata = False):
-    if a.tag != b.tag:
-        return False
-    a_attrs = a.items()
-    a_attrs.sort()
-    b_attrs = b.items()
-    b_attrs.sort()
-
-    if not ignore_level1_cdata:
-        if a.text != b.text:
-            return False
-
-    if a_attrs != b_attrs:
-        return False
-
-    if len(a) != len(b):
-        return False
-    for ac, bc in zip(a, b):
-        if ac.tag != bc.tag:
-            return False
-        if not ignore_level1_cdata:
-            if a.text != b.text:
-                return False
-        if not xml_elements_equal(ac, bc):
-            return False
-    return True
+from pyxmpp2.utils import xml_elements_equal
 
 class EventTemplate:
     def __init__(self, template):
