@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2011 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -25,355 +25,287 @@ from __future__ import absolute_import
 
 __docformat__="restructuredtext en"
 
-import libxml2
+from xml.etree import ElementTree
 import random
+import weakref
+import copy
 
-from . import xmlextra
-from .utils import from_utf8,to_utf8
-from .jid import JID
-from .xmlextra import common_doc, common_ns, COMMON_NS
 from .exceptions import ProtocolError, JIDMalformedProtocolError
+from .jid import JID
+from .stanzapayload import StanzaPayload, XMLPayload
 
 random.seed()
-last_id=random.randrange(1000000)
+last_id = random.randrange(1000000)
 
 def gen_id():
     """Generate stanza id unique for the session.
 
     :return: the new id."""
     global last_id
-    last_id+=1
+    last_id += 1
     return str(last_id)
 
-class Stanza:
+class Stanza(object):
     """Base class for all XMPP stanzas.
 
+    :Properties:
+        - `from_jid`: source JID of the stanza
+        - `to_jid`: destination JID of the stanza
+        - `stanza_type`: staza type: one of: "get", "set", "result" or "error".
+        - `stanza_id`: stanza id
+        - `stream`: stream on which the stanza was received or `None` when the
+          stream is not available. May be used to send replies or get some
+          session-related parameters.
     :Ivariables:
-        - `xmlnode`: stanza XML node.
-        - `_error`: `pyxmpp.error.StanzaErrorNode` describing the error associated with
-          the stanza of type "error".
-        - `stream`: stream on which the stanza was received or `None`. May be
-          used to send replies or get some session-related parameters.
+        - `_payload`: the stanza payload
+        - `_error`: error associated a stanza of type "error"
+        - `_namespace`: namespace of this stanza element
     :Types:
-        - `xmlnode`: `libxml2.xmlNode`
-        - `_error`: `pyxmpp.error.StanzaErrorNode`"""
-    stanza_type="Unknown"
-
-    def __init__(self, name_or_xmlnode, from_jid=None, to_jid=None,
-            stanza_type=None, stanza_id=None, error=None, error_cond=None,
-            stream = None):
+        - `from_jid`: `JID`
+        - `to_jid`: `JID`
+        - `stanza_type`: `unicode`
+        - `stanza_id`: `unicode`
+        - `stream`: `pyxmpp2.stream.Stream`
+        - `_payload`: `list` of `StanzaPayload`
+        - `_error`: `pyxmpp2.error.StanzaErrorElement`"""
+    element_name = "Unknown"
+    def __init__(self, element, from_jid = None, to_jid = None,
+                            stanza_type = None, stanza_id = None,
+                            error = None, error_cond = None,
+                            stream = None):
         """Initialize a Stanza object.
 
         :Parameters:
-            - `name_or_xmlnode`: XML node to be wrapped into the Stanza object
-              or other Presence object to be copied. If not given then new
-              presence stanza is created using following parameters.
+            - `element`: XML element of this stanza, or element name for a new
+              stanza. If element is given it must not be modified later,
+              unless `decode_payload()` and `mark_dirty()` methods are called
+              first.
             - `from_jid`: sender JID.
             - `to_jid`: recipient JID.
-            - `stanza_type`: staza type: one of: "get", "set", "result" or "error".
+            - `stanza_type`: staza type: one of: "get", "set", "result" 
+                                                                or "error".
             - `stanza_id`: stanza id -- value of stanza's "id" attribute. If
               not given, then unique for the session value is generated.
             - `error`: error object. Ignored if `stanza_type` is not "error".
-            - `error_cond`: error condition name. Ignored if `stanza_type` is not
-              "error" or `error` is not None.
+            - `error_cond`: error condition name. Ignored if `stanza_type` is
+              not "error" or `error` is not None.
         :Types:
-            - `name_or_xmlnode`: `unicode` or `libxml2.xmlNode` or `Stanza`
+            - `_element`: `unicode` or `ElementTree.Element`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
             - `stanza_id`: `unicode`
-            - `error`: `pyxmpp.error.StanzaErrorNode`
+            - `error`: `pyxmpp.error.StanzaErrorElement`
             - `error_cond`: `unicode`"""
-        self._error=None
-        self.xmlnode=None
-        if isinstance(name_or_xmlnode,Stanza):
-            self.xmlnode=name_or_xmlnode.xmlnode.docCopyNode(common_doc, True)
-            common_doc.addChild(self.xmlnode)
-            self.xmlnode.reconciliateNs(common_doc)
-        elif isinstance(name_or_xmlnode,libxml2.xmlNode):
-            self.xmlnode=name_or_xmlnode.docCopyNode(common_doc,1)
-            common_doc.addChild(self.xmlnode)
-            try:
-                ns = self.xmlnode.ns()
-            except libxml2.treeError:
-                ns = None
-            if not ns or not ns.name:
-                xmlextra.replace_ns(self.xmlnode, ns, common_ns)
-            self.xmlnode.reconciliateNs(common_doc)
+        self._error = None
+        if isinstance(element, ElementTree.Element):
+            self._element = element
+            self._dirty = False
+            if element.tag.startswith("{"):
+                self._namespace, self.stanza_type = element.tag[1:].split("}")
+            else:
+                self._namespace = "jabber:client"
+                self.element_name = element.tag
         else:
-            self.xmlnode=common_doc.newChild(common_ns,name_or_xmlnode,None)
+            self._element = None
+            self._dirty = True
+            self.element_name = unicode(element)
+            self._namespace = "jabber:client"
+
+        self._ns_prefix = "{{{0}}}".format(self._namespace)
+        self._element_qname = self._ns_prefix + self.element_name
 
         if from_jid is not None:
-            if not isinstance(from_jid,JID):
-                from_jid=JID(from_jid)
-            self.xmlnode.setProp("from",from_jid.as_utf8())
+            self.from_jid = from_jid
 
         if to_jid is not None:
-            if not isinstance(to_jid,JID):
-                to_jid=JID(to_jid)
-            self.xmlnode.setProp("to",to_jid.as_utf8())
+            self.to_jid = to_jid
 
         if stanza_type:
-            self.xmlnode.setProp("type",stanza_type)
+            self.stanza_type = stanza_type
 
         if stanza_id:
-            self.xmlnode.setProp("id",stanza_id)
+            self.stanza_id = stanza_id
 
-        if self.get_type()=="error":
-            from .error import StanzaErrorNode
+        if self.type == "error":
+            from .error import StanzaErrorElement
             if error:
-                self._error=StanzaErrorNode(error,parent=self.xmlnode,copy=1)
+                self._error = StanzaErrorElement(error)
             elif error_cond:
-                self._error=StanzaErrorNode(error_cond,parent=self.xmlnode)
-        self.stream = stream
+                self._error = StanzaErrorElement(error_cond)
 
-    def __del__(self):
-        if self.xmlnode:
-            self.free()
-
-    def free(self):
-        """Free the node associated with this `Stanza` object."""
-        if self._error:
-            self._error.free_borrowed()
-        self.xmlnode.unlinkNode()
-        self.xmlnode.freeNode()
-        self.xmlnode=None
+        self._stream = weakref.ref(stream)
 
     def copy(self):
         """Create a deep copy of the stanza.
 
         :returntype: `Stanza`"""
-        return Stanza(self)
+        result = Stanza(self.element_name, self.from_jid, self.to_jid, 
+                                self.type, self.id, self.error, self.stream)
+        for payload in self._payload:
+            result.add_payload(payload.copy())
+        return result
 
     def serialize(self):
         """Serialize the stanza into an UTF-8 encoded XML string.
 
         :return: serialized stanza.
         :returntype: `str`"""
-        return self.xmlnode.serialize(encoding="utf-8")
+        return serialize(self.get_element())
 
-    def get_node(self):
-        """Return the XML node wrapped into `self`.
+    def as_xml(self):
+        """Return the XML stanza representation.
 
-        :returntype: `libxml2.xmlNode`"""
-        return self.xmlnode
+        Always return an independent copy of the stanza XML representation,
+        which can be freely modified without affecting the stanza.
 
-    def get_from(self):
-        """Get "from" attribute of the stanza.
+        :returntype: `ElementTree.Element`"""
+        element = ElementTree.Element(self._element_qname, attrs)
+        for payload in self._payload:
+            element.append(payload.as_xml())
 
-        :return: value of the "from" attribute (sender JID) or None.
-        :returntype: `JID`"""
-        if self.xmlnode.hasProp("from"):
-            try:
-                return JID(from_utf8(self.xmlnode.prop("from")))
-            except JIDError:
-                raise JIDMalformedProtocolError, "Bad JID in the 'from' attribute"
-        else:
-            return None
+    def get_xml(self):
+        """Return the XML stanza representation.
 
-    get_from_jid=get_from
+        This returns the original or cached XML representation, which
+        may be much more efficient than `as_xml`. 
+        
+        Result of this function should never be modified.
 
-    def get_to(self):
-        """Get "to" attribute of the stanza.
+        :returntype: `ElementTree.Element`"""
+        if not self._dirty:
+            return self._element
+        element = self.as_xml()
+        self._element = element
+        self._dirty = False
+        return element
 
-        :return: value of the "to" attribute (recipient JID) or None.
-        :returntype: `JID`"""
-        if self.xmlnode.hasProp("to"):
-            try:
-                return JID(from_utf8(self.xmlnode.prop("to")))
-            except JIDError:
-                raise JIDMalformedProtocolError, "Bad JID in the 'to' attribute"
-        else:
-            return None
+    def decode_payload(self):
+        """Decode payload from the element passed to the stanza constructor.
 
-    get_to_jid=get_to
+        Iterates over stanza children and creates StanzaPayload objects for
+        them. Called automatically by `get_payload()` and other methods that
+        access the payload.
+        
+        For the `Stanza` class stanza namespace child elements will also be
+        included as the payload. For subclasses these are not considered
+        payload."""
+        if self.payload is not None:
+            # already decoded
+            return
+        if self._element is None:
+            raise ValueError, "This stanza has no element to decode"""
+        payload = []
+        for child in self._element:
+            if self.__class__ is not Stanza:
+                if child.tag.startswith(self._ns_prefix):
+                    continue
+            payload.append(XMLPayload(child))
+        self.payload = payload
 
-    def get_type(self):
-        """Get "type" attribute of the stanza.
+    @property
+    def from_jid(self):
+        return self._from_jid
 
-        :return: value of the "type" attribute (stanza type) or None.
-        :returntype: `unicode`"""
-        if self.xmlnode.hasProp("type"):
-            return from_utf8(self.xmlnode.prop("type"))
-        else:
-            return None
+    @from_jid.setter
+    def from_jid(self, from_jid):
+        self._from_jid = from_jid
+        self._dirty = True
 
-    get_stanza_type=get_type
+    @property
+    def to_jid(self):
+        return self._to_jid
 
-    def get_id(self):
-        """Get "id" attribute of the stanza.
+    @to_jid.setter
+    def to_jid(self, to_jid):
+        self._to_jid = to_jid
+        self._dirty = True
 
-        :return: value of the "id" attribute (stanza identifier) or None.
-        :returntype: `unicode`"""
-        if self.xmlnode.hasProp("id"):
-            return from_utf8(self.xmlnode.prop("id"))
-        else:
-            return None
+    @property
+    def stanza_type(self):
+        return self._stanza_type
 
-    get_stanza_id=get_id
+    @stanza_type.setter
+    def stanza_type(self, stanza_type):
+        self._stanza_type = stanza_type
+        self._dirty = True
 
-    def get_error(self):
-        """Get stanza error information.
+    @property
+    def stanza_id(self):
+        return self._stanza_id
 
-        :return: object describing the error.
-        :returntype: `pyxmpp.error.StanzaErrorNode`"""
-        if self._error:
-            return self._error
-        n=self.xpath_eval(u"ns:error")
-        if not n:
-            raise ProtocolError, (None, "This stanza contains no error: %r" % (self.serialize(),))
-        from .error import StanzaErrorNode
-        self._error=StanzaErrorNode(n[0],copy=0)
+    @stanza_id.setter
+    def stanza_id(self, stanza_id):
+        self._stanza_id = stanza_id
+        self._dirty = True
+
+    @property
+    def error(self):
         return self._error
 
-    def set_from(self,from_jid):
-        """Set "from" attribute of the stanza.
+    @error.setter
+    def error(self, error):
+        self._error = error
+        self._dirty = True
+
+    def mark_dirty(self):
+        """Mark the stanza `dirty` so the XML representation will be
+        re-built the next time it is requested.
+        
+        This should be called each time the payload attached to the stanza is
+        modifed."""
+        self._dirty = True
+
+    def set_payload(self, payload):
+        """Set stanza payload to a single item. 
+        
+        All current stanza content of will be dropped.
+        Marks the stanza dirty.
 
         :Parameters:
-            - `from_jid`: new value of the "from" attribute (sender JID).
+            - `payload`: XML element or stanza payload object to use
         :Types:
-            - `from_jid`: `JID`"""
-        if from_jid:
-            return self.xmlnode.setProp("from", JID(from_jid).as_utf8())
-        else:
-            return self.xmlnode.unsetProp("from")
-
-    def set_to(self,to_jid):
-        """Set "to" attribute of the stanza.
-
-        :Parameters:
-            - `to_jid`: new value of the "to" attribute (recipient JID).
-        :Types:
-            - `to_jid`: `JID`"""
-        if to_jid:
-            return self.xmlnode.setProp("to", JID(to_jid).as_utf8())
-        else:
-            return self.xmlnode.unsetProp("to")
-
-    def set_type(self,stanza_type):
-        """Set "type" attribute of the stanza.
-
-        :Parameters:
-            - `stanza_type`: new value of the "type" attribute (stanza type).
-        :Types:
-            - `stanza_type`: `unicode`"""
-        if stanza_type:
-            return self.xmlnode.setProp("type",to_utf8(stanza_type))
-        else:
-            return self.xmlnode.unsetProp("type")
-
-    def set_id(self,stanza_id):
-        """Set "id" attribute of the stanza.
-
-        :Parameters:
-            - `stanza_id`: new value of the "id" attribute (stanza identifier).
-        :Types:
-            - `stanza_id`: `unicode`"""
-        if stanza_id:
-            return self.xmlnode.setProp("id",to_utf8(stanza_id))
-        else:
-            return self.xmlnode.unsetProp("id")
-
-    def set_content(self,content):
-        """Set stanza content to an XML node.
-
-        :Parameters:
-            - `content`: XML node to be included in the stanza.
-        :Types:
-            - `content`: `libxml2.xmlNode` or unicode, or UTF-8 `str`
+            - `payload`: `ElementTree.Element` or `StanzaPayload`
         """
-        while self.xmlnode.children:
-            self.xmlnode.children.unlinkNode()
-        if hasattr(content,"as_xml"):
-            content.as_xml(parent=self.xmlnode,doc=common_doc)
-        elif isinstance(content,libxml2.xmlNode):
-            self.xmlnode.addChild(content.docCopyNode(common_doc,1))
-        elif isinstance(content,unicode):
-            self.xmlnode.setContent(to_utf8(content))
+        if isinstance(payload, ElementTree.Element):
+            self._payload = [ XMLPayload(payload) ]
+        elif isinstance(payload, StanzaPayload):
+            self._payload = [ payload ]
         else:
-            self.xmlnode.setContent(content)
+            raise TypeError, "Bad payload type"
+        self._dirty = True
 
-    def add_content(self,content):
-        """Add an XML node to the stanza's payload.
+    def add_payload(self, payload):
+        """Add new the stanza payload.
+        
+        Marks the stanza dirty.
 
         :Parameters:
-            - `content`: XML node to be added to the payload.
+            - `payload`: XML element or stanza payload object to add
         :Types:
-            - `content`: `libxml2.xmlNode`, UTF-8 `str` or unicode, or
-               an object with "as_xml()" method.
+            - `payload`: `ElementTree.Element` or `StanzaPayload`
         """
-        if hasattr(content, "as_xml"):
-            content.as_xml(parent = self.xmlnode, doc = common_doc)
-        elif isinstance(content,libxml2.xmlNode):
-            self.xmlnode.addChild(content.docCopyNode(common_doc,1))
-        elif isinstance(content,unicode):
-            self.xmlnode.addContent(to_utf8(content))
+        if self._payload is None:
+            self.decode_payload()
+        if isinstance(payload, ElementTree.Element):
+            self._payload.append(XMLPayload(payload))
+        elif isinstance(payload, StanzaPayload):
+            self._payload.append(payload)
         else:
-            self.xmlnode.addContent(content)
+            raise TypeError, "Bad payload type"
+        self._dirty = True
 
-    def set_new_content(self,ns_uri,name):
-        """Set stanza payload to a new XML element.
-
-        :Parameters:
-            - `ns_uri`: XML namespace URI of the element.
-            - `name`: element name.
-        :Types:
-            - `ns_uri`: `str`
-            - `name`: `str` or `unicode`
+    def get_all_payload(self):
+        """Return list of stanza payload objects.
+       
+        :Returntype: `list` of `StanzaPayload`
         """
-        while self.xmlnode.children:
-            self.xmlnode.children.unlinkNode()
-        return self.add_new_content(ns_uri,name)
+        if self._payload is None:
+            self.decode_payload()
+        return list(self._payload)
 
-    def add_new_content(self,ns_uri,name):
-        """Add a new XML element to the stanza payload.
-
-        :Parameters:
-            - `ns_uri`: XML namespace URI of the element.
-            - `name`: element name.
-        :Types:
-            - `ns_uri`: `str`
-            - `name`: `str` or `unicode`
-        """
-        c=self.xmlnode.newChild(None,to_utf8(name),None)
-        if ns_uri:
-            ns=c.newNs(ns_uri,None)
-            c.setNs(ns)
-        return c
-
-    def xpath_eval(self,expr,namespaces=None):
-        """Evaluate an XPath expression on the stanza XML node.
-
-        The expression will be evaluated in context where the common namespace
-        (the one used for stanza elements, mapped to 'jabber:client',
-        'jabber:server', etc.) is bound to prefix "ns" and other namespaces are
-        bound accordingly to the `namespaces` list.
-
-        :Parameters:
-            - `expr`: XPath expression.
-            - `namespaces`: mapping from namespace prefixes to URIs.
-        :Types:
-            - `expr`: `unicode`
-            - `namespaces`: `dict` or other mapping
-        """
-        ctxt = common_doc.xpathNewContext()
-        ctxt.setContextNode(self.xmlnode)
-        ctxt.xpathRegisterNs("ns",COMMON_NS)
-        if namespaces:
-            for prefix,uri in namespaces.items():
-                ctxt.xpathRegisterNs(unicode(prefix),uri)
-        ret=ctxt.xpathEval(unicode(expr))
-        ctxt.xpathFreeContext()
-        return ret
-
-    def __eq__(self,other):
-        if not isinstance(other,Stanza):
-            return False
-        return self.xmlnode.serialize()==other.xmlnode.serialize()
-
-    def __ne__(self,other):
-        if not isinstance(other,Stanza):
-            return True
-        return self.xmlnode.serialize()!=other.xmlnode.serialize()
+#    def __eq__(self, other):
+#        if not isinstance(other,Stanza):
+#            return False
 
 # vi: sts=4 et sw=4
