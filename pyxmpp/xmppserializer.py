@@ -124,6 +124,43 @@ class XMPPSerializer(object):
         """Return the end tag of the stream root element."""
         return u"</{0}:stream>".format(self._root_prefixes[STREAM_NS])
 
+    def _split_qname(self, name, declared_prefixes, level):
+        """Split an element of attribute qname into namespace and local
+        name."""
+        if name.startswith(u"{"):
+            namespace, name = name[1:].split(u"}", 1)
+            if namespace in STANZA_NAMESPACES:
+                namespace = self.stanza_namespace
+        elif declared_prefixes[self.stanza_namespace] is None:
+            namespace = self.stanza_namespace
+        elif level is not None:
+            raise ValueError, "Non-stanza element with no namespace"
+        else:
+            namespace = None
+        return namespace, name
+
+    def _make_prefix(self, declared_prefixes):
+        """Make up a new namespace prefix, which won't conflict
+        with `self._prefixes` and prefixes declared in the current scope.
+        
+        :Parameters:
+            - `declared_prefixes`: namespace to prefix mapping for the current
+              scope
+        :Types:
+            - `declared_prefixes`: `unicode` to `unicode` dictionary
+
+        :Returns: a new prefix
+        :Returntype: `unicode`
+        """
+        used_prefixes = set(self._prefixes.values()) 
+        used_prefixes |= set(declared_prefixes.values())
+        while True:
+            prefix = u"ns{0}".format(self._next_id)
+            self._next_id += 1
+            if prefix not in used_prefixes:
+                break
+        return prefix
+
     def _make_prefixed(self, name, level, declared_prefixes, declarations):
         """Return namespace-prefixed tag or attribute name.
         
@@ -147,16 +184,7 @@ class XMPPSerializer(object):
             - `declarations`: `unicode` to `unicode` dictionary
 
         :Returntype: `unicode`"""
-        if name.startswith(u"{"):
-            namespace, name = name[1:].split(u"}", 1)
-            if namespace in STANZA_NAMESPACES:
-                namespace = self.stanza_namespace
-        elif declared_prefixes[self.stanza_namespace] is None:
-            namespace = self.stanza_namespace
-        elif level:
-            raise ValueError, "Non-stanza element with no namespace"
-        else:
-            namespace = None
+        namespace, name = self._split_qname(name, declared_prefixes, level)
         if namespace is None:
             prefix = None
         elif namespace in declared_prefixes:
@@ -169,19 +197,44 @@ class XMPPSerializer(object):
             if level is not None and level <= 2:
                 prefix = None
             else:
-                used_prefixes = set(self._prefixes.values()) 
-                used_prefixes |= set(declared_prefixes.values())
-                while True:
-                    prefix = u"ns{0}".format(self._next_id)
-                    self._next_id += 1
-                    if prefix not in used_prefixes:
-                        break
+                prefix = self._make_prefix(declared_prefixes)
             declarations[namespace] = prefix
             declared_prefixes[namespace] = prefix
         if prefix:
             return prefix + u":" + name
         else:
             return name
+
+    @staticmethod
+    def _make_ns_declarations(declarations, declared_prefixes):
+        """Build namespace declarations and remove obsoleted mappings
+        from `declared_prefixes`.
+
+        :Parameters:
+            - `declarations`: namespace to prefix mapping of the new 
+                declarations
+            - `declared_prefixes`: namespace to prefix mapping of already
+                declared prefixes.
+        :Types:
+            - `declarations`: `unicode` to `unicode` dictionary
+            - `declared_prefixes`: `unicode` to `unicode` dictionary
+
+        :Return: string of namespace declarations to be used in a start tag
+        :Returntype: `unicode`
+        """
+        result = []
+        for namespace, prefix in declarations.items():
+            if prefix:
+                result.append(u' xmlns:{0}={1}'.format(prefix, quoteattr(
+                                                                namespace)))
+            else:
+                result.append(u' xmlns={1}'.format(prefix, quoteattr(
+                                                                namespace)))
+            for d_namespace, d_prefix in declared_prefixes.items():
+                if (not prefix and not d_prefix) or d_prefix == prefix:
+                    if namespace != d_namespace:
+                        del declared_prefixes[d_namespace]
+        return u" ".join(result)
 
     def _emit_element(self, element, level, declared_prefixes):
         """"Recursive XML element serializer.
@@ -210,17 +263,11 @@ class XMPPSerializer(object):
             prefixed = self._make_prefixed(name, level, declared_prefixes,
                                                                 declarations)
             start_tag += u' {0}={1}'.format(prefixed, quoteattr(value))
-        for namespace, prefix in declarations.items():
-            if prefix:
-                start_tag += u' xmlns:{0}={1}'.format(prefix, quoteattr(
-                                                                namespace))
-            else:
-                start_tag += u' xmlns={1}'.format(prefix, quoteattr(
-                                                                namespace))
-            for d_namespace, d_prefix in declared_prefixes.items():
-                if (not prefix and not d_prefix) or d_prefix == prefix:
-                    if namespace != d_namespace:
-                        del declared_prefixes[d_namespace]
+
+        declarations = self._make_ns_declarations(declarations, 
+                                                        declared_prefixes)
+        if declarations:
+            start_tag += u" " + declarations
         children = []
         for child in element:
             children.append(self._emit_element(child, level +1,
@@ -279,8 +326,6 @@ def serialize(element):
         :Return: serialized element
         :Returntype: `unicode`
     """
-    # pylint: disable-msg=W0603
-    global _THREAD
     if _THREAD.serializer is None:
         _THREAD.serializer = XMPPSerializer("jabber:client")
         _THREAD.serializer.emit_head(None, None)
