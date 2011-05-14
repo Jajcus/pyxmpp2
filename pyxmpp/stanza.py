@@ -23,12 +23,11 @@ Normative reference:
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
 from xml.etree import ElementTree
 import random
 import weakref
-import copy
 
 from .exceptions import ProtocolError, JIDMalformedProtocolError
 from .jid import JID
@@ -36,15 +35,6 @@ from .stanzapayload import StanzaPayload, XMLPayload
 from .xmppserializer import serialize
 
 random.seed()
-last_id = random.randrange(1000000)
-
-def gen_id():
-    """Generate stanza id unique for the session.
-
-    :return: the new id."""
-    global last_id
-    last_id += 1
-    return str(last_id)
 
 class Stanza(object):
     """Base class for all XMPP stanzas.
@@ -69,11 +59,12 @@ class Stanza(object):
         - `stream`: `pyxmpp2.stream.Stream`
         - `_payload`: `list` of `StanzaPayload`
         - `_error`: `pyxmpp2.error.StanzaErrorElement`"""
+    # pylint: disable-msg=R0902
     element_name = "Unknown"
     def __init__(self, element, from_jid = None, to_jid = None,
                             stanza_type = None, stanza_id = None,
                             error = None, error_cond = None,
-                            stream = None):
+                            stream = None): # pylint: disable-msg=R0913
         """Initialize a Stanza object.
 
         :Parameters:
@@ -134,6 +125,8 @@ class Stanza(object):
 
         if stanza_id:
             self.stanza_id = stanza_id
+        elif self._element is None:
+            self.stanza_id = self.gen_id()
 
         if self.stanza_type == "error":
             from .error import StanzaErrorElement
@@ -143,15 +136,20 @@ class Stanza(object):
                 self._error = StanzaErrorElement(error_cond)
 
         if stream is not None:
-                self._stream = weakref.ref(stream)
+            self._stream = weakref.ref(stream)
     
     def _decode_attributes(self):
-        from_jid = self._element.get('from')
-        if from_jid:
-            self._from_jid = JID(from_jid)
-        to_jid = self._element.get('to')
-        if to_jid:
-            self._to_jid = JID(to_jid)
+        """Decode attributes of the stanza XML element
+        and put them into the stanza properties."""
+        try:
+            from_jid = self._element.get('from')
+            if from_jid:
+                self._from_jid = JID(from_jid)
+            to_jid = self._element.get('to')
+            if to_jid:
+                self._to_jid = JID(to_jid)
+        except ValueError:
+            raise JIDMalformedProtocolError
         self._stanza_type = self._element.get('type')
         self._stanza_id = self._element.get('id')
 
@@ -161,7 +159,7 @@ class Stanza(object):
         :returntype: `Stanza`"""
         result = Stanza(self.element_name, self.from_jid, self.to_jid, 
                         self.stanza_type, self.stanza_id, self.error,
-                        self.stream)
+                        self._stream())
         for payload in self._payload:
             result.add_payload(payload.copy())
         return result
@@ -220,7 +218,7 @@ class Stanza(object):
         access the payload.
         
         For the `Stanza` class stanza namespace child elements will also be
-        included as the payload. For subclasses these are not considered
+        included as the payload. For subclasses these are no considered
         payload."""
         if self._payload is not None:
             # already decoded
@@ -236,47 +234,47 @@ class Stanza(object):
         self._payload = payload
 
     @property
-    def from_jid(self):
+    def from_jid(self): # pylint: disable-msg=C0111,E0202
         return self._from_jid
 
-    @from_jid.setter
-    def from_jid(self, from_jid):
+    @from_jid.setter # pylint: disable-msg=E1101
+    def from_jid(self, from_jid): # pylint: disable-msg=E0202,E0102,C0111
         self._from_jid = JID(from_jid)
         self._dirty = True
 
     @property
-    def to_jid(self):
+    def to_jid(self): # pylint: disable-msg=C0111,E0202
         return self._to_jid
 
-    @to_jid.setter
-    def to_jid(self, to_jid):
+    @to_jid.setter # pylint: disable-msg=E1101
+    def to_jid(self, to_jid): # pylint: disable-msg=E0202,E0102,C0111
         self._to_jid = JID(to_jid)
         self._dirty = True
 
     @property
-    def stanza_type(self):
+    def stanza_type(self): # pylint: disable-msg=C0111,E0202
         return self._stanza_type
 
-    @stanza_type.setter
-    def stanza_type(self, stanza_type):
+    @stanza_type.setter # pylint: disable-msg=E1101
+    def stanza_type(self, stanza_type): # pylint: disable-msg=E0202,E0102,C0111
         self._stanza_type = unicode(stanza_type)
         self._dirty = True
 
     @property
-    def stanza_id(self):
+    def stanza_id(self): # pylint: disable-msg=C0111,E0202
         return self._stanza_id
 
-    @stanza_id.setter
-    def stanza_id(self, stanza_id):
+    @stanza_id.setter # pylint: disable-msg=E1101
+    def stanza_id(self, stanza_id): # pylint: disable-msg=E0202,E0102,C0111
         self._stanza_id = unicode(stanza_id)
         self._dirty = True
 
     @property
-    def error(self):
+    def error(self): # pylint: disable-msg=C0111,E0202
         return self._error
 
-    @error.setter
-    def error(self, error):
+    @error.setter # pylint: disable-msg=E1101
+    def error(self, error): # pylint: disable-msg=E0202,E0102,C0111
         self._error = error
         self._dirty = True
 
@@ -335,6 +333,17 @@ class Stanza(object):
         if self._payload is None:
             self.decode_payload()
         return list(self._payload)
+
+    last_id = random.randrange(1000000)
+
+    @classmethod
+    def gen_id(cls):
+        """Generate stanza id unique for the session.
+
+        :return: the new id."""
+        cls.last_id += 1
+        return str(cls.last_id)
+
 
 #    def __eq__(self, other):
 #        if not isinstance(other,Stanza):
