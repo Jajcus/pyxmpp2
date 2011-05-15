@@ -83,7 +83,7 @@ class Stanza(object):
             - `error_cond`: error condition name. Ignored if `stanza_type` is
               not "error" or `error` is not None.
         :Types:
-            - `_element`: `unicode` or `ElementTree.Element`
+            - `element`: `unicode` or `ElementTree.Element`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
