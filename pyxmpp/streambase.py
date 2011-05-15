@@ -55,17 +55,6 @@ from .exceptions import FatalStreamError, StreamParseError, StreamAuthentication
 STREAM_NS="http://etherx.jabber.org/streams"
 BIND_NS="urn:ietf:params:xml:ns:xmpp-bind"
 
-def stanza_factory(xmlnode, stream = None):
-    """Creates Iq, Message or Presence object for XML stanza `xmlnode`"""
-    if xmlnode.name=="iq":
-        return Iq(xmlnode, stream = stream)
-    if xmlnode.name=="message":
-        return Message(xmlnode, stream = stream)
-    if xmlnode.name=="presence":
-        return Presence(xmlnode, stream = stream)
-    else:
-        return Stanza(xmlnode, stream = stream)
-
 class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
     """Base class for a generic XMPP stream.
 

@@ -23,17 +23,42 @@ Normative reference:
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
-import libxml2
 import logging
 import threading
+from collections import defaultdict
 
 from .expdict import ExpiringDictionary
-from .exceptions import ProtocolError, BadRequestProtocolError, FeatureNotImplementedProtocolError
+from .exceptions import ProtocolError, BadRequestProtocolError
+from .exceptions import FeatureNotImplementedProtocolError
 from .stanza import Stanza
+from .message import Message
+from .presence import Presence
+from .iq import Iq
 
-class StanzaProcessor:
+logger = logging.getLogger("pyxmpp.stanzaprocessor")
+
+def stanza_factory(element, stream = None):
+    """Creates Iq, Message or Presence object for XML stanza `element`
+    
+    :Parameters:
+        - `element`: the stanza XML element
+        - `stream`: stream where the stanza was received
+    :Types:
+        - `element`: `ElementTree.Element`
+        - `stream`: `pyxmpp2.stream.Stream`
+    """
+    if element.name == "iq":
+        return Iq(element, stream = stream)
+    if element.name == "message":
+        return Message(element, stream = stream)
+    if element.name == "presence":
+        return Presence(element, stream = stream)
+    else:
+        return Stanza(element, stream = stream)
+
+class StanzaProcessor(object):
     """Universal stanza handler/router class.
 
     Provides facilities to set up custom handlers for various types of stanzas.
@@ -47,28 +72,36 @@ class StanzaProcessor:
           considered local.
         - `initiator`: `True` if local stream endpoint is the initiating entity.
     """
+    # pylint: disable-msg=R0902
     def __init__(self):
         """Initialize a `StanzaProcessor` object."""
-        self.me=None
-        self.peer=None
-        self.initiator=None
-        self.peer_authenticated=False
-        self.process_all_stanzas=True
-        self._iq_response_handlers=ExpiringDictionary()
-        self._iq_get_handlers={}
-        self._iq_set_handlers={}
-        self._message_handlers=[]
-        self._presence_handlers=[]
-        self.__logger=logging.getLogger("pyxmpp.Stream")
-        self.lock=threading.RLock()
+        self.me = None
+        self.peer = None
+        self.initiator = None
+        self.peer_authenticated = False
+        self.process_all_stanzas = True
+        self._iq_response_handlers = ExpiringDictionary()
+        self._iq_handlers = defaultdict(list)
+        self._message_handlers = []
+        self._presence_handlers = []
+        self.lock = threading.RLock()
 
     def process_response(self, response):
         """Examines out the response returned by a stanza handler and sends all
         stanzas provided.
 
+        :Parameters:
+            - `response`: the response to process. `None` or `False` means
+            'not handled'. `True` means 'handled'. Stanza or stanza list means
+            handled with the stanzas to send back
+        :Types:
+            - `response`: `bool` or `Stanza` or iterable of `Stanza`
+
         :Returns:
-           - `True`: if `response` is `Stanza`, iterable or `True` (meaning the stanza was processed).
-           - `False`: when `response` is `False` or `None`
+            - `True`: if `response` is `Stanza`, iterable or `True` (meaning the
+             stanza was processed).
+            - `False`: when `response` is `False` or `None`
+
         :returntype: `bool`
         """
 
@@ -89,59 +122,84 @@ class StanzaProcessor:
                 self.send(stanza)
         return True
 
+    def _process_iq_response(self, stanza):
+        """Process IQ stanza of type 'response' or 'error'.
+
+        :Parameters:
+            - `stanza`: the stanza received
+        :Types:
+            - `stanza`: `Iq`
+
+        If a matching handler is available pass the stanza to it.  Otherwise
+        ignore it if it is "error" or "result" stanza or return
+        "feature-not-implemented" error if it is "get" or "set"."""
+
+
+        stanza_id = stanza.stanza_id
+        from_jid = stanza.from_jid
+        if from_jid:
+            ufrom = from_jid.as_unicode()
+        else:
+            ufrom = None
+        res_handler = err_handler = None
+        try:
+            res_handler, err_handler = self._iq_response_handlers.pop(
+                                                    (stanza_id, ufrom))
+        except KeyError:
+            if ( (from_jid == self.peer or from_jid == self.me 
+                                        or from_jid == self.me.bare()) ):
+                try:
+                    res_handler, err_handler = \
+                            self._iq_response_handlers.pop(
+                                                    (stanza_id, None))
+                except KeyError:
+                    pass
+        if stanza.stanza_type == "result":
+            if res_handler:
+                response = res_handler(stanza)
+            else:
+                return False
+        else:
+            if err_handler:
+                response = err_handler(stanza)
+            else:
+                return False
+        self.process_response(response)
+        return True
+
     def process_iq(self, stanza):
         """Process IQ stanza received.
 
         :Parameters:
             - `stanza`: the stanza received
+        :Types:
+            - `stanza`: `Iq`
 
-        If a matching handler is available pass the stanza to it.
-        Otherwise ignore it if it is "error" or "result" stanza
-        or return "feature-not-implemented" error."""
+        If a matching handler is available pass the stanza to it.  Otherwise
+        ignore it if it is "error" or "result" stanza or return
+        "feature-not-implemented" error if it is "get" or "set"."""
 
-        sid=stanza.get_id()
-        fr=stanza.get_from()
-
-        typ=stanza.get_type()
-        if typ in ("result","error"):
-            if fr:
-                ufr=fr.as_unicode()
-            else:
-                ufr=None
-            res_handler = err_handler = None
-            try:
-                res_handler, err_handler = self._iq_response_handlers.pop((sid,ufr))
-            except KeyError:
-                if ( (fr==self.peer or fr==self.me or fr==self.me.bare()) ):
-                    try:
-                        res_handler, err_handler = self._iq_response_handlers.pop((sid,None))
-                    except KeyError:
-                        pass
-                if None is res_handler is err_handler:
-                    return False
-            if typ=="result":
-                response = res_handler(stanza)
-            else:
-                response = err_handler(stanza)
-            self.process_response(response)
-            return True
-
-        q=stanza.get_query()
-        if not q:
-            raise BadRequestProtocolError, "Stanza with no child element"
-        el=q.name
-        ns=q.ns().getContent()
-
-        if typ=="get":
-            if self._iq_get_handlers.has_key((el,ns)):
-                response = self._iq_get_handlers[(el,ns)](stanza)
+        typ = stanza.stanza_type
+        if typ in ("result", "error"):
+            return self._process_iq_response(stanza)
+        payload = stanza.get_payload()
+        if not payload:
+            raise BadRequestProtocolError, "<iq/> stanza with no child element"
+        if len(payload) > 1:
+            raise BadRequestProtocolError, ("<iq/> stanza with too many"
+                                                            " child elements")
+        if typ == "get":
+            handler = self._get_iq_handler("get", payload)
+            if handler:
+                response = handler(stanza)
                 self.process_response(response)
                 return True
             else:
                 raise FeatureNotImplementedProtocolError, "Not implemented"
-        elif typ=="set":
-            if self._iq_set_handlers.has_key((el,ns)):
-                response = self._iq_set_handlers[(el,ns)](stanza)
+        elif typ == "set":
+            handler = self._get_iq_handler("set", payload)
+            if handler:
+                response = handler(stanza)
                 self.process_response(response)
                 return True
             else:
@@ -149,7 +207,13 @@ class StanzaProcessor:
         else:
             raise BadRequestProtocolError, "Unknown IQ stanza type"
 
-    def __try_handlers(self,handler_list,typ,stanza):
+    def _get_iq_handler(self, iq_type, payload):
+        """Get an <iq/> handler for given iq  type and payload."""
+        key = (payload.__class__, payload.handler_key)
+        handler = self._iq_handlers[iq_type].get(key)
+        return handler
+
+    def __try_handlers(self, handler_list, stanza, stanza_type = None):
         """ Search the handler list for handlers matching
         given stanza type and payload namespace. Run the
         handlers found ordering them by priority until
@@ -157,40 +221,34 @@ class StanzaProcessor:
 
         :Parameters:
             - `handler_list`: list of available handlers
-            - `typ`: stanza type (value of its "type" attribute)
             - `stanza`: the stanza to handle
+            - `stanza_type`: stanza type override (value of its "type"
+                            attribute)
 
         :return: result of the last handler or `False` if no
             handler was found."""
-        namespaces=[]
-        if stanza.xmlnode.children:
-            c=stanza.xmlnode.children
-            while c:
-                try:
-                    ns=c.ns()
-                except libxml2.treeError:
-                    ns=None
-                if ns is None:
-                    c=c.next
-                    continue
-                ns_uri=ns.getContent()
-                if ns_uri not in namespaces:
-                    namespaces.append(ns_uri)
-                c=c.next
+        if stanza_type is None:
+            stanza_type = stanza.stanza_type
+        payload = stanza.get_all_payload()
+        classes = [p.__class__ for p in payload]
+        keys = [(p.__class__, p.handler_key) for p in payload]
         for handler_entry in handler_list:
-            t=handler_entry[1]
-            ns=handler_entry[2]
-            handler=handler_entry[3]
-            if t!=typ:
+            type_filter = handler_entry[1]
+            class_filter = handler_entry[2]
+            extra_filter = handler_entry[3]
+            handler = handler_entry[4]
+            if type_filter != stanza_type:
                 continue
-            if ns is not None and ns not in namespaces:
+            if extra_filter is None and class_filter not in classes:
+                continue
+            if extra_filter and (class_filter, extra_filter) not in keys:
                 continue
             response = handler(stanza)
             if self.process_response(response):
                 return True
         return False
 
-    def process_message(self,stanza):
+    def process_message(self, stanza):
         """Process message stanza.
 
         Pass it to a handler of the stanza's type and payload namespace.
@@ -202,17 +260,19 @@ class StanzaProcessor:
         """
 
         if not self.initiator and not self.peer_authenticated:
-            self.__logger.debug("Ignoring message - peer not authenticated yet")
+            logger.debug("Ignoring message - peer not authenticated yet")
             return True
 
-        typ=stanza.get_type()
-        if self.__try_handlers(self._message_handlers,typ,stanza):
+        if self.__try_handlers(self._message_handlers, stanza):
             return True
-        if typ!="error":
-            return self.__try_handlers(self._message_handlers,"normal",stanza)
+
+        stanza_type = stanza.stanza_type
+        if stanza_type != "error":
+            return self.__try_handlers(self._message_handlers, stanza,
+                                                    stanza_type = "normal")
         return False
 
-    def process_presence(self,stanza):
+    def process_presence(self, stanza):
         """Process presence stanza.
 
         Pass it to a handler of the stanza's type and payload namespace.
@@ -222,15 +282,15 @@ class StanzaProcessor:
         """
 
         if not self.initiator and not self.peer_authenticated:
-            self.__logger.debug("Ignoring presence - peer not authenticated yet")
+            logger.debug("Ignoring presence - peer not authenticated yet")
             return True
 
-        typ=stanza.get_type()
-        if not typ:
-            typ="available"
-        return self.__try_handlers(self._presence_handlers,typ,stanza)
+        stanza_type = stanza.get_type()
+        if not stanza_type:
+            stanza_type = "available"
+        return self.__try_handlers(self._presence_handlers, stanza, stanza_type)
 
-    def route_stanza(self,stanza):
+    def route_stanza(self, stanza):
         """Process stanza not addressed to us.
 
         Return "recipient-unavailable" return if it is not
@@ -243,12 +303,12 @@ class StanzaProcessor:
         :Parameters:
             - `stanza`: presence stanza to be processed
         """
-        if stanza.get_type() not in ("error","result"):
-            r = stanza.make_error_response("recipient-unavailable")
-            self.send(r)
+        if stanza.stanza_type not in ("error", "result"):
+            response = stanza.make_error_response("recipient-unavailable")
+            self.send(response)
         return True
 
-    def process_stanza(self,stanza):
+    def process_stanza(self, stanza):
         """Process stanza received from the stream.
 
         First "fix" the stanza with `self.fix_in_stanza()`,
@@ -264,45 +324,49 @@ class StanzaProcessor:
         """
 
         self.fix_in_stanza(stanza)
-        to=stanza.get_to()
+        to_jid = stanza.to_jid
 
-        if not self.process_all_stanzas and to and to!=self.me and to.bare()!=self.me.bare():
+        if not self.process_all_stanzas and to_jid and (
+                to_jid != self.me and to_jid.bare() != self.me.bare()):
             return self.route_stanza(stanza)
 
         try:
-            if stanza.stanza_type=="iq":
+            if isinstance(stanza, Iq):
                 if self.process_iq(stanza):
                     return True
-            elif stanza.stanza_type=="message":
+            elif isinstance(stanza, Message):
                 if self.process_message(stanza):
                     return True
-            elif stanza.stanza_type=="presence":
+            elif isinstance(stanza, Presence):
                 if self.process_presence(stanza):
                     return True
-        except ProtocolError, e:
-            typ = stanza.get_type()
-            if typ != 'error' and (typ != 'result' or stanza.stanza_type != 'iq'):
-                r = stanza.make_error_response(e.xmpp_name)
-                self.send(r)
-                e.log_reported()
+        except ProtocolError, err:
+            typ = stanza.stanza_type
+            if typ != 'error' and (typ != 'result' 
+                                                or stanza.stanza_type != 'iq'):
+                response = stanza.make_error_response(err.xmpp_name)
+                self.send(response)
+                err.log_reported()
             else:
-                e.log_ignored()
-
-        self.__logger.debug("Unhandled %r stanza: %r" % (stanza.stanza_type,stanza.serialize()))
+                err.log_ignored()
+            return
+        logger.debug("Unhandled %r stanza: %r" % (stanza.stanza_type,
+                                                        stanza.serialize()))
         return False
 
-    def check_to(self,to):
+    def check_to(self, to_jid):
         """Check "to" attribute of received stream header.
 
-        :return: `to` if it is equal to `self.me`, None otherwise.
+        :return: `to_jid` if it is equal to `self.me`, None otherwise.
 
         Should be overriden in derived classes which require other logic
         for handling that attribute."""
-        if to!=self.me:
+        if to_jid != self.me:
             return None
-        return to
+        return to_jid
 
-    def set_response_handlers(self,iq,res_handler,err_handler,timeout_handler=None,timeout=300):
+    def set_response_handlers(self, stanza, res_handler, err_handler,
+                                    timeout_handler = None, timeout = 300):
         """Set response handler for an IQ "get" or "set" stanza.
 
         This should be called before the stanza is sent.
@@ -320,43 +384,56 @@ class StanzaProcessor:
               but this feature should rather not be used (it is better not to
               respond to 'error' stanzas).
             - `timeout_handler`: timeout handler for the stanza. Will be called
-              when no matching <iq type="result"/> or <iq type="error"/> is
-              received in next `timeout` seconds. The handler should accept
-              two arguments and ignore them.
+              (with no arguments) when no matching <iq type="result"/> or <iq
+              type="error"/> is received in next `timeout` seconds.
             - `timeout`: timeout value for the stanza. After that time if no
               matching <iq type="result"/> nor <iq type="error"/> stanza is
               received, then timeout_handler (if given) will be called.
         """
+        # pylint: disable-msg=R0913
         self.lock.acquire()
         try:
-            self._set_response_handlers(iq,res_handler,err_handler,timeout_handler,timeout)
+            self._set_response_handlers(stanza, res_handler, err_handler,
+                                                    timeout_handler, timeout)
         finally:
             self.lock.release()
 
-    def _set_response_handlers(self,iq,res_handler,err_handler,timeout_handler=None,timeout=300):
-        """Same as `Stream.set_response_handlers` but assume `self.lock` is acquired."""
-        self.fix_out_stanza(iq)
-        to=iq.get_to()
-        if to:
-            to=to.as_unicode()
+    def _set_response_handlers(self, stanza, res_handler, err_handler,
+                                timeout_handler = None, timeout = 300):
+        """Same as `Stream.set_response_handlers` but assume `self.lock` is
+        acquired."""
+        # pylint: disable-msg=R0913
+        self.fix_out_stanza(stanza)
+        to_jid = stanza.to_jid
+        if to_jid:
+            to_jid = unicode(to_jid)
         if timeout_handler:
-            self._iq_response_handlers.set_item((iq.get_id(),to),
-                    (res_handler,err_handler),
-                    timeout,timeout_handler)
+            def callback(dummy1, dummy1):
+                """Wrapper for the timeout handler to make it compatible
+                with the `ExpiringDictionary` """
+                timeout_handler()
+            self._iq_response_handlers.set_item(
+                                    (stanza.stanza_id, to_jid),
+                                    (res_handler,err_handler),
+                                    timeout, callback)
         else:
-            self._iq_response_handlers.set_item((iq.get_id(),to),
-                    (res_handler,err_handler),timeout)
+            self._iq_response_handlers.set_item(
+                                    (stanza.stanza_id, to_jid),
+                                    (res_handler, err_handler),
+                                    timeout)
 
-    def set_iq_get_handler(self,element,namespace,handler):
+    def set_iq_get_handler(self, payload_class, handler, payload_key = None):
         """Set <iq type="get"/> handler.
 
         :Parameters:
-            - `element`: payload element name
-            - `namespace`: payload element namespace URI
+            - `payload_class`: payload class requested
+            - `payload_key`: extra filter for payload
             - `handler`: function to be called when a stanza
               with defined element is received. Its only argument
               will be the stanza received. The handler may return a stanza or
               list of stanzas which should be sent in response.
+        :Types:
+            - `payload_class`: `classobj`, a subclass of `StanzaPayload`
 
         Only one handler may be defined per one namespaced element.
         If a handler for the element was already set it will be lost
@@ -364,11 +441,12 @@ class StanzaProcessor:
         """
         self.lock.acquire()
         try:
-            self._iq_get_handlers[(element,namespace)]=handler
+            key = (payload_class, payload_key)
+            self._iq_handlers["get"][key] = handler
         finally:
             self.lock.release()
 
-    def unset_iq_get_handler(self,element,namespace):
+    def unset_iq_get_handler(self, payload_class, payload_key):
         """Remove <iq type="get"/> handler.
 
         :Parameters:
@@ -377,68 +455,84 @@ class StanzaProcessor:
         """
         self.lock.acquire()
         try:
-            if self._iq_get_handlers.has_key((element,namespace)):
-                del self._iq_get_handlers[(element,namespace)]
+            key = (payload_class, payload_key)
+            if key in self._iq_handlers["get"]:
+                del self._iq_handlers["get"][key]
         finally:
             self.lock.release()
 
-    def set_iq_set_handler(self,element,namespace,handler):
+    def set_iq_set_handler(self, payload_class, handler, payload_key = None):
         """Set <iq type="set"/> handler.
 
         :Parameters:
-            - `element`: payload element name
-            - `namespace`: payload element namespace URI
+            - `payload_class`: payload class requested
+            - `payload_key`: extra filter for payload
             - `handler`: function to be called when a stanza
               with defined element is received. Its only argument
               will be the stanza received. The handler may return a stanza or
               list of stanzas which should be sent in response.
-
+        :Types:
+            - `payload_class`: `classobj`, a subclass of `StanzaPayload`
 
         Only one handler may be defined per one namespaced element.
         If a handler for the element was already set it will be lost
-        after calling this method."""
+        after calling this method.
+        """
         self.lock.acquire()
         try:
-            self._iq_set_handlers[(element,namespace)]=handler
+            key = (payload_class, payload_key)
+            self._iq_handlers["set"][key] = handler
         finally:
             self.lock.release()
 
-    def unset_iq_set_handler(self,element,namespace):
+    def unset_iq_set_handler(self, payload_class, payload_key):
         """Remove <iq type="set"/> handler.
 
         :Parameters:
-            - `element`: payload element name.
-            - `namespace`: payload element namespace URI."""
+            - `element`: payload element name
+            - `namespace`: payload element namespace URI
+        """
         self.lock.acquire()
         try:
-            if self._iq_set_handlers.has_key((element,namespace)):
-                del self._iq_set_handlers[(element,namespace)]
+            key = (payload_class, payload_key)
+            if key in self._iq_handlers["set"]:
+                del self._iq_handlers["set"][key]
         finally:
             self.lock.release()
 
-    def __add_handler(self,handler_list,typ,namespace,priority,handler):
+    @staticmethod
+    def __add_handler(handler_list, stanza_type, payload_class,
+                                        payload_key, priority, handler):
         """Add a handler function to a prioritized handler list.
 
         :Parameters:
             - `handler_list`: a handler list.
-            - `typ`: stanza type.
-            - `namespace`: stanza payload namespace.
+            - `stanza_type`: stanza type.
+            - `payload_class`: expected payload class. The handler will be
+              called only for stanzas with payload of this class
+            - `payload_key`: additional filter for the payload, specific
+              for the `payload_class`
             - `priority`: handler priority. Must be >=0 and <=100. Handlers
               with lower priority list will be tried first."""
-        if priority<0 or priority>100:
+        # pylint: disable-msg=R0913
+        if priority < 0 or priority > 100:
             raise ValueError,"Bad handler priority (must be in 0:100)"
-        handler_list.append((priority,typ,namespace,handler))
-        handler_list.sort()
+        handler_list.append((priority, stanza_type, payload_class, 
+                                                payload_key, handler))
+        handler_list.sort(key = lambda x: x[0])
 
-    def set_message_handler(self, typ, handler, namespace=None, priority=100):
+    def set_message_handler(self, stanza_type, handler, payload_class = None,
+                                        payload_key = None, priority=100):
         """Set a handler for <message/> stanzas.
 
         :Parameters:
-            - `typ`: message type. `None` will be treated the same as "normal",
-              and will be the default for unknown types (those that have no
-              handler associated).
-            - `namespace`: payload namespace. If `None` that message with any
-              payload (or even with no payload) will match.
+            - `stanza_type`: message type. `None` will be treated the same as
+              "normal", and will be the default for unknown types (those that
+              have no handler associated).
+            - `payload_class`: expected payload class. The handler will be
+              called only for stanzas with payload of this class
+            - `payload_key`: additional filter for the payload, specific
+              for the `payload_class`
             - `priority`: priority value for the handler. Handlers with lower
               priority value are tried first.
             - `handler`: function to be called when a message stanza
@@ -447,53 +541,64 @@ class StanzaProcessor:
               stanza or list of stanzas which should be sent in response.
 
         Multiple <message /> handlers with the same type/namespace/priority may
-        be set. Order of calling handlers with the same priority is not defined.
-        Handlers will be called in priority order until one of them returns True or
-        any stanza(s) to send (even empty list will do).
+        be set. Order of calling handlers with the same priority is not
+        defined.  Handlers will be called in priority order until one of them
+        returns True or any stanza(s) to send (even empty list will do).
         """
+        # pylint: disable-msg=R0913
         self.lock.acquire()
         try:
-            if not typ:
-                typ = "normal"
-            self.__add_handler(self._message_handlers,typ,namespace,priority,handler)
+            if stanza_type is None:
+                stanza_type = "normal"
+            self.__add_handler(self._message_handlers, stanza_type, 
+                                        payload_class, payload_key,
+                                        priority, handler)
         finally:
             self.lock.release()
 
-    def set_presence_handler(self,typ,handler,namespace=None,priority=100):
+    def set_presence_handler(self, stanza_type, handler, payload_class = None,
+                                    payload_key = None, priority = 100):
         """Set a handler for <presence/> stanzas.
 
         :Parameters:
-            - `typ`: presence type. "available" will be treated the same as `None`.
-            - `namespace`: payload namespace. If `None` that presence with any
-              payload (or even with no payload) will match.
-            - `priority`: priority value for the handler. Handlers with lower
-              priority value are tried first.
+            - `stanza_type`: presence type. "available" will be treated the
+              same as `None`.
             - `handler`: function to be called when a presence stanza
               with defined type and payload namespace is received. Its only
               argument will be the stanza received. The handler may return a
               stanza or list of stanzas which should be sent in response.
+            - `payload_class`: expected payload class. If given, then the
+              handler will be called only for stanzas with payload of this
+              class
+            - `payload_key`: additional filter for the payload, specific
+              for the `payload_class`
+            - `priority`: priority value for the handler. Handlers with lower
+              priority value are tried first.
 
-        Multiple <presence /> handlers with the same type/namespace/priority may
-        be set. Order of calling handlers with the same priority is not defined.
-        Handlers will be called in priority order until one of them returns
-        True or any stanza(s) to send (even empty list will do).
+        Multiple <presence /> handlers with the same type/class/filter/priority
+        may be set. Order of calling handlers with the same priority is not
+        defined.  Handlers will be called in priority order until one of them
+        returns True or any stanza(s) to send (even empty list will do).
         """
+        # pylint: disable-msg=R0913
         self.lock.acquire()
         try:
-            if not typ:
-                typ="available"
-            self.__add_handler(self._presence_handlers,typ,namespace,priority,handler)
+            if not stanza_type:
+                stanza_type = "available"
+            self.__add_handler(self._presence_handlers, stanza_type,
+                                    payload_class, payload_key,
+                                    priority, handler)
         finally:
             self.lock.release()
 
-    def fix_in_stanza(self,stanza):
+    def fix_in_stanza(self, stanza):
         """Modify incoming stanza before processing it.
 
         This implementation does nothig. It should be overriden in derived
         classes if needed."""
         pass
 
-    def fix_out_stanza(self,stanza):
+    def fix_out_stanza(self, stanza):
         """Modify outgoing stanza before sending into the stream.
 
         This implementation does nothig. It should be overriden in derived
@@ -501,7 +606,7 @@ class StanzaProcessor:
         pass
 
 
-    def send(self,stanza):
+    def send(self, stanza):
         """Send a stanza somwhere. This one does nothing. Should be overriden
         in derived classes.
 
@@ -509,7 +614,7 @@ class StanzaProcessor:
             - `stanza`: the stanza to send.
         :Types:
             - `stanza`: `pyxmpp.stanza.Stanza`"""
-        raise NotImplementedError,"This method must be overriden in derived classes."""
-
+        raise NotImplementedError, ("This method must be overriden in derived"
+                                    " classes.")
 
 # vi: sts=4 et sw=4

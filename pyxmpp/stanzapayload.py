@@ -25,8 +25,6 @@ class StanzaPayload:
     """Abstract base class for stanza payload objects."""
     __metaclass__ = ABCMeta
 
-    xml_namespace = None
-
     def __init__(self, data):
         raise NotImplementedError
 
@@ -35,6 +33,13 @@ class StanzaPayload:
 
     def copy(self):
         return deepcopy(self)
+
+    @property
+    def handler_key(self):
+        """Defines a key which may be used when registering handlers
+        for stanzas with this payload."""
+        return None
+
 
 class XMLPayload(StanzaPayload):
     """Transparent XML payload for stanza.
@@ -51,8 +56,15 @@ class XMLPayload(StanzaPayload):
             self.xml_namespace = data.tag[1:].split("}", 1)[0]
         else:
             self.xml_namespace = None
+        self.xml_element_name = data.tag
         self.element = data
 
     def as_xml(self):
         return self.element
+
+    @property
+    def handler_key(self):
+        """Return `self.xml_element_name` as the extra key for stanza
+        handlers."""
+        return self.xml_element_name
     
