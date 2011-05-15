@@ -23,25 +23,24 @@ Normative reference:
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
-import libxml2
+from xml.etree import ElementTree
 
-from .utils import to_utf8,from_utf8
 from .stanza import Stanza
-from .xmlextra import common_ns
 
-presence_types=("available","unavailable","probe","subscribe","unsubscribe","subscribed",
-        "unsubscribed","invisible","error")
+PRESENCE_TYPES = ("available", "unavailable", "probe",
+                    "subscribe", "unsubscribe", "subscribed", "unsubscribed",
+                    "invisible", "error")
 
-accept_responses={
+ACCEPT_RESPONSES = {
         "subscribe": "subscribed",
         "subscribed": "subscribe",
         "unsubscribe": "unsubscribed",
         "unsubscribed": "unsubscribe",
         }
 
-deny_responses={
+DENY_RESPONSES = {
         "subscribe": "unsubscribed",
         "subscribed": "unsubscribe",
         "unsubscribe": "subscribed",
@@ -49,11 +48,23 @@ deny_responses={
         }
 
 class Presence(Stanza):
-    """Wraper object for <presence /> stanzas."""
-    stanza_type="presence"
-    def __init__(self, xmlnode = None, from_jid = None, to_jid = None, stanza_type = None, 
-            stanza_id = None, show = None, status = None, priority = 0,
-            error = None, error_cond = None, stream = None):
+    """<presence /> stanza.
+    
+    :Properties:
+        - `show`: status type
+        - `status`: status message
+        - `priority`: presence priority
+    :Types:
+        - `show`: `unicode`
+        - `status`: `unicode`
+        - `priority`: `int`
+    """
+    # pylint: disable-msg=R0902
+    element_name = "presence"
+    def __init__(self, element = None, from_jid = None, to_jid = None,
+                            stanza_type = None, stanza_id = None,
+                            error = None, error_cond = None, stream = None,
+                            show = None, status = None, priority = None):
         """Initialize a `Presence` object.
 
         :Parameters:
@@ -62,189 +73,172 @@ class Presence(Stanza):
               presence stanza is created using following parameters.
             - `from_jid`: sender JID.
             - `to_jid`: recipient JID.
-            - `stanza_type`: staza type: one of: None, "available", "unavailable",
-              "subscribe", "subscribed", "unsubscribe", "unsubscribed" or
-              "error". "available" is automaticaly changed to_jid None.
+            - `stanza_type`: staza type: one of: None, "available",
+              "unavailable", "subscribe", "subscribed", "unsubscribe",
+              "unsubscribed" or "error". "available" is automaticaly changed to
+              None.
             - `stanza_id`: stanza id -- value of stanza's "id" attribute
             - `show`: "show" field of presence stanza. One of: None, "away",
               "xa", "dnd", "chat".
             - `status`: descriptive text for the presence stanza.
             - `priority`: presence priority.
-            - `error_cond`: error condition name. Ignored if `stanza_type` is not "error"
+            - `error_cond`: error condition name. Ignored if `stanza_type` is
+              not "error"
         :Types:
-            - `xmlnode`: `unicode` or `libxml2.xmlNode` or `Stanza`
+            - `element`: `ElementTree.Element`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
             - `stanza_id`: `unicode`
             - `show`: `unicode`
             - `status`: `unicode`
-            - `priority`: `unicode`
+            - `priority`: `int`
             - `error_cond`: `unicode`"""
+        # pylint: disable-msg=R0913
+        self._show = None
+        self._status = None
+        self._priority = 0
         self.xmlnode=None
-        if isinstance(xmlnode,Presence):
-            pass
-        elif isinstance(xmlnode,Stanza):
-            raise TypeError,"Couldn't make Presence from other Stanza"
-        elif isinstance(xmlnode,libxml2.xmlNode):
-            pass
-        elif xmlnode is not None:
-            raise TypeError,"Couldn't make Presence from %r" % (type(xmlnode),)
+        if element is None:
+            element = "presence"
+        elif not isinstance(element, ElementTree.Element):
+            raise TypeError, "Couldn't make Presence from " + repr(element)
 
-        if stanza_type and stanza_type not in presence_types:
-            raise ValueError, "Invalid presence type: %r" % (type,)
+        if stanza_type is not None and stanza_type not in PRESENCE_TYPES:
+            raise ValueError, "Bad presence type"
+        elif stanza_type == 'available':
+            stanza_type = None
+        
+        Stanza.__init__(self, element, from_jid = from_jid, to_jid = to_jid,
+                        stanza_type = stanza_type, stanza_id = stanza_id,
+                        error = error, error_cond = error_cond, stream = stream)
 
-        if stanza_type=="available":
-            stanza_type=None
+        if self.element_name != "presence":
+            raise ValueError, "The element is not <presence />"
 
-        if xmlnode is None:
-            xmlnode="presence"
+        self._show_tag = self._ns_prefix + "show"
+        self._status_tag = self._ns_prefix + "status"
+        self._priority_tag = self._ns_prefix + "priority"
 
-        Stanza.__init__(self, xmlnode, from_jid = from_jid, to_jid = to_jid, stanza_type = stanza_type,
-                stanza_id = stanza_id, error = error, error_cond = error_cond, stream = stream)
+        if self._element is not None:
+            self._decode_subelements()
 
-        if show:
-            self.xmlnode.newTextChild(common_ns,"show",to_utf8(show))
-        if status:
-            self.xmlnode.newTextChild(common_ns,"status",to_utf8(status))
-        if priority and priority!=0:
-            self.xmlnode.newTextChild(common_ns,"priority",to_utf8(unicode(priority)))
+        if show is not None:
+            self.show = show
+        if status is not None:
+            self.status = status
+        if priority is not None:
+            self.priority = priority
+
+    def _decode_subelements(self):
+        """Decode the stanza subelements."""
+        for child in self._element:
+            if child.tag == self._show_tag:
+                self._show = child.text
+            elif child.tag == self._status_tag:
+                self._status = child.text
+            elif child.tag == self._priority_tag:
+                try:
+                    self._priority = int(child.text.strip())
+                    if self._priority < -128 or self._priority > 127:
+                        raise ValueError
+                except ValueError:
+                    raise ProtocolError, "Presence priority not an integer"
+
+    def as_xml(self):
+        """Return the XML stanza representation.
+
+        Always return an independent copy of the stanza XML representation,
+        which can be freely modified without affecting the stanza.
+
+        :returntype: `ElementTree.Element`"""
+        result = Stanza.as_xml(self)
+        if self._show:
+            child = ElementTree.SubElement(result, self._show_tag)
+            child.text = self._show
+        if self._status:
+            child = ElementTree.SubElement(result, self._status_tag)
+            child.text = self._status
+        if self._priority:
+            child = ElementTree.SubElement(result, self._priority_tag)
+            child.text = unicode(self._priority)
+        return result
 
     def copy(self):
-        """Create a deep copy of the presence stanza.
+        """Create a deep copy of the stanza.
 
         :returntype: `Presence`"""
-        return Presence(self)
+        result = Presence(None, self.from_jid, self.to_jid, 
+                        self.stanza_type, self.stanza_id, self.error,
+                        self._stream(), 
+                        self._show, self._status, self._priority)
+        for payload in self._payload:
+            result.add_payload(payload.copy())
+        return result
 
-    def set_status(self,status):
-        """Change presence status description.
+    @property
+    def show(self): # pylint: disable-msg=C0111,E0202
+        return self._show
 
-        :Parameters:
-            - `status`: descriptive text for the presence stanza.
-        :Types:
-            - `status`: `unicode`"""
-        n=self.xpath_eval("ns:status")
-        if not status:
-            if n:
-                n[0].unlinkNode()
-                n[0].freeNode()
-            else:
-                return
-        if n:
-            n[0].setContent(to_utf8(status))
-        else:
-            self.xmlnode.newTextChild(common_ns,"status",to_utf8(status))
+    @show.setter # pylint: disable-msg=E1101
+    def show(self, show): # pylint: disable-msg=E0202,E0102,C0111
+        self._show = unicode(show)
+        self._dirty = True
 
-    def get_status(self):
-        """Get presence status description.
+    @property
+    def status(self): # pylint: disable-msg=C0111,E0202
+        return self._status
 
-        :return: value of stanza's <status/> field.
-        :returntype: `unicode`"""
-        n=self.xpath_eval("ns:status")
-        if n:
-            return from_utf8(n[0].getContent())
-        else:
-            return None
+    @status.setter # pylint: disable-msg=E1101
+    def status(self, status): # pylint: disable-msg=E0202,E0102,C0111
+        self._status = unicode(status)
+        self._dirty = True
 
-    def get_show(self):
-        """Get presence "show" field.
+    @property
+    def priority(self): # pylint: disable-msg=C0111,E0202
+        return self._priority
 
-        :return: value of stanza's <show/> field.
-        :returntype: `unicode`"""
-        n=self.xpath_eval("ns:show")
-        if n:
-            return from_utf8(n[0].getContent())
-        else:
-            return None
-
-    def set_show(self,show):
-        """Change presence "show" field.
-
-        :Parameters:
-            - `show`: new value for the "show" field of presence stanza. One
-              of: None, "away", "xa", "dnd", "chat".
-        :Types:
-            - `show`: `unicode`"""
-        n=self.xpath_eval("ns:show")
-        if not show:
-            if n:
-                n[0].unlinkNode()
-                n[0].freeNode()
-            else:
-                return
-        if n:
-            n[0].setContent(to_utf8(show))
-        else:
-            self.xmlnode.newTextChild(common_ns,"show",to_utf8(show))
-
-    def get_priority(self):
-        """Get presence priority.
-
-        :return: value of stanza's priority. 0 if the stanza doesn't contain
-            <priority/> element.
-        :returntype: `int`"""
-        n=self.xpath_eval("ns:priority")
-        if not n:
-            return 0
-        try:
-            prio=int(n[0].getContent())
-        except ValueError:
-            return 0
-        return prio
-
-    def set_priority(self,priority):
-        """Change presence priority.
-
-        :Parameters:
-            - `priority`: new presence priority.
-        :Types:
-            - `priority`: `int`"""
-        n=self.xpath_eval("ns:priority")
-        if not priority:
-            if n:
-                n[0].unlinkNode()
-                n[0].freeNode()
-            else:
-                return
-        priority=int(priority)
-        if priority<-128 or priority>127:
-            raise ValueError, "Bad priority value"
-        priority=str(priority)
-        if n:
-            n[0].setContent(priority)
-        else:
-            self.xmlnode.newTextChild(common_ns,"priority",priority)
+    @priority.setter # pylint: disable-msg=E1101
+    def priority(self, priority): # pylint: disable-msg=E0202,E0102,C0111
+        priority = int(priority)
+        if priority < -128 or priority > 127:
+            raise ValueError, "Priority must be in the (-128, 128) range"
+        self._priority = priority
+        self._dirty = True
 
     def make_accept_response(self):
-        """Create "accept" response for the "subscribe"/"subscribed"/"unsubscribe"/"unsubscribed"
-        presence stanza.
+        """Create "accept" response for the "subscribe" / "subscribed" /
+        "unsubscribe" / "unsubscribed" presence stanza.
 
         :return: new stanza.
-        :returntype: `Presence`"""
-
-        if self.get_type() not in ("subscribe","subscribed","unsubscribe","unsubscribed"):
+        :returntype: `Presence`
+        """
+        if self.stanza_type not in ("subscribe", "subscribed",
+                                                "unsubscribe", "unsubscribed"):
             raise ValueError, ("Results may only be generated for 'subscribe',"
                 "'subscribed','unsubscribe' or 'unsubscribed' presence")
-
-        pr=Presence(stanza_type=accept_responses[self.get_type()],
-            from_jid=self.get_to(),to_jid=self.get_from(),stanza_id=self.get_id())
-        return pr
+        stanza = Presence(stanza_type = accept_responses[self.get_type()],
+                            from_jid = self.from_jid, to_jid = self.to_jid,
+                                                    stanza_id = self.stanza_id)
+        return stanza
 
     def make_deny_response(self):
-        """Create "deny" response for the "subscribe"/"subscribed"/"unsubscribe"/"unsubscribed"
-        presence stanza.
+        """Create "deny" response for the "subscribe" / "subscribed" /
+        "unsubscribe" / "unsubscribed" presence stanza.
 
         :return: new presence stanza.
-        :returntype: `Presence`"""
-        if self.get_type() not in ("subscribe","subscribed","unsubscribe","unsubscribed"):
+        :returntype: `Presence`
+        """
+        if self.stanza_type not in ("subscribe", "subscribed",
+                                                "unsubscribe", "unsubscribed"):
             raise ValueError, ("Results may only be generated for 'subscribe',"
                 "'subscribed','unsubscribe' or 'unsubscribed' presence")
+        stanza = Presence(stanza_type = deny_responses[self.get_type()],
+                            from_jid = self.from_jid, to_jid = self.to_jid,
+                                                    stanza_id = self.stanza_id)
+        return stanza
 
-        pr=Presence(stanza_type=deny_responses[self.get_type()],
-            from_jid=self.get_to(),to_jid=self.get_from(),stanza_id=self.get_id())
-        return pr
-
-    def make_error_response(self,cond):
+    def make_error_response(self, cond):
         """Create error response for the any non-error presence stanza.
 
         :Parameters:
@@ -253,19 +247,24 @@ class Presence(Stanza):
             - `cond`: `unicode`
 
         :return: new presence stanza.
-        :returntype: `Presence`"""
+        :returntype: `Presence`
+        """
+        
+        if self.stanza_type == "error":
+            raise ValueError, ("Errors may not be generated in response"
+                                                                " to errors")
 
-        if self.get_type() == "error":
-            raise ValueError, "Errors may not be generated in response to errors"
+        stanza = Presence(stanza_type = "error", from_jid = self.from_jid,
+                            to_jid = self.to_jid, stanza_id = self.stanza_id,
+                            status = self._status, show = self._show,
+                            priority = self._priority, error_cond = cond)
 
-        p=Presence(stanza_type="error",from_jid=self.get_to(),to_jid=self.get_from(),
-            stanza_id=self.get_id(),error_cond=cond)
+        if payload is None:
+            self.decode_payload()
 
-        if self.xmlnode.children:
-            n=self.xmlnode.children
-            while n:
-                p.xmlnode.children.addPrevSibling(n.copyNode(1))
-                n=n.next
-        return p
+        for payload in self._payload:
+            stanza.add_payload(payload)
+
+        return stanza
 
 # vi: sts=4 et sw=4
