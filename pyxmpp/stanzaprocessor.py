@@ -49,11 +49,12 @@ def stanza_factory(element, stream = None):
         - `element`: `ElementTree.Element`
         - `stream`: `pyxmpp2.stream.Stream`
     """
-    if element.name == "iq":
+    tag = element.tag
+    if tag.endswith("}iq") or tag == "iq":
         return Iq(element, stream = stream)
-    if element.name == "message":
+    if tag.endswith("}message") or tag == "message":
         return Message(element, stream = stream)
-    if element.name == "presence":
+    if tag.endswith("}presence") or tag == "presence":
         return Presence(element, stream = stream)
     else:
         return Stanza(element, stream = stream)
@@ -408,7 +409,7 @@ class StanzaProcessor(object):
         if to_jid:
             to_jid = unicode(to_jid)
         if timeout_handler:
-            def callback(dummy1, dummy1):
+            def callback(dummy1, dummy2):
                 """Wrapper for the timeout handler to make it compatible
                 with the `ExpiringDictionary` """
                 timeout_handler()
