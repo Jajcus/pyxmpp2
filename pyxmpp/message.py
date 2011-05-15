@@ -58,13 +58,13 @@ class Message(Stanza):
               "error", "groupchat"
             - `stanza_id`: stanza id -- value of stanza's "id" attribute. If
               not given, then unique for the session value is generated.
-            - `thread`: message thread id.
             - `error_cond`: error condition name. Ignored if `stanza_type` 
               is not "error".
             - `subject`: message subject,
             - `body`: message body.
+            - `thread`: message thread id.
         :Types:
-            - `_element`: `ElementTree.Element`
+            - `element`: `ElementTree.Element`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
@@ -88,15 +88,15 @@ class Message(Stanza):
                         stanza_type = stanza_type, stanza_id = stanza_id,
                         error = error, error_cond = error_cond, stream = stream)
 
+        if self.element_name != "message":
+            raise ValueError, "The element is not <message/>"
+
         self._subject_tag = self._ns_prefix + "subject"
         self._body_tag = self._ns_prefix + "body"
         self._thread_tag = self._ns_prefix + "thread"
 
         if self._element is not None:
             self._decode_subelements()
-
-        if self.element_name != "message":
-            raise ValueError, "The element is not <message/>"
 
         if subject is not None:
             self.subject = subject
@@ -151,7 +151,7 @@ class Message(Stanza):
 
     @subject.setter # pylint: disable-msg=E1101
     def subject(self, subject): # pylint: disable-msg=E0202,E0102,C0111
-        self._subject = subject
+        self._subject = unicode(subject)
         self._dirty = True
 
     @property
@@ -160,7 +160,7 @@ class Message(Stanza):
 
     @body.setter # pylint: disable-msg=E1101
     def body(self, body): # pylint: disable-msg=E0202,E0102,C0111
-        self._body = body
+        self._body = unicode(body)
         self._dirty = True
 
     @property
@@ -169,7 +169,7 @@ class Message(Stanza):
 
     @thread.setter # pylint: disable-msg=E1101
     def thread(self, thread): # pylint: disable-msg=E0202,E0102,C0111
-        self._thread = thread
+        self._thread = unicode(thread)
         self._dirty = True
 
     def make_error_response(self, cond):
