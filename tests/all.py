@@ -5,8 +5,9 @@ import sys
 import getopt
 
 all_modules=[ "jid", "stream_reader", "xmppserializer", "stanza",
+            "message",
              "cache", 
-#          "vcard", "disco", "message", "presence", "dataforms", "interface"
+#          "vcard", "disco", "presence", "dataforms", "interface"
                 ]
 
 def suite(modules=None):
