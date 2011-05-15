@@ -33,6 +33,7 @@ from .exceptions import ProtocolError, JIDMalformedProtocolError
 from .jid import JID
 from .stanzapayload import StanzaPayload, XMLPayload
 from .xmppserializer import serialize
+from .constants import STANZA_NAMESPACES, STANZA_CLIENT_NS
 
 random.seed()
 
@@ -100,15 +101,17 @@ class Stanza(object):
             self._decode_attributes()
             if element.tag.startswith("{"):
                 self._namespace, self.element_name = element.tag[1:].split("}")
+                if self._namespace not in STANZA_NAMESPACES:
+                    raise ProtocolError, "Wrong stanza namespace"
             else:
-                self._namespace = "jabber:client"
+                self._namespace = STANZA_CLIENT_NS
                 self.element_name = element.tag
             self._payload = None
         else:
             self._element = None
             self._dirty = True
             self.element_name = unicode(element)
-            self._namespace = "jabber:client"
+            self._namespace = STANZA_CLIENT_NS
             self._payload = []
 
         self._ns_prefix = "{{{0}}}".format(self._namespace)
