@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2011 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -23,109 +23,156 @@ Normative reference:
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
-import libxml2
+from xml.etree import ElementTree
 from .stanza import Stanza
-from .utils import to_utf8,from_utf8
-from .xmlextra import common_ns
 
-message_types=("normal","chat","headline","error","groupchat")
+MESSAGE_TYPES = ("normal", "chat", "headline", "error", "groupchat")
 
 class Message(Stanza):
-    """Wraper object for <message /> stanzas."""
-    stanza_type="message"
-    def __init__(self, xmlnode = None, from_jid = None, to_jid = None, stanza_type = None, stanza_id = None,
-            subject = None, body = None, thread = None, error = None, error_cond = None, stream = None):
+    """<message /> stanza class.
+
+    :Properties:
+        - `subject`: message subject
+        - `body`: message body
+        - `thread`: message thread-id
+    :Types:
+        - `subject`: `unicode`
+        - `body`: `unicode`
+        - `thread`: `unicode`
+    """
+    # pylint: disable-msg=R0902
+    element_name = "message"
+    def __init__(self, element = None, from_jid = None, to_jid = None,
+                            stanza_type = None, stanza_id = None,
+                            error = None, error_cond = None, stream = None,
+                            subject = None, body = None, thread = None):
         """Initialize a `Message` object.
 
         :Parameters:
-            - `xmlnode`: XML node to_jid be wrapped into the `Message` object
-              or other Message object to be copied. If not given then new
-              presence stanza is created using following parameters.
+            - `element`: XML element of this stanza.
             - `from_jid`: sender JID.
             - `to_jid`: recipient JID.
-            - `stanza_type`: staza type: one of: "get", "set", "result" or "error".
-            - `stanza_id`: stanza id -- value of stanza's "id" attribute. If not
-              given, then unique for the session value is generated.
+            - `stanza_type`: staza type: one of: "normal", "chat", "headline",
+              "error", "groupchat"
+            - `stanza_id`: stanza id -- value of stanza's "id" attribute. If
+              not given, then unique for the session value is generated.
+            - `thread`: message thread id.
+            - `error_cond`: error condition name. Ignored if `stanza_type` 
+              is not "error".
             - `subject`: message subject,
             - `body`: message body.
-            - `thread`: message thread id.
-            - `error_cond`: error condition name. Ignored if `stanza_type` is not "error".
         :Types:
-            - `xmlnode`: `unicode` or `libxml2.xmlNode` or `Stanza`
+            - `_element`: `ElementTree.Element`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
             - `stanza_id`: `unicode`
+            - `error`: `pyxmpp.error.StanzaErrorElement`
+            - `error_cond`: `unicode`
             - `subject`: `unicode`
             - `body`: `unicode`
             - `thread`: `unicode`
-            - `error_cond`: `unicode`"""
+        """
+        # pylint: disable-msg=R0913
+        self._subject = None
+        self._body = None
+        self._thread = None
+        if element is None:
+            element = "message"
+        elif not isinstance(element, ElementTree.Element):
+            raise TypeError, "Couldn't make Message from " + repr(element)
 
-        self.xmlnode=None
-        if isinstance(xmlnode,Message):
-            pass
-        elif isinstance(xmlnode,Stanza):
-            raise TypeError, "Couldn't make Message from other Stanza"
-        elif isinstance(xmlnode,libxml2.xmlNode):
-            pass
-        elif xmlnode is not None:
-            raise TypeError, "Couldn't make Message from %r" % (type(xmlnode),)
+        Stanza.__init__(self, element, from_jid = from_jid, to_jid = to_jid,
+                        stanza_type = stanza_type, stanza_id = stanza_id,
+                        error = error, error_cond = error_cond, stream = stream)
 
-        if xmlnode is None:
-            xmlnode="message"
+        self._subject_tag = self._ns_prefix + "subject"
+        self._body_tag = self._ns_prefix + "body"
+        self._thread_tag = self._ns_prefix + "thread"
 
-        Stanza.__init__(self, xmlnode, from_jid = from_jid, to_jid = to_jid, stanza_type = stanza_type,
-                stanza_id = stanza_id, error = error, error_cond = error_cond, stream = stream)
+        if self._element is not None:
+            self._decode_subelements()
+
+        if self.element_name != "message":
+            raise ValueError, "The element is not <message/>"
 
         if subject is not None:
-            self.xmlnode.newTextChild(common_ns,"subject",to_utf8(subject))
+            self.subject = subject
         if body is not None:
-            self.xmlnode.newTextChild(common_ns,"body",to_utf8(body))
+            self.body = body
         if thread is not None:
-            self.xmlnode.newTextChild(common_ns,"thread",to_utf8(thread))
+            self.thread = thread
 
-    def get_subject(self):
-        """Get the message subject.
+    def _decode_subelements(self):
+        """Decode the stanza subelements."""
+        for child in self._element:
+            if child.tag == self._subject_tag:
+                self._subject = child.text
+            elif child.tag == self._body_tag:
+                self._body = child.text
+            elif child.tag == self._thread_tag:
+                self._thread = child.text
 
-        :return: the message subject or `None` if there is no subject.
-        :returntype: `unicode`"""
-        n=self.xpath_eval("ns:subject")
-        if n:
-            return from_utf8(n[0].getContent())
-        else:
-            return None
+    def as_xml(self):
+        """Return the XML stanza representation.
 
-    def get_thread(self):
-        """Get the thread-id subject.
+        Always return an independent copy of the stanza XML representation,
+        which can be freely modified without affecting the stanza.
 
-        :return: the thread-id or `None` if there is no thread-id.
-        :returntype: `unicode`"""
-        n=self.xpath_eval("ns:thread")
-        if n:
-            return from_utf8(n[0].getContent())
-        else:
-            return None
+        :returntype: `ElementTree.Element`"""
+        result = Stanza.as_xml(self)
+        if self._subject:
+            child = ElementTree.SubElement(result, self._subject_tag)
+            child.text = self._subject
+        if self._body:
+            child = ElementTree.SubElement(result, self._body_tag)
+            child.text = self._body
+        if self._thread:
+            child = ElementTree.SubElement(result, self._thread_tag)
+            child.text = self._thread
+        return result
 
     def copy(self):
-        """Create a deep copy of the message stanza.
+        """Create a deep copy of the stanza.
 
         :returntype: `Message`"""
-        return Message(self)
+        result = Message(None, self.from_jid, self.to_jid, 
+                        self.stanza_type, self.stanza_id, self.error,
+                        self._stream(), self._subject, self._body, self._thread)
+        for payload in self._payload:
+            result.add_payload(payload.copy())
+        return result
 
-    def get_body(self):
-        """Get the body of the message.
+    @property
+    def subject(self): # pylint: disable-msg=C0111,E0202
+        return self._subject
 
-        :return: the body of the message or `None` if there is no body.
-        :returntype: `unicode`"""
-        n=self.xpath_eval("ns:body")
-        if n:
-            return from_utf8(n[0].getContent())
-        else:
-            return None
+    @subject.setter # pylint: disable-msg=E1101
+    def subject(self, subject): # pylint: disable-msg=E0202,E0102,C0111
+        self._subject = subject
+        self._dirty = True
 
-    def make_error_response(self,cond):
+    @property
+    def body(self): # pylint: disable-msg=C0111,E0202
+        return self._body
+
+    @body.setter # pylint: disable-msg=E1101
+    def body(self, body): # pylint: disable-msg=E0202,E0102,C0111
+        self._body = body
+        self._dirty = True
+
+    @property
+    def thread(self): # pylint: disable-msg=C0111,E0202
+        return self._thread
+
+    @thread.setter # pylint: disable-msg=E1101
+    def thread(self, thread): # pylint: disable-msg=E0202,E0102,C0111
+        self._thread = thread
+        self._dirty = True
+
+    def make_error_response(self, cond):
         """Create error response for any non-error message stanza.
 
         :Parameters:
@@ -134,19 +181,21 @@ class Message(Stanza):
         :return: new message stanza with the same "id" as self, "from" and
             "to" attributes swapped, type="error" and containing <error />
             element plus payload of `self`.
-        :returntype: `unicode`"""
+        :returntype: `Message`"""
 
-        if self.get_type() == "error":
-            raise ValueError, "Errors may not be generated in response to errors"
+        if self.stanza_type == "error":
+            raise ValueError, ("Errors may not be generated in response"
+                                                                " to errors")
 
-        m=Message(stanza_type="error",from_jid=self.get_to(),to_jid=self.get_from(),
-            stanza_id=self.get_id(),error_cond=cond)
+        msg = Message(stanza_type = "error", from_jid = self.to_jid, 
+                        to_jid = self.from_jid, stanza_id = self.stanza_id,
+                        error_cond = cond,
+                        subject = self._subject, body = self._body,
+                        thread = self._thread)
 
-        if self.xmlnode.children:
-            n=self.xmlnode.children
-            while n:
-                m.xmlnode.children.addPrevSibling(n.copyNode(1))
-                n=n.next
-        return m
+        for payload in self._payload:
+            msg.add_payload(payload.copy())
+
+        return msg
 
 # vi: sts=4 et sw=4
