@@ -28,12 +28,13 @@ import threading
 import re
 from xml.sax.saxutils import escape, quoteattr
 
-from .constants import STANZA_NAMESPACES, STREAM_NS
+from .constants import STANZA_NAMESPACES, STREAM_NS, XML_NS
 
 __docformat__ = "restructuredtext en"
 
 STANDARD_PREFIXES = {
         STREAM_NS: u'stream',
+        XML_NS: u'xml',
     }
 
 EVIL_CHARACTERS_RE = re.compile(r"[\000-\010\013\014\016-\037]", re.UNICODE)
