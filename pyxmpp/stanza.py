@@ -168,10 +168,10 @@ class Stanza(object):
         return result
 
     def serialize(self):
-        """Serialize the stanza into an UTF-8 encoded XML string.
+        """Serialize the stanza into a Unicode XML string.
 
         :return: serialized stanza.
-        :returntype: `str`"""
+        :returntype: `unicode`"""
         return serialize(self.get_xml())
 
     def as_xml(self):
