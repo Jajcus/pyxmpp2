@@ -35,60 +35,60 @@ class TestCacheItem(unittest.TestCase):
         item = CacheItem("test_addr",o, sec(0.1), sec(0.2), sec(0.3))
         post = datetime.utcnow()
 
-        self.failUnless(item.timestamp >= pre and item.timestamp <= post)
-        self.failUnless(item.value is o)
-        self.failUnless(item.address == "test_addr")
+        self.assertTrue(item.timestamp >= pre and item.timestamp <= post)
+        self.assertTrue(item.value is o)
+        self.assertTrue(item.address == "test_addr")
 
     def test_item_state_transitions(self):
         item = CacheItem("test_addr","test_value", sec(0.1), sec(0.2), sec(0.3))
 
         # t+0
-        self.failUnlessEqual(item.state,"new")
+        self.assertEqual(item.state,"new")
         state = item.update_state()
-        self.failUnlessEqual(state,item.state)
-        self.failUnlessEqual(item.state,"fresh")
+        self.assertEqual(state,item.state)
+        self.assertEqual(item.state,"fresh")
 
         sleep(0.01)
         # t+~0.01
         state = item.update_state()
-        self.failUnlessEqual(state,item.state)
-        self.failUnlessEqual(item.state,"fresh")
+        self.assertEqual(state,item.state)
+        self.assertEqual(item.state,"fresh")
 
         sleep(0.1)
         # t+~0.11
         state = item.update_state()
-        self.failUnlessEqual(state,item.state)
-        self.failUnlessEqual(item.state,"old")
+        self.assertEqual(state,item.state)
+        self.assertEqual(item.state,"old")
 
         sleep(0.01)
         # t+~0.12
         state = item.update_state()
-        self.failUnlessEqual(state,item.state)
-        self.failUnlessEqual(item.state,"old")
+        self.assertEqual(state,item.state)
+        self.assertEqual(item.state,"old")
 
         sleep(0.1)
         # t+~0.22
         state = item.update_state()
-        self.failUnlessEqual(state,item.state)
-        self.failUnlessEqual(item.state,"stale")
+        self.assertEqual(state,item.state)
+        self.assertEqual(item.state,"stale")
 
         sleep(0.01)
         # t+~0.23
         state = item.update_state()
-        self.failUnlessEqual(state,item.state)
-        self.failUnlessEqual(item.state,"stale")
+        self.assertEqual(state,item.state)
+        self.assertEqual(item.state,"stale")
 
         sleep(0.1)
         # t+~0.33
         state = item.update_state()
-        self.failUnlessEqual(state,item.state)
-        self.failUnlessEqual(item.state,"purged")
+        self.assertEqual(state,item.state)
+        self.assertEqual(item.state,"purged")
 
         sleep(0.1)
         # t+~0.43
         state = item.update_state()
-        self.failUnlessEqual(state,item.state)
-        self.failUnlessEqual(item.state,"purged")
+        self.assertEqual(state,item.state)
+        self.assertEqual(item.state,"purged")
 
 class TestCacheFetcher(unittest.TestCase):
     def setUp(self):
@@ -111,36 +111,36 @@ class TestCacheFetcher(unittest.TestCase):
 
     def test_fetcher_fetch(self):
         fetcher = self.make_fetcher()
-        self.failUnlessRaises(RuntimeError,fetcher.fetch)
+        self.assertRaises(RuntimeError,fetcher.fetch)
 
     def test_success(self):
         fetcher = self.make_fetcher()
         fetcher.got_it("test_value")
-        self.failUnlessEqual(self.event,("success", "test_addr", "test_value", "new"))
+        self.assertEqual(self.event,("success", "test_addr", "test_value", "new"))
         self.event = None
         fetcher.got_it("test_value")
-        self.failUnlessEqual(self.event, None)
+        self.assertEqual(self.event, None)
 
     def test_success_other_state(self):
         fetcher = self.make_fetcher()
         fetcher.got_it("test_value","stale")
-        self.failUnlessEqual(self.event,("success", "test_addr", "test_value", "stale"))
+        self.assertEqual(self.event,("success", "test_addr", "test_value", "stale"))
 
     def test_error(self):
         fetcher = self.make_fetcher()
         fetcher.error("test_error")
-        self.failUnlessEqual(self.event,("error", "test_addr", "test_error"))
+        self.assertEqual(self.event,("error", "test_addr", "test_error"))
         self.event = None
         fetcher.error("test_error")
-        self.failUnlessEqual(self.event, None)
+        self.assertEqual(self.event, None)
 
     def test_timeout(self):
         fetcher = self.make_fetcher()
         fetcher.timeout()
-        self.failUnlessEqual(self.event,("timeout", "test_addr"))
+        self.assertEqual(self.event,("timeout", "test_addr"))
         self.event = None
         fetcher.timeout()
-        self.failUnlessEqual(self.event, None)
+        self.assertEqual(self.event, None)
 
 class TestCache(unittest.TestCase):
     def setUp(self):
@@ -171,27 +171,27 @@ class TestCache(unittest.TestCase):
         item3 = CacheItem("test_addr3","test_value3", sec(1), sec(2), sec(3))
         cache.add_item(item3)
         gitem2 = cache.get_item("test_addr2","fresh")
-        self.failUnless(gitem2 is item2, "gitem2=%r item2=%r" % (gitem2, item2))
+        self.assertTrue(gitem2 is item2, "gitem2=%r item2=%r" % (gitem2, item2))
         gitem1 = cache.get_item("test_addr1","old")
-        self.failUnless(gitem1 is item1, "gitem2=%r item2=%r" % (gitem2, item2))
+        self.assertTrue(gitem1 is item1, "gitem2=%r item2=%r" % (gitem2, item2))
         gitem3 = cache.get_item("test_addr3","stale")
-        self.failUnless(gitem3 is item3, "gitem2=%r item2=%r" % (gitem2, item2))
+        self.assertTrue(gitem3 is item3, "gitem2=%r item2=%r" % (gitem2, item2))
         gitem1 = cache.get_item("test_addr1","new")
-        self.failUnless(gitem1 is None, "gitem1=%r" % (gitem1,))
+        self.assertTrue(gitem1 is None, "gitem1=%r" % (gitem1,))
 
     def test_max_items(self):
         cache = Cache(10)
-        self.failUnlessEqual(cache.num_items(),0,"number of items: "+`cache.num_items()`)
+        self.assertEqual(cache.num_items(),0,"number of items: "+`cache.num_items()`)
         for i in range(10):
             item = CacheItem(i,i, sec(1), sec(2), sec(3))
             cache.add_item(item)
-        self.failUnlessEqual(cache.num_items(),10,"number of items: "+`cache.num_items()`)
+        self.assertEqual(cache.num_items(),10,"number of items: "+`cache.num_items()`)
         for i in range(10,30):
             item = CacheItem(i,i, sec(1), sec(2), sec(3))
             cache.add_item(item)
-        self.failUnless(cache.num_items() > 7,"number of items: "+`cache.num_items()`)
-        self.failUnless(cache.num_items() <= 10,"number of items: "+`cache.num_items()`)
-        self.failUnlessEqual(cache.num_items(),len(cache._items),
+        self.assertTrue(cache.num_items() > 7,"number of items: "+`cache.num_items()`)
+        self.assertTrue(cache.num_items() <= 10,"number of items: "+`cache.num_items()`)
+        self.assertEqual(cache.num_items(),len(cache._items),
             "number of items: %r, in dict: %r" % (cache.num_items(), cache._items))
 
     def test_item_expiration(self):
@@ -199,99 +199,99 @@ class TestCache(unittest.TestCase):
         item = CacheItem("test_addr","test_value", sec(0.1), sec(0.2), sec(0.3))
         cache.add_item(item)
         gitem = cache.get_item("test_addr","fresh")
-        self.failUnlessEqual(gitem,item)
+        self.assertEqual(gitem,item)
         sleep(0.01)
         gitem = cache.get_item("test_addr","fresh")
-        self.failUnlessEqual(gitem,item)
+        self.assertEqual(gitem,item)
         sleep(0.1)
         gitem = cache.get_item("test_addr","fresh")
-        self.failUnlessEqual(gitem,None)
+        self.assertEqual(gitem,None)
         cache.tick()
         gitem = cache.get_item("test_addr","old")
-        self.failUnlessEqual(gitem,item)
+        self.assertEqual(gitem,item)
         sleep(0.3)
         cache.tick()
         gitem = cache.get_item("test_addr","stale")
-        self.failUnlessEqual(gitem,None)
-        self.failUnlessEqual(cache.num_items(),0,"number of items: "+`cache.num_items()`)
+        self.assertEqual(gitem,None)
+        self.assertEqual(cache.num_items(),0,"number of items: "+`cache.num_items()`)
 
     def test_request_object_success(self):
         cache = Cache(100)
         cache.set_fetcher(self.Fetcher)
         cache.request_object(1, "fresh", self.object_handler,
                 self.error_handler, self.timeout_handler)
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.05)
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.3)
-        self.failUnlessEqual(self.event,("success", 1, "value1", "new"))
+        self.assertEqual(self.event,("success", 1, "value1", "new"))
         self.event = None
         cache.request_object(1, "fresh", self.object_handler,
                 self.error_handler, self.timeout_handler)
-        self.failUnlessEqual(self.event,("success", 1, "value1", "fresh"))
+        self.assertEqual(self.event,("success", 1, "value1", "fresh"))
         self.event = None
         cache.request_object(2, "fresh", self.object_handler,
                 self.error_handler, self.timeout_handler)
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.05)
         cache.tick()
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.3)
         cache.tick()
-        self.failUnlessEqual(self.event,("success", 2, "value2", "new"))
+        self.assertEqual(self.event,("success", 2, "value2", "new"))
         self.event = None
         cache.request_object(2, "fresh", self.object_handler,
                 self.error_handler, self.timeout_handler)
-        self.failUnlessEqual(self.event,("success", 2, "value2", "fresh"))
+        self.assertEqual(self.event,("success", 2, "value2", "fresh"))
         cache.tick()
         self.event = None
         cache.request_object(1, "fresh", self.object_handler,
                 self.error_handler, self.timeout_handler)
-        self.failUnlessEqual(self.event,("success", 1, "value1", "fresh"))
+        self.assertEqual(self.event,("success", 1, "value1", "fresh"))
 
     def test_request_object_backup(self):
         cache = Cache(100)
         cache.set_fetcher(self.Fetcher)
         cache.request_object(1, "fresh", self.object_handler,
                 self.error_handler, self.timeout_handler)
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.05)
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.3)
-        self.failUnlessEqual(self.event,("success", 1, "value1", "new"))
+        self.assertEqual(self.event,("success", 1, "value1", "new"))
         self.event = None
         self.force_error = True
         cache.request_object(1, "new", self.object_handler,
                 self.error_handler, self.timeout_handler)
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.05)
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.3)
-        self.failUnlessEqual(self.event,("error", 1, "Forced error"))
+        self.assertEqual(self.event,("error", 1, "Forced error"))
         self.event = None
 
         self.force_error = True
         cache.request_object(1, "new", self.object_handler,
                 self.error_handler, self.timeout_handler,
                 backup_state = "stale")
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.05)
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.3)
-        self.failUnlessEqual(self.event,("success", 1, "value1", "stale"))
+        self.assertEqual(self.event,("success", 1, "value1", "stale"))
 
     def test_request_object_failure(self):
         cache = Cache(100)
         cache.set_fetcher(self.Fetcher)
         cache.request_object(-1, "fresh", self.object_handler,
                 self.error_handler, self.timeout_handler)
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.05)
         cache.tick()
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.3)
         cache.tick()
-        self.failUnlessEqual(self.event,("error", -1, "Negative address"))
+        self.assertEqual(self.event,("error", -1, "Negative address"))
 
     def test_request_object_timeout(self):
         cache = Cache(100)
@@ -299,10 +299,10 @@ class TestCache(unittest.TestCase):
         cache.request_object(1, "fresh", self.object_handler,
                 self.error_handler, self.timeout_handler,
                 timeout=timedelta(seconds=0.1))
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.05)
         cache.tick()
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.05)
         cache.tick()
         sleep(0.05)
@@ -311,7 +311,7 @@ class TestCache(unittest.TestCase):
         cache.tick()
         sleep(0.3)
         cache.tick()
-        self.failUnlessEqual(self.event,("timeout", 1))
+        self.assertEqual(self.event,("timeout", 1))
 
     def object_handler(self, address, value, state):
         self.event = ("success", address, value, state)
@@ -358,29 +358,29 @@ class TestCacheSuite(unittest.TestCase):
 
         cache.request_object(TestClass1, 1, "fresh", self.object_handler,
                 self.error_handler, self.timeout_handler)
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.05)
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.3)
-        self.failUnlessEqual(self.event,("success", 1, TestClass1(1), "new"))
+        self.assertEqual(self.event,("success", 1, TestClass1(1), "new"))
         self.event = None
         cache.request_object(TestClass1, 1, "fresh", self.object_handler,
                 self.error_handler, self.timeout_handler)
-        self.failUnlessEqual(self.event,("success", 1, TestClass1(1), "fresh"))
+        self.assertEqual(self.event,("success", 1, TestClass1(1), "fresh"))
         self.event = None
         cache.request_object(TestClass2, 2, "fresh", self.object_handler,
                 self.error_handler, self.timeout_handler)
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.05)
         cache.tick()
-        self.failUnlessEqual(self.event,None,"Early event: %r" % (self.event,))
+        self.assertEqual(self.event,None,"Early event: %r" % (self.event,))
         sleep(0.3)
         cache.tick()
-        self.failUnlessEqual(self.event,("success", 2, TestClass2(2), "new"))
+        self.assertEqual(self.event,("success", 2, TestClass2(2), "new"))
         self.event = None
         cache.request_object(TestClass2, 2, "fresh", self.object_handler,
                 self.error_handler, self.timeout_handler)
-        self.failUnlessEqual(self.event,("success", 2, TestClass2(2), "fresh"))
+        self.assertEqual(self.event,("success", 2, TestClass2(2), "fresh"))
 
     def object_handler(self, address, value, state):
         self.event = ("success", address, value, state)

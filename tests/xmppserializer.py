@@ -13,30 +13,30 @@ class TestXMPPSerializer(unittest.TestCase):
     def test_emit_head(self):
         serializer = XMPPSerializer("jabber:client")
         output = serializer.emit_head("fromX", "toY")
-        self.failUnless(output.startswith("<stream:stream "))
-        self.failUnless("xmlns='jabber:client'" in output
+        self.assertTrue(output.startswith("<stream:stream "))
+        self.assertTrue("xmlns='jabber:client'" in output
                             or 'xmlns="jabber:client"' in output)
         xml = ElementTree.XML(output + "</stream:stream>")
-        self.failUnlessEqual(xml.tag,
+        self.assertEqual(xml.tag,
                                 "{http://etherx.jabber.org/streams}stream")
-        self.failUnlessEqual(xml.get('from'), 'fromX')
-        self.failUnlessEqual(xml.get('to'), 'toY')
-        self.failUnlessEqual(xml.get('version'), '1.0')
-        self.failUnlessEqual(len(xml), 0)
+        self.assertEqual(xml.get('from'), 'fromX')
+        self.assertEqual(xml.get('to'), 'toY')
+        self.assertEqual(xml.get('version'), '1.0')
+        self.assertEqual(len(xml), 0)
 
     def test_emit_head_no_from_to(self):
         serializer = XMPPSerializer("jabber:client")
         output = serializer.emit_head(None, None)
         xml = ElementTree.XML(output + "</stream:stream>")
-        self.failUnlessEqual(xml.get('from'), None)
-        self.failUnlessEqual(xml.get('to'), None)
+        self.assertEqual(xml.get('from'), None)
+        self.assertEqual(xml.get('to'), None)
 
     def test_emit_tail(self):
         serializer = XMPPSerializer("jabber:client")
         output = serializer.emit_head("fromX", "toY")
         output += serializer.emit_tail()
         xml = ElementTree.XML(output)
-        self.failUnlessEqual(len(xml), 0)
+        self.assertEqual(len(xml), 0)
 
     def test_emit_stanza(self):
         serializer = XMPPSerializer("jabber:client")
@@ -52,21 +52,21 @@ class TestXMPPSerializer(unittest.TestCase):
         output += serializer.emit_stanza(stanza)
         output += serializer.emit_tail()
         xml = ElementTree.XML(output)
-        self.failUnlessEqual(len(xml), 1)
-        self.failUnlessEqual(len(xml[0]), 2)
-        self.failUnless(xml_elements_equal(xml[0], stanza))
+        self.assertEqual(len(xml), 1)
+        self.assertEqual(len(xml[0]), 2)
+        self.assertTrue(xml_elements_equal(xml[0], stanza))
 
         # no prefix for stanza elements
-        self.failUnless("<message><body>" in output)
+        self.assertTrue("<message><body>" in output)
 
         # no prefix for stanza child
-        self.failUnless("<sub " in output)
+        self.assertTrue("<sub " in output)
         
         # ...and its same-namespace child
-        self.failUnless("<sub1/" in output or "<sub1 " in output)
+        self.assertTrue("<sub1/" in output or "<sub1 " in output)
 
         # prefix for other namespace child
-        self.failUnless("<ns1:sub2" in output)
+        self.assertTrue("<ns1:sub2" in output)
 
 def suite():
     suite = unittest.TestSuite()

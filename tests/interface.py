@@ -37,10 +37,10 @@ class TestInterface(unittest.TestCase):
             self.interfaces_implementation.implements(I1)
         class C2(object):
             self.interfaces_implementation.implements(I2)
-        self.failUnless(I1.implementedBy(C1))
-        self.failUnless(I2.implementedBy(C2))
-        self.failIf(I2.implementedBy(C1))
-        self.failIf(I1.implementedBy(C2))
+        self.assertTrue(I1.implementedBy(C1))
+        self.assertTrue(I2.implementedBy(C2))
+        self.assertFalse(I2.implementedBy(C1))
+        self.assertFalse(I1.implementedBy(C2))
 
     def test_providedBy(self):
         class I1(self.interfaces_implementation.Interface):
@@ -53,10 +53,10 @@ class TestInterface(unittest.TestCase):
             self.interfaces_implementation.implements(I2)
         o1=C1()
         o2=C2()
-        self.failUnless(I1.providedBy(o1))
-        self.failUnless(I2.providedBy(o2))
-        self.failIf(I2.providedBy(o1))
-        self.failIf(I1.providedBy(o2))
+        self.assertTrue(I1.providedBy(o1))
+        self.assertTrue(I2.providedBy(o2))
+        self.assertFalse(I2.providedBy(o1))
+        self.assertFalse(I1.providedBy(o2))
 
     def test_inheritance(self):
         class I1(self.interfaces_implementation.Interface):
@@ -66,8 +66,8 @@ class TestInterface(unittest.TestCase):
         class C1(object):
             self.interfaces_implementation.implements(I2)
         o1 = C1()
-        self.failUnless(I1.providedBy(o1))
-        self.failUnless(issubclass(I2, I1))
+        self.assertTrue(I1.providedBy(o1))
+        self.assertTrue(issubclass(I2, I1))
 
 class TestPyXMPPInterface(TestInterface):
     interfaces_implementation = pyxmpp.interface
@@ -81,11 +81,11 @@ if zope_interface_found:
 
 class TestZopeAndPyXMPPInterface(unittest.TestCase):
     def test_interface_identity(self):
-        self.failUnless(pyxmpp.interface.Interface is zope.interface.Interface)
+        self.assertTrue(pyxmpp.interface.Interface is zope.interface.Interface)
     def test_attribute_identity(self):
-        self.failUnless(pyxmpp.interface.Attribute is zope.interface.Attribute)
+        self.assertTrue(pyxmpp.interface.Attribute is zope.interface.Attribute)
     def test_implements_identity(self):
-        self.failUnless(pyxmpp.interface.implements is zope.interface.implements)
+        self.assertTrue(pyxmpp.interface.implements is zope.interface.implements)
 
 def suite():
     suite = unittest.TestSuite()

@@ -23,34 +23,34 @@ MESSAGE2 = """<message xmlns="jabber:client"/>"""
 
 class TestMessage(unittest.TestCase):
     def check_message_full(self, m):
-        self.failUnlessEqual(m.from_jid, JID("source@example.com/res"))
-        self.failUnlessEqual(m.to_jid, JID("dest@example.com"))
-        self.failUnlessEqual(m.stanza_type, "normal")
-        self.failUnlessEqual(m.stanza_id, "1")
-        self.failUnlessEqual(m.subject, u"Subject")
-        self.failUnlessEqual(m.body, u"The body")
-        self.failUnlessEqual(m.thread, u"thread-id")
+        self.assertEqual(m.from_jid, JID("source@example.com/res"))
+        self.assertEqual(m.to_jid, JID("dest@example.com"))
+        self.assertEqual(m.stanza_type, "normal")
+        self.assertEqual(m.stanza_id, "1")
+        self.assertEqual(m.subject, u"Subject")
+        self.assertEqual(m.body, u"The body")
+        self.assertEqual(m.thread, u"thread-id")
         payload = m.get_all_payload()
-        self.failUnless(payload)
-        self.failUnlessEqual(payload[0].xml_namespace, 
+        self.assertTrue(payload)
+        self.assertEqual(payload[0].xml_namespace, 
                                         "http://pyxmpp.jajcus.net/xmlns/test")
-        self.failUnless(len(payload[0].element) > 0)
-        self.failUnlessEqual(payload[0].element[0].tag, 
+        self.assertTrue(len(payload[0].element) > 0)
+        self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
 
     def check_message_empty(self, m, can_have_id):
-        self.failUnlessEqual(m.from_jid, None)
-        self.failUnlessEqual(m.to_jid, None)
-        self.failUnlessEqual(m.stanza_type, None)
+        self.assertEqual(m.from_jid, None)
+        self.assertEqual(m.to_jid, None)
+        self.assertEqual(m.stanza_type, None)
         if can_have_id:
-            self.failIf(m.stanza_id is None)
+            self.assertFalse(m.stanza_id is None)
         else:
-            self.failIf(m.stanza_id is not None)
-        self.failUnlessEqual(m.subject, None)
-        self.failUnlessEqual(m.body, None)
-        self.failUnlessEqual(m.thread, None)
+            self.assertFalse(m.stanza_id is not None)
+        self.assertEqual(m.subject, None)
+        self.assertEqual(m.body, None)
+        self.assertEqual(m.thread, None)
         payload = m.get_all_payload()
-        self.failIf(payload)
+        self.assertFalse(payload)
 
     def test_message_full_from_xml(self):
         m = Message(XML(MESSAGE1))

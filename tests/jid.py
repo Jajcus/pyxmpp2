@@ -84,11 +84,11 @@ class TestJID(unittest.TestCase):
         for jid,tuple in valid_jids:
             j=JID(jid)
             jtuple=(j.node,j.domain,j.resource)
-            self.failUnlessEqual(jtuple,tuple)
+            self.assertEqual(jtuple,tuple)
     def test_jid_from_tuple(self):
         for (node,domain,resource),jid in valid_tuples:
             j=JID(node,domain,resource)
-            self.failUnlessEqual(unicode(j),jid)
+            self.assertEqual(unicode(j),jid)
     def test_invalid_jids(self):
         for jid in invalid_jids:
             try:
@@ -101,10 +101,10 @@ class TestJID(unittest.TestCase):
     def test_comparision(self):
         for e in comparisions_true:
             result=eval(e)
-            self.failUnless(result,'Expression %r gave: %r' % (e,result))
+            self.assertTrue(result,'Expression %r gave: %r' % (e,result))
         for e in comparisions_false:
             result=eval(e)
-            self.failIf(result,'Expression %r gave: %r' % (e,result))
+            self.assertFalse(result,'Expression %r gave: %r' % (e,result))
 
 class TestUncachedJID(TestJID):
     def setUp(self):

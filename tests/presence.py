@@ -26,42 +26,42 @@ PRESENCE3 = """<presence xmlns="jabber:client" from='source@example.com/res'
 
 class TestPresence(unittest.TestCase):
     def check_presence_full(self, p):
-        self.failUnlessEqual(p.from_jid, JID("source@example.com/res"))
-        self.failUnlessEqual(p.to_jid, JID("dest@example.com"))
-        self.failUnlessEqual(p.stanza_type, None)
-        self.failUnlessEqual(p.stanza_id, "1")
-        self.failUnlessEqual(p.show, "away")
-        self.failUnlessEqual(p.status, "The Status")
-        self.failUnlessEqual(p.priority, 10)
+        self.assertEqual(p.from_jid, JID("source@example.com/res"))
+        self.assertEqual(p.to_jid, JID("dest@example.com"))
+        self.assertEqual(p.stanza_type, None)
+        self.assertEqual(p.stanza_id, "1")
+        self.assertEqual(p.show, "away")
+        self.assertEqual(p.status, "The Status")
+        self.assertEqual(p.priority, 10)
         payload = p.get_all_payload()
-        self.failUnless(payload)
-        self.failUnlessEqual(payload[0].xml_namespace, 
+        self.assertTrue(payload)
+        self.assertEqual(payload[0].xml_namespace, 
                                         "http://pyxmpp.jajcus.net/xmlns/test")
-        self.failUnless(len(payload[0].element) > 0)
-        self.failUnlessEqual(payload[0].element[0].tag, 
+        self.assertTrue(len(payload[0].element) > 0)
+        self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
 
     def check_presence_empty(self, p, can_have_id):
-        self.failUnlessEqual(p.from_jid, None)
-        self.failUnlessEqual(p.to_jid, None)
-        self.failUnlessEqual(p.stanza_type, None)
+        self.assertEqual(p.from_jid, None)
+        self.assertEqual(p.to_jid, None)
+        self.assertEqual(p.stanza_type, None)
         if can_have_id:
-            self.failIf(p.stanza_id is None)
+            self.assertFalse(p.stanza_id is None)
         else:
-            self.failIf(p.stanza_id is not None)
-        self.failUnlessEqual(p.show, None)
-        self.failUnlessEqual(p.status, None)
-        self.failUnlessEqual(p.priority, 0)
+            self.assertFalse(p.stanza_id is not None)
+        self.assertEqual(p.show, None)
+        self.assertEqual(p.status, None)
+        self.assertEqual(p.priority, 0)
         payload = p.get_all_payload()
-        self.failIf(payload)
+        self.assertFalse(payload)
 
     def check_presence_subscribe(self, p):
-        self.failUnlessEqual(p.from_jid, JID("source@example.com/res"))
-        self.failUnlessEqual(p.to_jid, JID("dest@example.com"))
-        self.failUnlessEqual(p.stanza_type, "subscribe")
-        self.failUnlessEqual(p.stanza_id, None)
-        self.failUnlessEqual(p.show, None)
-        self.failUnlessEqual(p.status, None)
+        self.assertEqual(p.from_jid, JID("source@example.com/res"))
+        self.assertEqual(p.to_jid, JID("dest@example.com"))
+        self.assertEqual(p.stanza_type, "subscribe")
+        self.assertEqual(p.stanza_id, None)
+        self.assertEqual(p.show, None)
+        self.assertEqual(p.status, None)
 
     def test_presence_full_from_xml(self):
         p = Presence(XML(PRESENCE1))

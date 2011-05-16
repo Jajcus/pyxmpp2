@@ -41,7 +41,7 @@ class TestDiscoInfo(unittest.TestCase):
         txt=`[(i.name,i.category,i.type) for i in di.identities]`
         txt+="\n"+`di.features`+"\n"
         should_be=file("data/disco_info_in.txt").read()
-        self.failUnlessEqual(txt,should_be)
+        self.assertEqual(txt,should_be)
 
     def build_disco_info(self,node=None):
         di=disco.DiscoInfo(node)
@@ -58,37 +58,37 @@ class TestDiscoInfo(unittest.TestCase):
 
     def test_building_with_node(self):
         di=self.build_disco_info("test")
-        self.failUnlessEqual(di.node,"test")
+        self.assertEqual(di.node,"test")
 
     def test_identities(self):
         di=self.build_disco_info()
         actual_identities=[(i.name,i.category,i.type) for i in di.identities]
         actual_identities.sort()
-        self.failUnlessEqual(actual_identities,test_identities)
+        self.assertEqual(actual_identities,test_identities)
 
     def test_features(self):
         di=self.build_disco_info()
         actual_features=di.get_features()
         actual_features.sort()
-        self.failUnlessEqual(actual_features,test_features)
+        self.assertEqual(actual_features,test_features)
 
     def test_identity_is(self):
         di=self.build_disco_info()
         for name,category,type in test_identities:
-            self.failUnless(di.identity_is(category,type),
+            self.assertTrue(di.identity_is(category,type),
                 "Identity (%r,%r) not matched" % (category,type))
-            self.failUnless(di.identity_is(category,None),
+            self.assertTrue(di.identity_is(category,None),
                 "Identity (%r,%r) not matched" % (category,None))
         for category,type in notest_identities:
-            self.failIf(di.identity_is(category,type),
+            self.assertFalse(di.identity_is(category,type),
                 "Identity (%r,%r) matched" % (category,type))
 
     def test_has_feature(self):
         di=self.build_disco_info()
         for var in test_features:
-            self.failUnless(di.has_feature(var),"Feature %r not found" % (var,))
+            self.assertTrue(di.has_feature(var),"Feature %r not found" % (var,))
         for var in notest_features:
-            self.failIf(di.has_feature(var),"Feature %r found" % (var,))
+            self.assertFalse(di.has_feature(var),"Feature %r found" % (var,))
 
 
 # def test_building(self):
@@ -117,7 +117,7 @@ class TestDiscoItems(unittest.TestCase):
         di=disco.DiscoItems(xmldata.getRootElement())
         txt=`[(i.jid,i.name,i.node,i.action) for i in di.items]`+"\n"
         should_be=file("data/disco_items_in.txt").read()
-        self.failUnlessEqual(txt,should_be)
+        self.assertEqual(txt,should_be)
 
     def build_disco_items(self,node=None):
         di=disco.DiscoItems(node)
@@ -129,27 +129,27 @@ class TestDiscoItems(unittest.TestCase):
         di=self.build_disco_items()
         txt=di.as_xml().serialize()
         should_be=file("data/disco_items_out.xml").read()
-        self.failUnlessEqual(txt,should_be)
+        self.assertEqual(txt,should_be)
 
     def test_building(self):
         self.build_disco_items()
 
     def test_building_with_node(self):
         di=self.build_disco_items("test")
-        self.failUnlessEqual(di.node,"test")
+        self.assertEqual(di.node,"test")
 
     def test_items(self):
         di=self.build_disco_items()
         actual_items=[(i.jid,i.node,i.name) for i in di.items]
         actual_items.sort()
-        self.failUnlessEqual(actual_items,test_items)
+        self.assertEqual(actual_items,test_items)
 
     def test_has_item(self):
         di=self.build_disco_items()
         for jid,node,name in test_items:
-            self.failUnless(di.has_item(jid,node),"Item (%r,%r) not found" % (jid,node))
+            self.assertTrue(di.has_item(jid,node),"Item (%r,%r) not found" % (jid,node))
         for jid,node in notest_items:
-            self.failIf(di.has_item(jid,node),"Item (%r,%r) found" % (jid,node))
+            self.assertFalse(di.has_item(jid,node),"Item (%r,%r) found" % (jid,node))
 
 def suite():
      suite = unittest.TestSuite()

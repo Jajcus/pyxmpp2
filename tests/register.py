@@ -13,67 +13,67 @@ legacy_fields = ( "username", "nick", "password", "name", "first", "last", "emai
 class TestRegister(unittest.TestCase):
     def test_jep77_example1(self):
         register = self.parse_stanza(jep77_example1)
-        self.failUnless(register.form is None)
-        self.failIf(register.registered)
-        self.failUnless(register.instructions is None)
-        self.failIf(register.remove)
+        self.assertTrue(register.form is None)
+        self.assertFalse(register.registered)
+        self.assertTrue(register.instructions is None)
+        self.assertFalse(register.remove)
         for field in legacy_fields:
-            self.failUnless(getattr(register, field) is None)
+            self.assertTrue(getattr(register, field) is None)
     def test_jep77_example2(self):
         register = self.parse_stanza(jep77_example2)
-        self.failUnlessEqual(register.instructions.strip(), u"Choose a username and password for use with this service.\n       Please also provide your email address.")
-        self.failUnlessEqual(register.username, u"")
-        self.failUnlessEqual(register.password, u"")
-        self.failUnlessEqual(register.email, u"")
+        self.assertEqual(register.instructions.strip(), u"Choose a username and password for use with this service.\n       Please also provide your email address.")
+        self.assertEqual(register.username, u"")
+        self.assertEqual(register.password, u"")
+        self.assertEqual(register.email, u"")
 
     def test_jep77_example2_get_form(self):
         register = self.parse_stanza(jep77_example2)
         form = register.get_form()
-        self.failUnlessEqual(form["FORM_TYPE"].value, "jabber:iq:register")
-        self.failUnlessEqual(form.instructions.strip(), u"Choose a username and password for use with this service.\n       Please also provide your email address.")
-        self.failUnless("username" in form)
-        self.failUnless(form["username"].required)
-        self.failUnless("password" in form)
-        self.failUnless(form["password"].required)
-        self.failUnless("email" in form)
-        self.failUnless(form["email"].required)
+        self.assertEqual(form["FORM_TYPE"].value, "jabber:iq:register")
+        self.assertEqual(form.instructions.strip(), u"Choose a username and password for use with this service.\n       Please also provide your email address.")
+        self.assertTrue("username" in form)
+        self.assertTrue(form["username"].required)
+        self.assertTrue("password" in form)
+        self.assertTrue(form["password"].required)
+        self.assertTrue("email" in form)
+        self.assertTrue(form["email"].required)
 
     def test_jep77_example3(self):
         register = self.parse_stanza(jep77_example3)
-        self.failUnless(register.registered)
-        self.failUnlessEqual(register.username, u"juliet")
-        self.failUnlessEqual(register.password, u"R0m30")
-        self.failUnlessEqual(register.email, u"juliet@capulet.com")
+        self.assertTrue(register.registered)
+        self.assertEqual(register.username, u"juliet")
+        self.assertEqual(register.password, u"R0m30")
+        self.assertEqual(register.email, u"juliet@capulet.com")
     def test_jep77_example4(self):
         register = self.parse_stanza(jep77_example4)
-        self.failIf(register.registered)
-        self.failUnlessEqual(register.username, u"bill")
-        self.failUnlessEqual(register.password, u"Calliope")
-        self.failUnlessEqual(register.email, u"bill@shakespeare.lit")
+        self.assertFalse(register.registered)
+        self.assertEqual(register.username, u"bill")
+        self.assertEqual(register.password, u"Calliope")
+        self.assertEqual(register.email, u"bill@shakespeare.lit")
     def test_jep77_example8(self):
         register = self.parse_stanza(jep77_example8)
-        self.failUnless(register.remove)
+        self.assertTrue(register.remove)
     def test_jep77_example10(self):
         register = self.parse_stanza(jep77_example10)
-        self.failUnlessEqual(register.username, u"bill")
-        self.failUnlessEqual(register.password, u"newpass")
+        self.assertEqual(register.username, u"bill")
+        self.assertEqual(register.password, u"newpass")
     def test_jep77_example16(self):
         register = self.parse_stanza(jep77_example16)
         form = self.parse_form(jep77_example16_form)
-        self.failIf(register.form is None)
-        self.failUnlessEqual(register.form.type, form.type)
-        self.failUnlessEqual(register.form.instructions, form.instructions)
-        self.failUnlessEqual(len(register.form.fields), len(form.fields))
+        self.assertFalse(register.form is None)
+        self.assertEqual(register.form.type, form.type)
+        self.assertEqual(register.form.instructions, form.instructions)
+        self.assertEqual(len(register.form.fields), len(form.fields))
         for i in range(0, len(form.fields)):
             f1 = register.form[i]
             f2 = form[i]
-            self.failUnlessEqual(f1.name, f2.name)
-            self.failUnlessEqual(f1.type, f2.type)
-            self.failUnlessEqual(f1.value, f2.value)
+            self.assertEqual(f1.name, f2.name)
+            self.assertEqual(f1.type, f2.type)
+            self.assertEqual(f1.value, f2.value)
 
     def test_jep77_example17(self):
         register = self.parse_stanza(jep77_example17)
-        self.failUnlessEqual(register.instructions.strip(), u"To register, visit http://www.shakespeare.lit/contests.php")
+        self.assertEqual(register.instructions.strip(), u"To register, visit http://www.shakespeare.lit/contests.php")
 
     def parse_stanza(self, xml):
         doc = libxml2.parseDoc(xml)

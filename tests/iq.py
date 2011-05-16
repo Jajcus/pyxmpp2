@@ -35,51 +35,51 @@ IQ4 = """
 
 class TestIq(unittest.TestCase):
     def check_iq1(self, iq):
-        self.failUnlessEqual(iq.from_jid, JID("source@example.com/res"))
-        self.failUnlessEqual(iq.to_jid, JID("dest@example.com"))
-        self.failUnlessEqual(iq.stanza_type, "get")
-        self.failUnlessEqual(iq.stanza_id, "1")
+        self.assertEqual(iq.from_jid, JID("source@example.com/res"))
+        self.assertEqual(iq.to_jid, JID("dest@example.com"))
+        self.assertEqual(iq.stanza_type, "get")
+        self.assertEqual(iq.stanza_id, "1")
         payload = iq.get_all_payload()
-        self.failUnless(payload)
-        self.failUnlessEqual(payload[0].xml_namespace, 
+        self.assertTrue(payload)
+        self.assertEqual(payload[0].xml_namespace, 
                                         "http://pyxmpp.jajcus.net/xmlns/test")
-        self.failUnless(len(payload[0].element) > 0)
-        self.failUnlessEqual(payload[0].element[0].tag, 
+        self.assertTrue(len(payload[0].element) > 0)
+        self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
 
     def check_iq2(self, iq):
-        self.failUnlessEqual(iq.to_jid, JID("source@example.com/res"))
-        self.failUnlessEqual(iq.from_jid, JID("dest@example.com"))
-        self.failUnlessEqual(iq.stanza_type, "result")
-        self.failUnlessEqual(iq.stanza_id, "1")
+        self.assertEqual(iq.to_jid, JID("source@example.com/res"))
+        self.assertEqual(iq.from_jid, JID("dest@example.com"))
+        self.assertEqual(iq.stanza_type, "result")
+        self.assertEqual(iq.stanza_id, "1")
         payload = iq.get_all_payload()
-        self.failUnless(payload)
-        self.failUnlessEqual(payload[0].xml_namespace, 
+        self.assertTrue(payload)
+        self.assertEqual(payload[0].xml_namespace, 
                                         "http://pyxmpp.jajcus.net/xmlns/test")
-        self.failUnless(len(payload[0].element) > 0)
-        self.failUnlessEqual(payload[0].element[0].tag, 
+        self.assertTrue(len(payload[0].element) > 0)
+        self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
 
     def check_iq3(self, iq):
-        self.failUnlessEqual(iq.from_jid, JID("source@example.com/res"))
-        self.failUnlessEqual(iq.to_jid, JID("dest@example.com"))
-        self.failUnlessEqual(iq.stanza_type, "set")
-        self.failUnlessEqual(iq.stanza_id, "2")
+        self.assertEqual(iq.from_jid, JID("source@example.com/res"))
+        self.assertEqual(iq.to_jid, JID("dest@example.com"))
+        self.assertEqual(iq.stanza_type, "set")
+        self.assertEqual(iq.stanza_id, "2")
         payload = iq.get_all_payload()
-        self.failUnless(payload)
-        self.failUnlessEqual(payload[0].xml_namespace, 
+        self.assertTrue(payload)
+        self.assertEqual(payload[0].xml_namespace, 
                                         "http://pyxmpp.jajcus.net/xmlns/test")
-        self.failUnless(len(payload[0].element) > 0)
-        self.failUnlessEqual(payload[0].element[0].tag, 
+        self.assertTrue(len(payload[0].element) > 0)
+        self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
 
     def check_iq4(self, iq):
-        self.failUnlessEqual(iq.to_jid, JID("source@example.com/res"))
-        self.failUnlessEqual(iq.from_jid, JID("dest@example.com"))
-        self.failUnlessEqual(iq.stanza_type, "result")
-        self.failUnlessEqual(iq.stanza_id, "2")
+        self.assertEqual(iq.to_jid, JID("source@example.com/res"))
+        self.assertEqual(iq.from_jid, JID("dest@example.com"))
+        self.assertEqual(iq.stanza_type, "result")
+        self.assertEqual(iq.stanza_id, "2")
         payload = iq.get_all_payload()
-        self.failIf(payload)
+        self.assertFalse(payload)
 
     def test_iq_get_from_xml(self):
         iq = Iq(XML(IQ1))

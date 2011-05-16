@@ -38,15 +38,15 @@ class TestStanzaFactory(unittest.TestCase):
     def test_iq(self):
         element = XML(IQ1)
         stanza = stanza_factory(element)
-        self.failUnless( isinstance(stanza, Iq) )
+        self.assertTrue( isinstance(stanza, Iq) )
     def test_message(self):
         element = XML(MESSAGE1)
         stanza = stanza_factory(element)
-        self.failUnless( isinstance(stanza, Message) )
+        self.assertTrue( isinstance(stanza, Message) )
     def test_presence(self):
         element = XML(PRESENCE1)
         stanza = stanza_factory(element)
-        self.failUnless( isinstance(stanza, Presence) )
+        self.assertTrue( isinstance(stanza, Presence) )
 
 def suite():
      suite = unittest.TestSuite()

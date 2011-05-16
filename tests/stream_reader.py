@@ -103,7 +103,7 @@ class TestStreamReader(unittest.TestCase):
 
     def event(self, event, element):
         expected = self.expected_events.pop(0)
-        self.failUnless(event==expected.event, "Got %r, expected %r" % (event, expected.event))
+        self.assertTrue(event==expected.event, "Got %r, expected %r" % (event, expected.event))
         if expected.offset < self.chunk_start:
             self.fail("Delayed event: %r. Expected at: %i, found at %i:%i"
                     % (event, expected.offset, self.chunk_start, self.chunk_end))

@@ -113,33 +113,33 @@ class TestVCard(unittest.TestCase):
         xmldata=libxml2.parseFile("data/vcard1.xml")
         vc=vcard.VCard(xmldata.getRootElement())
         should_be=file("data/vcard1.txt").read()
-        self.failUnlessEqual(vcard2txt(vc),should_be)
+        self.assertEqual(vcard2txt(vc),should_be)
     def test_xml_without_n(self):
         xmldata=libxml2.parseFile("data/vcard_without_n.xml")
         vc=vcard.VCard(xmldata.getRootElement())
         should_be=file("data/vcard_without_n.txt").read()
-        self.failUnlessEqual(vcard2txt(vc),should_be)
+        self.assertEqual(vcard2txt(vc),should_be)
     def test_xml_without_fn(self):
         xmldata=libxml2.parseFile("data/vcard_without_n.xml")
         vc=vcard.VCard(xmldata.getRootElement())
         should_be=file("data/vcard_without_n.txt").read()
-        self.failUnlessEqual(vcard2txt(vc),should_be)
+        self.assertEqual(vcard2txt(vc),should_be)
     def test_xml_with_semicolon(self):
         xmldata = libxml2.parseFile("data/vcard_with_semicolon.xml")
         vc = vcard.VCard(xmldata.getRootElement())
         first = vc.rfc2426()
         second = vcard.VCard(first).rfc2426()
-        self.failUnlessEqual(first, second)
+        self.assertEqual(first, second)
     def test_vcf_input1(self):
         input=file("data/vcard2.vcf").read()
         vc=vcard.VCard(input)
         should_be=file("data/vcard2.txt").read()
-        self.failUnlessEqual(vcard2txt(vc),should_be)
+        self.assertEqual(vcard2txt(vc),should_be)
     def test_vcf_input2(self):
         input=file("data/vcard3.vcf").read()
         vc=vcard.VCard(input)
         should_be=file("data/vcard3.txt").read()
-        self.failUnlessEqual(vcard2txt(vc),should_be)
+        self.assertEqual(vcard2txt(vc),should_be)
     #TODO: test_xml_output
 
 def suite():

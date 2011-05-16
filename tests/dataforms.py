@@ -10,19 +10,19 @@ from pyxmpp2.jid import JID
 class TestForm(unittest.TestCase):
     def test_empty_form_type(self):
         form = self.parse_form(empty_form)
-        self.failUnlessEqual(form.type,"form")
-        self.failIf(form.title)
-        self.failIf(form.instructions)
-        self.failIf(form.fields)
-        self.failIf(form.items)
-        self.failIf(form.reported_fields)
-        self.failIf(list(form))
+        self.assertEqual(form.type,"form")
+        self.assertFalse(form.title)
+        self.assertFalse(form.instructions)
+        self.assertFalse(form.fields)
+        self.assertFalse(form.items)
+        self.assertFalse(form.reported_fields)
+        self.assertFalse(list(form))
         form = self.parse_form(empty_submit)
-        self.failUnlessEqual(form.type,"submit")
+        self.assertEqual(form.type,"submit")
         form = self.parse_form(empty_cancel)
-        self.failUnlessEqual(form.type,"cancel")
+        self.assertEqual(form.type,"cancel")
         form = self.parse_form(empty_result)
-        self.failUnlessEqual(form.type,"result")
+        self.assertEqual(form.type,"result")
 
     def test_jep4_example2_basic(self):
         form = self.parse_form(jep4_example2)
@@ -120,113 +120,113 @@ class TestForm(unittest.TestCase):
 
     def test_field_text_hidden(self):
         field = Field(field_type="hidden", value=u"bleble")
-        self.failUnlessEqual(field.value,u"bleble")
-        self.failUnlessEqual(field.values,[u"bleble"])
+        self.assertEqual(field.value,u"bleble")
+        self.assertEqual(field.values,[u"bleble"])
         field = Field(field_type="hidden", values=[u"abcd"])
-        self.failUnlessEqual(field.value,u"abcd")
-        self.failUnlessEqual(field.values,[u"abcd"])
+        self.assertEqual(field.value,u"abcd")
+        self.assertEqual(field.values,[u"abcd"])
         field.value = u"zażółć gęślą jaźń"
-        self.failUnlessEqual(field.value, u"zażółć gęślą jaźń")
-        self.failUnlessEqual(field.values,[u"zażółć gęślą jaźń"])
+        self.assertEqual(field.value, u"zażółć gęślą jaźń")
+        self.assertEqual(field.values,[u"zażółć gęślą jaźń"])
 
     def test_field_text_fixed(self):
         field = Field(field_type="fixed", value=u"bleble")
-        self.failUnlessEqual(field.value,u"bleble")
-        self.failUnlessEqual(field.values,[u"bleble"])
+        self.assertEqual(field.value,u"bleble")
+        self.assertEqual(field.values,[u"bleble"])
         field = Field(field_type="fixed", values=[u"abcd"])
-        self.failUnlessEqual(field.value,u"abcd")
-        self.failUnlessEqual(field.values,[u"abcd"])
+        self.assertEqual(field.value,u"abcd")
+        self.assertEqual(field.values,[u"abcd"])
         field.value = u"zażółć gęślą jaźń"
-        self.failUnlessEqual(field.value, u"zażółć gęślą jaźń")
-        self.failUnlessEqual(field.values,[u"zażółć gęślą jaźń"])
+        self.assertEqual(field.value, u"zażółć gęślą jaźń")
+        self.assertEqual(field.values,[u"zażółć gęślą jaźń"])
 
     def test_field_text_private(self):
         field = Field(field_type="text-private", value=u"bleble")
-        self.failUnlessEqual(field.value,u"bleble")
-        self.failUnlessEqual(field.values,[u"bleble"])
+        self.assertEqual(field.value,u"bleble")
+        self.assertEqual(field.values,[u"bleble"])
         field = Field(field_type="text-private", values=[u"abcd"])
-        self.failUnlessEqual(field.value,u"abcd")
-        self.failUnlessEqual(field.values,[u"abcd"])
+        self.assertEqual(field.value,u"abcd")
+        self.assertEqual(field.values,[u"abcd"])
         field.value = u"zażółć gęślą jaźń"
-        self.failUnlessEqual(field.value, u"zażółć gęślą jaźń")
-        self.failUnlessEqual(field.values,[u"zażółć gęślą jaźń"])
+        self.assertEqual(field.value, u"zażółć gęślą jaźń")
+        self.assertEqual(field.values,[u"zażółć gęślą jaźń"])
 
     def test_field_text_single(self):
         field = Field(field_type="text-single", value=u"bleble")
-        self.failUnlessEqual(field.value,u"bleble")
-        self.failUnlessEqual(field.values,[u"bleble"])
+        self.assertEqual(field.value,u"bleble")
+        self.assertEqual(field.values,[u"bleble"])
         field = Field(field_type="text-single", values=[u"abcd"])
-        self.failUnlessEqual(field.value,u"abcd")
-        self.failUnlessEqual(field.values,[u"abcd"])
+        self.assertEqual(field.value,u"abcd")
+        self.assertEqual(field.values,[u"abcd"])
         field.value = u"zażółć gęślą jaźń"
-        self.failUnlessEqual(field.value, u"zażółć gęślą jaźń")
-        self.failUnlessEqual(field.values,[u"zażółć gęślą jaźń"])
+        self.assertEqual(field.value, u"zażółć gęślą jaźń")
+        self.assertEqual(field.values,[u"zażółć gęślą jaźń"])
 
     def test_field_text_multi(self):
         field = Field(field_type="text-multi", value=[u"item1", u"item2"])
-        self.failUnlessEqual(field.value, [u"item1", u"item2"])
-        self.failUnlessEqual(field.values, [u"item1", u"item2"])
+        self.assertEqual(field.value, [u"item1", u"item2"])
+        self.assertEqual(field.values, [u"item1", u"item2"])
         field = Field(field_type="text-multi", values=[u"item", u""])
-        self.failUnlessEqual(field.value, [u"item", u""])
-        self.failUnlessEqual(field.values, [u"item", u""])
+        self.assertEqual(field.value, [u"item", u""])
+        self.assertEqual(field.values, [u"item", u""])
         field.value = [u"a", u"b"]
-        self.failUnlessEqual(field.value, [u"a", u"b"])
-        self.failUnlessEqual(field.values, [u"a", u"b"])
+        self.assertEqual(field.value, [u"a", u"b"])
+        self.assertEqual(field.values, [u"a", u"b"])
 
     def test_field_list_single(self):
         field = Field(field_type="list-single", value=u"bleble")
-        self.failUnlessEqual(field.value,u"bleble")
-        self.failUnlessEqual(field.values,[u"bleble"])
+        self.assertEqual(field.value,u"bleble")
+        self.assertEqual(field.values,[u"bleble"])
         field = Field(field_type="list-single", values=[u"abcd"])
-        self.failUnlessEqual(field.value,u"abcd")
-        self.failUnlessEqual(field.values,[u"abcd"])
+        self.assertEqual(field.value,u"abcd")
+        self.assertEqual(field.values,[u"abcd"])
         field.value = u"zażółć gęślą jaźń"
-        self.failUnlessEqual(field.value, u"zażółć gęślą jaźń")
-        self.failUnlessEqual(field.values,[u"zażółć gęślą jaźń"])
+        self.assertEqual(field.value, u"zażółć gęślą jaźń")
+        self.assertEqual(field.values,[u"zażółć gęślą jaźń"])
 
     def test_field_list_multi(self):
         field = Field(field_type="list-multi", value=[u"item1", u"item2"])
-        self.failUnlessEqual(field.value, [u"item1", u"item2"])
-        self.failUnlessEqual(field.values, [u"item1", u"item2"])
+        self.assertEqual(field.value, [u"item1", u"item2"])
+        self.assertEqual(field.values, [u"item1", u"item2"])
         field = Field(field_type="list-multi", values=[u"item", u""])
-        self.failUnlessEqual(field.value, [u"item", u""])
-        self.failUnlessEqual(field.values, [u"item", u""])
+        self.assertEqual(field.value, [u"item", u""])
+        self.assertEqual(field.values, [u"item", u""])
         field.value = [u"a", u"b"]
-        self.failUnlessEqual(field.value, [u"a", u"b"])
-        self.failUnlessEqual(field.values, [u"a", u"b"])
+        self.assertEqual(field.value, [u"a", u"b"])
+        self.assertEqual(field.values, [u"a", u"b"])
 
     def test_field_jid_single(self):
         field = Field(field_type="jid-single", value=JID(u"user@example.com"))
-        self.failUnlessEqual(field.value, JID(u"user@example.com"))
-        self.failUnlessEqual(field.values, [u"user@example.com"])
+        self.assertEqual(field.value, JID(u"user@example.com"))
+        self.assertEqual(field.values, [u"user@example.com"])
         field = Field(field_type="jid-single", values=[u"user@example.com"])
-        self.failUnlessEqual(field.value, JID(u"user@example.com"))
-        self.failUnlessEqual(field.values, [u"user@example.com"])
+        self.assertEqual(field.value, JID(u"user@example.com"))
+        self.assertEqual(field.values, [u"user@example.com"])
         field.value = JID(u"example.com")
-        self.failUnlessEqual(field.value, JID(u"example.com"))
-        self.failUnlessEqual(field.values, [u"example.com"])
+        self.assertEqual(field.value, JID(u"example.com"))
+        self.assertEqual(field.values, [u"example.com"])
 
     def test_field_jid_multi(self):
         field = Field(field_type="jid-multi", value=[JID(u"user1@example.com"), JID(u"user2@example.com")])
-        self.failUnlessEqual(field.value, [JID(u"user1@example.com"), JID(u"user2@example.com")])
-        self.failUnlessEqual(field.values, [u"user1@example.com", u"user2@example.com"])
+        self.assertEqual(field.value, [JID(u"user1@example.com"), JID(u"user2@example.com")])
+        self.assertEqual(field.values, [u"user1@example.com", u"user2@example.com"])
         field = Field(field_type="jid-multi", values=[u"user@example.com", u"example.com"])
-        self.failUnlessEqual(field.value, [JID(u"user@example.com"), JID(u"example.com")])
-        self.failUnlessEqual(field.values, [u"user@example.com", u"example.com"])
+        self.assertEqual(field.value, [JID(u"user@example.com"), JID(u"example.com")])
+        self.assertEqual(field.values, [u"user@example.com", u"example.com"])
         field.value = [u"user3@example.com"]
-        self.failUnlessEqual(field.value, [JID(u"user3@example.com")])
-        self.failUnlessEqual(field.values, [u"user3@example.com"])
+        self.assertEqual(field.value, [JID(u"user3@example.com")])
+        self.assertEqual(field.values, [u"user3@example.com"])
 
     def test_field_boolean(self):
         field = Field(field_type="boolean", value=True)
-        self.failUnlessEqual(field.value, True)
-        self.failUnlessEqual(field.values, [u"1"])
+        self.assertEqual(field.value, True)
+        self.assertEqual(field.values, [u"1"])
         field = Field(field_type="boolean", values=[u"0"])
-        self.failUnlessEqual(field.value, False)
-        self.failUnlessEqual(field.values, [u"0"])
+        self.assertEqual(field.value, False)
+        self.assertEqual(field.values, [u"0"])
         field.value = True
-        self.failUnlessEqual(field.value, True)
-        self.failUnlessEqual(field.values, [u"1"])
+        self.assertEqual(field.value, True)
+        self.assertEqual(field.values, [u"1"])
 
     def build_form_inc(self, form_type, title, instructions, field_data):
         form = Form(form_type)
@@ -253,53 +253,53 @@ class TestForm(unittest.TestCase):
 
     def check_form_info(self, form, form_info):
         form_type, title, instructions = form_info
-        self.failUnlessEqual(form.type, form_type)
-        self.failUnlessEqual(form.title, title)
-        self.failUnlessEqual(form.instructions, instructions)
+        self.assertEqual(form.type, form_type)
+        self.assertEqual(form.title, title)
+        self.assertEqual(form.instructions, instructions)
 
     def check_form_iter(self, form, field_data):
         form_iter = iter(form)
         for name, ftype, values, label, options, required, desc in field_data:
             field = form_iter.next()
-            self.failUnlessEqual(field.name, name)
-            self.failUnlessEqual(field.type, ftype)
-            self.failUnlessEqual(field.values, values)
+            self.assertEqual(field.name, name)
+            self.assertEqual(field.type, ftype)
+            self.assertEqual(field.values, values)
             foptions = [(o.label, o.value) for o in field.options]
-            self.failUnlessEqual(foptions, options)
-            self.failUnlessEqual(field.required, required)
-            self.failUnlessEqual(field.desc, desc)
-        self.failUnlessRaises(StopIteration, form_iter.next)
+            self.assertEqual(foptions, options)
+            self.assertEqual(field.required, required)
+            self.assertEqual(field.desc, desc)
+        self.assertRaises(StopIteration, form_iter.next)
 
     def check_form_mapping(self, form, field_data):
         for name, ftype, values, label, options, required, desc in field_data:
             if not name:
                 continue
             field = form[name]
-            self.failUnlessEqual(field.name, name)
-            self.failUnlessEqual(field.type, ftype)
-            self.failUnlessEqual(field.values, values)
+            self.assertEqual(field.name, name)
+            self.assertEqual(field.type, ftype)
+            self.assertEqual(field.values, values)
             foptions = [(o.label, o.values[0]) for o in field.options]
-            self.failUnlessEqual(foptions, options)
-            self.failUnlessEqual(field.required, required)
-            self.failUnlessEqual(field.desc, desc)
+            self.assertEqual(foptions, options)
+            self.assertEqual(field.required, required)
+            self.assertEqual(field.desc, desc)
 
     def check_form_parsed_values(self, form, value_dict):
         for name, value in value_dict.items():
             field = form[name]
-            self.failUnlessEqual(field.value,value)
-            self.failUnless(type(field.value) is type(value))
+            self.assertEqual(field.value,value)
+            self.assertTrue(type(field.value) is type(value))
 
     def check_form_reported(self, form, expected):
         it = iter(expected)
         for field in form.reported_fields:
-            self.failUnlessEqual(field.name,it.next())
-        self.failUnlessRaises(StopIteration, it.next)
+            self.assertEqual(field.name,it.next())
+        self.assertRaises(StopIteration, it.next)
 
     def check_form_items(self, form, items):
         it = iter(items)
         for item in form.items:
             self.check_form_iter(item, it.next())
-        self.failUnlessRaises(StopIteration, it.next)
+        self.assertRaises(StopIteration, it.next)
 
     def parse_form(self, xml):
         doc = libxml2.parseDoc(xml)
