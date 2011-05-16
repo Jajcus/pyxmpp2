@@ -82,7 +82,7 @@ class StanzaProcessor(object):
         self.peer_authenticated = False
         self.process_all_stanzas = True
         self._iq_response_handlers = ExpiringDictionary()
-        self._iq_handlers = defaultdict(list)
+        self._iq_handlers = defaultdict(dict)
         self._message_handlers = []
         self._presence_handlers = []
         self.lock = threading.RLock()
@@ -186,9 +186,6 @@ class StanzaProcessor(object):
         payload = stanza.get_payload()
         if not payload:
             raise BadRequestProtocolError("<iq/> stanza with no child element")
-        if len(payload) > 1:
-            raise BadRequestProtocolError("<iq/> stanza with too many"
-                                                            " child elements")
         if typ == "get":
             handler = self._get_iq_handler("get", payload)
             if handler:
@@ -305,7 +302,7 @@ class StanzaProcessor(object):
             - `stanza`: presence stanza to be processed
         """
         if stanza.stanza_type not in ("error", "result"):
-            response = stanza.make_error_response("recipient-unavailable")
+            response = stanza.make_error_response(u"recipient-unavailable")
             self.send(response)
         return True
 
