@@ -102,7 +102,7 @@ class Stanza(object):
             if element.tag.startswith("{"):
                 self._namespace, self.element_name = element.tag[1:].split("}")
                 if self._namespace not in STANZA_NAMESPACES:
-                    raise ProtocolError, "Wrong stanza namespace"
+                    raise ProtocolError("Wrong stanza namespace")
             else:
                 self._namespace = STANZA_CLIENT_NS
                 self.element_name = element.tag
@@ -227,7 +227,7 @@ class Stanza(object):
             # already decoded
             return
         if self._element is None:
-            raise ValueError, "This stanza has no element to decode"""
+            raise ValueError("This stanza has no element to decode""")
         payload = []
         for child in self._element:
             if self.__class__ is not Stanza:
@@ -305,7 +305,7 @@ class Stanza(object):
         elif isinstance(payload, StanzaPayload):
             self._payload = [ payload ]
         else:
-            raise TypeError, "Bad payload type"
+            raise TypeError("Bad payload type")
         self._dirty = True
 
     def add_payload(self, payload):
@@ -325,7 +325,7 @@ class Stanza(object):
         elif isinstance(payload, StanzaPayload):
             self._payload.append(payload)
         else:
-            raise TypeError, "Bad payload type"
+            raise TypeError("Bad payload type")
         self._dirty = True
 
     def get_all_payload(self):

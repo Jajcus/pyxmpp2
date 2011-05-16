@@ -51,7 +51,7 @@ class XMLPayload(StanzaPayload):
         if isinstance(data, StanzaPayload):
             data = data.as_xml()
         if not isinstance(data, ElementTree.Element):
-            raise TypeError, "ElementTree.Element required"
+            raise TypeError("ElementTree.Element required")
         if data.tag.startswith("{"):
             self.xml_namespace = data.tag[1:].split("}", 1)[0]
         else:

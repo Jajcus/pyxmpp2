@@ -115,7 +115,7 @@ class LegacyClientStream(ClientStream):
             return
         self.__logger.debug("trying auth: %r" % (self._auth_methods_left,))
         if not self._auth_methods_left:
-            raise LegacyAuthenticationError,"No allowed authentication methods available"
+            raise LegacyAuthenticationError("No allowed authentication methods available")
         method=self._auth_methods_left[0]
         if method.startswith("sasl:"):
             return ClientStream._try_auth(self)
@@ -242,7 +242,7 @@ class LegacyClientStream(ClientStream):
                 ae=ae[0].name
             else:
                 ae=err.get_condition().name
-            raise LegacyAuthenticationError,("Authentication error condition: %s"
+            raise LegacyAuthenticationError("Authentication error condition: %s"
                         % (ae,))
         finally:
             self.lock.release()
@@ -390,7 +390,7 @@ class LegacyClientStream(ClientStream):
                 ae=ae[0].name
             else:
                 ae=err.get_condition().name
-            raise RegistrationError,("Authentication error condition: %s" % (ae,))
+            raise RegistrationError("Authentication error condition: %s" % (ae,))
         finally:
             self.lock.release()
 

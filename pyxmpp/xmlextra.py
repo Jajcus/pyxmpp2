@@ -103,7 +103,7 @@ class StreamHandler:
             - `descr`: description of the error
         :Types:
             - `descr`: `str`"""
-        raise StreamParseError,descr
+        raise StreamParseError(descr)
 
     def warning(self,desc):
         """Called when an warning is encountered in the stream.
@@ -551,7 +551,7 @@ class StreamReader:
         self.lock.acquire()
         if self.in_use:
             self.lock.release()
-            raise StreamParseError,"StreamReader.feed() is not reentrant!"
+            raise StreamParseError("StreamReader.feed() is not reentrant!")
         self.in_use=1
         try:
             return self.reader.feed(s)

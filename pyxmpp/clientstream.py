@@ -132,7 +132,7 @@ class ClientStream(Stream):
     def _connect(self,server=None,port=None):
         """Same as `ClientStream.connect` but assume `self.lock` is acquired."""
         if not self.my_jid.node or not self.my_jid.resource:
-            raise ClientStreamError,"Client JID must have username and resource"
+            raise ClientStreamError("Client JID must have username and resource")
         if not server:
             server=self.server
         if not port:
@@ -178,7 +178,7 @@ class ClientStream(Stream):
             return
         self.__logger.debug("trying auth: %r", (self._auth_methods_left,))
         if not self._auth_methods_left:
-            raise StreamAuthenticationError,"No allowed authentication methods available"
+            raise StreamAuthenticationError("No allowed authentication methods available")
         method=self._auth_methods_left[0]
         if method.startswith("sasl:"):
             if self.version:

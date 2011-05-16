@@ -145,10 +145,10 @@ class Register(StanzaPayloadObject):
 
         self.__logger.debug("Converting jabber:iq:register element from XML")
         if xmlnode.type!="element":
-            raise ValueError,"XML node is not a jabber:iq:register element (not an element)"
+            raise ValueError("XML node is not a jabber:iq:register element (not an element)")
         ns=get_node_ns_uri(xmlnode)
         if ns and ns!=REGISTER_NS or xmlnode.name!="query":
-            raise ValueError,"XML node is not a jabber:iq:register element"
+            raise ValueError("XML node is not a jabber:iq:register element")
 
         for element in xml_element_iter(xmlnode.children):
             ns = get_node_ns_uri(element)
@@ -211,7 +211,7 @@ class Register(StanzaPayloadObject):
 
         if self.form:
             if self.form.type != form_type:
-                raise ValueError, "Bad form type in the jabber:iq:register element"
+                raise ValueError("Bad form type in the jabber:iq:register element")
             return self.form
 
         form = Form(form_type, instructions = self.instructions)
@@ -249,7 +249,7 @@ class Register(StanzaPayloadObject):
             return result
 
         if "FORM_TYPE" not in form or "jabber:iq:register" not in form["FORM_TYPE"].values:
-            raise ValueError, "FORM_TYPE is not jabber:iq:register"
+            raise ValueError("FORM_TYPE is not jabber:iq:register")
 
         for field in legacy_fields:
             self.__logger.debug(u"submitted field %r" % (field, ))
@@ -258,7 +258,7 @@ class Register(StanzaPayloadObject):
                 form_value = form[field].value
             except KeyError:
                 if value:
-                    raise ValueError, "Required field with no value!"
+                    raise ValueError("Required field with no value!")
                 continue
             setattr(result, field, form_value)
 

@@ -88,7 +88,7 @@ class JID(object):
             cls.cache[node_or_jid] = obj
         else:
             if domain is None and resource is None:
-                raise JIDError, "At least domain must be given"
+                raise JIDError("At least domain must be given")
             if check:
                 node = cls.__prepare_node(node_or_jid)
                 domain = cls.__prepare_domain(domain)
@@ -101,7 +101,7 @@ class JID(object):
         return obj
     
     def __setattr__(self, name, value):
-        raise RuntimeError, "JID objects are immutable!"
+        raise RuntimeError("JID objects are immutable!")
 
     def __attribute_declarations__(self):
         # to make pylint happy
@@ -140,7 +140,7 @@ class JID(object):
         else:
             resource = None
         if not domain:
-            raise JIDError, "Domain is required in JID."
+            raise JIDError("Domain is required in JID.")
         return (node, domain, resource)
 
     @staticmethod
@@ -161,7 +161,7 @@ class JID(object):
         data = unicode(data)
         node = nodeprep.prepare(data)
         if len(node.encode("utf-8")) > 1023:
-            raise JIDError,"Node name too long"
+            raise JIDError("Node name too long")
         return node
 
     @staticmethod
@@ -175,13 +175,13 @@ class JID(object):
 
         :raise JIDError: if the domain name is too long."""
         if not data:
-            raise JIDError, "Domain must be given"
+            raise JIDError("Domain must be given")
         data = unicode(data)
         labels = data.split(u".")
         labels = [idna.nameprep(label) for label in labels]
         domain = ".".join(labels)
         if len(domain.encode("utf-8")) > 1023:
-            raise JIDError, "Domain name too long"
+            raise JIDError("Domain name too long")
         return domain
 
     @staticmethod
@@ -199,7 +199,7 @@ class JID(object):
         data = unicode(data)
         resource = resourceprep.prepare(data)
         if len(resource.encode("utf-8")) > 1023:
-            raise JIDError, "Resource name too long"
+            raise JIDError("Resource name too long")
         return resource
 
     def __str__(self):

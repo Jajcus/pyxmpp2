@@ -212,7 +212,7 @@ class Profile:
         for c in s:
             for t in self.prohibited:
                 if t.lookup(c):
-                    raise StringprepError,"Prohibited character: %r" % (c,)
+                    raise StringprepError("Prohibited character: %r" % (c,))
         return s
 
     def check_unassigned(self,s):
@@ -220,7 +220,7 @@ class Profile:
         for c in s:
             for t in self.unassigned:
                 if t.lookup(c):
-                    raise StringprepError,"Unassigned character: %r" % (c,)
+                    raise StringprepError("Unassigned character: %r" % (c,))
         return s
 
     def check_bidi(self,s):
@@ -233,9 +233,9 @@ class Profile:
             elif D_2.lookup(c):
                 has_l=1
         if has_l and has_ral:
-            raise StringprepError,"Both RandALCat and LCat characters present"
+            raise StringprepError("Both RandALCat and LCat characters present")
         if has_l and (D_1.lookup(s[0]) is None or D_1.lookup(s[-1]) is None):
-            raise StringprepError,"The first and the last character must be RandALCat"
+            raise StringprepError("The first and the last character must be RandALCat")
         return s
 
 nodeprep=Profile(

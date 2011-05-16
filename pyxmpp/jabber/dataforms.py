@@ -67,7 +67,7 @@ class Option(StanzaPayloadObject):
             warnings.warn("Option constructor accepts only single value now.", DeprecationWarning, stacklevel=1)
             self.value = values[0]
         else:
-            raise TypeError, "value argument to pyxmpp.dataforms.Option is required"
+            raise TypeError("value argument to pyxmpp.dataforms.Option is required")
 
 
     @property
@@ -112,7 +112,7 @@ class Option(StanzaPayloadObject):
                 value = from_utf8(child.getContent())
                 break
         if value is None:
-            raise BadRequestProtocolError, "No value in <option/> element"
+            raise BadRequestProtocolError("No value in <option/> element")
         return cls(value, label)
 
 class Field(StanzaPayloadObject):
@@ -174,23 +174,23 @@ class Field(StanzaPayloadObject):
         """
         self.name = name
         if field_type is not None and field_type not in self.allowed_types:
-            raise ValueError, "Invalid form field type: %r" % (field_type,)
+            raise ValueError("Invalid form field type: %r" % (field_type,))
         self.type = field_type
         if value is not None:
             if values:
-                raise ValueError, "values or value must be given, not both"
+                raise ValueError("values or value must be given, not both")
             self.value = value
         elif not values:
             self.values = []
         else:
             self.values = list(values)
         if field_type and not field_type.endswith("-multi") and len(self.values) > 1:
-            raise ValueError, "Multiple values for a single-value field"
+            raise ValueError("Multiple values for a single-value field")
         self.label = label
         if not options:
             self.options = []
         elif field_type and not field_type.startswith("list-"):
-            raise ValueError, "Options not allowed for non-list fields"
+            raise ValueError("Options not allowed for non-list fields")
         else:
             self.options = list(options)
         self.required = required
@@ -198,7 +198,7 @@ class Field(StanzaPayloadObject):
 
     def __getattr__(self, name):
         if name != "value":
-            raise AttributeError, "'Field' object has no attribute %r" % (name,)
+            raise AttributeError("'Field' object has no attribute %r" % (name,))
         values = self.values
         t = self.type
         l = len(values)
@@ -212,7 +212,7 @@ class Field(StanzaPayloadObject):
                         return False
                     elif v in ("1","true"):
                         return True
-                raise ValueError, "Bad boolean value"
+                raise ValueError("Bad boolean value")
             elif t.startswith("jid-"):
                 values = [JID(v) for v in values]
             if t.endswith("-multi"):
@@ -222,7 +222,7 @@ class Field(StanzaPayloadObject):
         elif l == 1:
             return values[0]
         else:
-            raise ValueError, "Multiple values of a single-value field"
+            raise ValueError("Multiple values of a single-value field")
 
     def __setattr__(self, name, value):
         if name != "value":
@@ -260,7 +260,7 @@ class Field(StanzaPayloadObject):
             warnings.warn(".add_option() accepts single value now.", DeprecationWarning, stacklevel=1)
             value = value[0]
         if self.type not in ("list-multi", "list-single"):
-            raise ValueError, "Options are allowed only for list types."
+            raise ValueError("Options are allowed only for list types.")
         option = Option(value, label)
         self.options.append(option)
         return option
@@ -276,7 +276,7 @@ class Field(StanzaPayloadObject):
             - `xmlnode`: `libxml2.xmlNode`
             - `doc`: `libxml2.xmlDoc`"""
         if self.type is not None and self.type not in self.allowed_types:
-            raise ValueError, "Invalid form field type: %r" % (self.type,)
+            raise ValueError("Invalid form field type: %r" % (self.type,))
         if self.type is not None:
             xmlnode.setProp("type", self.type)
         if not self.label is None:
@@ -285,7 +285,7 @@ class Field(StanzaPayloadObject):
             xmlnode.setProp("var", to_utf8(self.name))
         if self.values:
             if self.type and len(self.values) > 1 and not self.type.endswith(u"-multi"):
-                raise ValueError, "Multiple values not allowed for %r field" % (self.type,)
+                raise ValueError("Multiple values not allowed for %r field" % (self.type,))
             for value in self.values:
                 xmlnode.newTextChild(xmlnode.ns(), "value", to_utf8(value))
         for option in self.options:
@@ -329,7 +329,7 @@ class Field(StanzaPayloadObject):
                 options.append(Option._new_from_xml(child))
             child = child.next
         if field_type and not field_type.endswith("-multi") and len(values) > 1:
-            raise BadRequestProtocolError, "Multiple values for a single-value field"
+            raise BadRequestProtocolError("Multiple values for a single-value field")
         return cls(name, values, field_type, label, options, required, desc)
 
 class Item(StanzaPayloadObject):
@@ -377,7 +377,7 @@ class Item(StanzaPayloadObject):
         for f in self.fields:
             if f.name == name_or_index:
                 return f
-        raise KeyError, name_or_index
+        raise KeyError(name_or_index)
 
     def __contains__(self, name):
         for f in self.fields:
@@ -510,7 +510,7 @@ class Form(StanzaPayloadObject):
         if isinstance(xmlnode_or_type, libxml2.xmlNode):
             self.__from_xml(xmlnode_or_type)
         elif xmlnode_or_type not in self.allowed_types:
-            raise ValueError, "Form type %r not allowed." % (xmlnode_or_type,)
+            raise ValueError("Form type %r not allowed." % (xmlnode_or_type,))
         else:
             self.type = xmlnode_or_type
             self.title = title
@@ -534,7 +534,7 @@ class Form(StanzaPayloadObject):
         for f in self.fields:
             if f.name == name_or_index:
                 return f
-        raise KeyError, name_or_index
+        raise KeyError(name_or_index)
 
     def __contains__(self, name):
         for f in self.fields:
@@ -616,7 +616,7 @@ class Form(StanzaPayloadObject):
                 continue
             if not field.values:
                 if field.required:
-                    raise ValueError, "Required field with no value!"
+                    raise ValueError("Required field with no value!")
                 continue
             if keep_types:
                 result.add_field(field.name, field.values, field.type)
@@ -642,7 +642,7 @@ class Form(StanzaPayloadObject):
             - `xmlnode`: `libxml2.xmlNode`
             - `doc`: `libxml2.xmlDoc`"""
         if self.type not in self.allowed_types:
-            raise ValueError, "Form type %r not allowed." % (self.type,)
+            raise ValueError("Form type %r not allowed." % (self.type,))
         xmlnode.setProp("type", self.type)
         if self.type == "cancel":
             return
@@ -677,10 +677,10 @@ class Form(StanzaPayloadObject):
         self.instructions = None
         if (xmlnode.type != "element" or xmlnode.name != "x"
                 or xmlnode.ns().content != DATAFORM_NS):
-            raise ValueError, "Not a form: " + xmlnode.serialize() 
+            raise ValueError("Not a form: " + xmlnode.serialize()) 
         self.type = xmlnode.prop("type")
         if not self.type in self.allowed_types:
-            raise BadRequestProtocolError, "Bad form type: %r" % (self.type,)
+            raise BadRequestProtocolError("Bad form type: %r" % (self.type,))
         child = xmlnode.children
         while child:
             if child.type != "element" or child.ns().content != DATAFORM_NS:

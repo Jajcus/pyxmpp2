@@ -98,13 +98,13 @@ class ComponentStream(Stream):
     def _connect(self,server=None,port=None):
         """Same as `ComponentStream.connect` but assume `self.lock` is acquired."""
         if self.me.node or self.me.resource:
-            raise Value, "Component JID may have only domain defined"
+            raise Value("Component JID may have only domain defined")
         if not server:
             server=self.server
         if not port:
             port=self.port
         if not server or not port:
-            raise ValueError, "Server or port not given"
+            raise ValueError("Server or port not given")
         Stream._connect(self,server,port,None,self.me)
 
     def accept(self,sock):
@@ -188,7 +188,7 @@ class ComponentStream(Stream):
                 return
             else:
                 self._send_stream_error("not-authorized")
-                raise FatalComponentStreamError,"Hanshake error."
+                raise FatalComponentStreamError("Hanshake error.")
 
         if ns_uri in ("jabber:component:accept","jabber:client","jabber:server"):
             stanza=stanza_factory(node)

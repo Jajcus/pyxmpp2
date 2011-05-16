@@ -226,7 +226,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
             if exception:
                 raise exception
             else:
-                raise FatalStreamError,"Cannot connect"
+                raise FatalStreamError("Cannot connect")
 
         self.addr=addr
         self.port=port
@@ -332,15 +332,15 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
             r=self.doc_in.getRootElement()
             if r.ns().getContent() != STREAM_NS:
                 self._send_stream_error("invalid-namespace")
-                raise FatalStreamError,"Invalid namespace."
+                raise FatalStreamError("Invalid namespace.")
         except libxml2.treeError:
             self._send_stream_error("invalid-namespace")
-            raise FatalStreamError,"Couldn't get the namespace."
+            raise FatalStreamError("Couldn't get the namespace.")
 
         self.version=r.prop("version")
         if self.version and self.version!="1.0":
             self._send_stream_error("unsupported-version")
-            raise FatalStreamError,"Unsupported protocol version."
+            raise FatalStreamError("Unsupported protocol version.")
 
         to_from_mismatch=0
         if self.initiator:
@@ -361,7 +361,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
                 to=self.check_to(to)
                 if not to:
                     self._send_stream_error("host-unknown")
-                    raise FatalStreamError,'Bad "to"'
+                    raise FatalStreamError('Bad "to"')
                 self.me=JID(to)
             self._send_stream_start(self.generate_id())
             self._send_stream_features()
@@ -416,7 +416,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         :Parameters:
             - `descr`: error description
         """
-        raise StreamParseError,descr
+        raise StreamParseError(descr)
 
     def _send_stream_end(self):
         """Send stream end tag."""
@@ -435,7 +435,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
     def _send_stream_start(self,sid=None):
         """Send stream start tag."""
         if self.doc_out:
-            raise StreamError,"Stream start already sent"
+            raise StreamError("Stream start already sent")
         self.doc_out=libxml2.newDoc("1.0")
         root=self.doc_out.newChild(None, "stream", None)
         self.stream_ns=root.newNs(STREAM_NS,"stream")
@@ -848,7 +848,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         [initiating entity only]
 
         :raise FatalStreamError:"""
-        raise FatalStreamError,"Resource binding failed"
+        raise FatalStreamError("Resource binding failed")
 
     def connected(self):
         """Check if stream is connected.

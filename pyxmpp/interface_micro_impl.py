@@ -30,25 +30,25 @@ from types import FunctionType
 
 def classImplements(cls, *interfaces):
     if not isinstance(cls, classobj):
-        raise TypeError, "%r is not a class"
+        raise TypeError("%r is not a class")
     for interface in interfaces:
         if not isinstance(interface, InterfaceClass):
-            raise TypeError, "Only interfaces may be implemented"
+            raise TypeError("Only interfaces may be implemented")
     cls.__implemented__ = tuple(interfaces)
 
 def implements(*interfaces):
     for interface in interfaces:
         if not isinstance(interface, InterfaceClass):
-            raise TypeError, "Only interfaces may be implemented"
+            raise TypeError("Only interfaces may be implemented")
 
     frame = sys._getframe(1)
     locals = frame.f_locals
 
     if (locals is frame.f_globals) or ('__module__' not in locals):
-        raise TypeError, "implements() may only be used in a class definition"
+        raise TypeError("implements() may only be used in a class definition")
 
     if "__implemented__" in locals:
-        raise TypeError, "implements() may be used only once"
+        raise TypeError("implements() may be used only once")
 
     locals["__implemented__"] = tuple(interfaces)
 
@@ -95,11 +95,11 @@ class InterfaceClass(object):
         self.__module__ = __module__
         for base in bases:
             if not isinstance(base, InterfaceClass):
-                raise TypeError, 'Interface bases must be Interfaces'
+                raise TypeError('Interface bases must be Interfaces')
         if attrs is not None:
             for aname, attr in attrs.items():
                 if not isinstance(attr, Attribute) and type(attr) is not FunctionType:
-                    raise TypeError, 'Interface attributes must be Attributes o functions (%r found in %s)' % (attr, aname)
+                    raise TypeError('Interface attributes must be Attributes o functions (%r found in %s)' % (attr, aname))
         self.__bases__ = bases
         self.__attrs = attrs
         self.__name__ = name

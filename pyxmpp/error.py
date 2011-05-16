@@ -204,14 +204,14 @@ class ErrorNode:
             self.__from_xml(xmlnode_or_cond,ns,copy,parent)
         elif isinstance(xmlnode_or_cond,ErrorNode):
             if not copy:
-                raise TypeError, "ErrorNodes may only be copied"
+                raise TypeError("ErrorNodes may only be copied")
             self.ns=from_utf8(xmlnode_or_cond.ns.getContent())
             self.xmlnode=xmlnode_or_cond.xmlnode.docCopyNode(common_doc,1)
             if not parent:
                 parent=common_root
             parent.addChild(self.xmlnode)
         elif ns is None:
-            raise ValueError, "Condition namespace not given"
+            raise ValueError("Condition namespace not given")
         else:
             if parent:
                 self.xmlnode=parent.newChild(common_ns,"error",None)
@@ -248,7 +248,7 @@ class ErrorNode:
                 ns=None
                 c=c.next
             if ns==None:
-                raise ProtocolError, "Bad error namespace"
+                raise ProtocolError("Bad error namespace")
         self.ns=from_utf8(ns)
         if copy:
             self.xmlnode=xmlnode.docCopyNode(common_doc,1)
@@ -447,7 +447,7 @@ class StreamErrorNode(ErrorNode):
             xmlnode_or_cond = xmlnode_or_cond.decode("utf-8")
         if type(xmlnode_or_cond) is unicode:
             if not stream_errors.has_key(xmlnode_or_cond):
-                raise ValueError, "Bad error condition"
+                raise ValueError("Bad error condition")
         ErrorNode.__init__(self,xmlnode_or_cond,STREAM_ERROR_NS,copy=copy,parent=parent)
 
     def get_message(self):
@@ -488,7 +488,7 @@ class StanzaErrorNode(ErrorNode):
             xmlnode_or_cond=unicode(xmlnode_or_cond,"utf-8")
         if type(xmlnode_or_cond) is unicode:
             if not stanza_errors.has_key(xmlnode_or_cond):
-                raise ValueError, "Bad error condition"
+                raise ValueError("Bad error condition")
 
         ErrorNode.__init__(self,xmlnode_or_cond,STANZA_ERROR_NS,copy=copy,parent=parent)
 

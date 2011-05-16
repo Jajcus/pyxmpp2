@@ -185,7 +185,7 @@ def getaddrinfo(host, port, family = None,
     if type(port)!=int:
         port=socket.getservbyname(port,proto)
     if family not in (AF_UNSPEC, AF_INET, AF_INET6):
-        raise NotImplementedError, "Unsupported protocol family."
+        raise NotImplementedError("Unsupported protocol family.")
     if ipv4_re.match(host) and family in (AF_UNSPEC, AF_INET):
         return [(AF_INET, socktype, proto, host, (host, port))]
     if ipv6_re.match(host) and family in (AF_UNSPEC, AF_INET6):
@@ -208,15 +208,15 @@ def getaddrinfo(host, port, family = None,
             exception = err
             continue
         if not allow_cname and r.rrset.name != dns.name.from_text(host):
-            raise UnexpectedCNAMEError, (
+            raise UnexpectedCNAMEError(
                     "Unexpected CNAME record found for %r" % (host,))
         if r:
             for rr in r:
                 ret.append((rfamily, socktype, proto, r.rrset.name,
                                                         (rr.to_text(),port)))
     if not ret and exception:
-        raise DNSError, "Could not resolve %r: %s" % (host,
-                                                exception.__class__.__name__)
+        raise DNSError("Could not resolve %r: %s" % (host,
+                                                exception.__class__.__name__))
     return ret
 
 # vi: sts=4 et sw=4

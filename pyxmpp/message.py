@@ -82,14 +82,14 @@ class Message(Stanza):
         if element is None:
             element = "message"
         elif not isinstance(element, ElementTree.Element):
-            raise TypeError, "Couldn't make Message from " + repr(element)
+            raise TypeError("Couldn't make Message from " + repr(element))
 
         Stanza.__init__(self, element, from_jid = from_jid, to_jid = to_jid,
                         stanza_type = stanza_type, stanza_id = stanza_id,
                         error = error, error_cond = error_cond, stream = stream)
 
         if self.element_name != "message":
-            raise ValueError, "The element is not <message/>"
+            raise ValueError("The element is not <message/>")
 
         self._subject_tag = self._ns_prefix + "subject"
         self._body_tag = self._ns_prefix + "body"
@@ -184,7 +184,7 @@ class Message(Stanza):
         :returntype: `Message`"""
 
         if self.stanza_type == "error":
-            raise ValueError, ("Errors may not be generated in response"
+            raise ValueError("Errors may not be generated in response"
                                                                 " to errors")
 
         msg = Message(stanza_type = "error", from_jid = self.to_jid, 

@@ -124,13 +124,13 @@ class Component:
         :raise ValueError: when some of the component properties
           (`self.jid`, `self.secret`,`self.server` or `self.port`) are wrong."""
         if not self.jid or self.jid.node or self.jid.resource:
-            raise ValueError,"Cannot connect: no or bad JID given"
+            raise ValueError("Cannot connect: no or bad JID given")
         if not self.secret:
-            raise ValueError,"Cannot connect: no secret given"
+            raise ValueError("Cannot connect: no secret given")
         if not self.server:
-            raise ValueError,"Cannot connect: no server given"
+            raise ValueError("Cannot connect: no server given")
         if not self.port:
-            raise ValueError,"Cannot connect: no port given"
+            raise ValueError("Cannot connect: no port given")
 
         self.lock.acquire()
         try:

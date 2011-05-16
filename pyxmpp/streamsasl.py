@@ -187,7 +187,7 @@ class StreamSASLMixIn(sasl.PasswordManager):
             self._post_auth()
 
         if isinstance(r,sasl.Failure):
-            raise SASLAuthenticationFailed,"SASL authentication failed"
+            raise SASLAuthenticationFailed("SASL authentication failed")
 
         return True
 
@@ -223,7 +223,7 @@ class StreamSASLMixIn(sasl.PasswordManager):
         xmlnode.freeNode()
 
         if isinstance(r,sasl.Failure):
-            raise SASLAuthenticationFailed,"SASL authentication failed"
+            raise SASLAuthenticationFailed("SASL authentication failed")
 
         return True
 
@@ -275,7 +275,7 @@ class StreamSASLMixIn(sasl.PasswordManager):
             self._post_auth()
 
         if isinstance(r,sasl.Failure):
-            raise SASLAuthenticationFailed,"SASL authentication failed"
+            raise SASLAuthenticationFailed("SASL authentication failed")
 
         return 1
 
@@ -304,7 +304,7 @@ class StreamSASLMixIn(sasl.PasswordManager):
             self._post_auth()
         else:
             self.__logger.debug("SASL authentication failed")
-            raise SASLAuthenticationFailed,"Additional success data procesing failed"
+            raise SASLAuthenticationFailed("Additional success data procesing failed")
         return True
 
     def _process_sasl_failure(self,xmlnode):
@@ -320,7 +320,7 @@ class StreamSASLMixIn(sasl.PasswordManager):
             return False
 
         self.__logger.debug("SASL authentication failed: %r" % (xmlnode.serialize(),))
-        raise SASLAuthenticationFailed,"SASL authentication failed"
+        raise SASLAuthenticationFailed("SASL authentication failed")
 
     def _process_sasl_abort(self):
         """Process incoming <sasl:abort/> element.
@@ -344,12 +344,12 @@ class StreamSASLMixIn(sasl.PasswordManager):
             - `authzid`: authorization ID.
             - `mechanism`: SASL mechanism to use."""
         if not self.initiator:
-            raise SASLAuthenticationFailed,"Only initiating entity start SASL authentication"
+            raise SASLAuthenticationFailed("Only initiating entity start SASL authentication")
         while not self.features:
             self.__logger.debug("Waiting for features")
             self._read()
         if not self.peer_sasl_mechanisms:
-            raise SASLNotAvailable,"Peer doesn't support SASL"
+            raise SASLNotAvailable("Peer doesn't support SASL")
 
         if not mechanism:
             mechanism=None
@@ -358,11 +358,11 @@ class StreamSASLMixIn(sasl.PasswordManager):
                     mechanism=m
                     break
             if not mechanism:
-                raise SASLMechanismNotAvailable,"Peer doesn't support any of our SASL mechanisms"
+                raise SASLMechanismNotAvailable("Peer doesn't support any of our SASL mechanisms")
             self.__logger.debug("Our mechanism: %r" % (mechanism,))
         else:
             if mechanism not in self.peer_sasl_mechanisms:
-                raise SASLMechanismNotAvailable,"%s is not available" % (mechanism,)
+                raise SASLMechanismNotAvailable("%s is not available" % (mechanism,))
 
         self.auth_method_used="sasl:"+mechanism
 
@@ -370,7 +370,7 @@ class StreamSASLMixIn(sasl.PasswordManager):
 
         initial_response=self.authenticator.start(username,authzid)
         if not isinstance(initial_response,sasl.Response):
-            raise SASLAuthenticationFailed,"SASL initiation failed"
+            raise SASLAuthenticationFailed("SASL initiation failed")
 
         root=self.doc_out.getRootElement()
         xmlnode=root.newChild(None,"auth",None)

@@ -62,9 +62,9 @@ class RosterItem(StanzaPayloadObject):
         else:
             node_or_jid=JID(node_or_jid)
             if subscription not in ("none","from","to","both","remove"):
-                raise ValueError,"Bad subscription type: %r" % (subscription,)
+                raise ValueError("Bad subscription type: %r" % (subscription,))
             if ask not in ("subscribe",None):
-                raise ValueError,"Bad ask type: %r" % (ask,)
+                raise ValueError("Bad ask type: %r" % (ask,))
             self.jid=node_or_jid
             self.ask=ask
             self.subscription=subscription
@@ -74,10 +74,10 @@ class RosterItem(StanzaPayloadObject):
     def from_xml(self,node):
         """Initialize RosterItem from XML node."""
         if node.type!="element":
-            raise ValueError,"XML node is not a roster item (not en element)"
+            raise ValueError("XML node is not a roster item (not en element)")
         ns=get_node_ns_uri(node)
         if ns and ns!=ROSTER_NS or node.name!="item":
-            raise ValueError,"XML node is not a roster item"
+            raise ValueError("XML node is not a roster item")
         jid=JID(node.prop("jid").decode("utf-8"))
         subscription=node.prop("subscription")
         if subscription not in ("none","from","to","both","remove"):
@@ -190,10 +190,10 @@ class Roster(StanzaPayloadObject):
         """
         self.items_dict={}
         if node.type!="element":
-            raise ValueError,"XML node is not a roster (not en element)"
+            raise ValueError("XML node is not a roster (not en element)")
         ns=get_node_ns_uri(node)
         if ns and ns!=ROSTER_NS or node.name!="query":
-            raise ValueError,"XML node is not a roster"
+            raise ValueError("XML node is not a roster")
         n=node.children
         while n:
             if n.type!="element":
@@ -307,7 +307,7 @@ class Roster(StanzaPayloadObject):
         :raise KeyError: if the item is not found.
         """
         if not jid:
-            raise ValueError,"jid is None"
+            raise ValueError("jid is None")
         return self.items_dict[jid]
 
     def add_item(self,item_or_jid,subscription="none",name=None,groups=(),ask=None):
@@ -321,10 +321,10 @@ class Roster(StanzaPayloadObject):
         if isinstance(item_or_jid,RosterItem):
             item=item_or_jid
             if self.items_dict.has_key(item.jid):
-                raise ValueError,"Item already exists"
+                raise ValueError("Item already exists")
         else:
             if self.items_dict.has_key(item_or_jid):
-                raise ValueError,"Item already exists"
+                raise ValueError("Item already exists")
             if not self.server or subscription not in ("none","from","to","both"):
                 subscription="none"
             if not self.server:
@@ -350,7 +350,7 @@ class Roster(StanzaPayloadObject):
         item=ctxt.xpathEval("r:item")
         ctxt.xpathFreeContext()
         if not item:
-            raise ValueError,"No item to update"
+            raise ValueError("No item to update")
         item=item[0]
         item=RosterItem(item)
         jid=item.jid

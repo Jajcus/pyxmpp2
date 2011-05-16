@@ -69,7 +69,7 @@ class MucXBase(StanzaPayloadWrapperObject):
             - `parent`: `libxml2.xmlNode`
         """
         if self.ns==None:
-            raise RuntimeError,"Pure virtual class called"
+            raise RuntimeError("Pure virtual class called")
         self.xmlnode=None
         self.borrowed=False
         if isinstance(xmlnode,libxml2.xmlNode):
@@ -84,11 +84,11 @@ class MucXBase(StanzaPayloadWrapperObject):
                 xmlextra.replace_ns(self.xmlnode, ns, common_ns)
         elif isinstance(xmlnode,MucXBase):
             if not copy:
-                raise TypeError, "MucXBase may only be copied"
+                raise TypeError("MucXBase may only be copied")
             self.xmlnode=xmlnode.xmlnode.docCopyNode(common_doc,1)
             common_root.addChild(self.xmlnode)
         elif xmlnode is not None:
-            raise TypeError, "Bad MucX constructor argument"
+            raise TypeError("Bad MucX constructor argument")
         else:
             if parent:
                 self.xmlnode=parent.newChild(None,self.element,None)
@@ -168,11 +168,11 @@ class MucX(MucXBase):
                 break
 
         if parameters.maxchars and parameters.maxchars < 0:
-            raise ValueError, "History parameter maxchars must be positive"
+            raise ValueError("History parameter maxchars must be positive")
         if parameters.maxstanzas and parameters.maxstanzas < 0:
-            raise ValueError, "History parameter maxstanzas must be positive"
+            raise ValueError("History parameter maxstanzas must be positive")
         if parameters.maxseconds and parameters.maxseconds < 0:
-            raise ValueError, "History parameter maxseconds must be positive"
+            raise ValueError("History parameter maxseconds must be positive")
 
         hnode=self.xmlnode.newChild(self.xmlnode.ns(), "history", None)
 
@@ -271,7 +271,7 @@ class MucItemBase(object):
     """
     def __init__(self):
         if self.__class__ is MucItemBase:
-            raise RuntimeError,"Abstract class called"
+            raise RuntimeError("Abstract class called")
 
 class MucItem(MucItemBase):
     """
@@ -340,12 +340,12 @@ class MucItem(MucItemBase):
         if not affiliation:
             affiliation=None
         elif affiliation not in affiliations:
-            raise ValueError,"Bad affiliation"
+            raise ValueError("Bad affiliation")
         self.affiliation=affiliation
         if not role:
             role=None
         elif role not in roles:
-            raise ValueError,"Bad role"
+            raise ValueError("Bad role")
         self.role=role
         if jid:
             self.jid=JID(jid)
@@ -447,7 +447,7 @@ class MucStatus(MucItemBase):
         """
         code=int(code)
         if code<0 or code>999:
-            raise ValueError,"Bad status code"
+            raise ValueError("Bad status code")
         self.code=code
 
     def __from_xmlnode(self, xmlnode):
@@ -533,7 +533,7 @@ class MucUserX(MucXBase):
             - `item`: `MucItemBase`
         """
         if not isinstance(item,MucItemBase):
-            raise TypeError,"Bad item type for muc#user"
+            raise TypeError("Bad item type for muc#user")
         item.as_xml(self.xmlnode)
 
 class MucOwnerX(MucXBase):
@@ -569,7 +569,7 @@ class MucStanzaExt:
     def __init__(self):
         """Initialize a `MucStanzaExt` derived object."""
         if self.__class__ is MucStanzaExt:
-            raise RuntimeError,"Abstract class called"
+            raise RuntimeError("Abstract class called")
         self.xmlnode=None
         self.muc_child=None
 

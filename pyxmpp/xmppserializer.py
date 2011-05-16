@@ -134,7 +134,7 @@ class XMPPSerializer(object):
         elif declared_prefixes[self.stanza_namespace] is None:
             namespace = self.stanza_namespace
         elif level is not None:
-            raise ValueError, "Non-stanza element with no namespace"
+            raise ValueError("Non-stanza element with no namespace")
         else:
             namespace = None
         return namespace, name
@@ -302,7 +302,7 @@ class XMPPSerializer(object):
         :Returntype: `unicode`
         """
         if not self._head_emitted:
-            raise RuntimeError, ".emit_head() must be called first."
+            raise RuntimeError(".emit_head() must be called first.")
         string = self._emit_element(element, level = 1, 
                                     declared_prefixes = self._root_prefixes)
         return remove_evil_characters(string)

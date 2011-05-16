@@ -202,7 +202,7 @@ class DiscoItem(StanzaPayloadWrapperObject):
                 self.xmlnode.unsetProp("action")
             return
         if action not in ("remove","update"):
-            raise ValueError, "Action must be 'update' or 'remove'"
+            raise ValueError("Action must be 'update' or 'remove'")
         action = unicode(action)
         self.xmlnode.setProp("action", action.encode("utf-8"))
 
@@ -271,9 +271,9 @@ class DiscoIdentity(StanzaPayloadWrapperObject):
             else:
                 self.xmlnode=xmlnode_or_name
         elif not item_category:
-            raise ValueError,"DiscoInfo requires category"
+            raise ValueError("DiscoInfo requires category")
         elif not item_type:
-            raise ValueError,"DiscoInfo requires type"
+            raise ValueError("DiscoInfo requires type")
         else:
             if disco:
                 self.xmlnode=disco.xmlnode.newChild(None,"identity",None)
@@ -329,7 +329,7 @@ class DiscoIdentity(StanzaPayloadWrapperObject):
         :Types:
             - `name`: `unicode` """
         if not name:
-            raise ValueError, "name is required in DiscoIdentity"
+            raise ValueError("name is required in DiscoIdentity")
         name = unicode(name)
         self.xmlnode.setProp("name", name.encode("utf-8"))
 
@@ -353,7 +353,7 @@ class DiscoIdentity(StanzaPayloadWrapperObject):
         :Types:
             - `category`: `unicode` """
         if not category:
-            raise ValueError, "Category is required in DiscoIdentity"
+            raise ValueError("Category is required in DiscoIdentity")
         category = unicode(category)
         self.xmlnode.setProp("category", category.encode("utf-8"))
 
@@ -377,7 +377,7 @@ class DiscoIdentity(StanzaPayloadWrapperObject):
         :Types:
             - `item_type`: `unicode` """
         if not item_type:
-            raise ValueError,"Type is required in DiscoIdentity"
+            raise ValueError("Type is required in DiscoIdentity")
         item_type = unicode(item_type)
         self.xmlnode.setProp("type", item_type.encode("utf-8"))
 
@@ -410,7 +410,7 @@ class DiscoItems(StanzaPayloadWrapperObject):
         if isinstance(xmlnode_or_node,libxml2.xmlNode):
             ns=xmlnode_or_node.ns()
             if ns.getContent() != DISCO_ITEMS_NS:
-                raise ValueError, "Bad disco-items namespace"
+                raise ValueError("Bad disco-items namespace")
             self.xmlnode=xmlnode_or_node.docCopyNode(common_doc,1)
             common_root.addChild(self.xmlnode)
             self.ns=self.xmlnode.ns()
@@ -573,7 +573,7 @@ class DiscoInfo(StanzaPayloadWrapperObject):
         if isinstance(xmlnode_or_node,libxml2.xmlNode):
             ns=xmlnode_or_node.ns()
             if ns.getContent() != DISCO_INFO_NS:
-                raise ValueError, "Bad disco-info namespace"
+                raise ValueError("Bad disco-info namespace")
             self.xmlnode=xmlnode_or_node.docCopyNode(doc,1)
             parent.addChild(self.xmlnode)
         else:
@@ -664,13 +664,13 @@ class DiscoInfo(StanzaPayloadWrapperObject):
         :return: `True` if the feature is found in `self`.
         :returntype: `bool`"""
         if not var:
-            raise ValueError,"var is None"
+            raise ValueError("var is None")
         if '"' not in var:
             expr=u'd:feature[@var="%s"]' % (var,)
         elif "'" not in var:
             expr=u"d:feature[@var='%s']" % (var,)
         else:
-            raise ValueError, "Invalid feature name"
+            raise ValueError("Invalid feature name")
 
         l=self.xpath_ctxt.xpathEval(to_utf8(expr))
         if l:
@@ -702,13 +702,13 @@ class DiscoInfo(StanzaPayloadWrapperObject):
         :Types:
             - `var`: `unicode`"""
         if not var:
-            raise ValueError,"var is None"
+            raise ValueError("var is None")
         if '"' not in var:
             expr='d:feature[@var="%s"]' % (var,)
         elif "'" not in var:
             expr="d:feature[@var='%s']" % (var,)
         else:
-            raise ValueError, "Invalid feature name"
+            raise ValueError("Invalid feature name")
 
         l=self.xpath_ctxt.xpathEval(expr)
         if not l:
@@ -767,7 +767,7 @@ class DiscoInfo(StanzaPayloadWrapperObject):
             given type and category.
         :returntype: `bool`"""
         if not item_category:
-            raise ValueError, "bad category"
+            raise ValueError("bad category")
         if not item_type:
             type_expr=u""
         elif '"' not in item_type:
@@ -775,13 +775,13 @@ class DiscoInfo(StanzaPayloadWrapperObject):
         elif "'" not in type:
             type_expr=u" and @type='%s'" % (item_type,)
         else:
-            raise ValueError, "Invalid type name"
+            raise ValueError("Invalid type name")
         if '"' not in item_category:
             expr=u'd:identity[@category="%s"%s]' % (item_category,type_expr)
         elif "'" not in item_category:
             expr=u"d:identity[@category='%s'%s]" % (item_category,type_expr)
         else:
-            raise ValueError, "Invalid category name"
+            raise ValueError("Invalid category name")
 
         l=self.xpath_ctxt.xpathEval(to_utf8(expr))
         if l:

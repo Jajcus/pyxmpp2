@@ -102,10 +102,10 @@ class Presence(Stanza):
         if element is None:
             element = "presence"
         elif not isinstance(element, ElementTree.Element):
-            raise TypeError, "Couldn't make Presence from " + repr(element)
+            raise TypeError("Couldn't make Presence from " + repr(element))
 
         if stanza_type is not None and stanza_type not in PRESENCE_TYPES:
-            raise ValueError, "Bad presence type"
+            raise ValueError("Bad presence type")
         elif stanza_type == 'available':
             stanza_type = None
         
@@ -114,7 +114,7 @@ class Presence(Stanza):
                         error = error, error_cond = error_cond, stream = stream)
 
         if self.element_name != "presence":
-            raise ValueError, "The element is not <presence />"
+            raise ValueError("The element is not <presence />")
 
         self._show_tag = self._ns_prefix + "show"
         self._status_tag = self._ns_prefix + "status"
@@ -143,7 +143,7 @@ class Presence(Stanza):
                     if self._priority < -128 or self._priority > 127:
                         raise ValueError
                 except ValueError:
-                    raise ProtocolError, "Presence priority not an integer"
+                    raise ProtocolError("Presence priority not an integer")
 
     def as_xml(self):
         """Return the XML stanza representation.
@@ -202,7 +202,7 @@ class Presence(Stanza):
     def priority(self, priority): # pylint: disable-msg=E0202,E0102,C0111
         priority = int(priority)
         if priority < -128 or priority > 127:
-            raise ValueError, "Priority must be in the (-128, 128) range"
+            raise ValueError("Priority must be in the (-128, 128) range")
         self._priority = priority
         self._dirty = True
 
@@ -215,7 +215,7 @@ class Presence(Stanza):
         """
         if self.stanza_type not in ("subscribe", "subscribed",
                                                 "unsubscribe", "unsubscribed"):
-            raise ValueError, ("Results may only be generated for 'subscribe',"
+            raise ValueError("Results may only be generated for 'subscribe',"
                 "'subscribed','unsubscribe' or 'unsubscribed' presence")
         stanza = Presence(stanza_type = accept_responses[self.get_type()],
                             from_jid = self.from_jid, to_jid = self.to_jid,
@@ -231,7 +231,7 @@ class Presence(Stanza):
         """
         if self.stanza_type not in ("subscribe", "subscribed",
                                                 "unsubscribe", "unsubscribed"):
-            raise ValueError, ("Results may only be generated for 'subscribe',"
+            raise ValueError("Results may only be generated for 'subscribe',"
                 "'subscribed','unsubscribe' or 'unsubscribed' presence")
         stanza = Presence(stanza_type = deny_responses[self.get_type()],
                             from_jid = self.from_jid, to_jid = self.to_jid,
@@ -251,7 +251,7 @@ class Presence(Stanza):
         """
         
         if self.stanza_type == "error":
-            raise ValueError, ("Errors may not be generated in response"
+            raise ValueError("Errors may not be generated in response"
                                                                 " to errors")
 
         stanza = Presence(stanza_type = "error", from_jid = self.from_jid,

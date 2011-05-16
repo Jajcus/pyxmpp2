@@ -64,20 +64,20 @@ class Iq(Stanza):
 
         if stanza_type is None:
             if element is None:
-                raise ValueError, "Missing iq type"
+                raise ValueError("Missing iq type")
         elif stanza_type not in IQ_TYPES:
-            raise ValueError, "Bad iq type"
+            raise ValueError("Bad iq type")
         if element is None:
             element = "iq"
         elif not isinstance(element, ElementTree.Element):
-            raise TypeError, "Couldn't make Iq from " + repr(element)
+            raise TypeError("Couldn't make Iq from " + repr(element))
         
         Stanza.__init__(self, element, from_jid = from_jid, to_jid = to_jid,
                         stanza_type = stanza_type, stanza_id = stanza_id,
                         error = error, error_cond = error_cond, stream = stream)
         
         if self.element_name != "iq":
-            raise ValueError, "The element is not <iq/>"
+            raise ValueError("The element is not <iq/>")
 
     def copy(self):
         """Create a deep copy of the stanza.
@@ -103,7 +103,7 @@ class Iq(Stanza):
         :returntype: `Iq`"""
 
         if self.stanza_type in ("result", "error"):
-            raise ValueError, ("Errors may not be generated for"
+            raise ValueError("Errors may not be generated for"
                                                 " 'result' and 'error' iq")
 
         stanza = Iq(stanza_type="error", from_jid = self.to_jid, 
@@ -122,7 +122,7 @@ class Iq(Stanza):
         :returntype: `Iq`"""
 
         if self.stanza_type not in ("set", "get"):
-            raise ValueError, ("Results may only be generated for"
+            raise ValueError("Results may only be generated for"
                                                         " 'set' or 'get' iq")
         stanza = Iq(stanza_type = "result", from_jid = self.to_jid,
                         to_jid = self.from_jid, stanza_id = self.stanza_id)
@@ -143,7 +143,7 @@ class Iq(Stanza):
         if self._payload is None:
             self.decode_payload()
         if len(self._payload) >= 1:
-            raise ValueError, "Cannot add more payload to Iq stanza"
+            raise ValueError("Cannot add more payload to Iq stanza")
         return Stanza.add_payload(self, payload)
 
 # vi: sts=4 et sw=4

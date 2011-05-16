@@ -185,9 +185,9 @@ class StanzaProcessor(object):
             return self._process_iq_response(stanza)
         payload = stanza.get_payload()
         if not payload:
-            raise BadRequestProtocolError, "<iq/> stanza with no child element"
+            raise BadRequestProtocolError("<iq/> stanza with no child element")
         if len(payload) > 1:
-            raise BadRequestProtocolError, ("<iq/> stanza with too many"
+            raise BadRequestProtocolError("<iq/> stanza with too many"
                                                             " child elements")
         if typ == "get":
             handler = self._get_iq_handler("get", payload)
@@ -196,7 +196,7 @@ class StanzaProcessor(object):
                 self.process_response(response)
                 return True
             else:
-                raise FeatureNotImplementedProtocolError, "Not implemented"
+                raise FeatureNotImplementedProtocolError("Not implemented")
         elif typ == "set":
             handler = self._get_iq_handler("set", payload)
             if handler:
@@ -204,9 +204,9 @@ class StanzaProcessor(object):
                 self.process_response(response)
                 return True
             else:
-                raise FeatureNotImplementedProtocolError, "Not implemented"
+                raise FeatureNotImplementedProtocolError("Not implemented")
         else:
-            raise BadRequestProtocolError, "Unknown IQ stanza type"
+            raise BadRequestProtocolError("Unknown IQ stanza type")
 
     def _get_iq_handler(self, iq_type, payload):
         """Get an <iq/> handler for given iq  type and payload."""
@@ -517,7 +517,7 @@ class StanzaProcessor(object):
               with lower priority list will be tried first."""
         # pylint: disable-msg=R0913
         if priority < 0 or priority > 100:
-            raise ValueError,"Bad handler priority (must be in 0:100)"
+            raise ValueError("Bad handler priority (must be in 0:100)")
         handler_list.append((priority, stanza_type, payload_class, 
                                                 payload_key, handler))
         handler_list.sort(key = lambda x: x[0])
@@ -615,7 +615,7 @@ class StanzaProcessor(object):
             - `stanza`: the stanza to send.
         :Types:
             - `stanza`: `pyxmpp.stanza.Stanza`"""
-        raise NotImplementedError, ("This method must be overriden in derived"
+        raise NotImplementedError("This method must be overriden in derived"
                                     " classes.")
 
 # vi: sts=4 et sw=4

@@ -86,9 +86,9 @@ class CacheItem(object):
             - `purge_period`: `timedelta`
             - `state`: `str`"""
         if freshness_period>expiration_period:
-            raise ValueError, "freshness_period greater then expiration_period"
+            raise ValueError("freshness_period greater then expiration_period")
         if expiration_period>purge_period:
-            raise ValueError, "expiration_period greater then purge_period"
+            raise ValueError("expiration_period greater then purge_period")
         self.address = address
         self.value = value
         now = datetime.utcnow()
@@ -221,7 +221,7 @@ class CacheFetcher:
         """Start the retrieval process.
 
         This method must be implemented in any fetcher class."""
-        raise RuntimeError, "Pure virtual method called"
+        raise RuntimeError("Pure virtual method called")
 
     def got_it(self, value, state = "new"):
         """Handle a successfull retrieval and call apriopriate handler.
@@ -431,7 +431,7 @@ class Cache:
                 object_handler(item.address, item.value, item.state)
                 return
             if not self._fetcher:
-                raise TypeError, "No cache fetcher defined"
+                raise TypeError("No cache fetcher defined")
             if not error_handler:
                 def default_error_handler(address, _unused):
                     "Default error handler."
@@ -756,7 +756,7 @@ class CacheSuite:
         self._lock.acquire()
         try:
             if object_class not in self._caches:
-                raise TypeError, "No cache for %r" % (object_class,)
+                raise TypeError("No cache for %r" % (object_class,))
 
             self._caches[object_class].request_object(address, state, object_handler,
                     error_handler, timeout_handler, backup_state, timeout,

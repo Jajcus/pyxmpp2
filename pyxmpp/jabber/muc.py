@@ -319,7 +319,7 @@ class MucRoomUser:
                 self.role="participant"
                 self.update_presence(presence_or_user_or_jid)
             else:
-                raise TypeError,"Bad argument type for MucRoomUser constructor"
+                raise TypeError("Bad argument type for MucRoomUser constructor")
 
     def update_presence(self,presence):
         """
@@ -477,7 +477,7 @@ class MucRoomState:
             - `history_since`: `datetime.datetime`
         """
         if self.joined:
-            raise RuntimeError,"Room is already joined"
+            raise RuntimeError("Room is already joined")
         p=MucPresence(to_jid=self.room_jid)
         p.make_join_request(password, history_maxchars, history_maxstanzas,
                 history_seconds, history_since)
@@ -689,14 +689,14 @@ class MucRoomState:
             - `stanza`: `Presence`
         """
         if stanza.get_query_ns() != MUC_OWNER_NS:
-            raise ValueError, "Bad result namespace" # TODO: ProtocolError
+            raise ValueError("Bad result namespace") # TODO: ProtocolError
         query = stanza.get_query()
         form = None
         for el in xml_element_ns_iter(query.children, DATAFORM_NS):
             form = Form(el)
             break
         if not form:
-            raise ValueError, "No form received" # TODO: ProtocolError
+            raise ValueError("No form received") # TODO: ProtocolError
         self.configuration_form = form
         self.handler.configuration_form_received(form)
 
@@ -771,7 +771,7 @@ class MucRoomState:
         if form.type == "cancel":
             return None
         elif form.type != "submit":
-            raise ValueError, "A 'submit' form required to configure a room"
+            raise ValueError("A 'submit' form required to configure a room")
         iq = Iq(to_jid = self.room_jid.bare(), stanza_type = "set")
         query = iq.new_query(MUC_OWNER_NS, "query")
         form.as_xml(query)
@@ -788,7 +788,7 @@ class MucRoomState:
         :returntype: `unicode`
         """
         if self.configured:
-            raise RuntimeError, "Instant room may be requested for unconfigured room only"
+            raise RuntimeError("Instant room may be requested for unconfigured room only")
         form = Form("submit")
         return self.configure_room(form)
 
@@ -880,13 +880,13 @@ class MucRoomManager:
         """
 
         if not room.node or room.resource:
-            raise ValueError,"Invalid room JID"
+            raise ValueError("Invalid room JID")
 
         room_jid = JID(room.node, room.domain, nick)
 
         cur_rs = self.rooms.get(room_jid.bare().as_unicode())
         if cur_rs and cur_rs.joined:
-            raise RuntimeError,"Room already joined"
+            raise RuntimeError("Room already joined")
 
         rs=MucRoomState(self, self.stream.me, room_jid, handler)
         self.rooms[room_jid.bare().as_unicode()]=rs

@@ -80,7 +80,7 @@ def rfc2425encode(name,value,parameters=None,charset="utf-8"):
         value=value.replace(u"\r",u"\\n")
         value=value.encode(charset,"replace")
     elif type(value) is not str:
-        raise TypeError,"Bad type for rfc2425 value"
+        raise TypeError("Bad type for rfc2425 value")
     elif not valid_string_re.match(value):
         parameters["encoding"]="b"
         value=binascii.b2a_base64(value)
@@ -149,7 +149,7 @@ class VCardString(VCardField):
         else:
             self.value=value
         if not self.value and not empty_ok:
-            raise Empty,"Empty string value"
+            raise Empty("Empty string value")
     def rfc2426(self):
         """RFC2426-encode the field content.
 
@@ -215,11 +215,11 @@ class VCardJID(VCardField):
             try:
                 self.value=pyxmpp.jid.JID(value.getContent())
             except JIDError:
-                raise JIDMalformedProtocolError, "JID malformed"
+                raise JIDMalformedProtocolError("JID malformed")
         else:
             self.value=pyxmpp.jid.JID(value)
         if not self.value:
-            raise Empty,"Empty JID value"
+            raise Empty("Empty JID value")
     def rfc2426(self):
         """RFC2426-encode the field content.
 
@@ -273,7 +273,7 @@ class VCardName(VCardField):
         _unused = rfc2425parameters
         VCardField.__init__(self,name)
         if self.name.upper()!="N":
-            raise RuntimeError,"VCardName handles only 'N' type"
+            raise RuntimeError("VCardName handles only 'N' type")
         if isinstance(value,libxml2.xmlNode):
             self.family,self.given,self.middle,self.prefix,self.suffix=[u""]*5
             empty=1
@@ -304,7 +304,7 @@ class VCardName(VCardField):
                     empty=0
                 n=n.next
             if empty:
-                raise Empty, "Empty N value"
+                raise Empty("Empty N value")
         else:
             v=non_quoted_semicolon_re.split(value)
             value=[u""]*5
@@ -396,9 +396,9 @@ class VCardImage(VCardField):
                     self.uri=unicode(n.getContent(),"utf-8","replace")
                 n=n.next
             if (self.uri and self.image) or (not self.uri and not self.image):
-                raise ValueError,"Bad %s value in vcard" % (name,)
+                raise ValueError("Bad %s value in vcard" % (name,))
             if (not self.uri and not self.image):
-                raise Empty,"Bad %s value in vcard" % (name,)
+                raise Empty("Bad %s value in vcard" % (name,))
         else:
             if rfc2425parameters.get("value", "").lower()=="uri":
                 self.uri=value
@@ -483,7 +483,7 @@ class VCardAdr(VCardField):
         if not rfc2425parameters:
             rfc2425parameters={}
         if self.name.upper()!="ADR":
-            raise RuntimeError,"VCardAdr handles only 'ADR' type"
+            raise RuntimeError("VCardAdr handles only 'ADR' type")
         (self.pobox,self.extadr,self.street,self.locality,
                 self.region,self.pcode,self.ctry)=[""]*7
         self.type=[]
@@ -540,7 +540,7 @@ class VCardAdr(VCardField):
         if self.type==[]:
             self.type=["intl","postal","parcel","work"]
         elif "dom" in self.type and "intl" in self.type:
-            raise ValueError,"Both 'dom' and 'intl' specified in vcard ADR"
+            raise ValueError("Both 'dom' and 'intl' specified in vcard ADR")
 
     def rfc2426(self):
         """RFC2426-encode the field content.
@@ -600,7 +600,7 @@ class VCardLabel(VCardField):
         if not rfc2425parameters:
             rfc2425parameters={}
         if self.name.upper()!="LABEL":
-            raise RuntimeError,"VCardAdr handles only 'LABEL' type"
+            raise RuntimeError("VCardAdr handles only 'LABEL' type")
         if isinstance(value,libxml2.xmlNode):
             self.lines=[]
             self.type=[]
@@ -625,7 +625,7 @@ class VCardLabel(VCardField):
             if self.type==[]:
                 self.type=["intl","postal","parcel","work"]
             elif "dom" in self.type and "intl" in self.type:
-                raise ValueError,"Both 'dom' and 'intl' specified in vcard LABEL"
+                raise ValueError("Both 'dom' and 'intl' specified in vcard LABEL")
             if not self.lines:
                 self.lines=[""]
         else:
@@ -686,7 +686,7 @@ class VCardTel(VCardField):
         if not rfc2425parameters:
             rfc2425parameters={}
         if self.name.upper()!="TEL":
-            raise RuntimeError,"VCardTel handles only 'TEL' type"
+            raise RuntimeError("VCardTel handles only 'TEL' type")
         if isinstance(value,libxml2.xmlNode):
             self.number=None
             self.type=[]
@@ -710,7 +710,7 @@ class VCardTel(VCardField):
             if self.type==[]:
                 self.type=["voice"]
             if not self.number:
-                raise Empty,"No tel number"
+                raise Empty("No tel number")
         else:
             t=rfc2425parameters.get("type")
             if t:
@@ -767,7 +767,7 @@ class VCardEmail(VCardField):
         if not rfc2425parameters:
             rfc2425parameters={}
         if self.name.upper()!="EMAIL":
-            raise RuntimeError,"VCardEmail handles only 'EMAIL' type"
+            raise RuntimeError("VCardEmail handles only 'EMAIL' type")
         if isinstance(value,libxml2.xmlNode):
             self.address=None
             self.type=[]
@@ -789,7 +789,7 @@ class VCardEmail(VCardField):
             if self.type==[]:
                 self.type=["internet"]
             if not self.address:
-                raise Empty,"No USERID"
+                raise Empty("No USERID")
         else:
             t=rfc2425parameters.get("type")
             if t:
@@ -844,7 +844,7 @@ class VCardGeo(VCardField):
         _unused = rfc2425parameters
         VCardField.__init__(self,name)
         if self.name.upper()!="GEO":
-            raise RuntimeError,"VCardName handles only 'GEO' type"
+            raise RuntimeError("VCardName handles only 'GEO' type")
         if isinstance(value,libxml2.xmlNode):
             self.lat,self.lon=[None]*2
             n=value.children
@@ -863,7 +863,7 @@ class VCardGeo(VCardField):
                     self.lon=unicode(n.getContent(),"utf-8")
                 n=n.next
             if not self.lat or not self.lon:
-                raise ValueError,"Bad vcard GEO value"
+                raise ValueError("Bad vcard GEO value")
         else:
             self.lat,self.lon=(unquote_semicolon(val) for val in non_quoted_semicolon_re.split(value))
     def rfc2426(self):
@@ -912,7 +912,7 @@ class VCardOrg(VCardField):
         _unused = rfc2425parameters
         VCardField.__init__(self,name)
         if self.name.upper()!="ORG":
-            raise RuntimeError,"VCardName handles only 'ORG' type"
+            raise RuntimeError("VCardName handles only 'ORG' type")
         if isinstance(value,libxml2.xmlNode):
             self.name,self.unit=None,""
             n=value.children
@@ -931,7 +931,7 @@ class VCardOrg(VCardField):
                     self.unit=unicode(n.getContent(),"utf-8")
                 n=n.next
             if not self.name:
-                raise Empty,"Bad vcard ORG value"
+                raise Empty("Bad vcard ORG value")
         else:
             sp=non_quoted_semicolon_re.split(value,1)
             if len(sp)>1:
@@ -987,7 +987,7 @@ class VCardCategories(VCardField):
         VCardField.__init__(self,name)
         self.name=name
         if self.name.upper()!="CATEGORIES":
-            raise RuntimeError,"VCardName handles only 'CATEGORIES' type"
+            raise RuntimeError("VCardName handles only 'CATEGORIES' type")
         if isinstance(value,libxml2.xmlNode):
             self.keywords=[]
             n=value.children
@@ -1004,7 +1004,7 @@ class VCardCategories(VCardField):
                     self.keywords.append(unicode(n.getContent(),"utf-8"))
                 n=n.next
             if not self.keywords:
-                raise Empty,"Bad vcard CATEGORIES value"
+                raise Empty("Bad vcard CATEGORIES value")
         else:
             self.keywords=value.split(",")
     def rfc2426(self):
@@ -1067,19 +1067,19 @@ class VCardSound(VCardField):
                     continue
                 if n.name=='BINVAL':
                     if (self.phonetic or self.uri):
-                        raise ValueError,"Bad SOUND value in vcard"
+                        raise ValueError("Bad SOUND value in vcard")
                     self.sound=base64.decodestring(n.getContent())
                 if n.name=='PHONETIC':
                     if (self.sound or self.uri):
-                        raise ValueError,"Bad SOUND value in vcard"
+                        raise ValueError("Bad SOUND value in vcard")
                     self.phonetic=unicode(n.getContent(),"utf-8","replace")
                 if n.name=='EXTVAL':
                     if (self.phonetic or self.sound):
-                        raise ValueError,"Bad SOUND value in vcard"
+                        raise ValueError("Bad SOUND value in vcard")
                     self.uri=unicode(n.getContent(),"utf-8","replace")
                 n=n.next
             if (not self.phonetic and not self.uri and not self.sound):
-                raise Empty,"Bad SOUND value in vcard"
+                raise Empty("Bad SOUND value in vcard")
         else:
             if rfc2425parameters.get("value", "").lower()=="uri":
                 self.uri=value
@@ -1224,7 +1224,7 @@ class VCardKey(VCardField):
                     self.cred=base64.decodestring(n.getContent())
                 n=n.next
             if not self.cred:
-                raise Empty,"Bad %s value in vcard" % (name,)
+                raise Empty("Bad %s value in vcard" % (name,))
         else:
             self.type=rfc2425parameters.get("type")
             self.cred=value
@@ -1386,7 +1386,7 @@ class VCard(StanzaPayloadObject):
             if self.content.has_key(c):
                 continue
             if tp=="required":
-                raise ValueError,"%s is missing" % (c,)
+                raise ValueError("%s is missing" % (c,))
             elif tp=="multi":
                 self.content[c]=[]
             elif tp=="optional":
@@ -1421,9 +1421,9 @@ class VCard(StanzaPayloadObject):
             - `data`: `libxml2.xmlNode`"""
         ns=get_node_ns(data)
         if ns and ns.getContent()!=VCARD_NS:
-            raise ValueError, "Not in the %r namespace" % (VCARD_NS,)
+            raise ValueError("Not in the %r namespace" % (VCARD_NS,))
         if data.name!="vCard":
-            raise ValueError, "Bad root element name: %r" % (data.name,)
+            raise ValueError("Bad root element name: %r" % (data.name,))
         n=data.children
         dns=get_node_ns(data)
         while n:
@@ -1440,7 +1440,7 @@ class VCard(StanzaPayloadObject):
             cl,tp=self.components[n.name]
             if tp in ("required","optional"):
                 if self.content.has_key(n.name):
-                    raise ValueError,"Duplicate %s" % (n.name,)
+                    raise ValueError("Duplicate %s" % (n.name,))
                 try:
                     self.content[n.name]=cl(n.name,n)
                 except Empty:
@@ -1512,7 +1512,7 @@ class VCard(StanzaPayloadObject):
         cl,tp=self.components[name]
         if tp in ("required","optional"):
             if self.content.has_key(name):
-                raise ValueError,"Duplicate %s" % (name,)
+                raise ValueError("Duplicate %s" % (name,))
             try:
                 self.content[name]=cl(name,value,params)
             except Empty:
@@ -1571,7 +1571,7 @@ class VCard(StanzaPayloadObject):
         try:
             return self.content[name.upper().replace("_","-")]
         except KeyError:
-            raise AttributeError,"Attribute %r not found" % (name,)
+            raise AttributeError("Attribute %r not found" % (name,))
     def __getitem__(self,name):
         return self.content[name.upper()]
 

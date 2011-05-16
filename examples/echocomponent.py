@@ -91,7 +91,7 @@ class Component(pyxmpp.jabberd.Component):
         see above."""
         to=iq.get_to()
         if to and to!=self.jid:
-            raise FeatureNotImplementedProtocolError, "Tried to register at non-null node"
+            raise FeatureNotImplementedProtocolError("Tried to register at non-null node")
         iq=iq.make_result_response()
         q=iq.new_query("jabber:iq:register")
         q.newTextChild(q.ns(),"instructions","Enter anything below.")
@@ -108,7 +108,7 @@ class Component(pyxmpp.jabberd.Component):
         subscription handling."""
         to=iq.get_to()
         if to and to!=self.jid:
-            raise FeatureNotImplementedProtocolError, "Tried to register at non-null node"
+            raise FeatureNotImplementedProtocolError("Tried to register at non-null node")
         remove=iq.xpath_eval("r:query/r:remove",{"r":"jabber:iq:register"})
         if remove:
             m=Message(from_jid=iq.get_to(),to_jid=iq.get_from(),stanza_type="chat",

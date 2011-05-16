@@ -215,7 +215,7 @@ class StreamTLSMixIn:
             self._process_tls_node(xmlnode)
             return True
         if self.tls_settings and self.tls_settings.require and not self.tls:
-            raise StreamEncryptionRequired,"TLS encryption required and not started yet"
+            raise StreamEncryptionRequired("TLS encryption required and not started yet")
         return False
 
     def _handle_tls_features(self):
@@ -235,9 +235,9 @@ class StreamTLSMixIn:
 
         if not self.tls:
             if tls_required_n and not self.tls_settings:
-                raise FatalStreamError,"StartTLS support disabled, but required by peer"
+                raise FatalStreamError("StartTLS support disabled, but required by peer")
             if self.tls_settings and self.tls_settings.require and not tls_n:
-                raise FatalStreamError,"StartTLS required, but not supported by peer"
+                raise FatalStreamError("StartTLS required, but not supported by peer")
             if self.tls_settings and tls_n:
                 self.__logger.debug("StartTLS negotiated")
                 if self.initiator:
@@ -270,7 +270,7 @@ class StreamTLSMixIn:
             return False
         if self.initiator:
             if xmlnode.name=="failure":
-                raise TLSNegotiationFailed,"Peer failed to initialize TLS connection"
+                raise TLSNegotiationFailed("Peer failed to initialize TLS connection")
             elif xmlnode.name!="proceed" or not self.tls_requested:
                 self.__logger.debug("Unexpected TLS node: %r" % (xmlnode.serialize()))
                 return False
@@ -285,14 +285,14 @@ class StreamTLSMixIn:
             self._restart_stream()
             return True
         else:
-            raise FatalStreamError,"TLS not implemented for the receiving side yet"
+            raise FatalStreamError("TLS not implemented for the receiving side yet")
 
     def _make_tls_connection(self):
         """Initiate TLS connection.
 
         [initiating entity only]"""
         if not tls_available or not self.tls_settings:
-            raise TLSError,"TLS is not available"
+            raise TLSError("TLS is not available")
 
         self.state_change("tls connecting",self.peer)
 
@@ -323,7 +323,7 @@ class StreamTLSMixIn:
         if self.tls_settings.verify_peer:
             valid = self.tls_settings.verify_callback(self.tls.getpeercert())
             if not valid:
-                raise SSLError, "Certificate verification failed"
+                raise SSLError("Certificate verification failed")
         self.socket = self.tls
         self.state_change("tls connected", self.peer)
 

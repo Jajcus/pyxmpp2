@@ -270,7 +270,7 @@ class JabberClient(Client):
         _unused = stanza
         self.__logger.debug(u"default registration callback started. auto-filling-in the form...")
         if not 'FORM_TYPE' in form or 'jabber:iq:register' not in form['FORM_TYPE'].values:
-            raise RuntimeError, "Unknown form type: %r %r" % (form, form['FORM_TYPE'])
+            raise RuntimeError("Unknown form type: %r %r" % (form, form['FORM_TYPE']))
         for field in form:
             if field.name == u"username":
                 self.__logger.debug(u"Setting username to %r" % (self.jid.node,))
@@ -280,7 +280,7 @@ class JabberClient(Client):
                 field.value = self.password
             elif field.required:
                 self.__logger.debug(u"Unknown required field: %r" % (field.name,))
-                raise RuntimeError, "Unsupported required registration form field %r" % (field.name,)
+                raise RuntimeError("Unsupported required registration form field %r" % (field.name,))
             else:
                 self.__logger.debug(u"Unknown field: %r" % (field.name,))
         self.submit_registration_form(form)

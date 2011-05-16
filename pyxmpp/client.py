@@ -128,7 +128,7 @@ class Client:
         Set `self.stream` and notify `self.state_changed` when connection
         succeeds."""
         if not self.jid:
-            raise ClientError, "Cannot connect: no or bad JID given"
+            raise ClientError("Cannot connect: no or bad JID given")
         self.lock.acquire()
         try:
             stream = self.stream
