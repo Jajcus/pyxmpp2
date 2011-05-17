@@ -9,6 +9,7 @@ from pyxmpp2.iq import Iq
 from pyxmpp2.jid import JID
 from pyxmpp2.stanzapayload import XMLPayload
 from pyxmpp2.xmppserializer import serialize
+from pyxmpp2.error import StanzaErrorElement
 
 IQ1 = """
 <iq xmlns="jabber:client" from='source@example.com/res' 
@@ -33,6 +34,14 @@ IQ4 = """
                                 from='dest@example.com' type='result' id='2'>
 </iq>"""
 
+IQ5 = """
+<iq xmlns="jabber:client" to='source@example.com/res' 
+                                from='dest@example.com' type='error' id='1'>
+<payload xmlns="http://pyxmpp.jajcus.net/xmlns/test"><abc/></payload>
+<error type="modify"><bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>
+</iq>"""
+
+
 class TestIq(unittest.TestCase):
     def check_iq1(self, iq):
         self.assertEqual(iq.from_jid, JID("source@example.com/res"))
@@ -46,6 +55,7 @@ class TestIq(unittest.TestCase):
         self.assertTrue(len(payload[0].element) > 0)
         self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        self.assertFalse(iq.error)
 
     def check_iq2(self, iq):
         self.assertEqual(iq.to_jid, JID("source@example.com/res"))
@@ -59,6 +69,7 @@ class TestIq(unittest.TestCase):
         self.assertTrue(len(payload[0].element) > 0)
         self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        self.assertFalse(iq.error)
 
     def check_iq3(self, iq):
         self.assertEqual(iq.from_jid, JID("source@example.com/res"))
@@ -72,6 +83,7 @@ class TestIq(unittest.TestCase):
         self.assertTrue(len(payload[0].element) > 0)
         self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        self.assertFalse(iq.error)
 
     def check_iq4(self, iq):
         self.assertEqual(iq.to_jid, JID("source@example.com/res"))
@@ -80,6 +92,23 @@ class TestIq(unittest.TestCase):
         self.assertEqual(iq.stanza_id, "2")
         payload = iq.get_all_payload()
         self.assertFalse(payload)
+        self.assertFalse(iq.error)
+
+    def check_iq5(self, iq):
+        self.assertEqual(iq.to_jid, JID("source@example.com/res"))
+        self.assertEqual(iq.from_jid, JID("dest@example.com"))
+        self.assertEqual(iq.stanza_type, "error")
+        self.assertEqual(iq.stanza_id, "1")
+        payload = iq.get_all_payload()
+        self.assertTrue(payload)
+        self.assertEqual(payload[0].xml_namespace, 
+                                        "http://pyxmpp.jajcus.net/xmlns/test")
+        self.assertTrue(len(payload[0].element) > 0)
+        self.assertEqual(payload[0].element[0].tag, 
+                                "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        error = iq.error
+        self.assertTrue(isinstance(error, StanzaErrorElement))
+        self.assertEqual(error.condition_name, "bad-request")
 
     def test_iq_get_from_xml(self):
         iq = Iq(XML(IQ1))
@@ -153,6 +182,13 @@ class TestIq(unittest.TestCase):
         payload = XMLPayload(payload)
         iq2.add_payload(payload)
         self.check_iq2(iq2)
+
+    def test_iq_make_error_response(self):
+        iq = Iq(XML(IQ1))
+        iq5 = iq.make_error_response(u"bad-request")
+        self.check_iq5(iq5)
+        xml = iq5.as_xml()
+        self.check_iq5( Iq(xml) )
 
 def suite():
      suite = unittest.TestSuite()
