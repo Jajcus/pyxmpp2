@@ -5,7 +5,7 @@ import sys
 import getopt
 
 all_modules=[ "jid", "stream_reader", "xmppserializer", "stanza",
-            "message", "presence", "iq",
+            "message", "presence", "iq", "stanzaprocessor",
              "cache", 
 #          "vcard", "disco", "dataforms", "interface"
                 ]
