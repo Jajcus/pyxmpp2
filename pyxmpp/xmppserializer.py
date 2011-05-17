@@ -125,17 +125,25 @@ class XMPPSerializer(object):
         """Return the end tag of the stream root element."""
         return u"</{0}:stream>".format(self._root_prefixes[STREAM_NS])
 
-    def _split_qname(self, name, declared_prefixes, level):
+    def _split_qname(self, name, is_element):
         """Split an element of attribute qname into namespace and local
-        name."""
+        name.
+
+        :Parameters:
+            - `name`: element or attribute QName
+            - `is_element`: `True` for an element, `False` for an attribute
+        :Types:
+            - `name`: `unicode`
+            - `is_element`: `bool`
+        
+        :Return: namespace URI, local name
+        :returntype: `unicode`, `unicode`"""
         if name.startswith(u"{"):
             namespace, name = name[1:].split(u"}", 1)
             if namespace in STANZA_NAMESPACES:
                 namespace = self.stanza_namespace
-        elif declared_prefixes[self.stanza_namespace] is None:
-            namespace = self.stanza_namespace
-        elif level is not None:
-            raise ValueError("Non-stanza element with no namespace")
+        elif is_element:
+            raise ValueError(u"Element with no namespace: {0!r}".format(name))
         else:
             namespace = None
         return namespace, name
@@ -162,18 +170,19 @@ class XMPPSerializer(object):
                 break
         return prefix
 
-    def _make_prefixed(self, name, level, declared_prefixes, declarations):
+    def _make_prefixed(self, name, is_element, declared_prefixes, declarations):
         """Return namespace-prefixed tag or attribute name.
         
         Add appropriate declaration to `declarations` when neccessary.
 
-        When `level` is 2 (stanza children) and no prefix for the namespace
-        is defined, make the elements namespace default, otherwise mak up
-        the prefix.
+        If no prefix for an element namespace is defined, make the elements
+        namespace default (no prefix). For attributes, make up a prefix in such
+        case.
         
         :Parameters:
-            - `name`: ElementTree 'qname' ('{namespace-uri}local-name')
+            - `name`: QName ('{namespace-uri}local-name')
               to convert
+            - `is_element`: `True` for element, `False` for an attribute
             - `declared_prefixes`: mapping of prefixes already declared 
               at this scope
             - `declarations`: XMLNS declarations on the current element.
@@ -181,11 +190,12 @@ class XMPPSerializer(object):
               for attributes.
         :Types:
             - `name`: `unicode`
+            - `is_element`: `bool`
             - `declared_prefixes`: `unicode` to `unicode` dictionary
             - `declarations`: `unicode` to `unicode` dictionary
 
         :Returntype: `unicode`"""
-        namespace, name = self._split_qname(name, declared_prefixes, level)
+        namespace, name = self._split_qname(name, is_element)
         if namespace is None:
             prefix = None
         elif namespace in declared_prefixes:
@@ -195,7 +205,7 @@ class XMPPSerializer(object):
             declarations[namespace] = prefix
             declared_prefixes[namespace] = prefix
         else:
-            if level is not None and level <= 2:
+            if is_element:
                 prefix = None
             else:
                 prefix = self._make_prefix(declared_prefixes)
@@ -256,12 +266,12 @@ class XMPPSerializer(object):
         declarations = {}
         declared_prefixes = dict(declared_prefixes)
         name = element.tag
-        prefixed = self._make_prefixed(name, level, declared_prefixes,
+        prefixed = self._make_prefixed(name, True, declared_prefixes,
                                                                 declarations)
         start_tag = u"<{0}".format(prefixed)
         end_tag = u"</{0}>".format(prefixed)
         for name, value in element.items():
-            prefixed = self._make_prefixed(name, level, declared_prefixes,
+            prefixed = self._make_prefixed(name, False, declared_prefixes,
                                                                 declarations)
             start_tag += u' {0}={1}'.format(prefixed, quoteattr(value))
 

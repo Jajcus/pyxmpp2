@@ -2,6 +2,9 @@
 # -*- coding: UTF-8 -*-
 
 import unittest
+
+import re
+
 from xml.etree import ElementTree
 from xml.etree.ElementTree import XML
 
@@ -12,8 +15,8 @@ from pyxmpp2.utils import xml_elements_equal
 
 
 STANZA0 = "<presence xmlns='jabber:client' />"
-STANZA1 = "<presence />"
-STANZA2 = "<message />"
+STANZA1 = "<presence xmlns='jabber:server'><status>XXXX</status></presence>"
+STANZA2 = "<message xmlns='jabber:client' />"
 STANZA3 = """
 <presence from='a@b.c/d' to='e@f.g/h' id='666' type='unavailable' 
                                                 xmlns='jabber:client'/>
@@ -67,7 +70,7 @@ class TestStanza(unittest.TestCase):
     def test_serialize1(self):
         for xml in (STANZA0, STANZA1, STANZA2, STANZA3, STANZA4, STANZA5):
             stanza = Stanza(XML(xml))
-            element1 = XML(xml.replace(" xmlns='jabber:client'",""))
+            element1 = XML(re.sub(r" xmlns='jabber:[^'\":]*'", "", xml))
             element2 = XML(stanza.serialize())
             self.assertTrue(xml_elements_equal(element1, element2, True))
     def test_serialize2(self):

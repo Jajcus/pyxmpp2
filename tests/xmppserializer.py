@@ -66,7 +66,7 @@ class TestXMPPSerializer(unittest.TestCase):
         self.assertTrue("<sub1/" in output or "<sub1 " in output)
 
         # prefix for other namespace child
-        self.assertTrue("<ns1:sub2" in output)
+        self.assertTrue("<sub2" in output)
 
 def suite():
     suite = unittest.TestSuite()

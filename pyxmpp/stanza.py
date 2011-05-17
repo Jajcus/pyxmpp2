@@ -29,7 +29,7 @@ from xml.etree import ElementTree
 import random
 import weakref
 
-from .exceptions import ProtocolError, JIDMalformedProtocolError
+from .exceptions import BadRequestProtocolError, JIDMalformedProtocolError
 from .jid import JID
 from .stanzapayload import StanzaPayload, XMLPayload
 from .xmppserializer import serialize
@@ -99,13 +99,12 @@ class Stanza(object):
             self._element = element
             self._dirty = False
             self._decode_attributes()
-            if element.tag.startswith("{"):
+            if not element.tag.startswith("{"):
+                raise ValueError("Element has no namespace")
+            else:
                 self._namespace, self.element_name = element.tag[1:].split("}")
                 if self._namespace not in STANZA_NAMESPACES:
-                    raise ProtocolError("Wrong stanza namespace")
-            else:
-                self._namespace = STANZA_CLIENT_NS
-                self.element_name = element.tag
+                    raise BadRequestProtocolError("Wrong stanza namespace")
             self._payload = None
         else:
             self._element = None
@@ -346,10 +345,5 @@ class Stanza(object):
         :return: the new id."""
         cls.last_id += 1
         return str(cls.last_id)
-
-
-#    def __eq__(self, other):
-#        if not isinstance(other,Stanza):
-#            return False
 
 # vi: sts=4 et sw=4
