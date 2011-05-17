@@ -237,10 +237,11 @@ class StanzaProcessor(object):
             handler = handler_entry[4]
             if type_filter != stanza_type:
                 continue
-            if extra_filter is None and class_filter not in classes:
-                continue
-            if extra_filter and (class_filter, extra_filter) not in keys:
-                continue
+            if class_filter:
+                if extra_filter is None and class_filter not in classes:
+                    continue
+                if extra_filter and (class_filter, extra_filter) not in keys:
+                    continue
             response = handler(stanza)
             if self.process_response(response):
                 return True
@@ -261,11 +262,17 @@ class StanzaProcessor(object):
             logger.debug("Ignoring message - peer not authenticated yet")
             return True
 
-        if self.__try_handlers(self._message_handlers, stanza):
-            return True
 
         stanza_type = stanza.stanza_type
-        if stanza_type != "error":
+        if stanza_type is None:
+            stanza_type = "normal"
+
+        if self.__try_handlers(self._message_handlers, stanza,
+                                                stanza_type = stanza_type):
+            return True
+
+        if stanza_type not in ("error", "normal"):
+            # try 'normal' handler additionaly to the regular handler
             return self.__try_handlers(self._message_handlers, stanza,
                                                     stanza_type = "normal")
         return False
@@ -283,7 +290,7 @@ class StanzaProcessor(object):
             logger.debug("Ignoring presence - peer not authenticated yet")
             return True
 
-        stanza_type = stanza.get_type()
+        stanza_type = stanza.stanza_type
         if not stanza_type:
             stanza_type = "available"
         return self.__try_handlers(self._presence_handlers, stanza, stanza_type)
