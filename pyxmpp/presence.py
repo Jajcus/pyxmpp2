@@ -27,6 +27,7 @@ __docformat__ = "restructuredtext en"
 
 from xml.etree import ElementTree
 
+from .exceptions import BadRequestProtocolError
 from .stanza import Stanza
 
 PRESENCE_TYPES = ("available", "unavailable", "probe",
@@ -143,7 +144,8 @@ class Presence(Stanza):
                     if self._priority < -128 or self._priority > 127:
                         raise ValueError
                 except ValueError:
-                    raise ProtocolError("Presence priority not an integer")
+                    raise BadRequestProtocolError(
+                                            "Presence priority not an integer")
 
     def as_xml(self):
         """Return the XML stanza representation.
