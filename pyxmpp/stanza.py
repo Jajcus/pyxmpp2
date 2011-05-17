@@ -34,6 +34,7 @@ from .jid import JID
 from .stanzapayload import StanzaPayload, XMLPayload
 from .xmppserializer import serialize
 from .constants import STANZA_NAMESPACES, STANZA_CLIENT_NS
+from .error import StanzaErrorElement
 
 random.seed()
 
@@ -131,11 +132,12 @@ class Stanza(object):
             self.stanza_id = self.gen_id()
 
         if self.stanza_type == "error":
-            from .error import StanzaErrorElement
             if error:
                 self._error = StanzaErrorElement(error)
             elif error_cond:
                 self._error = StanzaErrorElement(error_cond)
+            else:
+                self._decode_error()
 
         if stream is not None:
             self._stream = weakref.ref(stream)
@@ -155,6 +157,16 @@ class Stanza(object):
         self._stanza_type = self._element.get('type')
         self._stanza_id = self._element.get('id')
 
+    def _decode_error(self):
+        """Decode error element of the stanza."""
+        error_qname = self._ns_prefix + "error"
+        for child in self._element:
+            if child.tag == error_qname:
+                self._error = StanzaErrorElement(child)
+                return
+        raise BadRequestProtocolError("Error element missing in"
+                                                            " an error stanza")
+
     def copy(self):
         """Create a deep copy of the stanza.
 
@@ -162,6 +174,8 @@ class Stanza(object):
         result = Stanza(self.element_name, self.from_jid, self.to_jid, 
                         self.stanza_type, self.stanza_id, self.error,
                         self._stream())
+        if self._payload is None:
+            self.decode_payload()
         for payload in self._payload:
             result.add_payload(payload.copy())
         return result
@@ -194,6 +208,8 @@ class Stanza(object):
             self.decode_payload()
         for payload in self._payload:
             element.append(payload.as_xml())
+        if self._error:
+            element.append(self._error.as_xml())
         return element
 
     def get_xml(self):

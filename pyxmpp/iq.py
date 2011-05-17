@@ -86,6 +86,8 @@ class Iq(Stanza):
         result = Iq(None, self.from_jid, self.to_jid, 
                         self.stanza_type, self.stanza_id, self.error,
                         self._stream())
+        if self._payload is None:
+            self.decode_payload()
         for payload in self._payload:
             # use Stanza.add_payload to skip the payload length check
             Stanza.add_payload(result, payload)
@@ -109,6 +111,8 @@ class Iq(Stanza):
         stanza = Iq(stanza_type="error", from_jid = self.to_jid, 
                         to_jid = self.from_jid, stanza_id = self.stanza_id,
                         error_cond = cond)
+        if self._payload is None:
+            self.decode_payload()
         for payload in self._payload:
             # use Stanza.add_payload to skip the payload length check
             Stanza.add_payload(stanza, payload)

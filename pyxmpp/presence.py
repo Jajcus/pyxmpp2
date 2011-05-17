@@ -174,6 +174,8 @@ class Presence(Stanza):
                         self.stanza_type, self.stanza_id, self.error,
                         self._stream(), 
                         self._show, self._status, self._priority)
+        if self._payload is None:
+            self.decode_payload()
         for payload in self._payload:
             result.add_payload(payload.copy())
         return result

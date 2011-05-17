@@ -193,6 +193,8 @@ class Message(Stanza):
                         subject = self._subject, body = self._body,
                         thread = self._thread)
 
+        if self._payload is None:
+            self.decode_payload()
         for payload in self._payload:
             msg.add_payload(payload.copy())
 

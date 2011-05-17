@@ -37,7 +37,7 @@ from . import xmlextra
 from .exceptions import ProtocolError
 from .constants import STREAM_NS, STANZA_ERROR_NS, STREAM_ERROR_NS
 from .constants import STREAM_QNP, STANZA_ERROR_QNP, STREAM_ERROR_QNP
-from .constants import PYXMPP_ERROR_NS, STANZA_CLIENT_QNP
+from .constants import PYXMPP_ERROR_NS, STANZA_CLIENT_QNP, STANZA_NAMESPACES
 
 logger = logging.getLogger("pyxmpp.error")
 
@@ -100,7 +100,7 @@ STREAM_ERRORS_Q = dict([( "{{{0}}}{1}".format(STREAM_ERROR_NS, x[0]), x[1])
 UNDEFINED_STREAM_CONDITION = \
         "{urn:ietf:params:xml:ns:xmpp-streams}undefined-condition"
 UNDEFINED_STANZA_CONDITION = \
-        "{urn:ietf:params:xml:ns:xmpp-streams}undefined-condition"
+        "{urn:ietf:params:xml:ns:xmpp-stanzas}undefined-condition"
 
 STANZA_ERRORS = {
             u"bad-request":
@@ -259,9 +259,9 @@ class ErrorElement(object):
         :Types:
             - `element`: `ElementTree.Element`
         """
-        if not element.tag != self.error_qname:
-            raise ValueError(u"This is not a {0} element".format(
-                                                            self.error_qname))
+        if element.tag != self.error_qname:
+            raise ValueError(u"{0!r} is not a {1!r} element".format(
+                                                    element, self.error_qname))
         self.condition = None
         for child in element:
             if child.tag.startswith(self.cond_qname_prefix):
@@ -284,11 +284,17 @@ class ErrorElement(object):
                         break
                 if not bad:
                     self.custom_condition.append( deepcopy(child) )
-        if not condition:
-            condition = ElementTree.Element(self.cond_qname_prefix
+        if self.condition is None:
+            self.condition = ElementTree.Element(self.cond_qname_prefix
                                                     + "undefined-condition")
-        if condition.tag in OBSOLETE_CONDITIONS:
+        if self.condition.tag in OBSOLETE_CONDITIONS:
             new_cond_name = OBSOLETE_CONDITIONS[condition.tag]
+
+    @property
+    def condition_name(self):
+        """Return the condition name (condition element name without the
+        namespace)."""
+        return self.condition.tag.split("}", 1)[1]
 
     def get_description(self, lang = None):
         """Get the optional description text included in the error element.
@@ -407,9 +413,9 @@ class StanzaErrorElement(ErrorElement):
             if element_or_cond not in STANZA_ERRORS:
                 raise ValueError(u"Bad error condition")
         elif element_or_cond.tag.startswith(u"{"):
-            namespace = element_or_cond.tag.split(u"}", 1)[0]
+            namespace = element_or_cond.tag[1:].split(u"}", 1)[0]
             if namespace not in STANZA_NAMESPACES:
-                raise ValueError(u"Bad error namespace")
+                raise ValueError(u"Bad error namespace {0!r}".format(namespace))
             self.error_qname = u"{{{0}}}error".format(namespace)
             self.text_qname = u"{{{0}}}text".format(namespace)
         else:
@@ -450,7 +456,7 @@ class StanzaErrorElement(ErrorElement):
 
         :return: the error message.
         :returntype: `unicode`"""
-        cond = self.condition
+        cond = self.condition_name
         if cond in STANZA_ERRORS:
             return STANZA_ERRORS[cond][0]
         else:
@@ -472,5 +478,6 @@ class StanzaErrorElement(ErrorElement):
             if not code:
                 code = STANZA_ERRORS_Q[self.condition.tag][2]
             result.set("code", self._legacy_code)
+        return result
 
 # vi: sts=4 et sw=4
