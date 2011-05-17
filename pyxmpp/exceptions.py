@@ -170,7 +170,8 @@ class ProtocolError(Error):
         return "<ProtocolError %r %r>" % (self.xmpp_name, self.message)
 
 class BadRequestProtocolError(ProtocolError):
-    """Raised when invalid stanza is processed and 'bad-request' error should be reported."""
+    """Raised when invalid stanza is processed and 'bad-request' error should
+    be reported."""
     def __init__(self, message):
         ProtocolError.__init__(self, "bad-request", message)
 
