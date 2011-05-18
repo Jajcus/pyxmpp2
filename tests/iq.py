@@ -107,7 +107,7 @@ class TestIq(unittest.TestCase):
         self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         error = iq.error
-        self.assertTrue(isinstance(error, StanzaErrorElement))
+        self.assertIsInstance(error, StanzaErrorElement)
         self.assertEqual(error.condition_name, "bad-request")
 
     def test_iq_get_from_xml(self):

@@ -187,14 +187,14 @@ class TestStanzaProcessor(unittest.TestCase):
         self.assertFalse(self.handlers_called)
         self.assertEqual(len(self.stanzas_sent), 2)
         stanza1 = self.stanzas_sent[0]
-        self.assertTrue(isinstance(stanza1, Iq))
+        self.assertIsInstance(stanza1, Iq)
         self.assertEqual(stanza1.stanza_type, u"error")
         self.assertEqual(stanza1.error.condition_name,
                                         u"feature-not-implemented")
         self.assertEqual(stanza1.stanza_id, u"1")
         self.assertEqual(stanza1.to_jid, JID(u"source@example.com/res"))
         stanza2 = self.stanzas_sent[1]
-        self.assertTrue(isinstance(stanza2, Iq))
+        self.assertIsInstance(stanza2, Iq)
         self.assertEqual(stanza2.stanza_type, u"error")
         self.assertEqual(stanza2.error.condition_name,
                                         u"feature-not-implemented")
@@ -208,13 +208,13 @@ class TestStanzaProcessor(unittest.TestCase):
                                                         "echo_message"])
         self.assertEqual(len(self.stanzas_sent), 3)
         stanza1 = self.stanzas_sent[0]
-        self.assertTrue(isinstance(stanza1, Message))
+        self.assertIsInstance(stanza1, Message)
         self.assertEqual(stanza1.stanza_type, u"normal")
         stanza2 = self.stanzas_sent[1]
-        self.assertTrue(isinstance(stanza2, Message))
+        self.assertIsInstance(stanza2, Message)
         self.assertEqual(stanza2.stanza_type, None)
         stanza2 = self.stanzas_sent[2]
-        self.assertTrue(isinstance(stanza2, Message))
+        self.assertIsInstance(stanza2, Message)
         self.assertEqual(stanza2.stanza_type, u"chat")
 
     def test_message_pass1_pass2(self):

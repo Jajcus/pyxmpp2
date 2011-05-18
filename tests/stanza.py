@@ -97,8 +97,8 @@ class TestStanza(unittest.TestCase):
         payload = stanza5.get_all_payload()
         self.assertEqual(len(payload), 1)
         payload = payload[0]
-        self.assertTrue(isinstance(payload, StanzaPayload))
-        self.assertTrue(isinstance(payload, XMLPayload))
+        self.assertIsInstance(payload, StanzaPayload)
+        self.assertIsInstance(payload, XMLPayload)
         self.assertEqual(payload.xml_namespace, "jabber:iq:version")
         self.assertTrue(xml_elements_equal(
                             XML(STANZA5)[0], payload.element))
