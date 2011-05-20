@@ -1,0 +1,180 @@
+#
+# (C) Copyright 2011 Jacek Konieczny <jajcus@jajcus.net>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License Version
+# 2.1 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# pylint: disable-msg=W0201
+
+"""XMPP stream events."""
+
+from __future__ import absolute_import
+
+__docformat__ = "restructuredtext en"
+
+class StreamEvent(object):
+    def __init__(self):
+        pass
+    def __unicode__(self):
+        raise NotImplementedError
+
+class AuthorizedEvent(StreamEvent):
+    """Event raised after stream authentication and authorization is complete.
+    Usually it happens after SASL authentication and XMPP resource binding.
+    
+    Default action: none
+    
+    :Ivariables:
+        - `authorized_jid`: JID just authorized to use the stream
+    :Types:
+        - `authorized_jid`: `pyxmpp2.jid.JID`
+    """
+    def __init__(self, authorized_jid):
+        self.authorized_jid = authorized_jid
+    def __unicode__(self):
+        return u"Authorized: {0}".format(self.authorized_jid)
+
+class BindingResourceEvent(StreamEvent):
+    """Emitted when resource binding is initiated for the stream.
+
+    Probably useful only for connection progres monitoring.
+    
+    :Ivariables:
+        - `resource`: the resource
+    :Types:
+        - `resource`: `unicode`
+    """
+    def __init__(self, resource):
+        self.resource = resource
+    def __unicode__(self):
+        return u"Binding resource '{0}'".format(self.resource)
+
+class ConnectedEvent(StreamEvent):
+    """Emitted after the stream socket is connected, just before the actual
+    XMPP exchange happens.
+    
+    :Ivariables:
+        - `sockaddr`: remote IP address and port
+    :Types:
+        - `sockaddr`: (`str`, `int`)
+    """
+    def __init__(self, sockaddr):
+        self.sockaddr = sockaddr
+    def __unicode__(self):
+        ipaddr, port = self.sockaddr
+        if ":" in ipaddr:
+            return u"Connected to [{0}]:{1}".format(ipaddr, port)
+        else:
+            return u"Connected to {0}:{1}".format(ipaddr, port)
+
+class ConnectingEvent(StreamEvent):
+    """Emitted on TCP connection attempt. May happen multiple times during
+    single stream connection – several addresses may be tried until one answers.
+
+    Probably useful only for connection progres monitoring.
+    
+    :Ivariables:
+        - `sockaddr`: remote IP address and port
+    :Types:
+        - `sockaddr`: (`str`, `int`)
+    """
+    def __init__(self, sockaddr):
+        self.sockaddr = sockaddr
+    def __unicode__(self):
+        ipaddr, port = self.sockaddr
+        if ":" in ipaddr:
+            return u"Connecting to [{0}]:{1}...".format(ipaddr, port)
+        else:
+            return u"Connecting to {0}:{1}...".format(ipaddr, port)
+
+class ConnectionAcceptedEvent(StreamEvent):
+    """Emitted when a new TCP connection is accepted.
+    
+    :Ivariables:
+        - `sockaddr`: remote IP address and port
+    :Types:
+        - `sockaddr`: (`str`, `int`)
+    """
+    def __init__(self, sockaddr):
+        self.sockaddr = sockaddr
+    def __unicode__(self):
+        ipaddr, port = self.sockaddr
+        if ":" in ipaddr:
+            return u"Connection received from [{0}]:{1}".format(ipaddr, port)
+        else:
+            return u"Connection received from {0}:{1}".format(ipaddr, port)
+
+class DisconnectedEvent(StreamEvent):
+    """Emitted when the stream is disconnected. No more stanzas will 
+    be received and no more stanzas can be sent via this stream.
+    
+    :Ivariables:
+        - `peer`: peer name
+    :Types:
+        - `peer`: `pyxmpp2.jid.JID`
+    """
+    def __init__(self, peer):
+        self.peer = peer
+    def __unicode__(self):
+        return u"Disconnected from {0}".format(peer)
+
+class ResolvingAddressEvent(StreamEvent):
+    """Emitted when staring to resolve an address (A or AAAA) DNS record
+    for a hostname.
+
+    Probably useful only for connection progres monitoring.
+    
+    :Ivariables:
+        - `hostname`: host name
+    :Types:
+        - `hostname`: `unicode`
+    """
+    def __init__(self, hostname):
+        self.hostname = hostname
+    def __unicode__(self):
+        return u"Resolving address of '{0}'...".format(self.hostname)
+
+class ResolvingSRVEvent(StreamEvent):
+    """Emitted when staring to resolve an SRV DNS record for a domain.
+
+    Probably useful only for connection progres monitoring.
+    
+    :Ivariables:
+        - `domain`: domain name
+        - `service`: service name
+    :Types:
+        - `hostname`: `unicode`
+        - `service`: `unicode`
+    """
+    def __init__(self, domain, service):
+        self.domain = domain
+        self.service = service
+    def __unicode__(self):
+        return u"Resolving SRV record of '{0}' for '{1}...".format(
+                                                self.service, self.domain)
+
+class StreamConnectedEvent(StreamEvent):
+    """Emitted when the initial stream handshake (<stream:stream> tag exchange)
+    is completed, before any authentication.
+    
+    :Ivariables:
+        - `peer`: peer name
+    :Types:
+        - `peer`: `pyxmpp2.jid.JID`
+    """
+    def __init__(self, peer):
+        self.peer = peer
+    def __unicode__(self):
+        return u"Connected to {0}".format(peer)
+
+__all__ = [ name for name in dir() if name.endswith("Event") ]
