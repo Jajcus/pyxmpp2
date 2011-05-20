@@ -20,6 +20,7 @@
 XML_NS = "http://www.w3.org/XML/1998/namespace"
 
 STREAM_NS = "http://etherx.jabber.org/streams"
+BIND_NS="urn:ietf:params:xml:ns:xmpp-bind"
 
 STANZA_CLIENT_NS = "jabber:client"
 STANZA_SERVER_NS = "jabber:server"
@@ -36,3 +37,4 @@ for name, value in globals().items():
         globals()[name[:-3] + "_QNP"] = "{{{0}}}".format(value)
 
 XML_LANG_QNAME = XML_QNP + "lang"
+
