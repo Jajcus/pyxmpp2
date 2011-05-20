@@ -47,6 +47,7 @@ class Message(Stanza):
     def __init__(self, element = None, from_jid = None, to_jid = None,
                             stanza_type = None, stanza_id = None,
                             error = None, error_cond = None, stream = None,
+                            language = None,
                             subject = None, body = None, thread = None):
         """Initialize a `Message` object.
 
@@ -60,6 +61,7 @@ class Message(Stanza):
               not given, then unique for the session value is generated.
             - `error_cond`: error condition name. Ignored if `stanza_type` 
               is not "error".
+            - `language`: default language for the stanza content
             - `subject`: message subject,
             - `body`: message body.
             - `thread`: message thread id.
@@ -74,6 +76,7 @@ class Message(Stanza):
             - `subject`: `unicode`
             - `body`: `unicode`
             - `thread`: `unicode`
+            - `language`: `unicode`
         """
         # pylint: disable-msg=R0913
         self._subject = None
@@ -86,7 +89,8 @@ class Message(Stanza):
 
         Stanza.__init__(self, element, from_jid = from_jid, to_jid = to_jid,
                         stanza_type = stanza_type, stanza_id = stanza_id,
-                        error = error, error_cond = error_cond, stream = stream)
+                        error = error, error_cond = error_cond, stream = stream,
+                        language = language)
 
         if self.element_name != "message":
             raise ValueError("The element is not <message/>")

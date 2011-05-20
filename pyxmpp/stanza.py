@@ -92,7 +92,8 @@ class Stanza(object):
             - `stanza_id`: `unicode`
             - `error`: `pyxmpp.error.StanzaErrorElement`
             - `error_cond`: `unicode`
-            - `language`: `unicode`"""
+            - `language`: `unicode`
+        """
         self._error = None
         self._from_jid = None
         self._to_jid = None

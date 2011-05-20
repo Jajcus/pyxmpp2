@@ -38,7 +38,8 @@ class Iq(Stanza):
     element_name = "message"
     def __init__(self, element = None, from_jid = None, to_jid = None, 
                             stanza_type = None, stanza_id = None, 
-                            error = None, error_cond=None, stream = None):
+                            error = None, error_cond=None, stream = None,
+                            language = None):
         """Initialize an `Iq` object.
 
         :Parameters:
@@ -51,6 +52,7 @@ class Iq(Stanza):
               not given, then unique for the session value is generated.
             - `error_cond`: error condition name. Ignored if `stanza_type` 
               is not "error".
+            - `language`: default language for the stanza content
         :Types:
             - `element`: `ElementTree.Element`
             - `from_jid`: `JID`
@@ -59,6 +61,7 @@ class Iq(Stanza):
             - `stanza_id`: `unicode`
             - `error`: `pyxmpp.error.StanzaErrorElement`
             - `error_cond`: `unicode`
+            - `language`: `unicode`
         """
         # pylint: disable-msg=R0913
 
@@ -74,7 +77,8 @@ class Iq(Stanza):
         
         Stanza.__init__(self, element, from_jid = from_jid, to_jid = to_jid,
                         stanza_type = stanza_type, stanza_id = stanza_id,
-                        error = error, error_cond = error_cond, stream = stream)
+                        error = error, error_cond = error_cond, stream = stream,
+                        language = language)
         
         if self.element_name != "iq":
             raise ValueError("The element is not <iq/>")

@@ -65,6 +65,7 @@ class Presence(Stanza):
     def __init__(self, element = None, from_jid = None, to_jid = None,
                             stanza_type = None, stanza_id = None,
                             error = None, error_cond = None, stream = None,
+                            language = None,
                             show = None, status = None, priority = None):
         """Initialize a `Presence` object.
 
@@ -79,6 +80,7 @@ class Presence(Stanza):
               "unsubscribed" or "error". "available" is automaticaly changed to
               None.
             - `stanza_id`: stanza id -- value of stanza's "id" attribute
+            - `language`: default language for the stanza content
             - `show`: "show" field of presence stanza. One of: None, "away",
               "xa", "dnd", "chat".
             - `status`: descriptive text for the presence stanza.
@@ -91,10 +93,12 @@ class Presence(Stanza):
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
             - `stanza_id`: `unicode`
+            - `language`: `unicode`
             - `show`: `unicode`
             - `status`: `unicode`
             - `priority`: `int`
-            - `error_cond`: `unicode`"""
+            - `error_cond`: `unicode`
+        """
         # pylint: disable-msg=R0913
         self._show = None
         self._status = None
@@ -112,7 +116,8 @@ class Presence(Stanza):
         
         Stanza.__init__(self, element, from_jid = from_jid, to_jid = to_jid,
                         stanza_type = stanza_type, stanza_id = stanza_id,
-                        error = error, error_cond = error_cond, stream = stream)
+                        error = error, error_cond = error_cond, stream = stream,
+                        language = language)
 
         if self.element_name != "presence":
             raise ValueError("The element is not <presence />")
