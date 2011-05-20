@@ -76,14 +76,18 @@ class StanzaProcessor(object):
         - `initiator`: `True` if local stream endpoint is the initiating entity.
     """
     # pylint: disable-msg=R0902
-    def __init__(self):
-        """Initialize a `StanzaProcessor` object."""
+    def __init__(self, default_timeout = 300):
+        """Initialize a `StanzaProcessor` object.
+
+        :Parameters:
+            - `default_timeout`: default timeout for IQ response handlers
+        """
         self.me = None
         self.peer = None
         self.initiator = None
         self.peer_authenticated = False
         self.process_all_stanzas = True
-        self._iq_response_handlers = ExpiringDictionary()
+        self._iq_response_handlers = ExpiringDictionary(default_timeout)
         self._iq_handlers = defaultdict(dict)
         self._message_handlers = []
         self._presence_handlers = []
@@ -373,7 +377,7 @@ class StanzaProcessor(object):
         return to_jid
 
     def set_response_handlers(self, stanza, res_handler, err_handler,
-                                    timeout_handler = None, timeout = 300):
+                                    timeout_handler = None, timeout = None):
         """Set response handler for an IQ "get" or "set" stanza.
 
         This should be called before the stanza is sent.
@@ -406,7 +410,7 @@ class StanzaProcessor(object):
             self.lock.release()
 
     def _set_response_handlers(self, stanza, res_handler, err_handler,
-                                timeout_handler = None, timeout = 300):
+                                timeout_handler = None, timeout = None):
         """Same as `Stream.set_response_handlers` but assume `self.lock` is
         acquired."""
         # pylint: disable-msg=R0913
