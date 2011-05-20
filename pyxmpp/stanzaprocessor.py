@@ -39,25 +39,27 @@ from .iq import Iq
 
 logger = logging.getLogger("pyxmpp.stanzaprocessor")
 
-def stanza_factory(element, stream = None):
+def stanza_factory(element, stream = None, language = None):
     """Creates Iq, Message or Presence object for XML stanza `element`
     
     :Parameters:
         - `element`: the stanza XML element
         - `stream`: stream where the stanza was received
+        - `language`: default language for the stanza
     :Types:
         - `element`: `ElementTree.Element`
         - `stream`: `pyxmpp2.stream.Stream`
+        - `language`: `unicode`
     """
     tag = element.tag
     if tag.endswith("}iq") or tag == "iq":
-        return Iq(element, stream = stream)
+        return Iq(element, stream = stream, language = language)
     if tag.endswith("}message") or tag == "message":
-        return Message(element, stream = stream)
+        return Message(element, stream = stream, language = language)
     if tag.endswith("}presence") or tag == "presence":
-        return Presence(element, stream = stream)
+        return Presence(element, stream = stream, language = language)
     else:
-        return Stanza(element, stream = stream)
+        return Stanza(element, stream = stream, language = language)
 
 class StanzaProcessor(object):
     """Universal stanza handler/router class.

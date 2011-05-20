@@ -33,7 +33,7 @@ from .exceptions import BadRequestProtocolError, JIDMalformedProtocolError
 from .jid import JID
 from .stanzapayload import StanzaPayload, XMLPayload
 from .xmppserializer import serialize
-from .constants import STANZA_NAMESPACES, STANZA_CLIENT_NS
+from .constants import STANZA_NAMESPACES, STANZA_CLIENT_NS, XML_LANG_QNAME
 from .error import StanzaErrorElement
 
 random.seed()
@@ -66,7 +66,7 @@ class Stanza(object):
     def __init__(self, element, from_jid = None, to_jid = None,
                             stanza_type = None, stanza_id = None,
                             error = None, error_cond = None,
-                            stream = None): # pylint: disable-msg=R0913
+                            stream = None, language = None): # pylint: disable-msg=R0913
         """Initialize a Stanza object.
 
         :Parameters:
@@ -83,6 +83,7 @@ class Stanza(object):
             - `error`: error object. Ignored if `stanza_type` is not "error".
             - `error_cond`: error condition name. Ignored if `stanza_type` is
               not "error" or `error` is not None.
+            - `language`: default language for the stanza content
         :Types:
             - `element`: `unicode` or `ElementTree.Element`
             - `from_jid`: `JID`
@@ -90,12 +91,14 @@ class Stanza(object):
             - `stanza_type`: `unicode`
             - `stanza_id`: `unicode`
             - `error`: `pyxmpp.error.StanzaErrorElement`
-            - `error_cond`: `unicode`"""
+            - `error_cond`: `unicode`
+            - `language`: `unicode`"""
         self._error = None
         self._from_jid = None
         self._to_jid = None
         self._stanza_type = None
         self._stanza_id = None
+        self._language = language
         if isinstance(element, ElementTree.Element):
             self._element = element
             self._dirty = False
@@ -156,6 +159,9 @@ class Stanza(object):
             raise JIDMalformedProtocolError
         self._stanza_type = self._element.get('type')
         self._stanza_id = self._element.get('id')
+        lang = self._element.get(XML_LANG_QNAME)
+        if lang:
+            self._language = lang
 
     def _decode_error(self):
         """Decode error element of the stanza."""
@@ -187,8 +193,14 @@ class Stanza(object):
         :returntype: `unicode`"""
         return serialize(self.get_xml())
 
-    def as_xml(self):
+    def as_xml(self, legacy = False):
         """Return the XML stanza representation.
+
+        :Parameters:
+            - `legacy`: if the error conditions should be encoded the XMPP 0.9 
+              way
+        :Types:
+            - `legacy`: `bool`
 
         Always return an independent copy of the stanza XML representation,
         which can be freely modified without affecting the stanza.
@@ -203,13 +215,15 @@ class Stanza(object):
             attrs['type'] = self._stanza_type
         if self._stanza_id:
             attrs['id'] = self._stanza_id
+        if self._language:
+            attrs[XML_LANG_QNAME] = self._language
         element = ElementTree.Element(self._element_qname, attrs)
         if self._payload is None:
             self.decode_payload()
         for payload in self._payload:
             element.append(payload.as_xml())
         if self._error:
-            element.append(self._error.as_xml())
+            element.append(self._error.as_xml(legacy = legacy))
         return element
 
     def get_xml(self):
