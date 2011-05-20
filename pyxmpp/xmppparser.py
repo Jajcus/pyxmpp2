@@ -45,15 +45,11 @@ class StreamHandler(object):
             - `element`: `ElementTree.Element`"""
         logger.error("Unhandled stream start: {0!r}".format(element))
 
-    def stream_end(self, element):
+    def stream_end(self):
         """Called when the end tag of root element is encountered
         in the stream.
-
-        :Parameters:
-            - `element`: the root element
-        :Types:
-            - `element`: `ElementTree.Element`"""
-        logger.error("Unhandled stream start: {0!r}".format(element))
+        """
+        logger.error("Unhandled stream end")
 
     def stanza(self, element):
         """Called when the end tag of a direct child of the root
@@ -148,7 +144,7 @@ class ParserTarget(object):
                 self._handler.error(u"Unexpected end tag for: {0!r}"
                                 " (stream end tag expected)".format(tag))
                 return
-            self._handler.stream_end(self._root)
+            self._handler.stream_end()
             return
         element = self._builder.end(tag)
         if self._level == 1:
@@ -185,7 +181,7 @@ class StreamReader(object):
             self.in_use = 1
             try:
                 if data:
-                    return self.parser.feed(data)
+                    self.parser.feed(data)
                 else:
                     self.parser.close()
             finally:
