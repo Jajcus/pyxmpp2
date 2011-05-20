@@ -35,7 +35,7 @@ class StreamHandler(xmppparser.StreamHandler):
         self.test_case = test_case
     def stream_start(self, element):
         self.test_case.event("start", element)
-    def stream_end(self, element):
+    def stream_end(self):
         self.test_case.event("end", None)
     def stanza(self, element):
         self.test_case.event("node", element)
