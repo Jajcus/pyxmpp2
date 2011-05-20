@@ -20,7 +20,6 @@
 Normative reference:
   - `RFC 6120 <http://xmpp.org/rfcs/rfc6120.html>`__
   - `RFC 3920 <http://xmpp.org/rfcs/rfc3920.html>`__
-  - `JEP 86 <http://www.jabber.org/jeps/jep-0086.html>`__
 """
 
 from __future__ import absolute_import
@@ -32,12 +31,12 @@ import logging
 from xml.etree import ElementTree
 from copy import deepcopy
 
-from .xmlextra import common_doc, common_root, common_ns
 from . import xmlextra
 from .exceptions import ProtocolError
 from .constants import STREAM_NS, STANZA_ERROR_NS, STREAM_ERROR_NS
 from .constants import STREAM_QNP, STANZA_ERROR_QNP, STREAM_ERROR_QNP
 from .constants import PYXMPP_ERROR_NS, STANZA_CLIENT_QNP, STANZA_NAMESPACES
+from .xmppserialize import serialize
 
 logger = logging.getLogger("pyxmpp.error")
 
@@ -330,8 +329,13 @@ class ErrorElement(object):
         :returntype: `unicode`"""
         return serialize(self.as_xml())
 
-    def as_xml(self):
+    def as_xml(self, legacy = False):
         """Return the XML error representation.
+
+        :Parameters:
+            - `legacy`: to encode error codes the XMPP 0.9 way
+        :Types:
+            - `legacy`: `bool`
 
         :returntype: `ElementTree.Element`"""
         result = ElementTree.Element(self.error_qname)
