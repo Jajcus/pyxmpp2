@@ -18,23 +18,29 @@
 "Common XMPP constants."""
 
 XML_NS = "http://www.w3.org/XML/1998/namespace"
+XML_QNP = "{{{0}}}".format(XML_NS)
 
 STREAM_NS = "http://etherx.jabber.org/streams"
-BIND_NS="urn:ietf:params:xml:ns:xmpp-bind"
+STREAM_QNP = "{{{0}}}".format(STREAM_NS)
+
+BIND_NS ="urn:ietf:params:xml:ns:xmpp-bind"
+BIND_QNP = "{{{0}}}".format(BIND_NS)
 
 STANZA_CLIENT_NS = "jabber:client"
+STANZA_CLIENT_QNP = "{{{0}}}".format(STANZA_CLIENT_NS)
+
 STANZA_SERVER_NS = "jabber:server"
+STANZA_CLIENT_QNP = "{{{0}}}".format(STANZA_SERVER_NS)
 
 STANZA_NAMESPACES = (STANZA_CLIENT_NS, STANZA_SERVER_NS)
 
-STANZA_ERROR_NS='urn:ietf:params:xml:ns:xmpp-stanzas'
-STREAM_ERROR_NS='urn:ietf:params:xml:ns:xmpp-streams'
-PYXMPP_ERROR_NS='http://pyxmpp.jajcus.net/xmlns/errors'
+STANZA_ERROR_NS = 'urn:ietf:params:xml:ns:xmpp-stanzas'
+STANZA_ERROR_QNP = "{{{0}}}".format(STANZA_ERROR_NS)
 
-# build the _QNP (QName prefix) constants
-for name, value in globals().items():
-    if name.endswith("_NS"):
-        globals()[name[:-3] + "_QNP"] = "{{{0}}}".format(value)
+STREAM_ERROR_NS = 'urn:ietf:params:xml:ns:xmpp-streams'
+STREAM_ERROR_QNP = "{{{0}}}".format(STREAM_ERROR_NS)
+
+PYXMPP_ERROR_NS = 'http://pyxmpp.jajcus.net/xmlns/errors'
+PYXMPP_ERROR_QNP = "{{{0}}}".format(PYXMPP_ERROR_NS)
 
 XML_LANG_QNAME = XML_QNP + "lang"
-
