@@ -574,7 +574,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         else:
             legacy = False
         self.fix_out_stanza(stanza)
-        element = self.stanza.as_xml(legacy = legacy)
+        element = stanza.as_xml(legacy = legacy)
         self._write_element(element)
 
     def regular_tasks(self):
@@ -740,6 +740,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             finally:
                 self.lock.acquire()
         elif tag == FEATURES_TAG:
+            logger.debug("Got features element: {0}".format(serialize(element)))
             self.features = element
             self._got_features()
         else:
@@ -785,11 +786,10 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         for element in self.features:
             if element.tag == FEATURE_BIND:
                 has_bind_feature = True
-        if self.authenticated:
-            if has_bind_feature:
-                self.bind(self.me.resource)
-            else:
-                self.event(AuthorizedEvent(self.me))
+        if has_bind_feature:
+            self.bind(self.me.resource)
+        elif self.authenticated:
+            self.event(AuthorizedEvent(self.me))
 
     def bind(self, resource):
         """Bind to a resource.
@@ -820,9 +820,9 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             - `stanza`: <iq type="result"/> stanza received.
 
         Set `self.me` to the full JID negotiated."""
-        element = stanza.get_payload()
+        payload = stanza.get_payload()
         jid = None
-        for child in element:
+        for child in payload.element:
             if child.tag == BIND_QNP + u"jid":
                 jid = child.text
                 break

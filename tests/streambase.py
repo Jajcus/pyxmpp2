@@ -3,17 +3,31 @@
 
 import unittest
 import time
+import re
 
 from xml.etree.ElementTree import Element, SubElement, XML
 
 from pyxmpp2.streambase import StreamBase
 from pyxmpp2.streamevents import *
 from pyxmpp2.exceptions import StreamParseError
+from pyxmpp2.jid import JID
 
 from test_util import NetworkTestCase
 
 C2S_SERVER_STREAM_HEAD = '<stream:stream version="1.0" from="127.0.0.1" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
 C2S_CLIENT_STREAM_HEAD = '<stream:stream version="1.0" to="127.0.0.1" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
+
+BIND_FEATURES = """<stream:features>
+     <bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>
+</stream:features>"""
+
+BIND_RESPONSE = """<iq type="result" id="{0}">
+  <bind  xmlns="urn:ietf:params:xml:ns:xmpp-bind">
+    <jid>test@127.0.0.1/Test</jid>
+  </bind>
+</iq>
+"""
+
 STREAM_TAIL = '</stream:stream>'
         
 PARSE_ERROR_RESPONSE = ('<stream:error><xml-not-well-formed'
@@ -42,6 +56,16 @@ class JustStreamConnectEventHandler(object):
             return True
         return False
 
+class AuthorizedEventHandler(object):
+    def __init__(self):
+        self.events_received = []
+    def handle_xmpp_event(self, event):
+        self.events_received.append(event)
+        if isinstance(event, AuthorizedEvent):
+            event.stream.close()
+            return True
+        return False
+
 class JustAcceptEventHandler(object):
     def __init__(self):
         self.events_received = []
@@ -52,13 +76,15 @@ class JustAcceptEventHandler(object):
             return True
         return False
 
-
-
 class TestInitiator(NetworkTestCase):
-    def loop(self, stream):
-        timeout = time.time() + TIMEOUT
+    def loop(self, stream, timeout = TIMEOUT, expect = None):
+        timeout = time.time() + timeout
         while stream.socket and time.time() < timeout:
-            stream.loop_iter(1)
+            stream.loop_iter(0.1)
+            if expect:
+                match = expect.match(self.server.rdata)
+                if match:
+                    return match.group(1)
 
     def test_connect_close(self):
         addr, port = self.start_server()
@@ -83,7 +109,27 @@ class TestInitiator(NetworkTestCase):
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [ResolvingAddressEvent, ConnectingEvent,
                     ConnectedEvent, StreamConnectedEvent, DisconnectedEvent])
-    
+ 
+    def test_bind(self):
+        addr, port = self.start_server()
+        handler = AuthorizedEventHandler()
+        stream = StreamBase(u"jabber:client", event_handler = handler)
+        stream.me = JID("test@127.0.0.1")
+        stream.connect(addr, port)
+        self.server.write(C2S_SERVER_STREAM_HEAD)
+        stream.loop_iter(1)
+        self.server.write(BIND_FEATURES)
+        req_id = self.loop(stream, timeout = 10, 
+                    expect = re.compile(r".*<iq[^>]*id=[\"']([^\"']*)[\"']"))
+
+        self.server.write(BIND_RESPONSE.format(req_id))
+        self.loop(stream)
+        self.assertIsNone(stream.socket)
+        event_classes = [e.__class__ for e in handler.events_received]
+        self.assertEqual(event_classes, [ResolvingAddressEvent, ConnectingEvent,
+                    ConnectedEvent, StreamConnectedEvent,
+                    BindingResourceEvent, AuthorizedEvent, DisconnectedEvent])
+   
     def test_parse_error(self):
         addr, port = self.start_server()
         handler = JustStreamConnectEventHandler()

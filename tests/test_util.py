@@ -27,10 +27,10 @@ class NetReaderWritter(object):
     def start(self):
         reader_thread = threading.Thread(target = self.reader_run, 
                                                             name = "Reader")
-        reader_thread.daemon = False
+        reader_thread.daemon = True
         writter_thread = threading.Thread(target = self.writter_run, 
                                                             name = "Writter")
-        writter_thread.daemon = False
+        writter_thread.daemon = True
         reader_thread.start()
         writter_thread.start()
 
