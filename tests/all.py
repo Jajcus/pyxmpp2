@@ -3,6 +3,7 @@
 import unittest
 import sys
 import getopt
+import logging
 
 all_modules=[ "jid", "stream_reader", "xmppserializer", "stanza",
             "message", "presence", "iq", "stanzaprocessor",
@@ -41,7 +42,12 @@ def main(args=None):
                 sys.exit(0)
     else:
         modules=None
-
+    logger = logging.getLogger()
+    logger.addHandler(logging.StreamHandler())
+    if verbosity > 2:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.ERROR)
     unittest.TextTestRunner(verbosity=verbosity).run(suite())
 
 if __name__ == '__main__':
