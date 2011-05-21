@@ -79,7 +79,7 @@ class ConnectedEvent(StreamEvent):
 
 class ConnectingEvent(StreamEvent):
     """Emitted on TCP connection attempt. May happen multiple times during
-    single stream connection – several addresses may be tried until one answers.
+    single stream connection - several addresses may be tried until one answers.
 
     Probably useful only for connection progres monitoring.
     
@@ -126,7 +126,7 @@ class DisconnectedEvent(StreamEvent):
     def __init__(self, peer):
         self.peer = peer
     def __unicode__(self):
-        return u"Disconnected from {0}".format(peer)
+        return u"Disconnected from {0}".format(self.peer)
 
 class ResolvingAddressEvent(StreamEvent):
     """Emitted when staring to resolve an address (A or AAAA) DNS record
@@ -175,4 +175,4 @@ class StreamConnectedEvent(StreamEvent):
     def __init__(self, peer):
         self.peer = peer
     def __unicode__(self):
-        return u"Connected to {0}".format(peer)
+        return u"Connected to {0}".format(self.peer)
