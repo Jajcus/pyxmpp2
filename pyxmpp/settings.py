@@ -86,7 +86,7 @@ class XMPPSettings(MutableMapping):
             - `key`: `unicode`
         """
         self.get(key, required = True)
-    def __setitiem__(self, key, value):
+    def __setitem__(self, key, value):
         """Set a parameter value.
         
         :Parameters:
@@ -144,5 +144,5 @@ class XMPPSettings(MutableMapping):
         return self._settings.items()
     @classmethod
     def add_defaults(cls, defaults):
-        self._defaults.update(defaults)
+        cls._defaults.update(defaults)
 
