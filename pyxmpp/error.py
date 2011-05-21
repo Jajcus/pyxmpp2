@@ -36,7 +36,7 @@ from .exceptions import ProtocolError
 from .constants import STREAM_NS, STANZA_ERROR_NS, STREAM_ERROR_NS
 from .constants import STREAM_QNP, STANZA_ERROR_QNP, STREAM_ERROR_QNP
 from .constants import PYXMPP_ERROR_NS, STANZA_CLIENT_QNP, STANZA_NAMESPACES
-from .xmppserialize import serialize
+from .xmppserializer import serialize
 
 logger = logging.getLogger("pyxmpp.error")
 
