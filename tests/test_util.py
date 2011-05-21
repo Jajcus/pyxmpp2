@@ -151,6 +151,12 @@ class NetworkTestCase(unittest.TestCase):
             self.client.close()
 
     def start_server(self, ip_version = 4):
+        sock = self.make_listening_socket(ip_version)
+        self.server = NetReaderWritter(sock, need_accept = True)
+        self.server.start()
+        return sock.getsockname()
+    
+    def make_listening_socket(self, ip_version = 4):
         if ip_version == 4:
             if not self.can_do_ipv4:
                 self.skipTest("Networking not available")
@@ -168,11 +174,9 @@ class NetworkTestCase(unittest.TestCase):
         sock = socket.socket(family, socket.SOCK_STREAM)
         sock.bind((addr, 0))
         sock.listen(1)
-        self.server = NetReaderWritter(sock, need_accept = True)
-        self.server.start()
-        return sock.getsockname()
+        return sock
 
-    def start_client(self, ip_version, sockaddr):
+    def start_client(self, sockaddr, ip_version = 4):
         if ip_version == 4:
             if not self.can_do_ipv4:
                 self.skipTest("Networking not available")

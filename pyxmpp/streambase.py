@@ -773,7 +773,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         """Generate a random and unique stream ID.
 
         :return: the id string generated."""
-        return uuid.uuid4()
+        return unicode(uuid.uuid4())
 
     def _got_features(self):
         """Process incoming <stream:features/> element.
