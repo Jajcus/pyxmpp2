@@ -16,6 +16,7 @@ class TestXMPPSerializer(unittest.TestCase):
         self.assertTrue(output.startswith("<stream:stream "))
         self.assertTrue("xmlns='jabber:client'" in output
                             or 'xmlns="jabber:client"' in output)
+        self.assertFalse("xmlns:xml" in output)
         xml = ElementTree.XML(output + "</stream:stream>")
         self.assertEqual(xml.tag,
                                 "{http://etherx.jabber.org/streams}stream")

@@ -84,6 +84,8 @@ class XMPPSerializer(object):
             - `namespace`: `unicode`
             - `prefix`: `unicode`
         """
+        if prefix == "xml" and namespace != XML_NS:
+            raise ValueError, "Cannot change 'xml' prefix meaning"
         self._prefixes[namespace] = prefix
 
     def emit_head(self, stream_from, stream_to, stream_id = None, 
@@ -120,6 +122,8 @@ class XMPPSerializer(object):
         if language is not None:
             tag += u" xml:lang={0}".format(quoteattr(stream_id))
         for namespace, prefix in self._root_prefixes.items():
+            if prefix == "xml":
+                continue
             if prefix:
                 tag += u' xmlns:{0}={1}'.format(prefix, quoteattr(namespace))
             else:
