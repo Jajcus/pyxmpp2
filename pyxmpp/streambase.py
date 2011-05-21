@@ -19,43 +19,63 @@
 """Core XMPP stream functionality.
 
 Normative reference:
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
+  - `RFC 6120 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
-import libxml2
 import socket
-import os
 import time
-import random
-import threading
 import errno
 import logging
+import uuid
+import re
+
+from xml.etree import ElementTree
 
 
-from . import xmlextra
+from .xmppparser import StreamHandler
 from .expdict import ExpiringDictionary
-from .utils import to_utf8, from_utf8
-from .stanza import Stanza
-from .error import StreamErrorNode
+from .error import StreamErrorElement
 from .iq import Iq
-from .presence import Presence
-from .message import Message
 from .jid import JID
 from . import resolver
-from .stanzaprocessor import StanzaProcessor
-from .exceptions import StreamError, StreamEncryptionRequired
-from .exceptions import HostMismatch, ProtocolError
+from .stanzaprocessor import StanzaProcessor, stanza_factory
+from .exceptions import StreamError, BadRequestProtocolError
+from .exceptions import HostMismatch
 from .exceptions import DNSError, UnexpectedCNAMEError
-from .exceptions import FatalStreamError, StreamParseError, StreamAuthenticationError
+from .exceptions import FatalStreamError, StreamParseError
+from .constants import STREAM_QNP, BIND_QNP, XML_LANG_QNAME
+from .settings import XMPPSettings
+from .xmppserializer import serialize, XMPPSerializer
+from .xmppparser import StreamReader
+from .stanzapayload import XMLPayload
 
-STREAM_NS="http://etherx.jabber.org/streams"
-BIND_NS="urn:ietf:params:xml:ns:xmpp-bind"
+from .streamevents import AuthorizedEvent, BindingResourceEvent, ConnectedEvent
+from .streamevents import ConnectingEvent, ConnectionAcceptedEvent
+from .streamevents import DisconnectedEvent, ResolvingAddressEvent
+from .streamevents import ResolvingSRVEvent, StreamConnectedEvent
 
-class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
+XMPPSettings.add_defaults(
+        {
+            u"language": "en",
+            u"languages": ("en",),
+            u"keepalive": 0,
+            u"default_stanza_timeout": 300,
+            u"extra_ns_prefixes": {},
+        })
+
+logger = logging.getLogger("pyxmpp.streambase")
+
+LANG_SPLIT_RE = re.compile(r"(.*)(?:-[a-zA-Z0-9])?-[a-zA-Z0-9]+$")
+
+ERROR_TAG = STREAM_QNP + u"error"
+FEATURES_TAG = STREAM_QNP + u"features"
+FEATURE_BIND = BIND_QNP + u"bind"
+
+class StreamBase(StanzaProcessor, StreamHandler):
     """Base class for a generic XMPP stream.
 
     Responsible for establishing connection, parsing the stream, dispatching
@@ -68,6 +88,8 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
     specification.
 
     :Ivariables:
+        - `stanza_namespace`: default namespace of the stream
+        - `settings`: stream settings
         - `lock`: RLock object used to synchronize access to Stream object.
         - `features`: stream features as annouced by the initiator.
         - `me`: local stream endpoint JID.
@@ -75,87 +97,82 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         - `process_all_stanzas`: when `True` then all stanzas received are
           considered local.
         - `initiator`: `True` if local stream endpoint is the initiating entity.
-        - `owner`: `Client`, `Component` or similar object "owning" this stream.
         - `_reader`: the stream reader object (push parser) for the stream.
+        - `version`: Negotiated version of the XMPP protocol. (0,9) for the
+          legacy (pre-XMPP) Jabber protocol.
+    :Types:
+        - `settings`: XMPPSettings
+        - `version`: (`int`, `int`) tuple
     """
-    def __init__(self, default_ns, extra_ns = (), keepalive = 0, owner = None):
+    def __init__(self, stanza_namespace, settings = None):
         """Initialize Stream object
 
         :Parameters:
-          - `default_ns`: stream's default namespace ("jabber:client" for
-            client, "jabber:server" for server, etc.)
-          - `extra_ns`: sequence of extra namespace URIs to be defined for
-            the stream.
-          - `keepalive`: keepalive output interval. 0 to disable.
-          - `owner`: `Client`, `Component` or similar object "owning" this stream.
+          - `stanza_namespace`: stream's default namespace URI ("jabber:client"
+            for client, "jabber:server" for server, etc.)
+          - `settings`: extra settings
+        :Types:
+          - `stanza_namespace`: `unicode`
+          - `settings`: XMPPSettings
         """
-        StanzaProcessor.__init__(self)
-        xmlextra.StreamHandler.__init__(self)
-        self.default_ns_uri=default_ns
-        if extra_ns:
-            self.extra_ns_uris=extra_ns
-        else:
-            self.extra_ns_uris=[]
-        self.keepalive=keepalive
-        self._reader_lock=threading.Lock()
-        self.process_all_stanzas=False
-        self.port=None
+        StreamHandler.__init__(self)
+        if settings is None:
+            settings = XMPPSettings()
+        self.settings = settings
+        StanzaProcessor.__init__(self, settings[u"default_stanza_timeout"])
+        self.stanza_namespace = stanza_namespace
+        self._stanza_namespace_p = "{{{0}}}".format(stanza_namespace)
+        self.keepalive = self.settings[u"keepalive"]
+        self.process_all_stanzas = False
+        self.port = None
         self._reset()
-        self.owner = owner
-        self.__logger=logging.getLogger("pyxmpp.Stream")
 
     def _reset(self):
         """Reset `Stream` object state making it ready to handle new
         connections."""
-        self.doc_in=None
-        self.doc_out=None
-        self.socket=None
-        self._reader=None
-        self.addr=None
-        self.default_ns=None
-        self.extra_ns={}
-        self.stream_ns=None
-        self._reader=None
-        self.ioreader=None
-        self.me=None
-        self.peer=None
-        self.skip=False
-        self.stream_id=None
-        self._iq_response_handlers=ExpiringDictionary()
-        self._iq_get_handlers={}
-        self._iq_set_handlers={}
-        self._message_handlers=[]
-        self._presence_handlers=[]
-        self.eof=False
-        self.initiator=None
-        self.features=None
-        self.authenticated=False
-        self.peer_authenticated=False
-        self.auth_method_used=None
-        self.version=None
-        self.last_keepalive=False
+        self.socket = None
+        self._reader = None
+        self.addr = None
+        self.me = None
+        self.peer = None
+        self.stream_id = None
+        self.eof = False
+        self.initiator = None
+        self.features = None
+        self.authenticated = False
+        self.peer_authenticated = False
+        self.auth_method_used = None
+        self.version = None
+        self.last_keepalive = False
+        self.language = None
+        self.peer_language = None
+        self._serializer = None
 
-    def __del__(self):
-        self.close()
+        # FIXME?
+        self._iq_response_handlers = ExpiringDictionary()
+        self._iq_get_handlers = {}
+        self._iq_set_handlers = {}
+        self._message_handlers = []
+        self._presence_handlers = []
 
-    def _connect_socket(self,sock,to=None):
+    def _connect_socket(self, sock, to = None):
         """Initialize stream on outgoing connection.
 
         :Parameters:
           - `sock`: connected socket for the stream
           - `to`: name of the remote host
         """
-        self.eof=0
-        self.socket=sock
+        self.eof = False
+        self.socket = sock
         if to:
-            self.peer=JID(to)
+            self.peer = JID(to)
         else:
-            self.peer=None
-        self.initiator=1
+            self.peer = None
+        self.initiator = True
         self._send_stream_start()
         self._make_reader()
 
-    def connect(self,addr,port,service=None,to=None):
+    def connect(self, addr, port, service = None, to = None):
         """Establish XMPP connection with given address.
 
         [initiating entity only]
@@ -166,74 +183,71 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
             - `service`: service name (to be resolved using SRV DNS records)
             - `to`: peer name if different than `addr`
         """
-        self.lock.acquire()
-        try:
-            return self._connect(addr,port,service,to)
-        finally:
-            self.lock.release()
+        with self.lock:
+            return self._connect(addr, port, service, to)
 
     def _connect(self, addr, port, service = None, to = None):
         """Same as `Stream.connect` but assume `self.lock` is acquired."""
         if to is None:
-            to = from_utf8(addr)
+            to = unicode(addr)
         allow_cname = True
         if service is not None:
-            self.state_change("resolving srv", (addr, service))
+            self.event(ResolvingSRVEvent(addr, service))
             addrs = resolver.resolve_srv(addr, service)
             if not addrs:
                 addrs = [(addr, port)]
             else:
                 allow_cname = False
         else:
-            addrs=[(addr, port)]
+            addrs = [(addr, port)]
         exception = None
         for addr, port in addrs:
             if type(addr) in (str, unicode):
-                self.state_change("resolving", addr)
-            s=None
+                self.event(ResolvingAddressEvent(addr))
+            sock = None
             while True:
                 try:
                     addresses = resolver.getaddrinfo(addr, port, None,
                                 socket.SOCK_STREAM, allow_cname = allow_cname)
                     break
                 except UnexpectedCNAMEError, err:
-                    self.__logger.warning(str(err))
+                    logger.warning(str(err))
                     allow_cname = True
                     continue
                 except DNSError, err:
-                    self.__logger.debug(str(err))
+                    logger.debug(str(err))
                     exception = err
                     addresses = []
                     break
             for res in addresses:
                 family, socktype, proto, _unused, sockaddr = res
                 try:
-                    s=socket.socket(family,socktype,proto)
-                    self.state_change("connecting",sockaddr)
-                    s.connect(sockaddr)
-                    self.state_change("connected",sockaddr)
+                    sock = socket.socket(family, socktype, proto)
+                    self.event(ConnectingEvent(sockaddr))
+                    sock.connect(sockaddr)
+                    self.event(ConnectedEvent(sockaddr))
                 except socket.error, err:
                     exception = err
-                    self.__logger.debug("Connect to %r failed" % (sockaddr,))
-                    if s:
-                        s.close()
-                        s=None
+                    logger.debug("Connect to {0!r} failed".format(sockaddr))
+                    if sock:
+                        sock.close()
+                        sock = None
                     continue
                 break
-            if s:
+            if sock:
                 break
-        if not s:
+        if not sock:
             if exception:
-                raise exception
+                raise exception # pylint: disable-msg=E0702
             else:
                 raise FatalStreamError("Cannot connect")
 
-        self.addr=addr
-        self.port=port
-        self._connect_socket(s, to)
-        self.last_keepalive=time.time()
+        self.addr = addr
+        self.port = port
+        self._connect_socket(sock, to)
+        self.last_keepalive = time.time()
 
-    def accept(self,sock,myname):
+    def accept(self, sock, myname):
         """Accept incoming connection.
 
         [receiving entity only]
@@ -241,37 +255,32 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         :Parameters:
             - `sock`: a listening socket.
             - `myname`: local stream endpoint name."""
-        self.lock.acquire()
-        try:
-            return self._accept(sock,myname)
-        finally:
-            self.lock.release()
+        with self.lock:
+            return self._accept(sock, myname)
 
-    def _accept(self,sock,myname):
+    def _accept(self, sock, myname):
         """Same as `Stream.accept` but assume `self.lock` is acquired."""
-        self.eof=0
-        self.socket,addr=sock.accept()
-        self.__logger.debug("Connection from: %r" % (addr,))
-        self.addr,self.port=addr
+        self.eof = False
+        self.socket, addr = sock.accept()
+        self.event(ConnectionAcceptedEvent(addr))
+        logger.debug("Connection from: %r" % (addr,))
+        self.addr, self.port = addr
         if myname:
-            self.me=JID(myname)
+            self.me = JID(myname)
         else:
-            self.me=None
-        self.initiator=0
+            self.me = None
+        self.initiator = 0
         self._make_reader()
-        self.last_keepalive=time.time()
+        self.last_keepalive = time.time()
 
     def disconnect(self):
         """Gracefully close the connection."""
-        self.lock.acquire()
-        try:
+        with self.lock:
             return self._disconnect()
-        finally:
-            self.lock.release()
 
     def _disconnect(self):
         """Same as `Stream.disconnect` but assume `self.lock` is acquired."""
-        if self.doc_out:
+        if self._serializer:
             self._send_stream_end()
 
     def _post_connect(self):
@@ -286,131 +295,127 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         This method is supposed to be overriden in derived classes."""
         pass
 
-    def state_change(self,state,arg):
-        """Called when connection state is changed.
+    def event(self, event): # pylint: disable-msg=R0201
+        """Handle a stream event.
+        
+        Called when connection state is changed.
 
-        This method is supposed to be overriden in derived classes
-        or replaced by an application.
+        This method is supposed to be overriden in derived classes.
 
         It may be used to display the connection progress."""
-        self.__logger.debug("State: %s: %r" % (state,arg))
+        logger.debug(u"Stream event: {0}".format(event))
 
     def close(self):
         """Forcibly close the connection and clear the stream state."""
-        self.lock.acquire()
-        try:
+        with self.lock:
             return self._close()
-        finally:
-            self.lock.release()
 
     def _close(self):
         """Same as `Stream.close` but assume `self.lock` is acquired."""
         self._disconnect()
-        if self.doc_in:
-            self.doc_in=None
-        if self.features:
-            self.features=None
-        self._reader=None
-        self.stream_id=None
         if self.socket:
             self.socket.close()
         self._reset()
 
     def _make_reader(self):
-        """Create ne `xmlextra.StreamReader` instace as `self._reader`."""
-        self._reader=xmlextra.StreamReader(self)
+        """Create ne `StreamReader` instace as `self._reader`."""
+        self._reader = StreamReader(self)
 
-    def stream_start(self,doc):
+    def stream_start(self, element):
         """Process <stream:stream> (stream start) tag received from peer.
 
         :Parameters:
-            - `doc`: document created by the parser"""
-        self.doc_in=doc
-        self.__logger.debug("input document: %r" % (self.doc_in.serialize(),))
-
-        try:
-            r=self.doc_in.getRootElement()
-            if r.ns().getContent() != STREAM_NS:
-                self._send_stream_error("invalid-namespace")
-                raise FatalStreamError("Invalid namespace.")
-        except libxml2.treeError:
+            - `element`: root element (empty) created by the parser"""
+        logger.debug("input document: " + ElementTree.dump(element))
+        if not element.tag.starts_with(STREAM_QNP):
             self._send_stream_error("invalid-namespace")
-            raise FatalStreamError("Couldn't get the namespace.")
+            raise FatalStreamError("Bad stream namespace")
 
-        self.version=r.prop("version")
-        if self.version and self.version!="1.0":
+        version = element.get("version")
+        if version:
+            try:
+                major, minor = version.split(".", 1)
+            except ValueError:
+                self._send_stream_error("unsupported-version")
+                raise FatalStreamError("Unsupported protocol version.")
+            self.version = (major, minor)
+        else:
+            self.version = (0, 9)
+
+        if self.version[0] != 1 and self.version != (0, 9):
             self._send_stream_error("unsupported-version")
             raise FatalStreamError("Unsupported protocol version.")
 
-        to_from_mismatch=0
+        peer_lang = element.get(XML_LANG_QNAME)
+        self.peer_language = peer_lang
+        if not self.initiator:
+            lang = None
+            languages = self.settings["languages"]
+            while peer_lang:
+                if peer_lang in languages:
+                    lang = peer_lang
+                    break
+                match = LANG_SPLIT_RE.match(peer_lang)
+                if not match:
+                    break
+                peer_lang = match.group(0)
+            if lang:
+                self.language = lang
+
+        to_from_mismatch = False
         if self.initiator:
-            self.stream_id=r.prop("id")
-            peer = from_utf8(r.prop("from"))
+            self.stream_id = element.get("id")
+            peer = element.get("from")
             if peer:
                 peer = JID(peer)
             if self.peer:
-                if peer and peer!=self.peer:
-                    self.__logger.debug("peer hostname mismatch:"
-                        " %r != %r" % (peer,self.peer))
-                    to_from_mismatch=1
+                if peer and peer != self.peer:
+                    logger.debug("peer hostname mismatch: {0!r} != {1!r}"
+                                                    .format(peer,self.peer))
+                    to_from_mismatch = True
             else:
-                self.peer=peer
+                self.peer = peer
         else:
-            to = from_utf8(r.prop("to"))
+            to = element.get("to")
             if to:
-                to=self.check_to(to)
+                to = self.check_to(to)
                 if not to:
                     self._send_stream_error("host-unknown")
                     raise FatalStreamError('Bad "to"')
-                self.me=JID(to)
+                self.me = JID(to)
             self._send_stream_start(self.generate_id())
             self._send_stream_features()
-            self.state_change("fully connected",self.peer)
+            self.event(StreamConnectedEvent(self.peer))
             self._post_connect()
 
-        if not self.version:
-            self.state_change("fully connected",self.peer)
+        if self.version == (0, 9):
+            self.event(StreamConnectedEvent(self.peer))
             self._post_connect()
 
         if to_from_mismatch:
-            raise HostMismatch
+            raise HostMismatch()
 
-    def stream_end(self, _unused):
+    def stream_end(self):
         """Process </stream:stream> (stream end) tag received from peer.
-
-        :Parameters:
-            - `_unused`: document created by the parser"""
-        self.__logger.debug("Stream ended")
-        self.eof=1
-        if self.doc_out:
-            self._send_stream_end()
-        if self.doc_in:
-            self.doc_in=None
-            self._reader=None
-            if self.features:
-                self.features=None
-        self.state_change("disconnected",self.peer)
-
-    def stanza_start(self,doc,node):
-        """Process stanza (first level child element of the stream) start tag
-        -- do nothing.
-
-        :Parameters:
-            - `doc`: parsed document
-            - `node`: stanza's full XML
         """
-        pass
+        logger.debug("Stream ended")
+        self.eof = True
+        if self._serializer:
+            self._send_stream_end()
+        if self._reader:
+            self._reader = None
+            self.features = None
+        self.event(DisconnectedEvent(self.peer))
 
-    def stanza(self, _unused, node):
+    def stanza(self, element):
         """Process stanza (first level child element of the stream).
 
         :Parameters:
-            - `_unused`: parsed document
-            - `node`: stanza's full XML
+            - `element`: stanza's full XML
         """
-        self._process_node(node)
+        self._process_element(element)
 
-    def error(self,descr):
+    def error(self, descr):
         """Handle stream XML parse error.
 
         :Parameters:
@@ -420,63 +425,58 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
     def _send_stream_end(self):
         """Send stream end tag."""
-        self.doc_out.getRootElement().addContent(" ")
-        s=self.doc_out.getRootElement().serialize(encoding="UTF-8")
-        end=s.rindex("<")
+        data = self._serializer.emit_tail()
         try:
-            self._write_raw(s[end:])
-        except (IOError,SystemError,socket.error),e:
-            self.__logger.debug("Sending stream closing tag failed:"+str(e))
-        self.doc_out.freeDoc()
-        self.doc_out=None
-        if self.features:
-            self.features=None
+            self._write_raw(data.encode("utf-8"))
+        except (IOError, SystemError, socket.error), err:
+            logger.debug(u"Sending stream closing tag failed: {0}".format(err))
+        self._serializer = None
+        self.features = None
 
-    def _send_stream_start(self,sid=None):
+    def _send_stream_start(self, stream_id = None):
         """Send stream start tag."""
-        if self.doc_out:
+        if self._serializer:
             raise StreamError("Stream start already sent")
-        self.doc_out=libxml2.newDoc("1.0")
-        root=self.doc_out.newChild(None, "stream", None)
-        self.stream_ns=root.newNs(STREAM_NS,"stream")
-        root.setNs(self.stream_ns)
-        self.default_ns=root.newNs(self.default_ns_uri,None)
-        for prefix,uri in self.extra_ns:
-            self.extra_ns[uri]=root.newNs(uri,prefix)
+        if not self.language:
+            self.language = self.settings["language"]
+        self._serializer = XMPPSerializer(self.stanza_namespace,
+                                        self.settings["extra_ns_prefixes"])
         if self.peer and self.initiator:
-            root.setProp("to",self.peer.as_utf8())
+            stream_to = unicode(self.peer)
+        else:
+            stream_to = None
         if self.me and not self.initiator:
-            root.setProp("from",self.me.as_utf8())
-        root.setProp("version","1.0")
-        if sid:
-            root.setProp("id",sid)
-            self.stream_id=sid
-        sr=self.doc_out.serialize(encoding="UTF-8")
-        self._write_raw(sr[:sr.find("/>")]+">")
+            stream_from = unicode(self.me)
+        else:
+            stream_from = None
+        if stream_id:
+            self.stream_id = stream_id
+        else:
+            self.stream_id = None
+        head = self._serializer.emit_head(stream_from, stream_to,
+                                    self.stream_id, language = self.language)
+        self._write_raw(head.encode("utf-8"))
 
-    def _send_stream_error(self,condition):
+    def _send_stream_error(self, condition):
         """Send stream error element.
 
         :Parameters:
             - `condition`: stream error condition name, as defined in the
               XMPP specification."""
-        if not self.doc_out:
+        if self.eof:
+            return
+        if not self._serializer:
             self._send_stream_start()
-        e=StreamErrorNode(condition)
-        e.xmlnode.setNs(self.stream_ns)
-        self._write_raw(e.serialize())
-        e.free()
+        element = StreamErrorElement(condition)
+        data = self._serializer.emit_stanza(element)
+        self._write_raw(data.encode("utf-8"))
         self._send_stream_end()
 
     def _restart_stream(self):
         """Restart the stream as needed after SASL and StartTLS negotiation."""
-        self._reader=None
-        #self.doc_out.freeDoc()
-        self.doc_out=None
-        #self.doc_in.freeDoc() # memleak, but the node which caused the restart
-                    # will be freed after this function returns
-        self.doc_in=None
-        self.features=None
+        self._reader = None
+        self._serializer = None
+        self.features = None
         if self.initiator:
             self._send_stream_start(self.stream_id)
         self._make_reader()
@@ -486,132 +486,127 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
 
         [receving entity only]
 
-        :returns: new <features/> element node."""
-        root=self.doc_out.getRootElement()
-        features=root.newChild(root.ns(),"features",None)
+        :returns: new <features/> element
+        :returntype: `ElementTree.Element`"""
+        features = ElementTree.Element(STREAM_QNP + "features")
         return features
 
     def _send_stream_features(self):
         """Send stream <features/>.
 
         [receiving entity only]"""
-        self.features=self._make_stream_features()
-        self._write_raw(self.features.serialize(encoding="UTF-8"))
+        self.features = self._make_stream_features()
+        data = self._serializer.emit_stanza(self.features)
+        self._write_raw(data.encode("utf-8"))
 
-    def write_raw(self,data):
+    def write_raw(self, data):
         """Write raw data to the stream socket.
 
         :Parameters:
-            - `data`: data to send"""
-        self.lock.acquire()
-        try:
+            - `data`: data to send
+        :Types:
+            - `data`: `bytes`"""
+        with self.lock:
             return self._write_raw(data)
-        finally:
-            self.lock.release()
 
-    def _write_raw(self,data):
+    def _write_raw(self, data):
         """Same as `Stream.write_raw` but assume `self.lock` is acquired."""
-        logging.getLogger("pyxmpp.Stream.out").debug("OUT: %r",data)
+        logging.getLogger("pyxmpp.stream.out").debug("OUT: %r", data)
         try:
             while data:
                 sent = self.socket.send(data)
                 data = data[sent:]
-        except (IOError,OSError,socket.error),e:
-            raise FatalStreamError("IO Error: "+str(e))
+        except (IOError, OSError, socket.error), err:
+            raise FatalStreamError(u"IO Error: {0}".format(err))
 
-    def _write_node(self,xmlnode):
-        """Write XML `xmlnode` to the stream.
+    def _write_element(self, element):
+        """Write XML `element` to the stream.
 
         :Parameters:
-            - `xmlnode`: XML node to send."""
-        if self.eof or not self.socket or not self.doc_out:
-            self.__logger.debug("Dropping stanza: %r" % (xmlnode,))
+            - `element`: Element node to send.
+        :Types:
+            - `element`: `ElementTree.Element`
+        """
+        if self.eof or not self.socket or not self._serializer:
+            logger.debug("Dropping stanza: {0}".format(
+                                                    ElementTree.dump(element)))
             return
-        xmlnode=xmlnode.docCopyNode(self.doc_out,1)
-        self.doc_out.addChild(xmlnode)
-        try:
-            ns = xmlnode.ns()
-        except libxml2.treeError:
-            ns = None
-        if ns and ns.content == xmlextra.COMMON_NS:
-            xmlextra.replace_ns(xmlnode, ns, self.default_ns)
-        s = xmlextra.safe_serialize(xmlnode)
-        self._write_raw(s)
-        xmlnode.unlinkNode()
-        xmlnode.freeNode()
+        data = self._serializer.emit_stanza(element)
+        self._write_raw(data.encode("utf-8"))
 
-    def send(self,stanza):
+    def send(self, stanza):
         """Write stanza to the stream.
 
         :Parameters:
-            - `stanza`: XMPP stanza to send."""
-        self.lock.acquire()
-        try:
+            - `stanza`: XMPP stanza to send.
+        :Types:
+            - `stanza`: `pyxmpp2.stanza.Stanza`
+        """
+        with self.lock:
             return self._send(stanza)
-        finally:
-            self.lock.release()
 
-    def _send(self,stanza):
+    def _send(self, stanza):
         """Same as `Stream.send` but assume `self.lock` is acquired."""
-        if not self.version:
-            try:
-                err = stanza.get_error()
-            except ProtocolError:
-                err = None
-            if err:
-                err.downgrade()
+        if self.version == (0, 9):
+            legacy = True
+        else:
+            legacy = False
         self.fix_out_stanza(stanza)
-        self._write_node(stanza.xmlnode)
+        element = self.stanza.as_xml(legacy = legacy)
+        self._write_element(element)
 
-    def idle(self):
+    def regular_tasks(self):
         """Do some housekeeping (cache expiration, timeout handling).
 
         This method should be called periodically from the application's
-        main loop."""
-        self.lock.acquire()
-        try:
-            return self._idle()
-        finally:
-            self.lock.release()
+        main loop.
+        
+        :Return: suggested delay (in seconds) before the next call to this
+                                                                    method.
+        :Returntype: `int`
+        """
+        with self.lock:
+            return self._regular_tasks()
 
-    def _idle(self):
-        """Same as `Stream.idle` but assume `self.lock` is acquired."""
+    def _regular_tasks(self):
+        """Same as `Stream.regular_tasks` but assume `self.lock` is acquired."""
         self._iq_response_handlers.expire()
         if not self.socket or self.eof:
-            return
-        now=time.time()
-        if self.keepalive and now-self.last_keepalive>=self.keepalive:
+            return 0
+        now = time.time()
+        if self.keepalive and now - self.last_keepalive >= self.keepalive:
             self._write_raw(" ")
-            self.last_keepalive=now
+            self.last_keepalive = now
+            return min(self.keepalive, 
+                                    self.settings[u"default_stanza_timeout"])
+        else:
+            return self.settings[u"default_stanza_timeout"]
 
     def fileno(self):
         """Return filedescriptor of the stream socket."""
         self.lock.acquire()
         try:
-            return self.socket.fileno()
+            if self.socket:
+                return self.socket.fileno()
+            else:
+                return None
         finally:
             self.lock.release()
 
-    def loop(self,timeout):
+    def loop(self, timeout):
         """Simple "main loop" for the stream."""
-        self.lock.acquire()
-        try:
+        with self.lock:
             while not self.eof and self.socket is not None:
-                act=self._loop_iter(timeout)
+                act = self._loop_iter(timeout)
                 if not act:
-                    self._idle()
-        finally:
-            self.lock.release()
+                    self._regular_tasks()
 
-    def loop_iter(self,timeout):
+    def loop_iter(self, timeout):
         """Single iteration of a simple "main loop" for the stream."""
-        self.lock.acquire()
-        try:
+        with self.lock:
             return self._loop_iter(timeout)
-        finally:
-            self.lock.release()
 
-    def _loop_iter(self,timeout):
+    def _loop_iter(self, timeout):
         """Same as `Stream.loop_iter` but assume `self.lock` is acquired."""
         import select
         self.lock.release()
@@ -620,11 +615,12 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
                 time.sleep(timeout)
                 return False
             try:
-                ifd, _unused, efd = select.select( [self.socket], [], [self.socket], timeout )
-            except select.error,e:
-                if e.args[0]!=errno.EINTR:
+                ifd, _unused, efd = select.select([self.socket], [],
+                                                        [self.socket], timeout)
+            except select.error, err:
+                if err.args[0] != errno.EINTR:
                     raise
-                ifd, _unused, efd=[], [], []
+                ifd, _unused, efd = [], [], []
         finally:
             self.lock.acquire()
         if self.socket in ifd or self.socket in efd:
@@ -639,43 +635,38 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         Should be called whenever there is input available
         on `self.fileno()` socket descriptor. Is called by
         `self.loop_iter`."""
-        self.lock.acquire()
-        try:
+        with self.lock:
             self._process()
-        finally:
-            self.lock.release()
 
     def _process(self):
         """Same as `Stream.process` but assume `self.lock` is acquired."""
         try:
             try:
                 self._read()
-            except (xmlextra.error,),e:
-                self.__logger.exception("Exception during read()")
-                raise StreamParseError(unicode(e))
-            except:
+            except Exception, err:
+                logger.exception("Exception during read()")
                 raise
-        except (IOError,OSError,socket.error),e:
+        except (IOError, OSError, socket.error), err:
             self.close()
-            raise FatalStreamError("IO Error: "+str(e))
-        except (FatalStreamError,KeyboardInterrupt,SystemExit),e:
+            raise FatalStreamError("IO Error: "+str(err))
+        except (FatalStreamError, KeyboardInterrupt, SystemExit), err:
             self.close()
             raise
 
     def _read(self):
         """Read data pending on the stream socket and pass it to the parser."""
-        self.__logger.debug("StreamBase._read(), socket: %r",self.socket)
+        logger.debug("StreamBase._read(), socket: {0!r}", self.socket)
         if self.eof:
             return
         try:
-            r=self.socket.recv(1024)
-        except socket.error,e:
-            if e.args[0]!=errno.EINTR:
+            data = self.socket.recv(1024)
+        except socket.error, err:
+            if err.args[0] != errno.EINTR:
                 raise
             return
-        self._feed_reader(r)
+        self._feed_reader(data)
 
-    def _feed_reader(self,data):
+    def _feed_reader(self, data):
         """Feed the stream reader with data received.
 
         If `data` is None or empty, then stream end (peer disconnected) is
@@ -686,97 +677,71 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         :Types:
             - `data`: `unicode`
         """
-        logging.getLogger("pyxmpp.Stream.in").debug("IN: %r",data)
+        logging.getLogger("pyxmpp.stream.in").debug("IN: %r", data)
         if data:
             try:
-                r=self._reader.feed(data)
-                while r:
-                    r=self._reader.feed("")
-                if r is None:
-                    self.eof=1
-                    self.disconnect()
+                self._reader.feed(data)
             except StreamParseError:
                 self._send_stream_error("xml-not-well-formed")
                 raise
         else:
-            self.eof=1
+            self.eof = True
             self.disconnect()
-        if self.eof:
-            self.stream_end(None)
+            self.stream_end()
 
-    def _process_node(self,xmlnode):
+    def _process_element(self, element):
         """Process first level element of the stream.
 
         The element may be stream error or features, StartTLS
         request/response, SASL request/response or a stanza.
 
         :Parameters:
-            - `xmlnode`: XML node describing the element
+            - `element`: XML element
+        :Types:
+            - `element`: `ElementTree.Element`
         """
-        ns_uri=xmlnode.ns().getContent()
-        if ns_uri=="http://etherx.jabber.org/streams":
-            self._process_stream_node(xmlnode)
-            return
-
-        if ns_uri==self.default_ns_uri:
-            stanza=stanza_factory(xmlnode, self)
+        tag = element.tag
+        if tag.startswith(self._stanza_namespace_p):
+            stanza = stanza_factory(element, self, self.language)
             self.lock.release()
             try:
                 self.process_stanza(stanza)
             finally:
                 self.lock.acquire()
-                stanza.free()
-        else:
-            self.__logger.debug("Unhandled node: %r" % (xmlnode.serialize(),))
-
-    def _process_stream_node(self,xmlnode):
-        """Process first level stream-namespaced element of the stream.
-
-        The element may be stream error or stream features.
-
-        :Parameters:
-            - `xmlnode`: XML node describing the element
-        """
-        if xmlnode.name=="error":
-            e=StreamErrorNode(xmlnode)
+        elif tag == ERROR_TAG:
+            error = StreamErrorElement(element)
             self.lock.release()
             try:
-                self.process_stream_error(e)
+                self.process_stream_error(error)
             finally:
                 self.lock.acquire()
-                e.free()
-            return
-        elif xmlnode.name=="features":
-            self.__logger.debug("Got stream features")
-            self.__logger.debug("Node: %r" % (xmlnode,))
-            self.features=xmlnode.copyNode(1)
-            self.doc_in.addChild(self.features)
+        elif tag == FEATURES_TAG:
+            self.features = element
             self._got_features()
-            return
+        else:
+            logger.debug("Unhandled element: {0}".format(serialize(element)))
 
-        self.__logger.debug("Unhandled stream node: %r" % (xmlnode.serialize(),))
-
-    def process_stream_error(self,err):
+    def process_stream_error(self, error):
         """Process stream error element received.
 
         :Types:
-            - `err`: `StreamErrorNode`
+            - `error`: `StreamErrorNode`
 
         :Parameters:
-            - `err`: error received
+            - `error`: error received
         """
 
-        self.__logger.debug("Unhandled stream error: condition: %s %r"
-                % (err.get_condition().name,err.serialize()))
+        logger.debug("Unhandled stream error: condition: {0} {1!r}"
+                            .format(error.condition_name, error.serialize()))
 
-    def check_to(self,to):
+    def check_to(self, to):
         """Check "to" attribute of received stream header.
 
         :return: `to` if it is equal to `self.me`, None otherwise.
 
         Should be overriden in derived classes which require other logic
         for handling that attribute."""
-        if to!=self.me:
+        if to != self.me:
             return None
         return to
 
@@ -784,7 +749,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         """Generate a random and unique stream ID.
 
         :return: the id string generated."""
-        return "%i-%i-%s" % (os.getpid(),time.time(),str(random.random())[2:])
+        return uuid.uuid4()
 
     def _got_features(self):
         """Process incoming <stream:features/> element.
@@ -792,43 +757,37 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         [initiating entity only]
 
         The received features node is available in `self.features`."""
-        ctxt = self.doc_in.xpathNewContext()
-        ctxt.setContextNode(self.features)
-        ctxt.xpathRegisterNs("stream",STREAM_NS)
-        ctxt.xpathRegisterNs("bind",BIND_NS)
-        bind_n=None
-        try:
-            bind_n=ctxt.xpathEval("bind:bind")
-        finally:
-            ctxt.xpathFreeContext()
-
+        has_bind_feature = False
+        for element in self.features:
+            if element.tag == FEATURE_BIND:
+                has_bind_feature = True
         if self.authenticated:
-            if bind_n:
+            if has_bind_feature:
                 self.bind(self.me.resource)
             else:
-                self.state_change("authorized",self.me)
+                self.event(AuthorizedEvent(self.me))
 
-    def bind(self,resource):
+    def bind(self, resource):
         """Bind to a resource.
 
         [initiating entity only]
 
         :Parameters:
             - `resource`: the resource name to bind to.
+        :Types:
+            - `resource`: `unicode`
 
         XMPP stream is authenticated for bare JID only. To use
         the full JID it must be bound to a resource.
         """
-        iq=Iq(stanza_type="set")
-        q=iq.new_query(BIND_NS, u"bind")
-        if resource:
-            q.newTextChild(None,"resource",to_utf8(resource))
-        self.state_change("binding",resource)
-        self.set_response_handlers(iq,self._bind_success,self._bind_error)
-        self.send(iq)
-        iq.free()
+        stanza = Iq(stanza_type = "set")
+        element = ElementTree.Element(BIND_QNP + u"bind")
+        stanza.set_payload(XMLPayload(element))
+        self.event(BindingResourceEvent(resource))
+        self.set_response_handlers(stanza, self._bind_success, self._bind_error)
+        self.send(stanza)
 
-    def _bind_success(self,stanza):
+    def _bind_success(self, stanza):
         """Handle resource binding success.
 
         [initiating entity only]
@@ -837,12 +796,19 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
             - `stanza`: <iq type="result"/> stanza received.
 
         Set `self.me` to the full JID negotiated."""
-        jid_n=stanza.xpath_eval("bind:bind/bind:jid",{"bind":BIND_NS})
-        if jid_n:
-            self.me=JID(jid_n[0].getContent().decode("utf-8"))
-        self.state_change("authorized",self.me)
+        element = stanza.get_payload()
+        jid = None
+        for child in element:
+            if child.tag == BIND_QNP + u"jid":
+                jid = child.text
+                break
+        if not jid:
+            raise BadRequestProtocolError(u"<jid/> element mising in"
+                                                    " the bind response")
+        self.me = JID(jid)
+        self.event(AuthorizedEvent(self.me))
 
-    def _bind_error(self,stanza):
+    def _bind_error(self, stanza): # pylint: disable-msg=R0201,W0613
         """Handle resource binding success.
 
         [initiating entity only]
@@ -854,7 +820,7 @@ class StreamBase(StanzaProcessor,xmlextra.StreamHandler):
         """Check if stream is connected.
 
         :return: True if stream connection is active."""
-        if self.doc_in and self.doc_out and not self.eof:
+        if self.connected and not self.eof:
             return True
         else:
             return False
