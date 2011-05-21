@@ -1,6 +1,6 @@
-general:
-- documentation !!!
-- better error handling
+- finish the big pyxmpp->pyxmpp2 refactorisation
+- multi-language text for stanza elements (like message/body,
+  presence/status) and error text
 
 xmpp-base:
 - jabber:server stream support (including diallback)
@@ -10,5 +10,4 @@ xmpp-im:
 
 other:
 - jabber:iq:version
-- jabberd 2.0 component stream support
 - jabber:iq:search
