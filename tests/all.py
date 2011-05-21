@@ -6,6 +6,7 @@ import getopt
 
 all_modules=[ "jid", "stream_reader", "xmppserializer", "stanza",
             "message", "presence", "iq", "stanzaprocessor",
+            "streambase", 
              "cache", 
 #          "vcard", "disco", "dataforms", "interface"
                 ]
@@ -45,4 +46,5 @@ def main(args=None):
 
 if __name__ == '__main__':
     main(sys.argv[1:])
+
 # vi: sts=4 et sw=4

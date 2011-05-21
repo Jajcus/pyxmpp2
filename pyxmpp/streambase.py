@@ -32,11 +32,13 @@ import errno
 import logging
 import uuid
 import re
+from abc import ABCMeta
+from functools import wraps
 
 from xml.etree import ElementTree
 
 
-from .xmppparser import StreamHandler
+from .xmppparser import XMLStreamHandler
 from .expdict import ExpiringDictionary
 from .error import StreamErrorElement
 from .iq import Iq
@@ -75,7 +77,27 @@ ERROR_TAG = STREAM_QNP + u"error"
 FEATURES_TAG = STREAM_QNP + u"features"
 FEATURE_BIND = BIND_QNP + u"bind"
 
-class StreamBase(StanzaProcessor, StreamHandler):
+class XMPPEventHandler:
+    __metaclass__ = ABCMeta
+    stream = None
+    def handle_xmpp_event(event):
+        return False
+
+def once(func):
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        with self.lock:
+            if func.__name__ in self._in_progress:
+                raise AlreadyInProgress(func.__name__)
+            self._in_progress.add(func.__name__)
+        try:
+            func(self, *args, **kwargs)
+        finally:
+            with self.lock:
+                self._in_progress.remove(func.__name__)
+    return wrapper
+
+class StreamBase(StanzaProcessor, XMLStreamHandler):
     """Base class for a generic XMPP stream.
 
     Responsible for establishing connection, parsing the stream, dispatching
@@ -104,18 +126,20 @@ class StreamBase(StanzaProcessor, StreamHandler):
         - `settings`: XMPPSettings
         - `version`: (`int`, `int`) tuple
     """
-    def __init__(self, stanza_namespace, settings = None):
+    def __init__(self, stanza_namespace, event_handler, settings = None):
         """Initialize Stream object
 
         :Parameters:
           - `stanza_namespace`: stream's default namespace URI ("jabber:client"
             for client, "jabber:server" for server, etc.)
+          - `event_handler`: object to handle the stream events
           - `settings`: extra settings
         :Types:
           - `stanza_namespace`: `unicode`
           - `settings`: XMPPSettings
+          - `event_handler`: `XMPPEventHandler`
         """
-        StreamHandler.__init__(self)
+        XMLStreamHandler.__init__(self)
         if settings is None:
             settings = XMPPSettings()
         self.settings = settings
@@ -125,6 +149,8 @@ class StreamBase(StanzaProcessor, StreamHandler):
         self.keepalive = self.settings[u"keepalive"]
         self.process_all_stanzas = False
         self.port = None
+        self.event_handler = event_handler
+        self._in_progress = set()
         self._reset()
 
     def _reset(self):
@@ -172,6 +198,7 @@ class StreamBase(StanzaProcessor, StreamHandler):
         self._send_stream_start()
         self._make_reader()
 
+    @once
     def connect(self, addr, port, service = None, to = None):
         """Establish XMPP connection with given address.
 
@@ -183,11 +210,6 @@ class StreamBase(StanzaProcessor, StreamHandler):
             - `service`: service name (to be resolved using SRV DNS records)
             - `to`: peer name if different than `addr`
         """
-        with self.lock:
-            return self._connect(addr, port, service, to)
-
-    def _connect(self, addr, port, service = None, to = None):
-        """Same as `Stream.connect` but assume `self.lock` is acquired."""
         if to is None:
             to = unicode(addr)
         allow_cname = True
@@ -225,7 +247,6 @@ class StreamBase(StanzaProcessor, StreamHandler):
                     sock = socket.socket(family, socktype, proto)
                     self.event(ConnectingEvent(sockaddr))
                     sock.connect(sockaddr)
-                    self.event(ConnectedEvent(sockaddr))
                 except socket.error, err:
                     exception = err
                     logger.debug("Connect to {0!r} failed".format(sockaddr))
@@ -241,11 +262,12 @@ class StreamBase(StanzaProcessor, StreamHandler):
                 raise exception # pylint: disable-msg=E0702
             else:
                 raise FatalStreamError("Cannot connect")
-
-        self.addr = addr
-        self.port = port
-        self._connect_socket(sock, to)
-        self.last_keepalive = time.time()
+        with self.lock:
+            self.addr = addr
+            self.port = port
+            self._connect_socket(sock, to)
+            self.last_keepalive = time.time()
+        self.event(ConnectedEvent(sockaddr))
 
     def accept(self, sock, myname):
         """Accept incoming connection.
@@ -256,13 +278,14 @@ class StreamBase(StanzaProcessor, StreamHandler):
             - `sock`: a listening socket.
             - `myname`: local stream endpoint name."""
         with self.lock:
-            return self._accept(sock, myname)
+            addr = self._accept(sock, myname)
+        self.event(ConnectionAcceptedEvent(addr))
 
     def _accept(self, sock, myname):
-        """Same as `Stream.accept` but assume `self.lock` is acquired."""
+        """Same as `Stream.accept` but assume `self.lock` is acquired
+        and does not emit the `ConnectionAcceptedEvent`."""
         self.eof = False
         self.socket, addr = sock.accept()
-        self.event(ConnectionAcceptedEvent(addr))
         logger.debug("Connection from: %r" % (addr,))
         self.addr, self.port = addr
         if myname:
@@ -272,6 +295,7 @@ class StreamBase(StanzaProcessor, StreamHandler):
         self.initiator = 0
         self._make_reader()
         self.last_keepalive = time.time()
+        return addr
 
     def disconnect(self):
         """Gracefully close the connection."""
@@ -281,29 +305,23 @@ class StreamBase(StanzaProcessor, StreamHandler):
     def _disconnect(self):
         """Same as `Stream.disconnect` but assume `self.lock` is acquired."""
         if self._serializer:
+            # output stream open - close it
             self._send_stream_end()
-
-    def _post_connect(self):
-        """Called when connection is established.
-
-        This method is supposed to be overriden in derived classes."""
-        pass
-
-    def _post_auth(self):
-        """Called when connection is authenticated.
-
-        This method is supposed to be overriden in derived classes."""
-        pass
+        if self._reader is None:
+            # input stream not started or already finished
+            self._close()
 
     def event(self, event): # pylint: disable-msg=R0201
         """Handle a stream event.
         
         Called when connection state is changed.
 
-        This method is supposed to be overriden in derived classes.
-
-        It may be used to display the connection progress."""
+        Must not be called with self.lock acquired!
+        """
+        event.stream = self
         logger.debug(u"Stream event: {0}".format(event))
+        if self.event_handler:
+            return self.event_handler.handle_xmpp_event(event)
 
     def close(self):
         """Forcibly close the connection and clear the stream state."""
@@ -312,9 +330,14 @@ class StreamBase(StanzaProcessor, StreamHandler):
 
     def _close(self):
         """Same as `Stream.close` but assume `self.lock` is acquired."""
-        self._disconnect()
-        if self.socket:
+        if self._reader:
+            self._reader = None
+        if self._serializer:
+            self._send_stream_end()
+        if self.socket is not None:
             self.socket.close()
+            self.socket = None
+            self.event(DisconnectedEvent(self.peer))
         self._reset()
 
     def _make_reader(self):
@@ -323,11 +346,13 @@ class StreamBase(StanzaProcessor, StreamHandler):
 
     def stream_start(self, element):
         """Process <stream:stream> (stream start) tag received from peer.
+        
+        `self.lock` is acquired when this method is called.
 
         :Parameters:
             - `element`: root element (empty) created by the parser"""
-        logger.debug("input document: " + ElementTree.dump(element))
-        if not element.tag.starts_with(STREAM_QNP):
+        logger.debug("input document: " + ElementTree.tostring(element))
+        if not element.tag.startswith(STREAM_QNP):
             self._send_stream_error("invalid-namespace")
             raise FatalStreamError("Bad stream namespace")
 
@@ -335,6 +360,7 @@ class StreamBase(StanzaProcessor, StreamHandler):
         if version:
             try:
                 major, minor = version.split(".", 1)
+                major, minor = int(major), int(minor)
             except ValueError:
                 self._send_stream_error("unsupported-version")
                 raise FatalStreamError("Unsupported protocol version.")
@@ -385,43 +411,39 @@ class StreamBase(StanzaProcessor, StreamHandler):
                 self.me = JID(to)
             self._send_stream_start(self.generate_id())
             self._send_stream_features()
-            self.event(StreamConnectedEvent(self.peer))
-            self._post_connect()
 
-        if self.version == (0, 9):
+        self.lock.release()
+        try:
             self.event(StreamConnectedEvent(self.peer))
-            self._post_connect()
+        finally:
+            self.lock.acquire()
 
         if to_from_mismatch:
             raise HostMismatch()
 
     def stream_end(self):
         """Process </stream:stream> (stream end) tag received from peer.
+        
+        `self.lock` is acquired when this method is called.
         """
         logger.debug("Stream ended")
         self.eof = True
-        if self._serializer:
-            self._send_stream_end()
         if self._reader:
             self._reader = None
             self.features = None
-        self.event(DisconnectedEvent(self.peer))
+        if self._serializer:
+            self._send_stream_end()
+        self._close()
 
-    def stanza(self, element):
-        """Process stanza (first level child element of the stream).
+    def stream_element(self, element):
+        """Process first level child element of the stream).
+
+        `self.lock` is acquired when this method is called.
 
         :Parameters:
             - `element`: stanza's full XML
         """
         self._process_element(element)
-
-    def error(self, descr):
-        """Handle stream XML parse error.
-
-        :Parameters:
-            - `descr`: error description
-        """
-        raise StreamParseError(descr)
 
     def _send_stream_end(self):
         """Send stream end tag."""
@@ -467,7 +489,7 @@ class StreamBase(StanzaProcessor, StreamHandler):
             return
         if not self._serializer:
             self._send_stream_start()
-        element = StreamErrorElement(condition)
+        element = StreamErrorElement(condition).as_xml()
         data = self._serializer.emit_stanza(element)
         self._write_raw(data.encode("utf-8"))
         self._send_stream_end()
@@ -529,7 +551,7 @@ class StreamBase(StanzaProcessor, StreamHandler):
         """
         if self.eof or not self.socket or not self._serializer:
             logger.debug("Dropping stanza: {0}".format(
-                                                    ElementTree.dump(element)))
+                                                ElementTree.tostring(element)))
             return
         data = self._serializer.emit_stanza(element)
         self._write_raw(data.encode("utf-8"))
@@ -644,7 +666,7 @@ class StreamBase(StanzaProcessor, StreamHandler):
             try:
                 self._read()
             except Exception, err:
-                logger.exception("Exception during read()")
+                logger.debug("Exception during read()", exc_info = True)
                 raise
         except (IOError, OSError, socket.error), err:
             self.close()
@@ -655,7 +677,7 @@ class StreamBase(StanzaProcessor, StreamHandler):
 
     def _read(self):
         """Read data pending on the stream socket and pass it to the parser."""
-        logger.debug("StreamBase._read(), socket: {0!r}", self.socket)
+        logger.debug("StreamBase._read(), socket: {0!r}".format(self.socket))
         if self.eof:
             return
         try:
@@ -671,6 +693,8 @@ class StreamBase(StanzaProcessor, StreamHandler):
 
         If `data` is None or empty, then stream end (peer disconnected) is
         assumed and the stream is closed.
+
+        `self.lock` is acquired during the operation.
 
         :Parameters:
             - `data`: data received from the stream socket.
@@ -783,9 +807,9 @@ class StreamBase(StanzaProcessor, StreamHandler):
         stanza = Iq(stanza_type = "set")
         element = ElementTree.Element(BIND_QNP + u"bind")
         stanza.set_payload(XMLPayload(element))
-        self.event(BindingResourceEvent(resource))
         self.set_response_handlers(stanza, self._bind_success, self._bind_error)
         self.send(stanza)
+        self.event(BindingResourceEvent(resource))
 
     def _bind_success(self, stanza):
         """Handle resource binding success.
@@ -820,7 +844,7 @@ class StreamBase(StanzaProcessor, StreamHandler):
         """Check if stream is connected.
 
         :return: True if stream connection is active."""
-        if self.connected and not self.eof:
+        if self.socket and not self.eof:
             return True
         else:
             return False
