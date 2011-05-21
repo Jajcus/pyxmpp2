@@ -36,6 +36,7 @@ from .exceptions import ProtocolError
 from .constants import STREAM_NS, STANZA_ERROR_NS, STREAM_ERROR_NS
 from .constants import STREAM_QNP, STANZA_ERROR_QNP, STREAM_ERROR_QNP
 from .constants import PYXMPP_ERROR_NS, STANZA_CLIENT_QNP, STANZA_NAMESPACES
+from .constants import XML_LANG_QNAME
 from .xmppserializer import serialize
 
 logger = logging.getLogger("pyxmpp.error")
@@ -211,34 +212,36 @@ class ErrorElement(object):
         - `condition_name`: XMPP-defined condition name
     :Ivariables:
         - `condition`: the condition element
-        - `text`: (language, text) pairs with human-readable error description,
-          language can be `None` or RFC 3066 language tag
+        - `text`: human-readable error description
         - `custom_condition`: list of custom condition elements
+        - `language`: xml:lang of the error element
     :Types:
         - `condition_name`: `unicode`
         - `condition`: `unicode`
-        - `text`: `list` of (`unicode`, `unicode`)
+        - `text`: `unicode`
         - `custom_condition`: `list` of `ElementTree.Element`
+        - `language`: `unicode`
 
     """
     error_qname = "{unknown}error"
     text_qname = "{unknown}text"
     cond_qname_prefix = "{unknown}"
-    def __init__(self, element_or_cond, description = None, lang = None):
+    def __init__(self, element_or_cond, text = None, language = None):
         """Initialize an StanzaErrorElement object.
 
         :Parameters:
             - `element_or_cond`: XML <error/> element to decode or an error
               condition name or element.
-            - `description`: optional description to override the default one
-            - `lang`: RFC 3066 language tag for the description
+            - `text`: optional description to override the default one
+            - `language`: RFC 3066 language tag for the description
         :Types:
             - `element_or_cond`: `ElementTree.Element` or `unicode`
-            - `description`: `unicode`
-            - `lang`: `unicode`
+            - `text`: `unicode`
+            - `language`: `unicode`
         """
-        self.text = []
+        self.text = None
         self.custom_condition = []
+        self.language = language
         if isinstance(element_or_cond, basestring):
             self.condition = ElementTree.Element(self.cond_qname_prefix 
                                                         + element_or_cond)
@@ -246,9 +249,9 @@ class ErrorElement(object):
             raise TypeError, "Element or unicode string expected"
         else:
             self._from_xml(element_or_cond)
-        if description:
-            self.text = [t for t in self.text if t[0] != lang]
-            self.text.append(lang, description)
+
+        if text:
+            self.text = text
 
     def _from_xml(self, element):
         """Initialize an ErrorElement object from an XML element.
@@ -261,6 +264,9 @@ class ErrorElement(object):
         if element.tag != self.error_qname:
             raise ValueError(u"{0!r} is not a {1!r} element".format(
                                                     element, self.error_qname))
+        lang = element.get(XML_LANG_QNAME, None)
+        if lang:
+            self.language = lang
         self.condition = None
         for child in element:
             if child.tag.startswith(self.cond_qname_prefix):
@@ -270,8 +276,9 @@ class ErrorElement(object):
                 self.condition = deepcopy(child)
             elif child.tag == self.text_qname:
                 lang = child.get(XML_LANG_QNAME, None)
-                description = child.text.strip()
-                self.text.append( (lang, description) )
+                if lang:
+                    self.language = lang
+                self.text = child.text.strip()
             else:
                 bad = False
                 for prefix in (STREAM_QNP, STANZA_CLIENT_QNP, STANZA_SERVER_QNP,
@@ -294,22 +301,6 @@ class ErrorElement(object):
         """Return the condition name (condition element name without the
         namespace)."""
         return self.condition.tag.split("}", 1)[1]
-
-    def get_description(self, lang = None):
-        """Get the optional description text included in the error element.
-
-        :Parameters:
-            - `lang`: the preferred language (RFC 3066 tag)
-
-        :return: (lang, description) tuple, both description and language may
-            be None.
-        :returntype: (`unicode`, `unicode`)"""
-        if not self.text:
-            return None, None
-        for t_lang, t_descr in self.text:
-            if t_lang == lang:
-                return t_lang, t_descr
-        return self.text[0]
 
     def add_custom_condition(self, element):
         """Add custom condition element to the error.
@@ -340,9 +331,10 @@ class ErrorElement(object):
         :returntype: `ElementTree.Element`"""
         result = ElementTree.Element(self.error_qname)
         result.append(deepcopy(self.condition))
-        for lang, description in self.text:
-            text = ElementTree.SubElement(result, self.text_qname,
-                                            { XML_LANG_QNAME: lang } )
+        if self.text:
+            text = ElementTree.SubElement(result, self.text_qname)
+            if self.language:
+                text.set(XML_LANG_QNAME, self.language)
             text.text = description
         return result
 
@@ -351,23 +343,23 @@ class StreamErrorElement(ErrorElement):
     error_qname = STREAM_QNP + "error"
     text_qname = STREAM_QNP + "text"
     cond_qname_prefix = STREAM_ERROR_QNP
-    def __init__(self, element_or_cond, description = None, lang = None):
+    def __init__(self, element_or_cond, text = None, language = None):
         """Initialize an StreamErrorElement object.
 
         :Parameters:
             - `element_or_cond`: XML <error/> element to decode or an error
               condition name or element.
-            - `description`: optional description to override the default one
-            - `lang`: RFC 3066 language tag for the description
+            - `text`: optional description to override the default one
+            - `langugage`: RFC 3066 language tag for the description
         :Types:
             - `element_or_cond`: `ElementTree.Element` or `unicode`
-            - `description`: `unicode`
-            - `lang`: `unicode`
+            - `text`: `unicode`
+            - `language`: `unicode`
         """
         if isinstance(element_or_cond, unicode):
             if element_or_cond not in STREAM_ERRORS:
                 raise ValueError("Bad error condition")
-        ErrorElement.__init__(self, element_or_cond, description, lang)
+        ErrorElement.__init__(self, element_or_cond, text, language)
 
     def get_message(self):
         """Get the standard English message for the error.
@@ -394,21 +386,21 @@ class StanzaErrorElement(ErrorElement):
     error_qname = STANZA_CLIENT_QNP + "error"
     text_qname = STANZA_CLIENT_QNP + "text"
     cond_qname_prefix = STANZA_ERROR_QNP
-    def __init__(self, element_or_cond, description = None, lang = None,
+    def __init__(self, element_or_cond, text = None, language = None,
                                                             error_type = None):
         """Initialize an StanzaErrorElement object.
 
         :Parameters:
             - `element_or_cond`: XML <error/> element to decode or an error
               condition name or element.
-            - `description`: optional description to override the default one
-            - `lang`: RFC 3066 language tag for the description
+            - `text`: optional description to override the default one
+            - `language`: RFC 3066 language tag for the description
             - `error_type`: 'type' of the error, one of: 'auth', 'cancel',
               'continue', 'modify', 'wait'
         :Types:
             - `element_or_cond`: `ElementTree.Element` or `unicode`
-            - `description`: `unicode`
-            - `lang`: `unicode`
+            - `text`: `unicode`
+            - `language`: `unicode`
             - `error_type`: `unicode`
         """
         self.error_type = None
@@ -424,7 +416,7 @@ class StanzaErrorElement(ErrorElement):
             self.text_qname = u"{{{0}}}text".format(namespace)
         else:
             raise ValueError(u"Bad error namespace - no namespace")
-        ErrorElement.__init__(self, element_or_cond, description, lang)
+        ErrorElement.__init__(self, element_or_cond, text, language)
         if error_type is not None:
             self.error_type = error_type
         if self.condition.tag in STANZA_ERRORS_Q:
