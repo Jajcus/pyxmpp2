@@ -141,4 +141,8 @@ class XMPPSettings(MutableMapping):
         
         :Returntype: - `list` of tuples
         """
-        return slef._settings.items()
+        return self._settings.items()
+    @classmethod
+    def add_defaults(cls, defaults):
+        self._defaults.update(defaults)
+
