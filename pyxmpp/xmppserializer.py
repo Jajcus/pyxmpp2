@@ -86,8 +86,8 @@ class XMPPSerializer(object):
         """
         self._prefixes[namespace] = prefix
 
-    def emit_head(self, stream_from, stream_to, stream_id, version = u'1.0',
-                                                            language = None):
+    def emit_head(self, stream_from, stream_to, stream_id = None, 
+                                            version = u'1.0', language = None):
         """Return the opening tag of the stream root element.
 
         :Parameters:
