@@ -30,14 +30,14 @@ class EventTemplate:
     def __repr__(self):
         return "<EventTemplate %r at %r: %r>" % (self.event, self.offset, ElementTree.dump(self.xml))
 
-class StreamHandler(xmppparser.StreamHandler):
+class StreamHandler(xmppparser.XMLStreamHandler):
     def __init__(self, test_case):
         self.test_case = test_case
     def stream_start(self, element):
         self.test_case.event("start", element)
     def stream_end(self):
         self.test_case.event("end", None)
-    def stanza(self, element):
+    def stream_element(self, element):
         self.test_case.event("node", element)
 
 expected_events = []

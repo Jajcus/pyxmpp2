@@ -32,7 +32,7 @@ COMMON_NS = "http://pyxmpp.jajcus.net/xmlns/common"
 
 logger = logging.getLogger("pyxmpp.xmppparser")
 
-class StreamHandler(object):
+class XMLStreamHandler(object):
     """Base class for stream handler."""
     # pylint: disable-msg=R0201
     def stream_start(self, element):
@@ -51,7 +51,7 @@ class StreamHandler(object):
         """
         logger.error("Unhandled stream end")
 
-    def stanza(self, element):
+    def stream_element(self, element):
         """Called when the end tag of a direct child of the root
         element is encountered in the stream.
 
@@ -61,7 +61,7 @@ class StreamHandler(object):
             - `element`: `ElementTree.Element`"""
         logger.error("Unhandled stanza: {0!r}".format(element))
 
-    def error(self, descr):
+    def stream_parse_error(self, descr):
         """Called when an error is encountered in the stream.
 
         :Parameters:
@@ -69,15 +69,6 @@ class StreamHandler(object):
         :Types:
             - `descr`: `unicode`"""
         raise StreamParseError(descr)
-
-    def warning(self, descr):
-        """Called when an warning is encountered in the stream.
-
-        :Parameters:
-            - `descr`: description of the warning
-        :Types:
-            - `descr`: `unicode`"""
-        logger.warning("XML STREAM WARNING: {0}".format(descr))
 
 class ParserTarget(object):
     """Element tree parser events handler for the XMPP stream parser."""
@@ -137,18 +128,19 @@ class ParserTarget(object):
         """
         self._level -= 1
         if self._level < 0:
-            self._handler.error(u"Unexpected end tag for: {0!r}".format(tag))
+            self._handler.stream_parse_error(u"Unexpected end tag for: {0!r}"
+                                                                .format(tag))
             return
         if self._level == 0:
             if tag != self._root.tag:
-                self._handler.error(u"Unexpected end tag for: {0!r}"
-                                " (stream end tag expected)".format(tag))
+                self._handler.stream_parse_error(u"Unexpected end tag for:"
+                            " {0!r} (stream end tag expected)".format(tag))
                 return
             self._handler.stream_end()
             return
         element = self._builder.end(tag)
         if self._level == 1:
-            self._handler.stanza(element)
+            self._handler.stream_element(element)
 
 class StreamReader(object):
     """XML stream reader."""
@@ -184,6 +176,8 @@ class StreamReader(object):
                     self.parser.feed(data)
                 else:
                     self.parser.close()
+            except ElementTree.ParseError, err:
+                self.handler.stream_parse_error(unicode(err))
             finally:
                 self.in_use = 0
 
