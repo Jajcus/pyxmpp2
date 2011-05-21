@@ -15,7 +15,7 @@ build: version
 	-cd tests ; chmod a+x *.py
 
 test:
-	$(MAKE) -C tests
+	$(MAKE) -C tests tests
 
 doc:
 	$(MAKE) -C doc
