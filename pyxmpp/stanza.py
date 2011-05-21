@@ -224,7 +224,8 @@ class Stanza(object):
         for payload in self._payload:
             element.append(payload.as_xml())
         if self._error:
-            element.append(self._error.as_xml(legacy = legacy))
+            element.append(self._error.as_xml(legacy = legacy,
+                                        stanza_namespace = self._namespace))
         return element
 
     def get_xml(self):

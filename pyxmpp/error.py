@@ -352,7 +352,7 @@ class StreamErrorElement(ErrorElement):
     text_qname = STREAM_QNP + "text"
     cond_qname_prefix = STREAM_ERROR_QNP
     def __init__(self, element_or_cond, description = None, lang = None):
-        """Initialize an StanzaErrorElement object.
+        """Initialize an StreamErrorElement object.
 
         :Parameters:
             - `element_or_cond`: XML <error/> element to decode or an error
@@ -466,15 +466,20 @@ class StanzaErrorElement(ErrorElement):
         else:
             return None
 
-    def as_xml(self, legacy = False):
+    def as_xml(self, stanza_namespace = None, legacy = False):
         """Return the XML error representation.
 
         :Parameters:
             - `legacy`: if legacy 'code' attribute should be included
+            - `stanza_namespace`: namespace URI of the containing stanza
         Types:
             - `legacy`: `bool`
+            - `stanza_namespace`: `unicode`
 
         :returntype: `ElementTree.Element`"""
+        if stanza_namespace:
+            self.error_qname = "{{{0}}}error".format(stanza_namespace)
+            self.text_qname = "{{{0}}}text".format(stanza_namespace)
         result = ErrorElement.as_xml(self)
         result.set("type", self.error_type)
         if legacy:
