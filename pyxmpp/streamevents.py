@@ -176,5 +176,3 @@ class StreamConnectedEvent(StreamEvent):
         self.peer = peer
     def __unicode__(self):
         return u"Connected to {0}".format(peer)
-
-__all__ = [ name for name in dir() if name.endswith("Event") ]
