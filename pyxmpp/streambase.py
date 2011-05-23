@@ -113,7 +113,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         - `stanza_namespace`: default namespace of the stream
         - `settings`: stream settings
         - `lock`: RLock object used to synchronize access to Stream object.
-        - `features`: stream features as annouced by the initiator.
+        - `features`: stream features as annouced by the receiver.
         - `me`: local stream endpoint JID.
         - `peer`: remote stream endpoint JID.
         - `process_all_stanzas`: when `True` then all stanzas received are
@@ -127,7 +127,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         - `version`: (`int`, `int`) tuple
     """
     def __init__(self, stanza_namespace, event_handler, settings = None):
-        """Initialize Stream object
+        """Initialize StreamBase object
 
         :Parameters:
           - `stanza_namespace`: stream's default namespace URI ("jabber:client"

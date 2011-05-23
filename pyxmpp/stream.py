@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2011 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -18,12 +18,12 @@
 """Generic XMPP stream implementation.
 
 Normative reference:
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
+  - `RFC 6120 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
 import logging
 
@@ -31,7 +31,7 @@ from .streambase import StreamBase
 from .streamtls import StreamTLSMixIn
 from .streamsasl import StreamSASLMixIn
 
-class Stream(StreamTLSMixIn,StreamSASLMixIn,StreamBase):
+class Stream(StreamTLSMixIn, StreamSASLMixIn, StreamBase):
     """Generic XMPP stream class.
 
     Responsible for establishing connection, parsing the stream,
@@ -42,36 +42,24 @@ class Stream(StreamTLSMixIn,StreamSASLMixIn,StreamBase):
     Whenever we say "stream" here we actually mean two streams
     (incoming and outgoing) of one connections, as defined by the XMPP
     specification.
-
-    :Ivariables:
-        - `lock`: RLock object used to synchronize access to Stream object.
-        - `features`: stream features as annouced by the initiator.
-        - `me`: local stream endpoint JID.
-        - `peer`: remote stream endpoint JID.
-        - `process_all_stanzas`: when `True` then all stanzas received are
-          considered local.
-        - `tls`: TLS connection object.
-        - `initiator`: `True` if local stream endpoint is the initiating entity.
-        - `_reader`: the stream reader object (push parser) for the stream.
     """
-    def __init__(self, default_ns, extra_ns = (), sasl_mechanisms = (),
-                    tls_settings = None, keepalive = 0, owner = None):
+    # pylint: disable-msg=R0904
+    def __init__(self, stanza_namespace, event_handler, settings = None):
         """Initialize Stream object
 
         :Parameters:
-          - `default_ns`: stream's default namespace ("jabber:client" for
-            client, "jabber:server" for server, etc.)
-          - `extra_ns`: sequence of extra namespace URIs to be defined for
-            the stream.
-          - `sasl_mechanisms`: sequence of SASL mechanisms allowed for
-            authentication. Currently "PLAIN", "DIGEST-MD5" and "GSSAPI" are supported.
-          - `tls_settings`: settings for StartTLS -- `TLSSettings` instance.
-          - `keepalive`: keepalive output interval. 0 to disable.
-          - `owner`: `Client`, `Component` or similar object "owning" this stream.
+          - `stanza_namespace`: stream's default namespace URI ("jabber:client"
+            for client, "jabber:server" for server, etc.)
+          - `event_handler`: object to handle the stream events
+          - `settings`: extra settings
+        :Types:
+          - `stanza_namespace`: `unicode`
+          - `settings`: XMPPSettings
+          - `event_handler`: `XMPPEventHandler`
         """
-        StreamBase.__init__(self, default_ns, extra_ns, keepalive, owner)
-        StreamTLSMixIn.__init__(self, tls_settings)
-        StreamSASLMixIn.__init__(self, sasl_mechanisms)
+        StreamBase.__init__(self, stanza_namespace, event_handler, settings)
+        StreamTLSMixIn.__init__(self)
+        StreamSASLMixIn.__init__(self)
         self.__logger = logging.getLogger("pyxmpp.Stream")
 
     def _reset(self):
@@ -87,25 +75,27 @@ class Stream(StreamTLSMixIn,StreamSASLMixIn,StreamBase):
         [receving entity only]
 
         :returns: new <features/> element node."""
-        features=StreamBase._make_stream_features(self)
+        features = StreamBase._make_stream_features(self)
         self._make_stream_tls_features(features)
         self._make_stream_sasl_features(features)
         return features
 
-    def _process_node(self,xmlnode):
+    def _process_element(self, element):
         """Process first level element of the stream.
 
         The element may be stream error or features, StartTLS
         request/response, SASL request/response or a stanza.
 
         :Parameters:
-            - `xmlnode`: XML node describing the element
+            - `element`: XML element
+        :Types:
+            - `element`: `ElementTree.Element`
         """
-        if self._process_node_tls(xmlnode):
+        if self._process_tls_element(element):
             return
-        if self._process_node_sasl(xmlnode):
+        if self._process_sasl_element(element):
             return
-        StreamBase._process_node(self,xmlnode)
+        StreamBase._process_element(self, element)
 
     def _got_features(self):
         """Process incoming <stream:features/> element.
@@ -116,8 +106,5 @@ class Stream(StreamTLSMixIn,StreamSASLMixIn,StreamBase):
         self._handle_tls_features()
         self._handle_sasl_features()
         StreamBase._got_features(self)
-        if not self.tls_requested and not self.authenticated:
-            self.state_change("fully connected",self.peer)
-            self._post_connect()
 
 # vi: sts=4 et sw=4
