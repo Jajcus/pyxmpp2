@@ -145,4 +145,7 @@ class XMPPSettings(MutableMapping):
     @classmethod
     def add_defaults(cls, defaults):
         cls._defaults.update(defaults)
+    @classmethod
+    def add_default_factory(cls, setting, factory, cache = False):
+        self._defaults_factories[setting] = (factory, cache)
 
