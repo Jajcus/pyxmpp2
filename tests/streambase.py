@@ -21,12 +21,26 @@ BIND_FEATURES = """<stream:features>
      <bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>
 </stream:features>"""
 
+BIND_GENERATED_REQUEST = """<iq type="set" id="42">
+  <bind  xmlns="urn:ietf:params:xml:ns:xmpp-bind">
+  </bind>
+</iq>
+"""
+
 BIND_GENERATED_RESPONSE = """<iq type="result" id="{0}">
   <bind  xmlns="urn:ietf:params:xml:ns:xmpp-bind">
     <jid>test@127.0.0.1/Generated</jid>
   </bind>
 </iq>
 """
+
+BIND_PROVIDED_REQUEST = """<iq type="set" id="42">
+  <bind  xmlns="urn:ietf:params:xml:ns:xmpp-bind">
+    <resource>Provided</resource>
+  </bind>
+</iq>
+"""
+
 BIND_PROVIDED_RESPONSE = """<iq type="result" id="{0}">
   <bind  xmlns="urn:ietf:params:xml:ns:xmpp-bind">
     <jid>test@127.0.0.1/Provided</jid>
@@ -71,6 +85,13 @@ class AuthorizedEventHandler(object):
         if isinstance(event, AuthorizedEvent):
             event.stream.close()
             return True
+        return False
+
+class IgnoreEventHandler(object):
+    def __init__(self):
+        self.events_received = []
+    def handle_xmpp_event(self, event):
+        self.events_received.append(event)
         return False
 
 class JustAcceptEventHandler(object):
@@ -176,10 +197,14 @@ class TestInitiator(NetworkTestCase):
                     ConnectedEvent, StreamConnectedEvent, DisconnectedEvent])
  
 class TestReceiver(NetworkTestCase):
-    def loop(self, stream):
-        timeout = time.time() + TIMEOUT
+    def loop(self, stream, timeout = TIMEOUT, expect = None):
+        timeout = time.time() + timeout
         while stream.socket and time.time() < timeout:
-            stream.loop_iter(1)
+            stream.loop_iter(0.1)
+            if expect:
+                match = expect.match(self.client.rdata)
+                if match:
+                    return match.group(1)
 
     def test_accept_close(self):
         sock = self.make_listening_socket()
@@ -207,6 +232,52 @@ class TestReceiver(NetworkTestCase):
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [ConnectionAcceptedEvent,
                                     StreamConnectedEvent, DisconnectedEvent])
+ 
+    def test_bind_no_resource(self):
+        sock = self.make_listening_socket()
+        self.start_client(sock.getsockname())
+        handler = IgnoreEventHandler()
+        stream = StreamBase(u"jabber:client", event_handler = handler)
+        stream.accept(sock, sock.getsockname()[0])
+        stream.peer_authenticated = True
+        stream.peer = JID("test@127.0.0.1")
+        self.client.write(C2S_CLIENT_STREAM_HEAD)
+        features = self.loop(stream, timeout = 10, 
+                expect = re.compile(r".*<stream:features>(.*<bind.*urn:ietf:params:xml:ns:xmpp-bind.*)</stream:features>"))
+        self.assertIsNotNone(features)
+        self.client.write(BIND_GENERATED_REQUEST)
+        resource = self.loop(stream, timeout = 10, 
+                expect = re.compile(r".*<iq.*id=(?:\"42\"|'42').*><bind.*<jid>test@127.0.0.1/(.*)</jid>.*</bind>"))
+        self.assertTrue(resource)
+        self.client.write(STREAM_TAIL)
+        self.loop(stream)
+        self.assertIsNone(stream.socket)
+        event_classes = [e.__class__ for e in handler.events_received]
+        self.assertEqual(event_classes, [ConnectionAcceptedEvent,
+                    StreamConnectedEvent, AuthorizedEvent, DisconnectedEvent])
+ 
+    def test_bind_resource(self):
+        sock = self.make_listening_socket()
+        self.start_client(sock.getsockname())
+        handler = IgnoreEventHandler()
+        stream = StreamBase(u"jabber:client", event_handler = handler)
+        stream.accept(sock, sock.getsockname()[0])
+        stream.peer_authenticated = True
+        stream.peer = JID("test@127.0.0.1")
+        self.client.write(C2S_CLIENT_STREAM_HEAD)
+        features = self.loop(stream, timeout = 10, 
+                expect = re.compile(r".*<stream:features>(.*<bind.*urn:ietf:params:xml:ns:xmpp-bind.*)</stream:features>"))
+        self.assertIsNotNone(features)
+        self.client.write(BIND_PROVIDED_REQUEST)
+        resource = self.loop(stream, timeout = 10, 
+                expect = re.compile(r".*<iq.*id=(?:\"42\"|'42').*><bind.*<jid>test@127.0.0.1/(.*)</jid>.*</bind>"))
+        self.assertEqual(resource, u"Provided")
+        self.client.write(STREAM_TAIL)
+        self.loop(stream)
+        self.assertIsNone(stream.socket)
+        event_classes = [e.__class__ for e in handler.events_received]
+        self.assertEqual(event_classes, [ConnectionAcceptedEvent,
+                    StreamConnectedEvent, AuthorizedEvent, DisconnectedEvent])
  
     def test_parse_error(self):
         sock = self.make_listening_socket()
@@ -237,7 +308,7 @@ if __name__ == '__main__':
     import logging
     logger = logging.getLogger()
     logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.ERROR)
+    logger.setLevel(logging.DEBUG)
     unittest.TextTestRunner(verbosity=2).run(suite())
 
 # vi: sts=4 et sw=4

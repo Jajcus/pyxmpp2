@@ -502,6 +502,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         if self.initiator:
             self._send_stream_start(self.stream_id)
         self._make_reader()
+        self.unset_iq_set_handler(XMLPayload, FEATURE_BIND)
 
     def _make_stream_features(self):
         """Create the <features/> element for the stream.
@@ -510,7 +511,11 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
 
         :returns: new <features/> element
         :returntype: `ElementTree.Element`"""
-        features = ElementTree.Element(STREAM_QNP + "features")
+        features = ElementTree.Element(FEATURES_TAG)
+        if self.peer_authenticated and not self.peer.resource:
+            ElementTree.SubElement(features, FEATURE_BIND)
+            self.set_iq_set_handler(XMLPayload, self.handle_bind_iq_set,
+                                                               FEATURE_BIND) 
         return features
 
     def _send_stream_features(self):
@@ -518,8 +523,35 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
 
         [receiving entity only]"""
         self.features = self._make_stream_features()
-        data = self._serializer.emit_stanza(self.features)
-        self._write_raw(data.encode("utf-8"))
+        self._write_element(self.features)
+
+    def handle_bind_iq_set(self, stanza):
+        """Handler <iq type="set"/> for resource binding."""
+        if self.peer.resource:
+            raise ResourceConstraintProtocolError(
+                        u"Only one resource per client supported")
+        element = stanza.get_payload().element
+        sub = element.find(BIND_QNP + u"resource")
+        jid = None
+        if sub is not None:
+            resource = sub.text
+            if resource:
+                try:
+                    jid = JID(self.peer.node, self.peer.domain, resource)
+                except JIDError:
+                    pass
+        if jid is None:
+            resource = unicode(uuid.uuid4())
+            jid = JID(self.peer.node, self.peer.domain, resource)
+        response = stanza.make_result_response()
+        element = ElementTree.Element(FEATURE_BIND)
+        sub = ElementTree.SubElement(element, BIND_QNP + u"jid")
+        sub.text = unicode(jid)
+        payload = XMLPayload(element)
+        response.set_payload(payload)
+        self.peer = jid
+        self.event(AuthorizedEvent(self.peer))
+        return response
 
     def write_raw(self, data):
         """Write raw data to the stream socket.
