@@ -91,9 +91,9 @@ class Stream(StreamTLSMixIn, StreamSASLMixIn, StreamBase):
         :Types:
             - `element`: `ElementTree.Element`
         """
-        if self._process_tls_element(element):
+        if self._process_element_tls(element):
             return
-        if self._process_sasl_element(element):
+        if self._process_element_sasl(element):
             return
         StreamBase._process_element(self, element)
 

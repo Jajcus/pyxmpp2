@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2011 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -19,57 +19,77 @@
 """SASL support XMPP streams.
 
 Normative reference:
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
+  - `RFC 6120 <http://www.ietf.org/rfc/rfc3920.txt>`__
 """
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
 import base64
 import logging
+from xml.etree import ElementTree
 
 from .jid import JID
 from . import sasl
-from .exceptions import StreamAuthenticationError, SASLNotAvailable, SASLMechanismNotAvailable, SASLAuthenticationFailed
+from .exceptions import SASLNotAvailable
+from .exceptions import SASLMechanismNotAvailable, SASLAuthenticationFailed
+from .constants import SASL_QNP
+from .settings import XMPPSettings
+from .streamevents import AuthenticatedEvent
+        
+logger = logging.getLogger("pyxmpp.streamsasl")
 
-SASL_NS="urn:ietf:params:xml:ns:xmpp-sasl"
-
-class StreamSASLMixIn(sasl.PasswordManager):
-    """SASL authentication mix-in class for XMPP stream."""
-    def __init__(self,sasl_mechanisms=()):
-        """Initialize Stream object
-
-        :Parameters:
-          - `sasl_mechanisms`: sequence of SASL mechanisms allowed for
-            authentication. Currently "PLAIN", "DIGEST-MD5" and "GSSAPI" are supported.
-        """
+class DefaultPasswordManager(sasl.PasswordManager):
+    """Default password manager."""
+    def __init__(self, settings):
+        self.settings = settings
         sasl.PasswordManager.__init__(self)
-        if sasl_mechanisms:
-            self.sasl_mechanisms=sasl_mechanisms
-        else:
-            self.sasl_mechanisms=[]
-        self.__logger=logging.getLogger("pyxmpp.StreamSASLMixIn")
+
+XMPPSettings.add_default_factory("password_manager", DefaultPasswordManager)
+
+MECHANISMS_TAG = SASL_QNP + u"mechanisms"
+MECHANISM_TAG = SASL_QNP + u"mechanism"
+CHALLENGE_TAG = SASL_QNP + u"challenge"
+SUCCESS_TAG = SASL_QNP + u"success"
+FAILURE_TAG = SASL_QNP + u"failure"
+AUTH_TAG = SASL_QNP + u"auth"
+RESPONSE_TAG = SASL_QNP + u"response"
+ABORT_TAG = SASL_QNP + u"abort"
+
+class StreamSASLMixIn(object):
+    """SASL authentication mix-in class for XMPP stream.
+
+    :Ivariables:
+        `peer_sasl_mechanisms`: SASL mechanisms offered by peer
+        `authenticator`: the authenticator object
+    :Types:
+        `peer_sasl_mechanisms`: `list` of `unicode`
+        `authenticator`: `sasl.ClientAuthenticator` or `sasl.ServerAuthenticator`
+    """
+    # pylint: disable-msg=R0903,R0902
+    def __init__(self):
+        """Initialize the SASL mix-in"""
+        self.password_manager = self.settings["password_manager"]
 
     def _reset_sasl(self):
         """Reset `StreamSASLMixIn` object state making it ready to handle new
         connections."""
-        self.peer_sasl_mechanisms=None
-        self.authenticator=None
+        self.peer_sasl_mechanisms = None
+        self.authenticator = None
 
-    def _make_stream_sasl_features(self,features):
+    def _make_stream_sasl_features(self, features):
         """Add SASL features to the <features/> element of the stream.
 
         [receving entity only]
 
         :returns: update <features/> element node."""
-        if self.sasl_mechanisms and not self.authenticated:
-            ml=features.newChild(None,"mechanisms",None)
-            ns=ml.newNs(SASL_NS,None)
-            ml.setNs(ns)
-            for m in self.sasl_mechanisms:
-                if m in sasl.all_mechanisms:
-                    ml.newTextChild(None,"mechanism",m)
+        mechs = self.settings['sasl_mechanisms'] 
+        if mechs and not self.authenticated:
+            sub = ElementTree.SubElement(features, MECHANISMS_TAG)
+            for mech in mechs:
+                if mech in sasl.all_mechanisms:
+                    ElementTree.SubElement(sub, MECHANISM_TAG).text = mech
         return features
 
     def _handle_sasl_features(self):
@@ -78,65 +98,63 @@ class StreamSASLMixIn(sasl.PasswordManager):
         [initiating entity only]
 
         The received features node is available in `self.features`."""
-        ctxt = self.doc_in.xpathNewContext()
-        ctxt.setContextNode(self.features)
-        ctxt.xpathRegisterNs("sasl",SASL_NS)
-        try:
-            sasl_mechanisms_n=ctxt.xpathEval("sasl:mechanisms/sasl:mechanism")
-        finally:
-            ctxt.xpathFreeContext()
+        element = self.features.find(MECHANISMS_TAG)
+        self.peer_sasl_mechanisms = []
+        if not element:
+            return
+        for sub in element:
+            if sub.tag != MECHANISM_TAG:
+                continue
+            self.peer_sasl_mechanisms.append(sub.text)
 
-        if sasl_mechanisms_n:
-            self.__logger.debug("SASL support found")
-            self.peer_sasl_mechanisms=[]
-            for n in sasl_mechanisms_n:
-                self.peer_sasl_mechanisms.append(n.getContent())
-
-    def _process_node_sasl(self,xmlnode):
-        """Process incoming stream element. Pass it to _process_sasl_node
+    def _process_element_sasl(self, element):
+        """Process incoming stream element. Pass it to _process_sasl_element
         if it is in the SASL namespace.
 
-        :return: `True` when the node was recognized as a SASL element.
-        :returntype: `bool`"""
-        ns_uri=xmlnode.ns().getContent()
-        if ns_uri==SASL_NS:
-            self._process_sasl_node(xmlnode)
+        :return: `True` when the element was recognized as a SASL element.
+        :returntype: `bool`
+        """
+        if element.tag.startswith(SASL_QNP):
+            self._process_sasl_element(element)
             return True
         return False
 
-    def _process_sasl_node(self,xmlnode):
+    def _process_sasl_element(self, element):
         """Process stream element in the SASL namespace.
 
         :Parameters:
-            - `xmlnode`: the XML node received
+            - `element`: the XML element
         """
         if self.initiator:
             if not self.authenticator:
-                self.__logger.debug("Unexpected SASL response: %r" % (xmlnode.serialize()))
-                ret=False
-            elif xmlnode.name=="challenge":
-                ret=self._process_sasl_challenge(xmlnode.getContent())
-            elif xmlnode.name=="success":
-                ret=self._process_sasl_success(xmlnode.getContent())
-            elif xmlnode.name=="failure":
-                ret=self._process_sasl_failure(xmlnode)
+                logger.debug("Unexpected SASL response: {0!r}".format(
+                                                ElementTree.tostring(element)))
+                ret = False
+            elif element.tag == CHALLENGE_TAG:
+                ret = self._process_sasl_challenge(element.text)
+            elif element.tag == SUCCESS_TAG:
+                ret = self._process_sasl_success(element.text)
+            elif element.tag == FAILURE_TAG:
+                ret = self._process_sasl_failure(element)
             else:
-                self.__logger.debug("Unexpected SASL node: %r" % (xmlnode.serialize()))
-                ret=False
+                logger.debug("Unexpected SASL element: {0!r}".format(
+                                                ElementTree.tostring(element)))
+                ret = False
         else:
-            if xmlnode.name=="auth":
-                mechanism=xmlnode.prop("mechanism")
-                ret=self._process_sasl_auth(mechanism,xmlnode.getContent())
-            if xmlnode.name=="response":
-                ret=self._process_sasl_response(xmlnode.getContent())
-            if xmlnode.name=="abort":
-                ret=self._process_sasl_abort()
+            if element.tag == AUTH_TAG:
+                mechanism = element.get("mechanism")
+                ret = self._process_sasl_auth(mechanism, element.text)
+            if element.tag == RESPONSE_TAG:
+                ret = self._process_sasl_response(element.text)
+            if element.tag == ABORT_TAG:
+                ret = self._process_sasl_abort()
             else:
-                self.__logger.debug("Unexpected SASL node: %r" % (xmlnode.serialize()))
-                ret=False
+                logger.debug("Unexpected SASL element: {0!r}".format(
+                                                ElementTree.tostring(element)))
+                ret = False
         return ret
 
-    def _process_sasl_auth(self,mechanism,content):
+    def _process_sasl_auth(self, mechanism, content):
         """Process incoming <sasl:auth/> element.
 
         [receiving entity only]
@@ -146,52 +164,40 @@ class StreamSASLMixIn(sasl.PasswordManager):
             - `content`: optional "initial response" included in the element.
         """
         if self.authenticator:
-            self.__logger.debug("Authentication already started")
+            logger.debug("Authentication already started")
             return False
 
-        self.auth_method_used="sasl:"+mechanism
-        self.authenticator=sasl.server_authenticator_factory(mechanism,self)
+        self.auth_method_used = mechanism
+        self.authenticator = sasl.server_authenticator_factory(mechanism, 
+                                                        self.password_manager)
+        ret = self.authenticator.start(base64.decodestring(content))
 
-        r=self.authenticator.start(base64.decodestring(content))
-
-        if isinstance(r,sasl.Success):
-            el_name="success"
-            content=r.base64()
-        elif isinstance(r,sasl.Challenge):
-            el_name="challenge"
-            content=r.base64()
+        if isinstance(ret, sasl.Success):
+            element = ElementTree.Element(SUCCESS_TAG)
+            element.text = ret.base64()
+        elif isinstance(ret, sasl.Challenge):
+            element = ElementTree.Element(CHALLENGE_TAG)
+            element.text = ret.base64()
         else:
-            el_name="failure"
-            content=None
+            element = ElementTree.Element(FAILURE_TAG)
+            ElementTree.SubElement(element, SASL_QNP + ret.reason)
 
-        root=self.doc_out.getRootElement()
-        xmlnode=root.newChild(None,el_name,None)
-        ns=xmlnode.newNs(SASL_NS,None)
-        xmlnode.setNs(ns)
-        if content:
-            xmlnode.setContent(content)
-        if isinstance(r,sasl.Failure):
-            xmlnode.newChild(None,r.reason,None)
+        self._write_element(element)
 
-        self._write_raw(xmlnode.serialize(encoding="UTF-8"))
-        xmlnode.unlinkNode()
-        xmlnode.freeNode()
-
-        if isinstance(r,sasl.Success):
-            if r.authzid:
-                self.peer=JID(r.authzid)
+        if isinstance(ret, sasl.Success):
+            if ret.authzid:
+                self.peer = JID(ret.authzid)
             else:
-                self.peer=JID(r.username,self.me.domain)
-            self.peer_authenticated=1
-            self.state_change("authenticated",self.peer)
-            self._post_auth()
-
-        if isinstance(r,sasl.Failure):
-            raise SASLAuthenticationFailed("SASL authentication failed")
-
+                self.peer = JID(ret.username, self.me.domain)
+            self.peer_authenticated = True
+            self.event(AuthenticatedEvent(self.peer))
+        elif isinstance(ret, sasl.Failure):
+            raise SASLAuthenticationFailed("SASL authentication failed: {0}"
+                                                            .format(ret.reason))
+        
         return True
 
-    def _process_sasl_challenge(self,content):
+    def _process_sasl_challenge(self, content):
         """Process incoming <sasl:challenge/> element.
 
         [initiating entity only]
@@ -200,34 +206,24 @@ class StreamSASLMixIn(sasl.PasswordManager):
             - `content`: the challenge data received (Base64-encoded).
         """
         if not self.authenticator:
-            self.__logger.debug("Unexpected SASL challenge")
+            logger.debug("Unexpected SASL challenge")
             return False
 
-        r=self.authenticator.challenge(base64.decodestring(content))
-        if isinstance(r,sasl.Response):
-            el_name="response"
-            content=r.base64()
+        ret = self.authenticator.challenge(base64.decodestring(content))
+        if isinstance(ret, sasl.Response):
+            element = ElementTree.Element(RESPONSE_TAG)
+            element.text = ret.base64()
         else:
-            el_name="abort"
-            content=None
+            element = ElementTree.Element(ABORT_TAG)
 
-        root=self.doc_out.getRootElement()
-        xmlnode=root.newChild(None,el_name,None)
-        ns=xmlnode.newNs(SASL_NS,None)
-        xmlnode.setNs(ns)
-        if content:
-            xmlnode.setContent(content)
+        self._write_element(element)
 
-        self._write_raw(xmlnode.serialize(encoding="UTF-8"))
-        xmlnode.unlinkNode()
-        xmlnode.freeNode()
-
-        if isinstance(r,sasl.Failure):
+        if isinstance(ret, sasl.Failure):
             raise SASLAuthenticationFailed("SASL authentication failed")
 
         return True
 
-    def _process_sasl_response(self,content):
+    def _process_sasl_response(self, content):
         """Process incoming <sasl:response/> element.
 
         [receiving entity only]
@@ -236,50 +232,39 @@ class StreamSASLMixIn(sasl.PasswordManager):
             - `content`: the response data received (Base64-encoded).
         """
         if not self.authenticator:
-            self.__logger.debug("Unexpected SASL response")
+            logger.debug("Unexpected SASL response")
             return 0
 
-        r=self.authenticator.response(base64.decodestring(content))
-        if isinstance(r,sasl.Success):
-            el_name="success"
-            content=r.base64()
-        elif isinstance(r,sasl.Challenge):
-            el_name="challenge"
-            content=r.base64()
+        ret = self.authenticator.response(base64.decodestring(content))
+        if isinstance(ret, sasl.Success):
+            element = ElementTree.Element(SUCCESS_TAG)
+            element.text = ret.base64()
+        elif isinstance(ret, sasl.Challenge):
+            element = ElementTree.Element(CHALLENGE_TAG)
+            element.text = ret.base64()
         else:
-            el_name="failure"
-            content=None
+            element = ElementTree.Element(FAILURE_TAG)
+            ElementTree.SubElement(element, SASL_QNP + ret.reason)
 
-        root=self.doc_out.getRootElement()
-        xmlnode=root.newChild(None,el_name,None)
-        ns=xmlnode.newNs(SASL_NS,None)
-        xmlnode.setNs(ns)
-        if content:
-            xmlnode.setContent(content)
-        if isinstance(r,sasl.Failure):
-            xmlnode.newChild(None,r.reason,None)
+        self._write_element(element)
 
-        self._write_raw(xmlnode.serialize(encoding="UTF-8"))
-        xmlnode.unlinkNode()
-        xmlnode.freeNode()
-
-        if isinstance(r,sasl.Success):
-            authzid=r.authzid
+        if isinstance(ret, sasl.Success):
+            authzid = ret.authzid
             if authzid:
-                self.peer=JID(r.authzid)
+                self.peer = JID(ret.authzid)
             else:
-                self.peer=JID(r.username,self.me.domain)
-            self.peer_authenticated=1
+                self.peer = JID(ret.username, self.me.domain)
+            self.peer_authenticated = True
             self._restart_stream()
-            self.state_change("authenticated",self.peer)
-            self._post_auth()
+            self.event(AuthenticatedEvent(self.peer))
 
-        if isinstance(r,sasl.Failure):
-            raise SASLAuthenticationFailed("SASL authentication failed")
+        if isinstance(ret, sasl.Failure):
+            raise SASLAuthenticationFailed("SASL authentication failed: {0!r}"
+                                                            .format(ret.reson))
 
-        return 1
+        return True
 
-    def _process_sasl_success(self,content):
+    def _process_sasl_success(self, content):
         """Process incoming <sasl:success/> element.
 
         [initiating entity only]
@@ -288,38 +273,37 @@ class StreamSASLMixIn(sasl.PasswordManager):
             - `content`: the "additional data with success" received (Base64-encoded).
         """
         if not self.authenticator:
-            self.__logger.debug("Unexpected SASL response")
+            logger.debug("Unexpected SASL response")
             return False
 
-        r=self.authenticator.finish(base64.decodestring(content))
-        if isinstance(r,sasl.Success):
-            self.__logger.debug("SASL authentication succeeded")
-            if r.authzid:
-                self.me=JID(r.authzid)
-            else:
-                self.me=self.me
-            self.authenticated=1
+        ret = self.authenticator.finish(base64.decodestring(content))
+        if isinstance(ret, sasl.Success):
+            logger.debug("SASL authentication succeeded")
+            if ret.authzid:
+                self.me = JID(ret.authzid)
+            self.authenticated = True
             self._restart_stream()
-            self.state_change("authenticated",self.me)
-            self._post_auth()
+            self.event(AuthenticatedEvent(self.me))
         else:
-            self.__logger.debug("SASL authentication failed")
-            raise SASLAuthenticationFailed("Additional success data procesing failed")
+            logger.debug("SASL authentication failed")
+            raise SASLAuthenticationFailed("Additional success data"
+                                                        " procesing failed")
         return True
 
-    def _process_sasl_failure(self,xmlnode):
+    def _process_sasl_failure(self, element):
         """Process incoming <sasl:failure/> element.
 
         [initiating entity only]
 
         :Parameters:
-            - `xmlnode`: the XML node received.
+            - `element`: the XML element received.
         """
         if not self.authenticator:
-            self.__logger.debug("Unexpected SASL response")
+            logger.debug("Unexpected SASL response")
             return False
 
-        self.__logger.debug("SASL authentication failed: %r" % (xmlnode.serialize(),))
+        logger.debug("SASL authentication failed: {0!r}".format(
+                                                ElementTree.tostring(element)))
         raise SASLAuthenticationFailed("SASL authentication failed")
 
     def _process_sasl_abort(self):
@@ -327,14 +311,14 @@ class StreamSASLMixIn(sasl.PasswordManager):
 
         [receiving entity only]"""
         if not self.authenticator:
-            self.__logger.debug("Unexpected SASL response")
+            logger.debug("Unexpected SASL response")
             return False
 
-        self.authenticator=None
-        self.__logger.debug("SASL authentication aborted")
+        self.authenticator = None
+        logger.debug("SASL authentication aborted")
         return True
 
-    def _sasl_authenticate(self,username,authzid,mechanism=None):
+    def _sasl_authenticate(self, username, authzid, mechanism = None):
         """Start SASL authentication process.
 
         [initiating entity only]
@@ -344,47 +328,42 @@ class StreamSASLMixIn(sasl.PasswordManager):
             - `authzid`: authorization ID.
             - `mechanism`: SASL mechanism to use."""
         if not self.initiator:
-            raise SASLAuthenticationFailed("Only initiating entity start SASL authentication")
-        while not self.features:
-            self.__logger.debug("Waiting for features")
-            self._read()
-        if not self.peer_sasl_mechanisms:
+            raise SASLAuthenticationFailed("Only initiating entity start"
+                                                        " SASL authentication")
+        if not self.features or not self.peer_sasl_mechanisms:
             raise SASLNotAvailable("Peer doesn't support SASL")
 
+        mechs = self.settings['sasl_mechanisms'] 
         if not mechanism:
-            mechanism=None
-            for m in self.sasl_mechanisms:
-                if m in self.peer_sasl_mechanisms:
-                    mechanism=m
+            mechanism = None
+            for mech in mechs:
+                if mech in self.peer_sasl_mechanisms:
+                    mechanism = mech
                     break
             if not mechanism:
-                raise SASLMechanismNotAvailable("Peer doesn't support any of our SASL mechanisms")
-            self.__logger.debug("Our mechanism: %r" % (mechanism,))
+                raise SASLMechanismNotAvailable("Peer doesn't support any of"
+                                                        " our SASL mechanisms")
+            logger.debug("Our mechanism: {0!r}".format(mechanism))
         else:
             if mechanism not in self.peer_sasl_mechanisms:
-                raise SASLMechanismNotAvailable("%s is not available" % (mechanism,))
+                raise SASLMechanismNotAvailable("{0!r} is not available"
+                                                            .format(mechanism))
 
-        self.auth_method_used="sasl:"+mechanism
+        self.auth_method_used = mechanism
+        self.authenticator = sasl.client_authenticator_factory(mechanism, self)
 
-        self.authenticator=sasl.client_authenticator_factory(mechanism,self)
-
-        initial_response=self.authenticator.start(username,authzid)
-        if not isinstance(initial_response,sasl.Response):
+        initial_response = self.authenticator.start(username, authzid)
+        if not isinstance(initial_response, sasl.Response):
             raise SASLAuthenticationFailed("SASL initiation failed")
 
-        root=self.doc_out.getRootElement()
-        xmlnode=root.newChild(None,"auth",None)
-        ns=xmlnode.newNs(SASL_NS,None)
-        xmlnode.setNs(ns)
-        xmlnode.setProp("mechanism",mechanism)
+        element = ElementTree.Element(AUTH_TAG)
+        element.set("mechanism", mechanism)
         if initial_response.data:
             if initial_response.encode:
-                xmlnode.setContent(initial_response.base64())
+                element.text = initial_response.base64()
             else:
-                xmlnode.setContent(initial_response.data)
+                element.text = initial_response.data
 
-        self._write_raw(xmlnode.serialize(encoding="UTF-8"))
-        xmlnode.unlinkNode()
-        xmlnode.freeNode()
+        self._write_element(element)
 
 # vi: sts=4 et sw=4

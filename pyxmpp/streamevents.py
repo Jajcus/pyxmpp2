@@ -28,6 +28,24 @@ class StreamEvent(object):
     def __unicode__(self):
         raise NotImplementedError
 
+class AuthenticatedEvent(StreamEvent):
+    """Event raised after stream authentication is complete.
+    Usually it happens after SASL authentication and before XMPP resource
+    binding.
+    
+    Default action: none
+    
+    :Ivariables:
+        - `authenticated_jid`: JID (bare) just authenticated
+    :Types:
+        - `authenticated_jid`: `pyxmpp2.jid.JID`
+    """
+    def __init__(self, authenticated_jid):
+        self.authenticated_jid = authenticated_jid
+    def __unicode__(self):
+        return u"Authenticated: {0}".format(self.authenticated_jid)
+
+
 class AuthorizedEvent(StreamEvent):
     """Event raised after stream authentication and authorization is complete.
     Usually it happens after SASL authentication and XMPP resource binding.

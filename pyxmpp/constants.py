@@ -43,4 +43,7 @@ STREAM_ERROR_QNP = "{{{0}}}".format(STREAM_ERROR_NS)
 PYXMPP_ERROR_NS = 'http://pyxmpp.jajcus.net/xmlns/errors'
 PYXMPP_ERROR_QNP = "{{{0}}}".format(PYXMPP_ERROR_NS)
 
+SASL_NS = "urn:ietf:params:xml:ns:xmpp-sasl"
+SASL_QNP = "{{{0}}}".format(SASL_NS)
+
 XML_LANG_QNAME = XML_QNP + "lang"
