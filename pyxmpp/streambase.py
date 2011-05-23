@@ -806,6 +806,9 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         """
         stanza = Iq(stanza_type = "set")
         element = ElementTree.Element(BIND_QNP + u"bind")
+        if resource:
+            sub = ElementTree.SubElement(element, BIND_QNP + u"resource")
+            sub.text = resource
         stanza.set_payload(XMLPayload(element))
         self.set_response_handlers(stanza, self._bind_success, self._bind_error)
         self.send(stanza)

@@ -21,12 +21,19 @@ BIND_FEATURES = """<stream:features>
      <bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>
 </stream:features>"""
 
-BIND_RESPONSE = """<iq type="result" id="{0}">
+BIND_GENERATED_RESPONSE = """<iq type="result" id="{0}">
   <bind  xmlns="urn:ietf:params:xml:ns:xmpp-bind">
-    <jid>test@127.0.0.1/Test</jid>
+    <jid>test@127.0.0.1/Generated</jid>
   </bind>
 </iq>
 """
+BIND_PROVIDED_RESPONSE = """<iq type="result" id="{0}">
+  <bind  xmlns="urn:ietf:params:xml:ns:xmpp-bind">
+    <jid>test@127.0.0.1/Provided</jid>
+  </bind>
+</iq>
+"""
+
 
 STREAM_TAIL = '</stream:stream>'
         
@@ -110,7 +117,7 @@ class TestInitiator(NetworkTestCase):
         self.assertEqual(event_classes, [ResolvingAddressEvent, ConnectingEvent,
                     ConnectedEvent, StreamConnectedEvent, DisconnectedEvent])
  
-    def test_bind(self):
+    def test_bind_no_resource(self):
         addr, port = self.start_server()
         handler = AuthorizedEventHandler()
         stream = StreamBase(u"jabber:client", event_handler = handler)
@@ -119,10 +126,30 @@ class TestInitiator(NetworkTestCase):
         self.server.write(C2S_SERVER_STREAM_HEAD)
         stream.loop_iter(1)
         self.server.write(BIND_FEATURES)
-        req_id = self.loop(stream, timeout = 10, 
+        req_id = self.loop(stream, timeout = 1, 
                     expect = re.compile(r".*<iq[^>]*id=[\"']([^\"']*)[\"']"))
-
-        self.server.write(BIND_RESPONSE.format(req_id))
+        self.assertIsNotNone(req_id)
+        self.server.write(BIND_GENERATED_RESPONSE.format(req_id))
+        self.loop(stream)
+        self.assertIsNone(stream.socket)
+        event_classes = [e.__class__ for e in handler.events_received]
+        self.assertEqual(event_classes, [ResolvingAddressEvent, ConnectingEvent,
+                    ConnectedEvent, StreamConnectedEvent,
+                    BindingResourceEvent, AuthorizedEvent, DisconnectedEvent])
+ 
+    def test_bind(self):
+        addr, port = self.start_server()
+        handler = AuthorizedEventHandler()
+        stream = StreamBase(u"jabber:client", event_handler = handler)
+        stream.me = JID("test@127.0.0.1/Provided")
+        stream.connect(addr, port)
+        self.server.write(C2S_SERVER_STREAM_HEAD)
+        stream.loop_iter(1)
+        self.server.write(BIND_FEATURES)
+        req_id = self.loop(stream, timeout = 1, 
+                    expect = re.compile(r".*<iq[^>]*id=[\"']([^\"']*)[\"'].*<resource>Provided</resource>"))
+        self.assertIsNotNone(req_id)
+        self.server.write(BIND_PROVIDED_RESPONSE.format(req_id))
         self.loop(stream)
         self.assertIsNone(stream.socket)
         event_classes = [e.__class__ for e in handler.events_received]

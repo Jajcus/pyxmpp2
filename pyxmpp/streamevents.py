@@ -57,7 +57,10 @@ class BindingResourceEvent(StreamEvent):
     def __init__(self, resource):
         self.resource = resource
     def __unicode__(self):
-        return u"Binding resource '{0}'".format(self.resource)
+        if self.resource is None:
+            return u"Requesting server-generated resource"
+        else:
+            return u"Binding resource '{0}'".format(self.resource)
 
 class ConnectedEvent(StreamEvent):
     """Emitted after the stream socket is connected, just before the actual
