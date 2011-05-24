@@ -85,7 +85,7 @@ class XMPPSettings(MutableMapping):
         :Types:
             - `key`: `unicode`
         """
-        self.get(key, required = True)
+        return self.get(key, required = True)
     def __setitem__(self, key, value):
         """Set a parameter value.
         
@@ -123,7 +123,7 @@ class XMPPSettings(MutableMapping):
             return self._defaults[key]
         if key in self._defaults_factories:
             factory, call_once = self._defaults_factories[key]
-            value = factory()
+            value = factory(self)
             if call_once:
                 self._defaults[key] = value
             return value
@@ -147,5 +147,5 @@ class XMPPSettings(MutableMapping):
         cls._defaults.update(defaults)
     @classmethod
     def add_default_factory(cls, setting, factory, cache = False):
-        self._defaults_factories[setting] = (factory, cache)
+        cls._defaults_factories[setting] = (factory, cache)
 
