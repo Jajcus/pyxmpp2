@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2011 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -32,8 +32,6 @@ import hashlib
 
 from .core import ClientAuthenticator,ServerAuthenticator
 from .core import Failure,Response,Challenge,Success,Failure
-
-from ..utils import to_utf8,from_utf8
 
 quote_re=re.compile(r"(?<!\\)\\(.)")
 

@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2011 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -17,7 +17,7 @@
 """PLAIN authentication mechanism for PyXMPP SASL implementation.
 
 Normative reference:
-  - `RFC 2595 <http://www.ietf.org/rfc/rfc2595.txt>`__
+  - `RFC 4616 <http://www.ietf.org/rfc/rfc4616.txt>`__
 """
 
 from __future__ import absolute_import
@@ -26,7 +26,6 @@ __docformat__="restructuredtext en"
 
 import logging
 
-from ..utils import to_utf8,from_utf8
 from .core import ClientAuthenticator,ServerAuthenticator
 from .core import Success,Failure,Challenge,Response
 
@@ -88,9 +87,9 @@ class PlainClientAuthenticator(ClientAuthenticator):
         if not self.password or pformat!="plain":
             self.__logger.debug("Couldn't retrieve plain password")
             return Failure("password-unavailable")
-        return Response("%s\000%s\000%s" % (    to_utf8(self.authzid),
-                            to_utf8(self.username),
-                            to_utf8(self.password)))
+        return Response(b"%s\000%s\000%s" % ( self.authzid.encode("utf-8"),
+                            self.username.encode("utf-8"),
+                            self.password.encode("utf-8")))
 
     def finish(self,data):
         """Handle authentication succes information from the server.
@@ -148,9 +147,9 @@ class PlainServerAuthenticator(ServerAuthenticator):
             self.__logger.debug("Bad response: %r" % (response,))
             return Failure("not-authorized")
         authzid,username,password=s
-        authzid=from_utf8(authzid)
-        username=from_utf8(username)
-        password=from_utf8(password)
+        authzid = authzid.decode("utf8")
+        username = username.decode("utf8")
+        password = password.decode("utf8")
         if not self.password_manager.check_password(username,password):
             self.__logger.debug("Bad password. Response was: %r" % (response,))
             return Failure("not-authorized")
