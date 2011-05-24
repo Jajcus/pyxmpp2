@@ -120,7 +120,7 @@ class XMPPSerializer(object):
         if stream_id is not None:
             tag += u" id={0}".format(quoteattr(stream_id))
         if language is not None:
-            tag += u" xml:lang={0}".format(quoteattr(stream_id))
+            tag += u" xml:lang={0}".format(quoteattr(language))
         for namespace, prefix in self._root_prefixes.items():
             if prefix == "xml":
                 continue
