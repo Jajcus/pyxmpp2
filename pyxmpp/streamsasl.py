@@ -36,8 +36,8 @@ from .exceptions import SASLNotAvailable
 from .exceptions import SASLMechanismNotAvailable, SASLAuthenticationFailed
 from .constants import SASL_QNP
 from .settings import XMPPSettings
-from .streamevents import AuthenticatedEvent
-        
+from .streamevents import AuthenticatedEvent, GotFeaturesEvent
+
 logger = logging.getLogger("pyxmpp.streamsasl")
 
 class DefaultPasswordManager(sasl.PasswordManager):
@@ -45,7 +45,38 @@ class DefaultPasswordManager(sasl.PasswordManager):
     def __init__(self, settings):
         self.settings = settings
         sasl.PasswordManager.__init__(self)
+    def get_password(self, username, realm = None, acceptable_formats = (
+                                                                    "plain",)):
+        """Get the password for user authentication.
 
+        [both client or server]
+
+        By default returns (None, None) providing no password. Should be
+        overriden in derived classes.
+
+        :Parameters:
+            - `username`: the username for which the password is requested.
+            - `realm`: the authentication realm for which the password is
+              requested.
+            - `acceptable_formats`: a sequence of acceptable formats of the
+              password data. Could be "plain", "md5:user:realm:password" or any
+              other mechanism-specific encoding. This allows non-plain-text
+              storage of passwords. But only "plain" format will work with
+              all password authentication mechanisms.
+        :Types:
+            - `username`: `unicode`
+            - `realm`: `unicode`
+            - `acceptable_formats`: sequence of `str`
+
+        :return: the password and its encoding (format).
+        :returntype: `unicode`,`str` tuple."""
+        return self.settings["password"], "plain"
+
+XMPPSettings.add_defaults({
+                            u"username": None, 
+                            u"authzid": None,
+                            u"sasl_mechanisms": ("DIGEST-MD5", "PLAIN"),
+                            })
 XMPPSettings.add_default_factory("password_manager", DefaultPasswordManager)
 
 MECHANISMS_TAG = SASL_QNP + u"mechanisms"
@@ -77,6 +108,7 @@ class StreamSASLMixIn(object):
         connections."""
         self.peer_sasl_mechanisms = None
         self.authenticator = None
+        self._username = None
 
     def _make_stream_sasl_features(self, features):
         """Add SASL features to the <features/> element of the stream.
@@ -100,7 +132,7 @@ class StreamSASLMixIn(object):
         The received features node is available in `self.features`."""
         element = self.features.find(MECHANISMS_TAG)
         self.peer_sasl_mechanisms = []
-        if not element:
+        if element is None:
             return
         for sub in element:
             if sub.tag != MECHANISM_TAG:
@@ -276,11 +308,17 @@ class StreamSASLMixIn(object):
             logger.debug("Unexpected SASL response")
             return False
 
-        ret = self.authenticator.finish(base64.decodestring(content))
+        if content:
+            data = base64.decodestring(content)
+        else:
+            data = None
+        ret = self.authenticator.finish(data)
         if isinstance(ret, sasl.Success):
             logger.debug("SASL authentication succeeded")
             if ret.authzid:
                 self.me = JID(ret.authzid)
+            else:
+                self.me = JID(ret.username, ret.realm)
             self.authenticated = True
             self._restart_stream()
             self.event(AuthenticatedEvent(self.me))
@@ -330,7 +368,7 @@ class StreamSASLMixIn(object):
         if not self.initiator:
             raise SASLAuthenticationFailed("Only initiating entity start"
                                                         " SASL authentication")
-        if not self.features or not self.peer_sasl_mechanisms:
+        if self.features is None or not self.peer_sasl_mechanisms:
             raise SASLNotAvailable("Peer doesn't support SASL")
 
         mechs = self.settings['sasl_mechanisms'] 
@@ -350,9 +388,10 @@ class StreamSASLMixIn(object):
                                                             .format(mechanism))
 
         self.auth_method_used = mechanism
-        self.authenticator = sasl.client_authenticator_factory(mechanism, self)
-
+        self.authenticator = sasl.client_authenticator_factory(mechanism,
+                                                        self.password_manager)
         initial_response = self.authenticator.start(username, authzid)
+        self._username = username
         if not isinstance(initial_response, sasl.Response):
             raise SASLAuthenticationFailed("SASL initiation failed")
 
@@ -365,5 +404,18 @@ class StreamSASLMixIn(object):
                 element.text = initial_response.data
 
         self._write_element(element)
+
+    def event(self, event):
+        if isinstance(event, GotFeaturesEvent):
+            if self.authenticated or not self.peer_sasl_mechanisms:
+                return
+            with self.lock:
+                username = self.settings.get("username")
+                if not username:
+                    if self.me.node:
+                        username = self.me.node
+                    else:
+                        username = self.me.domain
+                self._sasl_authenticate(username, self.settings["authzid"])
 
 # vi: sts=4 et sw=4
