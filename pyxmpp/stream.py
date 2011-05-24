@@ -107,4 +107,18 @@ class Stream(StreamTLSMixIn, StreamSASLMixIn, StreamBase):
         self._handle_sasl_features()
         StreamBase._got_features(self)
 
+    def event(self, event):
+        """Handle a stream event.
+        
+        Called when connection state is changed.
+
+        Must not be called with self.lock acquired!
+        """
+        handled = StreamBase.event(self, event)
+        if not handled:
+            handled = StreamSASLMixIn.event(self, event)
+        if not handled:
+            handled = StreamTLSMixIn.event(self, event)
+        return handled 
+
 # vi: sts=4 et sw=4
