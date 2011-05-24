@@ -55,7 +55,8 @@ from .xmppserializer import serialize, XMPPSerializer
 from .xmppparser import StreamReader
 from .stanzapayload import XMLPayload
 
-from .streamevents import AuthorizedEvent, BindingResourceEvent, ConnectedEvent
+from .streamevents import AuthorizedEvent, BindingResourceEvent
+from .streamevents import ConnectedEvent, GotFeaturesEvent
 from .streamevents import ConnectingEvent, ConnectionAcceptedEvent
 from .streamevents import DisconnectedEvent, ResolvingAddressEvent
 from .streamevents import ResolvingSRVEvent, StreamConnectedEvent
@@ -321,7 +322,10 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         event.stream = self
         logger.debug(u"Stream event: {0}".format(event))
         if self.event_handler:
-            return self.event_handler.handle_xmpp_event(event)
+            handled = self.event_handler.handle_xmpp_event(event)
+        else:
+            handled = None
+        return handled
 
     def close(self):
         """Forcibly close the connection and clear the stream state."""
@@ -818,10 +822,15 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         for element in self.features:
             if element.tag == FEATURE_BIND:
                 has_bind_feature = True
-        if has_bind_feature:
-            self.bind(self.me.resource)
-        elif self.authenticated:
-            self.event(AuthorizedEvent(self.me))
+        self.lock.release()
+        try:
+            handled = self.event(GotFeaturesEvent(self.features))
+            if not handled and has_bind_feature:
+                self.bind(self.me.resource)
+            elif self.authenticated:
+                self.event(AuthorizedEvent(self.me))
+        finally:
+            self.lock.acquire()
 
     def bind(self, resource):
         """Bind to a resource.

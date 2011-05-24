@@ -149,6 +149,26 @@ class DisconnectedEvent(StreamEvent):
     def __unicode__(self):
         return u"Disconnected from {0}".format(self.peer)
 
+class GotFeaturesEvent(StreamEvent):
+    """Emitted when the stream features are received.
+
+    Default action (skipped if the handler returns `True`) may be, depending
+    on the features available, one of:
+      - StartTLS initiation
+      - SASL authentication
+      - Resource binding
+    
+    :Ivariables:
+        - `features`: the <stream:features/> element
+    :Types:
+        - `features`: `ElementTree.Element`
+    """
+    def __init__(self, features):
+        self.features = features 
+    def __unicode__(self):
+        return u"Got stream features"
+
+
 class ResolvingAddressEvent(StreamEvent):
     """Emitted when staring to resolve an address (A or AAAA) DNS record
     for a hostname.
