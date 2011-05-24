@@ -155,7 +155,7 @@ class TestInitiator(NetworkTestCase):
         self.assertIsNone(stream.socket)
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [ResolvingAddressEvent, ConnectingEvent,
-                    ConnectedEvent, StreamConnectedEvent,
+                    ConnectedEvent, StreamConnectedEvent, GotFeaturesEvent,
                     BindingResourceEvent, AuthorizedEvent, DisconnectedEvent])
  
     def test_bind(self):
@@ -175,7 +175,7 @@ class TestInitiator(NetworkTestCase):
         self.assertIsNone(stream.socket)
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [ResolvingAddressEvent, ConnectingEvent,
-                    ConnectedEvent, StreamConnectedEvent,
+                    ConnectedEvent, StreamConnectedEvent, GotFeaturesEvent,
                     BindingResourceEvent, AuthorizedEvent, DisconnectedEvent])
    
     def test_parse_error(self):
@@ -308,7 +308,7 @@ if __name__ == '__main__':
     import logging
     logger = logging.getLogger()
     logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.ERROR)
     unittest.TextTestRunner(verbosity=2).run(suite())
 
 # vi: sts=4 et sw=4
