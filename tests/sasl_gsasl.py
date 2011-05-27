@@ -76,7 +76,8 @@ class PasswordManager(sasl.PasswordManager):
             self.realms = realms
         else:
             self.realms = []
-    def get_password(self, username, realm = None, acceptable_formats = ("plain",)):
+    def get_password(self, username, realm = None, 
+                                        acceptable_formats = ("plain",)):
         if self.username == username:
             return self.password, "plain"
         else:
@@ -103,184 +104,233 @@ class GSASLError(Exception):
 class OurSASLError(Exception):
     pass
 
-def test_client_authenticator(mechanism, authenticator, authzid = None):
-    cmd = ["gsasl", "--server", 
-                                "--quiet",
-                                "--mechanism=" + mechanism,
-                                "--password=good",
-                                "-a username",
-                                "--service=xmpp", 
-                                "--realm=jajcus.net",
-                                "--host=test.pyxmpp.jajcus.net",
-                                "--service-name=pyxmpp.jajcus.net"]
-    logger.debug("cmd: %r", " ".join(cmd))
-    pipe = subprocess.Popen(cmd, bufsize = 1,
-                    stdout = subprocess.PIPE, stdin = subprocess.PIPE,
-                                            stderr = open("/dev/null", "w"))
-    mech = pipe.stdout.readline().strip()
-    logger.debug("IN: %r", mech)
-    if mech != mechanism:
-        raise GSASLError, "GSASL returned different mechanism: " + mech
-    result = authenticator.start("username", authzid)
-    if isinstance(result, sasl.Failure):
-        raise OurSASLError, result.reason
-    response = result.base64()
-    if response:
-        logger.debug("OUT: %r", response)
-        pipe.stdin.write(response + "\n")
-    while True:
-        challenge = pipe.stdout.readline().strip()
-        if not challenge:
-            break
-        if challenge.startswith('Mechanism requested'):
-            continue
-        try:
-            decoded = challenge.decode("base64")
-        except (ValueError, binascii.Error):
-            logger.debug("not base64: %r", challenge)
-        if challenge.startswith('\x1b[') or response and response.decode("base64") == decoded:
-            logger.debug("echo: %r", challenge)
-            # for some unknown reason gsasl echoes our data back
-            response = None
-            continue
-        logger.debug("IN: %r", challenge)
-        result = authenticator.challenge(decoded)
+class TestSASLClientvsGSASL(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if not gsasl_available:
+            raise unittest.SkipTest("GSASL utility not available")
+
+    def test_PLAIN_good_pass_no_authzid(self):
+        if "PLAIN" not in gsasl_server_mechanisms:
+            raise unittest.SkipTest( "GSASL has no PLAIN support")
+        pm = PasswordManager("username", "good")
+        authenticator = sasl.client_authenticator_factory("PLAIN", pm)
+        ok = self.try_with_gsasl("PLAIN", authenticator)
+        self.assertTrue(ok)
+
+    def test_PLAIN_good_pass_authzid(self):
+        if "PLAIN" not in gsasl_server_mechanisms:
+            raise unittest.SkipTest( "GSASL has no PLAIN support")
+        pm = PasswordManager("username", "good")
+        authenticator = sasl.client_authenticator_factory("PLAIN", pm)
+        ok = self.try_with_gsasl("PLAIN", authenticator, authzid = "zid")
+        self.assertTrue(ok)
+
+    def test_PLAIN_bad_pass_no_authzid(self):
+        if "PLAIN" not in gsasl_server_mechanisms:
+            raise unittest.SkipTest( "GSASL has no PLAIN support")
+        pm = PasswordManager("username", "bad")
+        authenticator = sasl.client_authenticator_factory("PLAIN", pm)
+        ok = self.try_with_gsasl("PLAIN", authenticator)
+        self.assertFalse(ok)
+
+    def test_DIGEST_MD5_good_pass_no_authzid(self):
+        if "DIGEST-MD5" not in gsasl_server_mechanisms:
+            raise unittest.SkipTest( "GSASL has no DIGEST-MD5 support")
+        pm = PasswordManager("username", "good")
+        authenticator = sasl.client_authenticator_factory("DIGEST-MD5", pm)
+        ok = self.try_with_gsasl("DIGEST-MD5", authenticator, None,
+                        ["--service=xmpp", "--realm=jajcus.net",
+                         "--host=test.pyxmpp.jajcus.net", 
+                         "--service-name=pyxmpp.jajcus.net"])
+        self.assertTrue(ok)
+
+    def test_DIGEST_MD5_good_pass_authzid(self):
+        if "DIGEST-MD5" not in gsasl_server_mechanisms:
+            raise unittest.SkipTest( "GSASL has no DIGEST-MD5 support")
+        pm = PasswordManager("username", "good")
+        authenticator = sasl.client_authenticator_factory("DIGEST-MD5", pm)
+        ok = self.try_with_gsasl("DIGEST-MD5", authenticator, "zid",
+                        ["--service=xmpp", "--realm=jajcus.net",
+                         "--host=test.pyxmpp.jajcus.net", 
+                         "--service-name=pyxmpp.jajcus.net"])
+        self.assertTrue(ok)
+
+    def test_DIGEST_MD5_bad_pass_no_authzid(self):
+        if "DIGEST-MD5" not in gsasl_server_mechanisms:
+            raise unittest.SkipTest( "GSASL has no DIGEST-MD5 support")
+        pm = PasswordManager("username", "bad")
+        authenticator = sasl.client_authenticator_factory("DIGEST-MD5", pm)
+        ok = self.try_with_gsasl("DIGEST-MD5", authenticator, None,
+                        ["--service=xmpp", "--realm=jajcus.net",
+                         "--host=test.pyxmpp.jajcus.net", 
+                         "--service-name=pyxmpp.jajcus.net"])
+        self.assertFalse(ok)
+
+    @staticmethod
+    def try_with_gsasl(mechanism, authenticator, authzid = None, 
+                                                            gsasl_args = []):
+        cmd = ["gsasl", "--server", "--quiet",
+                "--mechanism=" + mechanism, "--password=good", 
+                "-a username"] + gsasl_args
+        logger.debug("cmd: %r", " ".join(cmd))
+        pipe = subprocess.Popen(cmd, bufsize = 1,
+                        stdout = subprocess.PIPE, stdin = subprocess.PIPE,
+                                                stderr = open("/dev/null", "w"))
+        mech = pipe.stdout.readline().strip()
+        logger.debug("IN: %r", mech)
+        if mech != mechanism:
+            raise GSASLError, "GSASL returned different mechanism: " + mech
+        result = authenticator.start("username", authzid)
         if isinstance(result, sasl.Failure):
             raise OurSASLError, result.reason
         response = result.base64()
-        logger.debug("OUT: %r", response)
-        pipe.stdin.write(response + "\n")
-        if response == "":
-            break
-    pipe.stdin.close()
-    pipe.stdout.close()
-    rc = pipe.wait()
-    if rc:
-        return False
-    result = authenticator.finish(None)
-    return isinstance(result, sasl.Success)
+        if response:
+            logger.debug("OUT: %r", response)
+            pipe.stdin.write(response + "\n")
+        while True:
+            challenge = pipe.stdout.readline().strip()
+            if not challenge:
+                break
+            if challenge.startswith('Mechanism requested'):
+                continue
+            try:
+                decoded = challenge.decode("base64")
+            except (ValueError, binascii.Error):
+                logger.debug("not base64: %r", challenge)
+            if challenge.startswith('\x1b[') or response and response.decode("base64") == decoded:
+                logger.debug("echo: %r", challenge)
+                # for some unknown reason gsasl echoes our data back
+                response = None
+                continue
+            logger.debug("IN: %r", challenge)
+            result = authenticator.challenge(decoded)
+            if isinstance(result, sasl.Failure):
+                raise OurSASLError, result.reason
+            response = result.base64()
+            logger.debug("OUT: %r", response)
+            pipe.stdin.write(response + "\n")
+            if response == "":
+                break
+        pipe.stdin.close()
+        pipe.stdout.close()
+        rc = pipe.wait()
+        if rc:
+            return False
+        result = authenticator.finish(None)
+        return isinstance(result, sasl.Success)
 
-def test_server_authenticator(mechanism, authenticator):
-    cmd = ["gsasl", "--client", 
-                                "--quiet",
-                                "--mechanism=" + mechanism,
-                                "--password=good",
-                                "--authentication-id=username",
-                                "--service=xmpp", 
-                                "--realm=jajcus.net",
+class TestSASLServervsGSASL(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if not gsasl_available:
+            raise unittest.SkipTest("GSASL utility not available")
+
+    def test_PLAIN_good_pass_no_authzid(self):
+        if "PLAIN" not in gsasl_client_mechanisms:
+            raise unittest.SkipTest("GSASL has no PLAIN support")
+        pm = PasswordManager("username", "good")
+        authenticator = sasl.server_authenticator_factory("PLAIN", pm)
+        ok = self.try_with_gsasl("PLAIN", authenticator)
+        self.assertTrue(ok)
+
+    def test_PLAIN_bad_pass_no_authzid(self):
+        if "PLAIN" not in gsasl_client_mechanisms:
+            raise unittest.SkipTest("GSASL has no PLAIN support")
+        pm = PasswordManager("username", "bad")
+        authenticator = sasl.server_authenticator_factory("PLAIN", pm)
+        with self.assertRaises(OurSASLError) as err:
+            self.try_with_gsasl("PLAIN", authenticator)
+        self.assertEqual(err.exception.args[0], "not-authorized")
+
+    def test_DIGEST_MD5_good_pass_authzid(self):
+        if "DIGEST-MD5" not in gsasl_client_mechanisms:
+            raise unittest.SkipTest( "GSASL has no DIGEST-MD5 support")
+        pm = PasswordManager("username", "good")
+        authenticator = sasl.server_authenticator_factory("DIGEST-MD5", pm)
+        ok = self.try_with_gsasl("DIGEST-MD5", authenticator, 
+                            [ "--service=xmpp", "--realm=jajcus.net",
                                 "--host=test.pyxmpp.jajcus.net",
-                                "--service-name=pyxmpp.jajcus.net"]
-    logger.debug("cmd: %r", " ".join(cmd))
-    pipe = subprocess.Popen(cmd, bufsize = 1,
-                    stdout = subprocess.PIPE, stdin = subprocess.PIPE,
-                                            stderr = open("/dev/null", "w"))
-    mech = pipe.stdout.readline().strip()
-    logger.debug("IN: %r", mech)
-    if mech != mechanism:
-        raise GSASLError, "GSASL returned different mechanism: " + mech
-    data = pipe.stdout.readline().strip()
-    if data:
-        result = authenticator.start(data.decode("base64"))
-    else:
-        result = authenticator.start(None)
-    if isinstance(result, sasl.Failure):
-        raise OurSASLError, result.reason
-    if isinstance(result, sasl.Success):
+                                "--service-name=pyxmpp.jajcus.net",
+                                "--quality-of-protection=qop-auth"])
+        self.assertTrue(ok)
+
+    def test_DIGEST_MD5_bad_pass_no_authzid(self):
+        if "DIGEST-MD5" not in gsasl_client_mechanisms:
+            raise unittest.SkipTest( "GSASL has no DIGEST-MD5 support")
+        pm = PasswordManager("username", "bad")
+        authenticator = sasl.server_authenticator_factory("DIGEST-MD5", pm)
+        with self.assertRaises(OurSASLError) as err:
+            self.try_with_gsasl("DIGEST-MD5", authenticator,
+                            [ "--service=xmpp", "--realm=jajcus.net",
+                                "--host=test.pyxmpp.jajcus.net",
+                                "--service-name=pyxmpp.jajcus.net",
+                                "--quality-of-protection=qop-auth"])
+        self.assertEqual(err.exception.args[0], "not-authorized")
+
+    @staticmethod
+    def try_with_gsasl(mechanism, authenticator, gsasl_args = []):
+        cmd = ["gsasl", "--client", "--quiet",
+                "--mechanism=" + mechanism, "--password=good",
+                "--authentication-id=username"] + gsasl_args
+        logger.debug("cmd: %r", " ".join(cmd))
+        pipe = subprocess.Popen(cmd, bufsize = 1,
+                        stdout = subprocess.PIPE, stdin = subprocess.PIPE,
+                                                stderr = open("/dev/null", "w"))
+        mech = pipe.stdout.readline().strip()
+        logger.debug("IN: %r", mech)
+        if mech != mechanism:
+            raise GSASLError, "GSASL returned different mechanism: " + mech
+        data = pipe.stdout.readline().strip()
+        if data:
+            result = authenticator.start(data.decode("base64"))
+        else:
+            result = authenticator.start(None)
+        if isinstance(result, sasl.Failure):
+            raise OurSASLError, result.reason
+        if isinstance(result, sasl.Success):
+            pipe.stdin.close()
+            pipe.stdout.close()
+            rc = pipe.wait()
+            if rc:
+                raise GSASLError, "GSASL exited with {0}".format(rc)
+            return True
+        challenge = result.base64()
+        logger.debug("OUT: %r", challenge)
+        pipe.stdin.write(challenge + "\n")
+        while True:
+            response = pipe.stdout.readline().strip()
+            if not response:
+                break
+            if response.startswith('Mechanism requested'):
+                continue
+            try:
+                decoded = response.decode("base64")
+            except (ValueError, binascii.Error):
+                logger.debug("not base64: %r", response)
+            if response.startswith('\x1b[') or challenge and challenge.decode("base64") == decoded:
+                logger.debug("echo: %r", challenge)
+                # for some unknown reason gsasl echoes our data back
+                challenge = None
+                continue
+            logger.debug("IN: %r", response)
+            result = authenticator.response(decoded)
+            if isinstance(result, sasl.Failure):
+                raise OurSASLError, result.reason
+            if isinstance(result, sasl.Success):
+                break
+            challenge = result.base64()
+            logger.debug("OUT: %r", challenge)
+            pipe.stdin.write(challenge + "\n")
         pipe.stdin.close()
         pipe.stdout.close()
         rc = pipe.wait()
         if rc:
             raise GSASLError, "GSASL exited with {0}".format(rc)
-        return True
-    challenge = result.base64()
-    logger.debug("OUT: %r", challenge)
-    pipe.stdin.write(challenge + "\n")
-    while True:
-        response = pipe.stdout.readline().strip()
-        if not response:
-            break
-        if response.startswith('Mechanism requested'):
-            continue
-        try:
-            decoded = response.decode("base64")
-        except (ValueError, binascii.Error):
-            logger.debug("not base64: %r", response)
-        if response.startswith('\x1b[') or challenge and challenge.decode("base64") == decoded:
-            logger.debug("echo: %r", challenge)
-            # for some unknown reason gsasl echoes our data back
-            challenge = None
-            continue
-        logger.debug("IN: %r", response)
-        result = authenticator.response(decoded)
-        if isinstance(result, sasl.Failure):
-            raise OurSASLError, result.reason
-        if isinstance(result, sasl.Success):
-            break
-        challenge = result.base64()
-        logger.debug("OUT: %r", challenge)
-        pipe.stdin.write(challenge + "\n")
-    pipe.stdin.close()
-    pipe.stdout.close()
-    rc = pipe.wait()
-    if rc:
-        raise GSASLError, "GSASL exited with {0}".format(rc)
-    return isinstance(result, sasl.Success)
+        return authenticator.done
 
 def suite():
     check_gsasl()
-    @unittest.skipUnless(gsasl_available, "GSASL utility not available")
-    class TestSASLClientvsGSASL(unittest.TestCase):
-        @unittest.skipIf("PLAIN" not in gsasl_server_mechanisms, 
-                                    "GSASL has no PLAIN support")
-        def test_PLAIN_good_pass_no_authzid(self):
-            pm = PasswordManager("username", "good")
-            authenticator = sasl.client_authenticator_factory("PLAIN", pm)
-            ok = test_client_authenticator("PLAIN", authenticator)
-            self.assertTrue(ok)
-
-        def test_PLAIN_good_pass_authzid(self):
-            pm = PasswordManager("username", "good")
-            authenticator = sasl.client_authenticator_factory("PLAIN", pm)
-            ok = test_client_authenticator("PLAIN", authenticator, authzid =
-                                                                        "zid")
-            self.assertTrue(ok)
-
-        def test_PLAIN_bad_pass_no_authzid(self):
-            pm = PasswordManager("username", "bad")
-            authenticator = sasl.client_authenticator_factory("PLAIN", pm)
-            ok = test_client_authenticator("PLAIN", authenticator)
-            self.assertFalse(ok)
-
-        def test_DIGEST_MD5_good_pass_no_authzid(self):
-            pm = PasswordManager("username", "good")
-            authenticator = sasl.client_authenticator_factory("DIGEST-MD5", pm)
-            ok = test_client_authenticator("DIGEST-MD5", authenticator)
-            self.assertTrue(ok)
-
-        def test_DIGEST_MD5_good_pass_authzid(self):
-            pm = PasswordManager("username", "good")
-            authenticator = sasl.client_authenticator_factory("DIGEST-MD5", pm)
-            ok = test_client_authenticator("DIGEST-MD5", authenticator, authzid =
-                                                                        "zid")
-            self.assertTrue(ok)
-
-        def test_DIGEST_MD5_bad_pass_no_authzid(self):
-            pm = PasswordManager("username", "bad")
-            authenticator = sasl.client_authenticator_factory("DIGEST-MD5", pm)
-            ok = test_client_authenticator("DIGEST-MD5", authenticator)
-            self.assertFalse(ok)
-
-    @unittest.skipUnless(gsasl_available, "GSASL utility not available")
-    class TestSASLServervsGSASL(unittest.TestCase):
-        @unittest.skipIf("PLAIN" not in gsasl_client_mechanisms, 
-                                    "GSASL has no PLAIN support")
-        def test_PLAIN_good_pass_no_authzid(self):
-            pm = PasswordManager("username", "good")
-            authenticator = sasl.server_authenticator_factory("PLAIN", pm)
-            ok = test_server_authenticator("PLAIN", authenticator)
-            self.assertTrue(ok)
-
-
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestSASLClientvsGSASL))
     suite.addTest(unittest.makeSuite(TestSASLServervsGSASL))
