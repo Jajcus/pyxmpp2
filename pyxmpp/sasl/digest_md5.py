@@ -213,9 +213,9 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 
         :return: the (empty) initial response
         :returntype: `sasl.Response` or `sasl.Failure`"""
-        self.username=from_utf8(username)
+        self.username = username
         if authzid:
-            self.authzid=from_utf8(authzid)
+            self.authzid = authzid
         else:
             self.authzid=""
         self.password=None
@@ -551,8 +551,8 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
         response=response.split('\x00')[0] # workaround for some SASL implementations
         if self.realm:
-            realm=to_utf8(self.realm)
-            realm=_quote(realm)
+            realm = self.realm.encode("utf-8")
+            realm = _quote(realm)
         else:
             realm=None
         username=None
@@ -571,7 +571,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
             val=m.group("val")
             self.__logger.debug("%r: %r" % (var,val))
             if var=="realm":
-                realm=val[1:-1]
+                realm=val[1:-1].decode("utf-8")
             elif var=="cnonce":
                 if cnonce:
                     self.__logger.debug("Duplicate cnonce")
@@ -584,9 +584,9 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
             elif var=="digest-uri":
                 digest_uri=val[1:-1]
             elif var=="authzid":
-                authzid=val[1:-1]
+                authzid=val[1:-1].decode("utf-8")
             elif var=="username":
-                username=val[1:-1]
+                username=val[1:-1].decode("utf-8")
             elif var=="response":
                 response_val=val
             elif var=="nc":
@@ -664,20 +664,20 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
-        username_uq=from_utf8(username.replace('\\',''))
+        username_uq = username.replace(u'\\', u'')
         if authzid:
-            authzid_uq=from_utf8(authzid.replace('\\',''))
+            authzid_uq = authzid.replace(u'\\', u'')
         else:
-            authzid_uq=None
+            authzid_uq = None
         if realm:
-            realm_uq=from_utf8(realm.replace('\\',''))
+            realm_uq = realm.replace(u'\\', u'')
         else:
             realm_uq=None
-        digest_uri_uq=digest_uri.replace('\\','')
-        self.username=username_uq
-        self.realm=realm_uq
-        password,pformat=self.password_manager.get_password(
-                    username_uq,realm_uq,("plain","md5:user:realm:pass"))
+        digest_uri_uq = digest_uri.replace('\\','')
+        self.username = username_uq
+        self.realm = realm_uq
+        password, pformat = self.password_manager.get_password(
+                    username_uq, realm_uq, ("plain", "md5:user:realm:pass"))
         if pformat=="md5:user:realm:pass":
             urp_hash=password
         elif pformat=="plain":
