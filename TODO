@@ -1,6 +1,7 @@
 - finish the big pyxmpp->pyxmpp2 refactorisation
 - multi-language text for stanza elements (like message/body,
   presence/status) and error text
+- implement SCRAM-SHA-1 and SCRAM-SHA-1-PLUS SASL mechanisms
 
 xmpp-base:
 - jabber:server stream support (including diallback)
