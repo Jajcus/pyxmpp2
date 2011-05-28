@@ -206,10 +206,10 @@ class StreamSASLMixIn(object):
 
         if isinstance(ret, sasl.Success):
             element = ElementTree.Element(SUCCESS_TAG)
-            element.text = ret.base64()
+            element.text = ret.encode()
         elif isinstance(ret, sasl.Challenge):
             element = ElementTree.Element(CHALLENGE_TAG)
-            element.text = ret.base64()
+            element.text = ret.encode()
         else:
             element = ElementTree.Element(FAILURE_TAG)
             ElementTree.SubElement(element, SASL_QNP + ret.reason)
@@ -244,7 +244,7 @@ class StreamSASLMixIn(object):
         ret = self.authenticator.challenge(base64.decodestring(content))
         if isinstance(ret, sasl.Response):
             element = ElementTree.Element(RESPONSE_TAG)
-            element.text = ret.base64()
+            element.text = ret.encode()
         else:
             element = ElementTree.Element(ABORT_TAG)
 
@@ -270,10 +270,10 @@ class StreamSASLMixIn(object):
         ret = self.authenticator.response(base64.decodestring(content))
         if isinstance(ret, sasl.Success):
             element = ElementTree.Element(SUCCESS_TAG)
-            element.text = ret.base64()
+            element.text = ret.encode()
         elif isinstance(ret, sasl.Challenge):
             element = ElementTree.Element(CHALLENGE_TAG)
-            element.text = ret.base64()
+            element.text = ret.encode()
         else:
             element = ElementTree.Element(FAILURE_TAG)
             ElementTree.SubElement(element, SASL_QNP + ret.reason)
@@ -399,7 +399,7 @@ class StreamSASLMixIn(object):
         element.set("mechanism", mechanism)
         if initial_response.data:
             if initial_response.encode:
-                element.text = initial_response.base64()
+                element.text = initial_response.encode()
             else:
                 element.text = initial_response.data
 

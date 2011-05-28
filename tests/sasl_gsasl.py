@@ -184,7 +184,7 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         result = authenticator.start("username", authzid)
         if isinstance(result, sasl.Failure):
             raise OurSASLError, result.reason
-        response = result.base64()
+        response = result.encode()
         if response:
             logger.debug("OUT: %r", response)
             pipe.stdin.write(response + "\n")
@@ -207,7 +207,7 @@ class TestSASLClientvsGSASL(unittest.TestCase):
             result = authenticator.challenge(decoded)
             if isinstance(result, sasl.Failure):
                 raise OurSASLError, result.reason
-            response = result.base64()
+            response = result.encode()
             logger.debug("OUT: %r", response)
             pipe.stdin.write(response + "\n")
             if response == "":
@@ -295,7 +295,7 @@ class TestSASLServervsGSASL(unittest.TestCase):
             if rc:
                 raise GSASLError, "GSASL exited with {0}".format(rc)
             return True
-        challenge = result.base64()
+        challenge = result.encode()
         logger.debug("OUT: %r", challenge)
         pipe.stdin.write(challenge + "\n")
         while True:
@@ -319,7 +319,7 @@ class TestSASLServervsGSASL(unittest.TestCase):
                 raise OurSASLError, result.reason
             if isinstance(result, sasl.Success):
                 break
-            challenge = result.base64()
+            challenge = result.encode()
             logger.debug("OUT: %r", challenge)
             pipe.stdin.write(challenge + "\n")
         pipe.stdin.close()

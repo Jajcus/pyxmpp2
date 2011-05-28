@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2011 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -17,18 +17,31 @@
 """Base classes for PyXMPP SASL implementation.
 
 Normative reference:
-  - `RFC 2222 <http://www.ietf.org/rfc/rfc2222.txt>`__
+  - `RFC 4422 <http://www.ietf.org/rfc/rfc4422.txt>`__
 """
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
 import random
 import logging
-from binascii import b2a_base64
+import uuid
 
+from base64 import standard_b64encode
+
+from abc import ABCMeta
+
+CLIENT_MECHANISMS_D = {}
+CLIENT_MECHANISMS = []
+SECURE_CLIENT_MECHANISMS = []
+
+SERVER_MECHANISMS_D = {}
+SERVER_MECHANISMS = []
+SECURE_SERVER_MECHANISMS = []
+        
 class PasswordManager:
+    __metaclass__ = ABCMeta
     """Base class for password managers.
 
     Password manager is an object responsible for providing or verification
@@ -36,46 +49,46 @@ class PasswordManager:
 
     All the methods of `PasswordManager` class may be overriden in derived
     classes for specific authentication and authorization policy."""
-    def __init__(self):
-        """Initialize a `PasswordManager` object."""
-        pass
-
-    def get_password(self,username,realm=None,acceptable_formats=("plain",)):
+    def get_password(self, username, realm = None,
+                                            acceptable_formats = (u"plain", )):
         """Get the password for user authentication.
 
         [both client or server]
 
         By default returns (None, None) providing no password. Should be
-        overriden in derived classes.
+        overriden in derived classes unless only `check_password` functionality
+        is available.
 
         :Parameters:
             - `username`: the username for which the password is requested.
             - `realm`: the authentication realm for which the password is
               requested.
             - `acceptable_formats`: a sequence of acceptable formats of the
-              password data. Could be "plain", "md5:user:realm:password" or any
-              other mechanism-specific encoding. This allows non-plain-text
-              storage of passwords. But only "plain" format will work with
-              all password authentication mechanisms.
+              password data. Could be "plain" (plain text password),
+              "md5:user:realm:password" (MD5 hex digest of user:realm:password)
+              or any other mechanism-specific encoding. This allows
+              non-plain-text storage of passwords. But only "plain" format will
+              work with all password authentication mechanisms.
         :Types:
             - `username`: `unicode`
             - `realm`: `unicode`
-            - `acceptable_formats`: sequence of `str`
+            - `acceptable_formats`: sequence of `unicode`
 
         :return: the password and its encoding (format).
-        :returntype: `unicode`,`str` tuple."""
-        _unused, _unused, _unused = username, realm, acceptable_formats
-        return None,None
+        :returntype: `unicode`,`str` tuple.
+        """
+        return None, None
 
-    def check_password(self,username,password,realm=None):
+    def check_password(self, username, password, realm = None):
         """Check the password validity.
 
         [server only]
 
         Used by plain-text authentication mechanisms.
 
-        Retrieve a "plain" password for the `username` and `realm` using
-        `self.get_password` and compare it with the password provided.
+        Default implementation: retrieve a "plain" password for the `username`
+        and `realm` using `self.get_password` and compare it with the password
+        provided.
 
         May be overrided e.g. to check the password against some external
         authentication mechanism (PAM, LDAP, etc.).
@@ -92,10 +105,21 @@ class PasswordManager:
             - `realm`: `unicode`
 
         :return: `True` if the password is valid.
-        :returntype: `bool`"""
-        pw,format=self.get_password(username,realm,("plain",))
-        if pw and format=="plain" and pw==password:
-            return True
+        :returntype: `bool`
+        """
+        pwd, pwd_format = self.get_password(username, realm, (
+                                        u"plain", u"md5:user:realm:password"))
+        if pwd_format == u"plain":
+            return pwd is not None and password == pwd
+        elif pwd_format in (u"md5:user:realm:password"):
+            if realm is None:
+                realm = ""
+            else:
+                realm = realm.encode("utf-8")
+            username = username.encode("utf-8")
+            password = password.encode("utf-8")
+            urp_hash = hashlib.md5(b"%s:%s:%s").hexdigest()
+            return urp_hash == pwd
         return False
 
     def get_realms(self):
@@ -105,10 +129,11 @@ class PasswordManager:
 
         :return: a list of realms available for authentication. May be empty --
             the client may choose its own realm then or use no realm at all.
-        :returntype: `list` of `unicode`"""
+        :returntype: `list` of `unicode`
+        """
         return []
 
-    def choose_realm(self,realm_list):
+    def choose_realm(self, realm_list):
         """Choose an authentication realm from the list provided by the server.
 
         [client only]
@@ -122,13 +147,14 @@ class PasswordManager:
             - `realm_list`: sequence of `unicode`
 
         :return: the realm chosen.
-        :returntype: `unicode`"""
+        :returntype: `unicode`
+        """
         if realm_list:
             return realm_list[0]
         else:
             return None
 
-    def check_authzid(self,authzid,extra_info=None):
+    def check_authzid(self, authzid, extra_info = None):
         """Check if the authenticated entity is allowed to use given
         authorization id.
 
@@ -149,35 +175,42 @@ class PasswordManager:
 
         :return: `True` if the authenticated entity is authorized to use
             the provided authorization id.
-        :returntype: `bool`"""
+        :returntype: `bool`
+        """
         if not extra_info:
-            extra_info={}
+            extra_info = {}
         return (not authzid
                 or extra_info.has_key("username")
-                        and extra_info["username"]==authzid)
+                        and extra_info["username"] == authzid)
 
     def get_serv_type(self):
         """Return the service type for DIGEST-MD5 'digest-uri' field.
 
         Should be overriden in derived classes.
 
-        :return: the service type ("unknown" by default)"""
-        return "unknown"
+        :return: the service type ("unknown" by default)
+        :returntype: `unicode`
+        """
+        return u"unknown"
 
     def get_serv_host(self):
         """Return the host name for DIGEST-MD5 'digest-uri' field.
 
         Should be overriden in derived classes.
 
-        :return: the host name ("unknown" by default)"""
-        return "unknown"
+        :return: the host name ("unknown" by default)
+        :returntype: `unicode`
+        """
+        return u"unknown"
 
     def get_serv_name(self):
         """Return the service name for DIGEST-MD5 'digest-uri' field.
 
         Should be overriden in derived classes.
 
-        :return: the service name or `None` (which is the default)."""
+        :return: the service name or `None` (which is the default).
+        :returntype: `unicode`
+        """
         return None
 
     def generate_nonce(self):
@@ -186,59 +219,60 @@ class PasswordManager:
         The string should be cryptographicaly secure random pattern.
 
         :return: the string generated.
-        :returntype: `str`"""
-        # FIXME: use some better RNG (/dev/urandom maybe)
-        r1=str(random.random())[2:]
-        r2=str(random.random())[2:]
-        return r1+r2
+        :returntype: `bytes`
+        """
+        return uuid.uuid4().hex
 
-class Reply:
+class Reply(object):
     """Base class for SASL authentication reply objects.
 
     :Ivariables:
         - `data`: optional reply data.
-        - `encode`: whether to base64 encode the data or not
+        - `_encode`: whether to base64 encode the data or not
     :Types:
-        - `data`: `str`
-        - `encode`; `bool`"""
-    def __init__(self,data="", encode=True):
+        - `data`: `bytes`
+        - `_encode`: `bool`
+    """
+    def __init__(self, data = b"", encode = True):
         """Initialize the `Reply` object.
 
         :Parameters:
             - `data`: optional reply data.
+            - `encode`: whether to base64 encode the data or not
         :Types:
-            - `data`: `str`"""
-        self.data=data
-        self.encode=encode
+            - `data`: `bytes`
+            - `encode`: `bool`
+        """
+        self.data = data
+        self._encode = encode
 
-    def base64(self):
-        """Base64-encode the data contained in the reply.
+    def encode(self):
+        """Base64-encode the data contained in the reply when appropriate.
 
-        :return: base64-encoded data.
-        :returntype: `str`"""
-        if self.data is not None:
-            ret=b2a_base64(self.data)
-            if ret[-1]=='\n':
-                ret=ret[:-1]
+        :return: encoded data.
+        :returntype: `bytes`
+        """
+        if self.data is not None and self._encode:
+            ret = standard_b64encode(self.data)
             return ret
         else:
-            return None
+            return self.data
 
 class Challenge(Reply):
     """The challenge SASL message (server's challenge for the client)."""
-    def __init__(self,data):
+    def __init__(self, data, encode = True):
         """Initialize the `Challenge` object."""
-        Reply.__init__(self,data)
+        Reply.__init__(self, data, encode)
     def __repr__(self):
-        return "<sasl.Challenge: %r>" % (self.data,)
+        return "<sasl.Challenge: {0!r}>".format(self.data)
 
 class Response(Reply):
     """The response SASL message (clients's reply the the server's challenge)."""
-    def __init__(self,data="", encode=True):
+    def __init__(self, data = b"", encode = True):
         """Initialize the `Response` object."""
-        Reply.__init__(self,data, encode)
+        Reply.__init__(self, data, encode)
     def __repr__(self):
-        return "<sasl.Response: %r>" % (self.data,)
+        return "<sasl.Response: {0!r}>".format(self.data)
 
 class Failure(Reply):
     """The failure SASL message.
@@ -246,22 +280,27 @@ class Failure(Reply):
     :Ivariables:
         - `reason`: the failure reason.
     :Types:
-        - `reason`: unicode."""
-    def __init__(self,reason,encode=True):
+        - `reason`: unicode.
+    """
+    def __init__(self, reason):
         """Initialize the `Failure` object.
 
         :Parameters:
             - `reason`: the failure reason.
         :Types:
-            - `reason`: unicode."""
-        Reply.__init__(self,"",encode)
-        self.reason=reason
+            - `reason`: unicode.
+        """
+        Reply.__init__(self, None)
+        self.reason = reason
     def __repr__(self):
-        return "<sasl.Failure: %r>" % (self.reason,)
+        return "<sasl.Failure: {0!r}>".format(self.reason)
 
 class Success(Reply):
-    """The success SASL message (sent by the server on authentication success)."""
-    def __init__(self,username,realm=None,authzid=None,data=None):
+    """The success SASL message (sent by the server on authentication
+    success).
+    """
+    def __init__(self, username, realm = None, authzid = None, data = None,
+                                                                encode = True):
         """Initialize the `Success` object.
 
         :Parameters:
@@ -269,38 +308,42 @@ class Success(Reply):
             - `realm`: authentication realm used.
             - `authzid`: authorization id.
             - `data`: the success data to be sent to the client.
+            - `encode`: whether to base64 encode the data or not
         :Types:
             - `username`: `unicode`
             - `realm`: `unicode`
             - `authzid`: `unicode`
             - `data`: `str`
+            - `encode`: `bool`
         """
-        Reply.__init__(self,data)
-        self.username=username
-        self.realm=realm
-        self.authzid=authzid
+        Reply.__init__(self, data, encode)
+        self.username = username
+        self.realm = realm
+        self.authzid = authzid
     def __repr__(self):
-        return "<sasl.Success: authzid: %r data: %r>" % (self.authzid,self.data)
+        return "<sasl.Success: authzid: {0!r} data: {1!r}>".format(
+                                                    self.authzid, self.data)
 
 class ClientAuthenticator:
+    __metaclass__ = ABCMeta
     """Base class for client authenticators.
 
     A client authenticator class is a client-side implementation of a SASL
     mechanism. One `ClientAuthenticator` object may be used for one
-    client authentication process."""
-
-    def __init__(self,password_manager):
+    client authentication process.
+    """
+    def __init__(self, password_manager):
         """Initialize a `ClientAuthenticator` object.
 
         :Parameters:
             - `password_manager`: a password manager providing authentication
               credentials.
         :Types:
-            - `password_manager`: `PasswordManager`"""
-        self.password_manager=password_manager
-        self.__logger=logging.getLogger("pyxmpp.sasl.ClientAuthenticator")
+            - `password_manager`: `PasswordManager`
+        """
+        self.password_manager = password_manager
 
-    def start(self,username,authzid):
+    def start(self, username, authzid):
         """Start the authentication process.
 
         :Parameters:
@@ -313,43 +356,41 @@ class ClientAuthenticator:
         :return: the initial response to send to the server or a failuer
             indicator.
         :returntype: `Response` or `Failure`"""
-        _unused, _unused = username, authzid
-        return Failure("Not implemented")
+        raise NotImplementedError
 
-    def challenge(self,challenge):
+    def challenge(self, challenge):
         """Process the server's challenge.
 
         :Parameters:
             - `challenge`: the challenge.
         :Types:
-            - `challenge`: `str`
+            - `challenge`: `bytes`
 
         :return: the response or a failure indicator.
         :returntype: `Response` or `Failure`"""
-        _unused = challenge
-        return Failure("Not implemented")
+        raise NotImplementedError
 
-    def finish(self,data):
+    def finish(self, data):
         """Handle authentication succes information from the server.
 
         :Parameters:
             - `data`: the optional additional data returned with the success.
         :Types:
-            - `data`: `str`
+            - `data`: `bytes`
 
         :return: success or failure indicator.
         :returntype: `Success` or `Failure`"""
-        _unused = data
-        return Failure("Not implemented")
+        raise NotImplementedError
 
 class ServerAuthenticator:
+    __metaclass__ = ABCMeta
     """Base class for server authenticators.
 
     A server authenticator class is a server-side implementation of a SASL
     mechanism. One `ServerAuthenticator` object may be used for one
-    client authentication process."""
-
-    def __init__(self,password_manager):
+    client authentication process.
+    """
+    def __init__(self, password_manager):
         """Initialize a `ServerAuthenticator` object.
 
         :Parameters:
@@ -357,10 +398,9 @@ class ServerAuthenticator:
               credential verfication.
         :Types:
             - `password_manager`: `PasswordManager`"""
-        self.password_manager=password_manager
-        self.__logger=logging.getLogger("pyxmpp.sasl.ServerAuthenticator")
+        self.password_manager = password_manager
 
-    def start(self,initial_response):
+    def start(self, initial_response):
         """Start the authentication process.
 
         :Parameters:
@@ -368,24 +408,77 @@ class ServerAuthenticator:
               the authentication request.
 
         :Types:
-            - `initial_response`: `str`
+            - `initial_response`: `bytes`
 
         :return: a challenge, a success or a failure indicator.
         :returntype: `Challenge` or `Failure` or `Success`"""
-        _unused = initial_response
-        return Failure("not-authorized")
+        raise NotImplementedError
 
-    def response(self,response):
+    def response(self, response):
         """Process a response from a client.
 
         :Parameters:
             - `response`: the response from the client to our challenge.
         :Types:
-            - `response`: `str`
+            - `response`: `bytes`
 
         :return: a challenge, a success or a failure indicator.
         :returntype: `Challenge` or `Success` or `Failure`"""
-        _unused = response
-        return Failure("not-authorized")
+        raise NotImplementedError
+
+def _key_func(item):
+    """Key function used for sorting SASL authenticator classes
+    """
+    klass = item[1]
+    return (klass._pyxmpp_sasl_secure, klass._pyxmpp_sasl_preference)
+
+def _register_client_authenticator(klass, name):
+    """Add a client authenticator class to `CLIENT_MECHANISMS_D`,
+    `CLIENT_MECHANISMS` and, optionally, to `SECURE_CLIENT_MECHANISMS`
+    """
+    CLIENT_MECHANISMS_D[name] = klass
+    items = sorted(CLIENT_MECHANISMS_D.items(), key = _key_func, reverse = True)
+    CLIENT_MECHANISMS[:] = [k for (k, v) in items ]
+    SECURE_CLIENT_MECHANISMS[:] = [k for (k, v) in items 
+                                                    if v._pyxmpp_sasl_secure]
+
+def _register_server_authenticator(klass, name):
+    """Add a client authenticator class to `SERVER_MECHANISMS_D`,
+    `SERVER_MECHANISMS` and, optionally, to `SECURE_SERVER_MECHANISMS`
+    """
+    SERVER_MECHANISMS_D[name] = klass
+    items = sorted(SERVER_MECHANISMS_D.items(), key = _key_func, reverse = True)
+    SERVER_MECHANISMS[:] = [k for (k, v) in items ]
+    SECURE_SERVER_MECHANISMS[:] = [k for (k, v) in items 
+                                                    if v._pyxmpp_sasl_secure]
+
+def sasl_mechanism(name, secure, preference = 50):
+    """Class decorator generator for `ClientAuthenticator` or
+    `ServerAuthenticator` subclasses. Adds the class to the pyxmpp.sasl
+    mechanism registry.
+
+    :Parameters:
+        - `name`: SASL mechanism name
+        - `secure`: if the mechanims can be considered secure - `True`
+          if it can be used over plain-text channel
+        - `preference`: mechanism preference level (the higher the better)
+    :Types:
+        - `name`: `unicode`
+        - `secure`: `bool`
+        - `preference`: `int`
+    """
+    def decorator(klass):
+        """The decorator."""
+        klass._pyxmpp_sasl_secure = secure
+        klass._pyxmpp_sasl_preference = preference
+        if issubclass(klass, ClientAuthenticator):
+            _register_client_authenticator(klass, name)
+        elif issubclass(klass, ServerAuthenticator):
+            _register_server_authenticator(klass, name)
+        else:
+            raise TypeError("Not a ClientAuthenticator"
+                                            " or ServerAuthenticator class")
+        return klass
+    return decorator
 
 # vi: sts=4 et sw=4

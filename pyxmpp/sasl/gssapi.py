@@ -1,5 +1,6 @@
 #
 # (C) Copyright 2008 Jelmer Vernooij <jelmer@samba.org>
+# (C) Copyright 2011 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -22,15 +23,17 @@ Normative reference:
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
 import base64
 import kerberos
 
 import logging
 
-from .core import (ClientAuthenticator,Failure,Response,Challenge,Success)
+from .core import ClientAuthenticator, Failure, Response, Challenge, Success
+from .core import sasl_mechanism
 
+@sasl_mechanism("GSSAPI", 75)
 class GSSAPIClientAuthenticator(ClientAuthenticator):
     """Provides client-side GSSAPI SASL (Kerberos 5) authentication."""
 

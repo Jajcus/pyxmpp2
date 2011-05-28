@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2011 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -17,55 +17,49 @@
 """SASL authentication implementaion for PyXMPP.
 
 Normative reference:
-  - `RFC 2222 <http://www.ietf.org/rfc/rfc2222.txt>`__
+  - `RFC 4422 <http://www.ietf.org/rfc/rfc4422.txt>`__
 """
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
-import random
+from .core import Reply, Response, Challenge, Success, Failure, PasswordManager
+from .core import CLIENT_MECHANISMS, SECURE_CLIENT_MECHANISMS
+from .core import SERVER_MECHANISMS, SECURE_SERVER_MECHANISMS
+from .core import CLIENT_MECHANISMS_D, SERVER_MECHANISMS_D
 
-from .core import Reply,Response,Challenge,Success,Failure,PasswordManager
+from . import plain
+from . import external
+from . import digest_md5
 
-from .plain import PlainClientAuthenticator,PlainServerAuthenticator
-from .digest_md5 import DigestMD5ClientAuthenticator,DigestMD5ServerAuthenticator
-from .external import ExternalClientAuthenticator
-
-safe_mechanisms_dict={"DIGEST-MD5":(DigestMD5ClientAuthenticator,DigestMD5ServerAuthenticator),
-                      "EXTERNAL":(ExternalClientAuthenticator, None)}
 try:
-    from .gssapi import GSSAPIClientAuthenticator
+    from . import gssapi
 except ImportError:
     pass # Kerberos not available
-else:
-    safe_mechanisms_dict["GSSAPI"] = (GSSAPIClientAuthenticator,None)
-unsafe_mechanisms_dict={"PLAIN":(PlainClientAuthenticator,PlainServerAuthenticator)}
-all_mechanisms_dict=safe_mechanisms_dict.copy()
-all_mechanisms_dict.update(unsafe_mechanisms_dict)
 
-safe_mechanisms=safe_mechanisms_dict.keys()
-unsafe_mechanisms=unsafe_mechanisms_dict.keys()
-all_mechanisms=safe_mechanisms+unsafe_mechanisms
-
-def client_authenticator_factory(mechanism,password_manager):
+def client_authenticator_factory(mechanism, password_manager):
     """Create a client authenticator object for given SASL mechanism and
     password manager.
 
     :Parameters:
-        - `mechanism`: name of the SASL mechanism ("PLAIN", "DIGEST-MD5" or "GSSAPI").
+        - `mechanism`: name of the SASL mechanism ("PLAIN", "DIGEST-MD5" or
+          "GSSAPI").
         - `password_manager`: name of the password manager object providing
           authentication credentials.
     :Types:
-        - `mechanism`: `str`
+        - `mechanism`: `unincode`
         - `password_manager`: `PasswordManager`
+
+    :raises: `KeyError` if no client authenticator is available for this
+              mechanism
 
     :return: new authenticator.
     :returntype: `sasl.core.ClientAuthenticator`"""
-    authenticator=all_mechanisms_dict[mechanism][0]
+    authenticator = CLIENT_MECHANISMS_D[mechanism]
     return authenticator(password_manager)
 
-def server_authenticator_factory(mechanism,password_manager):
+def server_authenticator_factory(mechanism, password_manager):
     """Create a server authenticator object for given SASL mechanism and
     password manager.
 
@@ -77,9 +71,12 @@ def server_authenticator_factory(mechanism,password_manager):
         - `mechanism`: `str`
         - `password_manager`: `PasswordManager`
 
+    :raises: `KeyError` if no server authenticator is available for this
+              mechanism
+
     :return: new authenticator.
     :returntype: `sasl.core.ServerAuthenticator`"""
-    authenticator=all_mechanisms_dict[mechanism][1]
+    authenticator = SERVER_MECHANISMS_D[mechanism]
     return authenticator(password_manager)
 
 # vi: sts=4 et sw=4
