@@ -23,6 +23,7 @@ from __future__ import absolute_import
 __docformat__ = "restructuredtext en"
 
 class StreamEvent(object):
+    stream = None
     def __init__(self):
         pass
     def __unicode__(self):

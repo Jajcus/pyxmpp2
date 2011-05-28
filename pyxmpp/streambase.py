@@ -26,6 +26,7 @@ from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 
+import inspect
 import socket
 import time
 import errno
@@ -60,6 +61,7 @@ from .streamevents import ConnectedEvent, GotFeaturesEvent
 from .streamevents import ConnectingEvent, ConnectionAcceptedEvent
 from .streamevents import DisconnectedEvent, ResolvingAddressEvent
 from .streamevents import ResolvingSRVEvent, StreamConnectedEvent
+from .streamevents import AuthenticatedEvent
 
 XMPPSettings.add_defaults(
         {
@@ -80,9 +82,56 @@ FEATURE_BIND = BIND_QNP + u"bind"
 
 class XMPPEventHandler:
     __metaclass__ = ABCMeta
-    stream = None
-    def handle_xmpp_event(event):
+    def handle_xmpp_event(self, event):
         return False
+
+class StreamFeatureHandler:
+    __metaclass__ = ABCMeta
+    def handle_stream_features(self, stream, features):
+        """Handle features announced by the stream peer.
+
+        [initiator only]
+
+        :Parameters:
+            - `stream`: the stream
+            - `features`: the features element just received
+        :Types:
+            - `stream`: `StreamBase`
+            - `features`: `ElementTree.Element`
+        """
+        return False
+    def make_stream_features(self, stream, features):
+        """Update the features element announced by the stream.
+
+        [receiver only]
+
+        :Parameters:
+            - `stream`: the stream
+            - `features`: the features element about to be sent
+        :Types:
+            - `stream`: `StreamBase`
+            - `features`: `ElementTree.Element`
+        """
+        return False
+
+def stream_element_handler(element_name, usage_restriction = None):
+    """Method decorator generator for decorating stream element
+    handler methods in `StreamFeatureHandler` subclasses.
+    
+    :Parameters:
+        - `element_name`: stream element QName
+        - `usage_restriction`: optional usage restriction: "initiator" or
+          "receiver"
+    :Types:
+        - `element_name`: `unicode`
+        - `usage_restriction`: `unicode`
+    """
+    def decorator(func):
+        """The decorator"""
+        func._pyxmpp_stream_element_handled = element_name
+        func._pyxmpp_usage_restriction = usage_restriction
+        return func
+    return decorator
 
 def once(func):
     @wraps(func)
@@ -127,18 +176,18 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         - `settings`: XMPPSettings
         - `version`: (`int`, `int`) tuple
     """
-    def __init__(self, stanza_namespace, event_handler, settings = None):
+    def __init__(self, stanza_namespace, handlers, settings = None):
         """Initialize StreamBase object
 
         :Parameters:
           - `stanza_namespace`: stream's default namespace URI ("jabber:client"
             for client, "jabber:server" for server, etc.)
-          - `event_handler`: object to handle the stream events
+          - `handlers`: objects to handle the stream events and elements
           - `settings`: extra settings
         :Types:
           - `stanza_namespace`: `unicode`
           - `settings`: XMPPSettings
-          - `event_handler`: `XMPPEventHandler`
+          - `handlers`: `list` of objects
         """
         XMLStreamHandler.__init__(self)
         if settings is None:
@@ -150,7 +199,14 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         self.keepalive = self.settings[u"keepalive"]
         self.process_all_stanzas = False
         self.port = None
-        self.event_handler = event_handler
+        self.handlers = handlers
+        self._event_handlers = []
+        self._stream_feature_handlers = []
+        for handler in handlers:
+            if isinstance(handler, XMPPEventHandler):
+                self._event_handlers.append(handler)
+            elif isinstance(handler, StreamFeatureHandler):
+                self._stream_feature_handlers.append(handler)
         self._in_progress = set()
         self._reset()
 
@@ -196,6 +252,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         else:
             self.peer = None
         self.initiator = True
+        self._setup_stream_element_handlers()
         self._send_stream_start()
         self._make_reader()
 
@@ -293,10 +350,35 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             self.me = JID(myname)
         else:
             self.me = None
-        self.initiator = 0
+        self.initiator = False
         self._make_reader()
         self.last_keepalive = time.time()
+        self._setup_stream_element_handlers()
         return addr
+
+    def _setup_stream_element_handlers(self):
+        """Set up stream element handlers.
+        
+        Scans the `self.handlers` list for `StreamFeatureHandler`
+        instances and updates `self._element_handlers` mapping with their
+        methods decorated with `@stream_element_handler`"""
+        if self.initiator:
+            mode = "initiator"
+        else:
+            mode = "receiver"
+        self._element_handlers = {}
+        for handler in self.handlers:
+            if not isinstance(handler, StreamFeatureHandler):
+                continue
+            for name, meth in inspect.getmembers(handler, callable):
+                if not hasattr(meth, "_pyxmpp_stream_element_handled"):
+                    continue
+                element_handled = meth._pyxmpp_stream_element_handled
+                if element_handled in self._element_handlers:
+                    # use only the first matching handler
+                    continue
+                if meth._pyxmpp_usage_restriction in (None, mode):
+                    self._element_handlers[element_handled] = meth
 
     def disconnect(self):
         """Gracefully close the connection."""
@@ -317,15 +399,15 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         
         Called when connection state is changed.
 
-        Must not be called with self.lock acquired!
+        Should not be called with self.lock acquired!
         """
         event.stream = self
         logger.debug(u"Stream event: {0}".format(event))
-        if self.event_handler:
-            handled = self.event_handler.handle_xmpp_event(event)
-        else:
-            handled = None
-        return handled
+        for handler in self._event_handlers:
+            logger.debug(u"  passing the event to: {0!r}".format(handler))
+            if handler.handle_xmpp_event(event):
+                return True
+        return False
 
     def close(self):
         """Forcibly close the connection and clear the stream state."""
@@ -519,7 +601,9 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         if self.peer_authenticated and not self.peer.resource:
             ElementTree.SubElement(features, FEATURE_BIND)
             self.set_iq_set_handler(XMLPayload, self.handle_bind_iq_set,
-                                                               FEATURE_BIND) 
+                                                               FEATURE_BIND)
+        for handler in self._stream_feature_handlers:
+            handler.make_stream_features(self, features)
         return features
 
     def _send_stream_features(self):
@@ -577,7 +661,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         except (IOError, OSError, socket.error), err:
             raise FatalStreamError(u"IO Error: {0}".format(err))
 
-    def _write_element(self, element):
+    def write_element(self, element):
         """Write XML `element` to the stream.
 
         :Parameters:
@@ -585,8 +669,14 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         :Types:
             - `element`: `ElementTree.Element`
         """
+        with self.lock:
+            self._write_element(element)
+
+    def _write_element(self, element):
+        """Same as `write_element` but with `self.lock` already acquired.
+        """
         if self.eof or not self.socket or not self._serializer:
-            logger.debug("Dropping stanza: {0}".format(
+            logger.debug("Dropping element: {0}".format(
                                                 ElementTree.tostring(element)))
             return
         data = self._serializer.emit_stanza(element)
@@ -761,6 +851,17 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             - `element`: `ElementTree.Element`
         """
         tag = element.tag
+        if tag in self._element_handlers:
+            self.lock.release()
+            try:
+                handler = self._element_handlers[tag]
+                logger.debug("Passing element {0!r} to method {1!r}"
+                                                    .format(element, handler))
+                handled = handler(self, element)
+            finally:
+                self.lock.acquire()
+            if handled:
+                return
         if tag.startswith(self._stanza_namespace_p):
             stanza = stanza_factory(element, self, self.language)
             self.lock.release()
@@ -781,6 +882,8 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             self._got_features()
         else:
             logger.debug("Unhandled element: {0}".format(serialize(element)))
+            logger.debug(" known handlers: {0!r}".format(
+                                                    self._element_handlers))
 
     def process_stream_error(self, error):
         """Process stream error element received.
@@ -825,6 +928,12 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         self.lock.release()
         try:
             handled = self.event(GotFeaturesEvent(self.features))
+            if not handled:
+                for handler in self._stream_feature_handlers:
+                    handled = handler.handle_stream_features(self,
+                                                                self.features)
+                    if handled:
+                        break
             if not handled and has_bind_feature:
                 self.bind(self.me.resource)
             elif self.authenticated:
@@ -892,5 +1001,21 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             return True
         else:
             return False
+
+    def set_peer_authenticated(self, peer, restart_stream = False):
+        with self.lock:
+            self.peer_authenticated = True
+            self.peer = peer
+            if restart_stream:
+                self._restart_stream()
+        self.event(AuthenticatedEvent(self.peer))
+
+    def set_authenticated(self, me, restart_stream = False):
+        with self.lock:
+            self.authenticated = True
+            self.me = me
+            if restart_stream:
+                self._restart_stream()
+        self.event(AuthenticatedEvent(self.me))
 
 # vi: sts=4 et sw=4

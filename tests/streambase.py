@@ -7,7 +7,7 @@ import re
 
 from xml.etree.ElementTree import Element, SubElement, XML
 
-from pyxmpp2.streambase import StreamBase
+from pyxmpp2.streambase import StreamBase, XMPPEventHandler
 from pyxmpp2.streamevents import *
 from pyxmpp2.exceptions import StreamParseError
 from pyxmpp2.jid import JID
@@ -57,7 +57,7 @@ PARSE_ERROR_RESPONSE = ('<stream:error><xml-not-well-formed'
 
 TIMEOUT = 1.0 # seconds
 
-class JustConnectEventHandler(object):
+class JustConnectEventHandler(XMPPEventHandler):
     def __init__(self):
         self.events_received = []
     def handle_xmpp_event(self, event):
@@ -67,7 +67,7 @@ class JustConnectEventHandler(object):
             return True
         return False
 
-class JustStreamConnectEventHandler(object):
+class JustStreamConnectEventHandler(XMPPEventHandler):
     def __init__(self):
         self.events_received = []
     def handle_xmpp_event(self, event):
@@ -77,7 +77,7 @@ class JustStreamConnectEventHandler(object):
             return True
         return False
 
-class AuthorizedEventHandler(object):
+class AuthorizedEventHandler(XMPPEventHandler):
     def __init__(self):
         self.events_received = []
     def handle_xmpp_event(self, event):
@@ -87,14 +87,14 @@ class AuthorizedEventHandler(object):
             return True
         return False
 
-class IgnoreEventHandler(object):
+class IgnoreEventHandler(XMPPEventHandler):
     def __init__(self):
         self.events_received = []
     def handle_xmpp_event(self, event):
         self.events_received.append(event)
         return False
 
-class JustAcceptEventHandler(object):
+class JustAcceptEventHandler(XMPPEventHandler):
     def __init__(self):
         self.events_received = []
     def handle_xmpp_event(self, event):
@@ -117,7 +117,7 @@ class TestInitiator(NetworkTestCase):
     def test_connect_close(self):
         addr, port = self.start_server()
         handler = JustConnectEventHandler()
-        stream = StreamBase(u"jabber:client", event_handler = handler)
+        stream = StreamBase(u"jabber:client", [handler])
         stream.connect(addr, port)
         self.loop(stream)
         self.assertIsNone(stream.socket)
@@ -127,7 +127,7 @@ class TestInitiator(NetworkTestCase):
     def test_stream_connect_disconnect(self):
         addr, port = self.start_server()
         handler = JustStreamConnectEventHandler()
-        stream = StreamBase(u"jabber:client", event_handler = handler)
+        stream = StreamBase(u"jabber:client", [handler])
         stream.connect(addr, port)
         self.server.write(C2S_SERVER_STREAM_HEAD)
         stream.loop_iter(1)
@@ -141,7 +141,7 @@ class TestInitiator(NetworkTestCase):
     def test_bind_no_resource(self):
         addr, port = self.start_server()
         handler = AuthorizedEventHandler()
-        stream = StreamBase(u"jabber:client", event_handler = handler)
+        stream = StreamBase(u"jabber:client", [handler])
         stream.me = JID("test@127.0.0.1")
         stream.connect(addr, port)
         self.server.write(C2S_SERVER_STREAM_HEAD)
@@ -161,7 +161,7 @@ class TestInitiator(NetworkTestCase):
     def test_bind(self):
         addr, port = self.start_server()
         handler = AuthorizedEventHandler()
-        stream = StreamBase(u"jabber:client", event_handler = handler)
+        stream = StreamBase(u"jabber:client", [handler])
         stream.me = JID("test@127.0.0.1/Provided")
         stream.connect(addr, port)
         self.server.write(C2S_SERVER_STREAM_HEAD)
@@ -181,7 +181,7 @@ class TestInitiator(NetworkTestCase):
     def test_parse_error(self):
         addr, port = self.start_server()
         handler = JustStreamConnectEventHandler()
-        stream = StreamBase(u"jabber:client", event_handler = handler)
+        stream = StreamBase(u"jabber:client", [handler])
         stream.connect(addr, port)
         self.server.write(C2S_SERVER_STREAM_HEAD)
         stream.loop_iter(1)
@@ -210,7 +210,7 @@ class TestReceiver(NetworkTestCase):
         sock = self.make_listening_socket()
         self.start_client(sock.getsockname())
         handler = JustAcceptEventHandler()
-        stream = StreamBase(u"jabber:client", event_handler = handler)
+        stream = StreamBase(u"jabber:client", [handler])
         stream.accept(sock, sock.getsockname()[0])
         self.loop(stream)
         self.assertIsNone(stream.socket)
@@ -222,7 +222,7 @@ class TestReceiver(NetworkTestCase):
         sock = self.make_listening_socket()
         self.start_client(sock.getsockname())
         handler = JustStreamConnectEventHandler()
-        stream = StreamBase(u"jabber:client", event_handler = handler)
+        stream = StreamBase(u"jabber:client", [handler])
         stream.accept(sock, sock.getsockname()[0])
         self.client.write(C2S_CLIENT_STREAM_HEAD)
         stream.loop_iter(1)
@@ -237,7 +237,7 @@ class TestReceiver(NetworkTestCase):
         sock = self.make_listening_socket()
         self.start_client(sock.getsockname())
         handler = IgnoreEventHandler()
-        stream = StreamBase(u"jabber:client", event_handler = handler)
+        stream = StreamBase(u"jabber:client", [handler])
         stream.accept(sock, sock.getsockname()[0])
         stream.peer_authenticated = True
         stream.peer = JID("test@127.0.0.1")
@@ -260,7 +260,7 @@ class TestReceiver(NetworkTestCase):
         sock = self.make_listening_socket()
         self.start_client(sock.getsockname())
         handler = IgnoreEventHandler()
-        stream = StreamBase(u"jabber:client", event_handler = handler)
+        stream = StreamBase(u"jabber:client", [handler])
         stream.accept(sock, sock.getsockname()[0])
         stream.peer_authenticated = True
         stream.peer = JID("test@127.0.0.1")
@@ -283,7 +283,7 @@ class TestReceiver(NetworkTestCase):
         sock = self.make_listening_socket()
         self.start_client(sock.getsockname())
         handler = JustStreamConnectEventHandler()
-        stream = StreamBase(u"jabber:client", event_handler = handler)
+        stream = StreamBase(u"jabber:client", [handler])
         stream.accept(sock, sock.getsockname()[0])
         self.client.write(C2S_CLIENT_STREAM_HEAD)
         stream.loop_iter(1)

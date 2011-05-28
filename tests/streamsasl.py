@@ -7,8 +7,8 @@ import re
 
 from xml.etree.ElementTree import Element, SubElement, XML
 
-from pyxmpp2.streambase import StreamBase
-from pyxmpp2.streamsasl import StreamSASLMixIn
+from pyxmpp2.streambase import StreamBase, XMPPEventHandler
+from pyxmpp2.streamsasl import StreamSASLHandler
 from pyxmpp2.streamevents import *
 from pyxmpp2.exceptions import SASLAuthenticationFailed
 from pyxmpp2.jid import JID
@@ -65,36 +65,7 @@ PARSE_ERROR_RESPONSE = ('<stream:error><xml-not-well-formed'
 
 TIMEOUT = 1.0 # seconds
 
-class Stream(StreamSASLMixIn, StreamBase):
-    def __init__(self, stanza_namespace, event_handler, settings = None):
-        StreamBase.__init__(self, stanza_namespace, event_handler, settings)
-        StreamSASLMixIn.__init__(self)
-
-    def _reset(self):
-        StreamBase._reset(self)
-        self._reset_sasl()
-
-    def _make_stream_features(self):
-        features = StreamBase._make_stream_features(self)
-        self._make_stream_sasl_features(features)
-        return features
-
-    def _process_element(self, element):
-        if self._process_element_sasl(element):
-            return
-        StreamBase._process_element(self, element)
-
-    def _got_features(self):
-        self._handle_sasl_features()
-        StreamBase._got_features(self)
-
-    def event(self, event):
-        handled = StreamBase.event(self, event)
-        if not handled:
-            handled = StreamSASLMixIn.event(self, event)
-        return handled 
-
-class IgnoreEventHandler(object):
+class IgnoreEventHandler(XMPPEventHandler):
     def __init__(self):
         self.events_received = []
     def handle_xmpp_event(self, event):
@@ -118,7 +89,7 @@ class TestInitiator(NetworkTestCase):
                                 u"username": u"user", 
                                 u"password": u"secret",
                                 })
-        stream = Stream(u"jabber:client", handler, settings)
+        stream = StreamBase(u"jabber:client", [StreamSASLHandler(settings), handler], settings)
         stream.connect(addr, port)
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.server.write(AUTH_FEATURES)
@@ -155,7 +126,7 @@ class TestInitiator(NetworkTestCase):
                                 u"username": u"user", 
                                 u"password": u"badsecret",
                                 })
-        stream = Stream(u"jabber:client", handler, settings)
+        stream = StreamBase(u"jabber:client", [StreamSASLHandler(settings), handler], settings)
         stream.connect(addr, port)
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.server.write(AUTH_FEATURES)
