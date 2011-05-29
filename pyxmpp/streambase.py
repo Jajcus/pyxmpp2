@@ -78,7 +78,6 @@ LANG_SPLIT_RE = re.compile(r"(.*)(?:-[a-zA-Z0-9])?-[a-zA-Z0-9]+$")
 
 ERROR_TAG = STREAM_QNP + u"error"
 FEATURES_TAG = STREAM_QNP + u"features"
-FEATURE_BIND = BIND_QNP + u"bind"
 
 class XMPPEventHandler:
     __metaclass__ = ABCMeta
@@ -205,7 +204,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         for handler in handlers:
             if isinstance(handler, XMPPEventHandler):
                 self._event_handlers.append(handler)
-            elif isinstance(handler, StreamFeatureHandler):
+            if isinstance(handler, StreamFeatureHandler):
                 self._stream_feature_handlers.append(handler)
         self._in_progress = set()
         self.socket = None
@@ -589,10 +588,6 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         :returns: new <features/> element
         :returntype: `ElementTree.Element`"""
         features = ElementTree.Element(FEATURES_TAG)
-        if self.peer_authenticated and not self.peer.resource:
-            ElementTree.SubElement(features, FEATURE_BIND)
-            self.set_iq_set_handler(XMLPayload, self.handle_bind_iq_set,
-                                                               FEATURE_BIND)
         for handler in self._stream_feature_handlers:
             handler.make_stream_features(self, features)
         return features
@@ -603,34 +598,6 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         [receiving entity only]"""
         self.features = self._make_stream_features()
         self._write_element(self.features)
-
-    def handle_bind_iq_set(self, stanza):
-        """Handler <iq type="set"/> for resource binding."""
-        if self.peer.resource:
-            raise ResourceConstraintProtocolError(
-                        u"Only one resource per client supported")
-        element = stanza.get_payload().element
-        sub = element.find(BIND_QNP + u"resource")
-        jid = None
-        if sub is not None:
-            resource = sub.text
-            if resource:
-                try:
-                    jid = JID(self.peer.node, self.peer.domain, resource)
-                except JIDError:
-                    pass
-        if jid is None:
-            resource = unicode(uuid.uuid4())
-            jid = JID(self.peer.node, self.peer.domain, resource)
-        response = stanza.make_result_response()
-        element = ElementTree.Element(FEATURE_BIND)
-        sub = ElementTree.SubElement(element, BIND_QNP + u"jid")
-        sub.text = unicode(jid)
-        payload = XMLPayload(element)
-        response.set_payload(payload)
-        self.peer = jid
-        self.event(AuthorizedEvent(self.peer))
-        return response
 
     def write_raw(self, data):
         """Write raw data to the stream socket.
@@ -912,77 +879,21 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         [initiating entity only]
 
         The received features node is available in `self.features`."""
-        has_bind_feature = False
-        for element in self.features:
-            if element.tag == FEATURE_BIND:
-                has_bind_feature = True
         self.lock.release()
         try:
+            logger.debug("got features, passing to event handlers...")
             handled = self.event(GotFeaturesEvent(self.features))
+            logger.debug("  handled: {0}".format(handled))
             if not handled:
+                logger.debug("  passing to stream features handlers: {0}"
+                                        .format(self._stream_feature_handlers))
                 for handler in self._stream_feature_handlers:
                     handled = handler.handle_stream_features(self,
                                                                 self.features)
                     if handled:
                         break
-            if not handled and has_bind_feature:
-                self.bind(self.me.resource)
-            elif self.authenticated:
-                self.event(AuthorizedEvent(self.me))
         finally:
             self.lock.acquire()
-
-    def bind(self, resource):
-        """Bind to a resource.
-
-        [initiating entity only]
-
-        :Parameters:
-            - `resource`: the resource name to bind to.
-        :Types:
-            - `resource`: `unicode`
-
-        XMPP stream is authenticated for bare JID only. To use
-        the full JID it must be bound to a resource.
-        """
-        stanza = Iq(stanza_type = "set")
-        element = ElementTree.Element(BIND_QNP + u"bind")
-        if resource:
-            sub = ElementTree.SubElement(element, BIND_QNP + u"resource")
-            sub.text = resource
-        stanza.set_payload(XMLPayload(element))
-        self.set_response_handlers(stanza, self._bind_success, self._bind_error)
-        self.send(stanza)
-        self.event(BindingResourceEvent(resource))
-
-    def _bind_success(self, stanza):
-        """Handle resource binding success.
-
-        [initiating entity only]
-
-        :Parameters:
-            - `stanza`: <iq type="result"/> stanza received.
-
-        Set `self.me` to the full JID negotiated."""
-        payload = stanza.get_payload()
-        jid = None
-        for child in payload.element:
-            if child.tag == BIND_QNP + u"jid":
-                jid = child.text
-                break
-        if not jid:
-            raise BadRequestProtocolError(u"<jid/> element mising in"
-                                                    " the bind response")
-        self.me = JID(jid)
-        self.event(AuthorizedEvent(self.me))
-
-    def _bind_error(self, stanza): # pylint: disable-msg=R0201,W0613
-        """Handle resource binding success.
-
-        [initiating entity only]
-
-        :raise FatalStreamError:"""
-        raise FatalStreamError("Resource binding failed")
 
     def connected(self):
         """Check if stream is connected.
