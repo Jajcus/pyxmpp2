@@ -62,13 +62,6 @@ class Stream(StreamTLSMixIn, StreamSASLMixIn, StreamBase):
         StreamSASLMixIn.__init__(self)
         self.__logger = logging.getLogger("pyxmpp.Stream")
 
-    def _reset(self):
-        """Reset `Stream` object state making it ready to handle new
-        connections."""
-        StreamBase._reset(self)
-        self._reset_tls()
-        self._reset_sasl()
-
     def _make_stream_features(self):
         """Create the <features/> element for the stream.
 

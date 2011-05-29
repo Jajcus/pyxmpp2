@@ -208,11 +208,6 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             elif isinstance(handler, StreamFeatureHandler):
                 self._stream_feature_handlers.append(handler)
         self._in_progress = set()
-        self._reset()
-
-    def _reset(self):
-        """Reset `Stream` object state making it ready to handle new
-        connections."""
         self.socket = None
         self._reader = None
         self.addr = None
@@ -230,13 +225,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         self.language = None
         self.peer_language = None
         self._serializer = None
-
-        # FIXME?
-        self._iq_response_handlers = ExpiringDictionary()
-        self._iq_get_handlers = {}
-        self._iq_set_handlers = {}
-        self._message_handlers = []
-        self._presence_handlers = []
+        self.finished = False
 
     def _connect_socket(self, sock, to = None):
         """Initialize stream on outgoing connection.
@@ -426,7 +415,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             self.socket.close()
             self.socket = None
             self.event(DisconnectedEvent(self.peer))
-        self._reset()
+        self.finished = True
 
     def _make_reader(self):
         """Create ne `StreamReader` instace as `self._reader`."""

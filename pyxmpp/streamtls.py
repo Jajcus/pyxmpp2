@@ -117,10 +117,6 @@ class StreamTLSMixIn:
         """
         self.tls_settings = tls_settings
         self.__logger = logging.getLogger("pyxmpp.StreamTLSMixIn")
-
-    def _reset_tls(self):
-        """Reset `StreamTLSMixIn` object state making it ready to handle new
-        connections."""
         self.tls = None
         self.tls_requested = False
 

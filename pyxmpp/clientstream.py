@@ -102,11 +102,6 @@ class ClientStream(Stream):
         self.me = None
         self._auth_methods_left = None
         self.__logger=logging.getLogger("pyxmpp.ClientStream")
-
-    def _reset(self):
-        """Reset `ClientStream` object state, making the object ready to handle
-        new connections."""
-        Stream._reset(self)
         self._auth_methods_left=[]
 
     def connect(self,server=None,port=None):
