@@ -35,8 +35,8 @@ class TestPresence(unittest.TestCase):
         self.assertEqual(p.priority, 10)
         payload = p.get_all_payload()
         self.assertTrue(payload)
-        self.assertEqual(payload[0].xml_namespace, 
-                                        "http://pyxmpp.jajcus.net/xmlns/test")
+        self.assertEqual(payload[0].xml_element_name, 
+                                "{http://pyxmpp.jajcus.net/xmlns/test}payload")
         self.assertTrue(len(payload[0].element) > 0)
         self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
@@ -90,7 +90,7 @@ class TestPresence(unittest.TestCase):
                 show = u"away",
                 status = u"The Status",
                 priority = 10)
-        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}t")
+        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
         SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         p.add_payload(payload)

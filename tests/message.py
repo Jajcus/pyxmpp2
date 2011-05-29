@@ -32,8 +32,8 @@ class TestMessage(unittest.TestCase):
         self.assertEqual(m.thread, u"thread-id")
         payload = m.get_all_payload()
         self.assertTrue(payload)
-        self.assertEqual(payload[0].xml_namespace, 
-                                        "http://pyxmpp.jajcus.net/xmlns/test")
+        self.assertEqual(payload[0].xml_element_name, 
+                            "{http://pyxmpp.jajcus.net/xmlns/test}payload")
         self.assertTrue(len(payload[0].element) > 0)
         self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
@@ -75,7 +75,7 @@ class TestMessage(unittest.TestCase):
                 subject = u"Subject",
                 body = u"The body",
                 thread = u"thread-id")
-        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}t")
+        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
         SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         m.add_payload(payload)

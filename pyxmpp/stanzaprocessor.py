@@ -37,7 +37,7 @@ from .exceptions import FeatureNotImplementedProtocolError
 from .stanza import Stanza
 from .message import Message
 from .presence import Presence
-from .stanzapayload import StanzaPayload
+from .stanzapayload import StanzaPayload, XMLPayload
 from .iq import Iq
 
 logger = logging.getLogger("pyxmpp.stanzaprocessor")
@@ -322,31 +322,33 @@ class StanzaProcessor(object):
         typ = stanza.stanza_type
         if typ in ("result", "error"):
             return self._process_iq_response(stanza)
-        payload = stanza.get_payload()
+        if typ not in ("get", "set"):
+            raise BadRequestProtocolError("Bad <iq/> type")
+        logger.debug("Handling <iq type='{0}'> stanza: {1!r}".format(
+                                                            stanza, typ))
+        payload = stanza.get_payload(None)
+        logger.debug("  payload: {0!r}".format(payload))
         if not payload:
             raise BadRequestProtocolError("<iq/> stanza with no child element")
-        if typ == "get":
-            handler = self._get_iq_handler("get", payload)
-            if handler:
-                response = handler(stanza)
-                self._process_handler_result(response)
-                return True
-            else:
-                raise FeatureNotImplementedProtocolError("Not implemented")
-        elif typ == "set":
-            handler = self._get_iq_handler("set", payload)
-            if handler:
-                response = handler(stanza)
-                self._process_handler_result(response)
-                return True
-            else:
-                raise FeatureNotImplementedProtocolError("Not implemented")
+        handler = self._get_iq_handler(typ, payload)
+        if not handler:
+            payload = stanza.get_payload(None, specialize = True)
+            logger.debug("  specialized payload: {0!r}".format(payload))
+            if not isinstance(payload, XMLPayload):
+                handler = self._get_iq_handler(typ, payload)
+        if handler:
+            response = handler(stanza)
+            self._process_handler_result(response)
+            return True
         else:
-            raise BadRequestProtocolError("Unknown IQ stanza type")
+            raise FeatureNotImplementedProtocolError("Not implemented")
 
     def _get_iq_handler(self, iq_type, payload):
         """Get an <iq/> handler for given iq  type and payload."""
         key = (payload.__class__, payload.handler_key)
+        logger.debug("looking up iq {0} handler for {1!r}, key: {2!r}"
+                            .format(iq_type, payload, key))
+        logger.debug("handlers: {0!r}".format(self._iq_handlers))
         handler = self._iq_handlers[iq_type].get(key)
         return handler
 

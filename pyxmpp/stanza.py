@@ -18,7 +18,7 @@
 """General XMPP Stanza handling.
 
 Normative reference:
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
+  - `RFC 6120 <http://www.ietf.org/rfc/rfc6120.txt>`__
 """
 
 from __future__ import absolute_import
@@ -31,7 +31,8 @@ import weakref
 
 from .exceptions import BadRequestProtocolError, JIDMalformedProtocolError
 from .jid import JID
-from .stanzapayload import StanzaPayload, XMLPayload
+from .stanzapayload import StanzaPayload, XMLPayload, payload_factory
+from .stanzapayload import payload_class_for_element_name
 from .xmppserializer import serialize
 from .constants import STANZA_NAMESPACES, STANZA_CLIENT_NS, XML_LANG_QNAME
 from .error import StanzaErrorElement
@@ -59,7 +60,7 @@ class Stanza(object):
         - `stanza_type`: `unicode`
         - `stanza_id`: `unicode`
         - `stream`: `pyxmpp2.stream.Stream`
-        - `_payload`: `list` of `StanzaPayload`
+        - `_payload`: `list` of (`unicode`, `StanzaPayload`) 
         - `_error`: `pyxmpp2.error.StanzaErrorElement`"""
     # pylint: disable-msg=R0902
     element_name = "Unknown"
@@ -73,7 +74,7 @@ class Stanza(object):
             - `element`: XML element of this stanza, or element name for a new
               stanza. If element is given it must not be modified later,
               unless `decode_payload()` and `mark_dirty()` methods are called
-              first.
+              first (the element changes won't affec the stanza then).
             - `from_jid`: sender JID.
             - `to_jid`: recipient JID.
             - `stanza_type`: staza type: one of: "get", "set", "result" 
@@ -244,7 +245,7 @@ class Stanza(object):
         self._dirty = False
         return element
 
-    def decode_payload(self):
+    def decode_payload(self, specialize = False):
         """Decode payload from the element passed to the stanza constructor.
 
         Iterates over stanza children and creates StanzaPayload objects for
@@ -260,11 +261,15 @@ class Stanza(object):
         if self._element is None:
             raise ValueError("This stanza has no element to decode""")
         payload = []
+        if specialize:
+            factory = payload_factory
+        else:
+            factory = XMLPayload
         for child in self._element:
             if self.__class__ is not Stanza:
                 if child.tag.startswith(self._ns_prefix):
                     continue
-            payload.append(XMLPayload(child))
+            payload.append(factory(child))
         self._payload = payload
 
     @property
@@ -311,6 +316,10 @@ class Stanza(object):
     def error(self, error): # pylint: disable-msg=E0202,E0102,C0111
         self._error = error
         self._dirty = True
+
+    @property
+    def stream(self): # pylint: disable-msg=C0111,E0202
+        return self._stream()
 
     def mark_dirty(self):
         """Mark the stanza `dirty` so the XML representation will be
@@ -359,14 +368,84 @@ class Stanza(object):
             raise TypeError("Bad payload type")
         self._dirty = True
 
-    def get_all_payload(self):
+    def get_all_payload(self, specialize = False):
         """Return list of stanza payload objects.
+
+        :Parameters:
+            - `specialize`: If `True`, then return objects of specialized
+              `StanzaPayload` classes whenever possible, otherwise the
+              representation already available will be used (often
+              `XMLPayload`)
        
         :Returntype: `list` of `StanzaPayload`
         """
         if self._payload is None:
-            self.decode_payload()
+            self.decode_payload(specialize)
+        elif specialize:
+            for i, payload in enumerate(self._payload):
+                if isinstance(payload, XMLPayload):
+                    factory = payload_class_for_element_name(
+                                                        payload.element.tag)
+                    if factory is not XMLPayload:
+                        payload = factory(payload.element)
+                        self._payload[i] = payload
         return list(self._payload)
+
+    def get_payload(self, payload_class, payload_key = None,
+                                                        specialize = False):
+        """Get the first payload item matching the given class
+        and optional key.
+
+        Payloads may be addressed using a specific payload class or 
+        via the generic `XMLPayload` element, though the `XMLPayload`
+        representation is available only as long as the element is not
+        requested by a more specific type.
+
+        :Parameters:
+            - `payload_class`: requested payload class, a subclass of
+              `StanzaPayload`. If `None` get the first payload in whatever
+              class is available.
+            - `payload_key`: optional key for additional match. When used
+              with `payload_class`=`XMLPayload` this selects the element to
+              match
+            - `specialize`: If `True`, and `payload_class` is `None` then
+              return object of a specialized `StanzaPayload` subclass whenever
+              possible
+        :Types:
+            - `payload_class`: `StanzaPayload`
+            - `specialize`: `bool`
+      
+        :Return: payload element found or `None`
+        :Returntype: `StanzaPayload`
+        """
+        if self._payload is None:
+            self.decode_payload()
+        if payload_class is None:
+            if self._payload:
+                payload = self._payload[0]
+                if specialize and isinstance(payload, XMLPayload):
+                    factory = payload_class_for_element_name(
+                                                        payload.element.tag)
+                    if factory is not XMLPayload:
+                        payload = factory(payload.element)
+                        self._payload[0] = payload
+                return payload
+            else:
+                return None
+        elements = payload_class._pyxmpp_payload_element_name
+        for i, payload in enumerate(self._payload):
+            if isinstance(payload, XMLPayload):
+                if payload_class is not XMLPayload:
+                    if payload.xml_element_name not in elements:
+                        continue
+                    payload = payload_class(payload.element)
+            elif not isinstance(payload, payload_class):
+                continue
+            if payload_key is not None and payload_key != payload.handler_key():
+                continue
+            self._payload[i] = payload
+            return payload
+        return None
 
     last_id = random.randrange(1000000)
 

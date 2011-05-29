@@ -19,7 +19,14 @@
 
 from abc import ABCMeta
 from copy import deepcopy
+from collections import defaultdict
 from xml.etree import ElementTree
+import logging
+
+STANZA_PAYLOAD_CLASSES = {}
+STANZA_PAYLOAD_ELEMENTS = defaultdict(list)
+
+logger = logging.getLogger("pyxmpp.stanzapayload")
 
 class StanzaPayload:
     """Abstract base class for stanza payload objects."""
@@ -52,10 +59,6 @@ class XMLPayload(StanzaPayload):
             data = data.as_xml()
         if not isinstance(data, ElementTree.Element):
             raise TypeError("ElementTree.Element required")
-        if data.tag.startswith("{"):
-            self.xml_namespace = data.tag[1:].split("}", 1)[0]
-        else:
-            self.xml_namespace = None
         self.xml_element_name = data.tag
         self.element = data
 
@@ -67,4 +70,40 @@ class XMLPayload(StanzaPayload):
         """Return `self.xml_element_name` as the extra key for stanza
         handlers."""
         return self.xml_element_name
+
+def payload_element_name(element_name):
+    """Class decorator generator for decorationg
+    `StanzaPayload` subclasses.
     
+    :Parameters:
+        - `element_name`: XML element qname handled by the class
+    :Types:
+        - `element_name`: `unicode`
+    """
+    def decorator(klass):
+        if hasattr(klass, "_pyxmpp_payload_element_name"):
+            klass._pyxmpp_payload_element_name.append(element_name)
+        else:
+            klass._pyxmpp_payload_element_name = [element_name]
+        if element_name in STANZA_PAYLOAD_CLASSES:
+            logger.warning("Overriding payload class for {0!r}".format(
+                                                                element_name))
+        STANZA_PAYLOAD_CLASSES[element_name] = klass
+        STANZA_PAYLOAD_ELEMENTS[klass].append(element_name)
+        return klass
+    return decorator
+
+def payload_class_for_element_name(element_name):
+    logger.debug(" looking up payload class for element: {0!r}".format(
+                                                                element_name))
+    logger.debug("  known: {0!r}".format(STANZA_PAYLOAD_CLASSES))
+    if element_name in STANZA_PAYLOAD_CLASSES:
+        return STANZA_PAYLOAD_CLASSES[element_name]
+    else:
+        return XMLPayload
+
+def payload_element_names_for_class(klass):
+    return STANZA_PAYLOAD_ELEMENTS[klass]
+
+def payload_factory(element):
+    return payload_class_for_element_name(element.tag)(element)

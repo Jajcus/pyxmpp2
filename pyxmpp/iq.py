@@ -136,18 +136,6 @@ class Iq(Stanza):
                         to_jid = self.from_jid, stanza_id = self.stanza_id)
         return stanza
     
-    def get_payload(self):
-        """Return the stanza payload object or `None`.
-
-        :Returntype: `StanzaPayload`
-        """
-        if self._payload is None:
-            self.decode_payload()
-        if self._payload:
-            return self._payload[0]
-        else:
-            return None
-
     def add_payload(self, payload):
         """Add new the stanza payload. Fails if there is already some
         payload element attached (<iq/> stanza can contain only one payload

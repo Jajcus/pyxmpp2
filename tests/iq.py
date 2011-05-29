@@ -50,8 +50,8 @@ class TestIq(unittest.TestCase):
         self.assertEqual(iq.stanza_id, "1")
         payload = iq.get_all_payload()
         self.assertTrue(payload)
-        self.assertEqual(payload[0].xml_namespace, 
-                                        "http://pyxmpp.jajcus.net/xmlns/test")
+        self.assertEqual(payload[0].xml_element_name, 
+                            "{http://pyxmpp.jajcus.net/xmlns/test}payload")
         self.assertTrue(len(payload[0].element) > 0)
         self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
@@ -64,8 +64,8 @@ class TestIq(unittest.TestCase):
         self.assertEqual(iq.stanza_id, "1")
         payload = iq.get_all_payload()
         self.assertTrue(payload)
-        self.assertEqual(payload[0].xml_namespace, 
-                                        "http://pyxmpp.jajcus.net/xmlns/test")
+        self.assertEqual(payload[0].xml_element_name, 
+                                "{http://pyxmpp.jajcus.net/xmlns/test}payload")
         self.assertTrue(len(payload[0].element) > 0)
         self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
@@ -78,8 +78,8 @@ class TestIq(unittest.TestCase):
         self.assertEqual(iq.stanza_id, "2")
         payload = iq.get_all_payload()
         self.assertTrue(payload)
-        self.assertEqual(payload[0].xml_namespace, 
-                                        "http://pyxmpp.jajcus.net/xmlns/test")
+        self.assertEqual(payload[0].xml_element_name, 
+                                "{http://pyxmpp.jajcus.net/xmlns/test}payload")
         self.assertTrue(len(payload[0].element) > 0)
         self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
@@ -101,8 +101,8 @@ class TestIq(unittest.TestCase):
         self.assertEqual(iq.stanza_id, "1")
         payload = iq.get_all_payload()
         self.assertTrue(payload)
-        self.assertEqual(payload[0].xml_namespace, 
-                                        "http://pyxmpp.jajcus.net/xmlns/test")
+        self.assertEqual(payload[0].xml_element_name, 
+                                "{http://pyxmpp.jajcus.net/xmlns/test}payload")
         self.assertTrue(len(payload[0].element) > 0)
         self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
@@ -131,7 +131,7 @@ class TestIq(unittest.TestCase):
                 to_jid = JID("dest@example.com"),
                 stanza_type = "get",
                 stanza_id = 1)
-        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}t")
+        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
         SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         iq.add_payload(payload)
@@ -144,7 +144,7 @@ class TestIq(unittest.TestCase):
                 from_jid = JID("dest@example.com"),
                 stanza_type = "result",
                 stanza_id = 1)
-        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}t")
+        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
         SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         iq.add_payload(payload)
@@ -157,7 +157,7 @@ class TestIq(unittest.TestCase):
                 to_jid = JID("dest@example.com"),
                 stanza_type = "set",
                 stanza_id = 2)
-        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}t")
+        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
         SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         iq.add_payload(payload)
@@ -177,7 +177,7 @@ class TestIq(unittest.TestCase):
     def test_iq_make_result_response(self):
         iq = Iq(XML(IQ1))
         iq2 = iq.make_result_response()
-        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}t")
+        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
         SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         iq2.add_payload(payload)

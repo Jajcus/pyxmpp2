@@ -7,6 +7,9 @@ import re
 
 from xml.etree import ElementTree
 from xml.etree.ElementTree import XML
+        
+from pyxmpp2.stanzapayload import StanzaPayload, XMLPayload
+from pyxmpp2.stanzapayload import payload_element_name
 
 from pyxmpp2.stanza import Stanza
 from pyxmpp2.jid import JID
@@ -34,6 +37,36 @@ STANZA5 = """
     <query xmlns='jabber:iq:version' />
 </iq>
 """
+
+STANZA6 = """
+<iq from='a@b.c/d' to='e@f.g/h' id='666' type='get' xmlns='jabber:client'>
+    <element xmlns='http://pyxmpp.jajcus.net/test/ns' />
+</iq>
+"""
+STANZA7 = """
+<iq from='a@b.c/d' to='e@f.g/h' id='666' type='get' xmlns='jabber:client'>
+    <element xmlns='http://pyxmpp.jajcus.net/test/ns'><data>Test</data></element>
+</iq>
+"""
+
+
+@payload_element_name(u"{http://pyxmpp.jajcus.net/test/ns}element")
+class TestPayload(StanzaPayload):
+    def __init__(self, element = None, data = None):
+        self.data = None
+        if element is not None:
+            for child in element:
+                if child.tag == u"{http://pyxmpp.jajcus.net/test/ns}data":
+                    self.data = child.text
+        if data:
+            self.data = data
+    def as_xml(self):
+        element = ElementTree.Element(
+                                u"{http://pyxmpp.jajcus.net/test/ns}element")
+        if self.data:
+            ElementTree.SubElement(element,
+                    u"{http://pyxmpp.jajcus.net/test/ns}data").text = self.data
+        return element
 
 class TestStanza(unittest.TestCase):
     def test_stanza_from_empty_element(self):
@@ -92,16 +125,33 @@ class TestStanza(unittest.TestCase):
             stanza = Stanza(element)
             self.assertTrue(stanza.get_xml() is element)
     def test_stanza_payload(self):
-        from pyxmpp2.stanzapayload import StanzaPayload, XMLPayload
         stanza5 = Stanza(XML(STANZA5))
         payload = stanza5.get_all_payload()
         self.assertEqual(len(payload), 1)
         payload = payload[0]
         self.assertIsInstance(payload, StanzaPayload)
         self.assertIsInstance(payload, XMLPayload)
-        self.assertEqual(payload.xml_namespace, "jabber:iq:version")
+        self.assertEqual(payload.xml_element_name, "{jabber:iq:version}query")
         self.assertTrue(xml_elements_equal(
                             XML(STANZA5)[0], payload.element))
+
+    def test_stanza_get_custom_payload(self):
+        stanza6 = Stanza(XML(STANZA6))
+        payload = stanza6.get_payload(TestPayload)
+        self.assertIsInstance(payload, TestPayload)
+        self.assertIsNone(payload.data)
+        self.assertTrue(xml_elements_equal(XML(STANZA6)[0], payload.as_xml()))
+
+    def test_stanza_set_custom_payload(self):
+        stanza7 = Stanza("iq", from_jid = JID('a@b.c/d'), 
+                            to_jid = JID('e@f.g/h'), stanza_id = '666',
+                            stanza_type='get')
+        payload = TestPayload(data = u"Test")
+        stanza7.set_payload(payload)
+        payload1 = stanza7.get_payload(TestPayload)
+        self.assertTrue(payload1 is payload)
+        self.assertTrue(xml_elements_equal(XML(STANZA7), stanza7.as_xml(),
+                                                                        True))
 
 def suite():
     suite = unittest.TestSuite()
