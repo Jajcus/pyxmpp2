@@ -253,6 +253,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             self.peer = None
         self.initiator = True
         self._setup_stream_element_handlers()
+        self.setup_stanza_handlers(self.handlers, "pre-auth")
         self._send_stream_start()
         self._make_reader()
 
@@ -354,6 +355,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         self._make_reader()
         self.last_keepalive = time.time()
         self._setup_stream_element_handlers()
+        self.setup_stanza_handlers(self.handlers, "pre-auth")
         return addr
 
     def _setup_stream_element_handlers(self):
@@ -1008,6 +1010,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             self.peer = peer
             if restart_stream:
                 self._restart_stream()
+        self.setup_stanza_handlers(self.handlers, "post-auth")
         self.event(AuthenticatedEvent(self.peer))
 
     def set_authenticated(self, me, restart_stream = False):
@@ -1016,6 +1019,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             self.me = me
             if restart_stream:
                 self._restart_stream()
+        self.setup_stanza_handlers(self.handlers, "post-auth")
         self.event(AuthenticatedEvent(self.me))
 
 # vi: sts=4 et sw=4

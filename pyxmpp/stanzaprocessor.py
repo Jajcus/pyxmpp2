@@ -28,6 +28,8 @@ __docformat__ = "restructuredtext en"
 import logging
 import threading
 from collections import defaultdict
+from abc import ABCMeta
+import inspect
 
 from .expdict import ExpiringDictionary
 from .exceptions import ProtocolError, BadRequestProtocolError
@@ -35,9 +37,138 @@ from .exceptions import FeatureNotImplementedProtocolError
 from .stanza import Stanza
 from .message import Message
 from .presence import Presence
+from .stanzapayload import StanzaPayload
 from .iq import Iq
 
 logger = logging.getLogger("pyxmpp.stanzaprocessor")
+
+
+class XMPPFeatureHandler:
+    __metaclass__ = ABCMeta
+
+def _iq_handler(iq_type, payload_class, payload_key, usage_restriction):
+    """Method decorator generator for decorating <iq type='get'/> stanza
+    handler methods in `XMPPFeatureHandler` subclasses.
+    
+    :Parameters:
+        - `payload_class`: payload class expected
+        - `payload_key`: payload class specific filtering key
+        - `usage_restriction`: optional usage restriction: "pre-auth" or
+          "post-auth"
+    :Types:
+        - `payload_class`: subclass of `StanzaPayload`
+        - `usage_restriction`: `unicode`
+    """
+    def decorator(func):
+        """The decorator"""
+        func._pyxmpp_stanza_handled = ("iq", iq_type)
+        func._pyxmpp_payload_class_handled = payload_class
+        func._pyxmpp_payload_key = payload_key
+        func._pyxmpp_usage_restriction = usage_restriction
+        return func
+    return decorator
+
+
+def iq_get_stanza_handler(payload_class, payload_key = None, 
+                                            usage_restriction = "post-auth"):
+    """Method decorator generator for decorating <iq type='get'/> stanza
+    handler methods in `XMPPFeatureHandler` subclasses.
+    
+    :Parameters:
+        - `payload_class`: payload class expected
+        - `payload_key`: payload class specific filtering key
+        - `usage_restriction`: optional usage restriction: "pre-auth" or
+          "post-auth"
+    :Types:
+        - `payload_class`: subclass of `StanzaPayload`
+        - `usage_restriction`: `unicode`
+    """
+    return _iq_handler("get", payload_class, payload_key, usage_restriction)
+
+def iq_set_stanza_handler(payload_class, payload_key = None, 
+                                            usage_restriction = "post-auth"):
+    """Method decorator generator for decorating <iq type='set'/> stanza
+    handler methods in `XMPPFeatureHandler` subclasses.
+    
+    :Parameters:
+        - `payload_class`: payload class expected
+        - `payload_key`: payload class specific filtering key
+        - `usage_restriction`: optional usage restriction: "pre-auth" or
+          "post-auth"
+    :Types:
+        - `payload_class`: subclass of `StanzaPayload`
+        - `usage_restriction`: `unicode`
+    """
+    return _iq_handler("set", payload_class, payload_key, usage_restriction)
+
+def _stanza_handler(element_name, stanza_type, payload_class, payload_key,
+                                                            usage_restriction):
+    """Method decorator generator for decorating <message/> or <presence/>
+    stanza handler methods in `XMPPFeatureHandler` subclasses.
+    
+    :Parameters:
+        - `element_name`: "message" or "presence"
+        - `stanza_type`: expected value of the 'type' attribute of the stanza
+        - `payload_class`: payload class expected
+        - `payload_key`: payload class specific filtering key
+        - `usage_restriction`: optional usage restriction: "pre-auth" or
+          "post-auth"
+    :Types:
+        - `element_name`: `unicode`
+        - `stanza_type`: `unicode`
+        - `payload_class`: subclass of `StanzaPayload`
+        - `usage_restriction`: `unicode`
+    """
+    def decorator(func):
+        """The decorator"""
+        func._pyxmpp_stanza_handled = (element_name, stanza_type)
+        func._pyxmpp_payload_class_handled = payload_class
+        func._pyxmpp_payload_key = payload_key
+        func._pyxmpp_usage_restriction = usage_restriction
+        return func
+    return decorator
+
+def message_stanza_handler(stanza_type = None, payload_class = None,
+                            payload_key = None, usage_restriction = "post-auth"):
+    """Method decorator generator for decorating <message/> 
+    stanza handler methods in `XMPPFeatureHandler` subclasses.
+    
+    :Parameters:
+        - `payload_class`: payload class expected
+        - `stanza_type`: expected value of the 'type' attribute of the stanza.
+          `None` means all types except 'error'
+        - `payload_key`: payload class specific filtering key
+        - `usage_restriction`: optional usage restriction: "pre-auth" or
+          "post-auth"
+    :Types:
+        - `payload_class`: subclass of `StanzaPayload`
+        - `stanza_type`: `unicode`
+        - `usage_restriction`: `unicode`
+    """
+    if stanza_type is None:
+        stanza_type = "normal"
+    return _stanza_handler("message", stanza_type, payload_class, payload_key,
+                                                            usage_restriction)
+ 
+def presence_stanza_handler(stanza_type = None, payload_class = None,
+                            payload_key = None, usage_restriction = "post-auth"):
+    """Method decorator generator for decorating <presence/> 
+    stanza handler methods in `XMPPFeatureHandler` subclasses.
+    
+    :Parameters:
+        - `payload_class`: payload class expected
+        - `stanza_type`: expected value of the 'type' attribute of the stanza.
+        - `payload_key`: payload class specific filtering key
+        - `usage_restriction`: optional usage restriction: "pre-auth" or
+          "post-auth"
+    :Types:
+        - `payload_class`: subclass of `StanzaPayload`
+        - `stanza_type`: `unicode`
+        - `usage_restriction`: `unicode`
+    """
+    return _stanza_handler("presence", stanza_type, payload_class, payload_key,
+                                                            usage_restriction)
+ 
 
 def stanza_factory(element, stream = None, language = None):
     """Creates Iq, Message or Presence object for XML stanza `element`
@@ -93,7 +224,7 @@ class StanzaProcessor(object):
         self._presence_handlers = []
         self.lock = threading.RLock()
 
-    def process_response(self, response):
+    def _process_handler_result(self, response):
         """Examines out the response returned by a stanza handler and sends all
         stanzas provided.
 
@@ -127,6 +258,9 @@ class StanzaProcessor(object):
         for stanza in response:
             if isinstance(stanza, Stanza):
                 self.send(stanza)
+            else:
+                logger.warning(u"Unexpected object in stanza handler result:"
+                                                    u" {0!r}".format(stanza))
         return True
 
     def _process_iq_response(self, stanza):
@@ -139,9 +273,8 @@ class StanzaProcessor(object):
 
         If a matching handler is available pass the stanza to it.  Otherwise
         ignore it if it is "error" or "result" stanza or return
-        "feature-not-implemented" error if it is "get" or "set"."""
-
-
+        "feature-not-implemented" error if it is "get" or "set".
+        """
         stanza_id = stanza.stanza_id
         from_jid = stanza.from_jid
         if from_jid:
@@ -171,7 +304,7 @@ class StanzaProcessor(object):
                 response = err_handler(stanza)
             else:
                 return False
-        self.process_response(response)
+        self._process_handler_result(response)
         return True
 
     def process_iq(self, stanza):
@@ -196,7 +329,7 @@ class StanzaProcessor(object):
             handler = self._get_iq_handler("get", payload)
             if handler:
                 response = handler(stanza)
-                self.process_response(response)
+                self._process_handler_result(response)
                 return True
             else:
                 raise FeatureNotImplementedProtocolError("Not implemented")
@@ -204,7 +337,7 @@ class StanzaProcessor(object):
             handler = self._get_iq_handler("set", payload)
             if handler:
                 response = handler(stanza)
-                self.process_response(response)
+                self._process_handler_result(response)
                 return True
             else:
                 raise FeatureNotImplementedProtocolError("Not implemented")
@@ -236,11 +369,10 @@ class StanzaProcessor(object):
         payload = stanza.get_all_payload()
         classes = [p.__class__ for p in payload]
         keys = [(p.__class__, p.handler_key) for p in payload]
-        for handler_entry in handler_list:
-            type_filter = handler_entry[1]
-            class_filter = handler_entry[2]
-            extra_filter = handler_entry[3]
-            handler = handler_entry[4]
+        for handler in handler_list:
+            type_filter = handler._pyxmpp_stanza_handled[1]
+            class_filter = handler._pyxmpp_payload_class_handled
+            extra_filter = handler._pyxmpp_payload_key
             if type_filter != stanza_type:
                 continue
             if class_filter:
@@ -249,7 +381,7 @@ class StanzaProcessor(object):
                 if extra_filter and (class_filter, extra_filter) not in keys:
                     continue
             response = handler(stanza)
-            if self.process_response(response):
+            if self._process_handler_result(response):
                 return True
         return False
 
@@ -267,7 +399,6 @@ class StanzaProcessor(object):
         if not self.initiator and not self.peer_authenticated:
             logger.debug("Ignoring message - peer not authenticated yet")
             return True
-
 
         stanza_type = stanza.stanza_type
         if stanza_type is None:
@@ -297,8 +428,6 @@ class StanzaProcessor(object):
             return True
 
         stanza_type = stanza.stanza_type
-        if not stanza_type:
-            stanza_type = "available"
         return self.__try_handlers(self._presence_handlers, stanza, stanza_type)
 
     def route_stanza(self, stanza):
@@ -433,174 +562,40 @@ class StanzaProcessor(object):
                                     (res_handler, err_handler),
                                     timeout)
 
-    def set_iq_get_handler(self, payload_class, handler, payload_key = None):
-        """Set <iq type="get"/> handler.
-
-        :Parameters:
-            - `payload_class`: payload class requested
-            - `payload_key`: extra filter for payload
-            - `handler`: function to be called when a stanza
-              with defined element is received. Its only argument
-              will be the stanza received. The handler may return a stanza or
-              list of stanzas which should be sent in response.
-        :Types:
-            - `payload_class`: `classobj`, a subclass of `StanzaPayload`
-
-        Only one handler may be defined per one namespaced element.
-        If a handler for the element was already set it will be lost
-        after calling this method.
-        """
-        self.lock.acquire()
-        try:
-            key = (payload_class, payload_key)
-            self._iq_handlers["get"][key] = handler
-        finally:
-            self.lock.release()
-
-    def unset_iq_get_handler(self, payload_class, payload_key):
-        """Remove <iq type="get"/> handler.
-
-        :Parameters:
-            - `element`: payload element name
-            - `namespace`: payload element namespace URI
-        """
-        self.lock.acquire()
-        try:
-            key = (payload_class, payload_key)
-            if key in self._iq_handlers["get"]:
-                del self._iq_handlers["get"][key]
-        finally:
-            self.lock.release()
-
-    def set_iq_set_handler(self, payload_class, handler, payload_key = None):
-        """Set <iq type="set"/> handler.
-
-        :Parameters:
-            - `payload_class`: payload class requested
-            - `payload_key`: extra filter for payload
-            - `handler`: function to be called when a stanza
-              with defined element is received. Its only argument
-              will be the stanza received. The handler may return a stanza or
-              list of stanzas which should be sent in response.
-        :Types:
-            - `payload_class`: `classobj`, a subclass of `StanzaPayload`
-
-        Only one handler may be defined per one namespaced element.
-        If a handler for the element was already set it will be lost
-        after calling this method.
-        """
-        self.lock.acquire()
-        try:
-            key = (payload_class, payload_key)
-            self._iq_handlers["set"][key] = handler
-        finally:
-            self.lock.release()
-
-    def unset_iq_set_handler(self, payload_class, payload_key):
-        """Remove <iq type="set"/> handler.
-
-        :Parameters:
-            - `element`: payload element name
-            - `namespace`: payload element namespace URI
-        """
-        self.lock.acquire()
-        try:
-            key = (payload_class, payload_key)
-            if key in self._iq_handlers["set"]:
-                del self._iq_handlers["set"][key]
-        finally:
-            self.lock.release()
-
-    @staticmethod
-    def __add_handler(handler_list, stanza_type, payload_class,
-                                        payload_key, priority, handler):
-        """Add a handler function to a prioritized handler list.
-
-        :Parameters:
-            - `handler_list`: a handler list.
-            - `stanza_type`: stanza type.
-            - `payload_class`: expected payload class. The handler will be
-              called only for stanzas with payload of this class
-            - `payload_key`: additional filter for the payload, specific
-              for the `payload_class`
-            - `priority`: handler priority. Must be >=0 and <=100. Handlers
-              with lower priority list will be tried first."""
-        # pylint: disable-msg=R0913
-        if priority < 0 or priority > 100:
-            raise ValueError("Bad handler priority (must be in 0:100)")
-        handler_list.append((priority, stanza_type, payload_class, 
-                                                payload_key, handler))
-        handler_list.sort(key = lambda x: x[0])
-
-    def set_message_handler(self, stanza_type, handler, payload_class = None,
-                                        payload_key = None, priority=100):
-        """Set a handler for <message/> stanzas.
-
-        :Parameters:
-            - `stanza_type`: message type. `None` will be treated the same as
-              "normal", and will be the default for unknown types (those that
-              have no handler associated).
-            - `payload_class`: expected payload class. The handler will be
-              called only for stanzas with payload of this class
-            - `payload_key`: additional filter for the payload, specific
-              for the `payload_class`
-            - `priority`: priority value for the handler. Handlers with lower
-              priority value are tried first.
-            - `handler`: function to be called when a message stanza
-              with defined type and payload namespace is received. Its only
-              argument will be the stanza received. The handler may return a
-              stanza or list of stanzas which should be sent in response.
-
-        Multiple <message /> handlers with the same type/namespace/priority may
-        be set. Order of calling handlers with the same priority is not
-        defined.  Handlers will be called in priority order until one of them
-        returns True or any stanza(s) to send (even empty list will do).
-        """
-        # pylint: disable-msg=R0913
-        self.lock.acquire()
-        try:
-            if stanza_type is None:
-                stanza_type = "normal"
-            self.__add_handler(self._message_handlers, stanza_type, 
-                                        payload_class, payload_key,
-                                        priority, handler)
-        finally:
-            self.lock.release()
-
-    def set_presence_handler(self, stanza_type, handler, payload_class = None,
-                                    payload_key = None, priority = 100):
-        """Set a handler for <presence/> stanzas.
-
-        :Parameters:
-            - `stanza_type`: presence type. "available" will be treated the
-              same as `None`.
-            - `handler`: function to be called when a presence stanza
-              with defined type and payload namespace is received. Its only
-              argument will be the stanza received. The handler may return a
-              stanza or list of stanzas which should be sent in response.
-            - `payload_class`: expected payload class. If given, then the
-              handler will be called only for stanzas with payload of this
-              class
-            - `payload_key`: additional filter for the payload, specific
-              for the `payload_class`
-            - `priority`: priority value for the handler. Handlers with lower
-              priority value are tried first.
-
-        Multiple <presence /> handlers with the same type/class/filter/priority
-        may be set. Order of calling handlers with the same priority is not
-        defined.  Handlers will be called in priority order until one of them
-        returns True or any stanza(s) to send (even empty list will do).
-        """
-        # pylint: disable-msg=R0913
-        self.lock.acquire()
-        try:
-            if not stanza_type:
-                stanza_type = "available"
-            self.__add_handler(self._presence_handlers, stanza_type,
-                                    payload_class, payload_key,
-                                    priority, handler)
-        finally:
-            self.lock.release()
+    def setup_stanza_handlers(self, handler_objects, usage_restriction):
+        """Install stanza handlers provided by `handler_objects`"""
+        iq_handlers = {"get": {}, "set": {}}
+        message_handlers = []
+        presence_handlers = []
+        for obj in handler_objects:
+            if not isinstance(obj, XMPPFeatureHandler):
+                continue
+            for name, handler in inspect.getmembers(obj, callable):
+                if not hasattr(handler, "_pyxmpp_stanza_handled"):
+                    continue
+                element_name, stanza_type = handler._pyxmpp_stanza_handled
+                restr = handler._pyxmpp_usage_restriction
+                if restr and restr != usage_restriction:
+                    continue
+                if element_name == "iq":
+                    payload_class = handler._pyxmpp_payload_class_handled
+                    payload_key = handler._pyxmpp_payload_key
+                    if (payload_class,payload_key) in iq_handlers[stanza_type]:
+                        continue
+                    iq_handlers[stanza_type][(payload_class,payload_key)] = \
+                            handler
+                    continue
+                elif element_name == "message":
+                    handler_list = message_handlers
+                elif element_name == "presence":
+                    handler_list = presence_handlers
+                else:
+                    raise ValueError, "Bad handler decoration"
+                handler_list.append(handler)
+        with self.lock:
+            self._iq_handlers = iq_handlers
+            self._presence_handlers = presence_handlers
+            self._message_handlers = message_handlers
 
     def fix_in_stanza(self, stanza):
         """Modify incoming stanza before processing it.

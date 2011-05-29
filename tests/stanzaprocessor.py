@@ -9,6 +9,11 @@ from pyxmpp2.iq import Iq
 from pyxmpp2.message import Message
 from pyxmpp2.presence import Presence
 from pyxmpp2.stanzaprocessor import stanza_factory, StanzaProcessor
+from pyxmpp2.stanzaprocessor import XMPPFeatureHandler
+from pyxmpp2.stanzaprocessor import iq_get_stanza_handler
+from pyxmpp2.stanzaprocessor import iq_set_stanza_handler
+from pyxmpp2.stanzaprocessor import message_stanza_handler
+from pyxmpp2.stanzaprocessor import presence_stanza_handler
 from pyxmpp2.stanzapayload import XMLPayload
 from pyxmpp2.jid import JID
 from pyxmpp2.utils import xml_elements_equal
@@ -158,20 +163,30 @@ class TestStanzaProcessor(unittest.TestCase):
         self.handlers_called.append("pass2")
 
     def test_iq_ignore_handlers(self):
-        self.p.set_iq_get_handler(XMLPayload, self.ignore_iq_get,
-                    "{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        self.p.set_iq_set_handler(XMLPayload, self.ignore_iq_set,
-                    "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+        parent = self
+        class Handlers(XMPPFeatureHandler):
+            @iq_get_stanza_handler(XMLPayload, "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+            def handler1(self, stanza):
+                return parent.ignore_iq_get(stanza)
+            @iq_set_stanza_handler(XMLPayload, "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+            def handler2(self, stanza):
+                return parent.ignore_iq_set(stanza)
+        self.p.setup_stanza_handlers([Handlers()], "post-auth")
         self.process_stanzas(ALL_STANZAS)
         self.assertEqual(self.handlers_called, ["ignore_iq_get",
                                                     "ignore_iq_set"])
         self.assertFalse(self.stanzas_sent)
 
     def test_iq_reply_handlers(self):
-        self.p.set_iq_get_handler(XMLPayload, self.reply_iq_get,
-                    "{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        self.p.set_iq_set_handler(XMLPayload, self.reply_iq_set,
-                    "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+        parent = self
+        class Handlers(XMPPFeatureHandler):
+            @iq_get_stanza_handler(XMLPayload, "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+            def handler1(self, stanza):
+                return parent.reply_iq_get(stanza)
+            @iq_set_stanza_handler(XMLPayload, "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+            def handler2(self, stanza):
+                return parent.reply_iq_set(stanza)
+        self.p.setup_stanza_handlers([Handlers()], "post-auth")
         self.process_stanzas(ALL_STANZAS)
         self.assertEqual(self.handlers_called, ["reply_iq_get",
                                                     "reply_iq_set"])
@@ -202,7 +217,12 @@ class TestStanzaProcessor(unittest.TestCase):
         self.assertEqual(stanza2.to_jid, JID(u"source@example.com/res"))
 
     def test_message_handler(self):
-        self.p.set_message_handler(None, self.echo_message)
+        parent = self
+        class Handlers(XMPPFeatureHandler):
+            @message_stanza_handler()
+            def handler1(self, stanza):
+                return parent.echo_message(stanza)
+        self.p.setup_stanza_handlers([Handlers()], "post-auth")
         self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["echo_message", "echo_message",
                                                         "echo_message"])
@@ -218,16 +238,32 @@ class TestStanzaProcessor(unittest.TestCase):
         self.assertEqual(stanza2.stanza_type, u"chat")
 
     def test_message_pass1_pass2(self):
-        self.p.set_message_handler(None, self.pass1, priority = 10)
-        self.p.set_message_handler(None, self.pass2, priority = 20)
+        parent = self
+        class Handlers1(XMPPFeatureHandler):
+            @message_stanza_handler()
+            def handler1(self, stanza):
+                return parent.pass1(stanza)
+        class Handlers2(XMPPFeatureHandler):
+            @message_stanza_handler()
+            def handler1(self, stanza):
+                return parent.pass2(stanza)
+        self.p.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
         self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1", "pass2",
                                         "pass1", "pass2", "pass1", "pass2"])
         self.assertEqual(len(self.stanzas_sent), 0)
 
     def test_message_pass2_pass1(self):
-        self.p.set_message_handler(None, self.pass1, priority = 20)
-        self.p.set_message_handler(None, self.pass2, priority = 10)
+        parent = self
+        class Handlers1(XMPPFeatureHandler):
+            @message_stanza_handler()
+            def handler1(self, stanza):
+                return parent.pass1(stanza)
+        class Handlers2(XMPPFeatureHandler):
+            @message_stanza_handler()
+            def handler1(self, stanza):
+                return parent.pass2(stanza)
+        self.p.setup_stanza_handlers([Handlers2(), Handlers1()], "post-auth")
         self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass2", "pass1",
                                         "pass2", "pass1", "pass2", "pass1"])
@@ -235,37 +271,74 @@ class TestStanzaProcessor(unittest.TestCase):
 
 
     def test_message_eat1_eat2(self):
-        self.p.set_message_handler(None, self.eat1, priority = 10)
-        self.p.set_message_handler(None, self.eat1, priority = 20)
+        parent = self
+        class Handlers1(XMPPFeatureHandler):
+            @message_stanza_handler()
+            def handler1(self, stanza):
+                return parent.eat1(stanza)
+        class Handlers2(XMPPFeatureHandler):
+            @message_stanza_handler()
+            def handler1(self, stanza):
+                return parent.eat2(stanza)
+        self.p.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
         self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["eat1", "eat1", "eat1"])
         self.assertEqual(len(self.stanzas_sent), 0)
 
     def test_message_pass1_eat2(self):
-        self.p.set_message_handler(None, self.pass1, priority = 10)
-        self.p.set_message_handler(None, self.eat2, priority = 20)
+        parent = self
+        class Handlers1(XMPPFeatureHandler):
+            @message_stanza_handler()
+            def handler1(self, stanza):
+                return parent.pass1(stanza)
+        class Handlers2(XMPPFeatureHandler):
+            @message_stanza_handler()
+            def handler1(self, stanza):
+                return parent.eat2(stanza)
+        self.p.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
         self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1", "eat2", 
                                         "pass1", "eat2", "pass1", "eat2"])
         self.assertEqual(len(self.stanzas_sent), 0)
 
     def test_message_chat_handler(self):
-        self.p.set_message_handler("chat", self.pass1, priority = 10)
+        parent = self
+        class Handlers(XMPPFeatureHandler):
+            @message_stanza_handler("chat")
+            def handler1(self, stanza):
+                return parent.pass1(stanza)
+        self.p.setup_stanza_handlers([Handlers()], "post-auth")
         self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1"])
         self.assertEqual(len(self.stanzas_sent), 0)
 
     def test_presence_pass1_pass2(self):
-        self.p.set_presence_handler(None, self.pass1, priority = 10)
-        self.p.set_presence_handler(None, self.pass2, priority = 20)
+        parent = self
+        class Handlers1(XMPPFeatureHandler):
+            @presence_stanza_handler()
+            def handler1(self, stanza):
+                return parent.pass1(stanza)
+        class Handlers2(XMPPFeatureHandler):
+            @presence_stanza_handler()
+            def handler1(self, stanza):
+                return parent.pass2(stanza)
+        self.p.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
         self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1", "pass2",
                                                         "pass1", "pass2"])
         self.assertEqual(len(self.stanzas_sent), 0)
 
     def test_presence_pass2_pass1(self):
-        self.p.set_presence_handler(None, self.pass1, priority = 20)
-        self.p.set_presence_handler(None, self.pass2, priority = 10)
+        parent = self
+        class Handlers1(XMPPFeatureHandler):
+            @presence_stanza_handler()
+            def handler1(self, stanza):
+                return parent.pass1(stanza)
+        class Handlers2(XMPPFeatureHandler):
+            @presence_stanza_handler()
+            def handler1(self, stanza):
+                return parent.pass2(stanza)
+        self.p.setup_stanza_handlers([Handlers2(), Handlers1()], "post-auth")
         self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass2", "pass1",
                                                         "pass2", "pass1"])
@@ -273,27 +346,46 @@ class TestStanzaProcessor(unittest.TestCase):
 
 
     def test_presence_eat1_eat2(self):
-        self.p.set_presence_handler(None, self.eat1, priority = 10)
-        self.p.set_presence_handler(None, self.eat1, priority = 20)
+        parent = self
+        class Handlers1(XMPPFeatureHandler):
+            @presence_stanza_handler()
+            def handler1(self, stanza):
+                return parent.eat1(stanza)
+        class Handlers2(XMPPFeatureHandler):
+            @presence_stanza_handler()
+            def handler1(self, stanza):
+                return parent.eat2(stanza)
+        self.p.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
         self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["eat1", "eat1"])
         self.assertEqual(len(self.stanzas_sent), 0)
 
     def test_presence_pass1_eat2(self):
-        self.p.set_presence_handler(None, self.pass1, priority = 10)
-        self.p.set_presence_handler(None, self.eat2, priority = 20)
+        parent = self
+        class Handlers1(XMPPFeatureHandler):
+            @presence_stanza_handler()
+            def handler1(self, stanza):
+                return parent.pass1(stanza)
+        class Handlers2(XMPPFeatureHandler):
+            @presence_stanza_handler()
+            def handler1(self, stanza):
+                return parent.eat2(stanza)
+        self.p.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
         self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1", "eat2", 
                                                     "pass1", "eat2"])
         self.assertEqual(len(self.stanzas_sent), 0)
 
     def test_presence_subscribe_handler(self):
-        self.p.set_presence_handler("subscribe", self.pass1, priority = 10)
+        parent = self
+        class Handlers(XMPPFeatureHandler):
+            @presence_stanza_handler("subscribe")
+            def handler1(self, stanza):
+                return parent.pass1(stanza)
+        self.p.setup_stanza_handlers([Handlers()], "post-auth")
         self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1"])
         self.assertEqual(len(self.stanzas_sent), 0)
-
-
 
 def suite():
      suite = unittest.TestSuite()
@@ -302,6 +394,10 @@ def suite():
      return suite
 
 if __name__ == '__main__':
+    import logging
+    logger = logging.getLogger()
+    logger.addHandler(logging.StreamHandler())
+    logger.setLevel(logging.ERROR)
     unittest.TextTestRunner(verbosity=2).run(suite())
 
 # vi: sts=4 et sw=4
