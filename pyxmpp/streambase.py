@@ -653,12 +653,8 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
 
     def _send(self, stanza):
         """Same as `Stream.send` but assume `self.lock` is acquired."""
-        if self.version == (0, 9):
-            legacy = True
-        else:
-            legacy = False
         self.fix_out_stanza(stanza)
-        element = stanza.as_xml(legacy = legacy)
+        element = stanza.as_xml()
         self._write_element(element)
 
     def regular_tasks(self):

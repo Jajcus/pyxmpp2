@@ -195,14 +195,8 @@ class Stanza(object):
         :returntype: `unicode`"""
         return serialize(self.get_xml())
 
-    def as_xml(self, legacy = False):
+    def as_xml(self):
         """Return the XML stanza representation.
-
-        :Parameters:
-            - `legacy`: if the error conditions should be encoded the XMPP 0.9 
-              way
-        :Types:
-            - `legacy`: `bool`
 
         Always return an independent copy of the stanza XML representation,
         which can be freely modified without affecting the stanza.
@@ -225,7 +219,7 @@ class Stanza(object):
         for payload in self._payload:
             element.append(payload.as_xml())
         if self._error:
-            element.append(self._error.as_xml(legacy = legacy,
+            element.append(self._error.as_xml(
                                         stanza_namespace = self._namespace))
         return element
 

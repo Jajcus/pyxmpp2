@@ -24,18 +24,16 @@ Normative reference:
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
 import logging
 
 from xml.etree import ElementTree
 from copy import deepcopy
 
-from . import xmlextra
-from .exceptions import ProtocolError
-from .constants import STREAM_NS, STANZA_ERROR_NS, STREAM_ERROR_NS
+from .constants import STANZA_ERROR_NS, STREAM_ERROR_NS
 from .constants import STREAM_QNP, STANZA_ERROR_QNP, STREAM_ERROR_QNP
-from .constants import PYXMPP_ERROR_NS, STANZA_CLIENT_QNP, STANZA_NAMESPACES
+from .constants import STANZA_CLIENT_QNP, STANZA_SERVER_QNP, STANZA_NAMESPACES
 from .constants import XML_LANG_QNAME
 from .xmppserializer import serialize
 
@@ -105,70 +103,71 @@ UNDEFINED_STANZA_CONDITION = \
 STANZA_ERRORS = {
             u"bad-request":
                 ("Bad request",
-                "modify", 400),
+                "modify"),
             u"conflict":
                 ("Named session or resource already exists",
-                "cancel", 409),
+                "cancel"),
             u"feature-not-implemented":
                 ("Feature requested is not implemented",
-                "cancel", 501),
+                "cancel"),
             u"forbidden":
                 ("You are forbidden to perform requested action",
-                "auth", 403),
+                "auth"),
             u"gone":
-                ("Recipient or server can no longer be contacted at this address",
-                "modify", 302),
+                ("Recipient or server can no longer be contacted"
+                                                        " at this address",
+                "modify"),
             u"internal-server-error":
                 ("Internal server error",
-                "wait", 500),
+                "wait"),
             u"item-not-found":
                 ("Item not found"
-                ,"cancel", 404),
+                ,"cancel"),
             u"jid-malformed":
                 ("JID malformed",
-                "modify", 400),
+                "modify"),
             u"not-acceptable":
                 ("Requested action is not acceptable",
-                "modify", 406),
+                "modify"),
             u"not-allowed":
                 ("Requested action is not allowed",
-                "cancel", 405),
+                "cancel"),
             u"not-authorized":
                 ("Not authorized",
-                "auth", 401),
+                "auth"),
             u"policy-violation":
                 ("Policy violation",
-                "cancel", 405),
+                "cancel"),
             u"recipient-unavailable":
                 ("Recipient is not available",
-                "wait", 404),
+                "wait"),
             u"redirect":
                 ("Redirection",
-                "modify", 302),
+                "modify"),
             u"registration-required":
                 ("Registration required",
-                "auth", 407),
+                "auth"),
             u"remote-server-not-found":
                 ("Remote server not found",
-                "cancel", 404),
+                "cancel"),
             u"remote-server-timeout":
                 ("Remote server timeout",
-                "wait", 504),
+                "wait"),
             u"resource-constraint":
                 ("Resource constraint",
-                "wait", 500),
+                "wait"),
             u"service-unavailable":
                 ("Service is not available",
-                "cancel", 503),
+                "cancel"),
             u"subscription-required":
                 ("Subscription is required",
-                "auth", 407),
+                "auth"),
             u"undefined-condition":
                 ("Unknown error",
-                "cancel", 500),
+                "cancel"),
             u"unexpected-request":
                 ("Unexpected request",
-                "wait", 400),
+                "wait"),
     }
 
 STANZA_ERRORS_Q = dict([( "{{{0}}}{1}".format(STANZA_ERROR_NS, x[0]), x[1])
@@ -183,27 +182,6 @@ OBSOLETE_CONDITIONS = {
             "{urn:ietf:params:xml:ns:xmpp-stanzas}payment-required": 
                                                 UNDEFINED_STANZA_CONDITION,
 }
-
-
-LEGACY_CODES = {
-        302: "{urn:ietf:params:xml:ns:xmpp-stanzas}redirect",
-        400: "{urn:ietf:params:xml:ns:xmpp-stanzas}bad-request",
-        401: "{urn:ietf:params:xml:ns:xmpp-stanzas}not-authorized",
-        402: "{urn:ietf:params:xml:ns:xmpp-stanzas}payment-required",
-        403: "{urn:ietf:params:xml:ns:xmpp-stanzas}forbidden",
-        404: "{urn:ietf:params:xml:ns:xmpp-stanzas}item-not-found",
-        405: "{urn:ietf:params:xml:ns:xmpp-stanzas}not-allowed",
-        406: "{urn:ietf:params:xml:ns:xmpp-stanzas}not-acceptable",
-        407: "{urn:ietf:params:xml:ns:xmpp-stanzas}registration-required",
-        408: "{urn:ietf:params:xml:ns:xmpp-stanzas}remote-server-timeout",
-        409: "{urn:ietf:params:xml:ns:xmpp-stanzas}conflict",
-        500: "{urn:ietf:params:xml:ns:xmpp-stanzas}internal-server-error",
-        501: "{urn:ietf:params:xml:ns:xmpp-stanzas}feature-not-implemented",
-        502: "{urn:ietf:params:xml:ns:xmpp-stanzas}service-unavailable",
-        503: "{urn:ietf:params:xml:ns:xmpp-stanzas}service-unavailable",
-        504: "{urn:ietf:params:xml:ns:xmpp-stanzas}remote-server-timeout",
-        510: "{urn:ietf:params:xml:ns:xmpp-stanzas}service-unavailable",
-    }
 
 class ErrorElement(object):
     """Base class for both XMPP stream and stanza errors
@@ -261,6 +239,7 @@ class ErrorElement(object):
         :Types:
             - `element`: `ElementTree.Element`
         """
+        # pylint: disable-msg=R0912
         if element.tag != self.error_qname:
             raise ValueError(u"{0!r} is not a {1!r} element".format(
                                                     element, self.error_qname))
@@ -294,7 +273,8 @@ class ErrorElement(object):
             self.condition = ElementTree.Element(self.cond_qname_prefix
                                                     + "undefined-condition")
         if self.condition.tag in OBSOLETE_CONDITIONS:
-            new_cond_name = OBSOLETE_CONDITIONS[condition.tag]
+            new_cond_name = OBSOLETE_CONDITIONS[self.condition.tag]
+            self.condition = ElementTree.Element(new_cond_name)
 
     @property
     def condition_name(self):
@@ -320,13 +300,8 @@ class ErrorElement(object):
         :returntype: `unicode`"""
         return serialize(self.as_xml())
 
-    def as_xml(self, legacy = False):
+    def as_xml(self):
         """Return the XML error representation.
-
-        :Parameters:
-            - `legacy`: to encode error codes the XMPP 0.9 way
-        :Types:
-            - `legacy`: `bool`
 
         :returntype: `ElementTree.Element`"""
         result = ElementTree.Element(self.error_qname)
@@ -335,7 +310,7 @@ class ErrorElement(object):
             text = ElementTree.SubElement(result, self.text_qname)
             if self.language:
                 text.set(XML_LANG_QNAME, self.language)
-            text.text = description
+            text.text = self.text
         return result
 
 class StreamErrorElement(ErrorElement):
@@ -378,10 +353,8 @@ class StanzaErrorElement(ErrorElement):
     :Ivariables:
         - `error_type`: 'type' of the error, one of: 'auth', 'cancel',
           'continue', 'modify', 'wait'
-        - `_legacy_code`: legacy error code
     :Types:
         - `error_type`: `unicode`
-        - `_legacy_code`: `int`
     """
     error_qname = STANZA_CLIENT_QNP + "error"
     text_qname = STANZA_CLIENT_QNP + "text"
@@ -404,7 +377,6 @@ class StanzaErrorElement(ErrorElement):
             - `error_type`: `unicode`
         """
         self.error_type = None
-        self._legacy_code = None
         if isinstance(element_or_cond, basestring):
             if element_or_cond not in STANZA_ERRORS:
                 raise ValueError(u"Bad error condition")
@@ -425,8 +397,6 @@ class StanzaErrorElement(ErrorElement):
             cond = UNDEFINED_STANZA_CONDITION
         if not self.error_type:
             self.error_type = STANZA_ERRORS_Q[cond][1]
-        if not self._legacy_code:
-            self._legacy_code = STANZA_ERRORS_Q[cond][2]
 
     def _from_xml(self, element):
         """Initialize an ErrorElement object from an XML element.
@@ -440,12 +410,6 @@ class StanzaErrorElement(ErrorElement):
         error_type = element.get(u"type")
         if error_type:
             self.error_type = error_type
-        legacy_code = element.get(u"code")
-        if legacy_code:
-            self._legacy_code = legacy_code
-            if self.condition.tag == UNDEFINED_STANZA_CONDITION and (
-                                            legacy_code in LEGACY_CODES):
-                self.condition = LEGACY_CODES[legacy_code]
  
     def get_message(self):
         """Get the standard English message for the error.
@@ -458,14 +422,12 @@ class StanzaErrorElement(ErrorElement):
         else:
             return None
 
-    def as_xml(self, stanza_namespace = None, legacy = False):
+    def as_xml(self, stanza_namespace = None): # pylint: disable-msg=W0221
         """Return the XML error representation.
 
         :Parameters:
-            - `legacy`: if legacy 'code' attribute should be included
             - `stanza_namespace`: namespace URI of the containing stanza
         Types:
-            - `legacy`: `bool`
             - `stanza_namespace`: `unicode`
 
         :returntype: `ElementTree.Element`"""
@@ -474,11 +436,6 @@ class StanzaErrorElement(ErrorElement):
             self.text_qname = "{{{0}}}text".format(stanza_namespace)
         result = ErrorElement.as_xml(self)
         result.set("type", self.error_type)
-        if legacy:
-            code = self._legacy_code
-            if not code:
-                code = STANZA_ERRORS_Q[self.condition.tag][2]
-            result.set("code", self._legacy_code)
         return result
 
 # vi: sts=4 et sw=4
