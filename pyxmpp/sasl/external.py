@@ -27,9 +27,7 @@ from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 
-import base64
-
-from .core import ClientAuthenticator, Failure, Response, Challenge, Success
+from .core import ClientAuthenticator, Response, Success
 from .core import sasl_mechanism
 
 @sasl_mechanism("EXTERNAL", False, 20)
@@ -38,6 +36,8 @@ class ExternalClientAuthenticator(ClientAuthenticator):
     def __init__(self, password_manager):
         ClientAuthenticator.__init__(self, password_manager)
         self.password_manager = password_manager
+        self.username = None
+        self.authzid = None
 
     def start(self, username, authzid):
         self.username = username

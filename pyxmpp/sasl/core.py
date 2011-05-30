@@ -24,9 +24,8 @@ from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 
-import random
-import logging
 import uuid
+import hashlib
 
 from base64 import standard_b64encode
 
@@ -41,7 +40,6 @@ SERVER_MECHANISMS = []
 SECURE_SERVER_MECHANISMS = []
         
 class PasswordManager:
-    __metaclass__ = ABCMeta
     """Base class for password managers.
 
     Password manager is an object responsible for providing or verification
@@ -49,6 +47,8 @@ class PasswordManager:
 
     All the methods of `PasswordManager` class may be overriden in derived
     classes for specific authentication and authorization policy."""
+    # pylint: disable-msg=W0232,R0201
+    __metaclass__ = ABCMeta
     def get_password(self, username, realm = None,
                                             acceptable_formats = (u"plain", )):
         """Get the password for user authentication.
@@ -77,6 +77,7 @@ class PasswordManager:
         :return: the password and its encoding (format).
         :returntype: `unicode`,`str` tuple.
         """
+        # pylint: disable-msg=W0613
         return None, None
 
     def check_password(self, username, password, realm = None):
@@ -118,6 +119,8 @@ class PasswordManager:
                 realm = realm.encode("utf-8")
             username = username.encode("utf-8")
             password = password.encode("utf-8")
+
+            # pylint: disable-msg=E1101
             urp_hash = hashlib.md5(b"%s:%s:%s").hexdigest()
             return urp_hash == pwd
         return False
@@ -233,6 +236,7 @@ class Reply(object):
         - `data`: `bytes`
         - `_encode`: `bool`
     """
+    # pylint: disable-msg=R0903
     def __init__(self, data = b"", encode = True):
         """Initialize the `Reply` object.
 
@@ -260,6 +264,7 @@ class Reply(object):
 
 class Challenge(Reply):
     """The challenge SASL message (server's challenge for the client)."""
+    # pylint: disable-msg=R0903
     def __init__(self, data, encode = True):
         """Initialize the `Challenge` object."""
         Reply.__init__(self, data, encode)
@@ -267,7 +272,9 @@ class Challenge(Reply):
         return "<sasl.Challenge: {0!r}>".format(self.data)
 
 class Response(Reply):
-    """The response SASL message (clients's reply the the server's challenge)."""
+    """The response SASL message (clients's reply the the server's
+    challenge)."""
+    # pylint: disable-msg=R0903
     def __init__(self, data = b"", encode = True):
         """Initialize the `Response` object."""
         Reply.__init__(self, data, encode)
@@ -282,6 +289,7 @@ class Failure(Reply):
     :Types:
         - `reason`: unicode.
     """
+    # pylint: disable-msg=R0903
     def __init__(self, reason):
         """Initialize the `Failure` object.
 
@@ -299,6 +307,7 @@ class Success(Reply):
     """The success SASL message (sent by the server on authentication
     success).
     """
+    # pylint: disable-msg=R0903
     def __init__(self, username, realm = None, authzid = None, data = None,
                                                                 encode = True):
         """Initialize the `Success` object.
@@ -316,6 +325,7 @@ class Success(Reply):
             - `data`: `str`
             - `encode`: `bool`
         """
+        # pylint: disable-msg=R0913
         Reply.__init__(self, data, encode)
         self.username = username
         self.realm = realm
@@ -325,13 +335,13 @@ class Success(Reply):
                                                     self.authzid, self.data)
 
 class ClientAuthenticator:
-    __metaclass__ = ABCMeta
     """Base class for client authenticators.
 
     A client authenticator class is a client-side implementation of a SASL
     mechanism. One `ClientAuthenticator` object may be used for one
     client authentication process.
     """
+    __metaclass__ = ABCMeta
     def __init__(self, password_manager):
         """Initialize a `ClientAuthenticator` object.
 
@@ -383,13 +393,13 @@ class ClientAuthenticator:
         raise NotImplementedError
 
 class ServerAuthenticator:
-    __metaclass__ = ABCMeta
     """Base class for server authenticators.
 
     A server authenticator class is a server-side implementation of a SASL
     mechanism. One `ServerAuthenticator` object may be used for one
     client authentication process.
     """
+    __metaclass__ = ABCMeta
     def __init__(self, password_manager):
         """Initialize a `ServerAuthenticator` object.
 
@@ -429,6 +439,7 @@ class ServerAuthenticator:
 def _key_func(item):
     """Key function used for sorting SASL authenticator classes
     """
+    # pylint: disable-msg=W0212
     klass = item[1]
     return (klass._pyxmpp_sasl_secure, klass._pyxmpp_sasl_preference)
 
@@ -436,6 +447,7 @@ def _register_client_authenticator(klass, name):
     """Add a client authenticator class to `CLIENT_MECHANISMS_D`,
     `CLIENT_MECHANISMS` and, optionally, to `SECURE_CLIENT_MECHANISMS`
     """
+    # pylint: disable-msg=W0212
     CLIENT_MECHANISMS_D[name] = klass
     items = sorted(CLIENT_MECHANISMS_D.items(), key = _key_func, reverse = True)
     CLIENT_MECHANISMS[:] = [k for (k, v) in items ]
@@ -446,6 +458,7 @@ def _register_server_authenticator(klass, name):
     """Add a client authenticator class to `SERVER_MECHANISMS_D`,
     `SERVER_MECHANISMS` and, optionally, to `SECURE_SERVER_MECHANISMS`
     """
+    # pylint: disable-msg=W0212
     SERVER_MECHANISMS_D[name] = klass
     items = sorted(SERVER_MECHANISMS_D.items(), key = _key_func, reverse = True)
     SERVER_MECHANISMS[:] = [k for (k, v) in items ]
@@ -467,6 +480,7 @@ def sasl_mechanism(name, secure, preference = 50):
         - `secure`: `bool`
         - `preference`: `int`
     """
+    # pylint: disable-msg=W0212
     def decorator(klass):
         """The decorator."""
         klass._pyxmpp_sasl_secure = secure

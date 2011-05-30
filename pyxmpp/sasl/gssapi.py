@@ -30,34 +30,43 @@ import kerberos
 
 import logging
 
-from .core import ClientAuthenticator, Failure, Response, Challenge, Success
+from .core import ClientAuthenticator, Response, Success
 from .core import sasl_mechanism
+        
+logger = logging.getLogger("pyxmpp.sasl.gssapi")
 
 @sasl_mechanism("GSSAPI", 75)
 class GSSAPIClientAuthenticator(ClientAuthenticator):
     """Provides client-side GSSAPI SASL (Kerberos 5) authentication."""
 
-    def __init__(self,password_manager):
+    def __init__(self, password_manager):
         ClientAuthenticator.__init__(self, password_manager)
         self.password_manager = password_manager
-        self.__logger = logging.getLogger("pyxmpp.sasl.gssapi.GSSAPIClientAuthenticator")
+        self.username = None
+        self._gss = None
+        self.step = None
+        self.authzid = None
 
     def start(self, username, authzid):
         self.username = username
         self.authzid = authzid
-        rc, self._gss = kerberos.authGSSClientInit(authzid or "%s@%s" % ("xmpp", self.password_manager.get_serv_host()))
+        _unused, self._gss = kerberos.authGSSClientInit(authzid or 
+                        "{0}@{1}".format("xmpp", 
+                                    self.password_manager.get_serv_host()))
         self.step = 0
         return self.challenge("")
 
     def challenge(self, challenge):
         if self.step == 0:
-            rc = kerberos.authGSSClientStep(self._gss, base64.b64encode(challenge))
-            if rc != kerberos.AUTH_GSS_CONTINUE:
+            ret = kerberos.authGSSClientStep(self._gss,
+                                                base64.b64encode(challenge))
+            if ret != kerberos.AUTH_GSS_CONTINUE:
                 self.step = 1
         elif self.step == 1:
-            rc = kerberos.authGSSClientUnwrap(self._gss, base64.b64encode(challenge))
+            ret = kerberos.authGSSClientUnwrap(self._gss,
+                                                base64.b64encode(challenge))
             response = kerberos.authGSSClientResponse(self._gss)
-            rc = kerberos.authGSSClientWrap(self._gss, response, self.username)
+            ret = kerberos.authGSSClientWrap(self._gss, response, self.username)
         response = kerberos.authGSSClientResponse(self._gss)
         if response is None:
             return Response("")
@@ -66,8 +75,9 @@ class GSSAPIClientAuthenticator(ClientAuthenticator):
 
     def finish(self, data):
         self.username = kerberos.authGSSClientUserName(self._gss)
-        self.__logger.debug("Authenticated as %s" % kerberos.authGSSClientUserName(self._gss))
-        return Success(self.username,None,self.authzid)
+        logger.debug("Authenticated as {0!r}".format(
+                                    kerberos.authGSSClientUserName(self._gss)))
+        return Success(self.username, None, self.authzid)
 
 
 # vi: sts=4 et sw=4
