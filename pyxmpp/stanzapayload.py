@@ -32,8 +32,8 @@ class StanzaPayload:
     """Abstract base class for stanza payload objects."""
     __metaclass__ = ABCMeta
 
-    def __init__(self, data):
-        raise NotImplementedError
+    def __init__(self, element):
+        pass
 
     def as_xml(self):
         raise NotImplementedError
