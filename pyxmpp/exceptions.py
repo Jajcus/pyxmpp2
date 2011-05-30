@@ -185,4 +185,9 @@ class FeatureNotImplementedProtocolError(ProtocolError):
     def __init__(self, message):
         ProtocolError.__init__(self, "feature-not-implemented", message)
 
+class ResourceConstraintProtocolError(ProtocolError):
+    """Raised when stanza requests a feature which is not (yet) implemented."""
+    def __init__(self, message):
+        ProtocolError.__init__(self, "resource-constraint", message)
+
 # vi: sts=4 et sw=4

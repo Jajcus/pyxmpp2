@@ -26,22 +26,20 @@ from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 
-import inspect
-import socket
-import time
-import errno
 import logging
 import uuid
-import re
+
 from xml.etree import ElementTree
 
 from .constants import BIND_QNP
 from .stanzapayload import StanzaPayload, payload_element_name
 from .streambase import StreamFeatureHandler
 from .stanzaprocessor import XMPPFeatureHandler
-from .stanzaprocessor import iq_set_stanza_handler, iq_get_stanza_handler
+from .stanzaprocessor import iq_set_stanza_handler
 from .settings import XMPPSettings
 from .streamevents import BindingResourceEvent, AuthorizedEvent
+from .exceptions import ResourceConstraintProtocolError, JIDError
+from .exceptions import BadRequestProtocolError, FatalStreamError
 from .iq import Iq
 from .jid import JID
 
@@ -54,7 +52,17 @@ BIND_RESOURCE_TAG = BIND_QNP + u"resource"
 
 @payload_element_name(FEATURE_BIND)
 class ResourceBindingPayload(StanzaPayload):
+    """Resource binding <iq/> stanza payload.
+    
+    :Ivariables:
+        - `jid`: content of the <jid/> child element
+        - `resource`: content of the <resource/> child element
+    :Types:
+        - `jid`: `JID`
+        - `resource`: `unicode`
+    """
     def __init__(self, element = None, jid = None, resource = None):
+        StanzaPayload.__init__(self, element)
         self.jid = None
         self.resource = None
         if element is not None:
@@ -84,13 +92,18 @@ class ResourceBindingPayload(StanzaPayload):
         return element
 
 class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
+    """Resource binding implementation.
+
+    To be used as one of the handlers passed to a stream class
+    constructor."""
     def __init__(self, settings = None):
         """Initialize the SASL handler"""
         if settings is None:
             settings = XMPPSettings()
 
     def make_stream_features(self, stream, features):
-        """Add resource binding feature to the <features/> element of the stream.
+        """Add resource binding feature to the <features/> element of the
+        stream.
 
         [receving entity only]
 
@@ -143,6 +156,7 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
             - `stanza`: <iq type="result"/> stanza received.
 
         Set `self.me` to the full JID negotiated."""
+        # pylint: disable-msg=R0201
         payload = stanza.get_payload(ResourceBindingPayload)
         jid = payload.jid
         if not jid:
@@ -162,6 +176,7 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
     @iq_set_stanza_handler(ResourceBindingPayload)
     def handle_bind_iq_set(self, stanza):
         """Handler <iq type="set"/> for resource binding."""
+        # pylint: disable-msg=R0201
         peer = stanza.stream.peer
         if peer.resource:
             raise ResourceConstraintProtocolError(
