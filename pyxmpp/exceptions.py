@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2011 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -19,10 +19,11 @@
 
 This module defines all exceptions raised by PyXMPP.
 """
+# pylint: disable-msg=R0901
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
 import logging
 
@@ -126,7 +127,7 @@ class ComponentStreamError(StreamError):
     """Raised on a component error."""
     pass
 
-class FatalComponentStreamError(ComponentStreamError,FatalStreamError):
+class FatalComponentStreamError(ComponentStreamError, FatalStreamError):
     """Raised on a fatal component error."""
     pass
 
@@ -145,7 +146,7 @@ class ProtocolError(Error):
     "pyxmpp.ProtocolError.reported" channel and the ignored errors using
     "pyxmpp.ProtocolError.ignored" channel. Both with the "debug" level.
     
-    :Ivariables:
+    :Properites:
         - `xmpp_name` -- XMPP error name which should be reported.
         - `message` -- the error message."""
 
@@ -153,17 +154,24 @@ class ProtocolError(Error):
     logger_ignored = logging.getLogger("pyxmpp.ProtocolError.ignored")
 
     def __init__(self, xmpp_name, message):
-        self.args = (xmpp_name, message)
+        Error.__init__(self, xmpp_name, message)
+
     @property
     def xmpp_name(self):
+        """XMPP error name which should be reported"""
         return self.args[0]
     @property
     def message(self):
+        """The error message."""
         return self.args[1]
     def log_reported(self):
-        self.logger_reported.debug(u"Protocol error detected: %s", self.message)
+        """Log message via the "pyxmpp.ProtocolError.reported" logger."""
+        self.logger_reported.debug(u"Protocol error detected: {0}"
+                                                        .format(self.message))
     def log_ignored(self):
-        self.logger_ignored.debug(u"Protocol error detected: %s", self.message)
+        """Log message via the "pyxmpp.ProtocolError.ignored" logger."""
+        self.logger_ignored.debug(u"Protocol error detected: {0}"
+                                                        .format(self.message))
     def __unicode__(self):
         return str(self.args[1])
     def __repr__(self):
@@ -178,6 +186,7 @@ class BadRequestProtocolError(ProtocolError):
 class JIDMalformedProtocolError(ProtocolError, JIDError):
     """Raised when invalid JID is encountered."""
     def __init__(self, message):
+        JIDError.__init__(self)
         ProtocolError.__init__(self, "jid-malformed", message)
 
 class FeatureNotImplementedProtocolError(ProtocolError):
