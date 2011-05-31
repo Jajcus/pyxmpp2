@@ -40,23 +40,19 @@ from xml.etree import ElementTree
 
 
 from .xmppparser import XMLStreamHandler
-from .expdict import ExpiringDictionary
 from .error import StreamErrorElement
-from .iq import Iq
 from .jid import JID
 from . import resolver
 from .stanzaprocessor import StanzaProcessor, stanza_factory
-from .exceptions import StreamError, BadRequestProtocolError
+from .exceptions import StreamError, AlreadyInProgressError
 from .exceptions import HostMismatch
 from .exceptions import DNSError, UnexpectedCNAMEError
 from .exceptions import FatalStreamError, StreamParseError
-from .constants import STREAM_QNP, BIND_QNP, XML_LANG_QNAME
+from .constants import STREAM_QNP, XML_LANG_QNAME
 from .settings import XMPPSettings
 from .xmppserializer import serialize, XMPPSerializer
 from .xmppparser import StreamReader
-from .stanzapayload import XMLPayload
 
-from .streamevents import AuthorizedEvent, BindingResourceEvent
 from .streamevents import ConnectedEvent, GotFeaturesEvent
 from .streamevents import ConnectingEvent, ConnectionAcceptedEvent
 from .streamevents import DisconnectedEvent, ResolvingAddressEvent
@@ -83,11 +79,24 @@ FEATURES_TAG = STREAM_QNP + u"features"
 IP_RE = re.compile(r"^((\d+.){3}\d+)|([0-9a-f]*:[0-9a-f:]*:[0-9a-f]*)$")
 
 class XMPPEventHandler:
+    """Base class for PyXMPP event handlers."""
+    # pylint: disable-msg=W0232,R0903
     __metaclass__ = ABCMeta
     def handle_xmpp_event(self, event):
+        """Called for every event issued by the object
+        with this handler installed. Should return `True` if
+        no other handlers should be called for this event.
+        
+        :Return: `True` if no other handlers should be called and the default
+            action is to be skipped
+        :Returntype: `bool`
+        """
+        # pylint: disable-msg=R0201,W0613
         return False
 
 class StreamFeatureHandler:
+    """Base class for stream feature handlers."""
+    # pylint: disable-msg=W0232
     __metaclass__ = ABCMeta
     def handle_stream_features(self, stream, features):
         """Handle features announced by the stream peer.
@@ -101,7 +110,9 @@ class StreamFeatureHandler:
             - `stream`: `StreamBase`
             - `features`: `ElementTree.Element`
         """
+        # pylint: disable-msg=W0613,R0201
         return False
+
     def make_stream_features(self, stream, features):
         """Update the features element announced by the stream.
 
@@ -114,6 +125,7 @@ class StreamFeatureHandler:
             - `stream`: `StreamBase`
             - `features`: `ElementTree.Element`
         """
+        # pylint: disable-msg=W0613,R0201
         return False
 
 def stream_element_handler(element_name, usage_restriction = None):
@@ -136,14 +148,16 @@ def stream_element_handler(element_name, usage_restriction = None):
     return decorator
 
 def once(func):
+    """Decorator for methods which are no re-entrant"""
     @wraps(func)
     def wrapper(self, *args, **kwargs):
+        # pylint: disable-msg=C0111,W0212
         with self.lock:
             if func.__name__ in self._in_progress:
-                raise AlreadyInProgress(func.__name__)
+                raise AlreadyInProgressError(func.__name__)
             self._in_progress.add(func.__name__)
         try:
-            func(self, *args, **kwargs)
+            return func(self, *args, **kwargs)
         finally:
             with self.lock:
                 self._in_progress.remove(func.__name__)
@@ -291,10 +305,11 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             if type(addr) in (str, unicode):
                 self.event(ResolvingAddressEvent(addr))
             sock = None
+            allow_cname = not srv_used
             while True:
                 try:
                     addresses = resolver.getaddrinfo(addr, port, None,
-                                socket.SOCK_STREAM, allow_cname = not srv_used)
+                                            socket.SOCK_STREAM, allow_cname)
                     break
                 except UnexpectedCNAMEError, err:
                     logger.warning(str(err))
@@ -372,6 +387,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         Scans the `self.handlers` list for `StreamFeatureHandler`
         instances and updates `self._element_handlers` mapping with their
         methods decorated with `@stream_element_handler`"""
+        # pylint: disable-msg=W0212
         if self.initiator:
             mode = "initiator"
         else:
@@ -380,7 +396,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         for handler in self.handlers:
             if not isinstance(handler, StreamFeatureHandler):
                 continue
-            for name, meth in inspect.getmembers(handler, callable):
+            for _unused, meth in inspect.getmembers(handler, callable):
                 if not hasattr(meth, "_pyxmpp_stream_element_handled"):
                     continue
                 element_handled = meth._pyxmpp_stream_element_handled
@@ -598,7 +614,6 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         if self.initiator:
             self._send_stream_start(self.stream_id)
         self._make_reader()
-        self.unset_iq_set_handler(XMLPayload, FEATURE_BIND)
 
     def _make_stream_features(self):
         """Create the <features/> element for the stream.
@@ -868,7 +883,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         :Parameters:
             - `error`: error received
         """
-
+        # pylint: disable-msg=R0201
         logger.debug("Unhandled stream error: condition: {0} {1!r}"
                             .format(error.condition_name, error.serialize()))
 
@@ -887,6 +902,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         """Generate a random and unique stream ID.
 
         :return: the id string generated."""
+        # pylint: disable-msg=R0201
         return unicode(uuid.uuid4())
 
     def _got_features(self):
@@ -921,6 +937,16 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             return False
 
     def set_peer_authenticated(self, peer, restart_stream = False):
+        """Mark the other side of the stream authenticated as `peer`
+
+        :Parameters:
+            - `peer`: local JID just authenticated
+            - `restart_stream`: `True` when stream should be restarted
+                (needed after SASL authentication)
+        :Types:
+            - `peer`: `JID`
+            - `restart_stream`: `bool`
+        """
         with self.lock:
             self.peer_authenticated = True
             self.peer = peer
@@ -930,6 +956,16 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         self.event(AuthenticatedEvent(self.peer))
 
     def set_authenticated(self, me, restart_stream = False):
+        """Mark stream authenticated as `me`
+
+        :Parameters:
+            - `me`: local JID just authenticated
+            - `restart_stream`: `True` when stream should be restarted
+                (needed after SASL authentication)
+        :Types:
+            - `me`: `JID`
+            - `restart_stream`: `bool`
+        """
         with self.lock:
             self.authenticated = True
             self.me = me
