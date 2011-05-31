@@ -36,6 +36,9 @@ class JIDError(Error, ValueError):
     "Exception raised when invalid JID is used"
     pass
 
+class AlreadyInProgressError(Error):
+    pass
+
 class StreamError(Error):
     """Base class for all stream errors."""
     pass
