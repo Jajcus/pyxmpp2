@@ -50,6 +50,13 @@ FEATURE_BIND = BIND_QNP + u"bind"
 BIND_JID_TAG = BIND_QNP + u"jid"
 BIND_RESOURCE_TAG = BIND_QNP + u"resource"
 
+def default_resource_factory(settings):
+    """Factory for the 'resource' setting default: use random uuid"""
+    # pylint: disable-msg=W0613
+    return unicode(uuid.uuid4())
+
+XMPPSettings.add_default_factory("resource", default_resource_factory)
+
 @payload_element_name(FEATURE_BIND)
 class ResourceBindingPayload(StanzaPayload):
     """Resource binding <iq/> stanza payload.
@@ -123,7 +130,11 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
         if element is None:
             logger.debug("No <bind/> in features")
             return False
-        self.bind(stream, stream.me.resource)
+        if stream.me.resource:
+            resource = stream.me.resource
+        else:
+            resource = stream.settings["resource"]
+        self.bind(stream, resource)
         return True
 
     def bind(self, stream, resource):
