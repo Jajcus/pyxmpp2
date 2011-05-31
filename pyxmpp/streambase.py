@@ -79,6 +79,9 @@ LANG_SPLIT_RE = re.compile(r"(.*)(?:-[a-zA-Z0-9])?-[a-zA-Z0-9]+$")
 ERROR_TAG = STREAM_QNP + u"error"
 FEATURES_TAG = STREAM_QNP + u"features"
 
+# just to distinguish those from a domain name
+IP_RE = re.compile(r"^((\d+.){3}\d+)|([0-9a-f]*:[0-9a-f:]*:[0-9a-f]*)$")
+
 class XMPPEventHandler:
     __metaclass__ = ABCMeta
     def handle_xmpp_event(self, event):
@@ -246,8 +249,15 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         self._make_reader()
 
     @once
-    def connect(self, addr, port, service = None, to = None):
+    def connect(self, addr, port = None, service = None, to = None):
         """Establish XMPP connection with given address.
+
+        One of: `port` or `service` must be provided and `addr` must be 
+        a domain name and not an IP address `port` is not given.
+
+        When `service` is given try an SRV lookup for that service
+        at domain `addr`. If `service is not given or `addr` is an IP address, 
+        or the SRV lookup fails, connect to `port` at host `addr` directly.
 
         [initiating entity only]
 
@@ -259,16 +269,23 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         """
         if to is None:
             to = unicode(addr)
-        allow_cname = True
-        if service is not None:
+        srv_used = False
+        self.selected_host = None
+        if service is not None and not IP_RE.match(addr):
             self.event(ResolvingSRVEvent(addr, service))
             addrs = resolver.resolve_srv(addr, service)
-            if not addrs:
+            if addrs:
+                srv_used = True
+            elif port:
                 addrs = [(addr, port)]
             else:
-                allow_cname = False
-        else:
+                raise DNSError("Could not resolve SRV for service {0!r}"
+                            " on host {1!r} and fallback port number not given"
+                                                        .format(service, addr))
+        elif port:
             addrs = [(addr, port)]
+        else:
+            raise ValueError("No port number or service name given")
         exception = None
         for addr, port in addrs:
             if type(addr) in (str, unicode):
@@ -277,7 +294,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             while True:
                 try:
                     addresses = resolver.getaddrinfo(addr, port, None,
-                                socket.SOCK_STREAM, allow_cname = allow_cname)
+                                socket.SOCK_STREAM, allow_cname = not srv_used)
                     break
                 except UnexpectedCNAMEError, err:
                     logger.warning(str(err))
@@ -294,6 +311,8 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
                     sock = socket.socket(family, socktype, proto)
                     self.event(ConnectingEvent(sockaddr))
                     sock.connect(sockaddr)
+                    if srv_used:
+                        self.selected_host = addr
                 except socket.error, err:
                     exception = err
                     logger.debug("Connect to {0!r} failed".format(sockaddr))
@@ -323,7 +342,8 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
 
         :Parameters:
             - `sock`: a listening socket.
-            - `myname`: local stream endpoint name."""
+            - `myname`: local stream endpoint name.
+        """
         with self.lock:
             addr = self._accept(sock, myname)
         self.event(ConnectionAcceptedEvent(addr))
