@@ -309,7 +309,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             while True:
                 try:
                     addresses = resolver.getaddrinfo(addr, port, None,
-                                            socket.SOCK_STREAM, allow_cname)
+                                socket.SOCK_STREAM, allow_cname = allow_cname)
                     break
                 except UnexpectedCNAMEError, err:
                     logger.warning(str(err))
