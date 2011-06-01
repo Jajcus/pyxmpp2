@@ -4,6 +4,7 @@
 import unittest
 import time
 import re
+import base64
 
 from xml.etree.ElementTree import Element, SubElement, XML
 
@@ -29,33 +30,7 @@ BIND_FEATURES = """<stream:features>
      <bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>
 </stream:features>"""
 
-BIND_GENERATED_REQUEST = """<iq type="set" id="42">
-  <bind  xmlns="urn:ietf:params:xml:ns:xmpp-bind">
-  </bind>
-</iq>
-"""
-
-BIND_GENERATED_RESPONSE = """<iq type="result" id="{0}">
-  <bind  xmlns="urn:ietf:params:xml:ns:xmpp-bind">
-    <jid>test@127.0.0.1/Generated</jid>
-  </bind>
-</iq>
-"""
-
-BIND_PROVIDED_REQUEST = """<iq type="set" id="42">
-  <bind  xmlns="urn:ietf:params:xml:ns:xmpp-bind">
-    <resource>Provided</resource>
-  </bind>
-</iq>
-"""
-
-BIND_PROVIDED_RESPONSE = """<iq type="result" id="{0}">
-  <bind  xmlns="urn:ietf:params:xml:ns:xmpp-bind">
-    <jid>test@127.0.0.1/Provided</jid>
-  </bind>
-</iq>
-"""
-
+PLAIN_AUTH = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>{0}</auth>"
 
 STREAM_TAIL = '</stream:stream>'
         
@@ -117,7 +92,7 @@ class TestInitiator(NetworkTestCase):
         self.assertEqual(event_classes, [ResolvingAddressEvent, ConnectingEvent,
                     ConnectedEvent, StreamConnectedEvent, GotFeaturesEvent,
                     AuthenticatedEvent, StreamConnectedEvent, GotFeaturesEvent, 
-                    BindingResourceEvent, DisconnectedEvent])
+                    DisconnectedEvent])
  
     def test_auth_fail(self):
         addr, port = self.start_server()
@@ -149,10 +124,90 @@ class TestInitiator(NetworkTestCase):
                     ConnectedEvent, StreamConnectedEvent, GotFeaturesEvent,
                     DisconnectedEvent])
  
+class TestReceiver(NetworkTestCase):
+    def loop(self, stream, timeout = TIMEOUT, expect = None):
+        timeout = time.time() + timeout
+        while stream.socket and time.time() < timeout:
+            stream.loop_iter(0.1)
+            if expect:
+                match = expect.match(self.client.rdata)
+                if match:
+                    return match.group(1)
+
+    def test_auth(self):
+        sock = self.make_listening_socket()
+        self.start_client(sock.getsockname())
+        handler = IgnoreEventHandler()
+        settings = XMPPSettings({
+                                u"user_passwords": {
+                                        u"user": u"secret",
+                                    },
+                                })
+        stream = StreamBase(u"jabber:client", [StreamSASLHandler(settings), handler], settings)
+        stream.accept(sock, sock.getsockname()[0])
+        self.client.write(C2S_CLIENT_STREAM_HEAD)
+        xml = self.loop(stream, timeout = 1, expect = re.compile(
+            r".*<stream:features>(.*)</stream:features>"))
+        self.assertIsNotNone(xml)
+        element = XML(xml)
+        self.assertEqual(element.tag, "{urn:ietf:params:xml:ns:xmpp-sasl}mechanisms")
+        self.assertEqual(element[0].tag, "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
+        self.assertEqual(element[0].text, "DIGEST-MD5")
+        self.assertEqual(element[1].tag, "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
+        self.assertEqual(element[1].text, "PLAIN")
+        self.client.write(PLAIN_AUTH.format(
+                                    base64.b64encode(b"\000user\000secret")))
+        xml = self.loop(stream, timeout = 1, expect = re.compile(
+                                        r".*(<success.*>)"))
+        self.assertIsNotNone(xml)
+        self.client.write(C2S_CLIENT_STREAM_HEAD)
+        xml = self.loop(stream, timeout = 1, expect = re.compile(
+                                                    r".*(<stream:stream.*>)"))
+        self.assertIsNotNone(xml)
+        self.assertTrue(stream.peer_authenticated)
+        stream.disconnect()
+        self.client.write(b"</stream:stream>")
+        self.loop(stream)
+        event_classes = [e.__class__ for e in handler.events_received]
+        self.assertEqual(event_classes, [ConnectionAcceptedEvent,
+                                StreamConnectedEvent, AuthenticatedEvent,
+                                StreamConnectedEvent, DisconnectedEvent])
+ 
+    def test_auth_fail(self):
+        sock = self.make_listening_socket()
+        self.start_client(sock.getsockname())
+        handler = IgnoreEventHandler()
+        settings = XMPPSettings({
+                                u"user_passwords": {
+                                        u"user": u"secret",
+                                    },
+                                })
+        stream = StreamBase(u"jabber:client", [StreamSASLHandler(settings), handler], settings)
+        stream.accept(sock, sock.getsockname()[0])
+        self.client.write(C2S_CLIENT_STREAM_HEAD)
+        xml = self.loop(stream, timeout = 1, expect = re.compile(
+            r".*<stream:features>(.*)</stream:features>"))
+        self.assertIsNotNone(xml)
+        element = XML(xml)
+        self.assertEqual(element.tag, "{urn:ietf:params:xml:ns:xmpp-sasl}mechanisms")
+        self.assertEqual(element[0].tag, "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
+        self.assertEqual(element[0].text, "DIGEST-MD5")
+        self.assertEqual(element[1].tag, "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
+        self.assertEqual(element[1].text, "PLAIN")
+        self.client.write(PLAIN_AUTH.format(
+                                    base64.b64encode(b"\000user\000bad")))
+        with self.assertRaises(SASLAuthenticationFailed):
+            self.loop(stream)
+        self.client.write(b"</stream:stream>")
+        self.loop(stream)
+        event_classes = [e.__class__ for e in handler.events_received]
+        self.assertEqual(event_classes, [ConnectionAcceptedEvent,
+                                StreamConnectedEvent, DisconnectedEvent])
  
 def suite():
      suite = unittest.TestSuite()
      suite.addTest(unittest.makeSuite(TestInitiator))
+     suite.addTest(unittest.makeSuite(TestReceiver))
      return suite
 
 if __name__ == '__main__':

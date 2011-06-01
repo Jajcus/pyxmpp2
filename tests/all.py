@@ -7,7 +7,7 @@ import logging
 
 all_modules=[ "jid", "stream_reader", "xmppserializer", "stanza",
             "message", "presence", "iq", "stanzaprocessor",
-            "streambase", "sasl_gsasl", "binding",
+            "streambase", "sasl_gsasl", "binding", "streamsasl",
              "cache", 
 #          "vcard", "disco", "dataforms", "interface"
                 ]

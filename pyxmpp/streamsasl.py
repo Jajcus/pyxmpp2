@@ -91,7 +91,9 @@ class DefaultPasswordManager(sasl.PasswordManager):
         stream = self.stream
         if stream:
             if stream.initiator:
-                our_name = self.settings.get("username", stream.jid.node)
+                our_name = self.settings.get("username")
+                if our_name is None and self.stream and self.stream.me:
+                    our_name = self.stream.me.node
                 if our_name == username:
                     password = self.settings["password"]
                 else:
@@ -138,7 +140,7 @@ class DefaultPasswordManager(sasl.PasswordManager):
                 ret = False
             elif jid.node != extra_info["username"]:
                 ret = False
-            elif jid.domain != self.stream.jid.domain:
+            elif jid.domain != self.stream.me.domain:
                 ret = False
             elif not jid.resource:
                 ret = False
@@ -156,7 +158,7 @@ class DefaultPasswordManager(sasl.PasswordManager):
         :return: list of realms.
         :returntype: `list` of `unicode`"""
         if self.stream:
-            return [self.stream.jid.domain]
+            return [self.stream.me.domain]
         else:
             return []
 
@@ -180,7 +182,7 @@ class DefaultPasswordManager(sasl.PasswordManager):
                 return realm_list[0]
             else:
                 return None
-        jid = self.stream.jid
+        jid = self.stream.me
         if not realm_list:
             return jid.domain
         if jid.domain in realm_list:
@@ -198,7 +200,7 @@ class DefaultPasswordManager(sasl.PasswordManager):
 
         :return: domain of the own JID."""
         if self.stream:
-            return self.stream.jid.domain
+            return self.stream.me.domain
         else:
             return "unknown"
 
@@ -243,8 +245,6 @@ class StreamSASLHandler(StreamFeatureHandler):
             settings = XMPPSettings()
         self.settings = settings
         self.password_manager = settings["password_manager"]
-        if hasattr(self.password_manager, "set_stream"):
-            self.password_manager.set_stream(self)
         self.peer_sasl_mechanisms = None
         self.authenticator = None
         self._username = None
@@ -298,7 +298,8 @@ class StreamSASLHandler(StreamFeatureHandler):
         if self.authenticator:
             logger.debug("Authentication already started")
             return False
-
+        if hasattr(self.password_manager, "set_stream"):
+            self.password_manager.set_stream(stream)
         mechanism = element.get("mechanism")
         if not mechanism:
             stream.send_stream_error("bad-format")
@@ -327,7 +328,7 @@ class StreamSASLHandler(StreamFeatureHandler):
                 peer = JID(ret.authzid)
             else:
                 peer = JID(ret.username, stream.me.domain)
-            stream.set_peer_authenticated(peer)
+            stream.set_peer_authenticated(peer, True)
         elif isinstance(ret, sasl.Failure):
             raise SASLAuthenticationFailed("SASL authentication failed: {0}"
                                                             .format(ret.reason))
@@ -470,6 +471,9 @@ class StreamSASLHandler(StreamFeatureHandler):
                                                         " SASL authentication")
         if stream.features is None or not self.peer_sasl_mechanisms:
             raise SASLNotAvailable("Peer doesn't support SASL")
+
+        if hasattr(self.password_manager, "set_stream"):
+            self.password_manager.set_stream(stream)
 
         mechs = self.settings['sasl_mechanisms'] 
         if not mechanism:
