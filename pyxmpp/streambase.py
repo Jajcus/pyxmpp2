@@ -57,7 +57,7 @@ from .streamevents import ConnectedEvent, GotFeaturesEvent
 from .streamevents import ConnectingEvent, ConnectionAcceptedEvent
 from .streamevents import DisconnectedEvent, ResolvingAddressEvent
 from .streamevents import ResolvingSRVEvent, StreamConnectedEvent
-from .streamevents import AuthenticatedEvent
+from .streamevents import AuthenticatedEvent, StreamRestartedEvent
 
 XMPPSettings.add_defaults(
         {
@@ -188,9 +188,15 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         - `_reader`: the stream reader object (push parser) for the stream.
         - `version`: Negotiated version of the XMPP protocol. (0,9) for the
           legacy (pre-XMPP) Jabber protocol.
+        - `connection_state`: one of: None, "resolving" (resolving DN records),
+          "connecting" (connecting socket), "connected" (sockets connected),
+          "established" (xml stream start tags exchanged), "closing" (end tag
+          sent and our side of the connection closed) or "closed" (both sides
+          closed), "failed" (failed to resolve address or establish connection)
     :Types:
         - `settings`: XMPPSettings
         - `version`: (`int`, `int`) tuple
+        - `connection_state`: `unicode`
     """
     def __init__(self, stanza_namespace, handlers, settings = None):
         """Initialize StreamBase object
@@ -241,7 +247,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         self.language = None
         self.peer_language = None
         self._serializer = None
-        self.finished = False
+        self.connection_state = None
 
     def _connect_socket(self, sock, to = None):
         """Initialize stream on outgoing connection.
@@ -250,6 +256,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
           - `sock`: connected socket for the stream
           - `to`: name of the remote host
         """
+        self.connection_state = "connected"
         self.eof = False
         self.socket = sock
         if to:
@@ -285,6 +292,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             to = unicode(addr)
         srv_used = False
         self.selected_host = None
+        self.connection_state = "resolving"
         if service is not None and not IP_RE.match(addr):
             self.event(ResolvingSRVEvent(addr, service))
             addrs = resolver.resolve_srv(addr, service)
@@ -302,6 +310,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             raise ValueError("No port number or service name given")
         exception = None
         for addr, port in addrs:
+            self.connection_state = "resolving"
             if type(addr) in (str, unicode):
                 self.event(ResolvingAddressEvent(addr))
             sock = None
@@ -320,6 +329,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
                     exception = err
                     addresses = []
                     break
+            self.connection_state = "connecting"
             for res in addresses:
                 family, socktype, proto, _unused, sockaddr = res
                 try:
@@ -339,6 +349,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             if sock:
                 break
         if not sock:
+            self.connection_state = "failed"
             if exception:
                 raise exception # pylint: disable-msg=E0702
             else:
@@ -369,6 +380,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         self.eof = False
         self.socket, addr = sock.accept()
         logger.debug("Connection from: %r" % (addr,))
+        self.connection_state = "connected"
         self.addr, self.port = addr
         if myname:
             self.me = JID(myname)
@@ -450,7 +462,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             self.socket.close()
             self.socket = None
             self.event(DisconnectedEvent(self.peer))
-        self.finished = True
+        self.connection_state = "closed"
 
     def _make_reader(self):
         """Create ne `StreamReader` instace as `self._reader`."""
@@ -524,9 +536,14 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             self._send_stream_start(self.generate_id())
             self._send_stream_features()
 
+        if self.connection_state in ("established", "closing"):
+            event = StreamRestartedEvent(self.peer)
+        else:
+            event = StreamConnectedEvent(self.peer)
+            self.connection_state = "established"
         self.lock.release()
         try:
-            self.event(StreamConnectedEvent(self.peer))
+            self.event(event)
         finally:
             self.lock.acquire()
 
@@ -566,6 +583,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             logger.debug(u"Sending stream closing tag failed: {0}".format(err))
         self._serializer = None
         self.features = None
+        self.connection_state = "closing"
 
     def _send_stream_start(self, stream_id = None):
         """Send stream start tag."""

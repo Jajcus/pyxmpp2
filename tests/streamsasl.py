@@ -64,7 +64,8 @@ class TestInitiator(NetworkTestCase):
                                 u"username": u"user", 
                                 u"password": u"secret",
                                 })
-        stream = StreamBase(u"jabber:client", [StreamSASLHandler(settings), handler], settings)
+        stream = StreamBase(u"jabber:client", [StreamSASLHandler(settings), 
+                                                            handler], settings)
         stream.connect(addr, port)
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.server.write(AUTH_FEATURES)
@@ -91,7 +92,7 @@ class TestInitiator(NetworkTestCase):
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [ResolvingAddressEvent, ConnectingEvent,
                     ConnectedEvent, StreamConnectedEvent, GotFeaturesEvent,
-                    AuthenticatedEvent, StreamConnectedEvent, GotFeaturesEvent, 
+                    AuthenticatedEvent, StreamRestartedEvent, GotFeaturesEvent, 
                     DisconnectedEvent])
  
     def test_auth_fail(self):
@@ -171,7 +172,7 @@ class TestReceiver(NetworkTestCase):
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [ConnectionAcceptedEvent,
                                 StreamConnectedEvent, AuthenticatedEvent,
-                                StreamConnectedEvent, DisconnectedEvent])
+                                StreamRestartedEvent, DisconnectedEvent])
  
     def test_auth_fail(self):
         sock = self.make_listening_socket()

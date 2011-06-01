@@ -218,3 +218,17 @@ class StreamConnectedEvent(StreamEvent):
         self.peer = peer
     def __unicode__(self):
         return u"Connected to {0}".format(self.peer)
+
+class StreamRestartedEvent(StreamEvent):
+    """Emitted after stream is restarted (<stream:stream> tag exchange)
+    e.g. after SASL.
+    
+    :Ivariables:
+        - `peer`: peer name
+    :Types:
+        - `peer`: `pyxmpp2.jid.JID`
+    """
+    def __init__(self, peer):
+        self.peer = peer
+    def __unicode__(self):
+        return u"Connected to {0}".format(self.peer)
