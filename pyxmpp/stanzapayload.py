@@ -20,7 +20,7 @@
 from abc import ABCMeta
 from copy import deepcopy
 from collections import defaultdict
-from xml.etree import ElementTree
+from .etree import ElementTree, ElementClass
 import logging
 
 STANZA_PAYLOAD_CLASSES = {}
@@ -57,7 +57,7 @@ class XMLPayload(StanzaPayload):
     def __init__(self, data):
         if isinstance(data, StanzaPayload):
             data = data.as_xml()
-        if not isinstance(data, ElementTree.Element):
+        if not isinstance(data, ElementClass):
             raise TypeError("ElementTree.Element required")
         self.xml_element_name = data.tag
         self.element = data

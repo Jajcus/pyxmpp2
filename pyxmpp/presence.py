@@ -25,7 +25,7 @@ from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 
-from xml.etree import ElementTree
+from .etree import ElementTree, ElementClass
 
 from .exceptions import BadRequestProtocolError
 from .stanza import Stanza
@@ -106,7 +106,7 @@ class Presence(Stanza):
         self.xmlnode=None
         if element is None:
             element = "presence"
-        elif not isinstance(element, ElementTree.Element):
+        elif not isinstance(element, ElementClass):
             raise TypeError("Couldn't make Presence from " + repr(element))
 
         if stanza_type is not None and stanza_type not in PRESENCE_TYPES:

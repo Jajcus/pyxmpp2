@@ -28,7 +28,7 @@ __docformat__ = "restructuredtext en"
 
 import base64
 import logging
-from xml.etree import ElementTree
+from .etree import ElementTree
 
 from .jid import JID
 from . import sasl

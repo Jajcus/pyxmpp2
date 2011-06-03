@@ -37,7 +37,7 @@ def xml_elements_equal(element1, element2, ignore_level1_cdata = False):
     :Returntype: `bool`
     """
     # pylint: disable-msg=R0911
-    if element1.tag != element2.tag:
+    if None in (element1, element2) or element1.tag != element2.tag:
         return False
     attrs1 = element1.items()
     attrs1.sort()

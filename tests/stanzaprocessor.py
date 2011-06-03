@@ -3,7 +3,7 @@
 
 import unittest
 
-from xml.etree.ElementTree import Element, SubElement, XML
+from pyxmpp2.etree import ElementTree
 
 from pyxmpp2.iq import Iq
 from pyxmpp2.message import Message
@@ -80,15 +80,15 @@ NON_IQ_STANZAS = (MESSAGE1, MESSAGE2, MESSAGE3,
 
 class TestStanzaFactory(unittest.TestCase):
     def test_iq(self):
-        element = XML(IQ1)
+        element = ElementTree.XML(IQ1)
         stanza = stanza_factory(element)
         self.assertTrue( isinstance(stanza, Iq) )
     def test_message(self):
-        element = XML(MESSAGE1)
+        element = ElementTree.XML(MESSAGE1)
         stanza = stanza_factory(element)
         self.assertTrue( isinstance(stanza, Message) )
     def test_presence(self):
-        element = XML(PRESENCE1)
+        element = ElementTree.XML(PRESENCE1)
         stanza = stanza_factory(element)
         self.assertTrue( isinstance(stanza, Presence) )
 
@@ -107,7 +107,7 @@ class TestStanzaProcessor(unittest.TestCase):
 
     def process_stanzas(self, xml_elements):
         for xml in xml_elements:
-            stanza = stanza_factory(XML(xml))
+            stanza = stanza_factory(ElementTree.XML(xml))
             self.p.process_stanza(stanza)
 
     def ignore_iq_get(self, stanza):
@@ -127,8 +127,8 @@ class TestStanzaProcessor(unittest.TestCase):
         self.assertIsInstance(stanza, Iq)
         self.assertEqual(stanza.stanza_type, "get")
         reply = stanza.make_result_response()
-        element = Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        SubElement(element, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        element = ElementTree.Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
+        ElementTree.SubElement(element, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         reply.set_payload(element)
         return reply
 
@@ -192,9 +192,9 @@ class TestStanzaProcessor(unittest.TestCase):
                                                     "reply_iq_set"])
         self.assertEqual(len(self.stanzas_sent), 2)
         stanza1 = self.stanzas_sent[0]
-        self.assertTrue(xml_elements_equal(stanza1.as_xml(), XML(IQ2), True))
+        self.assertTrue(xml_elements_equal(stanza1.as_xml(), ElementTree.XML(IQ2), True))
         stanza2 = self.stanzas_sent[1]
-        self.assertTrue(xml_elements_equal(stanza2.as_xml(), XML(IQ4), True))
+        self.assertTrue(xml_elements_equal(stanza2.as_xml(), ElementTree.XML(IQ4), True))
 
     def test_no_handlers(self):
         self.process_stanzas(ALL_STANZAS)

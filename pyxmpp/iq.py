@@ -26,7 +26,7 @@ from __future__ import absolute_import
 __docformat__ = "restructuredtext en"
 
 
-from xml.etree import ElementTree
+from .etree import ElementTree, ElementClass
 
 from .stanza import Stanza
 
@@ -72,7 +72,7 @@ class Iq(Stanza):
             raise ValueError("Bad iq type")
         if element is None:
             element = "iq"
-        elif not isinstance(element, ElementTree.Element):
+        elif not isinstance(element, ElementClass):
             raise TypeError("Couldn't make Iq from " + repr(element))
         
         Stanza.__init__(self, element, from_jid = from_jid, to_jid = to_jid,

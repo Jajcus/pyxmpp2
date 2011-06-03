@@ -25,7 +25,7 @@ from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 
-from xml.etree import ElementTree
+from .etree import ElementTree, ElementClass
 import random
 import weakref
 
@@ -101,7 +101,7 @@ class Stanza(object):
         self._stanza_type = None
         self._stanza_id = None
         self._language = language
-        if isinstance(element, ElementTree.Element):
+        if isinstance(element, ElementClass):
             self._element = element
             self._dirty = False
             self._decode_attributes()
@@ -334,7 +334,7 @@ class Stanza(object):
         :Types:
             - `payload`: `ElementTree.Element` or `StanzaPayload`
         """
-        if isinstance(payload, ElementTree.Element):
+        if isinstance(payload, ElementClass):
             self._payload = [ XMLPayload(payload) ]
         elif isinstance(payload, StanzaPayload):
             self._payload = [ payload ]
@@ -354,7 +354,7 @@ class Stanza(object):
         """
         if self._payload is None:
             self.decode_payload()
-        if isinstance(payload, ElementTree.Element):
+        if isinstance(payload, ElementClass):
             self._payload.append(XMLPayload(payload))
         elif isinstance(payload, StanzaPayload):
             self._payload.append(payload)

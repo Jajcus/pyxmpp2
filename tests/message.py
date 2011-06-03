@@ -3,7 +3,7 @@
 
 import unittest
 
-from xml.etree.ElementTree import Element, SubElement, XML
+from pyxmpp2.etree import ElementTree
 
 from pyxmpp2.message import Message
 from pyxmpp2.jid import JID
@@ -53,11 +53,11 @@ class TestMessage(unittest.TestCase):
         self.assertFalse(payload)
 
     def test_message_full_from_xml(self):
-        m = Message(XML(MESSAGE1))
+        m = Message(ElementTree.XML(MESSAGE1))
         self.check_message_full(m)
 
     def test_message_empty_from_xml(self):
-        m = Message(XML(MESSAGE2))
+        m = Message(ElementTree.XML(MESSAGE2))
         self.check_message_empty(m, False)
 
     def test_message_empty(self):
@@ -75,8 +75,8 @@ class TestMessage(unittest.TestCase):
                 subject = u"Subject",
                 body = u"The body",
                 thread = u"thread-id")
-        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        payload = ElementTree.Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
+        ElementTree.SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         m.add_payload(payload)
         self.check_message_full( m )

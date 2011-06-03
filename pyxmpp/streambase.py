@@ -36,7 +36,7 @@ import re
 from abc import ABCMeta
 from functools import wraps
 
-from xml.etree import ElementTree
+from .etree import ElementTree
 
 
 from .xmppparser import XMLStreamHandler

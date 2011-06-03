@@ -28,7 +28,7 @@ __docformat__ = "restructuredtext en"
 
 import logging
 
-from xml.etree import ElementTree
+from .etree import ElementTree, ElementClass
 from copy import deepcopy
 
 from .constants import STANZA_ERROR_NS, STREAM_ERROR_NS
@@ -223,7 +223,7 @@ class ErrorElement(object):
         if isinstance(element_or_cond, basestring):
             self.condition = ElementTree.Element(self.cond_qname_prefix 
                                                         + element_or_cond)
-        elif not isinstance(element_or_cond, ElementTree.Element):
+        elif not isinstance(element_or_cond, ElementClass):
             raise TypeError, "Element or unicode string expected"
         else:
             self._from_xml(element_or_cond)

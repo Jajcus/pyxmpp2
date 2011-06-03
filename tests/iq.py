@@ -3,7 +3,7 @@
 
 import unittest
 
-from xml.etree.ElementTree import Element, SubElement, XML
+from pyxmpp2.etree import ElementTree
 
 from pyxmpp2.iq import Iq
 from pyxmpp2.jid import JID
@@ -111,19 +111,19 @@ class TestIq(unittest.TestCase):
         self.assertEqual(error.condition_name, "bad-request")
 
     def test_iq_get_from_xml(self):
-        iq = Iq(XML(IQ1))
+        iq = Iq(ElementTree.XML(IQ1))
         self.check_iq1(iq)
 
     def test_iq_result_full_from_xml(self):
-        iq = Iq(XML(IQ2))
+        iq = Iq(ElementTree.XML(IQ2))
         self.check_iq2(iq)
 
     def test_iq_set_from_xml(self):
-        iq = Iq(XML(IQ3))
+        iq = Iq(ElementTree.XML(IQ3))
         self.check_iq3(iq)
 
     def test_iq_result_empty_from_xml(self):
-        iq = Iq(XML(IQ4))
+        iq = Iq(ElementTree.XML(IQ4))
         self.check_iq4(iq)
 
     def test_iq_get(self):
@@ -131,8 +131,8 @@ class TestIq(unittest.TestCase):
                 to_jid = JID("dest@example.com"),
                 stanza_type = "get",
                 stanza_id = 1)
-        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        payload = ElementTree.Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
+        ElementTree.SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         iq.add_payload(payload)
         self.check_iq1(iq)
@@ -144,8 +144,8 @@ class TestIq(unittest.TestCase):
                 from_jid = JID("dest@example.com"),
                 stanza_type = "result",
                 stanza_id = 1)
-        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        payload = ElementTree.Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
+        ElementTree.SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         iq.add_payload(payload)
         self.check_iq2(iq)
@@ -157,8 +157,8 @@ class TestIq(unittest.TestCase):
                 to_jid = JID("dest@example.com"),
                 stanza_type = "set",
                 stanza_id = 2)
-        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        payload = ElementTree.Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
+        ElementTree.SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         iq.add_payload(payload)
         self.check_iq3(iq)
@@ -175,16 +175,16 @@ class TestIq(unittest.TestCase):
         self.check_iq4( Iq(xml) )
 
     def test_iq_make_result_response(self):
-        iq = Iq(XML(IQ1))
+        iq = Iq(ElementTree.XML(IQ1))
         iq2 = iq.make_result_response()
-        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        payload = ElementTree.Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
+        ElementTree.SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         iq2.add_payload(payload)
         self.check_iq2(iq2)
 
     def test_iq_make_error_response(self):
-        iq = Iq(XML(IQ1))
+        iq = Iq(ElementTree.XML(IQ1))
         iq5 = iq.make_error_response(u"bad-request")
         self.check_iq5(iq5)
         xml = iq5.as_xml()

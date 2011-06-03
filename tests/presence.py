@@ -3,7 +3,7 @@
 
 import unittest
 
-from xml.etree.ElementTree import Element, SubElement, XML
+from pyxmpp2.etree import ElementTree
 
 from pyxmpp2.presence import Presence
 from pyxmpp2.jid import JID
@@ -64,15 +64,15 @@ class TestPresence(unittest.TestCase):
         self.assertEqual(p.status, None)
 
     def test_presence_full_from_xml(self):
-        p = Presence(XML(PRESENCE1))
+        p = Presence(ElementTree.XML(PRESENCE1))
         self.check_presence_full(p)
 
     def test_presence_empty_from_xml(self):
-        p = Presence(XML(PRESENCE2))
+        p = Presence(ElementTree.XML(PRESENCE2))
         self.check_presence_empty(p, False)
 
     def test_presence_subscribe_from_xml(self):
-        p = Presence(XML(PRESENCE3))
+        p = Presence(ElementTree.XML(PRESENCE3))
         self.check_presence_subscribe(p)
 
     def test_presence_empty(self):
@@ -90,8 +90,8 @@ class TestPresence(unittest.TestCase):
                 show = u"away",
                 status = u"The Status",
                 priority = 10)
-        payload = Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        payload = ElementTree.Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
+        ElementTree.SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         p.add_payload(payload)
         self.check_presence_full(p)

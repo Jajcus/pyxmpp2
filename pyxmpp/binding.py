@@ -29,7 +29,7 @@ __docformat__ = "restructuredtext en"
 import logging
 import uuid
 
-from xml.etree import ElementTree
+from .etree import ElementTree
 
 from .constants import BIND_QNP
 from .stanzapayload import StanzaPayload, payload_element_name

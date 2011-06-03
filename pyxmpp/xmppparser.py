@@ -24,7 +24,7 @@ __docformat__ = "restructuredtext en"
 import threading
 import logging
 
-from xml.etree import ElementTree
+from .etree import ElementTree
 
 from .exceptions import StreamParseError
 
@@ -157,6 +157,7 @@ class StreamReader(object):
         self.parser = ElementTree.XMLParser(target = ParserTarget(handler))
         self.lock = threading.RLock()
         self.in_use = 0
+        self.started = False
 
     def feed(self, data):
         """Feed the parser with a chunk of data. Apropriate methods
@@ -172,6 +173,12 @@ class StreamReader(object):
                 raise StreamParseError("StreamReader.feed() is not reentrant!")
             self.in_use = 1
             try:
+                if not self.started:
+                    # workaround for lxml bug when fed with a big chunk at once
+                    if len(data) > 1:
+                        self.parser.feed(data[0])
+                        data = data[1:]
+                    self.started = True
                 if data:
                     self.parser.feed(data)
                 else:

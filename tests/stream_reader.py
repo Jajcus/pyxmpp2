@@ -2,6 +2,9 @@
 # -*- coding: UTF-8 -*-
 
 import sys
+import logging
+
+logger = logging.getLogger("pyxmpp.test.stream_reader")
 
 import unittest
 from xml.etree import ElementTree
@@ -88,6 +91,7 @@ class TestStreamReader(unittest.TestCase):
         while 1:
             data = self.file.read(chunk_length)
             if not data:
+                self.reader.feed('')
                 break
             self.chunk_end += len(data)
             self.reader.feed(data)
@@ -96,12 +100,14 @@ class TestStreamReader(unittest.TestCase):
                 break
             self.chunk_start = self.chunk_end
         r1 = self.whole_stream.getroot()
+        self.assertIsNotNone(r1)
         r2 = whole_stream.getroot()
         if not xml_elements_equal(r1, r2, True):
             self.fail("Whole stream invalid. Got: %r, Expected: %r"
                     % (ElementTree.tostring(r1), ElementTree.tostring(r2)))
 
     def event(self, event, element):
+        logger.debug(" event: {0!r} element: {1!r}".format(event, element))
         expected = self.expected_events.pop(0)
         self.assertTrue(event==expected.event, "Got %r, expected %r" % (event, expected.event))
         if expected.offset < self.chunk_start:
@@ -127,6 +133,9 @@ def suite():
     return suite
 
 if __name__ == '__main__':
+    logger = logging.getLogger()
+    logger.addHandler(logging.StreamHandler())
+    logger.setLevel(logging.ERROR)
     unittest.TextTestRunner(verbosity=2).run(suite())
 
 # vi: sts=4 et sw=4
