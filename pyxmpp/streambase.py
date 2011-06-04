@@ -48,7 +48,7 @@ from .exceptions import StreamError, AlreadyInProgressError
 from .exceptions import HostMismatch
 from .exceptions import DNSError, UnexpectedCNAMEError
 from .exceptions import FatalStreamError, StreamParseError
-from .constants import STREAM_QNP, XML_LANG_QNAME
+from .constants import STREAM_QNP, XML_LANG_QNAME, STREAM_ROOT_TAG
 from .settings import XMPPSettings
 from .xmppserializer import serialize, XMPPSerializer
 from .xmppparser import StreamReader
@@ -478,6 +478,9 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         if not element.tag.startswith(STREAM_QNP):
             self._send_stream_error("invalid-namespace")
             raise FatalStreamError("Bad stream namespace")
+        if element.tag != STREAM_ROOT_TAG:
+            self._send_stream_error("bad-format")
+            raise FatalStreamError("Bad root element")
 
         version = element.get("version")
         if version:

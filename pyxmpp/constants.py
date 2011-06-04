@@ -22,6 +22,7 @@ XML_QNP = "{{{0}}}".format(XML_NS)
 
 STREAM_NS = "http://etherx.jabber.org/streams"
 STREAM_QNP = "{{{0}}}".format(STREAM_NS)
+STREAM_ROOT_TAG = STREAM_QNP + "stream"
 
 BIND_NS ="urn:ietf:params:xml:ns:xmpp-bind"
 BIND_QNP = "{{{0}}}".format(BIND_NS)
