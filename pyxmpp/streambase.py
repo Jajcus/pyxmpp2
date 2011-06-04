@@ -241,6 +241,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         self.features = None
         self.authenticated = False
         self.peer_authenticated = False
+        self.tls_established = False
         self.auth_method_used = None
         self.version = None
         self.last_keepalive = False
@@ -376,16 +377,14 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
 
     def _accept(self, sock, myname):
         """Same as `Stream.accept` but assume `self.lock` is acquired
-        and does not emit the `ConnectionAcceptedEvent`."""
+        and does not emit the `ConnectionAcceptedEvent`.
+        """
         self.eof = False
         self.socket, addr = sock.accept()
         logger.debug("Connection from: %r" % (addr,))
         self.connection_state = "connected"
         self.addr, self.port = addr
-        if myname:
-            self.me = JID(myname)
-        else:
-            self.me = None
+        self.me = JID(myname)
         self.initiator = False
         self._make_reader()
         self.last_keepalive = time.time()
@@ -512,7 +511,6 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             if lang:
                 self.language = lang
 
-        to_from_mismatch = False
         if self.initiator:
             self.stream_id = element.get("id")
             peer = element.get("from")
@@ -521,10 +519,8 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             if self.peer:
                 if peer and peer != self.peer:
                     logger.debug("peer hostname mismatch: {0!r} != {1!r}"
-                                                    .format(peer,self.peer))
-                    to_from_mismatch = True
-            else:
-                self.peer = peer
+                                                    .format(peer, self.peer))
+            self.peer = peer
         else:
             to = element.get("to")
             if to:
@@ -533,7 +529,10 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
                     self._send_stream_error("host-unknown")
                     raise FatalStreamError('Bad "to"')
                 self.me = JID(to)
-            self._send_stream_start(self.generate_id())
+            peer = element.get("from")
+            if peer:
+                peer = JID(peer)
+            self._send_stream_start(self.generate_id(), stream_to = peer)
             self._send_stream_features()
 
         if self.connection_state in ("established", "closing"):
@@ -546,9 +545,6 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             self.event(event)
         finally:
             self.lock.acquire()
-
-        if to_from_mismatch:
-            raise HostMismatch()
 
     def stream_end(self):
         """Process </stream:stream> (stream end) tag received from peer.
@@ -585,7 +581,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         self.features = None
         self.connection_state = "closing"
 
-    def _send_stream_start(self, stream_id = None):
+    def _send_stream_start(self, stream_id = None, stream_to = None):
         """Send stream start tag."""
         if self._serializer:
             raise StreamError("Stream start already sent")
@@ -593,14 +589,13 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             self.language = self.settings["language"]
         self._serializer = XMPPSerializer(self.stanza_namespace,
                                         self.settings["extra_ns_prefixes"])
-        if self.peer and self.initiator:
+        if stream_to:
+            stream_to = unicode(stream_to)
+        elif self.peer and self.initiator:
             stream_to = unicode(self.peer)
-        else:
-            stream_to = None
-        if self.me and not self.initiator:
+        stream_from = None
+        if self.me and (self.tls_established or not self.initiator):
             stream_from = unicode(self.me)
-        else:
-            stream_from = None
         if stream_id:
             self.stream_id = stream_id
         else:
