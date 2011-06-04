@@ -110,7 +110,7 @@ class TestUncachedJID(TestJID):
     def setUp(self):
         import weakref
         JID.cache=weakref.WeakValueDictionary()
-        self.saved_stringprep_cache_size=xmppstringprep.stringprep_cache_size
+        self.saved_stringprep_cache_size = xmppstringprep._stringprep_cache_size
         xmppstringprep.set_stringprep_cache_size(0)
     def tearDown(self):
         xmppstringprep.set_stringprep_cache_size(self.saved_stringprep_cache_size)

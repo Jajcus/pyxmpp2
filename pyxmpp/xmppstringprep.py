@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2011 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -20,89 +20,30 @@
 """Nodeprep and resourceprep stringprep profiles.
 
 Normative reference:
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
+  - `RFC 6122 <http://xmpp.org/rfcs/rfc6122.html>`__
+  - `RFC 3454 <http://tools.ietf.org/html/rfc3454>`__
 """
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
 import stringprep
 import unicodedata
 from .exceptions import StringprepError
 
-class LookupFunction:
-    """Class for looking up RFC 3454 tables using function.
-
-    :Ivariables:
-        - `lookup`: the lookup function."""
-    def __init__(self,function):
-        """Initialize `LookupFunction` object.
-
-        :Parameters:
-            - `function`: function taking character code as input and returning
-              `bool` value or the mapped for `code`."""
-        self.lookup=function
-
-class LookupTable:
-    """Class for looking up RFC 3454 tables using a dictionary and/or list of ranges."""
-    def __init__(self,singles,ranges):
-        """Initialize `LookupTable` object.
-
-        :Parameters:
-            - `singles`: dictionary mapping Unicode characters into other Unicode characters.
-            - `ranges`: list of ``((start,end),value)`` tuples mapping codes in range (start,end)
-              to the value."""
-        self.singles=singles
-        self.ranges=ranges
-
-    def lookup(self,c):
-        """Do Unicode character lookup.
-
-        :Parameters:
-            - `c`: Unicode character to look up.
-
-        :return: the mapped value."""
-        if self.singles.has_key(c):
-            return self.singles[c]
-        c=ord(c)
-        for (start,end),value in self.ranges:
-            if c<start:
-                return None
-            if c<=end:
-                return value
-        return None
-
-A_1=LookupFunction(stringprep.in_table_a1)
-
-def b1_mapping(uc):
+def b1_mapping(char):
     """Do RFC 3454 B.1 table mapping.
 
     :Parameters:
-        - `uc`: Unicode character to map.
+        - `char`: Unicode character to map.
 
-    :returns: u"" if there is `uc` code in the table, `None` otherwise."""
-    if stringprep.in_table_b1(uc):
+    :returns: u"" if there is `uc` code in the table, `None` otherwise.
+    """
+    if stringprep.in_table_b1(char):
         return u""
     else:
         return None
-
-B_1=LookupFunction(b1_mapping)
-B_2=LookupFunction(stringprep.map_table_b2)
-B_3=LookupFunction(stringprep.map_table_b3)
-C_1_1=LookupFunction(stringprep.in_table_c11)
-C_1_2=LookupFunction(stringprep.in_table_c12)
-C_2_1=LookupFunction(stringprep.in_table_c21)
-C_2_2=LookupFunction(stringprep.in_table_c22)
-C_3=LookupFunction(stringprep.in_table_c3)
-C_4=LookupFunction(stringprep.in_table_c4)
-C_5=LookupFunction(stringprep.in_table_c5)
-C_6=LookupFunction(stringprep.in_table_c6)
-C_7=LookupFunction(stringprep.in_table_c7)
-C_8=LookupFunction(stringprep.in_table_c8)
-C_9=LookupFunction(stringprep.in_table_c9)
-D_1=LookupFunction(stringprep.in_table_d1)
-D_2=LookupFunction(stringprep.in_table_d2)
 
 def nfkc(data):
     """Do NFKC normalization of Unicode data.
@@ -111,14 +52,16 @@ def nfkc(data):
         - `data`: list of Unicode characters or Unicode string.
 
     :return: normalized Unicode string."""
-    if type(data) is list:
-        data=u"".join(data)
-    return unicodedata.normalize("NFKC",data)
+    if isinstance(data, list):
+        data = u"".join(data)
+    return unicodedata.normalize("NFKC", data)
 
-class Profile:
-    """Base class for stringprep profiles."""
-    cache_items=[]
-    def __init__(self,unassigned,mapping,normalization,prohibited,bidi=1):
+class Profile(object):
+    """Base class for stringprep profiles.
+    """
+    cache_items = []
+    def __init__(self, unassigned, mapping, normalization, prohibited,
+                                                                bidi = True):
         """Initialize Profile object.
 
         :Parameters:
@@ -127,15 +70,22 @@ class Profile:
             - `normalization`: the normalization function
             - `prohibited`: the lookup table with prohibited characters
             - `bidi`: if True then bidirectional checks should be done
+        :Types:
+            - `unassigned`: tuple of functions
+            - `mapping`: tuple of functions
+            - `normalization`: tuple of functions
+            - `prohibited`: tuple of functions
+            - `bidi`: `bool`
         """
-        self.unassigned=unassigned
-        self.mapping=mapping
-        self.normalization=normalization
-        self.prohibited=prohibited
-        self.bidi=bidi
-        self.cache={}
+        # pylint: disable-msg=R0913
+        self.unassigned = unassigned
+        self.mapping = mapping
+        self.normalization = normalization
+        self.prohibited = prohibited
+        self.bidi = bidi
+        self.cache = {}
 
-    def prepare(self,data):
+    def prepare(self, data):
         """Complete string preparation procedure for 'stored' strings.
         (includes checks for unassigned codes)
 
@@ -146,129 +96,147 @@ class Profile:
 
         :raise StringprepError: if the preparation fails
         """
-        r=self.cache.get(data)
-        if r is not None:
-            return r
-        s=self.map(data)
+        ret = self.cache.get(data)
+        if ret is not None:
+            return ret
+        result = self.map(data)
         if self.normalization:
-            s=self.normalization(s)
-        s=self.prohibit(s)
-        s=self.check_unassigned(s)
+            result = self.normalization(result)
+        result = self.prohibit(result)
+        result = self.check_unassigned(result)
         if self.bidi:
-            s=self.check_bidi(s)
-        if type(s) is list:
-            s=u"".string.join()
-        if len(self.cache_items)>=stringprep_cache_size:
-            remove=self.cache_items[:-stringprep_cache_size/2]
-            for profile,key in remove:
+            result = self.check_bidi(result)
+        if isinstance(result, list):
+            result = u"".join()
+        if len(self.cache_items) >= _stringprep_cache_size:
+            remove = self.cache_items[: -_stringprep_cache_size / 2]
+            for profile, key in remove:
                 try:
                     del profile.cache[key]
                 except KeyError:
                     pass
-            self.cache_items[:]=self.cache_items[-stringprep_cache_size/2:]
-        self.cache_items.append((self,data))
-        self.cache[data]=s
-        return s
+            self.cache_items[:] = self.cache_items[
+                                                -_stringprep_cache_size / 2 :]
+        self.cache_items.append((self, data))
+        self.cache[data] = result
+        return result
 
-    def prepare_query(self,s):
+    def prepare_query(self, data):
         """Complete string preparation procedure for 'query' strings.
         (without checks for unassigned codes)
 
         :Parameters:
-            - `s`: Unicode string to prepare.
+            - `data`: Unicode string to prepare.
 
         :return: prepared string
 
         :raise StringprepError: if the preparation fails
         """
-
-        s=self.map(s)
+        data = self.map(data)
         if self.normalization:
-            s=self.normalization(s)
-        s=self.prohibit(s)
+            data = self.normalization(data)
+        data = self.prohibit(data)
         if self.bidi:
-            s=self.check_bidi(s)
-        if type(s) is list:
-            s=u"".string.join(s)
-        return s
+            data = self.check_bidi(data)
+        if isinstance(data, list):
+            data = u"".join(data)
+        return data
 
-    def map(self,s):
+    def map(self, data):
         """Mapping part of string preparation."""
-        r=[]
-        for c in s:
-            rc=None
-            for t in self.mapping:
-                rc=t.lookup(c)
-                if rc is not None:
+        result = []
+        for char in data:
+            ret = None
+            for lookup in self.mapping:
+                ret = lookup(char)
+                if ret is not None:
                     break
-            if rc is not None:
-                r.append(rc)
+            if ret is not None:
+                result.append(ret)
             else:
-                r.append(c)
-        return r
+                result.append(char)
+        return result
 
-    def prohibit(self,s):
+    def prohibit(self, data):
         """Checks for prohibited characters."""
-        for c in s:
-            for t in self.prohibited:
-                if t.lookup(c):
-                    raise StringprepError("Prohibited character: %r" % (c,))
-        return s
+        for char in data:
+            for lookup in self.prohibited:
+                if lookup(char):
+                    raise StringprepError("Prohibited character: {0!r}"
+                                                                .format(char))
+        return data
 
-    def check_unassigned(self,s):
+    def check_unassigned(self, data):
         """Checks for unassigned character codes."""
-        for c in s:
-            for t in self.unassigned:
-                if t.lookup(c):
-                    raise StringprepError("Unassigned character: %r" % (c,))
-        return s
+        for char in data:
+            for lookup in self.unassigned:
+                if lookup(char):
+                    raise StringprepError("Unassigned character: {0!r}"
+                                                                .format(char))
+        return data
 
-    def check_bidi(self,s):
+    @staticmethod
+    def check_bidi(data):
         """Checks if sting is valid for bidirectional printing."""
-        has_l=0
-        has_ral=0
-        for c in s:
-            if D_1.lookup(c):
-                has_ral=1
-            elif D_2.lookup(c):
-                has_l=1
+        has_l = False
+        has_ral = False
+        for char in data:
+            if stringprep.in_table_d1(char):
+                has_ral = True
+            elif stringprep.in_table_d2(char):
+                has_l = True
         if has_l and has_ral:
             raise StringprepError("Both RandALCat and LCat characters present")
-        if has_l and (D_1.lookup(s[0]) is None or D_1.lookup(s[-1]) is None):
-            raise StringprepError("The first and the last character must be RandALCat")
-        return s
+        if has_ral and (not stringprep.in_table_d1(data[0])
+                                    or not stringprep.in_table_d1(data[-1])):
+            raise StringprepError("The first and the last character must"
+                                                                " be RandALCat")
+        return data
 
-nodeprep=Profile(
-    unassigned=(A_1,),
-    mapping=(B_1,B_2),
-    normalization=nfkc,
-    prohibited=(C_1_1,C_1_2,C_2_1,C_2_2,C_3,C_4,C_5,C_6,C_7,C_8,C_9,
-            LookupTable({u'"':True,u'&':True,u"'":True,u"/":True,
-                    u":":True,u"<":True,u">":True,u"@":True},()) ),
-    bidi=1)
+NODEPREP_PROHIBITED = set([u'"', u'&', u"'", u"/", u":", u"<", u">", u"@"])
 
-resourceprep=Profile(
-    unassigned=(A_1,),
-    mapping=(B_1,),
-    normalization=nfkc,
-    prohibited=(C_1_2,C_2_1,C_2_2,C_3,C_4,C_5,C_6,C_7,C_8,C_9),
-    bidi=1)
+NODEPREP = Profile(
+    unassigned = (stringprep.in_table_a1,),
+    mapping = (b1_mapping, stringprep.map_table_b2),
+    normalization = nfkc,
+    prohibited = (  stringprep.in_table_c11, stringprep.in_table_c12, 
+                    stringprep.in_table_c21, stringprep.in_table_c22, 
+                    stringprep.in_table_c3, stringprep.in_table_c4, 
+                    stringprep.in_table_c5, stringprep.in_table_c6, 
+                    stringprep.in_table_c7, stringprep.in_table_c8, 
+                    stringprep.in_table_c9,
+                    lambda x: x in NODEPREP_PROHIBITED ),
+    bidi = True)
 
-stringprep_cache_size=1000
+RESOURCEPREP = Profile(
+    unassigned = (stringprep.in_table_a1,),
+    mapping = (b1_mapping,),
+    normalization = nfkc,
+    prohibited = (  stringprep.in_table_c12, stringprep.in_table_c21,
+                    stringprep.in_table_c22, stringprep.in_table_c3, 
+                    stringprep.in_table_c4, stringprep.in_table_c5, 
+                    stringprep.in_table_c6, stringprep.in_table_c7, 
+                    stringprep.in_table_c8, stringprep.in_table_c9 ),
+    bidi = True)
+
+_stringprep_cache_size = 1000 # pylint: disable-msg=C0103
+
 def set_stringprep_cache_size(size):
     """Modify stringprep cache size.
 
     :Parameters:
-        - `size`: new cache size"""
-    global stringprep_cache_size
-    stringprep_cache_size=size
-    if len(Profile.cache_items)>size:
-        remove=Profile.cache_items[:-size]
-        for profile,key in remove:
+        - `size`: new cache size
+    """
+    # pylint: disable-msg=W0603
+    global _stringprep_cache_size
+    _stringprep_cache_size = size
+    if len(Profile.cache_items) > size:
+        remove = Profile.cache_items[:-size]
+        for profile, key in remove:
             try:
                 del profile.cache[key]
             except KeyError:
                 pass
-        Profile.cache_items=Profile.cache_items[-size:]
+        Profile.cache_items = Profile.cache_items[-size:]
 
 # vi: sts=4 et sw=4

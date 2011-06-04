@@ -30,7 +30,7 @@ import warnings
 
 from encodings import idna
 
-from .xmppstringprep import nodeprep, resourceprep
+from .xmppstringprep import NODEPREP, RESOURCEPREP
 from .exceptions import JIDError
 
 def are_domains_equal(domain1, domain2):
@@ -159,7 +159,7 @@ class JID(object):
             return None
 
         data = unicode(data)
-        node = nodeprep.prepare(data)
+        node = NODEPREP.prepare(data)
         if len(node.encode("utf-8")) > 1023:
             raise JIDError("Node name too long")
         return node
@@ -197,7 +197,7 @@ class JID(object):
         if not data:
             return None
         data = unicode(data)
-        resource = resourceprep.prepare(data)
+        resource = RESOURCEPREP.prepare(data)
         if len(resource.encode("utf-8")) > 1023:
             raise JIDError("Resource name too long")
         return resource
