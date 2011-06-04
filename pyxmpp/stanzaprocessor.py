@@ -33,7 +33,7 @@ import inspect
 
 from .expdict import ExpiringDictionary
 from .exceptions import ProtocolError, BadRequestProtocolError
-from .exceptions import FeatureNotImplementedProtocolError
+from .exceptions import ServiceUnavailableProtocolError
 from .stanza import Stanza
 from .message import Message
 from .presence import Presence
@@ -341,7 +341,7 @@ class StanzaProcessor(object):
             self._process_handler_result(response)
             return True
         else:
-            raise FeatureNotImplementedProtocolError("Not implemented")
+            raise ServiceUnavailableProtocolError("Not implemented")
 
     def _get_iq_handler(self, iq_type, payload):
         """Get an <iq/> handler for given iq  type and payload."""

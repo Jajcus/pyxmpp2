@@ -204,15 +204,13 @@ class TestStanzaProcessor(unittest.TestCase):
         stanza1 = self.stanzas_sent[0]
         self.assertIsInstance(stanza1, Iq)
         self.assertEqual(stanza1.stanza_type, u"error")
-        self.assertEqual(stanza1.error.condition_name,
-                                        u"feature-not-implemented")
+        self.assertEqual(stanza1.error.condition_name, u"service-unavailable")
         self.assertEqual(stanza1.stanza_id, u"1")
         self.assertEqual(stanza1.to_jid, JID(u"source@example.com/res"))
         stanza2 = self.stanzas_sent[1]
         self.assertIsInstance(stanza2, Iq)
         self.assertEqual(stanza2.stanza_type, u"error")
-        self.assertEqual(stanza2.error.condition_name,
-                                        u"feature-not-implemented")
+        self.assertEqual(stanza2.error.condition_name, u"service-unavailable")
         self.assertEqual(stanza2.stanza_id, u"2")
         self.assertEqual(stanza2.to_jid, JID(u"source@example.com/res"))
 
