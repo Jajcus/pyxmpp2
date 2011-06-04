@@ -70,9 +70,7 @@ class Presence(Stanza):
         """Initialize a `Presence` object.
 
         :Parameters:
-            - `xmlnode`: XML node to_jid be wrapped into the `Presence` object
-              or other Presence object to be copied. If not given then new
-              presence stanza is created using following parameters.
+            - `element`: XML element 
             - `from_jid`: sender JID.
             - `to_jid`: recipient JID.
             - `stanza_type`: staza type: one of: None, "available",
@@ -103,7 +101,6 @@ class Presence(Stanza):
         self._show = None
         self._status = None
         self._priority = 0
-        self.xmlnode=None
         if element is None:
             element = "presence"
         elif not isinstance(element, ElementClass):

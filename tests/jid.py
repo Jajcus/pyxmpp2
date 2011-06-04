@@ -12,14 +12,20 @@ valid_jids=[
         (None,u"example.com",None)),
     (u"example.com/Test",
         (None,u"example.com","Test")),
-    (u"jajcus@jabber.bnet.pl",
-        (u"jajcus",u"jabber.bnet.pl",None)),
-    (u"jajcus@jabber.bnet.pl/Test",
-        (u"jajcus",u"jabber.bnet.pl",u"Test")),
-    (u"Jajcus@jaBBer.bnet.pl/Test",
-        (u"jajcus",u"jabber.bnet.pl",u"Test")),
-    (u"Jajcus@jaBBer.bnet.pl/test",
-        (u"jajcus",u"jabber.bnet.pl",u"test")),
+    (u"jajcus@jajcus.net",
+        (u"jajcus",u"jajcus.net",None)),
+    (u"jajcus@192.168.1.1",
+        (u"jajcus",u"192.168.1.1",None)),
+    (u"jajcus@[2001:0DB8::1]",
+        (u"jajcus",u"[2001:db8::1]",None)),
+    (u"jajcus@[2001:0DB8::192.168.1.1]",
+        (u"jajcus",u"[2001:db8::c0a8:101]",None)),
+    (u"jajcus@jajcus.net/Test",
+        (u"jajcus",u"jajcus.net",u"Test")),
+    (u"Jajcus@jaJCus.net/Test",
+        (u"jajcus",u"jajcus.net",u"Test")),
+    (u"Jajcus@jaJCus.net/test",
+        (u"jajcus",u"jajcus.net",u"test")),
     (u"jajcuś@dżabber.example.com/Test",
         (u"jajcuś",u"dżabber.example.com",u"Test")),
     (u"JAJCUŚ@DŻABBER.EXAMPLE.COM/TEST",
@@ -33,10 +39,10 @@ valid_tuples=[
     ((None,u"example.com",None),u"example.com"),
     ((u"",u"example.com",u""),u"example.com"),
     ((None,u"example.com","Test"),u"example.com/Test"),
-    ((u"jajcus",u"jabber.bnet.pl",None),u"jajcus@jabber.bnet.pl"),
-    ((u"jajcus",u"jabber.bnet.pl",u"Test"),u"jajcus@jabber.bnet.pl/Test"),
-    ((u"Jajcus",u"jaBBer.bnet.pl",u"Test"),u"jajcus@jabber.bnet.pl/Test"),
-    ((u"Jajcus",u"jaBBer.bnet.pl",u"test"),u"jajcus@jabber.bnet.pl/test"),
+    ((u"jajcus",u"jajcus.net",None),u"jajcus@jajcus.net"),
+    ((u"jajcus",u"jajcus.net",u"Test"),u"jajcus@jajcus.net/Test"),
+    ((u"Jajcus",u"jaJCus.net",u"Test"),u"jajcus@jajcus.net/Test"),
+    ((u"Jajcus",u"jaJCus.net",u"test"),u"jajcus@jajcus.net/test"),
     ((u"jajcuś",u"dżabber.example.com",u"Test"),u"jajcuś@dżabber.example.com/Test"),
     ((u"JAJCUŚ",u"DŻABBER.EXAMPLE.COM",u"TEST"),u"jajcuś@dżabber.example.com/TEST"),
 ]
@@ -83,11 +89,11 @@ class TestJID(unittest.TestCase):
     def test_jid_from_string(self):
         for jid,tuple in valid_jids:
             j=JID(jid)
-            jtuple=(j.node,j.domain,j.resource)
+            jtuple=(j.local,j.domain,j.resource)
             self.assertEqual(jtuple,tuple)
     def test_jid_from_tuple(self):
-        for (node,domain,resource),jid in valid_tuples:
-            j=JID(node,domain,resource)
+        for (local,domain,resource),jid in valid_tuples:
+            j=JID(local,domain,resource)
             self.assertEqual(unicode(j),jid)
     def test_invalid_jids(self):
         for jid in invalid_jids:

@@ -114,7 +114,7 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
 
         [receving entity only]
 
-        :returns: update <features/> element node."""
+        :returns: update <features/> element."""
         if stream.peer_authenticated and not stream.peer.resource:
             ElementTree.SubElement(features, FEATURE_BIND)
 
@@ -123,7 +123,7 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
 
         [initiating entity only]
 
-        The received features node is available in `self.features`."""
+        The received features element is available in `self.features`."""
         logger.debug("Handling stream features: {0}".format(
                                         ElementTree.tostring(features)))
         element = features.find(FEATURE_BIND)
@@ -196,12 +196,12 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
         jid = None
         if resource:
             try:
-                jid = JID(peer.node, peer.domain, resource)
+                jid = JID(peer.local, peer.domain, resource)
             except JIDError:
                 pass
         if jid is None:
             resource = unicode(uuid.uuid4())
-            jid = JID(peer.node, peer.domain, resource)
+            jid = JID(peer.local, peer.domain, resource)
         response = stanza.make_result_response()
         payload = ResourceBindingPayload(jid = jid)
         response.set_payload(payload)

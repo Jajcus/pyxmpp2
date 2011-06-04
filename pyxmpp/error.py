@@ -250,7 +250,7 @@ class ErrorElement(object):
         for child in element:
             if child.tag.startswith(self.cond_qname_prefix):
                 if self.condition is not None:
-                    logger.warning("Multiple conditions in XMPP error node.")
+                    logger.warning("Multiple conditions in XMPP error element.")
                     continue
                 self.condition = deepcopy(child)
             elif child.tag == self.text_qname:

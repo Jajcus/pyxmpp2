@@ -62,7 +62,7 @@ class ClientStream(StreamBase):
             handlers = []
         if settings is None:
             settings = TLSSettings()
-        self.me = JID(jid.node, jid.domain)
+        self.me = JID(jid.local, jid.domain)
         if "resource" not in settings:
             settings["resource"] = jid.resource
         handlers = handlers + settings["base_c2s_handlers"]

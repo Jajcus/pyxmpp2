@@ -64,7 +64,7 @@ class DefaultPasswordManager(sasl.PasswordManager):
         [both client or server]
 
         If stream initiator: return the value of the "password" setting
-        if `username` patches the "username" setting or local jid node.
+        if `username` patches the "username" setting or local jid localpart.
 
         If stream receiver - lookup the password in the "user_passwords"
         setting.
@@ -93,7 +93,7 @@ class DefaultPasswordManager(sasl.PasswordManager):
             if stream.initiator:
                 our_name = self.settings.get("username")
                 if our_name is None and self.stream and self.stream.me:
-                    our_name = self.stream.me.node
+                    our_name = self.stream.me.local
                 if our_name == username:
                     password = self.settings["password"]
                 else:
@@ -138,7 +138,7 @@ class DefaultPasswordManager(sasl.PasswordManager):
             jid = JID(authzid)
             if not extra_info.has_key("username"):
                 ret = False
-            elif jid.node != extra_info["username"]:
+            elif jid.local != extra_info["username"]:
                 ret = False
             elif jid.domain != self.stream.me.domain:
                 ret = False
@@ -254,7 +254,7 @@ class StreamSASLHandler(StreamFeatureHandler):
 
         [receving entity only]
 
-        :returns: update <features/> element node."""
+        :returns: update <features/> element."""
         mechs = self.settings['sasl_mechanisms'] 
         if mechs and not stream.authenticated:
             sub = ElementTree.SubElement(features, MECHANISMS_TAG)
@@ -268,7 +268,7 @@ class StreamSASLHandler(StreamFeatureHandler):
 
         [initiating entity only]
 
-        The received features node is available in `self.features`."""
+        The received features element is available in `self.features`."""
         element = features.find(MECHANISMS_TAG)
         self.peer_sasl_mechanisms = []
         if element is None:
@@ -283,8 +283,8 @@ class StreamSASLHandler(StreamFeatureHandler):
 
         username = self.settings.get("username")
         if not username:
-            if stream.me.node:
-                username = stream.me.node
+            if stream.me.local:
+                username = stream.me.local
             else:
                 username = stream.me.domain
         self._sasl_authenticate(stream, username, self.settings["authzid"])
