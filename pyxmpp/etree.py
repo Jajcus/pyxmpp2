@@ -50,9 +50,10 @@ else:
 
 class ElementClass:
     __metaclass__ = ABCMeta
+    element_type = type(ElementTree.Element("x"))
     @classmethod
     def __subclasshook__(cls, other):
         if cls is ElementClass:
-            return hasattr(other, "tag")
+            return other is cls.element_type or hasattr(other, "tag")
         return NotImplemented
 
