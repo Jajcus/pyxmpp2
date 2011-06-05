@@ -5,6 +5,7 @@
 
 xmpp-base:
 - jabber:server stream support (including diallback)
+- TLS: verify othername (SRVName and XmppAddr), probably require ASN.1 decoder
 
 xmpp-im:
 - privacy lists

@@ -24,7 +24,7 @@ STREAM_NS = "http://etherx.jabber.org/streams"
 STREAM_QNP = "{{{0}}}".format(STREAM_NS)
 STREAM_ROOT_TAG = STREAM_QNP + "stream"
 
-BIND_NS ="urn:ietf:params:xml:ns:xmpp-bind"
+BIND_NS = "urn:ietf:params:xml:ns:xmpp-bind"
 BIND_QNP = "{{{0}}}".format(BIND_NS)
 
 STANZA_CLIENT_NS = "jabber:client"
@@ -46,5 +46,9 @@ PYXMPP_ERROR_QNP = "{{{0}}}".format(PYXMPP_ERROR_NS)
 
 SASL_NS = "urn:ietf:params:xml:ns:xmpp-sasl"
 SASL_QNP = "{{{0}}}".format(SASL_NS)
+
+TLS_NS = "urn:ietf:params:xml:ns:xmpp-tls"
+TLS_QNP = "{{{0}}}".format(TLS_NS)
+
 
 XML_LANG_QNAME = XML_QNP + "lang"

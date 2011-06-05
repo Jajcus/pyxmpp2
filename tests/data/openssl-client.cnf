@@ -1,0 +1,25 @@
+oid_section = new_oids
+
+[ new_oids ]
+xmppAddr = 1.3.6.1.5.5.7.8.5
+SRVName = 1.3.6.1.5.5.7.8.7
+
+[ req ]
+prompt = no
+default_bits		= 1024
+default_keyfile 	= privkey.pem
+distinguished_name	= req_distinguished_name
+string_mask = utf8only
+req_extensions = v3_req
+x509_extensions = v3_req
+
+[ req_distinguished_name ]
+organizationName	= PyXMPP
+organizationalUnitName	= Unit Tests
+commonName		= Client Name
+
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+
+subjectAltName=otherName:1.3.6.1.5.5.7.8.5;UTF8:user@server.example.org

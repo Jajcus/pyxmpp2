@@ -19,7 +19,7 @@
 """Resource binding implementation.
 
 Normative reference:
-  - `RFC 6120 <http://www.ietf.org/rfc/rfc3920.txt>`__
+  - `RFC 6120 <http://xmpp.org/rfcs/rfc6120.html>`__
 """
 
 from __future__ import absolute_import
@@ -33,7 +33,7 @@ from .etree import ElementTree
 
 from .constants import BIND_QNP
 from .stanzapayload import StanzaPayload, payload_element_name
-from .streambase import StreamFeatureHandler
+from .streambase import StreamFeatureHandler, StreamFeatureHandled
 from .stanzaprocessor import XMPPFeatureHandler
 from .stanzaprocessor import iq_set_stanza_handler
 from .settings import XMPPSettings
@@ -129,13 +129,13 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
         element = features.find(FEATURE_BIND)
         if element is None:
             logger.debug("No <bind/> in features")
-            return False
+            return None
         if stream.me.resource:
             resource = stream.me.resource
         else:
             resource = stream.settings["resource"]
         self.bind(stream, resource)
-        return True
+        return StreamFeatureHandled("Resource binding", mandatory = True)
 
     def bind(self, stream, resource):
         """Bind to a resource.

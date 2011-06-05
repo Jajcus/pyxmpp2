@@ -1,0 +1,21 @@
+[ req ]
+prompt = no
+default_bits		= 1024
+default_keyfile 	= privkey.pem
+distinguished_name	= req_distinguished_name
+x509_extensions	= v3_ca
+string_mask = utf8only
+
+[ req_distinguished_name ]
+organizationName	= PyXMPP
+organizationalUnitName	= Unit Tests
+commonName		= CA
+
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+
+[ v3_ca ]
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid:always,issuer
+basicConstraints = CA:true

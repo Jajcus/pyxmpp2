@@ -18,14 +18,15 @@
 
 """XMPP stream events."""
 
+# pylint: disable-msg=R0903,W0231
+
 from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 
 class StreamEvent(object):
+    """Base class for all stream events."""
     stream = None
-    def __init__(self):
-        pass
     def __unicode__(self):
         raise NotImplementedError
 
@@ -218,6 +219,39 @@ class StreamConnectedEvent(StreamEvent):
         self.peer = peer
     def __unicode__(self):
         return u"Connected to {0}".format(self.peer)
+
+class TLSConnectingEvent(StreamEvent):
+    """Emitted when the TLS handshake starts.
+    """
+    def __init__(self):
+        pass
+    def __unicode__(self):
+        return u"TLS connecting"
+
+class TLSConnectedEvent(StreamEvent):
+    """Emitted when the TLS layer has been established.
+    
+    :Ivariables:
+        - `cipher`: a three-value tuple containing the name of the cipher being
+          used, the version of the SSL protocol that defines its use, and the
+          number of secret bits being used
+        - `peer_certificate`: dictionary describing the peer certificate 
+    :Types:
+        - `peer`: `pyxmpp2.jid.JID`
+    """
+    def __init__(self, cipher, peer_certificate):
+        self.cipher = cipher
+        self.peer_certificate = peer_certificate
+    def __unicode__(self):
+        if self.peer_certificate and 'subject' in self.peer_certificate:
+            dname = u", ".join( [ u", ".join(
+                        [ u"{0}={1}".format(k,v) for k, v in dn_tuple ] ) 
+                            for dn_tuple in self.peer_certificate["subject"] ])
+            return (u"TLS connected to {0} using {1} cipher {2} ({3} bits)"
+                                .format(dname, self.cipher[0], self.cipher[1], 
+                                                                self.cipher[2]))
+        return u"TLS connected using {0} cipher {1} ({2} bits)".format(
+                            self.cipher[0], self.cipher[1], self.cipher[2])
 
 class StreamRestartedEvent(StreamEvent):
     """Emitted after stream is restarted (<stream:stream> tag exchange)

@@ -37,6 +37,7 @@ from .exceptions import SASLMechanismNotAvailable, SASLAuthenticationFailed
 from .constants import SASL_QNP
 from .settings import XMPPSettings
 from .streambase import StreamFeatureHandler
+from .streambase import StreamFeatureHandled, StreamFeatureNotHandled
 from .streambase import stream_element_handler
 
 logger = logging.getLogger("pyxmpp.streamsasl")
@@ -272,14 +273,14 @@ class StreamSASLHandler(StreamFeatureHandler):
         element = features.find(MECHANISMS_TAG)
         self.peer_sasl_mechanisms = []
         if element is None:
-            return
+            return None
         for sub in element:
             if sub.tag != MECHANISM_TAG:
                 continue
             self.peer_sasl_mechanisms.append(sub.text)
 
         if stream.authenticated or not self.peer_sasl_mechanisms:
-            return
+            return StreamFeatureNotHandled("SASL", mandatory = True)
 
         username = self.settings.get("username")
         if not username:
@@ -288,6 +289,7 @@ class StreamSASLHandler(StreamFeatureHandler):
             else:
                 username = stream.me.domain
         self._sasl_authenticate(stream, username, self.settings["authzid"])
+        return StreamFeatureHandled("SASL", mandatory = True)
 
     @stream_element_handler(AUTH_TAG, "receiver")
     def process_sasl_auth(self, stream, element):

@@ -23,6 +23,8 @@ class NetReaderWritter(object):
         self.lock = threading.RLock()
         self.write_cond = threading.Condition(self.lock)
         self.eof_cond = threading.Condition(self.lock)
+        self.extra_on_read = None
+        self.extra_on_write = None
 
     def start(self):
         reader_thread = threading.Thread(target = self.reader_run, 
@@ -60,7 +62,9 @@ class NetReaderWritter(object):
                     break
                 for fd, event in ret:
                     if event & select.POLLIN:
-                        if self.ready:
+                        if self.extra_on_read:
+                            self.extra_on_read()
+                        elif self.ready:
                             data = self.sock.recv(1024)
                             if not data:
                                 logger.debug(u"tst IN: EOF")
