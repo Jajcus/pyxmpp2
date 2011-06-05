@@ -19,7 +19,7 @@
 """Core XMPP stream functionality.
 
 Normative reference:
-  - `RFC 6120 <http://www.ietf.org/rfc/rfc3920.txt>`__
+  - `RFC 6120 <http://xmpp.org/rfcs/rfc6120.html>`__
 """
 
 from __future__ import absolute_import
