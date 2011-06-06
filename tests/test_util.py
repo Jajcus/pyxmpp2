@@ -5,6 +5,7 @@ import socket
 import threading
 import select
 import logging
+import ssl
 
 logger = logging.getLogger("pyxmpp.test.test_util")
 
@@ -20,11 +21,11 @@ class NetReaderWritter(object):
         self.eof = False
         self.error = False
         self.ready = not need_accept
+        self.write_enabled = True
         self.lock = threading.RLock()
         self.write_cond = threading.Condition(self.lock)
         self.eof_cond = threading.Condition(self.lock)
         self.extra_on_read = None
-        self.extra_on_write = None
 
     def start(self):
         reader_thread = threading.Thread(target = self.reader_run, 
@@ -36,19 +37,39 @@ class NetReaderWritter(object):
         reader_thread.start()
         writter_thread.start()
 
+    def do_tls_handshake(self):
+        logger.debug(" starting tls handshake")
+        self.sock.do_handshake()
+        logger.debug(" tls handshake started, resuming normal write")
+        self.extra_on_read = None
+        self.write_enabled = True
+        self.write_cond.notify()
+
+    def starttls(self, *args, **kwargs):
+        kwargs['do_handshake_on_connect'] = False
+        with self.lock:
+            # flush write buffer
+            logger.debug(" flushing write buffer before tls wrap")
+            while self.wdata:
+                self.write_cond.wait()
+            self.write_enabled = False
+            self.write_cond.notify()
+            logger.debug(" wrapping the socket")
+            self.sock = ssl.wrap_socket(*args, **kwargs)
+            self.extra_on_read = self.do_tls_handshake
+
     def writter_run(self):
         with self.write_cond:
             while self.sock is not None:
-                while self.ready and self.wdata:
+                while self.ready and self.wdata and self.write_enabled:
                     sent = self.sock.send(self.wdata)
                     logger.debug(u"tst OUT: " + repr(self.wdata[:sent]))
                     self.wdata = self.wdata[sent:]
+                    self.write_cond.notify()
                 self.write_cond.wait()
 
     def reader_run(self):
         with self.lock:
-            if not self.sock:
-                return
             poll = select.poll()
             poll.register(self.sock, select.POLLIN | select.POLLERR 
                                                         | select.POLLHUP)
@@ -107,6 +128,7 @@ class NetReaderWritter(object):
             self.sock = None
             self.wdata = None
             self.write_cond.notify()
+            self.eof_cond.wait(0.1)
 
     def wait(self, timeout):
         with self.eof_cond:

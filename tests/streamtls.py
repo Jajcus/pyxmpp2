@@ -76,14 +76,12 @@ class TestInitiator(NetworkTestCase):
         self.assertEqual(element.tag, 
                                 "{urn:ietf:params:xml:ns:xmpp-tls}starttls")
         self.server.write(PROCEED)
-        self.server.sock = ssl.wrap_socket(self.server.sock,
+        self.server.starttls(self.server.sock,
                                 keyfile = "data/server-key.pem",
                                 certfile = "data/server.pem",
                                 server_side = True,
                                 ca_certs = "data/ca.pem",
-                                do_handshake_on_connect = False,
                                 )
-        self.server.extra_on_read = self.server.sock.do_handshake
         stream_start = self.loop(stream, timeout = 1, expect = re.compile(
                                                     r"(<stream:stream[^>]*>)"))
         self.assertIsNotNone(stream_start)
@@ -119,14 +117,12 @@ class TestInitiator(NetworkTestCase):
         self.assertEqual(element.tag, 
                                 "{urn:ietf:params:xml:ns:xmpp-tls}starttls")
         self.server.write(PROCEED)
-        self.server.sock = ssl.wrap_socket(self.server.sock,
+        self.server.starttls(self.server.sock,
                                 keyfile = "data/server-key.pem",
                                 certfile = "data/server.pem",
                                 server_side = True,
                                 ca_certs = "data/ca.pem",
-                                do_handshake_on_connect = False,
                                 )
-        self.server.extra_on_read = self.server.sock.do_handshake
         stream_start = self.loop(stream, timeout = 1, expect = re.compile(
                                                     r"(<stream:stream[^>]*>)"))
         self.assertIsNotNone(stream_start)
@@ -197,7 +193,7 @@ if __name__ == '__main__':
     import logging
     logger = logging.getLogger()
     logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.ERROR)
     unittest.TextTestRunner(verbosity=2).run(suite())
 
 # vi: sts=4 et sw=4
