@@ -39,6 +39,10 @@ class JIDError(Error, ValueError):
 class AlreadyInProgressError(Error):
     pass
 
+class PyXMPPIOError(Error):
+    """Exception raised on I/O error."""
+    pass
+
 class StreamError(Error):
     """Base class for all stream errors."""
     pass
