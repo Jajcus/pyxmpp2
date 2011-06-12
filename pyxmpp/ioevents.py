@@ -34,6 +34,40 @@ import threading
 
 from abc import ABCMeta
 
+class IOHandlerPrepareResult(object):
+    """Result of the `IOHandler.prepare` method."""
+    # pylint: disable-msg=R0903
+    pass
+
+class HandlerReady(IOHandlerPrepareResult):
+    """Returned by the `IOHandler.prepare` method
+    when the object is ready to handle I/O events and doesn't need further
+    calls to the `IOHandler.prepare` method.
+    """
+    # pylint: disable-msg=R0903
+    def __repr__(self):
+        return "HandlerReady()"
+
+class PrepareAgain(IOHandlerPrepareResult):
+    """Returned by the `IOHandler.prepare` method
+    when the method needs to be called again.
+
+    :Ivariables:
+      - `timeout`: how long may the main loop wait before calling
+        `IOHandler.prepare` again. `None` means wait until the next loop
+        iteration whenever it happens, `0` - do not wait on I/O in this
+        iteration.
+    """
+    # pylint: disable-msg=R0903
+    def __init__(self, timeout = None):
+        IOHandlerPrepareResult.__init__(self)
+        self.timeout = timeout
+    def __repr__(self):
+        if self.timeout is None:
+            return "PrepareAgain({0!r})".format(self.timeout)
+        else:
+            return "PrepareAgain()"
+
 class IOHandler:
     """Wrapper for a socket or a file descriptor to be used in event loop
     or for I/O threads."""
@@ -65,9 +99,14 @@ class IOHandler:
         :Return: `True` when the I/O channel can be written to
         """
         raise NotImplementedError
-    def volatile(self):
+    def prepare(self):
         """
-        :Return: `True` if `fileno` result may change
+        Prepare the I/O handler for the event loop or an event loop 
+        iteration. 
+
+        :Return: `HandlerReady()` if there is no need to call `prepare` again
+        or `PrepareAgain()` otherwise.
+        :Returntype: `IOHandlerPrepareResult`
         """
         raise NotImplementedError
     def wait_for_writability(self):
@@ -141,6 +180,7 @@ class SelectMainLoop(MainLoopBase):
         MainLoopBase.__init__(self)
         self._quit = False
         self._handlers = []
+        self._prepared = set()
         self.poll = select.poll()
         self._timeout_handlers = []
 
@@ -183,6 +223,15 @@ class SelectMainLoop(MainLoopBase):
         readable = []
         writable = []
         for handler in self._handlers:
+            if handler not in self._prepared:
+                ret = handler.prepare()
+                if isinstance(ret, HandlerReady):
+                    self._prepared.add(handler)
+                elif isinstance(ret, PrepareAgain):
+                    if ret.timeout is not None:
+                        timeout = min(timeout, ret.timeout)
+                else:
+                    raise TypeError("Unexpected result type from prepare()")
             if not handler.fileno():
                 continue
             if handler.readable():
@@ -212,24 +261,43 @@ if hasattr(select, "poll"):
             MainLoopBase.__init__(self)
             self._quit = False
             self._handlers = {}
-            self._volatile_handlers = {}
+            self._unprepared_handlers = {}
             self.poll = select.poll()
             self._timeout_handlers = []
+            self._timeout = None
 
         def add_io_handler(self, handler):
             """Add an I/O handler to the loop."""
-            fileno = handler.fileno()
-            if fileno is None:
-                self._volatile_handlers[handler] = None
-                return
-            self._configure_io_handler(fileno, handler)
+            self._configure_io_handler(handler)
 
-        def _configure_io_handler(self, fileno, handler):
+        def _configure_io_handler(self, handler):
             """Register an io-handler at the polling object."""
-            if handler.volatile():
-                self._volatile_handlers[handler] = fileno
-            elif handler in self._volatile_handlers:
-                del self._volatile_handlers[handler]
+            if handler in self._unprepared_handlers:
+                old_fileno = self._unprepared_handlers[handler]
+                ret = handler.prepare()
+                if isinstance(ret, HandlerReady):
+                    del self._unprepared_handlers[handler]
+                    prepared = True
+                elif isinstance(ret, PrepareAgain):
+                    if ret.timeout is not None:
+                        if self._timeout is not None:
+                            self._timeout = min(self._timeout, ret.timeout)
+                        else:
+                            self._timeout = ret.timeout
+                    prepared = False
+                else:
+                    raise TypeError("Unexpected result type from prepare()")
+            else:
+                old_fileno = None
+                prepared = True
+            fileno = handler.fileno()
+            if old_fileno is not None and fileno != old_fileno:
+                del self._handlers[fileno]
+                self.poll.unregister(old_fileno)
+            if not prepared:
+                self._unprepared_handlers[handler] = fileno
+            if not fileno:
+                return
             self._handlers[fileno] = handler
             events = 0
             if handler.readable():
@@ -240,30 +308,22 @@ if hasattr(select, "poll"):
                 self.poll.register(fileno, events)
 
         def update_io_handler(self, handler):
-            """Add an I/O handler to the loop."""
-            fileno = handler.fileno()
-            if handler in self._volatile_handlers:
-                old_fileno = self._volatile_handlers[handler]
-                if old_fileno and fileno != old_fileno:
-                    try:
-                        del self._handlers[old_fileno]
-                    except KeyError:
-                        pass
-                    self.poll.unregister(old_fileno)
-            elif fileno not in self._handlers:
-                raise KeyError(handler)
-            self._configure_io_handler(fileno, handler)
+            """Update an I/O handler in the loop."""
+            self._configure_io_handler(handler)
 
         def remove_io_handler(self, handler):
             """Remove an i/o-handler."""
-            if handler in self._volatile_handlers:
-                fileno = self._volatile_handlers[handler]
-                del self._volatile_handlers[handler]
+            if handler in self._unprepared_handlers:
+                old_fileno = self._unprepared_handlers[handler]
+                del self._unprepared_handlers[handler]
             else:
-                fileno = handler.fileno()
-            if fileno:
-                del self._handlers[fileno]
-                self.poll.unregister(fileno)
+                old_fileno = handler.fileno()
+            if old_fileno is not None:
+                try:
+                    del self._handlers[old_fileno]
+                    self.poll.unregister(old_fileno)
+                except KeyError:
+                    pass
     
         def add_timeout_handler(self, timeout, handler):
             """Add a function to be called after `timeout` seconds."""
@@ -287,9 +347,12 @@ if hasattr(select, "poll"):
                     return sources_handled
             if self._timeout_handlers and schedule:
                 timeout = min(timeout, schedule - now)
-            for handler in self._volatile_handlers:
+            if self._timeout is not None:
+                timeout = min(timeout, self._timeout)
+            for handler in self._unprepared_handlers:
                 self.update_io_handler(handler)
             events = self.poll.poll(timeout)
+            self._timeout = None
             for (fileno, event) in events:
                 if event & select.POLLERR:
                     self._handlers[fileno].handle_err()
@@ -302,12 +365,15 @@ if hasattr(select, "poll"):
                 if event & select.POLLOUT:
                     self._handlers[fileno].handle_write()
                 sources_handled += 1
-                self._configure_io_handler(fileno, self._handlers[fileno])
+                self._configure_io_handler(self._handlers[fileno])
             return sources_handled
     MainLoop = PollMainLoop # pylint: disable-msg=C0103
 
 class ReadingThread(threading.Thread):
     """A thread reading from io_handler.
+
+    This thread will be also the one to call the `IOHandler.prepare` method
+    until HandlerReady is returned.
     
     It can be used (together with `WrittingThread`) instead of 
     a main loop."""
@@ -320,9 +386,23 @@ class ReadingThread(threading.Thread):
     def run(self):
         """The thread function."""
         self.io_handler.set_blocking(True)
+        prepared = False
+        timeout = 1
         while True:
+            if not prepared:
+                ret = self.io_handler.prepare()
+                if isinstance(ret, HandlerReady):
+                    prepared = True
+                elif isinstance(ret, PrepareAgain):
+                    if timeout is not None:
+                        timeout = ret.timeout
+                else:
+                    raise TypeError("Unexpected result type from prepare()")
             if self.io_handler.readable():
                 self.io_handler.handle_read()
+            elif not prepared:
+                if timeout:
+                    time.sleep(timeout)
             elif not self.io_handler.wait_for_readability():
                 break
 

@@ -35,7 +35,7 @@ from functools import partial
 from abc import ABCMeta
 from xml.etree import ElementTree
 
-from .ioevents import IOHandler
+from .ioevents import IOHandler, HandlerReady, PrepareAgain
 from .settings import XMPPSettings
 from .exceptions import DNSError, PyXMPPIOError
 from .streamevents import ResolvingSRVEvent, ResolvingAddressEvent
@@ -139,7 +139,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._blocking = sock.gettimeout() is not None
 
     def connect(self, addr, port = None, service = None):
-        """Establish TCP connection with given address.
+        """Start establishing TCP connection with given address.
 
         One of: `port` or `service` must be provided and `addr` must be 
         a domain name and not an IP address `port` is not given.
@@ -179,21 +179,30 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._dst_service = None
             self._family = family
             self._dst_addrs = [(family, sockaddr)]
-            self._start_connect()
+            self._state = "connect"
 
         if service is not None:
             self._dst_service = service
-            self._state = "resolving-srv"
+            self._state = "resolve-srv"
             self._dst_name = addr
-            self.event(ResolvingSRVEvent(addr))
-            resolver = self.settings["dns_resolver"]
-            resolver.resolve_srv(addr, service, "tcp", callback = self._got_srv)
         elif port:
             self._dst_nameports = [(self._dst_name, self._dst_port)]
             self._dst_service = None
-            self._resolve_hostname()
+            self._state = "resolve-hostname"
         else:
             raise ValueError("No port number and no SRV service name given")
+
+    def _resolve_srv(self):
+        """Start resolving the SRV record.
+        
+        :Return: The event to be raised
+        """
+        resolver = self.settings["dns_resolver"]
+        self._state = "resolving-srv"
+        resolver.resolve_srv(self._dst_name, self._dst_service, "tcp",
+                                                    callback = self._got_srv)
+        return ResolvingSRVEvent(self._dst_name)
+
 
     def _got_srv(self, addrs):
         """Handle SRV lookup result.
@@ -219,20 +228,20 @@ class TCPTransport(XMPPTransport, IOHandler):
                                     .format(self._dst_service, self._dst_name))
             else:
                 self._dst_nameports = addrs
-            self._resolve_hostname()
+            self._state = "resolve-hostname"
 
     def _resolve_hostname(self):
         """Start hostname resolution for the next name to try.
 
         [called with `self.lock` acquired]
         """
-        self._state = "resolving-address"
+        self._state = "resolving-hostname"
         resolver = self.settings["dns_resolver"]
         name, port = self._dst_nameports.pop(0)
-        self.event(ResolvingAddressEvent(name))
         resolver.resolve_address(name, callback = partial(
                                 self._got_addresses, name = name, port = port),
                                 allow_cname = self._dst_service is None)
+        return ResolvingAddressEvent(name)
 
     def _got_addresses(self, name, port, addrs):
         """Handler DNS address record lookup result.
@@ -245,7 +254,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         with self.lock:
             if not addrs:
                 if self._dst_nameports:
-                    self._resolve_hostname()
+                    self._state = "resolve-hostname"
                     return
                 else:
                     self._dst_addrs = []
@@ -256,7 +265,7 @@ class TCPTransport(XMPPTransport, IOHandler):
                 self._dst_nameports = addrs
             self._dst_addrs = [ (family, (addr, port)) for (family, addr)
                                                                     in addrs ]
-            self._start_connect()
+            self._state = "connect"
 
     def _start_connect(self):
         """Start connecting to the next address on the `self._dst_addrs`
@@ -265,7 +274,6 @@ class TCPTransport(XMPPTransport, IOHandler):
         [ called with `self.lock` acquired ] 
         
         """
-        self.event(ConnectingEvent(self._dst_addrs[0][1]))
         family, addr = self._dst_addrs.pop(0)
         if not self._socket or self._family != family:
             self._socket = socket.socket(family, socket.SOCK_STREAM)
@@ -278,18 +286,20 @@ class TCPTransport(XMPPTransport, IOHandler):
             if err.args[0] == errno.EINPROGRESS:
                 self._state = "connecting"
                 self._writability_cond.notify()
-                return
+                return ConnectingEvent(self._dst_addrs[0][1])
             elif self._dst_addrs:
-                return self._start_connect()
+                self._state = "connect"
+                return None
             elif self._dst_nameports:
-                return self._resolve_hostname()
+                self._state = "resolve-hostname"
+                return None
             else:
                 self._socket.close()
                 self._socket = None
                 self._state = "aborted"
                 raise
         self._state = "connected"
-        self.event(ConnectedEvent(self._dst_addr))
+        return ConnectedEvent(self._dst_addr)
 
     def _continue_connect(self):
         """Continue connecting.
@@ -302,18 +312,20 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._socket.connect(self._dst_addr)
         except socket.error, err:
             if err.args[0] == errno.EINPROGRESS:
-                return
+                return None
             elif self._dst_addrs:
-                return self._start_connect()
+                self._state = "connect"
+                return None
             elif self._dst_nameports:
-                return self._resolve_hostname()
+                self._state = "resolve-hostname"
+                return None
             else:
                 self._socket.close()
                 self._socket = None
                 self._state = "aborted"
                 raise
         self._state = "connected"
-        self.event(ConnectedEvent(self._dst_addr))
+        return ConnectedEvent(self._dst_addr)
 
     def _write(self, data):
         """Write raw data to the socket.
@@ -408,16 +420,32 @@ class TCPTransport(XMPPTransport, IOHandler):
             data = self._serializer.emit_stanza(element)
             self._write(data.encode("utf-8"))
 
-    def volatile(self):
-        """Retrurn `True` to mark `self` volatile until the final socket is
-        opened."""
-        if self._state in ("connected", "established", "closing", "closed",
+    def prepare(self):
+        """When connecting start the next connection step and schedule
+        next `prepare` call, when connected return `HandlerReady()`
+        """
+        event = None
+        result = HandlerReady()
+        with self.lock:
+            if self._state in ("connected", "established", "closing", "closed",
                                                                     "aborted"):
-            return False
-        elif self._eof or self._hup:
-            return False
-        else:
-            return True
+                # no need to call prepare() .fileno() is stable
+                pass
+            elif self._state == "connect":
+                event = self._start_connect()
+                result = PrepareAgain(None)
+            elif self._state == "resolve-hostname":
+                event = self._resolve_hostname()
+                result = PrepareAgain(0)
+            elif self._state == "resolve-srv":
+                event = self._resolve_srv()
+                result = PrepareAgain(0)
+            else:
+                # wait for i/o, but keep calling prepare()
+                result = PrepareAgain(None)
+        if event:
+            self.event(event)
+        return result
 
     def fileno(self):
         """Return file descriptor to poll or select."""
@@ -477,9 +505,13 @@ class TCPTransport(XMPPTransport, IOHandler):
         Handle the 'channel writable' state. E.g. send buffered data via a
         socket.
         """
+        event = None
         with self.lock:
             if self._state == "connecting":
-                self._continue_connect()
+                event = self._continue_connect()
+        if event:
+            self.event(event)
+
 
     def handle_read(self):
         """
@@ -514,6 +546,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         with self.lock:
             self._socket.close()
             self._socket = None
+            self._state = "aborted"
         raise PyXMPPIOError("Unhandled error on socket")
 
     def handle_nval(self):
@@ -523,6 +556,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         if self._socket is None:
             # socket closed by other thread
             return
+        self._state = "aborted"
         raise PyXMPPIOError("Invalid file descriptor used in main event loop")
 
     def close(self):
