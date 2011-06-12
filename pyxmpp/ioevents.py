@@ -31,8 +31,11 @@ __docformat__ = "restructuredtext en"
 import time
 import select
 import threading
+import logging
 
 from abc import ABCMeta
+
+logger = logging.getLogger("pyxmpp.ioevents")
 
 class IOHandlerPrepareResult(object):
     """Result of the `IOHandler.prepare` method."""
@@ -224,7 +227,9 @@ class SelectMainLoop(MainLoopBase):
         writable = []
         for handler in self._handlers:
             if handler not in self._prepared:
+                logger.debug(" preparing handler: {0!r}".format(handler))
                 ret = handler.prepare()
+                logger.debug("   prepare result: {0!r}".format(ret))
                 if isinstance(ret, HandlerReady):
                     self._prepared.add(handler)
                 elif isinstance(ret, PrepareAgain):
@@ -239,7 +244,7 @@ class SelectMainLoop(MainLoopBase):
             if handler.writable():
                 writable.append(handler)
         if not readable and not writable:
-            readable, writable, _unused = None, None, None
+            readable, writable, _unused = [], [], None
             time.sleep(timeout)
         else:
             readable, writable, _unused = select.select(
@@ -268,13 +273,16 @@ if hasattr(select, "poll"):
 
         def add_io_handler(self, handler):
             """Add an I/O handler to the loop."""
+            self._unprepared_handlers[handler] = None
             self._configure_io_handler(handler)
 
         def _configure_io_handler(self, handler):
             """Register an io-handler at the polling object."""
             if handler in self._unprepared_handlers:
                 old_fileno = self._unprepared_handlers[handler]
+                logger.debug(" preparing handler: {0!r}".format(handler))
                 ret = handler.prepare()
+                logger.debug("   prepare result: {0!r}".format(ret))
                 if isinstance(ret, HandlerReady):
                     del self._unprepared_handlers[handler]
                     prepared = True
@@ -292,7 +300,7 @@ if hasattr(select, "poll"):
                 prepared = True
             fileno = handler.fileno()
             if old_fileno is not None and fileno != old_fileno:
-                del self._handlers[fileno]
+                del self._handlers[old_fileno]
                 self.poll.unregister(old_fileno)
             if not prepared:
                 self._unprepared_handlers[handler] = fileno
@@ -305,6 +313,8 @@ if hasattr(select, "poll"):
             if handler.writable():
                 events |= select.POLLOUT
             if events:
+                logger.debug(" registering {0!r} handler fileno {1} for"
+                                " events {2}".format(handler, fileno, events))
                 self.poll.register(fileno, events)
 
         def update_io_handler(self, handler):
@@ -369,7 +379,7 @@ if hasattr(select, "poll"):
             return sources_handled
     MainLoop = PollMainLoop # pylint: disable-msg=C0103
 
-class ReadingThread(threading.Thread):
+class ReadingThread(object):
     """A thread reading from io_handler.
 
     This thread will be also the one to call the `IOHandler.prepare` method
@@ -377,52 +387,84 @@ class ReadingThread(threading.Thread):
     
     It can be used (together with `WrittingThread`) instead of 
     a main loop."""
-    def __init__(self, io_handler, name = None):
+    def __init__(self, io_handler, name = None, daemon = True):
         if name is None:
             name = u"{0!r} reader".format(io_handler)
+        self.name = name
         self.io_handler = io_handler
-        threading.Thread.__init__(name = name)
+        self.thread = threading.Thread(name = name, target = self.run)
+        self.thread.daemon = daemon
+        self._quit = False
+
+    def start(self):
+        self.thread.start()
+
+    def stop(self):
+        self._quit = True
 
     def run(self):
         """The thread function."""
-        self.io_handler.set_blocking(True)
+        logger.debug("{0}: entering thread".format(self.name))
+        self.io_handler.setblocking(True)
         prepared = False
-        timeout = 1
-        while True:
+        timeout = 0.1
+        while not self._quit:
             if not prepared:
+                logger.debug("{0}: preparing handler: {1!r}".format(
+                                                   self.name, self.io_handler))
                 ret = self.io_handler.prepare()
+                logger.debug("{0}: prepare result: {1!r}".format(self.name,
+                                                                        ret))
                 if isinstance(ret, HandlerReady):
                     prepared = True
                 elif isinstance(ret, PrepareAgain):
-                    if timeout is not None:
+                    if ret.timeout is not None:
                         timeout = ret.timeout
                 else:
                     raise TypeError("Unexpected result type from prepare()")
             if self.io_handler.readable():
+                logger.debug("{0}: readable".format(self.name))
                 self.io_handler.handle_read()
             elif not prepared:
                 if timeout:
                     time.sleep(timeout)
-            elif not self.io_handler.wait_for_readability():
-                break
+            else:
+                logger.debug("{0}: waiting for readability".format(self.name))
+                if not self.io_handler.wait_for_readability():
+                    break
+        logger.debug("{0}: exiting thread".format(self.name))
 
-class WrittingThread(threading.Thread):
+class WrittingThread(object):
     """A thread reading from io_handler.
     
     It can be used (together with `WrittingThread`) instead of 
     a main loop."""
-    def __init__(self, io_handler, name = None):
+    def __init__(self, io_handler, name = None, daemon = True):
         if name is None:
             name = u"{0!r} writer".format(io_handler)
+        self.name = name
         self.io_handler = io_handler
-        threading.Thread.__init__(name = name)
+        self.thread = threading.Thread(name = name, target = self.run)
+        self.thread.daemon = daemon
+        self._quit = False
+
+    def start(self):
+        self.thread.start()
+
+    def stop(self):
+        self._quit = True
 
     def run(self):
         """The thread function."""
-        self.io_handler.set_blocking(True)
-        while True:
+        logger.debug("{0}: entering thread".format(self.name))
+        self.io_handler.setblocking(True)
+        while not self._quit:
             if self.io_handler.writable():
+                logger.debug("{0}: writable".format(self.name))
                 self.io_handler.handle_write()
-            elif not self.io_handler.wait_for_writability():
-                break
+            else:
+                logger.debug("{0}: waiting for writaility".format(self.name))
+                if not self.io_handler.wait_for_writability():
+                    break
+        logger.debug("{0}: exiting thread".format(self.name))
 

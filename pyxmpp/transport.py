@@ -39,9 +39,10 @@ from .ioevents import IOHandler, HandlerReady, PrepareAgain
 from .settings import XMPPSettings
 from .exceptions import DNSError, PyXMPPIOError
 from .streamevents import ResolvingSRVEvent, ResolvingAddressEvent
-from .streamevents import ConnectedEvent, ConnectingEvent
+from .streamevents import ConnectedEvent, ConnectingEvent, DisconnectedEvent
 from .xmppserializer import XMPPSerializer
 from .xmppparser import StreamReader
+from . import resolver
 
 logger = logging.getLogger("pyxmpp.transport")
 
@@ -97,6 +98,20 @@ class XMPPTransport:
         """
         raise NotImplementedError
 
+    def connected(self):
+        """
+        Check if the transport is connected.
+
+        :Return: `True` if is connected.
+        """
+        raise NotImplementedReturn
+
+    def disconnect(self):
+        """
+        Gracefully disconnect the connection.
+        """
+        raise NotImplementedError
+
 class TCPTransport(XMPPTransport, IOHandler):
     """XMPP over TCP with optional TLS"""
     # pylint: disable-msg=R0902
@@ -137,6 +152,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._dst_addr = sock.getpeername()
             self._state = "connected"
             self._blocking = sock.gettimeout() is not None
+        self._close_event_emitted = False
 
     def connect(self, addr, port = None, service = None):
         """Start establishing TCP connection with given address.
@@ -167,8 +183,8 @@ class TCPTransport(XMPPTransport, IOHandler):
         try:
             res = socket.getaddrinfo(addr, port, socket.AF_UNSPEC,
                                 socket.SOCK_STREAM, 0, socket.AI_NUMERICHOST)
-            family = res[0]
-            sockaddr = res[4]
+            family = res[0][0]
+            sockaddr = res[0][4]
         except socket.gaierror:
             family = None
             sockaddr = None
@@ -180,8 +196,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._family = family
             self._dst_addrs = [(family, sockaddr)]
             self._state = "connect"
-
-        if service is not None:
+        elif service is not None:
             self._dst_service = service
             self._state = "resolve-srv"
             self._dst_name = addr
@@ -239,7 +254,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         resolver = self.settings["dns_resolver"]
         name, port = self._dst_nameports.pop(0)
         resolver.resolve_address(name, callback = partial(
-                                self._got_addresses, name = name, port = port),
+                                self._got_addresses, name, port),
                                 allow_cname = self._dst_service is None)
         return ResolvingAddressEvent(name)
 
@@ -286,7 +301,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             if err.args[0] == errno.EINPROGRESS:
                 self._state = "connecting"
                 self._writability_cond.notify()
-                return ConnectingEvent(self._dst_addrs[0][1])
+                return ConnectingEvent(addr)
             elif self._dst_addrs:
                 self._state = "connect"
                 return None
@@ -407,6 +422,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._serializer = None
             self._hup = True
             self._socket.shutdown(socket.SHUT_WR)
+            self._state = "closing"
 
     def send_element(self, element):
         """
@@ -426,6 +442,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         """
         event = None
         result = HandlerReady()
+        logger.debug("TCPHandler.prepare(): state: {0!r}".format(self._state))
         with self.lock:
             if self._state in ("connected", "established", "closing", "closed",
                                                                     "aborted"):
@@ -445,6 +462,8 @@ class TCPTransport(XMPPTransport, IOHandler):
                 result = PrepareAgain(None)
         if event:
             self.event(event)
+        logger.debug("TCPHandler.prepare(): new state: {0!r}"
+                                                        .format(self._state))
         return result
 
     def fileno(self):
@@ -469,7 +488,8 @@ class TCPTransport(XMPPTransport, IOHandler):
         """
         :Return: `True` when the I/O channel can be read
         """
-        return self._socket is not None and not self._eof
+        return self._socket is not None and not self._eof and (
+                                    self._state in ("connected", "closing"))
 
     def wait_for_readability(self):
         """
@@ -498,7 +518,7 @@ class TCPTransport(XMPPTransport, IOHandler):
                     return False
                 self._writability_cond.wait()
                 if self.writable():
-                    break
+                    return True
 
     def handle_write(self):
         """
@@ -509,14 +529,17 @@ class TCPTransport(XMPPTransport, IOHandler):
         with self.lock:
             if self._state == "connecting":
                 event = self._continue_connect()
+            elif self._state == "closed" and not self._close_event_emitted:
+                event = DisconnectedEvent(self._dst_addr)
+                self._close_event_emitted = True
         if event:
             self.event(event)
-
 
     def handle_read(self):
         """
         Handle the 'channel readable' state. E.g. read from a socket.
         """
+        event = None
         with self.lock:
             if self._eof or self._socket is None:
                 return
@@ -531,6 +554,11 @@ class TCPTransport(XMPPTransport, IOHandler):
                 self._feed_reader(data)
                 if self._blocking:
                     break
+            if self._state == "closed" and not self._close_event_emitted:
+                event = DisconnectedEvent(self._dst_addr)
+                self._close_event_emitted = True
+        if event:
+            self.event(event)
 
     def handle_hup(self):
         """
@@ -559,14 +587,47 @@ class TCPTransport(XMPPTransport, IOHandler):
         self._state = "aborted"
         raise PyXMPPIOError("Invalid file descriptor used in main event loop")
 
+    def connected(self):
+        """
+        Check if the transport is connected.
+
+        :Return: `True` if is connected.
+        """
+        return self._state == "connected" and not self._eof and not self._hup
+
+    def disconnect(self):
+        """Disconnect the stream gracefully."""
+        logger.debug("TCPTransport.disconnect()")
+        with self.lock:
+            if self._socket is None:
+                self._state = "closed"
+                return
+            if self._hup or not self._serializer:
+                self._close()
+            else:
+                self.send_stream_tail()
+
     def close(self):
         """Close the stream immediately, so it won't expect more events."""
         with self.lock:
-            if self._socket is None:
-                return
-            self._socket.shutdown(socket.SHUT_RDWR)
-            self._socket.close()
+            self._close()
+            if self._state == "closed" and not self._close_event_emitted:
+                event = DisconnectedEvent(self._dst_addr)
+                self._close_event_emitted = True
+        if event:
+            self.event(event)
+
+    def _close(self):
+        """Same as `close` but assumes `self.lock` acquired and doesn't try
+        to emit the `DisconnectedEvent`.
+        """
+        if self._socket is None:
             self._state = "closed"
+            return
+        self._socket.shutdown(socket.SHUT_RDWR)
+        self._socket.close()
+        self._socket = None
+        self._state = "closed"
 
     def _feed_reader(self, data):
         """Feed the stream reader with data received.
@@ -589,10 +650,12 @@ class TCPTransport(XMPPTransport, IOHandler):
         else:
             self._eof = True
             self._target.stream_eof()
+            if not self._serializer:
+                self._state = "closed"
 
     def event(self, event):
         """Pass an event to the target stream or just log it."""
-        if hasattr(self._target, "event"):
+        if self._target:
             self._target.event(event)
         else:
             logger.debug(u"TCP transport event: {0}".format(event))

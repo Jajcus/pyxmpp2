@@ -27,14 +27,10 @@ from __future__ import absolute_import
 __docformat__ = "restructuredtext en"
 
 import inspect
-import socket
-import time
-import errno
 import logging
 import uuid
 import re
 from abc import ABCMeta
-from functools import wraps
 
 from .etree import ElementTree
 
@@ -42,27 +38,21 @@ from .etree import ElementTree
 from .xmppparser import XMLStreamHandler
 from .error import StreamErrorElement
 from .jid import JID
-from . import resolver
 from .stanzaprocessor import StanzaProcessor, stanza_factory
-from .exceptions import StreamError, AlreadyInProgressError
-from .exceptions import DNSError, UnexpectedCNAMEError
+from .exceptions import StreamError
 from .exceptions import FatalStreamError, StreamParseError
 from .constants import STREAM_QNP, XML_LANG_QNAME, STREAM_ROOT_TAG
 from .settings import XMPPSettings
-from .xmppserializer import serialize, XMPPSerializer
-from .xmppparser import StreamReader
+from .xmppserializer import serialize
 
-from .streamevents import ConnectedEvent, GotFeaturesEvent
-from .streamevents import ConnectingEvent, ConnectionAcceptedEvent
-from .streamevents import DisconnectedEvent, ResolvingAddressEvent
-from .streamevents import ResolvingSRVEvent, StreamConnectedEvent
+from .streamevents import ConnectedEvent
+from .streamevents import StreamConnectedEvent, GotFeaturesEvent
 from .streamevents import AuthenticatedEvent, StreamRestartedEvent
 
 XMPPSettings.add_defaults(
         {
             u"language": "en",
             u"languages": ("en",),
-            u"keepalive": 0,
             u"default_stanza_timeout": 300,
             u"extra_ns_prefixes": {},
         })
@@ -187,22 +177,6 @@ def stream_element_handler(element_name, usage_restriction = None):
         return func
     return decorator
 
-def once(func):
-    """Decorator for methods which are no re-entrant"""
-    @wraps(func)
-    def wrapper(self, *args, **kwargs):
-        # pylint: disable-msg=C0111,W0212
-        with self.lock:
-            if func.__name__ in self._in_progress:
-                raise AlreadyInProgressError(func.__name__)
-            self._in_progress.add(func.__name__)
-        try:
-            return func(self, *args, **kwargs)
-        finally:
-            with self.lock:
-                self._in_progress.remove(func.__name__)
-    return wrapper
-
 class StreamBase(StanzaProcessor, XMLStreamHandler):
     """Base class for a generic XMPP stream.
 
@@ -225,33 +199,17 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         - `process_all_stanzas`: when `True` then all stanzas received are
           considered local.
         - `initiator`: `True` if local stream endpoint is the initiating entity.
-        - `_reader`: the stream reader object (push parser) for the stream.
         - `version`: Negotiated version of the XMPP protocol. (0,9) for the
           legacy (pre-XMPP) Jabber protocol.
-        - `connection_state`: one of: None, "resolving" (resolving DN records),
-          "connecting" (connecting socket), "connected" (sockets connected),
-          "established" (xml stream start tags exchanged), "closing" (end tag
-          sent and our side of the connection closed) or "closed" (both sides
-          closed), "failed" (failed to resolve address or establish connection)
-        - `_handle_read_impl`: function called (with `lock` acquired) when input
-          is available of the stream socket
-        - `_handle_write_impl`: function called (with `lock` acquired) when
-          stream socket is ready for write
-        - `_handle_err_impl`: function called (with `lock` acquired) when
-          stream socket signaled an error (e.g. POLLERR)
-        - `_handle_hup_impl`: function called (with `lock` acquired) when
-          stream socket signaled a hangup (e.g. POLLHUP)
-        - `_handle_nval_impl`: function called (with `lock` acquired) when
-          stream socket signaled a hangup (e.g. POLLNVAL)
-        - `_want_read_impl`: function called to check if the stream socket
-          should be polled for read
-        - `_want_write_impl`: function called to check if the stream socket
-          should be polled for write
+        - `_input_state`: `None`, "open" (<stream:stream> has been received)
+          "restart" or "closed" (</stream:stream> or EOF has been received)
+        - `_output_state`: `None`, "open" (<stream:stream> has been received)
+          "restart" or "closed" (</stream:stream> or EOF has been received)
     :Types:
         - `settings`: XMPPSettings
         - `version`: (`int`, `int`) tuple
-        - `connection_state`: `unicode`
     """
+    # pylint: disable-msg=R0902,R0904
     def __init__(self, stanza_namespace, handlers, settings = None):
         """Initialize StreamBase object
 
@@ -272,7 +230,6 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         StanzaProcessor.__init__(self, settings[u"default_stanza_timeout"])
         self.stanza_namespace = stanza_namespace
         self._stanza_namespace_p = "{{{0}}}".format(stanza_namespace)
-        self.keepalive = self.settings[u"keepalive"]
         self.process_all_stanzas = False
         self.port = None
         self.handlers = handlers
@@ -283,9 +240,6 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
                 self._event_handlers.append(handler)
             if isinstance(handler, StreamFeatureHandler):
                 self._stream_feature_handlers.append(handler)
-        self._in_progress = set()
-        self.socket = None
-        self._reader = None
         self.addr = None
         self.me = None
         self.peer = None
@@ -298,161 +252,54 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         self.tls_established = False
         self.auth_method_used = None
         self.version = None
-        self.last_keepalive = False
         self.language = None
         self.peer_language = None
-        self._serializer = None
-        self.connection_state = None
-        self._handle_read_impl = self._handle_read_direct
-        self._handle_write_impl = self._handle_write_direct
-        self._handle_err_impl = self._handle_err_direct
-        self._handle_hup_impl = self._handle_hup_direct
-        self._handle_nval_impl = self._handle_nval_direct
-        self._want_read_impl = self._want_read_direct
-        self._want_write_impl = self._want_write_direct
-        self._data_send_impl = self._direct_send
+        self.transport = None
+        self._input_state = None
+        self._output_state = None
 
-    def _connect_socket(self, sock, to = None):
-        """Initialize stream on outgoing connection.
-
+    def initiate(self, transport, to = None):
+        """Initiate an XMPP connection over the `transport`.
+        
         :Parameters:
-          - `sock`: connected socket for the stream
-          - `to`: name of the remote host
+            - `transport`: an XMPP transport instance
+            - `to`: peer name
         """
-        self.connection_state = "connected"
+        with self.lock:
+            self.initiator = True
+            self.transport = transport
+            transport.set_target(self)
+            if to:
+                self.peer = JID(to)
+            else:
+                self.peer = None
+            if transport.connected():
+                self._initiate()
+
+    def _initiate(self):
+        """Initiate an XMPP connection over a connected `self.transport`.
+
+        [ called with `self.lock` acquired ]
+        """
         self.eof = False
-        self.socket = sock
-        if to:
-            self.peer = JID(to)
-        else:
-            self.peer = None
-        self.initiator = True
         self._setup_stream_element_handlers()
         self.setup_stanza_handlers(self.handlers, "pre-auth")
         self._send_stream_start()
-        self._make_reader()
 
-    @once
-    def connect(self, addr, port = None, service = None, to = None):
-        """Establish XMPP connection with given address.
-
-        One of: `port` or `service` must be provided and `addr` must be 
-        a domain name and not an IP address `port` is not given.
-
-        When `service` is given try an SRV lookup for that service
-        at domain `addr`. If `service is not given or `addr` is an IP address, 
-        or the SRV lookup fails, connect to `port` at host `addr` directly.
-
-        [initiating entity only]
+    def receive(self, transport, myname):
+        """Receive an XMPP connection over the `transport`.
 
         :Parameters:
-            - `addr`: peer name or IP address
-            - `port`: port number to connect to
-            - `service`: service name (to be resolved using SRV DNS records)
-            - `to`: peer name if different than `addr`
-        """
-        if to is None:
-            to = unicode(addr)
-        srv_used = False
-        self.selected_host = None
-        self.connection_state = "resolving"
-        if service is not None and not IP_RE.match(addr):
-            self.event(ResolvingSRVEvent(addr, service))
-            addrs = resolver.resolve_srv(addr, service)
-            if addrs:
-                srv_used = True
-            elif port:
-                addrs = [(addr, port)]
-            else:
-                raise DNSError("Could not resolve SRV for service {0!r}"
-                            " on host {1!r} and fallback port number not given"
-                                                        .format(service, addr))
-        elif port:
-            addrs = [(addr, port)]
-        else:
-            raise ValueError("No port number or service name given")
-        exception = None
-        for addr, port in addrs:
-            self.connection_state = "resolving"
-            if type(addr) in (str, unicode):
-                self.event(ResolvingAddressEvent(addr))
-            sock = None
-            allow_cname = not srv_used
-            while True:
-                try:
-                    addresses = resolver.getaddrinfo(addr, port, None,
-                                socket.SOCK_STREAM, allow_cname = allow_cname)
-                    break
-                except UnexpectedCNAMEError, err:
-                    logger.warning(str(err))
-                    allow_cname = True
-                    continue
-                except DNSError, err:
-                    logger.debug(str(err))
-                    exception = err
-                    addresses = []
-                    break
-            self.connection_state = "connecting"
-            for res in addresses:
-                family, socktype, proto, _unused, sockaddr = res
-                try:
-                    sock = socket.socket(family, socktype, proto)
-                    self.event(ConnectingEvent(sockaddr))
-                    sock.connect(sockaddr)
-                    if srv_used:
-                        self.selected_host = addr
-                except socket.error, err:
-                    exception = err
-                    logger.debug("Connect to {0!r} failed".format(sockaddr))
-                    if sock:
-                        sock.close()
-                        sock = None
-                    continue
-                break
-            if sock:
-                break
-        if not sock:
-            self.connection_state = "failed"
-            if exception:
-                raise exception # pylint: disable-msg=E0702
-            else:
-                raise FatalStreamError("Cannot connect")
-        with self.lock:
-            self.addr = addr
-            self.port = port
-            self._connect_socket(sock, to)
-            self.last_keepalive = time.time()
-        self.event(ConnectedEvent(sockaddr))
-
-    def accept(self, sock, myname):
-        """Accept incoming connection.
-
-        [receiving entity only]
-
-        :Parameters:
-            - `sock`: a listening socket.
+            - `transport`: an XMPP transport instance
             - `myname`: local stream endpoint name.
         """
         with self.lock:
-            addr = self._accept(sock, myname)
-        self.event(ConnectionAcceptedEvent(addr))
-
-    def _accept(self, sock, myname):
-        """Same as `Stream.accept` but assume `self.lock` is acquired
-        and does not emit the `ConnectionAcceptedEvent`.
-        """
-        self.eof = False
-        self.socket, addr = sock.accept()
-        logger.debug("Connection from: %r" % (addr,))
-        self.connection_state = "connected"
-        self.addr, self.port = addr
-        self.me = JID(myname)
-        self.initiator = False
-        self._make_reader()
-        self.last_keepalive = time.time()
-        self._setup_stream_element_handlers()
-        self.setup_stanza_handlers(self.handlers, "pre-auth")
-        return addr
+            self.transport = transport
+            transport.set_target(self)
+            self.me = JID(myname)
+            self.initiator = False
+            self._setup_stream_element_handlers()
+            self.setup_stanza_handlers(self.handlers, "pre-auth")
 
     def _setup_stream_element_handlers(self):
         """Set up stream element handlers.
@@ -482,16 +329,8 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
     def disconnect(self):
         """Gracefully close the connection."""
         with self.lock:
-            return self._disconnect()
-
-    def _disconnect(self):
-        """Same as `Stream.disconnect` but assume `self.lock` is acquired."""
-        if self._serializer:
-            # output stream open - close it
-            self._send_stream_end()
-        if self._reader is None:
-            # input stream not started or already finished
-            self._close()
+            self.transport.disconnect()
+            self._output_state = "closed"
 
     def event(self, event): # pylint: disable-msg=R0201
         """Handle a stream event.
@@ -506,28 +345,14 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             logger.debug(u"  passing the event to: {0!r}".format(handler))
             if handler.handle_xmpp_event(event):
                 return True
+        if isinstance(event, ConnectedEvent) and self.initiator:
+            with self.lock:
+                self._initiate()
         return False
 
     def close(self):
         """Forcibly close the connection and clear the stream state."""
-        with self.lock:
-            return self._close()
-
-    def _close(self):
-        """Same as `Stream.close` but assume `self.lock` is acquired."""
-        if self._reader:
-            self._reader = None
-        if self._serializer:
-            self._send_stream_end()
-        if self.socket is not None:
-            self.socket.close()
-            self.socket = None
-            self.event(DisconnectedEvent(self.peer))
-        self.connection_state = "closed"
-
-    def _make_reader(self):
-        """Create ne `StreamReader` instace as `self._reader`."""
-        self._reader = StreamReader(self)
+        self.transport.close()
 
     def stream_start(self, element):
         """Process <stream:stream> (stream start) tag received from peer.
@@ -536,80 +361,77 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
 
         :Parameters:
             - `element`: root element (empty) created by the parser"""
-        logger.debug("input document: " + ElementTree.tostring(element))
-        if not element.tag.startswith(STREAM_QNP):
-            self._send_stream_error("invalid-namespace")
-            raise FatalStreamError("Bad stream namespace")
-        if element.tag != STREAM_ROOT_TAG:
-            self._send_stream_error("bad-format")
-            raise FatalStreamError("Bad root element")
+        with self.lock:
+            logger.debug("input document: " + ElementTree.tostring(element))
+            if not element.tag.startswith(STREAM_QNP):
+                self._send_stream_error("invalid-namespace")
+                raise FatalStreamError("Bad stream namespace")
+            if element.tag != STREAM_ROOT_TAG:
+                self._send_stream_error("bad-format")
+                raise FatalStreamError("Bad root element")
 
-        version = element.get("version")
-        if version:
-            try:
-                major, minor = version.split(".", 1)
-                major, minor = int(major), int(minor)
-            except ValueError:
+            self._input_state = "open"
+            version = element.get("version")
+            if version:
+                try:
+                    major, minor = version.split(".", 1)
+                    major, minor = int(major), int(minor)
+                except ValueError:
+                    self._send_stream_error("unsupported-version")
+                    raise FatalStreamError("Unsupported protocol version.")
+                self.version = (major, minor)
+            else:
+                self.version = (0, 9)
+
+            if self.version[0] != 1 and self.version != (0, 9):
                 self._send_stream_error("unsupported-version")
                 raise FatalStreamError("Unsupported protocol version.")
-            self.version = (major, minor)
-        else:
-            self.version = (0, 9)
 
-        if self.version[0] != 1 and self.version != (0, 9):
-            self._send_stream_error("unsupported-version")
-            raise FatalStreamError("Unsupported protocol version.")
+            peer_lang = element.get(XML_LANG_QNAME)
+            self.peer_language = peer_lang
+            if not self.initiator:
+                lang = None
+                languages = self.settings["languages"]
+                while peer_lang:
+                    if peer_lang in languages:
+                        lang = peer_lang
+                        break
+                    match = LANG_SPLIT_RE.match(peer_lang)
+                    if not match:
+                        break
+                    peer_lang = match.group(0)
+                if lang:
+                    self.language = lang
 
-        peer_lang = element.get(XML_LANG_QNAME)
-        self.peer_language = peer_lang
-        if not self.initiator:
-            lang = None
-            languages = self.settings["languages"]
-            while peer_lang:
-                if peer_lang in languages:
-                    lang = peer_lang
-                    break
-                match = LANG_SPLIT_RE.match(peer_lang)
-                if not match:
-                    break
-                peer_lang = match.group(0)
-            if lang:
-                self.language = lang
+            if self.initiator:
+                self.stream_id = element.get("id")
+                peer = element.get("from")
+                if peer:
+                    peer = JID(peer)
+                if self.peer:
+                    if peer and peer != self.peer:
+                        logger.debug("peer hostname mismatch: {0!r} != {1!r}"
+                                                        .format(peer, self.peer))
+                self.peer = peer
+            else:
+                to = element.get("to")
+                if to:
+                    to = self.check_to(to)
+                    if not to:
+                        self._send_stream_error("host-unknown")
+                        raise FatalStreamError('Bad "to"')
+                    self.me = JID(to)
+                peer = element.get("from")
+                if peer:
+                    peer = JID(peer)
+                self._send_stream_start(self.generate_id(), stream_to = peer)
+                self._send_stream_features()
 
-        if self.initiator:
-            self.stream_id = element.get("id")
-            peer = element.get("from")
-            if peer:
-                peer = JID(peer)
-            if self.peer:
-                if peer and peer != self.peer:
-                    logger.debug("peer hostname mismatch: {0!r} != {1!r}"
-                                                    .format(peer, self.peer))
-            self.peer = peer
-        else:
-            to = element.get("to")
-            if to:
-                to = self.check_to(to)
-                if not to:
-                    self._send_stream_error("host-unknown")
-                    raise FatalStreamError('Bad "to"')
-                self.me = JID(to)
-            peer = element.get("from")
-            if peer:
-                peer = JID(peer)
-            self._send_stream_start(self.generate_id(), stream_to = peer)
-            self._send_stream_features()
-
-        if self.connection_state in ("established", "closing"):
-            event = StreamRestartedEvent(self.peer)
-        else:
-            event = StreamConnectedEvent(self.peer)
-            self.connection_state = "established"
-        self.lock.release()
-        try:
-            self.event(event)
-        finally:
-            self.lock.acquire()
+            if self._input_state == "restart":
+                event = StreamRestartedEvent(self.peer)
+            else:
+                event = StreamConnectedEvent(self.peer)
+        self.event(event)
 
     def stream_end(self):
         """Process </stream:stream> (stream end) tag received from peer.
@@ -617,13 +439,9 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         `self.lock` is acquired when this method is called.
         """
         logger.debug("Stream ended")
-        self.eof = True
-        if self._reader:
-            self._reader = None
-            self.features = None
-        if self._serializer:
-            self._send_stream_end()
-        self._close()
+        self._input_state = "closed"
+        self.transport.disconnect()
+        self._output_state = "closed"
 
     def stream_element(self, element):
         """Process first level child element of the stream).
@@ -635,25 +453,22 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         """
         self._process_element(element)
 
-    def _send_stream_end(self):
-        """Send stream end tag."""
-        data = self._serializer.emit_tail()
-        try:
-            self._write_raw(data.encode("utf-8"))
-        except (IOError, SystemError, socket.error), err:
-            logger.debug(u"Sending stream closing tag failed: {0}".format(err))
-        self._serializer = None
-        self.features = None
-        self.connection_state = "closing"
+    def stream_parse_error(self, descr):
+        """Called when an error is encountered in the stream.
 
+        :Parameters:
+            - `descr`: description of the error
+        :Types:
+            - `descr`: `unicode`"""
+        self._send_stream_error("not-well-formed")
+        raise StreamParseError(descr)
+ 
     def _send_stream_start(self, stream_id = None, stream_to = None):
         """Send stream start tag."""
-        if self._serializer:
+        if self._output_state in ("open", "closed"):
             raise StreamError("Stream start already sent")
         if not self.language:
             self.language = self.settings["language"]
-        self._serializer = XMPPSerializer(self.stanza_namespace,
-                                        self.settings["extra_ns_prefixes"])
         if stream_to:
             stream_to = unicode(stream_to)
         elif self.peer and self.initiator:
@@ -665,33 +480,40 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
             self.stream_id = stream_id
         else:
             self.stream_id = None
-        head = self._serializer.emit_head(stream_from, stream_to,
+        self.transport.send_stream_head(self.stanza_namespace, 
+                                        stream_from, stream_to,
                                     self.stream_id, language = self.language)
-        self._write_raw(head.encode("utf-8"))
+        self._output_state = "open"
 
-    def _send_stream_error(self, condition):
+    def send_stream_error(self, condition):
         """Send stream error element.
 
         :Parameters:
             - `condition`: stream error condition name, as defined in the
-              XMPP specification."""
-        if self.eof:
+              XMPP specification.
+        """
+        with self.lock:
+            self._send_stream_error(condition)
+
+    def _send_stream_error(self, condition):
+        """Same as `send_stream_error`, but expects `self.lock` acquired.
+        """
+        if self._output_state is "closed":
             return
-        if not self._serializer:
+        if self._output_state in (None, "restart"):
             self._send_stream_start()
         element = StreamErrorElement(condition).as_xml()
-        data = self._serializer.emit_stanza(element)
-        self._write_raw(data.encode("utf-8"))
-        self._send_stream_end()
+        self.transport.send_element(element)
+        self.transport.disconnect()
+        self._output_state = "closed"
 
     def _restart_stream(self):
         """Restart the stream as needed after SASL and StartTLS negotiation."""
-        self._reader = None
-        self._serializer = None
+        self._input_state = "restart"
+        self._output_state = "restart"
         self.features = None
         if self.initiator:
             self._send_stream_start(self.stream_id)
-        self._make_reader()
 
     def _make_stream_features(self):
         """Create the <features/> element for the stream.
@@ -712,30 +534,6 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         self.features = self._make_stream_features()
         self._write_element(self.features)
 
-    def _write_raw(self, data):
-        """Write raw data to the stream socket.
-
-        :Parameters:
-            - `data`: data to send
-        :Types:
-            - `data`: `bytes`
-        """
-        with self.lock:
-            logging.getLogger("pyxmpp.stream.out").debug("OUT: %r", data)
-            return self._data_send_impl(data)
-
-    def _direct_send(self, data):
-        """Send data directly via `self.socket` (blocking call).
-
-        This is the default implementation for `_data_sender`
-        """
-        try:
-            while data:
-                sent = self.socket.send(data)
-                data = data[sent:]
-        except (IOError, OSError, socket.error), err:
-            raise FatalStreamError(u"IO Error: {0}".format(err))
-
     def write_element(self, element):
         """Write XML `element` to the stream.
 
@@ -750,12 +548,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
     def _write_element(self, element):
         """Same as `write_element` but with `self.lock` already acquired.
         """
-        if self.eof or not self.socket or not self._serializer:
-            logger.debug("Dropping element: {0}".format(
-                                                ElementTree.tostring(element)))
-            return
-        data = self._serializer.emit_stanza(element)
-        self._write_raw(data.encode("utf-8"))
+        self.transport.send_element(element)
 
     def send(self, stanza):
         """Write stanza to the stream.
@@ -790,217 +583,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
     def _regular_tasks(self):
         """Same as `Stream.regular_tasks` but assume `self.lock` is acquired."""
         self._iq_response_handlers.expire()
-        if not self.socket or self.eof:
-            return 0
-        now = time.time()
-        if self.keepalive and now - self.last_keepalive >= self.keepalive:
-            self._write_raw(" ")
-            self.last_keepalive = now
-            return min(self.keepalive, 
-                                    self.settings[u"default_stanza_timeout"])
-        else:
-            return self.settings[u"default_stanza_timeout"]
-
-    def fileno(self):
-        """Return filedescriptor of the stream socket."""
-        self.lock.acquire()
-        try:
-            if self.socket:
-                return self.socket.fileno()
-            else:
-                return None
-        finally:
-            self.lock.release()
-
-    def loop(self, timeout):
-        """Simple "main loop" for the stream."""
-        with self.lock:
-            while not self.eof and self.socket is not None:
-                act = self._loop_iter(timeout)
-                if not act:
-                    self._regular_tasks()
-
-    def loop_iter(self, timeout):
-        """Single iteration of a simple "main loop" for the stream."""
-        with self.lock:
-            return self._loop_iter(timeout)
-
-    def _loop_iter(self, timeout):
-        """Same as `Stream.loop_iter` but assume `self.lock` is acquired."""
-        import select
-        self.lock.release()
-        try:
-            if not self.socket:
-                time.sleep(timeout)
-                return False
-            try:
-                if self._want_read_impl():
-                    ifd = [self.socket]
-                else:
-                    ifd = []
-                if self._want_write_impl():
-                    ofd = [self.socket]
-                else:
-                    ofd = []
-                ifd, ofd = select.select(ifd, ofd, [], timeout)[0:2]
-            except select.error, err:
-                if err.args[0] != errno.EINTR:
-                    raise
-                ifd, ofd = [], []
-        finally:
-            self.lock.acquire()
-        result = False
-        if self.socket in ifd:
-            self._handle_read()
-            result = True
-        if self.socket in ofd:
-            self._handle_write_impl()
-            result = True
-        return result
-
-    def handle_read(self):
-        """Process stream's pending input.
-
-        Should be called whenever there is input available
-        on `self.fileno()` socket descriptor. Is called by `self.loop_iter`.
-        """
-        with self.lock:
-            return self._handle_read()
-
-    def handle_write(self):
-        """Process stream's pending output.
-
-        Should be called whenever `want_write` is `True` and 
-        the socket is known to be ready for write.
-        """
-        with self.lock:
-            return self._handle_write_impl()
-
-    def handle_hup(self):
-        """Process stream socket hangup event.
-
-        Should be called whenever `want_write` is `True` and 
-        the socket is known to be hung-up.
-        """
-        with self.lock:
-            return self._handle_hup_impl()
-
-    def handle_nval(self):
-        """Process stream socket invalid event.
-
-        Should be called whenever `want_write` is `True` 
-        or `want_read` is `True` and the socket descriptor is known to be
-        invalid.
-        """
-        with self.lock:
-            return self._handle_nval_impl()
-
-    def want_read(self):
-        """Check if the stream is ready to accept input from the socket.
-
-        :Return: `True` if `self.fileno()` should be polled for input
-        """
-        return self._want_read_impl()
-
-    def want_write(self):
-        """Check if the stream needs to write data to the socket.
-
-        :Return: `True` if `self.fileno()` should be polled for output
-        """
-        return self._want_write_impl()
-
-    def _handle_read(self):
-        """The same as `handle_read` by with `self.lock` acquired."""
-        try:
-            try:
-                self._handle_read_impl()
-            except Exception, err:
-                logger.debug("Exception during read()", exc_info = True)
-                raise
-        except (IOError, OSError, socket.error), err:
-            self.close()
-            raise FatalStreamError("IO Error: {0}".format(err))
-        except (FatalStreamError, KeyboardInterrupt, SystemExit), err:
-            self.close()
-            raise
-
-    def _handle_read_direct(self):
-        """Read data pending on the stream socket and pass it to the parser.
-
-        This is the default implementation for `_handle_read`.
-        """
-        logger.debug("StreamBase._read(), socket: {0!r}".format(self.socket))
-        if self.eof:
-            return
-        try:
-            data = self.socket.recv(4096)
-        except socket.error, err:
-            if err.args[0] != errno.EINTR:
-                raise
-            return 
-        self._feed_reader(data)
-
-    def _handle_write_direct(self):
-        """Handle stream write."""
-        pass
-
-    def _handle_hup_direct(self):
-        """Handle stream write."""
-        if self._serializer:
-            self._serializer = None
-            self.close()
-            raise FatalStreamError("Ungraceful stream hang-up")
-
-    def _handle_err_direct(self):
-        """Handle error on the socket."""
-        self.close()
-        raise FatalStreamError("Error on the stream socket")
-
-    def _handle_nval_direct(self):
-        """Handle error on the socket."""
-        self.socket = None
-        self.close()
-        raise FatalStreamError("Invalid socket")
-
-    def _want_read_direct(self):
-        """Check if the stream is ready to accept input from the socket.
-
-        :Return: `True` if `self.fileno()` should be polled for input
-        """
-        return self.socket and not self.eof
-
-    def _want_write_direct(self):
-        """Check if the stream waits for the socket to be ready for write.
-
-        :Return: `False` (write is not buffered currently)
-        """
-        # pylint: disable-msg=R0201
-        return False
-
-    def _feed_reader(self, data):
-        """Feed the stream reader with data received.
-
-        If `data` is None or empty, then stream end (peer disconnected) is
-        assumed and the stream is closed.
-
-        `self.lock` is acquired during the operation.
-
-        :Parameters:
-            - `data`: data received from the stream socket.
-        :Types:
-            - `data`: `unicode`
-        """
-        logging.getLogger("pyxmpp.stream.in").debug("IN: %r", data)
-        if data:
-            try:
-                self._reader.feed(data)
-            except StreamParseError:
-                self._send_stream_error("xml-not-well-formed")
-                raise
-        else:
-            self.eof = True
-            self.disconnect()
-            self.stream_end()
+        return 60
 
     def _process_element(self, element):
         """Process first level element of the stream.
@@ -1015,34 +598,21 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         """
         tag = element.tag
         if tag in self._element_handlers:
-            self.lock.release()
-            try:
-                handler = self._element_handlers[tag]
-                logger.debug("Passing element {0!r} to method {1!r}"
-                                                    .format(element, handler))
-                handled = handler(self, element)
-            finally:
-                self.lock.acquire()
+            handler = self._element_handlers[tag]
+            logger.debug("Passing element {0!r} to method {1!r}"
+                                                .format(element, handler))
+            handled = handler(self, element)
             if handled:
                 return
         if tag.startswith(self._stanza_namespace_p):
             stanza = stanza_factory(element, self, self.language)
-            self.lock.release()
-            try:
-                self.process_stanza(stanza)
-            finally:
-                self.lock.acquire()
+            self.process_stanza(stanza)
         elif tag == ERROR_TAG:
             error = StreamErrorElement(element)
-            self.lock.release()
-            try:
-                self.process_stream_error(error)
-            finally:
-                self.lock.acquire()
+            self.process_stream_error(error)
         elif tag == FEATURES_TAG:
             logger.debug("Got features element: {0}".format(serialize(element)))
-            self.features = element
-            self._got_features()
+            self._got_features(element)
         else:
             logger.debug("Unhandled element: {0}".format(serialize(element)))
             logger.debug(" known handlers: {0!r}".format(
@@ -1079,54 +649,48 @@ class StreamBase(StanzaProcessor, XMLStreamHandler):
         # pylint: disable-msg=R0201
         return unicode(uuid.uuid4())
 
-    def _got_features(self):
+    def _got_features(self, features):
         """Process incoming <stream:features/> element.
 
         [initiating entity only]
 
         The received features node is available in `self.features`."""
-        self.lock.release()
-        try:
-            logger.debug("got features, passing to event handlers...")
-            handled = self.event(GotFeaturesEvent(self.features))
-            logger.debug("  handled: {0}".format(handled))
-            if not handled:
-                mandatory_handled = []
-                mandatory_not_handled = []
-                logger.debug("  passing to stream features handlers: {0}"
-                                        .format(self._stream_feature_handlers))
-                for handler in self._stream_feature_handlers:
-                    ret = handler.handle_stream_features(self, self.features)
-                    if ret is None:
-                        continue
-                    elif isinstance(ret, StreamFeatureHandled):
-                        if ret.mandatory:
-                            mandatory_handled.append(unicode(ret))
-                            break
+        self.features = features
+        logger.debug("got features, passing to event handlers...")
+        handled = self.event(GotFeaturesEvent(self.features))
+        logger.debug("  handled: {0}".format(handled))
+        if not handled:
+            mandatory_handled = []
+            mandatory_not_handled = []
+            logger.debug("  passing to stream features handlers: {0}"
+                                    .format(self._stream_feature_handlers))
+            for handler in self._stream_feature_handlers:
+                ret = handler.handle_stream_features(self, self.features)
+                if ret is None:
+                    continue
+                elif isinstance(ret, StreamFeatureHandled):
+                    if ret.mandatory:
+                        mandatory_handled.append(unicode(ret))
                         break
-                    elif isinstance(ret, StreamFeatureNotHandled):
-                        if ret.mandatory:
-                            mandatory_not_handled.append(unicode(ret))
-                            break
-                    else:
-                        raise ValueError("Wrong value returned from a stream"
-                                " feature handler: {0!r}".format(ret))
-                if mandatory_not_handled and not mandatory_handled:
-                    self._send_stream_error("unsupported-feature")
-                    raise FatalStreamError(
-                            u"Unsupported mandatory-to-implement features: "
-                                            + u" ".join(mandatory_not_handled))
-        finally:
-            self.lock.acquire()
+                    break
+                elif isinstance(ret, StreamFeatureNotHandled):
+                    if ret.mandatory:
+                        mandatory_not_handled.append(unicode(ret))
+                        break
+                else:
+                    raise ValueError("Wrong value returned from a stream"
+                            " feature handler: {0!r}".format(ret))
+            if mandatory_not_handled and not mandatory_handled:
+                self.send_stream_error("unsupported-feature")
+                raise FatalStreamError(
+                        u"Unsupported mandatory-to-implement features: "
+                                        + u" ".join(mandatory_not_handled))
 
     def connected(self):
-        """Check if stream is connected.
+        """Check if stream is connected and stanzas may be sent.
 
         :return: True if stream connection is active."""
-        if self.socket and not self.eof:
-            return True
-        else:
-            return False
+        return self.transport.connected() and self._output_state == "open"
 
     def set_peer_authenticated(self, peer, restart_stream = False):
         """Mark the other side of the stream authenticated as `peer`
