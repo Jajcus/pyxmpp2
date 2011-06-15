@@ -22,13 +22,12 @@
 
 from __future__ import absolute_import
 
-__docformat__ = "restructuredtext en"
+from .events import Event
 
-class StreamEvent(object):
+
+class StreamEvent(Event):
     """Base class for all stream events."""
     stream = None
-    def __unicode__(self):
-        raise NotImplementedError
 
 class AuthenticatedEvent(StreamEvent):
     """Event raised after stream authentication is complete.
@@ -266,3 +265,4 @@ class StreamRestartedEvent(StreamEvent):
         self.peer = peer
     def __unicode__(self):
         return u"Connected to {0}".format(self.peer)
+
