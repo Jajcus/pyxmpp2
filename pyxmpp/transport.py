@@ -311,6 +311,9 @@ class TCPTransport(XMPPTransport, IOHandler):
                 self._state = "aborted"
                 self._writability_cond.notify()
                 raise
+        if self._blocking:
+            logger.debug("_start_connect: making the socket blocking again.")
+            self._socket.setblocking(True)
         self._state = "connected"
         self._stream.transport_connected()
         self.event(ConnectedEvent(self._dst_addr))
@@ -323,6 +326,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         :Return: `True` when just connected
         """
         if self._blocking:
+            logger.debug("_continue_connect: making the socket blocking again.")
             self._socket.setblocking(True)
         try:
             self._socket.connect(self._dst_addr)
@@ -554,11 +558,11 @@ class TCPTransport(XMPPTransport, IOHandler):
                     data = self._socket.recv(4096)
                 except socket.error, err:
                     if err.args[0] == errno.EINTR:
-                        pass
+                        continue
                     elif err.args[0] == errno.EWOULDBLOCK:
                         break
                 self._feed_reader(data)
-                if self._blocking:
+                if self._blocking or not data:
                     break
 
     def handle_hup(self):

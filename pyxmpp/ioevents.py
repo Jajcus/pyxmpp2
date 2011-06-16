@@ -33,6 +33,7 @@ import select
 import threading
 import logging
 import sys
+import Queue
 
 from abc import ABCMeta
 
@@ -159,6 +160,7 @@ class IOHandler:
 class MainLoopBase(object):
     """Base class for main loop implementations."""
     def __init__(self, handlers = []):
+        self.event_queue = EventQueue(handlers)
         self._quit = False
         event_handlers = []
         for handler in handlers:
@@ -166,7 +168,6 @@ class MainLoopBase(object):
                 self.add_io_handler(handler)
             elif isinstance(handler, EventHandler):
                 event_handlers.append(handler)
-        self.event_queue = EventQueue(event_handlers)
     def add_io_handler(self, handler):
         """Add an I/O handler to the loop."""
         raise NotImplementedError
@@ -182,6 +183,8 @@ class MainLoopBase(object):
     def quit(self):
         """Make the loop stop after the current iteration."""
         self.event_queue.post_event(QUIT)
+    def finished(self):
+        return self._quit
     def run(self, timeout = 60):
         """Run the loop."""
         while not self._quit:
@@ -195,7 +198,6 @@ class SelectMainLoop(MainLoopBase):
     def __init__(self, handlers = []):
         self._handlers = []
         self._prepared = set()
-        self.poll = select.poll()
         self._timeout_handlers = []
         MainLoopBase.__init__(self, handlers)
 
@@ -419,19 +421,26 @@ class IOThread(object):
         - `thread`: `threading.Thread`
         - `exc_info`: (type, value, traceback) tuple
     """
-    def __init__(self, io_handler, name, daemon = True):
+    def __init__(self, io_handler, name, daemon = True, exc_queue = None):
         self.name = name
         self.io_handler = io_handler
         self.thread = threading.Thread(name = name, target = self._run)
         self.thread.daemon = daemon
         self.exc_info = None
+        self.exc_queue = exc_queue
         self._quit = False
 
     def start(self):
         self.thread.start()
+    
+    def is_alive(self):
+        return self.thread.is_alive()
 
     def stop(self):
         self._quit = True
+
+    def join(self, timeout):
+        return self.thread.join(timeout)
 
     def _run(self):
         """The thread function. Calls `self.run()` and if it raises
@@ -445,6 +454,8 @@ class IOThread(object):
             self.exc_info = sys.exc_info()
             logger.exception(u"exception in the {0!r} thread:".format(
                                                                 self.name))
+            if self.exc_queue:
+                self.exc_queue.put( (self, self.exc_info) )
         else:
             logger.debug("{0}: exiting thread".format(self.name))
 
@@ -461,10 +472,11 @@ class ReadingThread(IOThread):
     
     It can be used (together with `WrittingThread`) instead of 
     a main loop."""
-    def __init__(self, io_handler, name = None, daemon = True):
+    def __init__(self, io_handler, name = None, daemon = True,
+                                                            exc_queue = None):
         if name is None:
             name = u"{0!r} reader".format(io_handler)
-        IOThread.__init__(self, io_handler, name, daemon)
+        IOThread.__init__(self, io_handler, name, daemon, exc_queue)
 
     def run(self):
         """The thread function."""
@@ -487,7 +499,11 @@ class ReadingThread(IOThread):
                     raise TypeError("Unexpected result type from prepare()")
             if self.io_handler.is_readable():
                 logger.debug("{0}: readable".format(self.name))
-                self.io_handler.handle_read()
+                fileno = self.io_handler.fileno()
+                if fileno is not None:
+                    readable = select.select([fileno], [], [], 1)[0]
+                    if readable:
+                        self.io_handler.handle_read()
             elif not prepared:
                 if timeout:
                     time.sleep(timeout)
@@ -501,10 +517,11 @@ class WrittingThread(IOThread):
     
     It can be used (together with `WrittingThread`) instead of 
     a main loop."""
-    def __init__(self, io_handler, name = None, daemon = True):
+    def __init__(self, io_handler, name = None, daemon = True,
+                                                            exc_queue = None):
         if name is None:
             name = u"{0!r} writer".format(io_handler)
-        IOThread.__init__(self, io_handler, name, daemon)
+        IOThread.__init__(self, io_handler, name, daemon, exc_queue)
 
     def run(self):
         """The thread function."""
@@ -512,8 +529,145 @@ class WrittingThread(IOThread):
         while not self._quit:
             if self.io_handler.is_writable():
                 logger.debug("{0}: writable".format(self.name))
-                self.io_handler.handle_write()
+                fileno = self.io_handler
+                if fileno:
+                    writable = select.select([], [fileno], [], 1)[1]
+                    if writable:
+                        self.io_handler.handle_read()
+                    self.io_handler.handle_write()
             else:
                 logger.debug("{0}: waiting for writaility".format(self.name))
                 if not self.io_handler.wait_for_writability():
                     break
+
+class EventDispatcherThread(object):
+    """Event dispatcher thread.
+    
+    :Ivariables:
+        - `name`: thread name (for debugging)
+        - `event_queue`: the event queue to poll
+        - `thread`: the actual thread object
+        - `exc_info`: this will hold exception information tuple
+        whenever the thread was aborted by an exception.
+    :Types:
+        - `name`: `unicode`
+        - `event_queue`: `EventQueue`
+        - `thread`: `threading.Thread`
+        - `exc_info`: (type, value, traceback) tuple
+    """
+    def __init__(self, event_queue, name = None,
+                                            daemon = True, exc_queue = None):
+        if name is None:
+            name = "event dispatcher"
+        self.name = name
+        self.thread = threading.Thread(name = name, target = self.run)
+        self.thread.daemon = daemon
+        self.exc_info = None
+        self.exc_queue = exc_queue
+        self.event_queue = event_queue
+
+    def start(self):
+        self.thread.start()
+
+    def is_alive(self):
+        return self.thread.is_alive()
+
+    def join(self, timeout):
+        return self.thread.join(timeout)
+
+    def run(self):
+        """The thread function. Calls `self.run()` and if it raises
+        an exception, stores it in self.exc_info and exc_queue
+        """
+        logger.debug("{0}: entering thread".format(self.name))
+        try:
+            self.event_queue.loop()
+        except:
+            logger.debug("{0}: aborting thread".format(self.name))
+            self.exc_info = sys.exc_info()
+            logger.exception(u"exception in the {0!r} thread:".format(
+                                                                self.name))
+            if self.exc_queue:
+                self.exc_queue.put( (self, self.exc_info) )
+        else:
+            logger.debug("{0}: exiting thread".format(self.name))
+
+
+class ThreadPool(object):
+    """Base class for main loop implementations."""
+    def __init__(self, handlers = []):
+        self.io_handlers = []
+        self.event_queue = EventQueue(handlers = handlers + [self])
+        for handler in handlers:
+            if isinstance(handler, IOHandler):
+                self.io_handlers.append(handler)
+                handler.set_event_queue(self.event_queue)
+        self.exc_queue = Queue.Queue()
+        self.io_threads = []
+        self.event_thread = None
+
+    def start(self, daemon = False):
+        self.io_threads = []
+        for handler in self.io_handlers:
+            reader = ReadingThread(handler, daemon = daemon,
+                                                    exc_queue = self.exc_queue)
+            writter = WrittingThread(handler, daemon = daemon,
+                                                    exc_queue = self.exc_queue)
+            self.io_threads += [reader, writter]
+        self.event_thread = EventDispatcherThread(self.event_queue,
+                                    daemon = daemon, exc_queue = self.exc_queue)
+        self.event_thread.start()
+        for thread in self.io_threads:
+            thread.start()
+
+    def stop(self, join = False, timeout = None):
+        logger.debug("Closing the io handlers...")
+        for handler in self.io_handlers:
+            handler.close()
+        logger.debug("Sending the QUIT signal")
+        self.event_queue.post_event(QUIT)
+        logger.debug("  sent")
+        for thread in self.io_threads:
+            logger.debug("Stopping thread: {0!r}".format(thread))
+            thread.stop()
+        if not join:
+            return
+        threads = list(self.io_threads)
+        if self.event_thread:
+            threads.append(self.event_thread)
+        if timeout is None:
+            for thread in threads:
+                thread.join()
+        else:
+            timeout1 = (timeout * 0.01) / len(threads)
+            threads_left = []
+            for thread in threads:
+                logger.debug("Quick-joining thread {0!r}...".format(thread))
+                thread.join(timeout1)
+                if thread.is_alive():
+                    logger.debug("  thread still alive".format(thread))
+                    threads_left.append(thread)
+            if threads_left:
+                timeout2 = (timeout * 0.99) / len(threads_left)
+                for thread in threads_left:
+                    logger.debug("Joining thread {0!r}...".format(thread))
+                    thread.join(timeout2)
+        self.io_threads = []
+        self.event_thread = None
+
+    def finished(self):
+        return self.event_thread is None or not self.event_thread.is_alive()
+
+    def loop(self, timeout):
+        if not self.event_thread:
+            return
+        while self.event_thread.is_alive():
+            self.loop_iteration(timeout)
+
+    def loop_iteration(self, timeout = 0.1):
+        try:
+            thread, exc_info = self.exc_queue.get(True, timeout)
+        except Queue.Empty:
+            return
+        exc_type, exc_value, ext_stack = exc_info
+        raise exc_type, exc_value, ext_stack

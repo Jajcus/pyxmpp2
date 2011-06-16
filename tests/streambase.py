@@ -65,29 +65,32 @@ class IgnoreEventHandler(EventRecorder):
 
 class TestInitiatorSelect(NetworkTestCase):
     def setUp(self):
+        NetworkTestCase.setUp(self)
         self.stream = None
         self.transport = None
+        self.loop = None
 
     def start_transport(self, handlers):
         self.transport = TCPTransport()
-        self.make_loop(handlers)
-        self._loop.add_io_handler(self.transport)
+        self.make_loop(handlers + [self.transport])
 
     def connect_transport(self):
         addr, port = self.start_server()
         self.transport.connect(addr, port)
 
     def make_loop(self, handlers):
-        self._loop = ioevents.SelectMainLoop(handlers)
+        self.loop = ioevents.SelectMainLoop(handlers)
 
     def tearDown(self):
-        self._loop = None
+        NetworkTestCase.tearDown(self)
+        self.loop = None
         self.stream = None
+        self.transport = None
 
     def wait(self, timeout = TIMEOUT, expect = None):
         timeout = time.time() + timeout
-        while not self._loop._quit:
-            self._loop.loop_iteration(0.1)
+        while not self.loop.finished():
+            self.loop.loop_iteration(0.1)
             if expect:
                 match = expect.match(self.server.rdata)
                 if match:
@@ -96,7 +99,7 @@ class TestInitiatorSelect(NetworkTestCase):
                 break
 
     def wait_short(self, timeout = 0.1):
-        self._loop.loop_iteration(timeout)
+        self.loop.loop_iteration(timeout)
 
     def test_connect_close(self):
         handler = JustConnectEventHandler()
@@ -122,7 +125,7 @@ class TestInitiatorSelect(NetworkTestCase):
         self.wait(expect = re.compile(".*(</stream:stream>)"))
         self.server.write(STREAM_TAIL)
         self.server.close()
-        self.wait()
+        self.wait(1)
         self.assertFalse(self.stream.is_connected())
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [ConnectingEvent, ConnectedEvent,
@@ -147,76 +150,67 @@ class TestInitiatorSelect(NetworkTestCase):
         self.server.close()
         self.wait()
         event_classes = [e.__class__ for e in handler.events_received]
+        
+        # when exception was raised by a thread DisconnectedEvent won't
+        # be sent
+        if event_classes[-1] == DisconnectedEvent:
+            event_classes = event_classes[:-1]
+
         self.assertEqual(event_classes, [ConnectingEvent, ConnectedEvent,
-                                    StreamConnectedEvent, DisconnectedEvent])
+                                    StreamConnectedEvent])
 
 @unittest.skipIf(not hasattr(ioevents, "PollMainLoop"), "No poll() support")
 class TestInitiatorPoll(TestInitiatorSelect):
     def make_loop(self, handlers):
-        self._loop = ioevents.PollMainLoop(handlers)
+        self.loop = ioevents.PollMainLoop(handlers)
 
 class TestInitiatorThreaded(TestInitiatorSelect):
-    def start_transport(self):
-        self.transport = TCPTransport()
-        self._reader =  ioevents.ReadingThread(self.transport)
-        self._writter =  ioevents.WrittingThread(self.transport)
-        self._writter.start()
-        self._reader.start()
+    def make_loop(self, handlers):
+        self.loop = ioevents.ThreadPool(handlers)
+
+    def connect_transport(self):
+        TestInitiatorSelect.connect_transport(self)
+        self.loop.start()
 
     def tearDown(self):
-        TestInitiatorSelect.tearDown(self)
-        self._reader.stop()
-        self._reader = None
-        self._writter.stop()
-        self._writter = None
-        time.sleep(0.01)
-
-    def wait(self, timeout = TIMEOUT, expect = None):
-        timeout = time.time() + timeout
-        logger.debug("wait")
-        while True:
-            if expect:
-                match = expect.match(self.server.rdata)
-                if match:
-                    return match.group(1)
-            if self._reader.exc_info is not None:
-                exc_info = self._reader.exc_info
-                self._reader.exc_info = None
-            elif self._writter.exc_info is not None:
-                exc_info = self._writter.exc_info
-                self._writter.exc_info = None
+        if self.loop:
+            logger.debug("Stopping the thread pool")
+            try:
+                self.loop.stop(True, 2)
+            except Exception:
+                logger.exception("self.loop.stop failed:")
             else:
-                exc_info = None
-            if exc_info is not None:
-                print "exc_info:", repr(exc_info)
-                e_type, e_value, e_trace = exc_info
-                raise e_type, e_value, e_trace
-            if not self._reader.thread.is_alive() and (
-                                        not self._writter.thread.is_alive()):
-                break
-            logger.debug("wait iter")
-            time.sleep(0.1)
-            if time.time() > timeout:
-                break
-
-    def wait_short(self, timeout = 0.1):
-        time.sleep(timeout)
+                logger.debug("  done (or timed out)")
+        TestInitiatorSelect.tearDown(self)
 
 class TestReceiverSelect(NetworkTestCase):
     def setUp(self):
-        self.make_loop()
+        NetworkTestCase.setUp(self)
+        self.stream = None
+        self.transport = None
+        self.loop = None
+        self.addr = None
 
-    def make_loop(self):
-        self._loop = ioevents.SelectMainLoop()
+    def start_transport(self, handlers):
+        sock = self.make_listening_socket()
+        self.addr = sock.getsockname()
+        self.start_client(self.addr)
+        self.transport = TCPTransport(sock = sock.accept()[0])
+        self.make_loop(handlers + [self.transport])
+
+    def make_loop(self, handlers):
+        self.loop = ioevents.SelectMainLoop(handlers)
 
     def tearDown(self):
-        self._loop = None
+        NetworkTestCase.tearDown(self)
+        self.loop = None
         self.stream = None
+        self.transport = None
 
-    def loop(self, timeout = TIMEOUT, expect = None):
+    def wait(self, timeout = TIMEOUT, expect = None):
         timeout = time.time() + timeout
-        while self.transport._state not in ("closed", "aborted"):
-            self._loop.loop_iteration(0.1)
+        while not self.loop._quit:
+            self.loop.loop_iteration(0.1)
             if expect:
                 match = expect.match(self.client.rdata)
                 if match:
@@ -224,62 +218,61 @@ class TestReceiverSelect(NetworkTestCase):
             if time.time() > timeout:
                 break
 
-    def loop_iter(self, timeout):
-        self._loop.loop_iteration(0.1)
+    def wait_short(self, timeout = 0.1):
+        self.loop.loop_iteration(timeout)
+
+    def tearDown(self):
+        self.loop = None
+        self.stream = None
 
     def test_stream_connect_disconnect(self):
-        sock = self.make_listening_socket()
-        self.start_client(sock.getsockname())
         handler = JustStreamConnectEventHandler()
-        self.stream = StreamBase(u"jabber:client", [handler])
-        self.transport = TCPTransport(sock = sock.accept()[0])
-        self._loop.add_io_handler(self.transport)
-        self.stream.receive(self.transport, sock.getsockname()[0])
+        self.start_transport([handler])
+        self.stream = StreamBase(u"jabber:client", [])
+        self.stream.receive(self.transport, self.addr[0])
         self.client.write(C2S_CLIENT_STREAM_HEAD)
-        self.loop_iter(1)
+        self.wait_short(0.5)
         self.client.write(STREAM_TAIL)
-        self.loop()
+        self.wait()
         self.assertFalse(self.stream.is_connected())
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [StreamConnectedEvent,
                                                             DisconnectedEvent])
 
     def test_parse_error(self):
-        sock = self.make_listening_socket()
-        self.start_client(sock.getsockname())
         handler = IgnoreEventHandler()
-        self.stream = StreamBase(u"jabber:client", [handler])
-        self.transport = TCPTransport(sock = sock.accept()[0])
-        self._loop.add_io_handler(self.transport)
-        self.stream.receive(self.transport, sock.getsockname()[0])
+        self.start_transport([handler])
+        self.stream = StreamBase(u"jabber:client", [])
+        self.stream.receive(self.transport, self.addr[0])
         self.client.write(C2S_CLIENT_STREAM_HEAD)
-        self.loop_iter(1)
+        self.wait_short(0.2)
         self.client.write("</stream:test>")
         with self.assertRaises(StreamParseError):
-            self.loop()
+            self.wait()
         self.assertFalse(self.stream.is_connected())
-        self.loop_iter(1)
+        self.wait_short(0.1)
         self.client.wait(1)
         self.assertTrue(self.client.eof)
         self.assertTrue(self.client.rdata.endswith(PARSE_ERROR_RESPONSE))
         self.client.close()
-        self.loop_iter(1)
+        self.wait()
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [StreamConnectedEvent, 
                                                             DisconnectedEvent])
 
 @unittest.skipIf(not hasattr(ioevents, "PollMainLoop"), "No poll() support")
 class TestReceiverPoll(TestReceiverSelect):
-    def make_loop(self):
-        self._loop = ioevents.PollMainLoop()
+    def make_loop(self, handlers):
+        self.loop = ioevents.PollMainLoop(handlers)
+
 
 def suite():
      suite = unittest.TestSuite()
      suite.addTest(unittest.makeSuite(TestInitiatorSelect))
-     #suite.addTest(unittest.makeSuite(TestReceiverSelect))
+     suite.addTest(unittest.makeSuite(TestReceiverSelect))
      suite.addTest(unittest.makeSuite(TestInitiatorPoll))
-     #suite.addTest(unittest.makeSuite(TestReceiverPoll))
-     #suite.addTest(unittest.makeSuite(TestInitiatorThreaded))
+     suite.addTest(unittest.makeSuite(TestReceiverPoll))
+     suite.addTest(unittest.makeSuite(TestInitiatorThreaded))
      return suite
 
 if __name__ == '__main__':

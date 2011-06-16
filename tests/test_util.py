@@ -124,7 +124,8 @@ class NetReaderWritter(object):
 
     def close(self):
         with self.lock:
-            self.sock.close()
+            if self.sock is not None:
+                self.sock.close()
             self.sock = None
             self.wdata = None
             self.write_cond.notify()
