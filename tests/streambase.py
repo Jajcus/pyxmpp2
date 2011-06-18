@@ -5,16 +5,20 @@ import unittest
 import time
 import re
 import logging
+import select
 
 from xml.etree.ElementTree import Element, SubElement, XML
 
 from pyxmpp2.streambase import StreamBase
-from pyxmpp2.events import EventHandler, event_handler, QUIT
 from pyxmpp2.streamevents import *
 from pyxmpp2.exceptions import StreamParseError
 from pyxmpp2.jid import JID
-from pyxmpp2 import ioevents
 from pyxmpp2.transport import TCPTransport
+
+from pyxmpp2.mainloop.interfaces import EventHandler, event_handler, QUIT
+from pyxmpp2.mainloop.select import SelectMainLoop
+from pyxmpp2.mainloop.poll import PollMainLoop
+from pyxmpp2.mainloop.threads import ThreadPool
 
 from test_util import NetworkTestCase
 
@@ -79,7 +83,7 @@ class TestInitiatorSelect(NetworkTestCase):
         self.transport.connect(addr, port)
 
     def make_loop(self, handlers):
-        self.loop = ioevents.SelectMainLoop(handlers)
+        self.loop = SelectMainLoop(handlers)
 
     def tearDown(self):
         NetworkTestCase.tearDown(self)
@@ -159,14 +163,14 @@ class TestInitiatorSelect(NetworkTestCase):
         self.assertEqual(event_classes, [ConnectingEvent, ConnectedEvent,
                                     StreamConnectedEvent])
 
-@unittest.skipIf(not hasattr(ioevents, "PollMainLoop"), "No poll() support")
+@unittest.skipIf(not hasattr(select, "poll"), "No poll() support")
 class TestInitiatorPoll(TestInitiatorSelect):
     def make_loop(self, handlers):
-        self.loop = ioevents.PollMainLoop(handlers)
+        self.loop = PollMainLoop(handlers)
 
 class TestInitiatorThreaded(TestInitiatorSelect):
     def make_loop(self, handlers):
-        self.loop = ioevents.ThreadPool(handlers)
+        self.loop = ThreadPool(handlers)
 
     def connect_transport(self):
         TestInitiatorSelect.connect_transport(self)
@@ -199,7 +203,7 @@ class TestReceiverSelect(NetworkTestCase):
         self.make_loop(handlers + [self.transport])
 
     def make_loop(self, handlers):
-        self.loop = ioevents.SelectMainLoop(handlers)
+        self.loop = SelectMainLoop(handlers)
 
     def tearDown(self):
         NetworkTestCase.tearDown(self)
@@ -260,10 +264,10 @@ class TestReceiverSelect(NetworkTestCase):
         self.assertEqual(event_classes, [StreamConnectedEvent, 
                                                             DisconnectedEvent])
 
-@unittest.skipIf(not hasattr(ioevents, "PollMainLoop"), "No poll() support")
+@unittest.skipIf(not hasattr(select, "poll"), "No poll() support")
 class TestReceiverPoll(TestReceiverSelect):
     def make_loop(self, handlers):
-        self.loop = ioevents.PollMainLoop(handlers)
+        self.loop = PollMainLoop(handlers)
 
 
 def suite():
@@ -279,7 +283,7 @@ if __name__ == '__main__':
     import logging
     logger = logging.getLogger()
     logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.ERROR)
     unittest.TextTestRunner(verbosity=2).run(suite())
 
 # vi: sts=4 et sw=4

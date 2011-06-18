@@ -145,6 +145,14 @@ class Event:
     def __unicode__(self):
         raise NotImplementedError
 
+QUIT = None
+class QuitEvent(Event):
+    @classmethod
+    def __unicode__(self):
+        return "Quit"
+QUIT = QuitEvent()
+del QuitEvent
+
 class EventHandler:
     """Base class for PyXMPP event handlers."""
     # pylint: disable-msg=W0232,R0903

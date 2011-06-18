@@ -44,10 +44,10 @@ from .exceptions import FatalStreamError, StreamParseError
 from .constants import STREAM_QNP, XML_LANG_QNAME, STREAM_ROOT_TAG
 from .settings import XMPPSettings
 from .xmppserializer import serialize
-from .events import EventHandler, event_handler
 from .streamevents import ConnectedEvent
 from .streamevents import StreamConnectedEvent, GotFeaturesEvent
 from .streamevents import AuthenticatedEvent, StreamRestartedEvent
+from .mainloop.interfaces import EventHandler, event_handler
 
 XMPPSettings.add_defaults(
         {

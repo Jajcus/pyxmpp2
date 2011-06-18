@@ -22,8 +22,7 @@
 
 from __future__ import absolute_import
 
-from .events import Event
-
+from .mainloop.interfaces import Event
 
 class StreamEvent(Event):
     """Base class for all stream events."""

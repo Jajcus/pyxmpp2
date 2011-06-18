@@ -32,7 +32,7 @@ import time
 import select
 import logging
 
-from .events import QUIT
+from .interfaces import QUIT, HandlerReady, PrepareAgain
 from .base import MainLoopBase
 
 logger = logging.getLogger("pyxmpp.mainloop.select")
@@ -69,8 +69,7 @@ class SelectMainLoop(MainLoopBase):
         """A loop iteration - check any scheduled events
         and I/O available and run the handlers.
         """
-        if self.event_queue.flush() is QUIT:
-            self._quit = True
+        if self.check_events():
             return 0
         sources_handled = 0
         now = time.time()
@@ -81,8 +80,7 @@ class SelectMainLoop(MainLoopBase):
                 self._timeout_handlers = self._timeout_handlers[1:]
                 handler()
                 sources_handled += 1
-            if self.event_queue.flush() is QUIT:
-                self._quit = True
+            if self.check_events():
                 return sources_handled
         if self._timeout_handlers and schedule:
             timeout = min(timeout, schedule - now)

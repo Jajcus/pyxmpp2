@@ -31,15 +31,7 @@ from collections import defaultdict
 
 logger = logging.getLogger("pyxmpp.mainloop.events")
 
-from .interfaces import Event, EventHandler
-
-QUIT = None
-class QuitEvent(Event):
-    @classmethod
-    def __unicode__(self):
-        return "Quit"
-QUIT = QuitEvent()
-del QuitEvent
+from .interfaces import Event, EventHandler, QUIT
 
 class EventQueue(object):
     def __init__(self, handlers = None):

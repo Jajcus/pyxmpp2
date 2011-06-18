@@ -32,7 +32,7 @@ import time
 import select
 import logging
 
-from .events import QUIT
+from .interfaces import QUIT, HandlerReady, PrepareAgain
 from .base import MainLoopBase
 
 logger = logging.getLogger("pyxmpp.mainloop.poll")
@@ -55,9 +55,8 @@ class PollMainLoop(MainLoopBase):
 
     def _configure_io_handler(self, handler):
         """Register an io-handler at the polling object."""
-        if self.event_queue.flush() is QUIT:
-            self._quit = True
-            return 0
+        if self.check_events():
+            return
         if handler in self._unprepared_handlers:
             old_fileno = self._unprepared_handlers[handler]
             logger.debug(" preparing handler: {0!r}".format(handler))
@@ -135,8 +134,7 @@ class PollMainLoop(MainLoopBase):
                 self._timeout_handlers = self._timeout_handlers[1:]
                 handler()
                 sources_handled += 1
-            if self.event_queue.flush() is QUIT:
-                self._quit = True
+            if self.check_events():
                 return sources_handled
         if self._timeout_handlers and schedule:
             timeout = min(timeout, schedule - now)

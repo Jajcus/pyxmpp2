@@ -22,10 +22,11 @@ from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 
+import time
 import logging
 
-from .events import EventQueue, QUIT
-from .interfaces import EventHandler, IOHandler, MainLoop
+from .events import EventQueue
+from .interfaces import EventHandler, IOHandler, MainLoop, QUIT
 
 logger = logging.getLogger("pyxmpp.mainloop.base")
 
@@ -37,12 +38,30 @@ class MainLoopBase(MainLoop):
             handlers = []
         self.event_queue = EventQueue(handlers)
         self._quit = False
+        self._started = False
         event_handlers = []
         for handler in handlers:
             if isinstance(handler, IOHandler):
                 self.add_io_handler(handler)
             elif isinstance(handler, EventHandler):
                 event_handlers.append(handler)
+    def finished(self):
+        return self._quit
+    def started(self):
+        return self._started
     def quit(self):
         """Make the loop stop after the current iteration."""
         self.event_queue.post_event(QUIT)
+    def loop(self, timeout = 1):
+        while not self._quit:
+            self.loop_iteration(timeout)
+    def loop_iteration(self, timeout):
+        if self.check_events():
+            return
+        time.sleep(timeout)
+    def check_events(self):
+        if self.event_queue.flush() is QUIT:
+            self._quit = True
+            return True
+        return False
+
