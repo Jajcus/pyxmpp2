@@ -16,7 +16,7 @@
 #
 # pylint: disable-msg=W0201
 
-"""PyXMPP main event loop – the event and I/O framework, aka re-inventing the
+"""PyXMPP main event loop - the event and I/O framework, aka re-inventing the
 wheel."""
 
 from __future__ import absolute_import

@@ -53,6 +53,7 @@ setup(
     #-- Python modules
     packages = [
         'pyxmpp2',
+        'pyxmpp2.mainloop',
         'pyxmpp2.jabber',
         'pyxmpp2.jabberd',
         'pyxmpp2.sasl',

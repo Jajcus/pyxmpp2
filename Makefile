@@ -31,8 +31,8 @@ publish:
 
 pylint:	TODO.pylint
 
-TODO.pylint:
-	./auxtools/pylint.sh | tee TODO.pylint
+TODO.pylint: build
+	./auxtools/pylint.sh $(CHECK_MODULE) | tee TODO.pylint
 
 ChangeLog: 
 	test -d .git && make cl-stamp || :

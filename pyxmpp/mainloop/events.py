@@ -27,45 +27,19 @@ import threading
 import logging
 import inspect
 
-from abc import ABCMeta
 from collections import defaultdict
 
-logger = logging.getLogger("pyxmpp.events")
+logger = logging.getLogger("pyxmpp.mainloop.events")
 
-class Event:
-    __metaclass__ = ABCMeta
-    def __unicode__(self):
-        raise NotImplementedError
+from .abc import Event, EventHandler
 
 QUIT = None
-class QuitEvent:
+class QuitEvent(Event):
     @classmethod
-    def __new__(cls):
-        if QUIT is not None:
-            return QUIT
-        return Event.__new__(cls)
     def __unicode__(self):
         return "Quit"
 QUIT = QuitEvent()
-
-class EventHandler:
-    """Base class for PyXMPP event handlers."""
-    # pylint: disable-msg=W0232,R0903
-    __metaclass__ = ABCMeta
-
-def event_handler(event_class = None):
-    """Method decorator generator for decorating event handlers.
-    
-    :Parameters:
-        - `event_class`: event class expected
-    :Types:
-        - `event_class`: subclass of `Event`
-    """
-    def decorator(func):
-        """The decorator"""
-        func._pyxmpp_event_handled = event_class
-        return func
-    return decorator
+del QuitEvent
 
 class EventQueue(object):
     def __init__(self, handlers = None):
@@ -100,6 +74,7 @@ class EventQueue(object):
             for name, handler in inspect.getmembers(obj, callable):
                 if not hasattr(handler, "_pyxmpp_event_handled"):
                     continue
+                # pylint: disable-msg=W0212
                 event_class = handler._pyxmpp_event_handled
                 handler_map[event_class].append( (i, handler) )
         self._handler_map = handler_map
