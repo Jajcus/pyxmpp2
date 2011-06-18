@@ -25,7 +25,7 @@ __docformat__ = "restructuredtext en"
 import logging
 
 from .events import EventQueue, QUIT
-from .abc import EventHandler, IOHandler, MainLoop
+from .interfaces import EventHandler, IOHandler, MainLoop
 
 logger = logging.getLogger("pyxmpp.mainloop.base")
 

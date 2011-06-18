@@ -35,7 +35,7 @@ import logging
 import sys
 import Queue
 
-from .abc import MainLoop, HandlerReady, PrepareAgain, IOHandler
+from .interfaces import MainLoop, HandlerReady, PrepareAgain, IOHandler
 from .events import EventQueue, QUIT
 
 logger = logging.getLogger("pyxmpp.mainloop.threads")

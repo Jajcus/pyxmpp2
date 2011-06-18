@@ -31,7 +31,7 @@ from collections import defaultdict
 
 logger = logging.getLogger("pyxmpp.mainloop.events")
 
-from .abc import Event, EventHandler
+from .interfaces import Event, EventHandler
 
 QUIT = None
 class QuitEvent(Event):

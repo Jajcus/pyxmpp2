@@ -35,7 +35,7 @@ from functools import partial
 from abc import ABCMeta
 from xml.etree import ElementTree
 
-from .mainloop.abc import IOHandler, HandlerReady, PrepareAgain
+from .mainloop.interfaces import IOHandler, HandlerReady, PrepareAgain
 from .settings import XMPPSettings
 from .exceptions import DNSError, PyXMPPIOError
 from .streamevents import ResolvingSRVEvent, ResolvingAddressEvent
