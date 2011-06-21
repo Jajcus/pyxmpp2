@@ -25,33 +25,38 @@ __docformat__ = "restructuredtext en"
 import time
 import logging
 
-from .events import EventQueue
+from .events import EventDispatcher
 from .interfaces import EventHandler, IOHandler, MainLoop, QUIT
+from ..settings import XMPPSettings
 
 logger = logging.getLogger("pyxmpp.mainloop.base")
 
 class MainLoopBase(MainLoop):
     """Base class for main loop implementations."""
     # pylint: disable-msg=W0223
-    def __init__(self, handlers = None):
+    def __init__(self, settings = None, handlers = None):
+        if settings is None:
+            self.settings = XMPPSettings()
+        else:
+            self.settings = settings
         if not handlers:
             handlers = []
-        self.event_queue = EventQueue(handlers)
+        self.event_dispatcher = EventDispatcher(self.settings, handlers)
+        self.event_queue = self.settings["event_queue"]
         self._quit = False
         self._started = False
-        event_handlers = []
         for handler in handlers:
             if isinstance(handler, IOHandler):
                 self.add_io_handler(handler)
             elif isinstance(handler, EventHandler):
-                event_handlers.append(handler)
+                self.event_dispatcher.add_handler(handler)
     def finished(self):
         return self._quit
     def started(self):
         return self._started
     def quit(self):
         """Make the loop stop after the current iteration."""
-        self.event_queue.post_event(QUIT)
+        self.event_queue.put(QUIT)
     def loop(self, timeout = 1):
         while not self._quit:
             self.loop_iteration(timeout)
@@ -60,7 +65,7 @@ class MainLoopBase(MainLoop):
             return
         time.sleep(timeout)
     def check_events(self):
-        if self.event_queue.flush() is QUIT:
+        if self.event_dispatcher.flush() is QUIT:
             self._quit = True
             return True
         return False

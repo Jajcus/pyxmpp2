@@ -323,7 +323,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, EventHandler):
         """
         event.stream = self
         logger.debug(u"Stream event: {0}".format(event))
-        self.event_queue.post_event(event)
+        self.settings["event_queue"].put(event)
         return False
 
     def transport_connected(self):

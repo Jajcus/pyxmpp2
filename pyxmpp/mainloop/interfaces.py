@@ -66,9 +66,6 @@ class IOHandler:
     def fileno(self):
         """Return file descriptor to poll or select."""
         raise NotImplementedError
-    def set_event_queue(self, queue):
-        """Set the event queue to be used by the IOHandler."""
-        pass
     def set_blocking(self, blocking = True):
         """Force the handler into blocking or nonblocking mode, so the
         `handle_write()` and `handle_read()` methods are guaranteed to block

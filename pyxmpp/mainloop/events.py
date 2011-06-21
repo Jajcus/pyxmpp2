@@ -32,17 +32,22 @@ from collections import defaultdict
 logger = logging.getLogger("pyxmpp.mainloop.events")
 
 from .interfaces import Event, EventHandler, QUIT
+from ..settings import XMPPSettings
 
-class EventQueue(object):
-    def __init__(self, handlers = None):
+def event_queue_factory(settings):
+    return Queue.Queue(settings["event_queue_max_size"])
+
+class EventDispatcher(object):
+    def __init__(self, settings = None, handlers = None):
+        if settings is None:
+            settings = XMPPSettings()
+        self.queue = settings["event_queue"]
         self._handlers_map = defaultdict(list)
-        if handlers is None:
-            self.handlers = []
+        if handlers:
+            self.handlers = list(handlers)
         else:
-            self.handlers = [handler for handler in handlers 
-                                    if isinstance(handler, EventHandler)]
+            self.handlers = []
         self._update_handlers()
-        self.queue = Queue.Queue()
         self.lock = threading.RLock()
 
     def add_handler(self, handler):
@@ -71,10 +76,6 @@ class EventQueue(object):
                 handler_map[event_class].append( (i, handler) )
         self._handler_map = handler_map
 
-    def post_event(self, event):
-        logger.debug("Posting event: {0!r}".format(event))
-        self.queue.put(event)
-
     def dispatch(self, block = False, timeout = None):
         logger.debug(" dispatching...")
         try:
@@ -100,13 +101,25 @@ class EventQueue(object):
         finally:
             self.queue.task_done()
 
-    def flush(self):
-        while True:
-            event = self.dispatch(False)
-            if event in (None, QUIT):
-                return event
+    def flush(self, dispatch = True):
+        if dispatch:
+            while True:
+                event = self.dispatch(False)
+                if event in (None, QUIT):
+                    return event
+        else:
+            while True:
+                try:
+                    self.queue.get(False)
+                except Queue.Empty:
+                    return None
 
     def loop(self):
         while self.dispatch(True) is not QUIT:
             pass
+
+XMPPSettings.add_defaults({
+                            u"event_queue_max_size": None, 
+                            })
+XMPPSettings.add_default_factory("event_queue", event_queue_factory, True)
 

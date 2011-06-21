@@ -39,16 +39,15 @@ logger = logging.getLogger("pyxmpp.mainloop.select")
 
 class SelectMainLoop(MainLoopBase):
     """Main event loop implementation based on the `select.select()` call."""
-    def __init__(self, handlers = []):
+    def __init__(self, settings = None, handlers = None):
         self._handlers = []
         self._prepared = set()
         self._timeout_handlers = []
-        MainLoopBase.__init__(self, handlers)
+        MainLoopBase.__init__(self, settings, handlers)
 
     def add_io_handler(self, handler):
         """Add an I/O handler to the loop."""
         self._handlers.append(handler)
-        handler.set_event_queue(self.event_queue)
 
     def update_io_handler(self, handler):
         """Add an I/O handler to the loop."""

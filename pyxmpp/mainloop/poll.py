@@ -34,24 +34,24 @@ import logging
 
 from .interfaces import QUIT, HandlerReady, PrepareAgain
 from .base import MainLoopBase
+from ..settings import XMPPSettings
 
 logger = logging.getLogger("pyxmpp.mainloop.poll")
 
 class PollMainLoop(MainLoopBase):
     """Main event loop based on the poll() syscall."""
-    def __init__(self, handlers):
+    def __init__(self, settings = None, handlers = None):
         self._handlers = {}
         self._unprepared_handlers = {}
         self.poll = select.poll()
         self._timeout_handlers = []
         self._timeout = None
-        MainLoopBase.__init__(self, handlers)
+        MainLoopBase.__init__(self, settings, handlers)
 
     def add_io_handler(self, handler):
         """Add an I/O handler to the loop."""
         self._unprepared_handlers[handler] = None
         self._configure_io_handler(handler)
-        handler.set_event_queue(self.event_queue)
 
     def _configure_io_handler(self, handler):
         """Register an io-handler at the polling object."""

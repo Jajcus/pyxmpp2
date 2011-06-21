@@ -35,8 +35,10 @@ import logging
 import sys
 import Queue
 
-from .interfaces import MainLoop, HandlerReady, PrepareAgain, IOHandler, QUIT
-from .events import EventQueue
+from .interfaces import MainLoop, HandlerReady, PrepareAgain
+from .interfaces import EventHandler, IOHandler, QUIT
+from .events import EventDispatcher
+from ..settings import XMPPSettings
 
 logger = logging.getLogger("pyxmpp.mainloop.threads")
 
@@ -86,8 +88,8 @@ class IOThread(object):
         except:
             logger.debug("{0}: aborting thread".format(self.name))
             self.exc_info = sys.exc_info()
-            logger.exception(u"exception in the {0!r} thread:".format(
-                                                                self.name))
+            logger.debug(u"exception in the {0!r} thread:"
+                            .format(self.name), exc_info = self.exc_info)
             if self.exc_queue:
                 self.exc_queue.put( (self, self.exc_info) )
         else:
@@ -185,11 +187,11 @@ class EventDispatcherThread(object):
         whenever the thread was aborted by an exception.
     :Types:
         - `name`: `unicode`
-        - `event_queue`: `EventQueue`
+        - `event_queue`: `Queue.Queue`
         - `thread`: `threading.Thread`
         - `exc_info`: (type, value, traceback) tuple
     """
-    def __init__(self, event_queue, name = None,
+    def __init__(self, event_dispatcher, name = None,
                                             daemon = True, exc_queue = None):
         if name is None:
             name = "event dispatcher"
@@ -198,7 +200,7 @@ class EventDispatcherThread(object):
         self.thread.daemon = daemon
         self.exc_info = None
         self.exc_queue = exc_queue
-        self.event_queue = event_queue
+        self.event_dispatcher = event_dispatcher
 
     def start(self):
         self.thread.start()
@@ -215,12 +217,12 @@ class EventDispatcherThread(object):
         """
         logger.debug("{0}: entering thread".format(self.name))
         try:
-            self.event_queue.loop()
+            self.event_dispatcher.loop()
         except:
             logger.debug("{0}: aborting thread".format(self.name))
             self.exc_info = sys.exc_info()
-            logger.exception(u"exception in the {0!r} thread:".format(
-                                                                self.name))
+            logger.debug(u"exception in the {0!r} thread:"
+                            .format(self.name), exc_info = self.exc_info)
             if self.exc_queue:
                 self.exc_queue.put( (self, self.exc_info) )
         else:
@@ -229,13 +231,18 @@ class EventDispatcherThread(object):
 
 class ThreadPool(MainLoop):
     """Thread pool object, as a replacement for an asychronous event loop."""
-    def __init__(self, handlers = []):
+    def __init__(self, settings = None, handlers = None):
+        if settings is None:
+            self.settings = XMPPSettings()
+        else:
+            self.settings = settings
         self.io_handlers = []
-        self.event_queue = EventQueue(handlers = handlers + [self])
-        for handler in handlers:
-            if isinstance(handler, IOHandler):
-                self.io_handlers.append(handler)
-                handler.set_event_queue(self.event_queue)
+        self.event_queue = self.settings["event_queue"]
+        self.event_dispatcher = EventDispatcher(self.settings, handlers)
+        if handlers:
+            for handler in handlers:
+                if isinstance(handler, IOHandler):
+                    self.io_handlers.append(handler)
         self.exc_queue = Queue.Queue()
         self.io_threads = []
         self.event_thread = None
@@ -248,7 +255,7 @@ class ThreadPool(MainLoop):
             writter = WrittingThread(handler, daemon = daemon,
                                                     exc_queue = self.exc_queue)
             self.io_threads += [reader, writter]
-        self.event_thread = EventDispatcherThread(self.event_queue,
+        self.event_thread = EventDispatcherThread(self.event_dispatcher,
                                     daemon = daemon, exc_queue = self.exc_queue)
         self.event_thread.start()
         for thread in self.io_threads:
@@ -258,8 +265,9 @@ class ThreadPool(MainLoop):
         logger.debug("Closing the io handlers...")
         for handler in self.io_handlers:
             handler.close()
-        logger.debug("Sending the QUIT signal")
-        self.event_queue.post_event(QUIT)
+        if self.event_thread.is_alive():
+            logger.debug("Sending the QUIT signal")
+            self.event_queue.put(QUIT)
         logger.debug("  sent")
         for thread in self.io_threads:
             logger.debug("Stopping thread: {0!r}".format(thread))

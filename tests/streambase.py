@@ -83,7 +83,7 @@ class TestInitiatorSelect(NetworkTestCase):
         self.transport.connect(addr, port)
 
     def make_loop(self, handlers):
-        self.loop = SelectMainLoop(handlers)
+        self.loop = SelectMainLoop(None, handlers)
 
     def tearDown(self):
         NetworkTestCase.tearDown(self)
@@ -145,7 +145,9 @@ class TestInitiatorSelect(NetworkTestCase):
         self.wait_short()
         self.server.write("</stream:test>")
         with self.assertRaises(StreamParseError):
+            logger.debug("-- WAIT start")
             self.wait()
+            logger.debug("-- WAIT end")
         self.assertFalse(self.stream.is_connected())
         self.wait_short()
         self.server.wait(1)
@@ -166,11 +168,11 @@ class TestInitiatorSelect(NetworkTestCase):
 @unittest.skipIf(not hasattr(select, "poll"), "No poll() support")
 class TestInitiatorPoll(TestInitiatorSelect):
     def make_loop(self, handlers):
-        self.loop = PollMainLoop(handlers)
+        self.loop = PollMainLoop(None, handlers)
 
 class TestInitiatorThreaded(TestInitiatorSelect):
     def make_loop(self, handlers):
-        self.loop = ThreadPool(handlers)
+        self.loop = ThreadPool(None, handlers)
 
     def connect_transport(self):
         TestInitiatorSelect.connect_transport(self)
@@ -185,6 +187,7 @@ class TestInitiatorThreaded(TestInitiatorSelect):
                 logger.exception("self.loop.stop failed:")
             else:
                 logger.debug("  done (or timed out)")
+            self.loop.event_dispatcher.flush(False)
         TestInitiatorSelect.tearDown(self)
 
 class TestReceiverSelect(NetworkTestCase):
@@ -203,7 +206,7 @@ class TestReceiverSelect(NetworkTestCase):
         self.make_loop(handlers + [self.transport])
 
     def make_loop(self, handlers):
-        self.loop = SelectMainLoop(handlers)
+        self.loop = SelectMainLoop(None, handlers)
 
     def tearDown(self):
         NetworkTestCase.tearDown(self)
@@ -213,7 +216,7 @@ class TestReceiverSelect(NetworkTestCase):
 
     def wait(self, timeout = TIMEOUT, expect = None):
         timeout = time.time() + timeout
-        while not self.loop._quit:
+        while not self.loop.finished():
             self.loop.loop_iteration(0.1)
             if expect:
                 match = expect.match(self.client.rdata)
@@ -261,14 +264,38 @@ class TestReceiverSelect(NetworkTestCase):
         self.client.close()
         self.wait()
         event_classes = [e.__class__ for e in handler.events_received]
-        self.assertEqual(event_classes, [StreamConnectedEvent, 
-                                                            DisconnectedEvent])
+        
+        # when exception was raised by a thread DisconnectedEvent won't
+        # be sent
+        if event_classes[-1] == DisconnectedEvent:
+            event_classes = event_classes[:-1]
+            
+        self.assertEqual(event_classes, [StreamConnectedEvent])
 
 @unittest.skipIf(not hasattr(select, "poll"), "No poll() support")
 class TestReceiverPoll(TestReceiverSelect):
     def make_loop(self, handlers):
-        self.loop = PollMainLoop(handlers)
+        self.loop = PollMainLoop(None, handlers)
 
+class TestReceiverThreaded(TestReceiverSelect):
+    def make_loop(self, handlers):
+        self.loop = ThreadPool(None, handlers)
+
+    def start_transport(self, handlers):
+        TestReceiverSelect.start_transport(self, handlers)
+        self.loop.start()
+
+    def tearDown(self):
+        if self.loop:
+            logger.debug("Stopping the thread pool")
+            try:
+                self.loop.stop(True, 2)
+            except Exception:
+                logger.exception("self.loop.stop failed:")
+            else:
+                logger.debug("  done (or timed out)")
+            self.loop.event_dispatcher.flush(False)
+        TestReceiverSelect.tearDown(self)
 
 def suite():
      suite = unittest.TestSuite()
@@ -277,6 +304,7 @@ def suite():
      suite.addTest(unittest.makeSuite(TestInitiatorPoll))
      suite.addTest(unittest.makeSuite(TestReceiverPoll))
      suite.addTest(unittest.makeSuite(TestInitiatorThreaded))
+     suite.addTest(unittest.makeSuite(TestReceiverThreaded))
      return suite
 
 if __name__ == '__main__':

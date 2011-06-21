@@ -152,7 +152,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._dst_addr = sock.getpeername()
             self._state = "connected"
             self._blocking = sock.gettimeout() is not None
-        self._event_queue = None
+        self._event_queue = self.settings["event_queue"]
 
     def connect(self, addr, port = None, service = None):
         """Start establishing TCP connection with given address.
@@ -383,7 +383,6 @@ class TCPTransport(XMPPTransport, IOHandler):
                 raise ValueError("Target stream already set")
             self._stream = stream
             self._reader = StreamReader(stream)
-            self._stream.event_queue = self._event_queue
 
     def send_stream_head(self, stanza_namespace, stream_from, stream_to, 
                         stream_id = None, version = u'1.0', language = None):
@@ -481,12 +480,6 @@ class TCPTransport(XMPPTransport, IOHandler):
                 return self._socket.fileno()
         return None
     
-    def set_event_queue(self, queue):
-        with self.lock:
-            self._event_queue = queue
-            if self._stream:
-                self._stream.event_queue = self._event_queue
-
     def set_blocking(self, blocking = True):
         """Force the handler into blocking mode, so the `handle_write()`
         and `handle_read()` methods are guaranteed to block (or fail if not
@@ -665,6 +658,5 @@ class TCPTransport(XMPPTransport, IOHandler):
         logger.debug(u"TCP transport event: {0}".format(event))
         if self._stream:
             event.stream = self._stream
-        if self._event_queue:
-            self._event_queue.post_event(event)
+        self._event_queue.put(event)
 
