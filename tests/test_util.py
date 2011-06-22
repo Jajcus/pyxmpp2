@@ -1,5 +1,8 @@
+#!/usr/bin/python
+
 """Utilities for pyxmmp2 unit tests."""
 
+import time
 import unittest
 import socket
 import threading
@@ -7,9 +10,17 @@ import select
 import logging
 import ssl
 
+from pyxmpp2.transport import TCPTransport
+from pyxmpp2.mainloop.interfaces import EventHandler, event_handler, QUIT
+from pyxmpp2.mainloop.select import SelectMainLoop
+from pyxmpp2.mainloop.poll import PollMainLoop
+from pyxmpp2.mainloop.threads import ThreadPool
+
 logger = logging.getLogger("pyxmpp.test.test_util")
 
 socket.setdefaulttimeout(5)
+
+TIMEOUT = 5.0 # seconds
 
 class NetReaderWritter(object):
     def __init__(self, sock, need_accept = False):
@@ -221,3 +232,128 @@ class NetworkTestCase(unittest.TestCase):
         self.client = NetReaderWritter(sock)
         self.client.start()
         return sock.getsockname()
+
+class InitiatorSelectTestCase(NetworkTestCase):
+    def setUp(self):
+        super(InitiatorSelectTestCase, self).setUp()
+        self.stream = None
+        self.transport = None
+        self.loop = None
+
+    def start_transport(self, handlers):
+        self.transport = TCPTransport()
+        self.make_loop(handlers + [self.transport])
+
+    def connect_transport(self):
+        addr, port = self.start_server()
+        self.transport.connect(addr, port)
+
+    def make_loop(self, handlers):
+        self.loop = SelectMainLoop(None, handlers)
+
+    def tearDown(self):
+        super(InitiatorSelectTestCase, self).tearDown()
+        self.loop = None
+        self.stream = None
+        self.transport = None
+
+    def wait(self, timeout = TIMEOUT, expect = None):
+        timeout = time.time() + timeout
+        while not self.loop.finished():
+            self.loop.loop_iteration(0.1)
+            if expect:
+                match = expect.match(self.server.rdata)
+                if match:
+                    return match.group(1)
+            if time.time() > timeout:
+                break
+
+    def wait_short(self, timeout = 0.1):
+        self.loop.loop_iteration(timeout)
+    
+class InitiatorPollTestMixIn(object):
+    def make_loop(self, handlers):
+        self.loop = PollMainLoop(None, handlers)
+
+class InitiatorThreadedTestMixIn(object):
+    def make_loop(self, handlers):
+        self.loop = ThreadPool(None, handlers)
+
+    def connect_transport(self):
+        InitiatorSelectTestCase.connect_transport(self)
+        self.loop.start()
+
+    def tearDown(self):
+        if self.loop:
+            logger.debug("Stopping the thread pool")
+            try:
+                self.loop.stop(True, 2)
+            except Exception:
+                logger.exception("self.loop.stop failed:")
+            else:
+                logger.debug("  done (or timed out)")
+            self.loop.event_dispatcher.flush(False)
+        super(InitiatorThreadedTestMixIn, self).tearDown()
+
+class ReceiverSelectTestCase(NetworkTestCase):
+    def setUp(self):
+        super(ReceiverSelectTestCase, self).setUp()
+        self.stream = None
+        self.transport = None
+        self.loop = None
+        self.addr = None
+
+    def start_transport(self, handlers):
+        sock = self.make_listening_socket()
+        self.addr = sock.getsockname()
+        self.start_client(self.addr)
+        self.transport = TCPTransport(sock = sock.accept()[0])
+        self.make_loop(handlers + [self.transport])
+
+    def make_loop(self, handlers):
+        self.loop = SelectMainLoop(None, handlers)
+
+    def wait(self, timeout = TIMEOUT, expect = None):
+        timeout = time.time() + timeout
+        while not self.loop.finished():
+            self.loop.loop_iteration(0.1)
+            if expect:
+                match = expect.match(self.client.rdata)
+                if match:
+                    return match.group(1)
+            if time.time() > timeout:
+                break
+
+    def wait_short(self, timeout = 0.1):
+        self.loop.loop_iteration(timeout)
+
+    def tearDown(self):
+        self.loop = None
+        self.stream = None
+        self.transport = None
+        super(ReceiverSelectTestCase, self).tearDown()
+
+class ReceiverPollTestMixIn(object):
+    def make_loop(self, handlers):
+        self.loop = PollMainLoop(None, handlers)
+
+class ReceiverThreadedTestMixIn(object):
+    def make_loop(self, handlers):
+        self.loop = ThreadPool(None, handlers)
+
+    def start_transport(self, handlers):
+        super(ReceiverThreadedTestMixIn, self).start_transport(handlers)
+        self.loop.start()
+
+    def tearDown(self):
+        if self.loop:
+            logger.debug("Stopping the thread pool")
+            try:
+                self.loop.stop(True, 2)
+            except Exception:
+                logger.exception("self.loop.stop failed:")
+            else:
+                logger.debug("  done (or timed out)")
+            self.loop.event_dispatcher.flush(False)
+        super(ReceiverThreadedTestMixIn, self).tearDown()
+

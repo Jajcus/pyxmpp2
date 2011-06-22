@@ -13,14 +13,13 @@ from pyxmpp2.streambase import StreamBase
 from pyxmpp2.streamevents import *
 from pyxmpp2.exceptions import StreamParseError
 from pyxmpp2.jid import JID
-from pyxmpp2.transport import TCPTransport
 
 from pyxmpp2.mainloop.interfaces import EventHandler, event_handler, QUIT
-from pyxmpp2.mainloop.select import SelectMainLoop
-from pyxmpp2.mainloop.poll import PollMainLoop
-from pyxmpp2.mainloop.threads import ThreadPool
 
-from test_util import NetworkTestCase
+from test_util import InitiatorSelectTestCase
+from test_util import InitiatorPollTestMixIn, InitiatorThreadedTestMixIn
+from test_util import ReceiverSelectTestCase
+from test_util import ReceiverPollTestMixIn, ReceiverThreadedTestMixIn
 
 C2S_SERVER_STREAM_HEAD = '<stream:stream version="1.0" from="127.0.0.1" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
 C2S_CLIENT_STREAM_HEAD = '<stream:stream version="1.0" to="127.0.0.1" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
@@ -30,8 +29,6 @@ STREAM_TAIL = '</stream:stream>'
 PARSE_ERROR_RESPONSE = ('<stream:error><not-well-formed'
                     '  xmlns="urn:ietf:params:xml:ns:xmpp-streams"/>'
                                         '</stream:error></stream:stream>')
-
-TIMEOUT = 5.0 # seconds
 
 logger = logging.getLogger("pyxmpp.test.streambase")
 
@@ -67,44 +64,7 @@ class AuthorizedEventHandler(EventRecorder):
 class IgnoreEventHandler(EventRecorder):
     pass
 
-class TestInitiatorSelect(NetworkTestCase):
-    def setUp(self):
-        NetworkTestCase.setUp(self)
-        self.stream = None
-        self.transport = None
-        self.loop = None
-
-    def start_transport(self, handlers):
-        self.transport = TCPTransport()
-        self.make_loop(handlers + [self.transport])
-
-    def connect_transport(self):
-        addr, port = self.start_server()
-        self.transport.connect(addr, port)
-
-    def make_loop(self, handlers):
-        self.loop = SelectMainLoop(None, handlers)
-
-    def tearDown(self):
-        NetworkTestCase.tearDown(self)
-        self.loop = None
-        self.stream = None
-        self.transport = None
-
-    def wait(self, timeout = TIMEOUT, expect = None):
-        timeout = time.time() + timeout
-        while not self.loop.finished():
-            self.loop.loop_iteration(0.1)
-            if expect:
-                match = expect.match(self.server.rdata)
-                if match:
-                    return match.group(1)
-            if time.time() > timeout:
-                break
-
-    def wait_short(self, timeout = 0.1):
-        self.loop.loop_iteration(timeout)
-
+class TestInitiatorSelect(InitiatorSelectTestCase):
     def test_connect_close(self):
         handler = JustConnectEventHandler()
         self.stream = StreamBase(u"jabber:client", [])
@@ -166,72 +126,13 @@ class TestInitiatorSelect(NetworkTestCase):
                                     StreamConnectedEvent])
 
 @unittest.skipIf(not hasattr(select, "poll"), "No poll() support")
-class TestInitiatorPoll(TestInitiatorSelect):
-    def make_loop(self, handlers):
-        self.loop = PollMainLoop(None, handlers)
+class TestInitiatorPoll(InitiatorPollTestMixIn, TestInitiatorSelect):
+    pass
 
-class TestInitiatorThreaded(TestInitiatorSelect):
-    def make_loop(self, handlers):
-        self.loop = ThreadPool(None, handlers)
+class TestInitiatorThreaded(InitiatorThreadedTestMixIn, TestInitiatorSelect):
+    pass
 
-    def connect_transport(self):
-        TestInitiatorSelect.connect_transport(self)
-        self.loop.start()
-
-    def tearDown(self):
-        if self.loop:
-            logger.debug("Stopping the thread pool")
-            try:
-                self.loop.stop(True, 2)
-            except Exception:
-                logger.exception("self.loop.stop failed:")
-            else:
-                logger.debug("  done (or timed out)")
-            self.loop.event_dispatcher.flush(False)
-        TestInitiatorSelect.tearDown(self)
-
-class TestReceiverSelect(NetworkTestCase):
-    def setUp(self):
-        NetworkTestCase.setUp(self)
-        self.stream = None
-        self.transport = None
-        self.loop = None
-        self.addr = None
-
-    def start_transport(self, handlers):
-        sock = self.make_listening_socket()
-        self.addr = sock.getsockname()
-        self.start_client(self.addr)
-        self.transport = TCPTransport(sock = sock.accept()[0])
-        self.make_loop(handlers + [self.transport])
-
-    def make_loop(self, handlers):
-        self.loop = SelectMainLoop(None, handlers)
-
-    def tearDown(self):
-        NetworkTestCase.tearDown(self)
-        self.loop = None
-        self.stream = None
-        self.transport = None
-
-    def wait(self, timeout = TIMEOUT, expect = None):
-        timeout = time.time() + timeout
-        while not self.loop.finished():
-            self.loop.loop_iteration(0.1)
-            if expect:
-                match = expect.match(self.client.rdata)
-                if match:
-                    return match.group(1)
-            if time.time() > timeout:
-                break
-
-    def wait_short(self, timeout = 0.1):
-        self.loop.loop_iteration(timeout)
-
-    def tearDown(self):
-        self.loop = None
-        self.stream = None
-
+class TestReceiverSelect(ReceiverSelectTestCase):
     def test_stream_connect_disconnect(self):
         handler = JustStreamConnectEventHandler()
         self.start_transport([handler])
@@ -273,29 +174,11 @@ class TestReceiverSelect(NetworkTestCase):
         self.assertEqual(event_classes, [StreamConnectedEvent])
 
 @unittest.skipIf(not hasattr(select, "poll"), "No poll() support")
-class TestReceiverPoll(TestReceiverSelect):
-    def make_loop(self, handlers):
-        self.loop = PollMainLoop(None, handlers)
+class TestReceiverPoll(ReceiverPollTestMixIn, TestReceiverSelect):
+    pass
 
-class TestReceiverThreaded(TestReceiverSelect):
-    def make_loop(self, handlers):
-        self.loop = ThreadPool(None, handlers)
-
-    def start_transport(self, handlers):
-        TestReceiverSelect.start_transport(self, handlers)
-        self.loop.start()
-
-    def tearDown(self):
-        if self.loop:
-            logger.debug("Stopping the thread pool")
-            try:
-                self.loop.stop(True, 2)
-            except Exception:
-                logger.exception("self.loop.stop failed:")
-            else:
-                logger.debug("  done (or timed out)")
-            self.loop.event_dispatcher.flush(False)
-        TestReceiverSelect.tearDown(self)
+class TestReceiverThreaded(ReceiverThreadedTestMixIn, TestReceiverSelect):
+    pass
 
 def suite():
      suite = unittest.TestSuite()
