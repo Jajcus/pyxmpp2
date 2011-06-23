@@ -169,8 +169,7 @@ class WrittingThread(IOThread):
                 if fileno:
                     writable = select.select([], [fileno], [], 1)[1]
                     if writable:
-                        self.io_handler.handle_read()
-                    self.io_handler.handle_write()
+                        self.io_handler.handle_write()
             else:
                 logger.debug("{0}: waiting for writaility".format(self.name))
                 if not self.io_handler.wait_for_writability():
