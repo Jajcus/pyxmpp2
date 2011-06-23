@@ -7,3 +7,4 @@ MANIFEST
 cl-stamp
 dist/
 TODO.pylint
+log
