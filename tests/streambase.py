@@ -106,7 +106,7 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         self.server.disconnect()
         self.wait()
         event_classes = [e.__class__ for e in handler.events_received]
-        
+       
         # when exception was raised by a thread DisconnectedEvent won't
         # be sent
         if event_classes[-1] == DisconnectedEvent:
