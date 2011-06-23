@@ -52,9 +52,9 @@ class NetReaderWritter(object):
         writter_thread.start()
 
     def do_tls_handshake(self):
-        logger.debug(" starting tls handshake")
+        logger.debug("tst: starting tls handshake")
         self.sock.do_handshake()
-        logger.debug(" tls handshake started, resuming normal write")
+        logger.debug("tst: tls handshake started, resuming normal write")
         self.extra_on_read = None
         self.write_enabled = True
         self.write_cond.notify()
@@ -63,14 +63,15 @@ class NetReaderWritter(object):
         kwargs['do_handshake_on_connect'] = False
         with self.lock:
             # flush write buffer
-            logger.debug(" flushing write buffer before tls wrap")
+            logger.debug("tst: flushing write buffer before tls wrap")
             while self.wdata:
                 self.write_cond.wait()
             self.write_enabled = False
             self.write_cond.notify()
-            logger.debug(" wrapping the socket")
+            logger.debug("tst: wrapping the socket")
             self.sock = ssl.wrap_socket(*args, **kwargs)
             self.extra_on_read = self.do_tls_handshake
+            self.rdata = ""
 
     def writter_run(self):
         with self.write_cond:

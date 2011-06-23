@@ -42,6 +42,7 @@ from .settings import XMPPSettings
 from .exceptions import DNSError, PyXMPPIOError
 from .streamevents import ResolvingSRVEvent, ResolvingAddressEvent
 from .streamevents import ConnectedEvent, ConnectingEvent, DisconnectedEvent
+from .streamevents import TLSConnectingEvent, TLSConnectedEvent
 from .xmppserializer import XMPPSerializer
 from .xmppparser import StreamReader
 from . import resolver
@@ -190,6 +191,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         self._event_queue = self.settings["event_queue"]
 
     def _set_state(self, state):
+        logger.debug(" _set_state({0!r})".format(state))
         self._state = state
         self._state_cond.notify()
 
@@ -480,10 +482,11 @@ class TCPTransport(XMPPTransport, IOHandler):
                                                                 .format(err))
             self._serializer = None
             self._hup = True
-            try:
-                self._socket.shutdown(socket.SHUT_WR)
-            except socket.error:
-                pass
+            if self._tls_state is None:
+                try:
+                    self._socket.shutdown(socket.SHUT_WR)
+                except socket.error:
+                    pass
             self._set_state("closing")
             self._write_queue.clear()
             self._write_queue_cond.notify()
@@ -507,8 +510,8 @@ class TCPTransport(XMPPTransport, IOHandler):
         result = HandlerReady()
         logger.debug("TCPHandler.prepare(): state: {0!r}".format(self._state))
         with self.lock:
-            if self._state in ("connected", "established", "closing", "closed",
-                                                                    "aborted"):
+            if self._state in ("connected", "established", 
+                                            "closing", "closed", "aborted"):
                 # no need to call prepare() .fileno() is stable
                 pass
             elif self._state == "connect":
@@ -539,7 +542,9 @@ class TCPTransport(XMPPTransport, IOHandler):
         :Return: `True` when the I/O channel can be read
         """
         return self._socket is not None and not self._eof and (
-                                    self._state in ("connected", "closing"))
+                    self._state in ("connected", "closing")
+                        or self._state == "tls-handshake" 
+                                        and self._tls_state == "want_read")
 
     def wait_for_readability(self):
         """
@@ -552,6 +557,9 @@ class TCPTransport(XMPPTransport, IOHandler):
                 if self._socket is None or self._eof:
                     return False
                 if self._state in ("connected", "closing"):
+                    return True
+                if self._state == "tls-handshake" and \
+                                            self._tls_state == "want_read":
                     return True
                 self._state_cond.wait()
 
@@ -596,6 +604,21 @@ class TCPTransport(XMPPTransport, IOHandler):
                 self._initiate_starttls(**job.kwargs)
             elif isinstance(job, TLSHandshake):
                 self._continue_tls_handshake()
+            else:
+                raise ValueError("Unrecognized job in the write queue: "
+                                        "{0!r}".format(job))
+
+    def starttls(self, **kwargs):
+        with self.lock:
+            self.event(TLSConnectingEvent())
+            self._write_queue.append(StartTLS(**kwargs))
+            self._write_queue_cond.notify()
+
+    def getpeercert(self):
+        with self.lock:
+            if not self._socket or self._tls_state != "connected":
+                raise ValueError("Not TLS-connected")
+            return self._socket.getpeercert()
 
     def _initiate_starttls(self, **kwargs):
         """Initiate starttls handshake over the socket.
@@ -603,41 +626,54 @@ class TCPTransport(XMPPTransport, IOHandler):
         if self._tls_state == "connected":
             raise RuntimeError("Already TLS-connected")
         kwargs["do_handshake_on_connect"] = False
+        logger.debug("Wrapping the socket into ssl")
         self._socket = ssl.wrap_socket(self._socket, **kwargs)
-        self._set_state("tls_handshake")
-        self._continue_tls_handshake(self)
+        self._set_state("tls-handshake")
+        self._continue_tls_handshake()
 
     def _continue_tls_handshake(self):
         """Continue a TLS handshake."""
         try:
+            logger.debug(" do_handshake()")
             self._socket.do_handshake()
-            self._tls_state = "connected"
-            self._set_state("connected")
         except ssl.SSLError, err:
             if err.args[0] == ssl.SSL_ERROR_WANT_READ:
                 self._tls_state = "want_read"
+                logger.debug("   want_read")
+                self._state_cond.notify()
+                return
             elif err.args[0] == ssl.SSL_ERROR_WANT_WRITE:
                 self._tls_state = "want_write"
+                logger.debug("   want_write")
                 self._write_queue.appendleft(TLSHandshake)
+                return
             else:
                 raise
+        self._tls_state = "connected"
+        self._set_state("connected")
+        self.event(TLSConnectedEvent(self._socket.cipher(),
+                                                self._socket.getpeercert()))
 
     def handle_read(self):
         """
         Handle the 'channel readable' state. E.g. read from a socket.
         """
         with self.lock:
+            logger.debug("handle_read()")
             if self._eof or self._socket is None:
                 return
-            if self._state == "tls_handshake":
+            if self._state == "tls-handshake":
                 while True:
-                    self._continue_tls_handshake(self)
+                    logger.debug("tls handshake read...")
+                    self._continue_tls_handshake()
+                    logger.debug("  state: {0}".format(self._tls_state))
                     if self._tls_state != "want_read":
                         break
-            else:
+            elif self._tls_state == "connected":
                 while self._socket and not self._eof:
+                    logger.debug("tls socket read...")
                     try:
-                        data = self._socket.recv(4096)
+                        data = self._socket.read(4096)
                     except ssl.SSLError, err:
                         if err.args[0] == ssl.SSL_ERROR_WANT_READ:
                             break
@@ -645,6 +681,17 @@ class TCPTransport(XMPPTransport, IOHandler):
                             break
                         else:
                             raise
+                    except socket.error, err:
+                        if err.args[0] == errno.EINTR:
+                            continue
+                        elif err.args[0] == errno.EWOULDBLOCK:
+                            break
+                    self._feed_reader(data)
+            else:
+                while self._socket and not self._eof:
+                    logger.debug("raw socket read...")
+                    try:
+                        data = self._socket.recv(4096)
                     except socket.error, err:
                         if err.args[0] == errno.EINTR:
                             continue
@@ -687,7 +734,8 @@ class TCPTransport(XMPPTransport, IOHandler):
 
         :Return: `True` if is connected.
         """
-        return self._state == "connected" and not self._eof and not self._hup
+        return self._state in ("connected", "tls-handshake") \
+                                            and not self._eof and not self._hup
 
     def disconnect(self):
         """Disconnect the stream gracefully."""

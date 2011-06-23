@@ -98,17 +98,24 @@ class SelectMainLoop(MainLoopBase):
                 else:
                     raise TypeError("Unexpected result type from prepare()")
             if not handler.fileno():
+                logger.debug(" {0!r}: no fileno".format(handler))
                 continue
             if handler.is_readable():
                 logger.debug(" {0!r} readable".format(handler))
                 readable.append(handler)
+            else:
+                logger.debug(" {0!r} not readable".format(handler))
             if handler.is_writable():
                 logger.debug(" {0!r} writable".format(handler))
                 writable.append(handler)
+            else:
+                logger.debug(" {0!r} not writable".format(handler))
         if not readable and not writable:
             readable, writable, _unused = [], [], None
             time.sleep(timeout)
         else:
+            logger.debug("select({0!r}, {1!r}, [], {2!r})"
+                                    .format( readable, writable,timeout))
             readable, writable, _unused = select.select(
                                             readable, writable, [], timeout)
         for handler in readable:

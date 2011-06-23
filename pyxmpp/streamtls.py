@@ -44,6 +44,8 @@ from .streambase import stream_element_handler
 from .settings import XMPPSettings
 from .streamevents import TLSConnectingEvent, TLSConnectedEvent
 
+from .mainloop.interfaces import EventHandler, event_handler
+
 STARTTLS_TAG = TLS_QNP + u"starttls"
 REQUIRED_TAG = TLS_QNP + u"required"
 PROCEED_TAG = TLS_QNP + u"proceed"
@@ -51,7 +53,7 @@ FAILURE_TAG = TLS_QNP + u"failure"
         
 logger = logging.getLogger("pyxmpp.streamtls")
 
-class StreamTLSHandler(StreamFeatureHandler):
+class StreamTLSHandler(StreamFeatureHandler, EventHandler):
     """Handler for stream TLS support.
     """
     def __init__(self, settings = None):
@@ -150,13 +152,7 @@ class StreamTLSHandler(StreamFeatureHandler):
             return False
         logger.debug(" tls: <proceed/> received")
         self.requested = False
-        try:
-            self._make_tls_connection()
-        except SSLError, err:
-            self.tls_socket = None
-            raise TLSError("TLS Error: {0}".format(err))
-        with stream.lock:
-            stream._restart_stream() # pylint: disable-msg=W0212
+        self._make_tls_connection()
         return True
 
     @stream_element_handler(STARTTLS_TAG, "receiver")
@@ -172,13 +168,12 @@ class StreamTLSHandler(StreamFeatureHandler):
 
         [initiating entity only]
         """
-        self.stream.event(TLSConnectingEvent())
-        logger.debug("Creating TLS connection")
+        logger.debug("Preparing TLS connection")
         if self.settings["tls_verify_peer"]:
             cert_reqs = ssl.CERT_REQUIRED
         else:
             cert_reqs = ssl.CERT_NONE
-        self.tls_socket = ssl.wrap_socket(self.stream.socket,
+        self.stream.transport.starttls(
                     keyfile = self.settings["tls_key_file"],
                     certfile = self.settings["tls_cert_file"],
                     server_side = not self.stream.initiator,
@@ -187,20 +182,17 @@ class StreamTLSHandler(StreamFeatureHandler):
                     ca_certs = self.settings["tls_cacert_file"],
                     do_handshake_on_connect = False,
                     )
-        logger.debug("Starting TLS handshake")
-        self.tls_socket.do_handshake()
-        self.tls_socket.setblocking(False)
+
+    @event_handler(TLSConnectedEvent)
+    def handle_tls_connected_event(self, event):
         if self.settings["tls_verify_peer"]:
-            valid = self.settings["tls_verify_callback"](self.stream,
-                                                self.tls_socket.getpeercert())
+            valid = self.settings["tls_verify_callback"](event.stream,
+                                                        event.peer_certificate)
             if not valid:
                 raise SSLError("Certificate verification failed")
-        self.stream.socket = self.tls_socket
-        self.stream.tls_established = True
-        self.stream._data_send_impl = self._send_data
-        self.stream._handle_read_impl = self._handle_read
-        self.stream.event(TLSConnectedEvent(self.tls_socket.cipher(),
-                                                self.tls_socket.getpeercert()))
+        event.stream.tls_established = True
+        with event.stream.lock:
+            event.stream._restart_stream() # pylint: disable-msg=W0212
 
     def _send_data(self, data):
         """TLS implementation of `StreamBase._data_sender` (blocking)"""

@@ -37,24 +37,22 @@ PROCEED = "<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls' />"
 
 STREAM_TAIL = '</stream:stream>'
         
-TIMEOUT = 1.0 # seconds
-
 class TestInitiator(InitiatorSelectTestCase):
     def test_enabled_optional(self):
         """Test TLS enabled in settings, and optional on the server."""
-        addr, port = self.start_server()
-        handler = EventRecorder()
         settings = XMPPSettings({
                                 u"tls_enable": True, 
                                 u"tls_cacert_file": "data/ca.pem", 
                                 })
-        stream = StreamBase(u"jabber:client", [StreamTLSHandler(settings), 
-                                                            handler], settings)
-        stream.connect(addr, port, to = "server.example.org")
+        handler = EventRecorder()
+        handlers = [StreamTLSHandler(settings), handler]
+        self.stream = StreamBase(u"jabber:client", handlers, settings)
+        self.start_transport(handlers)
+        self.stream.initiate(self.transport, to = "server.example.org")
+        self.connect_transport()
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.server.write(TLS_FEATURES)
-        xml = self.loop(stream, timeout = 1, expect = re.compile(
-                                           r".*(<starttls.*/>)"))
+        xml = self.wait(expect = re.compile(r".*(<starttls.*/>)"))
         self.assertIsNotNone(xml)
         element = XML(xml)
         self.assertEqual(element.tag, 
@@ -66,22 +64,22 @@ class TestInitiator(InitiatorSelectTestCase):
                                 server_side = True,
                                 ca_certs = "data/ca.pem",
                                 )
-        stream_start = self.loop(stream, timeout = 1, expect = re.compile(
-                                                    r"(<stream:stream[^>]*>)"))
+        stream_start = self.wait(expect = re.compile(
+                                    r"(<stream:stream[^>]*>)"))
         self.assertIsNotNone(stream_start)
-        self.assertTrue(stream.tls_established)
-        stream.disconnect()
+        self.assertTrue(self.stream.tls_established)
+        self.stream.disconnect()
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.server.write(EMPTY_FEATURES)
         self.server.write(b"</stream:stream>")
-        self.loop(stream)
+        self.wait()
         event_classes = [e.__class__ for e in handler.events_received]
-        self.assertEqual(event_classes, [ResolvingAddressEvent, ConnectingEvent,
+        self.assertEqual(event_classes, [ConnectingEvent,
                     ConnectedEvent, StreamConnectedEvent, GotFeaturesEvent,
                     TLSConnectingEvent, TLSConnectedEvent, StreamRestartedEvent,
                     GotFeaturesEvent, DisconnectedEvent])
 
-    def test_enabled_required(self):
+    def no_test_enabled_required(self):
         """Test TLS enabled in settings, and required on the server."""
         addr, port = self.start_server()
         handler = EventRecorder()
@@ -122,7 +120,7 @@ class TestInitiator(InitiatorSelectTestCase):
                     TLSConnectingEvent, TLSConnectedEvent, StreamRestartedEvent,
                     GotFeaturesEvent, DisconnectedEvent])
 
-    def test_enabled_missing(self):
+    def no_test_enabled_missing(self):
         """Test TLS enabled in settings, and missing on the server."""
         addr, port = self.start_server()
         handler = EventRecorder()
@@ -145,7 +143,7 @@ class TestInitiator(InitiatorSelectTestCase):
                     ConnectedEvent, StreamConnectedEvent, GotFeaturesEvent,
                     DisconnectedEvent])
 
-    def test_required_missing(self):
+    def no_test_required_missing(self):
         """Test TLS required in settings, and missing on the server."""
         addr, port = self.start_server()
         handler = EventRecorder()
@@ -170,14 +168,14 @@ class TestInitiator(InitiatorSelectTestCase):
 
 def suite():
      suite = unittest.TestSuite()
-     #suite.addTest(unittest.makeSuite(TestInitiator))
+     suite.addTest(unittest.makeSuite(TestInitiator))
      return suite
 
 if __name__ == '__main__':
     import logging
     logger = logging.getLogger()
     logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.ERROR)
+    logger.setLevel(logging.DEBUG)
     unittest.TextTestRunner(verbosity=2).run(suite())
 
 # vi: sts=4 et sw=4
