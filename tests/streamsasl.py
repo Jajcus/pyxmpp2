@@ -32,8 +32,6 @@ from test_util import ReceiverSelectTestCase
 from test_util import ReceiverPollTestMixIn, ReceiverThreadedTestMixIn
 
 
-from test_util import NetworkTestCase
-
 C2S_SERVER_STREAM_HEAD = '<stream:stream version="1.0" from="127.0.0.1" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
 C2S_CLIENT_STREAM_HEAD = '<stream:stream version="1.0" to="127.0.0.1" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
 
