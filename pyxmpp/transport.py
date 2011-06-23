@@ -30,11 +30,13 @@ import socket
 import threading
 import errno
 import logging
+import ssl
 
 from functools import partial
 from abc import ABCMeta
-from xml.etree import ElementTree
+from collections import deque
 
+from .etree import ElementTree
 from .mainloop.interfaces import IOHandler, HandlerReady, PrepareAgain
 from .settings import XMPPSettings
 from .exceptions import DNSError, PyXMPPIOError
@@ -45,6 +47,30 @@ from .xmppparser import StreamReader
 from . import resolver
 
 logger = logging.getLogger("pyxmpp.transport")
+
+
+class WriteJob(object):
+    def __repr__(self):
+        return "<WriteJob: {0}>".format(self.__class__.__name__)
+
+class ContinueConnect(WriteJob):
+    pass
+
+class StartTLS(WriteJob):
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+    def __repr__(self):
+        args = [ "{0}={1!r}".format(k,v) for (k,v) in self.kwargs.items() ]
+        return "<WriteJob: StartTLS: {0}>".format(" ".join(args))
+
+class TLSHandshake(WriteJob):
+    pass
+
+class WriteData(WriteJob):
+    def __init__(self, data):
+        self.data = data
+    def __repr__(self):
+        return "<WriteJob: WriteData: {0!r}>".format(self.data)
 
 class XMPPTransport:
     """Abstract base class for XMPP transport implementations."""
@@ -133,7 +159,8 @@ class TCPTransport(XMPPTransport, IOHandler):
         else:
             self.settings = XMPPSettings()
         self.lock = threading.RLock()
-        self._writability_cond = threading.Condition(self.lock)
+        self._write_queue = deque()
+        self._write_queue_cond = threading.Condition(self.lock)
         self._eof = False
         self._hup = False
         self._stream = None
@@ -146,6 +173,8 @@ class TCPTransport(XMPPTransport, IOHandler):
         self._dst_nameports = None
         self._dst_hostname = None
         self._dst_addrs = None
+        self._tls_state = None
+        self._state_cond = threading.Condition(self.lock)
         if sock is None:
             self._socket = None
             self._blocking = True
@@ -159,6 +188,10 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._state = "connected"
             self._blocking = sock.gettimeout() is not None
         self._event_queue = self.settings["event_queue"]
+
+    def _set_state(self, state):
+        self._state = state
+        self._state_cond.notify()
 
     def connect(self, addr, port = None, service = None):
         """Start establishing TCP connection with given address.
@@ -201,15 +234,15 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._dst_service = None
             self._family = family
             self._dst_addrs = [(family, sockaddr)]
-            self._state = "connect"
+            self._set_state("connect")
         elif service is not None:
             self._dst_service = service
-            self._state = "resolve-srv"
+            self._set_state("resolve-srv")
             self._dst_name = addr
         elif port:
             self._dst_nameports = [(self._dst_name, self._dst_port)]
             self._dst_service = None
-            self._state = "resolve-hostname"
+            self._set_state("resolve-hostname")
         else:
             raise ValueError("No port number and no SRV service name given")
 
@@ -217,7 +250,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         """Start resolving the SRV record.
         """
         resolver = self.settings["dns_resolver"]
-        self._state = "resolving-srv"
+        self._set_state("resolving-srv")
         resolver.resolve_srv(self._dst_name, self._dst_service, "tcp",
                                                     callback = self._got_srv)
         self.event(ResolvingSRVEvent(self._dst_name))
@@ -235,25 +268,25 @@ class TCPTransport(XMPPTransport, IOHandler):
                     self._dst_nameports = (self._dst_name, self._dst_port)
                 else:
                     self._dst_nameports = []
-                    self._state = "aborted"
+                    self._set_state("aborted")
                     raise DNSError("Could not resolve SRV for service {0!r}"
                             " on host {1!r} and fallback port number not given"
                                     .format(self._dst_service, self._dst_name))
             elif addrs == [(".", 0)]:
                 self._dst_nameports = []
-                self._state = "aborted"
+                self._set_state("aborted")
                 raise DNSError("Service {0!r} not available on host {1!r}"
                                     .format(self._dst_service, self._dst_name))
             else:
                 self._dst_nameports = addrs
-            self._state = "resolve-hostname"
+            self._set_state("resolve-hostname")
 
     def _resolve_hostname(self):
         """Start hostname resolution for the next name to try.
 
         [called with `self.lock` acquired]
         """
-        self._state = "resolving-hostname"
+        self._set_state("resolving-hostname")
         resolver = self.settings["dns_resolver"]
         name, port = self._dst_nameports.pop(0)
         resolver.resolve_address(name, callback = partial(
@@ -272,18 +305,18 @@ class TCPTransport(XMPPTransport, IOHandler):
         with self.lock:
             if not addrs:
                 if self._dst_nameports:
-                    self._state = "resolve-hostname"
+                    self._set_state("resolve-hostname")
                     return
                 else:
                     self._dst_addrs = []
-                    self._state = "aborted"
+                    self._set_state("aborted")
                     raise DNSError("Could not resolve address record for {0!r}"
                                                                 .format(name))
             else:
                 self._dst_nameports = addrs
             self._dst_addrs = [ (family, (addr, port)) for (family, addr)
                                                                     in addrs ]
-            self._state = "connect"
+            self._set_state("connect")
 
     def _start_connect(self):
         """Start connecting to the next address on the `self._dst_addrs`
@@ -302,27 +335,30 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._socket.connect(addr)
         except socket.error, err:
             if err.args[0] == errno.EINPROGRESS:
-                self._state = "connecting"
-                self._writability_cond.notify()
+                self._set_state("connecting")
+                self._write_queue.append(ContinueConnect())
+                self._write_queue_cond.notify()
                 self.event(ConnectingEvent(addr))
+                return
             elif self._dst_addrs:
-                self._state = "connect"
-                return None
+                self._set_state("connect")
+                return
             elif self._dst_nameports:
-                self._state = "resolve-hostname"
-                return None
+                self._set_state("resolve-hostname")
+                return
             else:
                 self._socket.close()
                 self._socket = None
-                self._state = "aborted"
-                self._writability_cond.notify()
+                self._set_state("aborted")
+                self._write_queue.clear()
+                self._write_queue_cond.notify()
                 raise
         if self._blocking:
             logger.debug("_start_connect: making the socket blocking again.")
             self._socket.setblocking(True)
-        self._state = "connected"
-        self._stream.transport_connected()
         self.event(ConnectedEvent(self._dst_addr))
+        self._set_state("connected")
+        self._stream.transport_connected()
 
     def _continue_connect(self):
         """Continue connecting.
@@ -340,17 +376,17 @@ class TCPTransport(XMPPTransport, IOHandler):
             if err.args[0] == errno.EINPROGRESS:
                 return None
             elif self._dst_addrs:
-                self._state = "connect"
+                self._set_state("connect")
                 return None
             elif self._dst_nameports:
-                self._state = "resolve-hostname"
+                self._set_state("resolve-hostname")
                 return None
             else:
                 self._socket.close()
                 self._socket = None
-                self._state = "aborted"
+                self._set_state("aborted")
                 raise
-        self._state = "connected"
+        self._set_state("connected")
         self._stream.transport_connected()
         self.event(ConnectedEvent(self._dst_addr))
 
@@ -367,7 +403,16 @@ class TCPTransport(XMPPTransport, IOHandler):
             raise PyXMPPIOError(u"Connection closed.")
         try:
             while data:
-                sent = self._socket.send(data)
+                try:
+                    sent = self._socket.send(data)
+                except SSLError, err:
+                    if err.args[0] == ssl.SSL_ERROR_WANT_WRITE:
+                        continue
+                    else:
+                        raise
+                except socket.error, err:
+                    if err.args[0] == errno.EINTR:
+                        continue
                 data = data[sent:]
         except (IOError, OSError, socket.error), err:
             raise PyXMPPIOError(u"IO Error: {0}".format(err))
@@ -442,8 +487,9 @@ class TCPTransport(XMPPTransport, IOHandler):
                 self._socket.shutdown(socket.SHUT_WR)
             except socket.error:
                 pass
-            self._state = "closing"
-            self._writability_cond.notify()
+            self._set_state("closing")
+            self._write_queue.clear()
+            self._write_queue_cond.notify()
 
     def send_element(self, element):
         """
@@ -516,14 +562,20 @@ class TCPTransport(XMPPTransport, IOHandler):
 
         :Return: `False` if it won't be readable (e.g. is closed)
         """
-        return self._socket is not None and not self._eof
+        with self.lock:
+            while True:
+                if self._socket is None or self._eof:
+                    return False
+                if self._state in ("connected", "closing"):
+                    return True
+                self._state_cond.wait()
 
     def is_writable(self):
         """
         :Return: `False` as currently the data is always written synchronously
         """
         with self.lock:
-            return self._socket and self._state == "connecting"
+            return self._socket and bool(self._write_queue)
 
     def wait_for_writability(self):
         """
@@ -535,9 +587,9 @@ class TCPTransport(XMPPTransport, IOHandler):
             while True:
                 if self._state in ("closing", "closed", "aborted"):
                     return False
-                self._writability_cond.wait()
-                if self.is_writable():
+                if self._socket and bool(self._write_queue):
                     return True
+                self._write_queue_cond.wait()
         return False
 
     def handle_write(self):
@@ -545,10 +597,45 @@ class TCPTransport(XMPPTransport, IOHandler):
         Handle the 'channel writable' state. E.g. send buffered data via a
         socket.
         """
-        events = []
         with self.lock:
-            if self._state == "connecting":
+            logger.debug("handle_write: queue: {0!r}".format(self._write_queue))
+            try:
+                job = self._write_queue.popleft()
+            except IndexError:
+                return
+            if isinstance(job, WriteData):
+                self._do_write(job.data)
+            elif isinstance(job, ContinueConnect):
                 self._continue_connect()
+            elif isinstance(job, StartTLS):
+                self._initiate_starttls(**job.kwargs)
+            elif isinstance(job, TLSHandshake):
+                self._continue_tls_handshake()
+
+    def _initiate_starttls(self, **kwargs):
+        """Initiate starttls handshake over the socket.
+        """
+        if self._tls_state == "connected":
+            raise RuntimeError("Already TLS-connected")
+        kwargs["do_handshake_on_connect"] = False
+        self._socket = ssl.wrap_socket(self._socket, **kwargs)
+        self._set_state("tls_handshake")
+        self._continue_tls_handshake(self)
+
+    def _continue_tls_handshake(self):
+        """Continue a TLS handshake."""
+        try:
+            self._socket.do_handshake()
+            self._tls_state = "connected"
+            self._set_state("connected")
+        except ssl.SSLError, err:
+            if err.args[0] == ssl.SSL_ERROR_WANT_READ:
+                self._tls_state = "want_read"
+            elif err.args[0] == ssl.SSL_ERROR_WANT_WRITE:
+                self._tls_state = "want_write"
+                self._write_queue.appendleft(TLSHandshake)
+            else:
+                raise
 
     def handle_read(self):
         """
@@ -557,17 +644,30 @@ class TCPTransport(XMPPTransport, IOHandler):
         with self.lock:
             if self._eof or self._socket is None:
                 return
-            while True:
-                try:
-                    data = self._socket.recv(4096)
-                except socket.error, err:
-                    if err.args[0] == errno.EINTR:
-                        continue
-                    elif err.args[0] == errno.EWOULDBLOCK:
+            if self._state == "tls_handshake":
+                while True:
+                    self._continue_tls_handshake(self)
+                    if self._tls_state != "want_read":
                         break
-                self._feed_reader(data)
-                if self._blocking or not data:
-                    break
+            else:
+                while True:
+                    try:
+                        data = self._socket.recv(4096)
+                    except SSLError, err:
+                        if err.args[0] == ssl.SSL_ERROR_WANT_READ:
+                            break
+                        elif err.args[0] == ssl.SSL_ERROR_WANT_WRITE:
+                            break
+                        else:
+                            raise
+                    except socket.error, err:
+                        if err.args[0] == errno.EINTR:
+                            continue
+                        elif err.args[0] == errno.EWOULDBLOCK:
+                            break
+                    self._feed_reader(data)
+                    if self._blocking or not data:
+                        break
 
     def handle_hup(self):
         """
@@ -583,8 +683,9 @@ class TCPTransport(XMPPTransport, IOHandler):
         with self.lock:
             self._socket.close()
             self._socket = None
-            self._state = "aborted"
-            self._writability_cond.notify()
+            self._set_state("aborted")
+            self._write_queue.clear()
+            self._write_queue.notify()
         raise PyXMPPIOError("Unhandled error on socket")
 
     def handle_nval(self):
@@ -594,7 +695,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         if self._socket is None:
             # socket closed by other thread
             return
-        self._state = "aborted"
+        self._set_state("aborted")
         raise PyXMPPIOError("Invalid file descriptor used in main event loop")
 
     def is_connected(self):
@@ -612,7 +713,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             if self._socket is None:
                 if self._state != "closed":
                     self.event(DisconnectedEvent(self._dst_addr))
-                    self._state = "closed"
+                    self._set_state("closed")
                 return
             if self._hup or not self._serializer:
                 self._close()
@@ -627,7 +728,7 @@ class TCPTransport(XMPPTransport, IOHandler):
     def _close(self):
         if self._state != "closed":
             self.event(DisconnectedEvent(self._dst_addr))
-            self._state = "closed"
+            self._set_state("closed")
         if self._socket is None:
             return
         try:
@@ -636,7 +737,8 @@ class TCPTransport(XMPPTransport, IOHandler):
             pass
         self._socket.close()
         self._socket = None
-        self._writability_cond.notify()
+        self._write_queue.clear()
+        self._write_queue_cond.notify()
 
     def _feed_reader(self, data):
         """Feed the stream reader with data received.
@@ -662,7 +764,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             if not self._serializer:
                 if self._state != "closed":
                     self.event(DisconnectedEvent(self._dst_addr))
-                    self._state = "closed"
+                    self._set_state("closed")
 
     def event(self, event):
         """Pass an event to the target stream or just log it."""
