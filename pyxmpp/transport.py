@@ -45,6 +45,7 @@ from .streamevents import ConnectedEvent, ConnectingEvent, DisconnectedEvent
 from .xmppserializer import XMPPSerializer
 from .xmppparser import StreamReader
 from . import resolver
+from .mainloop.wait import wait_for_write
 
 logger = logging.getLogger("pyxmpp.transport")
 
@@ -177,7 +178,6 @@ class TCPTransport(XMPPTransport, IOHandler):
         self._state_cond = threading.Condition(self.lock)
         if sock is None:
             self._socket = None
-            self._blocking = True
             self._dst_addr = None
             self._family = None
             self._state = None
@@ -186,7 +186,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._family = sock.family
             self._dst_addr = sock.getpeername()
             self._state = "connected"
-            self._blocking = sock.gettimeout() is not None
+            self._socket.setblocking(False)
         self._event_queue = self.settings["event_queue"]
 
     def _set_state(self, state):
@@ -328,9 +328,9 @@ class TCPTransport(XMPPTransport, IOHandler):
         family, addr = self._dst_addrs.pop(0)
         if not self._socket or self._family != family:
             self._socket = socket.socket(family, socket.SOCK_STREAM)
+            self._socket.setblocking(False)
         self._dst_addr = addr
         self._family  = family
-        self._socket.setblocking(False)
         try:
             self._socket.connect(addr)
         except socket.error, err:
@@ -353,9 +353,6 @@ class TCPTransport(XMPPTransport, IOHandler):
                 self._write_queue.clear()
                 self._write_queue_cond.notify()
                 raise
-        if self._blocking:
-            logger.debug("_start_connect: making the socket blocking again.")
-            self._socket.setblocking(True)
         self.event(ConnectedEvent(self._dst_addr))
         self._set_state("connected")
         self._stream.transport_connected()
@@ -367,9 +364,6 @@ class TCPTransport(XMPPTransport, IOHandler):
 
         :Return: `True` when just connected
         """
-        if self._blocking:
-            logger.debug("_continue_connect: making the socket blocking again.")
-            self._socket.setblocking(True)
         try:
             self._socket.connect(self._dst_addr)
         except socket.error, err:
@@ -405,13 +399,16 @@ class TCPTransport(XMPPTransport, IOHandler):
             while data:
                 try:
                     sent = self._socket.send(data)
-                except SSLError, err:
+                except ssl.SSLError, err:
                     if err.args[0] == ssl.SSL_ERROR_WANT_WRITE:
                         continue
                     else:
                         raise
                 except socket.error, err:
                     if err.args[0] == errno.EINTR:
+                        continue
+                    if err.args[0] == errno.EWOULDBLOCK:
+                        wait_for_write(self._socket)
                         continue
                 data = data[sent:]
         except (IOError, OSError, socket.error), err:
@@ -537,18 +534,6 @@ class TCPTransport(XMPPTransport, IOHandler):
                 return self._socket.fileno()
         return None
     
-    def set_blocking(self, blocking = True):
-        """Force the handler into blocking mode, so the `handle_write()`
-        and `handle_read()` methods are guaranteed to block (or fail if not
-        `is_readable()` or `is_writable()` if nothing can be written or there is
-        nothing to read.
-        """
-        with self.lock:
-            if self._socket is None or blocking == self._blocking:
-                return
-            self._blocking = blocking
-            self._socket.setblocking(blocking)
-
     def is_readable(self):
         """
         :Return: `True` when the I/O channel can be read
@@ -650,10 +635,10 @@ class TCPTransport(XMPPTransport, IOHandler):
                     if self._tls_state != "want_read":
                         break
             else:
-                while True:
+                while self._socket and not self._eof:
                     try:
                         data = self._socket.recv(4096)
-                    except SSLError, err:
+                    except ssl.SSLError, err:
                         if err.args[0] == ssl.SSL_ERROR_WANT_READ:
                             break
                         elif err.args[0] == ssl.SSL_ERROR_WANT_WRITE:
@@ -666,8 +651,6 @@ class TCPTransport(XMPPTransport, IOHandler):
                         elif err.args[0] == errno.EWOULDBLOCK:
                             break
                     self._feed_reader(data)
-                    if self._blocking or not data:
-                        break
 
     def handle_hup(self):
         """

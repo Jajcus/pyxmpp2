@@ -66,12 +66,6 @@ class IOHandler:
     def fileno(self):
         """Return file descriptor to poll or select."""
         raise NotImplementedError
-    def set_blocking(self, blocking = True):
-        """Force the handler into blocking or nonblocking mode, so the
-        `handle_write()` and `handle_read()` methods are guaranteed to block
-        for some time (or fail if not `is_readable()` or `is_writable()` if nothing
-        can be written or there is nothing to read."""
-        raise NotImplementedError
     def is_readable(self):
         """
         :Return: `True` when the I/O channel can be read

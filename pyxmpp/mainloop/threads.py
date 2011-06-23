@@ -39,6 +39,7 @@ from .interfaces import MainLoop, HandlerReady, PrepareAgain
 from .interfaces import EventHandler, IOHandler, QUIT
 from .events import EventDispatcher
 from ..settings import XMPPSettings
+from .wait import wait_for_read, wait_for_write
 
 logger = logging.getLogger("pyxmpp.mainloop.threads")
 
@@ -116,7 +117,6 @@ class ReadingThread(IOThread):
 
     def run(self):
         """The thread function."""
-        self.io_handler.set_blocking(True)
         prepared = False
         timeout = 0.1
         while not self._quit:
@@ -137,7 +137,7 @@ class ReadingThread(IOThread):
                 logger.debug("{0}: readable".format(self.name))
                 fileno = self.io_handler.fileno()
                 if fileno is not None:
-                    readable = select.select([fileno], [], [], 1)[0]
+                    readable = wait_for_read(fileno, 1)
                     if readable:
                         self.io_handler.handle_read()
             elif not prepared:
@@ -161,13 +161,12 @@ class WrittingThread(IOThread):
 
     def run(self):
         """The thread function."""
-        self.io_handler.set_blocking(True)
         while not self._quit:
             if self.io_handler.is_writable():
                 logger.debug("{0}: writable".format(self.name))
                 fileno = self.io_handler
                 if fileno:
-                    writable = select.select([], [fileno], [], 1)[1]
+                    writable = wait_for_write(fileno, 1)
                     if writable:
                         self.io_handler.handle_write()
             else:
