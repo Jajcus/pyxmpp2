@@ -352,6 +352,10 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, EventHandler):
                 self._send_stream_error("bad-format")
                 raise FatalStreamError("Bad root element")
 
+            if self._input_state == "restart":
+                event = StreamRestartedEvent(self.peer)
+            else:
+                event = StreamConnectedEvent(self.peer)
             self._input_state = "open"
             version = element.get("version")
             if version:
@@ -408,12 +412,8 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, EventHandler):
                     peer = JID(peer)
                 self._send_stream_start(self.generate_id(), stream_to = peer)
                 self._send_stream_features()
+            self.event(event)
 
-            if self._input_state == "restart":
-                event = StreamRestartedEvent(self.peer)
-            else:
-                event = StreamConnectedEvent(self.peer)
-        self.event(event)
 
     def stream_end(self):
         """Process </stream:stream> (stream end) tag received from peer.
@@ -497,6 +497,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, EventHandler):
         self._input_state = "restart"
         self._output_state = "restart"
         self.features = None
+        self.transport.restart()
         if self.initiator:
             self._send_stream_start(self.stream_id)
 

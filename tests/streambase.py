@@ -16,6 +16,7 @@ from pyxmpp2.jid import JID
 
 from pyxmpp2.mainloop.interfaces import EventHandler, event_handler, QUIT
 
+from test_util import EventRecorder
 from test_util import InitiatorSelectTestCase
 from test_util import InitiatorPollTestMixIn, InitiatorThreadedTestMixIn
 from test_util import ReceiverSelectTestCase
@@ -31,17 +32,6 @@ PARSE_ERROR_RESPONSE = ('<stream:error><not-well-formed'
                                         '</stream:error></stream:stream>')
 
 logger = logging.getLogger("pyxmpp.test.streambase")
-
-class EventRecorder(EventHandler):
-    def __init__(self):
-        self.events_received = []
-    @event_handler()
-    def handle_event(self, event):
-        self.events_received.append(event)
-        return False
-    @event_handler(DisconnectedEvent)
-    def handle_disconnected_event(self, event):
-        event.stream.event(QUIT)
 
 class JustConnectEventHandler(EventRecorder):
     @event_handler(ConnectedEvent)
@@ -113,7 +103,7 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         self.server.wait(1)
         self.assertTrue(self.server.eof)
         self.assertTrue(self.server.rdata.endswith(PARSE_ERROR_RESPONSE))
-        self.server.close()
+        self.server.disconnect()
         self.wait()
         event_classes = [e.__class__ for e in handler.events_received]
         

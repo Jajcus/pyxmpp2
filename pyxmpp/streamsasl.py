@@ -358,6 +358,7 @@ class StreamSASLHandler(StreamFeatureHandler):
         stream.write_element(element)
 
         if isinstance(ret, sasl.Failure):
+            stream.disconnect()
             raise SASLAuthenticationFailed("SASL authentication failed")
 
         return True

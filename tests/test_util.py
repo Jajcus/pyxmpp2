@@ -10,6 +10,8 @@ import select
 import logging
 import ssl
 
+from pyxmpp2.streamevents import DisconnectedEvent
+
 from pyxmpp2.transport import TCPTransport
 from pyxmpp2.mainloop.interfaces import EventHandler, event_handler, QUIT
 from pyxmpp2.mainloop.select import SelectMainLoop
@@ -32,6 +34,7 @@ class NetReaderWritter(object):
         self.eof = False
         self.error = False
         self.ready = not need_accept
+        self._disconnect = False
         self.write_enabled = True
         self.lock = threading.RLock()
         self.write_cond = threading.Condition(self.lock)
@@ -77,6 +80,10 @@ class NetReaderWritter(object):
                     logger.debug(u"tst OUT: " + repr(self.wdata[:sent]))
                     self.wdata = self.wdata[sent:]
                     self.write_cond.notify()
+                if self._disconnect and not self.wdata:
+                    self.sock.shutdown(socket.SHUT_WR)
+                    logger.debug(u"tst OUT: EOF")
+                    break
                 self.write_cond.wait()
 
     def reader_run(self):
@@ -127,6 +134,11 @@ class NetReaderWritter(object):
             self.wdata += data
             if self.ready:
                 self.write_cond.notify()
+
+    def disconnect(self):
+        with self.write_cond:
+            self._disconnect = True
+            self.write_cond.notify()
 
     def read(self):
         with self.cond:
@@ -356,4 +368,16 @@ class ReceiverThreadedTestMixIn(object):
                 logger.debug("  done (or timed out)")
             self.loop.event_dispatcher.flush(False)
         super(ReceiverThreadedTestMixIn, self).tearDown()
+
+class EventRecorder(EventHandler):
+    def __init__(self):
+        self.events_received = []
+    @event_handler()
+    def handle_event(self, event):
+        self.events_received.append(event)
+        return False
+    @event_handler(DisconnectedEvent)
+    def handle_disconnected_event(self, event):
+        event.stream.event(QUIT)
+
 

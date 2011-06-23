@@ -85,6 +85,12 @@ class XMPPTransport:
         """
         # pylint: disable-msg=R0913
         raise NotImplementedError
+    
+    def restart(self):
+        """Restart the stream after SASL or StartTLS handshake.
+        
+        For the initiator a new call to `send_stream_head` is required too."""
+        raise NotImplementedError
 
     def send_stream_tail(self):
         """
@@ -410,6 +416,11 @@ class TCPTransport(XMPPTransport, IOHandler):
             head = self._serializer.emit_head(stream_from, stream_to,
                                                 stream_id, version, language)
             self._write(head.encode("utf-8"))
+
+    def restart(self):
+        """Restart the stream after SASL or StartTLS handshake."""
+        self._reader = StreamReader(self._stream)
+        self._serializer = None
 
     def send_stream_tail(self):
         """
