@@ -5,6 +5,15 @@ import sys
 import getopt
 import logging
 
+import os
+
+import pyxmpp2.etree
+if "PYXMPP2_ETREE" not in os.environ:
+    # one of tests fails when xml.etree.ElementTree is used
+    import xml.etree.cElementTree
+    pyxmpp2.etree.ElementTree = xml.etree.cElementTree
+
+
 all_modules=[ "jid", "stream_reader", "xmppserializer", "stanza",
             "message", "presence", "iq", "stanzaprocessor",
             "streambase", "sasl_gsasl", "binding", "streamsasl",
