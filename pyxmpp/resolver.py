@@ -164,6 +164,91 @@ def reorder_srv(records):
         ret += shuffle_srv(tmp)
     return ret
 
+class DumbBlockingResolver(Resolver):
+    """Simple blocking resolver using only the standard Python library.
+    
+    This doesn't support SRV lookups!
+
+    `resolve_srv` will raise NotImplementedError
+    `resolve_hostname` will block until the lookup completes or fail and then
+    call the callback immediately.
+    """
+    # pylint: disable-msg=R0921
+    def __init__(self, settings = None):
+        if settings:
+            self.settings = settings
+        else:
+            self.settings = XMPPSettings()
+
+    def resolve_srv(self, domain, service, protocol, callback):
+        """Start looking up an SRV record for `service` at `address`.
+
+        `callback` will be called with a properly sorted list of (hostname,
+        port) pairs on success. The list will be empty on error and it will
+        contain only (".", 0) when the service is explicitely disabled.
+
+        :Parameters:
+            - `domain`: domain name to look up
+            - `service`: service name e.g. 'xmpp-client'
+            - `protocol`: protocol name, e.g. 'tcp'
+            - `callback`: a function to be called with a list of received
+              addresses
+        :Types:
+            - `domain`: `unicode`
+            - `service`: `unicode`
+            - `protocol`: `unicode`
+            - `callback`: function accepting a single argument
+        """
+        raise NotImplementedError("The DumbBlockingResolver cannot resolve"
+                " SRV records. DNSPython or target hostname explicitely set"
+                                                                " required")
+
+    def resolve_address(self, hostname, callback, allow_cname = True):
+        """Start looking up an A or AAAA record.
+
+        `callback` will be called with a list of (family, address) tuples
+        on success. Family is `socket.AF_INET` or `socket.AF_INET6`,
+        the address is IPv4 or IPv6 literal. The list will be empty on error.
+
+        :Parameters:
+            - `hostname`: the host name to look up
+            - `callback`: a function to be called with a list of received
+              addresses
+            - `allow_cname`: `True` if CNAMEs should be followed
+        :Types:
+            - `hostname`: `unicode`
+            - `callback`: function accepting a single argument
+            - `allow_cname`: `bool`
+        """
+        if self.settings["allow_ipv6"]:
+            if self.settings["allow_ipv4"]:
+                family = socket.AF_UNSPEC
+            else:
+                family = socket.AF_INET6
+        elif self.settings["allow_ipv4"]:
+            family = socket.AF_INET
+        else:
+            logger.warning("Neither IPv6 or IPv4 allowed.")
+            callback([])
+            return
+        try:
+            ret = socket.getaddrinfo(hostname, 0, family, socket.SOCK_STREAM, 0)
+        except socket.gaierror, err:
+            logger.warning("Couldn't resolve {0!r}: {1}".format(hostname,
+                                                                        err))
+            callback([])
+            return
+        if family == socket.AF_UNSPEC:
+            tmp = ret
+            if self.settings["prefer_ipv6"]:
+                ret = [ addr for addr in tmp if addr[0] == socket.AF_INET6 ]
+                ret += [ addr for addr in tmp if addr[0] == socket.AF_INET ]
+            else:
+                ret = [ addr for addr in tmp if addr[0] == socket.AF_INET ]
+                ret += [ addr for addr in tmp if addr[0] == socket.AF_INET6 ]
+        callback([(addr[0], addr[4][0]) for addr in ret])
+
+
 if HAVE_DNSPYTHON:
     class BlockingResolver(Resolver):
         """Blocking resolver using the DNSPython package.
@@ -198,11 +283,12 @@ if HAVE_DNSPYTHON:
             """
             if isinstance(domain, unicode):
                 domain = domain.encode("idna")
+            domain = b"_{0}._{1}.{2}".format(service, protocol, domain)
             try:
                 records = dns.resolver.query(domain, 'SRV')
             except dns.exception.DNSException, err:
-                logger.warning("Could not resolve {0!r}: {1}", domain, 
-                                                        err.__class__.__name__)
+                logger.warning("Could not resolve {0!r}: {1}"
+                                    .format(domain, err.__class__.__name__))
                 callback([])
                 return
             if not records:
@@ -214,7 +300,7 @@ if HAVE_DNSPYTHON:
                 hostname = record.target.to_text()
                 if hostname in (".", ""):
                     continue
-                result.append(hostname, record.port)
+                result.append((hostname, record.port))
 
             if not result:
                 callback([(".", 0)])
@@ -246,6 +332,8 @@ if HAVE_DNSPYTHON:
                 rtypes.append(("AAAA", socket.AF_INET6))
             if self.settings["allow_ipv4"]:
                 rtypes.append(("A", socket.AF_INET))
+            if not self.settings["prefer_ipv6"]:
+                rtypes.reverse()
             exception = None
             result = []
             for rtype, rfamily in rtypes:
@@ -270,95 +358,14 @@ if HAVE_DNSPYTHON:
                 logger.warning("Could not resolve {0!r}: {1}".format(hostname,
                                                 exception.__class__.__name__))
             callback(result)
-
-class DummyBlockingResolver(Resolver):
-    """Simple blocking resolver using only the standard Python library.
-    
-    This doesn't support SRV lookups!
-
-    `resolve_srv` will raise NotImplementedError
-    `resolve_hostname` will block until the lookup completes or fail and then
-    call the callback immediately.
-    """
-    # pylint: disable-msg=R0921
-    def __init__(self, settings):
-        if settings:
-            self.settings = settings
-        else:
-            self.settings = XMPPSettings()
-
-    def resolve_srv(self, domain, service, protocol, callback):
-        """Start looking up an SRV record for `service` at `address`.
-
-        `callback` will be called with a properly sorted list of (hostname,
-        port) pairs on success. The list will be empty on error and it will
-        contain only (".", 0) when the service is explicitely disabled.
-
-        :Parameters:
-            - `domain`: domain name to look up
-            - `service`: service name e.g. 'xmpp-client'
-            - `protocol`: protocol name, e.g. 'tcp'
-            - `callback`: a function to be called with a list of received
-              addresses
-        :Types:
-            - `domain`: `unicode`
-            - `service`: `unicode`
-            - `protocol`: `unicode`
-            - `callback`: function accepting a single argument
-        """
-        raise NotImplementedError("The DummyBlockingResolver cannot resolve"
-                " SRV records. DNSPython or target hostname explicitely set"
-                                                                " required")
-
-    def resolve_address(self, hostname, callback, allow_cname = True):
-        """Start looking up an A or AAAA record.
-
-        `callback` will be called with a list of IPv4 or IPv6 address literals
-        on success. The list will be empty on error.
-
-        :Parameters:
-            - `hostname`: the host name to look up
-            - `callback`: a function to be called with a list of received
-              addresses
-            - `allow_cname`: `True` if CNAMEs should be followed
-        :Types:
-            - `hostname`: `unicode`
-            - `callback`: function accepting a single argument
-            - `allow_cname`: `bool`
-        """
-        if self.settings["allow_ipv6"]:
-            if self.settings["allow_ipv4"]:
-                family = socket.AF_UNSPEC
-            else:
-                family = socket.AF_INET6
-        elif self.settings["allow_ipv4"]:
-            family = socket.AF_INET
-        else:
-            logger.warning("Neither IPv6 or IPv4 allowed.")
-            callback([])
-            return
-        try:
-            ret = socket.getaddrinfo(hostname, 0, family, socket.SOCK_STREAM, 0)
-        except socket.gaierror, err:
-            logger.warning("Couldn't resolve {0!r}: {1}".format(hostname,
-                                                                        err))
-            callback([])
-            return
-        if family == socket.AF_UNSPEC:
-            if self.settings["prefer_ipv6"]:
-                ret = [ addr for addr in ret if addr[0] == socket.AF_INET6 ]
-                ret += [ addr for addr in ret if addr[0] == socket.AF_INET ]
-            else:
-                ret = [ addr for addr in ret if addr[0] == socket.AF_INET ]
-                ret += [ addr for addr in ret if addr[0] == socket.AF_INET6 ]
-        callback([(addr[0], addr[4][0]) for addr in ret])
+    XMPPSettings.add_default_factory("dns_resolver", BlockingResolver)
+else:
+    XMPPSettings.add_default_factory("dns_resolver", DumbBlockingResolver)
 
 XMPPSettings.add_defaults({
             u"allow_ipv4": True,
             u"prefer_ipv6": True,
             })
-
-XMPPSettings.add_default_factory("dns_resolver", BlockingResolver)
 XMPPSettings.add_default_factory("allow_ipv6", lambda x: is_ipv6_available(),
                                                                         True)
 # vi: sts=4 et sw=4
