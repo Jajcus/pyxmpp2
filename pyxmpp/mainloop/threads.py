@@ -264,8 +264,7 @@ class TimeoutThread(object):
     def __init__(self, method, name = None, daemon = True, exc_queue = None):
         if name is None:
             name = "{0!r} timer thread"
-        else:
-            self.name = name
+        self.name = name
         self.method = method
         self.thread = threading.Thread(name = name, target = self._run)
         self.thread.daemon = daemon
@@ -442,12 +441,12 @@ class ThreadPool(MainLoop):
             logger.debug("Sending the QUIT signal")
             self.event_queue.put(QUIT)
         logger.debug("  sent")
-        for thread in self.io_threads:
+        threads = self.io_threads + self.timeout_threads
+        for thread in threads:
             logger.debug("Stopping thread: {0!r}".format(thread))
             thread.stop()
         if not join:
             return
-        threads = list(self.io_threads)
         if self.event_thread:
             threads.append(self.event_thread)
         if timeout is None:

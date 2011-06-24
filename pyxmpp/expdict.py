@@ -23,6 +23,9 @@ __docformat__="restructuredtext en"
 
 import time
 import threading
+import logging
+
+logger = logging.getLogger("pyxmpp.expdict")
 
 __all__ = ['ExpiringDictionary']
 
@@ -61,6 +64,7 @@ class ExpiringDictionary(dict):
 
     def __delitem__(self,key):
         self._lock.acquire()
+        logger.debug("expdict.__delitem__({0!r})".format(key))
         try:
             del self._timeouts[key]
             return dict.__delitem__(self,key)
@@ -69,6 +73,7 @@ class ExpiringDictionary(dict):
 
     def __getitem__(self,key):
         self._lock.acquire()
+        logger.debug("expdict.__getitem__({0!r})".format(key))
         try:
             self._expire_item(key)
             return dict.__getitem__(self,key)
@@ -88,6 +93,7 @@ class ExpiringDictionary(dict):
             self._lock.release()
 
     def __setitem__(self,key,value):
+        logger.debug("expdict.__setitem__({0!r},{1!r})".format(key,value))
         return self.set_item(key,value)
 
     def set_item(self,key,value,timeout=None,timeout_callback=None):
@@ -106,6 +112,8 @@ class ExpiringDictionary(dict):
             - `timeout`: `int`
             - `timeout_callback`: callable"""
         self._lock.acquire()
+        logger.debug("expdict.__setitem__({0!r},{1!r},{2!r},{3!r})"
+                            .format(key,value, timeout, timeout_callback))
         try:
             if not timeout:
                 timeout=self._default_timeout
@@ -120,8 +128,17 @@ class ExpiringDictionary(dict):
         Remove items that expired by now from the dictionary."""
         self._lock.acquire()
         try:
+            logger.debug("expdict.expire. timeouts: {0!r}"
+                                                    .format(self._timeouts))
+            next_timeout = None
             for k in self._timeouts.keys():
-                self._expire_item(k)
+                ret = self._expire_item(k)
+                if ret is not None:
+                    if next_timeout is None:
+                        next_timeout = ret
+                    else:
+                        next_timeout = min(next_timeout, ret)
+            return next_timeout
         finally:
             self._lock.release()
 
@@ -135,7 +152,8 @@ class ExpiringDictionary(dict):
         :Types:
             - `key`: any hashable value"""
         (timeout,callback)=self._timeouts[key]
-        if timeout<=time.time():
+        now = time.time()
+        if timeout <= now:
             item = dict.pop(self, key)
             del self._timeouts[key]
             if callback:
@@ -146,5 +164,8 @@ class ExpiringDictionary(dict):
                         callback(key)
                     except TypeError:
                         callback()
+            return None
+        else:
+            return timeout - now
 
 # vi: sts=4 et sw=4

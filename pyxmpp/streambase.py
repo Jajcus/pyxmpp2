@@ -47,7 +47,6 @@ from .xmppserializer import serialize
 from .streamevents import ConnectedEvent
 from .streamevents import StreamConnectedEvent, GotFeaturesEvent
 from .streamevents import AuthenticatedEvent, StreamRestartedEvent
-from .mainloop.interfaces import EventHandler, event_handler
 from .mainloop.interfaces import TimeoutHandler, timeout_handler
 
 XMPPSettings.add_defaults(
@@ -163,8 +162,7 @@ def stream_element_handler(element_name, usage_restriction = None):
         return func
     return decorator
 
-class StreamBase(StanzaProcessor, XMLStreamHandler, EventHandler,
-                                                            TimeoutHandler):
+class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
     """Base class for a generic XMPP stream.
 
     Responsible for establishing connection, parsing the stream, dispatching
@@ -555,7 +553,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, EventHandler,
         element = stanza.as_xml()
         self._write_element(element)
 
-    @timeout_handler(60)
+    @timeout_handler(1)
     def regular_tasks(self):
         """Do some housekeeping (cache expiration, timeout handling).
 
@@ -567,12 +565,11 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, EventHandler,
         :Returntype: `int`
         """
         with self.lock:
-            return self._regular_tasks()
-
-    def _regular_tasks(self):
-        """Same as `Stream.regular_tasks` but assume `self.lock` is acquired."""
-        self._iq_response_handlers.expire()
-        return 60
+            ret = self._iq_response_handlers.expire()
+            if ret is None:
+                return 1
+            else:
+                return min(1, ret)
 
     def _process_element(self, element):
         """Process first level element of the stream.
