@@ -29,14 +29,13 @@ from __future__ import absolute_import
 __docformat__ = "restructuredtext en"
 
 import time
-import select
 import threading
 import logging
 import sys
 import Queue
 
 from .interfaces import MainLoop, HandlerReady, PrepareAgain
-from .interfaces import EventHandler, IOHandler, QUIT
+from .interfaces import IOHandler, QUIT
 from .events import EventDispatcher
 from ..settings import XMPPSettings
 from .wait import wait_for_read, wait_for_write
@@ -68,15 +67,20 @@ class IOThread(object):
         self._quit = False
 
     def start(self):
+        """Start the thread.
+        """
         self.thread.start()
     
     def is_alive(self):
+        """Check if the thread is alive."""
         return self.thread.is_alive()
 
     def stop(self):
+        """Request the thread to stop."""
         self._quit = True
 
     def join(self, timeout):
+        """Join the thread (wait until it stops)."""
         return self.thread.join(timeout)
 
     def _run(self):
@@ -86,7 +90,7 @@ class IOThread(object):
         logger.debug("{0}: entering thread".format(self.name))
         try:
             self.run()
-        except:
+        except Exception: # pylint: disable-msg=W0703
             logger.debug("{0}: aborting thread".format(self.name))
             self.exc_info = sys.exc_info()
             logger.debug(u"exception in the {0!r} thread:"
@@ -116,7 +120,13 @@ class ReadingThread(IOThread):
         IOThread.__init__(self, io_handler, name, daemon, exc_queue)
 
     def run(self):
-        """The thread function."""
+        """The thread function.
+        
+        First, call the handler's 'prepare' method until it returns
+        `HandlerReady` then loop waiting for the socket input and calling
+        'handle_read' on the handler.
+        """
+        # pylint: disable-msg=R0912
         prepared = False
         timeout = 0.1
         while not self._quit:
@@ -160,7 +170,11 @@ class WrittingThread(IOThread):
         IOThread.__init__(self, io_handler, name, daemon, exc_queue)
 
     def run(self):
-        """The thread function."""
+        """The thread function.
+        
+        Loop waiting for the handler and socket being writable and calling 
+        `handle_write`.
+        """
         while not self._quit:
             if self.io_handler.is_writable():
                 logger.debug("{0}: writable".format(self.name))
@@ -201,12 +215,15 @@ class EventDispatcherThread(object):
         self.event_dispatcher = event_dispatcher
 
     def start(self):
+        """Start the thread."""
         self.thread.start()
 
     def is_alive(self):
+        """Check if the thread is alive."""
         return self.thread.is_alive()
 
     def join(self, timeout):
+        """Join the thread."""
         return self.thread.join(timeout)
 
     def run(self):
@@ -216,7 +233,7 @@ class EventDispatcherThread(object):
         logger.debug("{0}: entering thread".format(self.name))
         try:
             self.event_dispatcher.loop()
-        except:
+        except Exception: # pylint: disable-msg=W0703
             logger.debug("{0}: aborting thread".format(self.name))
             self.exc_info = sys.exc_info()
             logger.debug(u"exception in the {0!r} thread:"
@@ -230,10 +247,7 @@ class EventDispatcherThread(object):
 class ThreadPool(MainLoop):
     """Thread pool object, as a replacement for an asychronous event loop."""
     def __init__(self, settings = None, handlers = None):
-        if settings is None:
-            self.settings = XMPPSettings()
-        else:
-            self.settings = settings
+        self.settings = settings if settings else XMPPSettings()
         self.io_handlers = []
         self.event_queue = self.settings["event_queue"]
         self.event_dispatcher = EventDispatcher(self.settings, handlers)
@@ -246,6 +260,7 @@ class ThreadPool(MainLoop):
         self.event_thread = None
 
     def start(self, daemon = False):
+        """Start the threads."""
         self.io_threads = []
         for handler in self.io_handlers:
             reader = ReadingThread(handler, daemon = daemon,
@@ -260,6 +275,13 @@ class ThreadPool(MainLoop):
             thread.start()
 
     def stop(self, join = False, timeout = None):
+        """Stop the threads.
+
+        :Parameters:
+            `join`: join the threads (wait until they exit)
+            `timeout`: maximum time (in seconds) to wait when `join` is `True`).
+                 No limit when `timeout` is `None`.
+        """
         logger.debug("Closing the io handlers...")
         for handler in self.io_handlers:
             handler.close()
@@ -295,19 +317,35 @@ class ThreadPool(MainLoop):
         self.io_threads = []
         self.event_thread = None
 
+    @property
     def finished(self):
         return self.event_thread is None or not self.event_thread.is_alive()
 
-    def loop(self, timeout):
+    @property
+    def started(self):
+        return self.event_thread is not None
+        
+    def quit(self):
+        self.event_queue.put(QUIT)
+
+    def loop(self, timeout = 1):
+        """Wait until the event dispatcher thread exits (on the `QUIT` event).
+
+        Raise any exceptions from the threads.
+        """
         if not self.event_thread:
             return
         while self.event_thread.is_alive():
             self.loop_iteration(timeout)
 
     def loop_iteration(self, timeout = 0.1):
+        """Wait up to `timeout` seconds, raise any exception from the
+        threads.
+        """
         try:
-            thread, exc_info = self.exc_queue.get(True, timeout)
+            exc_info = self.exc_queue.get(True, timeout)[1]
         except Queue.Empty:
             return
         exc_type, exc_value, ext_stack = exc_info
         raise exc_type, exc_value, ext_stack
+

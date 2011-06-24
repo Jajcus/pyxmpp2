@@ -35,12 +35,10 @@ class MainLoopBase(MainLoop):
     """Base class for main loop implementations."""
     # pylint: disable-msg=W0223
     def __init__(self, settings = None, handlers = None):
-        if settings is None:
-            self.settings = XMPPSettings()
-        else:
-            self.settings = settings
+        self.settings = settings if settings else XMPPSettings()
         if not handlers:
             handlers = []
+        self._timeout_handlers = []
         self.event_dispatcher = EventDispatcher(self.settings, handlers)
         self.event_queue = self.settings["event_queue"]
         self._quit = False
@@ -50,23 +48,60 @@ class MainLoopBase(MainLoop):
                 self.add_io_handler(handler)
             elif isinstance(handler, EventHandler):
                 self.event_dispatcher.add_handler(handler)
+    @property
     def finished(self):
         return self._quit
+    @property
     def started(self):
         return self._started
     def quit(self):
-        """Make the loop stop after the current iteration."""
         self.event_queue.put(QUIT)
     def loop(self, timeout = 1):
         while not self._quit:
             self.loop_iteration(timeout)
-    def loop_iteration(self, timeout):
+    def loop_iteration(self, timeout = 1):
         if self.check_events():
             return
         time.sleep(timeout)
     def check_events(self):
+        """Call the event dispatcher. 
+
+        Quit the main loop when the `QUIT` event is reached.
+
+        :Return: `True` if `QUIT` was reached.
+        """
         if self.event_dispatcher.flush() is QUIT:
             self._quit = True
             return True
         return False
+
+    def add_timeout_handler(self, timeout, handler):
+        """Add a function to be called after `timeout` seconds."""
+        self._timeout_handlers.append(timeout, handler)
+        self._timeout_handlers.sort(key = lambda x: x[0])
+
+
+    def _call_timeout_handlers(self):
+        """Call the timeout handlers due.
+
+        :Return: (next_event_timeout, sources_handled) tuple.
+        next_event_timeout is number of seconds until the next timeout event,
+        sources_handled is number of handlers called.
+        """
+        sources_handled = 0
+        now = time.time()
+        schedule = None
+        while self._timeout_handlers:
+            schedule, handler = self._timeout_handlers[0]
+            if schedule <= now:
+                self._timeout_handlers = self._timeout_handlers[1:]
+                handler()
+                sources_handled += 1
+            if self.check_events():
+                return 0, sources_handled
+        if self._timeout_handlers and schedule:
+            timeout = schedule - now
+        else:
+            timeout = None
+        return timeout, sources_handled
 

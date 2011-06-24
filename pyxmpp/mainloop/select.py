@@ -32,7 +32,7 @@ import time
 import select
 import logging
 
-from .interfaces import QUIT, HandlerReady, PrepareAgain
+from .interfaces import HandlerReady, PrepareAgain
 from .base import MainLoopBase
 
 logger = logging.getLogger("pyxmpp.mainloop.select")
@@ -42,7 +42,6 @@ class SelectMainLoop(MainLoopBase):
     def __init__(self, settings = None, handlers = None):
         self._handlers = []
         self._prepared = set()
-        self._timeout_handlers = []
         MainLoopBase.__init__(self, settings, handlers)
 
     def add_io_handler(self, handler):
@@ -59,57 +58,20 @@ class SelectMainLoop(MainLoopBase):
     def remove_io_handler(self, handler):
         self._handlers.remove(handler)
 
-    def add_timeout_handler(self, timeout, handler):
-        """Add a function to be called after `timeout` seconds."""
-        self._timeout_handlers.append(timeout, handler)
-        self._timeout_handlers.sort(key = lambda x: x[0])
-
     def loop_iteration(self, timeout = 60):
         """A loop iteration - check any scheduled events
         and I/O available and run the handlers.
         """
         if self.check_events():
             return 0
-        sources_handled = 0
-        now = time.time()
-        schedule = None
-        while self._timeout_handlers:
-            schedule, handler = self._timeout_handlers[0]
-            if schedule <= now:
-                self._timeout_handlers = self._timeout_handlers[1:]
-                handler()
-                sources_handled += 1
-            if self.check_events():
-                return sources_handled
-        if self._timeout_handlers and schedule:
-            timeout = min(timeout, schedule - now)
-        readable = []
-        writable = []
-        for handler in self._handlers:
-            if handler not in self._prepared:
-                logger.debug(" preparing handler: {0!r}".format(handler))
-                ret = handler.prepare()
-                logger.debug("   prepare result: {0!r}".format(ret))
-                if isinstance(ret, HandlerReady):
-                    self._prepared.add(handler)
-                elif isinstance(ret, PrepareAgain):
-                    if ret.timeout is not None:
-                        timeout = min(timeout, ret.timeout)
-                else:
-                    raise TypeError("Unexpected result type from prepare()")
-            if not handler.fileno():
-                logger.debug(" {0!r}: no fileno".format(handler))
-                continue
-            if handler.is_readable():
-                logger.debug(" {0!r} readable".format(handler))
-                readable.append(handler)
-            else:
-                logger.debug(" {0!r} not readable".format(handler))
-            if handler.is_writable():
-                logger.debug(" {0!r} writable".format(handler))
-                writable.append(handler)
-            else:
-                logger.debug(" {0!r} not writable".format(handler))
+        next_timeout, sources_handled = self._call_timeout_handlers()
+        if self._quit:
+            return sources_handled
+        if next_timeout is not None:
+            timeout = min(next_timeout, timeout)
+        readable, writable, next_timeout = self._prepare_handlers()
+        if next_timeout is not None:
+            timeout = min(next_timeout, timeout)
         if not readable and not writable:
             readable, writable, _unused = [], [], None
             time.sleep(timeout)
@@ -125,3 +87,41 @@ class SelectMainLoop(MainLoopBase):
             handler.handle_write()
             sources_handled += 1
         return sources_handled
+
+    def _prepare_handlers(self):
+        """Prepare the I/O handlers.
+
+        :Return: (readable, writable, timeout) tuple. 'readable' is the list
+        of readable handlers, `writable` - the list of writable handlers,
+        `timeout` the suggested maximum timeout for this loop iteration or
+        `None`
+        """
+        timeout = None
+        readable = []
+        writable = []
+        for handler in self._handlers:
+            if handler not in self._prepared:
+                logger.debug(" preparing handler: {0!r}".format(handler))
+                ret = handler.prepare()
+                logger.debug("   prepare result: {0!r}".format(ret))
+                if isinstance(ret, HandlerReady):
+                    self._prepared.add(handler)
+                elif isinstance(ret, PrepareAgain):
+                    if ret.timeout is not None:
+                        if timeout is None:
+                            timeout = ret.timeout
+                        else:
+                            timeout = min(timeout, ret.timeout)
+                else:
+                    raise TypeError("Unexpected result type from prepare()")
+            if not handler.fileno():
+                logger.debug(" {0!r}: no fileno".format(handler))
+                continue
+            if handler.is_readable():
+                logger.debug(" {0!r} readable".format(handler))
+                readable.append(handler)
+            if handler.is_writable():
+                logger.debug(" {0!r} writable".format(handler))
+                writable.append(handler)
+        return readable, writable, timeout
+

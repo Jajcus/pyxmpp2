@@ -27,6 +27,8 @@ import select
 
 if hasattr(select, "poll"):
     def wait_for_read(socket, timeout = None):
+        """Wait up to `timeout` seconds until `socket` is ready for reading.
+        """
         if timeout is not None:
             timeout *= 1000
         poll = select.poll()
@@ -34,6 +36,8 @@ if hasattr(select, "poll"):
         events = poll.poll(timeout)
         return bool(events)
     def wait_for_write(socket, timeout = None):
+        """Wait up to `timeout` seconds until `socket` is ready for writing.
+        """
         if timeout is not None:
             timeout *= 1000
         poll = select.poll()
@@ -42,8 +46,13 @@ if hasattr(select, "poll"):
         return bool(events)
 else:
     def wait_for_read(socket, timeout = None):
+        """Wait up to `timeout` seconds until `socket` is ready for reading.
+        """
         readable = select.select([socket], [], [], timeout)[0]
         return bool(readable)
     def wait_for_write(socket, timeout = None):
+        """Wait up to `timeout` seconds until `socket` is ready for writing.
+        """
         writable = select.select([], [socket], [], timeout)[1]
-        return writable(readable)
+        return writable(writable)
+

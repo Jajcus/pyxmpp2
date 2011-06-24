@@ -28,13 +28,11 @@ from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 
-import time
-import select
 import logging
+import select
 
-from .interfaces import QUIT, HandlerReady, PrepareAgain
+from .interfaces import HandlerReady, PrepareAgain
 from .base import MainLoopBase
-from ..settings import XMPPSettings
 
 logger = logging.getLogger("pyxmpp.mainloop.poll")
 
@@ -44,7 +42,6 @@ class PollMainLoop(MainLoopBase):
         self._handlers = {}
         self._unprepared_handlers = {}
         self.poll = select.poll()
-        self._timeout_handlers = []
         self._timeout = None
         MainLoopBase.__init__(self, settings, handlers)
 
@@ -59,21 +56,7 @@ class PollMainLoop(MainLoopBase):
             return
         if handler in self._unprepared_handlers:
             old_fileno = self._unprepared_handlers[handler]
-            logger.debug(" preparing handler: {0!r}".format(handler))
-            ret = handler.prepare()
-            logger.debug("   prepare result: {0!r}".format(ret))
-            if isinstance(ret, HandlerReady):
-                del self._unprepared_handlers[handler]
-                prepared = True
-            elif isinstance(ret, PrepareAgain):
-                if ret.timeout is not None:
-                    if self._timeout is not None:
-                        self._timeout = min(self._timeout, ret.timeout)
-                    else:
-                        self._timeout = ret.timeout
-                prepared = False
-            else:
-                raise TypeError("Unexpected result type from prepare()")
+            prepared = self._prepare_io_handler(handler)
         else:
             old_fileno = None
             prepared = True
@@ -98,6 +81,27 @@ class PollMainLoop(MainLoopBase):
                             " events {2}".format(handler, fileno, events))
             self.poll.register(fileno, events)
 
+    def _prepare_io_handler(self, handler):
+        """Call the `IOHandler.prepare` method and
+        remove the handler from unprepared handler list when done.
+        """
+        logger.debug(" preparing handler: {0!r}".format(handler))
+        ret = handler.prepare()
+        logger.debug("   prepare result: {0!r}".format(ret))
+        if isinstance(ret, HandlerReady):
+            del self._unprepared_handlers[handler]
+            prepared = True
+        elif isinstance(ret, PrepareAgain):
+            if ret.timeout is not None:
+                if self._timeout is not None:
+                    self._timeout = min(self._timeout, ret.timeout)
+                else:
+                    self._timeout = ret.timeout
+            prepared = False
+        else:
+            raise TypeError("Unexpected result type from prepare()")
+        return prepared
+
     def update_io_handler(self, handler):
         """Update an I/O handler in the loop."""
         self._configure_io_handler(handler)
@@ -116,30 +120,17 @@ class PollMainLoop(MainLoopBase):
             except KeyError:
                 pass
 
-    def add_timeout_handler(self, timeout, handler):
-        """Add a function to be called after `timeout` seconds."""
-        self._timeout_handlers.append(timeout, handler)
-        self._timeout_handlers.sort(key = lambda x: x[0])
-
     def loop_iteration(self, timeout = 60):
         """A loop iteration - check any scheduled events
         and I/O available and run the handlers.
         """
-        sources_handled = 0
-        now = time.time()
-        schedule = None
-        while self._timeout_handlers:
-            schedule, handler = self._timeout_handlers[0]
-            if schedule <= now:
-                self._timeout_handlers = self._timeout_handlers[1:]
-                handler()
-                sources_handled += 1
-            if self.check_events():
-                return sources_handled
-        if self._timeout_handlers and schedule:
-            timeout = min(timeout, schedule - now)
+        next_timeout, sources_handled = self._call_timeout_handlers()
+        if self._quit:
+            return sources_handled
         if self._timeout is not None:
             timeout = min(timeout, self._timeout)
+        if next_timeout is not None:
+            timeout = min(next_timeout, timeout)
         for handler in list(self._unprepared_handlers):
             self.update_io_handler(handler)
         events = self.poll.poll(timeout)

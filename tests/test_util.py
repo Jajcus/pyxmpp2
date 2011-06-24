@@ -272,7 +272,7 @@ class InitiatorSelectTestCase(NetworkTestCase):
 
     def wait(self, timeout = TIMEOUT, expect = None):
         timeout = time.time() + timeout
-        while not self.loop.finished():
+        while not self.loop.finished:
             self.loop.loop_iteration(0.1)
             if expect:
                 match = expect.match(self.server.rdata)
@@ -328,7 +328,7 @@ class ReceiverSelectTestCase(NetworkTestCase):
 
     def wait(self, timeout = TIMEOUT, expect = None):
         timeout = time.time() + timeout
-        while not self.loop.finished():
+        while not self.loop.finished:
             self.loop.loop_iteration(0.1)
             if expect:
                 match = expect.match(self.client.rdata)

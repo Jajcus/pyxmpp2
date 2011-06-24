@@ -26,7 +26,7 @@ from abc import ABCMeta
 
 class IOHandlerPrepareResult(object):
     """Result of the `IOHandler.prepare` method."""
-    # pylint: disable-msg=R0903
+    # pylint: disable-msg=R0903,R0921,R0922
     pass
 
 class HandlerReady(IOHandlerPrepareResult):
@@ -132,13 +132,17 @@ class IOHandler:
         raise NotImplementedError
 
 class Event:
+    """Base class for PyXMPP2 events.
+    """
+    # pylint: disable-msg=W0232,R0903,R0921,R0922
     __metaclass__ = ABCMeta
     def __unicode__(self):
         raise NotImplementedError
 
 QUIT = None
 class QuitEvent(Event):
-    @classmethod
+    """The `QUIT` event class."""
+    # pylint: disable-msg=W0232,R0903
     def __unicode__(self):
         return "Quit"
 QUIT = QuitEvent()
@@ -165,6 +169,7 @@ def event_handler(event_class = None):
 
 class MainLoop:
     """Base class for main loop implementations."""
+    # pylint: disable-msg=W0232
     __metaclass__ = ABCMeta
     def add_io_handler(self, handler):
         """Add an I/O handler to the loop."""
@@ -181,13 +186,26 @@ class MainLoop:
     def quit(self):
         """Make the loop stop after the current iteration."""
         raise NotImplementedError
+    @property
     def started(self):
+        """`True` then the loop has been started.
+        """
         raise NotImplementedError
+    @property
     def finished(self):
+        """`True` then the loop has been finished or is about to finish (the
+        final iteration in progress).
+        """
         raise NotImplementedError
-    def run(self, timeout = 60):
-        """Run the loop."""
+    def loop(self, timeout = 1):
+        """Run the loop.
+        
+        :Parameters:
+            - `timeout`: default polling interval in seconds
+        :Types:
+            - `timeout`: `float`
+        """
         raise NotImplementedError
-    def loop_iteration(self, timeout = 60):
+    def loop_iteration(self, timeout = 1):
         """Single loop iteration."""
         raise NotImplementedError
