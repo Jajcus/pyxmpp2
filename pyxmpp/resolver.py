@@ -29,6 +29,8 @@ __docformat__ = "restructuredtext en"
 import socket
 import random
 import logging
+import threading
+import Queue
 
 from abc import ABCMeta
 
@@ -163,6 +165,70 @@ def reorder_srv(records):
     if tmp:
         ret += shuffle_srv(tmp)
     return ret
+
+class ThreadedResolverBase(Resolver):
+    def __init__(self, settings =  None, max_threads = 1):
+        if settings:
+            self.settings = settings
+        else:
+            self.settings = XMPPSettings()
+        self.threads = []
+        self.queue = Queue.Queue()
+        self.lock = threading.RLock()
+        self.max_threads = max_threads
+        self.last_thread_n = 0
+        
+    def _make_resolver(self):
+        raise NotImplementedError
+
+    def stop(self):
+        with self.lock:
+            for thread in self.threads:
+                self.queue.put(None)
+        
+    def _start_thread(self):
+        with self.lock:
+            if self.threads and self.queue.empty():
+                return
+            if len(self.threads) >= self.max_threads:
+                return
+            thread_n = self.last_thread_n + 1
+            self.last_thread_n = thread_n
+            thread = threading.Thread(target = self._run,
+                            name = "{0!r} #{1}".format(self, thread_n),
+                            args = (thread_n,))
+            self.threads.append(thread)
+            thread.daemon = True
+            thread.start()
+
+    def resolve_address(self, hostname, callback, allow_cname = True):
+        request = ("resolve_address", (hostname, callback, allow_cname))
+        self._start_thread()
+        self.queue.put(request)
+    
+    def resolve_srv(self, domain, service, protocol, callback):
+        request = ("resolve_srv", (domain, service, protocol, callback))
+        self._start_thread()
+        self.queue.put(request)
+
+    def _run(self, thread_n):
+        try:
+            logger.debug("{0!r}: entering thread #{1}"
+                                                .format(self, thread_n))
+            resolver = self._make_resolver()
+            while True:
+                request = self.queue.get()
+                if request is None:
+                    break
+                method, args = request
+                logger.debug(" calling {0!r}.{1}{2!r}"
+                                            .format(resolver, method, args))
+                getattr(resolver, method)(*args)
+                self.queue.task_done()
+            logger.debug("{0!r}: leaving thread #{1}"
+                                                .format(self, thread_n))
+        finally:
+            self.threads.remove(threading.currentThread())
 
 class DumbBlockingResolver(Resolver):
     """Simple blocking resolver using only the standard Python library.
@@ -358,6 +424,11 @@ if HAVE_DNSPYTHON:
                 logger.warning("Could not resolve {0!r}: {1}".format(hostname,
                                                 exception.__class__.__name__))
             callback(result)
+
+    class ThreadedResolver(ThreadedResolverBase):
+        def _make_resolver(self):    
+            return BlockingResolver(self.settings)
+
     XMPPSettings.add_default_factory("dns_resolver", BlockingResolver)
 else:
     XMPPSettings.add_default_factory("dns_resolver", DumbBlockingResolver)
