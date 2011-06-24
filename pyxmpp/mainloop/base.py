@@ -64,6 +64,11 @@ class MainLoopBase(MainLoop):
             self.event_dispatcher.remove_handler(handler)
 
     def _add_io_handler(self, handler):
+        """Add an `IOHandler` to the loop."""
+        raise NotImplementedError
+
+    def _remove_io_handler(self, handler):
+        """Remove an `IOHandler` from the loop."""
         raise NotImplementedError
 
     @property
@@ -95,6 +100,7 @@ class MainLoopBase(MainLoop):
 
     def _add_timeout_handler(self, handler):
         """Add a `TimeoutHandler` to the main loop."""
+        # pylint: disable-msg=W0212
         now = time.time()
         for dummy, method in inspect.getmembers(handler, callable):
             if not hasattr(method, "_pyxmpp_timeout"):
@@ -105,14 +111,9 @@ class MainLoopBase(MainLoop):
 
     def _remove_timeout_handler(self, handler):
         """Remove `TimeoutHandler` from the main loop."""
-        known = set((h for (t, h) in self._timeout_handlers))
-        for dummy, method in inspect.getmembers(handler, callable):
-            if not hasattr(method, "_pyxmpp_timeout"):
-                continue
-            if method in known:
-                self._timeout_handlers = [(t, h) for (t, h) 
+        self._timeout_handlers = [(t, h) for (t, h) 
                                             in self._timeout_handlers
-                                            if h != method]
+                                            if h.im_self != handler]
 
     def _call_timeout_handlers(self):
         """Call the timeout handlers due.
@@ -127,12 +128,13 @@ class MainLoopBase(MainLoop):
         while self._timeout_handlers:
             schedule, handler = self._timeout_handlers[0]
             if schedule <= now:
+                # pylint: disable-msg=W0212
                 self._timeout_handlers = self._timeout_handlers[1:]
                 result = handler()
                 rec = handler._pyxmpp_recurring
                 if rec:
-                    self._timeout_handlers.append((now + method._pyxmpp_timeout,
-                                                                    handler))
+                    self._timeout_handlers.append(
+                                    (now + handler._pyxmpp_timeout, handler))
                     self._timeout_handlers.sort(key = lambda x: x[0])
                 elif rec is None and result is not None:
                     self._timeout_handlers.append((now + result, handler))

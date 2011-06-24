@@ -33,9 +33,10 @@ import threading
 import logging
 import sys
 import Queue
+import inspect
 
 from .interfaces import MainLoop, HandlerReady, PrepareAgain
-from .interfaces import IOHandler, QUIT
+from .interfaces import IOHandler, QUIT, EventHandler, TimeoutHandler
 from .events import EventDispatcher
 from ..settings import XMPPSettings
 from .wait import wait_for_read, wait_for_write
@@ -243,36 +244,188 @@ class EventDispatcherThread(object):
         else:
             logger.debug("{0}: exiting thread".format(self.name))
 
+class TimeoutThread(object):
+    """Thread to handle `TimeoutHandler` methods.
+
+    :Ivariables:
+        - `method`: the timout handler method
+        - `name`: thread name (for debugging)
+        - `thread`: the actual thread object
+        - `exc_info`: this will hold exception information tuple
+        whenever the thread was aborted by an exception.
+        - `exc_queue`: queue for raised exceptions
+    :Types:
+        - `name`: `unicode`
+        - `method`: a bound method decorated with `timeout_handler`
+        - `thread`: `threading.Thread`
+        - `exc_info`: (type, value, traceback) tuple
+        - `exc_queue`: queue for raised exceptions
+    """
+    def __init__(self, method, name = None, daemon = True, exc_queue = None):
+        if name is None:
+            name = "{0!r} timer thread"
+        else:
+            self.name = name
+        self.method = method
+        self.thread = threading.Thread(name = name, target = self._run)
+        self.thread.daemon = daemon
+        self.exc_info = None
+        self.exc_queue = exc_queue
+        self._quit = False
+
+    def start(self):
+        """Start the thread.
+        """
+        self.thread.start()
+    
+    def is_alive(self):
+        """Check if the thread is alive."""
+        return self.thread.is_alive()
+
+    def stop(self):
+        """Request the thread to stop."""
+        self._quit = True
+
+    def join(self, timeout):
+        """Join the thread (wait until it stops)."""
+        return self.thread.join(timeout)
+
+    def _run(self):
+        """The thread function. Calls `self.run()` and if it raises
+        an exception, stores it in self.exc_info
+        """
+        logger.debug("{0}: entering thread".format(self.name))
+        try:
+            self.run()
+        except Exception: # pylint: disable-msg=W0703
+            logger.debug("{0}: aborting thread".format(self.name))
+            self.exc_info = sys.exc_info()
+            logger.debug(u"exception in the {0!r} thread:"
+                            .format(self.name), exc_info = self.exc_info)
+            if self.exc_queue:
+                self.exc_queue.put( (self, self.exc_info) )
+        else:
+            logger.debug("{0}: exiting thread".format(self.name))
+
+    def run(self):
+        """The thread function."""
+        # pylint: disable-msg=W0212
+        timeout = self.method._pyxmpp_timeout
+        recurring = self.method._pyxmpp_recurring
+        while not self._quit and timeout is not None:
+            if timeout:
+                time.sleep(timeout)
+            if self._quit:
+                break
+            ret = self.method()
+            if recurring is None:
+                timeout = ret
+            elif not recurring:
+                break
 
 class ThreadPool(MainLoop):
     """Thread pool object, as a replacement for an asychronous event loop."""
+    # pylint: disable-msg=R0902
     def __init__(self, settings = None, handlers = None):
         self.settings = settings if settings else XMPPSettings()
         self.io_handlers = []
+        self.timeout_handlers = []
         self.event_queue = self.settings["event_queue"]
         self.event_dispatcher = EventDispatcher(self.settings, handlers)
-        if handlers:
-            for handler in handlers:
-                if isinstance(handler, IOHandler):
-                    self.io_handlers.append(handler)
         self.exc_queue = Queue.Queue()
         self.io_threads = []
+        self.timeout_threads = []
         self.event_thread = None
+        self.daemon = False
+        if handlers:
+            for handler in handlers:
+                self.add_handler(handler)
+
+    def add_handler(self, handler):
+        if isinstance(handler, IOHandler):
+            self._add_io_handler(handler)
+        if isinstance(handler, EventHandler):
+            self.event_dispatcher.add_handler(handler)
+        if isinstance(handler, TimeoutHandler):
+            self._add_timeout_handler(handler)
+
+    def remove_handler(self, handler):
+        if isinstance(handler, IOHandler):
+            self._remove_io_handler(handler)
+        if isinstance(handler, EventHandler):
+            self.event_dispatcher.remove_handler(handler)
+        if isinstance(handler, TimeoutHandler):
+            self._remove_timeout_handler(handler)
+
+    def _add_io_handler(self, handler):
+        """Add an IOHandler to the pool.
+        """
+        self.io_handlers.append(handler)
+        if self.event_thread is None:
+            return
+
+    def _run_io_threads(self, handler):
+        """Start threads for an IOHandler.
+        """
+        reader = ReadingThread(handler, daemon = self.daemon,
+                                                exc_queue = self.exc_queue)
+        writter = WrittingThread(handler, daemon = self.daemon,
+                                                exc_queue = self.exc_queue)
+        self.io_threads += [reader, writter]
+        reader.start()
+        writter.start()
+
+    def _remove_io_handler(self, handler):
+        """Remove an IOHandler from the pool.
+        """
+        if handler not in self.io_handlers:
+            return
+        self.io_handlers.remove(handler)
+        for thread in self.io_threads:
+            if thread.io_handler is handler:
+                thread.stop()
+
+    def _add_timeout_handler(self, handler):
+        """Add a TimeoutHandler to the pool.
+        """
+        self.timeout_handlers.append(handler)
+        if self.event_thread is None:
+            return
+        self._run_timeout_threads(handler)
+
+    def _run_timeout_threads(self, handler):
+        """Start threads for a TimeoutHandler.
+        """
+        # pylint: disable-msg=W0212
+        for dummy, method in inspect.getmembers(handler, callable):
+            if not hasattr(method, "_pyxmpp_timeout"):
+                continue
+            thread = TimeoutThread(method, daemon = self.daemon,
+                                                    exc_queue = self.exc_queue)
+            self.timeout_threads.append(thread)
+            thread.start()
+
+    def _remove_timeout_handler(self, handler):
+        """Remove a TimeoutHandler from the pool.
+        """
+        if handler not in self.timeout_handlers:
+            return
+        self.io_handlers.remove(handler)
+        for thread in self.timeout_threads:
+            if thread.handler_method.im_self is handler:
+                thread.stop()
 
     def start(self, daemon = False):
         """Start the threads."""
+        self.daemon = daemon
         self.io_threads = []
-        for handler in self.io_handlers:
-            reader = ReadingThread(handler, daemon = daemon,
-                                                    exc_queue = self.exc_queue)
-            writter = WrittingThread(handler, daemon = daemon,
-                                                    exc_queue = self.exc_queue)
-            self.io_threads += [reader, writter]
         self.event_thread = EventDispatcherThread(self.event_dispatcher,
                                     daemon = daemon, exc_queue = self.exc_queue)
         self.event_thread.start()
-        for thread in self.io_threads:
-            thread.start()
+        for handler in self.io_handlers:
+            self._run_io_threads(handler)
+        for handler in self.timeout_handlers:
+            self._run_timeout_threads(handler)
 
     def stop(self, join = False, timeout = None):
         """Stop the threads.
