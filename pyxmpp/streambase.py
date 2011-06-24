@@ -48,6 +48,7 @@ from .streamevents import ConnectedEvent
 from .streamevents import StreamConnectedEvent, GotFeaturesEvent
 from .streamevents import AuthenticatedEvent, StreamRestartedEvent
 from .mainloop.interfaces import EventHandler, event_handler
+from .mainloop.interfaces import TimeoutHandler, timeout_handler
 
 XMPPSettings.add_defaults(
         {
@@ -162,7 +163,8 @@ def stream_element_handler(element_name, usage_restriction = None):
         return func
     return decorator
 
-class StreamBase(StanzaProcessor, XMLStreamHandler, EventHandler):
+class StreamBase(StanzaProcessor, XMLStreamHandler, EventHandler,
+                                                            TimeoutHandler):
     """Base class for a generic XMPP stream.
 
     Responsible for establishing connection, parsing the stream, dispatching
@@ -553,6 +555,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, EventHandler):
         element = stanza.as_xml()
         self._write_element(element)
 
+    @timeout_handler(60)
     def regular_tasks(self):
         """Do some housekeeping (cache expiration, timeout handling).
 

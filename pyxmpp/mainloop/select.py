@@ -44,18 +44,11 @@ class SelectMainLoop(MainLoopBase):
         self._prepared = set()
         MainLoopBase.__init__(self, settings, handlers)
 
-    def add_io_handler(self, handler):
+    def _add_io_handler(self, handler):
         """Add an I/O handler to the loop."""
         self._handlers.append(handler)
 
-    def update_io_handler(self, handler):
-        """Add an I/O handler to the loop."""
-        if handler in self._handlers:
-            return
-        else:
-            raise KeyError("Handler")
-
-    def remove_io_handler(self, handler):
+    def _remove_io_handler(self, handler):
         self._handlers.remove(handler)
 
     def loop_iteration(self, timeout = 60):

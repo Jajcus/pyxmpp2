@@ -155,6 +155,8 @@ class EventHandler:
 
 def event_handler(event_class = None):
     """Method decorator generator for decorating event handlers.
+
+    To be used on `EventHandler` subclass methods only.
     
     :Parameters:
         - `event_class`: event class expected
@@ -167,21 +169,56 @@ def event_handler(event_class = None):
         return func
     return decorator
 
+class TimeoutHandler:
+    """Base class for PyXMPP timeout handlers."""
+    # pylint: disable-msg=W0232,R0903
+    __metaclass__ = ABCMeta
+
+def timeout_handler(interval, recurring = None):
+    """Method decorator generator for decorating event handlers.
+    
+    To be used on `TimeoutHandler` subclass methods only.
+    
+    :Parameters:
+        - `interval`: interval (in seconds) before the method will be called.
+        - `recurring`: When `True`, the handler will be called each `interval`
+          seconds, when `False` it will be called only once. If `True`,
+          then the handler should return the next interval or `None` if it
+          should not be called again.
+    :Types:
+        - `interval`: `float`
+        - `recurring`: `bool`
+    """
+    def decorator(func):
+        """The decorator"""
+        func._pyxmpp_timeout = interval
+        func._pyxmpp_recurring = recurring
+        return func
+    return decorator
+
 class MainLoop:
     """Base class for main loop implementations."""
     # pylint: disable-msg=W0232
     __metaclass__ = ABCMeta
-    def add_io_handler(self, handler):
-        """Add an I/O handler to the loop."""
+    def add_handler(self, handler):
+        """Add a new handler to the main loop.
+
+        :Parameters:
+            `handler`: the handler object to add
+        :Types:
+            `handler`: `IOHandler` or `EventHandler` or `TimeoutHandler`
+        """
         raise NotImplementedError
-    def update_io_handler(self, handler):
-        """Add an I/O handler to the loop."""
-        raise NotImplementedError
-    def remove_io_handler(self, handler):
-        """Remove an I/O handler to the loop."""
-        raise NotImplementedError
-    def add_timeout_handler(self, timeout, handler):
-        """Add a function to be called after `timeout` seconds."""
+    def remove_handler(self, handler):
+        """Add a new handler to the main loop.
+
+        Do nothing if the handler is not registered at the main loop.
+
+        :Parameters:
+            `handler`: the handler object to add
+        :Types:
+            `handler`: `IOHandler` or `EventHandler` or `TimeoutHandler`
+        """
         raise NotImplementedError
     def quit(self):
         """Make the loop stop after the current iteration."""

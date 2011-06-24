@@ -24,9 +24,10 @@ __docformat__ = "restructuredtext en"
 
 import time
 import logging
+import inspect
 
 from .events import EventDispatcher
-from .interfaces import EventHandler, IOHandler, MainLoop, QUIT
+from .interfaces import EventHandler, IOHandler, TimeoutHandler, MainLoop, QUIT
 from ..settings import XMPPSettings
 
 logger = logging.getLogger("pyxmpp.mainloop.base")
@@ -44,10 +45,27 @@ class MainLoopBase(MainLoop):
         self._quit = False
         self._started = False
         for handler in handlers:
-            if isinstance(handler, IOHandler):
-                self.add_io_handler(handler)
-            elif isinstance(handler, EventHandler):
-                self.event_dispatcher.add_handler(handler)
+            self.add_handler(handler)
+
+    def add_handler(self, handler):
+        if isinstance(handler, IOHandler):
+            self._add_io_handler(handler)
+        if isinstance(handler, TimeoutHandler):
+            self._add_timeout_handler(handler)
+        if isinstance(handler, EventHandler):
+            self.event_dispatcher.add_handler(handler)
+
+    def remove_handler(self, handler):
+        if isinstance(handler, IOHandler):
+            self._remove_io_handler(handler)
+        if isinstance(handler, TimeoutHandler):
+            self._remove_timeout_handler(handler)
+        if isinstance(handler, EventHandler):
+            self.event_dispatcher.remove_handler(handler)
+
+    def _add_io_handler(self, handler):
+        raise NotImplementedError
+
     @property
     def finished(self):
         return self._quit
@@ -75,11 +93,26 @@ class MainLoopBase(MainLoop):
             return True
         return False
 
-    def add_timeout_handler(self, timeout, handler):
-        """Add a function to be called after `timeout` seconds."""
-        self._timeout_handlers.append(timeout, handler)
+    def _add_timeout_handler(self, handler):
+        """Add a `TimeoutHandler` to the main loop."""
+        now = time.time()
+        for dummy, method in inspect.getmembers(handler, callable):
+            if not hasattr(method, "_pyxmpp_timeout"):
+                continue
+            self._timeout_handlers.append((now + method._pyxmpp_timeout,
+                                                                    method))
         self._timeout_handlers.sort(key = lambda x: x[0])
 
+    def _remove_timeout_handler(self, handler):
+        """Remove `TimeoutHandler` from the main loop."""
+        known = set((h for (t, h) in self._timeout_handlers))
+        for dummy, method in inspect.getmembers(handler, callable):
+            if not hasattr(method, "_pyxmpp_timeout"):
+                continue
+            if method in known:
+                self._timeout_handlers = [(t, h) for (t, h) 
+                                            in self._timeout_handlers
+                                            if h != method]
 
     def _call_timeout_handlers(self):
         """Call the timeout handlers due.
@@ -95,7 +128,15 @@ class MainLoopBase(MainLoop):
             schedule, handler = self._timeout_handlers[0]
             if schedule <= now:
                 self._timeout_handlers = self._timeout_handlers[1:]
-                handler()
+                result = handler()
+                rec = handler._pyxmpp_recurring
+                if rec:
+                    self._timeout_handlers.append((now + method._pyxmpp_timeout,
+                                                                    handler))
+                    self._timeout_handlers.sort(key = lambda x: x[0])
+                elif rec is None and result is not None:
+                    self._timeout_handlers.append((now + result, handler))
+                    self._timeout_handlers.sort(key = lambda x: x[0])
                 sources_handled += 1
             if self.check_events():
                 return 0, sources_handled

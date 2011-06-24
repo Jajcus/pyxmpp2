@@ -45,7 +45,7 @@ class PollMainLoop(MainLoopBase):
         self._timeout = None
         MainLoopBase.__init__(self, settings, handlers)
 
-    def add_io_handler(self, handler):
+    def _add_io_handler(self, handler):
         """Add an I/O handler to the loop."""
         self._unprepared_handlers[handler] = None
         self._configure_io_handler(handler)
@@ -102,11 +102,7 @@ class PollMainLoop(MainLoopBase):
             raise TypeError("Unexpected result type from prepare()")
         return prepared
 
-    def update_io_handler(self, handler):
-        """Update an I/O handler in the loop."""
-        self._configure_io_handler(handler)
-
-    def remove_io_handler(self, handler):
+    def _remove_io_handler(self, handler):
         """Remove an i/o-handler."""
         if handler in self._unprepared_handlers:
             old_fileno = self._unprepared_handlers[handler]
@@ -132,7 +128,7 @@ class PollMainLoop(MainLoopBase):
         if next_timeout is not None:
             timeout = min(next_timeout, timeout)
         for handler in list(self._unprepared_handlers):
-            self.update_io_handler(handler)
+            self._configure_io_handler(handler)
         events = self.poll.poll(timeout)
         self._timeout = None
         for (fileno, event) in events:
