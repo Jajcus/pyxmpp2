@@ -44,7 +44,7 @@ class XMLStreamHandler(object):
         :Parameters:
             - `element`: the root element
         :Types:
-            - `element`: `ElementTree.Element`"""
+            - `element`: :etree:`ElementTree.Element`"""
         logger.error("Unhandled stream start: {0!r}".format(element))
 
     def stream_end(self):
@@ -60,7 +60,7 @@ class XMLStreamHandler(object):
         :Parameters:
             - `element`: the (complete) element being processed
         :Types:
-            - `element`: `ElementTree.Element`"""
+            - `element`: :etree:`ElementTree.Element`"""
         logger.error("Unhandled stanza: {0!r}".format(element))
 
     def stream_parse_error(self, descr):
@@ -91,7 +91,7 @@ class ParserTarget(object):
         :Parameters:
             - `handler`: Object to handle stream start, end and stanzas.
         :Types:
-            - `handler`: `StreamHandler`
+            - `handler`: `XMLStreamHandler`
         """
         self._handler = handler
         self._head = ""
@@ -115,7 +115,7 @@ class ParserTarget(object):
         Call the handler's 'stream_start' methods with 
         an empty root element if it is top level.
         
-        For lower level tags use `ElementTree.TreeBuilder` to collect them."""
+        For lower level tags use :etree:`ElementTree.TreeBuilder` to collect them."""
         if self._level == 0:
             self._root = ElementTree.Element(tag, attrs)
             self._handler.stream_start(self._root)
@@ -156,7 +156,21 @@ class ParserTarget(object):
             self._handler.stream_element(element)
 
 class StreamReader(object):
-    """XML stream reader."""
+    """XML stream reader.
+    
+    :Ivariables:
+        - `handler`: object to receive parsed stream elements
+        - `parser`: the xml parser
+        - `lock`: lock to protect the object
+        - `in_use`: re-entrancy protection
+        - `_started`: flag set after the first byte is pushed to the parser
+    :Types:
+        - `handler`: `XMLStreamHandler`
+        - `parser`: :etree:`ElementTree.XMLParser`
+        - `lock`: :std:`threading.RLock`
+        - `in_use`: `bool`
+        - `_started`: `bool`
+    """
     # pylint: disable-msg=R0903
     def __init__(self, handler):
         """Initialize the reader.
@@ -164,17 +178,17 @@ class StreamReader(object):
         :Parameters:
             - `handler`: Object to handle stream start, end and stanzas.
         :Types:
-            - `handler`: `StreamHandler`
+            - `handler`: `XMLStreamHandler`
         """
         self.handler = handler
         self.parser = ElementTree.XMLParser(target = ParserTarget(handler))
         self.lock = threading.RLock()
-        self.in_use = 0
-        self.started = False
+        self.in_use = False
+        self._started = False
 
     def feed(self, data):
         """Feed the parser with a chunk of data. Apropriate methods
-        of `self.handler` will be called whenever something interesting is
+        of `handler` will be called whenever something interesting is
         found.
 
         :Parameters:
@@ -184,14 +198,14 @@ class StreamReader(object):
         with self.lock:
             if self.in_use:
                 raise StreamParseError("StreamReader.feed() is not reentrant!")
-            self.in_use = 1
+            self.in_use = True
             try:
-                if not self.started:
+                if not self._started:
                     # workaround for lxml bug when fed with a big chunk at once
                     if len(data) > 1:
                         self.parser.feed(data[0])
                         data = data[1:]
-                    self.started = True
+                    self._started = True
                 if data:
                     self.parser.feed(data)
                 else:
@@ -199,6 +213,6 @@ class StreamReader(object):
             except ElementTree.ParseError, err:
                 self.handler.stream_parse_error(unicode(err))
             finally:
-                self.in_use = 0
+                self.in_use = False
 
 # vi: sts=4 et sw=4

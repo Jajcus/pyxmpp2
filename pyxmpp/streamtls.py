@@ -80,10 +80,10 @@ class StreamTLSHandler(StreamFeatureHandler, EventHandler):
         :Parameters:
             - `features`: the <features/> element of the stream.
         :Types:
-            - `features`: `ElementTree.Element`
+            - `features`: :etree:`ElementTree.Element`
 
         :returns: update <features/> element.
-        :returntype: `ElementTree.Element`
+        :returntype: :etree:`ElementTree.Element`
         """
         if self.stream and stream is not self.stream:
             raise ValueError("Single StreamTLSHandler instance can handle"
@@ -194,51 +194,13 @@ class StreamTLSHandler(StreamFeatureHandler, EventHandler):
         with event.stream.lock:
             event.stream._restart_stream() # pylint: disable-msg=W0212
 
-    def _send_data(self, data):
-        """TLS implementation of `StreamBase._data_sender` (blocking)"""
-        try:
-            if not self.stream.socket:
-                return
-            while data:
-                try:
-                    sent = self.stream.socket.send(data)
-                    data = data[sent:]
-                except SSLError, err:
-                    if err.args[0] == ssl.SSL_ERROR_WANT_WRITE:
-                        continue
-                    raise
-        except (IOError, OSError, socket.error), err:
-            raise FatalStreamError("IO Error: {0}".format(err))
-        except SSLError, err:
-            raise TLSError("TLS Error: {0}".format(err))
-
-    def _handle_read(self):
-        """Read data pending on the stream socket and feed the parser.
-        
-        Replacement for `StreamBase._handle_read_direct` as
-        `StreamBase._handle_read`
-        """
-        if self.stream.eof:
-            return
-        while self.stream.socket:
-            try:
-                data = self.stream.socket.read()
-                if data is None:
-                    return
-            except SSLError, err:
-                if err.args[0] == ssl.SSL_ERROR_WANT_READ:
-                    return
-                self.stream.close()
-                raise TLSError("TLS Error: {0}".format(err))
-            self.stream._feed_reader(data) # pylint: disable-msg=W0212
-
     @staticmethod
     def is_certificate_valid(stream, cert):
         """Default certificate verification callback for TLS connections.
 
         :Parameters:
             - `cert`: certificate information, as returned by
-              `ssl.SSLSocket.getpeercert`
+              :std:`ssl.SSLSocket.getpeercert`
 
         :return: computed verification result."""
         try:

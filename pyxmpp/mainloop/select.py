@@ -17,7 +17,7 @@
 
 """I/O Handling classes
 
-This module has a purpose similar to `asyncore` from the base library, but
+This module has a purpose similar to :std:`asyncore` from the base library, but
 should be more usable, especially for PyXMPP.
 
 Also, these interfaces should allow building application not only in
@@ -85,9 +85,9 @@ class SelectMainLoop(MainLoopBase):
         """Prepare the I/O handlers.
 
         :Return: (readable, writable, timeout) tuple. 'readable' is the list
-        of readable handlers, `writable` - the list of writable handlers,
-        `timeout` the suggested maximum timeout for this loop iteration or
-        `None`
+            of readable handlers, 'writable' - the list of writable handlers,
+            'timeout' the suggested maximum timeout for this loop iteration or
+            `None`
         """
         timeout = None
         readable = []

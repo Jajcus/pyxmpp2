@@ -17,7 +17,7 @@
 
 """I/O Handling classes
 
-This module has a purpose similar to `asyncore` from the base library, but
+This module has a purpose similar to :std:`asyncore` from the base library, but
 should be more usable, especially for PyXMPP.
 
 Also, these interfaces should allow building application not only in
@@ -82,7 +82,7 @@ class PollMainLoop(MainLoopBase):
             self.poll.register(fileno, events)
 
     def _prepare_io_handler(self, handler):
-        """Call the `IOHandler.prepare` method and
+        """Call the `interfaces.IOHandler.prepare` method and
         remove the handler from unprepared handler list when done.
         """
         logger.debug(" preparing handler: {0!r}".format(handler))

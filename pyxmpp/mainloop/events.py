@@ -37,27 +37,28 @@ from ..settings import XMPPSettings
 class EventDispatcher(object):
     """Dispatches events from an event queue to event handlers.
 
-    Events are `.interfaces.Event` instances stored in the event queue
+    Events are `interfaces.Event` instances stored in the event queue
     (defined by the "event_queue" setting). Event handlers are `EventHandler`
-    subclass instance methods decorated with the `event_handler` decorator.
+    subclass instance methods decorated with the `interfaces.event_handler`
+    decorator.
 
     :Ivariables:
         - `queue`: the event queue
         - `handlers`: list of handler objects
         - `lock`: the thread synchronisation lock
-        - `_handlers_map`: mapping of event type to list of handler methods
+        - `_handler_map`: mapping of event type to list of handler methods
     :Types:
-        - `queue`: `Queue.Queue`
+        - `queue`: :std:`Queue.Queue`
         - `handlers`: `list` of `EventHandler`
-        - `lock`: `threading.RLock`
-        - `_handlers_map`: `type` -> `list` of callable mapping
+        - `lock`: :std:`threading.RLock`
+        - `_handler_map`: `type` -> `list` of callable mapping
     """
     def __init__(self, settings = None, handlers = None):
         """Initialize the event dispatcher.
 
         :Parameters:
-            - `settings`: the settings. "event_queue" settings provides
-            the event queue object.
+            - `settings`: the settings. "event_queue" settings provides the
+              event queue object.
             - `handlers`: the initial list of event handler objects.
         :Types:
             - `settings`: `XMPPSettings`
@@ -66,7 +67,7 @@ class EventDispatcher(object):
         if settings is None:
             settings = XMPPSettings()
         self.queue = settings["event_queue"]
-        self._handlers_map = defaultdict(list)
+        self._handler_map = defaultdict(list)
         if handlers:
             self.handlers = list(handlers)
         else:
@@ -78,9 +79,9 @@ class EventDispatcher(object):
         """Add a handler object.
 
         :Parameters:
-            `handler`: the object providing event handler methods
+            - `handler`: the object providing event handler methods
         :Types:
-            `handler`: `EventHandler`
+            - `handler`: `EventHandler`
         """
         if not isinstance(handler, EventHandler):
             raise TypeError, "Not an EventHandler"
@@ -94,7 +95,7 @@ class EventDispatcher(object):
         """Remove a handler object.
         
         :Parameters:
-            `handler`: the object to remove
+            - `handler`: the object to remove
         """
         with self.lock:
             if handler in self.handlers:
@@ -102,7 +103,7 @@ class EventDispatcher(object):
                 self._update_handlers()
 
     def _update_handlers(self):
-        """Update `self.handler_map` after `self.handlers` have been
+        """Update `_handler_map` after `handlers` have been
         modified."""
         handler_map = defaultdict(list)
         for i, obj in enumerate(self.handlers):
@@ -119,11 +120,11 @@ class EventDispatcher(object):
         the appropriate handlers.
 
         :Parameters:
-            `block`: wait for event if the queue is empty
-            `timeout`: maximum time, in seconds, to wait if `block` is `True`
+            - `block`: wait for event if the queue is empty
+            - `timeout`: maximum time, in seconds, to wait if `block` is `True`
         :Types:
-            `block`: `bool`
-            `timeout`: `float`
+            - `block`: `bool`
+            - `timeout`: `float`
 
         :Return: the event handled (may be `QUIT`) or `None`
         """
@@ -159,8 +160,8 @@ class EventDispatcher(object):
         removed.
 
         :Parameters:
-            `dispatch`: if the events should be handled (`True`) or ignored
-            (`False`)
+            - `dispatch`: if the events should be handled (`True`) or ignored
+              (`False`)
 
         :Return: `QUIT` if the `QUIT` event was reached.
         """

@@ -1,0 +1,5 @@
+ElementTree	#
+ElementTree.ElementTree	#xml.etree.ElementTree.ElementTree
+ElementTree.Element	#xml.etree.ElementTree.Element
+ElementTree.TreeBuilder	#xml.etree.ElementTree.TreeBuilder
+ElementTree.XMLParser	#xml.etree.ElementTree.XMLParser

@@ -76,8 +76,8 @@ class Client:
         - `stream`: `pyxmpp.ClientStream`
         - `roster`: `pyxmpp.Roster`
         - `session_established`: `bool`
-        - `lock`: `threading.RLock`
-        - `state_changed`: `threading.Condition`
+        - `lock`: :std:`threading.RLock`
+        - `state_changed`: :std:`threading.Condition`
         - `interface_providers`: `list`
     """
     def __init__(self,jid=None,password=None,server=None,port=5222,
@@ -224,7 +224,7 @@ class Client:
         """Get the socket object of the active connection.
 
         :return: socket used by the stream.
-        :returntype: `socket.socket`"""
+        :returntype: :std:`socket.socket`"""
         return self.stream.socket
 
     def loop(self,timeout=1):

@@ -21,19 +21,22 @@ The rest of PyXMPP2 package imports the ElementTree API from this module.
 
 The actual API can be selected in one of two ways:
 
-By importing this module (before anything else) its `ElementTree` variable:
+By importing this module (before anything else) its :etree:`ElementTree`
+variable:
 
-    >> import pyxmpp2.etree
-    >> import xml.etree.cElementTree
-    >> pyxmpp2.etree.ElementTree = xml.etree.cElementTree
+.. python::
 
-Or by setting the 'PYXMPP2_ETREE' variable, e.g.:
+    import pyxmpp2.etree
+    import xml.etree.cElementTree
+    pyxmpp2.etree.ElementTree = xml.etree.cElementTree
+
+Or by setting the 'PYXMPP2_ETREE' environment variable, e.g.::
 
     $ PYXMPP2_ETREE="xml.etree"
 
-
 By default the standard Python ElementTree implementation is used
-(`xml.etree.ElementTree`)
+(`xml.etree.ElementTree
+<http://docs.python.org/library/xml.etree.elementtree.html>`__)
 """
 
 from __future__ import absolute_import
@@ -49,6 +52,9 @@ else:
     from xml.etree import ElementTree
 
 class ElementClass:
+    """Abstract class used to reference the :etree:`ElementTree.Element`
+    object type of the selected Element Tree implementation.
+    """
     __metaclass__ = ABCMeta
     element_type = None
     @classmethod

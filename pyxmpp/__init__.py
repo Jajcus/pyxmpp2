@@ -41,7 +41,7 @@ Module hierarchy
 
 Base XMPP features (`RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__, `RFC
 3921 <http://www.ietf.org/rfc/rfc3921.txt>`__) are implemented in direct
-submodules of `pyxmpp` package.
+submodules of `pyxmpp2` package.
 """
 
 __docformat__ = "restructuredtext en"

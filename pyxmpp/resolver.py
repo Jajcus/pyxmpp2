@@ -54,7 +54,7 @@ class Resolver:
     # pylint: disable-msg=W0232
     __metaclass__ = ABCMeta
     def resolve_srv(self, domain, service, protocol, callback):
-        """Start looking up an SRV record for `service` at `address`.
+        """Start looking up an SRV record for `service` at `domain`.
 
         `callback` will be called with a properly sorted list of (hostname,
         port) pairs on success. The list will be empty on error and it will
@@ -120,10 +120,10 @@ def shuffle_srv(records):
     :Parameters:
         - `records`: SRV records to shuffle.
     :Types:
-        - `records`: sequence of `dns.rdtypes.IN.SRV`
+        - `records`: sequence of :dns:`dns.rdtypes.IN.SRV`
 
     :return: reordered records.
-    :returntype: `list` of `dns.rdtypes.IN.SRV`"""
+    :returntype: `list` of :dns:`dns.rdtypes.IN.SRV`"""
     if not records:
         return []
     ret = []
@@ -148,10 +148,10 @@ def reorder_srv(records):
     :Parameters:
         - `records`: SRV records to shuffle.
     :Types:
-        - `records`: `list` of `dns.rdtypes.IN.SRV`
+        - `records`: `list` of :dns:`dns.rdtypes.IN.SRV`
 
     :return: reordered records.
-    :returntype: `list` of `dns.rdtypes.IN.SRV`"""
+    :returntype: `list` of :dns:`dns.rdtypes.IN.SRV`"""
     records = list(records)
     records.sort()
     ret = []
@@ -236,7 +236,7 @@ class DumbBlockingResolver(Resolver):
     This doesn't support SRV lookups!
 
     `resolve_srv` will raise NotImplementedError
-    `resolve_hostname` will block until the lookup completes or fail and then
+    `resolve_address` will block until the lookup completes or fail and then
     call the callback immediately.
     """
     # pylint: disable-msg=R0921
@@ -247,24 +247,6 @@ class DumbBlockingResolver(Resolver):
             self.settings = XMPPSettings()
 
     def resolve_srv(self, domain, service, protocol, callback):
-        """Start looking up an SRV record for `service` at `address`.
-
-        `callback` will be called with a properly sorted list of (hostname,
-        port) pairs on success. The list will be empty on error and it will
-        contain only (".", 0) when the service is explicitely disabled.
-
-        :Parameters:
-            - `domain`: domain name to look up
-            - `service`: service name e.g. 'xmpp-client'
-            - `protocol`: protocol name, e.g. 'tcp'
-            - `callback`: a function to be called with a list of received
-              addresses
-        :Types:
-            - `domain`: `unicode`
-            - `service`: `unicode`
-            - `protocol`: `unicode`
-            - `callback`: function accepting a single argument
-        """
         raise NotImplementedError("The DumbBlockingResolver cannot resolve"
                 " SRV records. DNSPython or target hostname explicitely set"
                                                                 " required")
@@ -273,7 +255,7 @@ class DumbBlockingResolver(Resolver):
         """Start looking up an A or AAAA record.
 
         `callback` will be called with a list of (family, address) tuples
-        on success. Family is `socket.AF_INET` or `socket.AF_INET6`,
+        on success. Family is :std:`socket.AF_INET` or :std:`socket.AF_INET6`,
         the address is IPv4 or IPv6 literal. The list will be empty on error.
 
         :Parameters:
@@ -319,7 +301,7 @@ if HAVE_DNSPYTHON:
     class BlockingResolver(Resolver):
         """Blocking resolver using the DNSPython package.
 
-        Both `resolve_srv` and `resolve_hostname` will block until the 
+        Both `resolve_srv` and `resolve_address` will block until the 
         lookup completes or fail and then call the callback immediately.
         """
         def __init__(self, settings =  None):
@@ -329,7 +311,7 @@ if HAVE_DNSPYTHON:
                 self.settings = XMPPSettings()
             
         def resolve_srv(self, domain, service, protocol, callback):
-            """Start looking up an SRV record for `service` at `address`.
+            """Start looking up an SRV record for `service` at `domain`.
 
             `callback` will be called with a properly sorted list of (hostname,
             port) pairs on success. The list will be empty on error and it will

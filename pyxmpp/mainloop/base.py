@@ -119,8 +119,8 @@ class MainLoopBase(MainLoop):
         """Call the timeout handlers due.
 
         :Return: (next_event_timeout, sources_handled) tuple.
-        next_event_timeout is number of seconds until the next timeout event,
-        sources_handled is number of handlers called.
+            next_event_timeout is number of seconds until the next timeout
+            event, sources_handled is number of handlers called.
         """
         sources_handled = 0
         now = time.time()

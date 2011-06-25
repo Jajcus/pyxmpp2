@@ -186,8 +186,6 @@ OBSOLETE_CONDITIONS = {
 class ErrorElement(object):
     """Base class for both XMPP stream and stanza errors
    
-    :Properties:
-        - `condition_name`: XMPP-defined condition name
     :Ivariables:
         - `condition`: the condition element
         - `text`: human-readable error description
@@ -197,7 +195,7 @@ class ErrorElement(object):
         - `condition_name`: `unicode`
         - `condition`: `unicode`
         - `text`: `unicode`
-        - `custom_condition`: `list` of `ElementTree.Element`
+        - `custom_condition`: `list` of :etree:`ElementTree.Element`
         - `language`: `unicode`
 
     """
@@ -213,7 +211,7 @@ class ErrorElement(object):
             - `text`: optional description to override the default one
             - `language`: RFC 3066 language tag for the description
         :Types:
-            - `element_or_cond`: `ElementTree.Element` or `unicode`
+            - `element_or_cond`: :etree:`ElementTree.Element` or `unicode`
             - `text`: `unicode`
             - `language`: `unicode`
         """
@@ -237,7 +235,7 @@ class ErrorElement(object):
         :Parameters:
             - `element`: XML element to be decoded.
         :Types:
-            - `element`: `ElementTree.Element`
+            - `element`: :etree:`ElementTree.Element`
         """
         # pylint: disable-msg=R0912
         if element.tag != self.error_qname:
@@ -288,7 +286,7 @@ class ErrorElement(object):
         :Parameters:
             - `element`: XML element
         :Types:
-            - `element`: `ElementTree.Element`
+            - `element`: :etree:`ElementTree.Element`
 
         """
         self.custom_condition.append(element)
@@ -303,7 +301,7 @@ class ErrorElement(object):
     def as_xml(self):
         """Return the XML error representation.
 
-        :returntype: `ElementTree.Element`"""
+        :returntype: :etree:`ElementTree.Element`"""
         result = ElementTree.Element(self.error_qname)
         result.append(deepcopy(self.condition))
         if self.text:
@@ -325,9 +323,9 @@ class StreamErrorElement(ErrorElement):
             - `element_or_cond`: XML <error/> element to decode or an error
               condition name or element.
             - `text`: optional description to override the default one
-            - `langugage`: RFC 3066 language tag for the description
+            - `language`: RFC 3066 language tag for the description
         :Types:
-            - `element_or_cond`: `ElementTree.Element` or `unicode`
+            - `element_or_cond`: :etree:`ElementTree.Element` or `unicode`
             - `text`: `unicode`
             - `language`: `unicode`
         """
@@ -371,7 +369,7 @@ class StanzaErrorElement(ErrorElement):
             - `error_type`: 'type' of the error, one of: 'auth', 'cancel',
               'continue', 'modify', 'wait'
         :Types:
-            - `element_or_cond`: `ElementTree.Element` or `unicode`
+            - `element_or_cond`: :etree:`ElementTree.Element` or `unicode`
             - `text`: `unicode`
             - `language`: `unicode`
             - `error_type`: `unicode`
@@ -404,7 +402,7 @@ class StanzaErrorElement(ErrorElement):
         :Parameters:
             - `element`: XML element to be decoded.
         :Types:
-            - `element`: `ElementTree.Element`
+            - `element`: :etree:`ElementTree.Element`
         """
         ErrorElement._from_xml(self, element)
         error_type = element.get(u"type")
@@ -424,13 +422,13 @@ class StanzaErrorElement(ErrorElement):
 
     def as_xml(self, stanza_namespace = None): # pylint: disable-msg=W0221
         """Return the XML error representation.
-
+        
         :Parameters:
             - `stanza_namespace`: namespace URI of the containing stanza
-        Types:
+        :Types:
             - `stanza_namespace`: `unicode`
-
-        :returntype: `ElementTree.Element`"""
+        
+        :returntype: :etree:`ElementTree.Element`"""
         if stanza_namespace:
             self.error_qname = "{{{0}}}error".format(stanza_namespace)
             self.text_qname = "{{{0}}}text".format(stanza_namespace)

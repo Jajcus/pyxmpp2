@@ -20,7 +20,7 @@
 Normative reference:
   - `RFC 6120 <http://www.ietf.org/rfc/rfc3920.txt>`__
   - `RFC 3920bis <http://xmpp.org/internet-drafts/draft-saintandre-rfc3920bis-08.html#security>`__
-  - `XEP-0178 <http://xmpp.org/extensions/xep-0178.html#c2s>__`
+  - `XEP-0178 <http://xmpp.org/extensions/xep-0178.html#c2s>`__
 """
 
 from __future__ import absolute_import

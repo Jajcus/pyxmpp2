@@ -123,7 +123,7 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
 
         [initiating entity only]
 
-        The received features element is available in `self.features`."""
+        The received features element is available in `features`."""
         logger.debug("Handling stream features: {0}".format(
                                         ElementTree.tostring(features)))
         element = features.find(FEATURE_BIND)
@@ -166,7 +166,7 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
         :Parameters:
             - `stanza`: <iq type="result"/> stanza received.
 
-        Set `self.me` to the full JID negotiated."""
+        Set `streambase.StreamBase.me` to the full JID negotiated."""
         # pylint: disable-msg=R0201
         payload = stanza.get_payload(ResourceBindingPayload)
         jid = payload.jid

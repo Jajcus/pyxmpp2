@@ -82,7 +82,7 @@ class Stream(StreamTLSMixIn, StreamSASLMixIn, StreamBase):
         :Parameters:
             - `element`: XML element
         :Types:
-            - `element`: `ElementTree.Element`
+            - `element`: :etree:`ElementTree.Element`
         """
         if self._process_element_tls(element):
             return

@@ -39,11 +39,11 @@ class XMPPSettings(MutableMapping):
     It can be used like a regular dictionary, but will provide reasonable
     defaults for PyXMPP for parameters which are not explicitely set.
     
-    :Classvariables:
+    :CVariables:
         - `_defaults`: defaults for registered parameters.
-        - `_defaults_factories`: factory functions providing default
-                    values which cannot be hard-coded.
-    :Instancevariables:
+        - `_defaults_factories`: factory functions providing default values
+          which cannot be hard-coded.
+    :Ivariables:
         - `_settings`: current values of the parameters explicitely set.
     """
     _defaults = {}
@@ -111,7 +111,7 @@ class XMPPSettings(MutableMapping):
         If parameter is not set, return `local_default` if it is not `None`
         or the PyXMPP global default otherwise.
 
-        :Raise: `KeyError` if parameter has no value and no global default
+        :Raise `KeyError`: if parameter has no value and no global default
 
         :Return: parameter value
         """

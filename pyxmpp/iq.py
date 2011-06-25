@@ -54,7 +54,7 @@ class Iq(Stanza):
               is not "error".
             - `language`: default language for the stanza content
         :Types:
-            - `element`: `ElementTree.Element`
+            - `element`: :etree:`ElementTree.Element`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
@@ -146,7 +146,7 @@ class Iq(Stanza):
         :Parameters:
             - `payload`: XML element or stanza payload object to add
         :Types:
-            - `payload`: `ElementTree.Element` or `StanzaPayload`
+            - `payload`: :etree:`ElementTree.Element` or `StanzaPayload`
         """
         if self._payload is None:
             self.decode_payload()

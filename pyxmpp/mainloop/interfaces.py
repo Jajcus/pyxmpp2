@@ -89,7 +89,7 @@ class IOHandler:
         iteration. 
 
         :Return: `HandlerReady()` if there is no need to call `prepare` again
-        or `PrepareAgain()` otherwise.
+            or `PrepareAgain()` otherwise.
         :Returntype: `IOHandlerPrepareResult`
         """
         raise NotImplementedError
@@ -204,9 +204,9 @@ class MainLoop:
         """Add a new handler to the main loop.
 
         :Parameters:
-            `handler`: the handler object to add
+            - `handler`: the handler object to add
         :Types:
-            `handler`: `IOHandler` or `EventHandler` or `TimeoutHandler`
+            - `handler`: `IOHandler` or `EventHandler` or `TimeoutHandler`
         """
         raise NotImplementedError
     def remove_handler(self, handler):
@@ -215,9 +215,9 @@ class MainLoop:
         Do nothing if the handler is not registered at the main loop.
 
         :Parameters:
-            `handler`: the handler object to add
+            - `handler`: the handler object to add
         :Types:
-            `handler`: `IOHandler` or `EventHandler` or `TimeoutHandler`
+            - `handler`: `IOHandler` or `EventHandler` or `TimeoutHandler`
         """
         raise NotImplementedError
     def quit(self):

@@ -38,7 +38,7 @@ def b1_mapping(char):
     :Parameters:
         - `char`: Unicode character to map.
 
-    :returns: u"" if there is `uc` code in the table, `None` otherwise.
+    :returns: u"" if there is `char` code in the table, `None` otherwise.
     """
     if stringprep.in_table_b1(char):
         return u""

@@ -234,11 +234,12 @@ class StreamSASLHandler(StreamFeatureHandler):
     """SASL authentication handler XMPP streams.
 
     :Ivariables:
-        `peer_sasl_mechanisms`: SASL mechanisms offered by peer
-        `authenticator`: the authenticator object
+        - `peer_sasl_mechanisms`: SASL mechanisms offered by peer
+        - `authenticator`: the authenticator object
     :Types:
-        `peer_sasl_mechanisms`: `list` of `unicode`
-        `authenticator`: `sasl.ClientAuthenticator` or `sasl.ServerAuthenticator`
+        - `peer_sasl_mechanisms`: `list` of `unicode`
+        - `authenticator`: `sasl.ClientAuthenticator` or
+          `sasl.ServerAuthenticator`
     """
     def __init__(self, settings = None):
         """Initialize the SASL handler"""
@@ -268,8 +269,7 @@ class StreamSASLHandler(StreamFeatureHandler):
         """Process incoming <stream:features/> element.
 
         [initiating entity only]
-
-        The received features element is available in `self.features`."""
+        """
         element = features.find(MECHANISMS_TAG)
         self.peer_sasl_mechanisms = []
         if element is None:

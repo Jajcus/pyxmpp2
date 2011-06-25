@@ -81,7 +81,7 @@ class XMPPTransport:
     def set_target(self, stream):
         """Make the `stream` the target for this transport instance.
 
-        The `stream_start`, `stream_end` and `stream_element` methods
+        The 'stream_start', 'stream_end' and 'stream_element' methods
         of the target will be called when appropriate content is received.
 
         :Parameters:
@@ -105,7 +105,7 @@ class XMPPTransport:
             - `version`: the 'version' of the stream.
             - `language`: the 'xml:lang' of the stream
         :Types:
-            - `stazna_namespace`: `unicode`
+            - `stanza_namespace`: `unicode`
             - `stream_from`: `unicode`
             - `stream_to`: `unicode`
             - `version`: `unicode`
@@ -147,10 +147,59 @@ class XMPPTransport:
         raise NotImplementedError
 
 class TCPTransport(XMPPTransport, IOHandler):
-    """XMPP over TCP with optional TLS"""
+    """XMPP over TCP with optional TLS.
+
+    :Ivariables:
+        - `lock`: the lock protecting this object
+        - `settings`: settings for this object
+          socket is currently open)
+        - `_dst_addr`: socket address currently in use
+        - `_dst_addrs`: list of (family, sockaddr) candidates to connect to
+        - `_dst_family`: address family of the socket
+        - `_dst_hostname`: hostname the transport is connecting to or connected
+          to
+        - `_dst_name`: requested domain name of the remote service
+        - `_dst_nameports`: list of (hostname, port) candidates to connect to
+        - `_dst_port`: requested port of the remote service
+        - `_dst_service`: requested service name (e.g. 'xmpp-client')
+        - `_eof`: `True` when reading side of the socket is closed
+        - `_event_queue`: queue to send connection events to
+        - `_hup`: `True` when the writing side of the socket is closed
+        - `_reader`: parser for the data received from the socket
+        - `_serializer`: XML serializer for data sent over the socket
+        - `_socket`: socket currently used by the transport (`None` if no
+        - `_state_cond`: condition object to synchronize threads over state
+          change
+        - `_state`: connection state (one of: `None`, "resolve-srv",
+          "resolve-hostname", "connect", "connected", "tls-handshake",
+          "closing", "closed", "aborted")
+        - `_stream`: the stream associated with this transport
+        - `_tls_state`: state of TLS handshake
+    :Types:
+        - `lock`: :std:`threading.RLock`
+        - `settings`: `XMPPSettings`
+        - `_dst_addr`: tuple
+        - `_dst_addrs`: list of tuples
+        - `_dst_family`: `int`
+        - `_dst_hostname`: `unicode`
+        - `_dst_name`: `unicode`
+        - `_dst_nameports`: list of tuples
+        - `_dst_port`: `int`
+        - `_dst_service`: `unicode`
+        - `_eof`: `bool`
+        - `_event_queue`: :std:`Queue.Queue`
+        - `_hup`: `bool`
+        - `_reader`: `StreamReader`
+        - `_serializer`: `XMPPSerializer`
+        - `_socket`: :std:`socket.socket`
+        - `_state_cond`: :std:`threading.Condition`
+        - `_state`: `unicode`
+        - `_stream`: `streambase.StreamBase`
+        - `_tls_state`: `unicode`
+    """
     # pylint: disable-msg=R0902
     def __init__(self, settings = None, sock = None):
-        """Initialize the `TCPTransport object.
+        """Initialize the `TCPTransport` object.
 
         :Parameters:
             - `settings`: XMPP settings to use
@@ -168,7 +217,6 @@ class TCPTransport(XMPPTransport, IOHandler):
         self._stream = None
         self._serializer = None
         self._reader = None
-        self._first_head_written = False
         self._dst_name = None
         self._dst_port = None
         self._dst_service = None
@@ -202,7 +250,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         a domain name and not an IP address `port` is not given.
 
         When `service` is given try an SRV lookup for that service
-        at domain `addr`. If `service is not given or `addr` is an IP address, 
+        at domain `addr`. If `service` is not given or `addr` is an IP address, 
         or the SRV lookup fails, connect to `port` at host `addr` directly.
 
         [initiating entity only]
@@ -216,7 +264,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._connect(addr, port, service)
 
     def _connect(self, addr, port, service):
-        """Same as `connect`, but assumes `self.lock` acquired.
+        """Same as `connect`, but assumes `lock` acquired.
         """
         self._dst_name = addr
         self._dst_port = port
@@ -286,7 +334,7 @@ class TCPTransport(XMPPTransport, IOHandler):
     def _resolve_hostname(self):
         """Start hostname resolution for the next name to try.
 
-        [called with `self.lock` acquired]
+        [called with `lock` acquired]
         """
         self._set_state("resolving-hostname")
         resolver = self.settings["dns_resolver"]
@@ -321,10 +369,9 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._set_state("connect")
 
     def _start_connect(self):
-        """Start connecting to the next address on the `self._dst_addrs`
-        list.
+        """Start connecting to the next address on the `_dst_addrs` list.
 
-        [ called with `self.lock` acquired ] 
+        [ called with `lock` acquired ] 
         
         """
         family, addr = self._dst_addrs.pop(0)
@@ -362,7 +409,7 @@ class TCPTransport(XMPPTransport, IOHandler):
     def _continue_connect(self):
         """Continue connecting.
 
-        [called with `self.lock` acquired]
+        [called with `lock` acquired]
 
         :Return: `True` when just connected
         """
@@ -417,9 +464,9 @@ class TCPTransport(XMPPTransport, IOHandler):
             raise PyXMPPIOError(u"IO Error: {0}".format(err))
 
     def set_target(self, stream):
-        """Make the `stream_handler` the target for this transport instance.
+        """Make the `stream` the target for this transport instance.
 
-        The `stream_start`, `stream_end` and `stream_element` methods
+        The 'stream_start', 'stream_end' and 'stream_element' methods
         of the target will be called when appropriate content is received.
 
         :Parameters:
@@ -510,8 +557,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         result = HandlerReady()
         logger.debug("TCPHandler.prepare(): state: {0!r}".format(self._state))
         with self.lock:
-            if self._state in ("connected", "established", 
-                                            "closing", "closed", "aborted"):
+            if self._state in ("connected", "closing", "closed", "aborted"):
                 # no need to call prepare() .fileno() is stable
                 pass
             elif self._state == "connect":
@@ -774,12 +820,12 @@ class TCPTransport(XMPPTransport, IOHandler):
     def _feed_reader(self, data):
         """Feed the stream reader with data received.
 
-        [ called with `self.lock` acquired ] 
+        [ called with `lock` acquired ] 
 
         If `data` is None or empty, then stream end (peer disconnected) is
         assumed and the stream is closed.
 
-        `self.lock` is acquired during the operation.
+        `lock` is acquired during the operation.
 
         :Parameters:
             - `data`: data received from the stream socket.

@@ -116,7 +116,7 @@ class StreamFeatureHandler:
             - `features`: the features element just received
         :Types:
             - `stream`: `StreamBase`
-            - `features`: `ElementTree.Element`
+            - `features`: :etree:`ElementTree.Element`
 
         :Return: 
             - `StreamFeatureHandled` instance if a feature was recognized and
@@ -138,7 +138,7 @@ class StreamFeatureHandler:
             - `features`: the features element about to be sent
         :Types:
             - `stream`: `StreamBase`
-            - `features`: `ElementTree.Element`
+            - `features`: :etree:`ElementTree.Element`
         """
         # pylint: disable-msg=W0613,R0201
         return False
@@ -175,24 +175,53 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
     specification.
 
     :Ivariables:
-        - `stanza_namespace`: default namespace of the stream
-        - `settings`: stream settings
-        - `lock`: RLock object used to synchronize access to Stream object.
+        - `authenticated`: `True` if local entity has authenticated to peer
         - `features`: stream features as annouced by the receiver.
+        - `handlers`: handlers for stream elements and stanza payload
+        - `initiator`: `True` if local stream endpoint is the initiating entity.
+        - `lock`: RLock object used to synchronize access to Stream object.
         - `me`: local stream endpoint JID.
+        - `peer_authenticated`: `True` if the peer has authenticated to us
+        - `peer_language`: language of human-readable stream content selected
+          by the peer
         - `peer`: remote stream endpoint JID.
         - `process_all_stanzas`: when `True` then all stanzas received are
           considered local.
-        - `initiator`: `True` if local stream endpoint is the initiating entity.
+        - `settings`: stream settings
+        - `stanza_namespace`: default namespace of the stream
+        - `tls_established`: `True` when the stream is protected by TLS
+        - `transport`: transport used by this stream
         - `version`: Negotiated version of the XMPP protocol. (0,9) for the
           legacy (pre-XMPP) Jabber protocol.
+        - `_element_handlers`: mapping from stream element names to lists of
+          methods handling them
         - `_input_state`: `None`, "open" (<stream:stream> has been received)
           "restart" or "closed" (</stream:stream> or EOF has been received)
         - `_output_state`: `None`, "open" (<stream:stream> has been received)
           "restart" or "closed" (</stream:stream> or EOF has been received)
+        - `_stanza_namespace_p`: qname prefix of the stanza namespace
+        - `_stream_feature_handlers`: stream features handlers
     :Types:
+        - `authenticated`: `bool`
+        - `features`: :etree:`ElementTree.Element`
+        - `handlers`: `list`
+        - `initiator`: `bool`
+        - `lock`: :std:`threading.RLock`
+        - `me`: `JID`
+        - `peer_authenticated`: `bool`
+        - `peer_language`: `unicode`
+        - `peer`: `JID`
+        - `process_all_stanzas`: `bool`
         - `settings`: XMPPSettings
+        - `stanza_namespace`: `unicode`
+        - `tls_established`: `bool`
+        - `transport`: `transport.XMPPTransport`
         - `version`: (`int`, `int`) tuple
+        - `_element_handlers`: `dict`
+        - `_input_state`: `unicode`
+        - `_output_state`: `unicode`
+        - `_stanza_namespace_p`: `unicode`
+        - `_stream_feature_handlers`: `list` of `StreamFeatureHandler`
     """
     # pylint: disable-msg=R0902,R0904
     def __init__(self, stanza_namespace, handlers, settings = None):
@@ -216,17 +245,14 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
         self.stanza_namespace = stanza_namespace
         self._stanza_namespace_p = "{{{0}}}".format(stanza_namespace)
         self.process_all_stanzas = False
-        self.port = None
         self.handlers = handlers
         self._stream_feature_handlers = []
         for handler in handlers:
             if isinstance(handler, StreamFeatureHandler):
                 self._stream_feature_handlers.append(handler)
-        self.addr = None
         self.me = None
         self.peer = None
         self.stream_id = None
-        self.eof = False
         self.initiator = None
         self.features = None
         self.authenticated = False
@@ -239,6 +265,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
         self.transport = None
         self._input_state = None
         self._output_state = None
+        self._element_handlers = {}
 
     def initiate(self, transport, to = None):
         """Initiate an XMPP connection over the `transport`.
@@ -259,11 +286,10 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
                 self._initiate()
 
     def _initiate(self):
-        """Initiate an XMPP connection over a connected `self.transport`.
+        """Initiate an XMPP connection over a connected `transport`.
 
-        [ called with `self.lock` acquired ]
+        [ called with `lock` acquired ]
         """
-        self.eof = False
         self._setup_stream_element_handlers()
         self.setup_stanza_handlers(self.handlers, "pre-auth")
         self._send_stream_start()
@@ -286,9 +312,10 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
     def _setup_stream_element_handlers(self):
         """Set up stream element handlers.
         
-        Scans the `self.handlers` list for `StreamFeatureHandler`
-        instances and updates `self._element_handlers` mapping with their
-        methods decorated with `@stream_element_handler`"""
+        Scans the `handlers` list for `StreamFeatureHandler`
+        instances and updates `_element_handlers` mapping with their
+        methods decorated with @`stream_element_handler`
+        """
         # pylint: disable-msg=W0212
         if self.initiator:
             mode = "initiator"
@@ -339,7 +366,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
     def stream_start(self, element):
         """Process <stream:stream> (stream start) tag received from peer.
         
-        `self.lock` is acquired when this method is called.
+        `lock` is acquired when this method is called.
 
         :Parameters:
             - `element`: root element (empty) created by the parser"""
@@ -481,7 +508,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
             self._send_stream_error(condition)
 
     def _send_stream_error(self, condition):
-        """Same as `send_stream_error`, but expects `self.lock` acquired.
+        """Same as `send_stream_error`, but expects `lock` acquired.
         """
         if self._output_state is "closed":
             return
@@ -507,7 +534,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
         [receving entity only]
 
         :returns: new <features/> element
-        :returntype: `ElementTree.Element`"""
+        :returntype: :etree:`ElementTree.Element`"""
         features = ElementTree.Element(FEATURES_TAG)
         for handler in self._stream_feature_handlers:
             handler.make_stream_features(self, features)
@@ -526,13 +553,13 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
         :Parameters:
             - `element`: Element node to send.
         :Types:
-            - `element`: `ElementTree.Element`
+            - `element`: :etree:`ElementTree.Element`
         """
         with self.lock:
             self._write_element(element)
 
     def _write_element(self, element):
-        """Same as `write_element` but with `self.lock` already acquired.
+        """Same as `write_element` but with `lock` already acquired.
         """
         self.transport.send_element(element)
 
@@ -548,7 +575,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
             return self._send(stanza)
 
     def _send(self, stanza):
-        """Same as `Stream.send` but assume `self.lock` is acquired."""
+        """Same as `send` but assume `lock` is acquired."""
         self.fix_out_stanza(stanza)
         element = stanza.as_xml()
         self._write_element(element)
@@ -580,7 +607,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
         :Parameters:
             - `element`: XML element
         :Types:
-            - `element`: `ElementTree.Element`
+            - `element`: :etree:`ElementTree.Element`
         """
         tag = element.tag
         if tag in self._element_handlers:
@@ -607,11 +634,11 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
     def process_stream_error(self, error):
         """Process stream error element received.
 
-        :Types:
-            - `error`: `StreamErrorNode`
-
         :Parameters:
             - `error`: error received
+
+        :Types:
+            - `error`: `StreamErrorElement`
         """
         # pylint: disable-msg=R0201
         logger.debug("Unhandled stream error: condition: {0} {1!r}"
@@ -620,7 +647,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
     def check_to(self, to):
         """Check "to" attribute of received stream header.
 
-        :return: `to` if it is equal to `self.me`, None otherwise.
+        :return: `to` if it is equal to `me`, None otherwise.
 
         Should be overriden in derived classes which require other logic
         for handling that attribute."""
@@ -640,7 +667,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
 
         [initiating entity only]
 
-        The received features node is available in `self.features`."""
+        The received features node is available in `features`."""
         self.features = features
         logger.debug("got features, passing to event handlers...")
         handled = self.event(GotFeaturesEvent(self.features))
@@ -683,8 +710,8 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
 
         :Parameters:
             - `peer`: local JID just authenticated
-            - `restart_stream`: `True` when stream should be restarted
-                (needed after SASL authentication)
+            - `restart_stream`: `True` when stream should be restarted (needed
+              after SASL authentication)
         :Types:
             - `peer`: `JID`
             - `restart_stream`: `bool`
@@ -698,12 +725,12 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
         self.event(AuthenticatedEvent(self.peer))
 
     def set_authenticated(self, me, restart_stream = False):
-        """Mark stream authenticated as `me`
+        """Mark stream authenticated as `me`.
 
         :Parameters:
             - `me`: local JID just authenticated
-            - `restart_stream`: `True` when stream should be restarted
-                (needed after SASL authentication)
+            - `restart_stream`: `True` when stream should be restarted (needed
+              after SASL authentication)
         :Types:
             - `me`: `JID`
             - `restart_stream`: `bool`

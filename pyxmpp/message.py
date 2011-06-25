@@ -32,15 +32,6 @@ MESSAGE_TYPES = ("normal", "chat", "headline", "error", "groupchat")
 
 class Message(Stanza):
     """<message /> stanza class.
-
-    :Properties:
-        - `subject`: message subject
-        - `body`: message body
-        - `thread`: message thread-id
-    :Types:
-        - `subject`: `unicode`
-        - `body`: `unicode`
-        - `thread`: `unicode`
     """
     # pylint: disable-msg=R0902
     element_name = "message"
@@ -66,7 +57,7 @@ class Message(Stanza):
             - `body`: message body.
             - `thread`: message thread id.
         :Types:
-            - `element`: `ElementTree.Element`
+            - `element`: :etree:`ElementTree.Element`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
@@ -125,7 +116,7 @@ class Message(Stanza):
         Always return an independent copy of the stanza XML representation,
         which can be freely modified without affecting the stanza.
 
-        :returntype: `ElementTree.Element`"""
+        :returntype: :etree:`ElementTree.Element`"""
         result = Stanza.as_xml(self)
         if self._subject:
             child = ElementTree.SubElement(result, self._subject_tag)
@@ -150,7 +141,11 @@ class Message(Stanza):
         return result
 
     @property
-    def subject(self): # pylint: disable-msg=C0111,E0202
+    def subject(self): # pylint: disable-msg=E0202
+        """Message subject.
+
+        :Returntype: `unicode`
+        """
         return self._subject
 
     @subject.setter # pylint: disable-msg=E1101
@@ -159,7 +154,11 @@ class Message(Stanza):
         self._dirty = True
 
     @property
-    def body(self): # pylint: disable-msg=C0111,E0202
+    def body(self): # pylint: disable-msg=E0202
+        """Message body.
+
+        :Returntype: `unicode`
+        """
         return self._body
 
     @body.setter # pylint: disable-msg=E1101
@@ -168,7 +167,11 @@ class Message(Stanza):
         self._dirty = True
 
     @property
-    def thread(self): # pylint: disable-msg=C0111,E0202
+    def thread(self): # pylint: disable-msg=E0202
+        """Thread id.
+
+        :Returntype: `unicode`
+        """
         return self._thread
 
     @thread.setter # pylint: disable-msg=E1101

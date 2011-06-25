@@ -30,8 +30,8 @@ def xml_elements_equal(element1, element2, ignore_level1_cdata = False):
         - `ignore_level1_cdata`: if direct text children of the elements
           should be ignored for the comparision
     :Types:
-        - `element1`: `ElementTree.Element`
-        - `element2`: `ElementTree.Element`
+        - `element1`: :etree:`ElementTree.Element`
+        - `element2`: :etree:`ElementTree.Element`
         - `ignore_level1_cdata`: `bool`
 
     :Returntype: `bool`
@@ -71,8 +71,8 @@ _NULLDELTA = datetime.timedelta()
 
 def datetime_utc_to_local(utc):
     """
-    An ugly hack to convert naive `datetime.datetime` object containing
-    UTC time to a naive `datetime.datetime` object with local time.
+    An ugly hack to convert naive :std:`datetime.datetime` object containing
+    UTC time to a naive :std:`datetime.datetime` object with local time.
     It seems standard Python 2.3 library doesn't provide any better way to
     do that.
     """
@@ -103,8 +103,8 @@ def datetime_utc_to_local(utc):
 
 def datetime_local_to_utc(local):
     """
-    Simple function to convert naive `datetime.datetime` object containing
-    local time to a naive `datetime.datetime` object with UTC time.
+    Simple function to convert naive :std:`datetime.datetime` object containing
+    local time to a naive :std:`datetime.datetime` object with UTC time.
     """
     timestamp = time.mktime(local.timetuple())
     return datetime.datetime.utcfromtimestamp(timestamp)

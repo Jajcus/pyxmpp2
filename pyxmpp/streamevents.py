@@ -154,14 +154,15 @@ class GotFeaturesEvent(StreamEvent):
 
     Default action (skipped if the handler returns `True`) may be, depending
     on the features available, one of:
-      - StartTLS initiation
-      - SASL authentication
-      - Resource binding
+      
+    - StartTLS initiation
+    - SASL authentication
+    - Resource binding
     
     :Ivariables:
         - `features`: the <stream:features/> element
     :Types:
-        - `features`: `ElementTree.Element`
+        - `features`: :etree:`ElementTree.Element`
     """
     def __init__(self, features):
         self.features = features 

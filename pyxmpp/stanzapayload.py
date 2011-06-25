@@ -53,7 +53,15 @@ class XMLPayload(StanzaPayload):
     
     This object can be used for any stanza payload.
     It doesn't decode the XML element, but instead keeps it in the ElementTree
-    format."""
+    format.
+    
+    :Ivariables:
+        - `xml_element_name`: qualified name of the wrapped element
+        - `element`: the wrapped element
+    :Types:
+        - `xml_element_name`: `unicode`
+        - `element`: :etree:`ElementTree.Element`
+    """
     def __init__(self, data):
         if isinstance(data, StanzaPayload):
             data = data.as_xml()
@@ -67,7 +75,7 @@ class XMLPayload(StanzaPayload):
 
     @property
     def handler_key(self):
-        """Return `self.xml_element_name` as the extra key for stanza
+        """Return `xml_element_name` as the extra key for stanza
         handlers."""
         return self.xml_element_name
 

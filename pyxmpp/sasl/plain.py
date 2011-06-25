@@ -140,7 +140,7 @@ class PlainServerAuthenticator(ServerAuthenticator):
         :Parameters:
             - `response`: the response from the client.
         :Types:
-            - `response`: `byted`
+            - `response`: `bytes`
 
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""

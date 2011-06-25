@@ -42,26 +42,15 @@ random.seed()
 class Stanza(object):
     """Base class for all XMPP stanzas.
 
-    :Properties:
-        - `from_jid`: source JID of the stanza
-        - `to_jid`: destination JID of the stanza
-        - `stanza_type`: staza type: one of: "get", "set", "result" or "error".
-        - `stanza_id`: stanza id
-        - `stream`: stream on which the stanza was received or `None` when the
-          stream is not available. May be used to send replies or get some
-          session-related parameters.
     :Ivariables:
         - `_payload`: the stanza payload
         - `_error`: error associated a stanza of type "error"
         - `_namespace`: namespace of this stanza element
     :Types:
-        - `from_jid`: `JID`
-        - `to_jid`: `JID`
-        - `stanza_type`: `unicode`
-        - `stanza_id`: `unicode`
-        - `stream`: `pyxmpp2.stream.Stream`
         - `_payload`: `list` of (`unicode`, `StanzaPayload`) 
-        - `_error`: `pyxmpp2.error.StanzaErrorElement`"""
+        - `_error`: `pyxmpp2.error.StanzaErrorElement`
+        - `_namespace`: `unicode`
+    """
     # pylint: disable-msg=R0902
     element_name = "Unknown"
     def __init__(self, element, from_jid = None, to_jid = None,
@@ -77,8 +66,8 @@ class Stanza(object):
               first (the element changes won't affec the stanza then).
             - `from_jid`: sender JID.
             - `to_jid`: recipient JID.
-            - `stanza_type`: staza type: one of: "get", "set", "result" 
-                                                                or "error".
+            - `stanza_type`: staza type: one of: "get", "set", "result" or
+              "error".
             - `stanza_id`: stanza id -- value of stanza's "id" attribute. If
               not given, then unique for the session value is generated.
             - `error`: error object. Ignored if `stanza_type` is not "error".
@@ -86,7 +75,7 @@ class Stanza(object):
               not "error" or `error` is not None.
             - `language`: default language for the stanza content
         :Types:
-            - `element`: `unicode` or `ElementTree.Element`
+            - `element`: `unicode` or :etree:`ElementTree.Element`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
@@ -201,7 +190,7 @@ class Stanza(object):
         Always return an independent copy of the stanza XML representation,
         which can be freely modified without affecting the stanza.
 
-        :returntype: `ElementTree.Element`"""
+        :returntype: :etree:`ElementTree.Element`"""
         attrs = {}
         if self._from_jid:
             attrs['from'] = unicode(self._from_jid)
@@ -231,7 +220,7 @@ class Stanza(object):
         
         Result of this function should never be modified.
 
-        :returntype: `ElementTree.Element`"""
+        :returntype: :etree:`ElementTree.Element`"""
         if not self._dirty:
             return self._element
         element = self.as_xml()
@@ -267,7 +256,11 @@ class Stanza(object):
         self._payload = payload
 
     @property
-    def from_jid(self): # pylint: disable-msg=C0111,E0202
+    def from_jid(self): # pylint: disable-msg=E0202
+        """Source JID of the stanza.
+
+        :returntype: `JID`
+        """
         return self._from_jid
 
     @from_jid.setter # pylint: disable-msg=E1101
@@ -276,7 +269,11 @@ class Stanza(object):
         self._dirty = True
 
     @property
-    def to_jid(self): # pylint: disable-msg=C0111,E0202
+    def to_jid(self): # pylint: disable-msg=E0202
+        """Destination JID of the stanza.
+
+        :returntype: `JID`
+        """
         return self._to_jid
 
     @to_jid.setter # pylint: disable-msg=E1101
@@ -286,6 +283,10 @@ class Stanza(object):
 
     @property
     def stanza_type(self): # pylint: disable-msg=C0111,E0202
+        """Stanza type, one of: "get", "set", "result" or "error".
+
+        :returntype: `unicode`
+        """
         return self._stanza_type
 
     @stanza_type.setter # pylint: disable-msg=E1101
@@ -295,6 +296,10 @@ class Stanza(object):
 
     @property
     def stanza_id(self): # pylint: disable-msg=C0111,E0202
+        """Stanza id.
+
+        :returntype: `unicode`
+        """
         return self._stanza_id
 
     @stanza_id.setter # pylint: disable-msg=E1101
@@ -303,7 +308,11 @@ class Stanza(object):
         self._dirty = True
 
     @property
-    def error(self): # pylint: disable-msg=C0111,E0202
+    def error(self): # pylint: disable-msg=E0202
+        """Stanza error element.
+
+        :returntype: `StanzaErrorElement`
+        """
         return self._error
 
     @error.setter # pylint: disable-msg=E1101
@@ -312,11 +321,15 @@ class Stanza(object):
         self._dirty = True
 
     @property
-    def stream(self): # pylint: disable-msg=C0111,E0202
+    def stream(self): # pylint: disable-msg=E0202
+        """Stream the stanza was received from.
+
+        :returntype: `streambase.StreamBase`
+        """
         return self._stream()
 
     def mark_dirty(self):
-        """Mark the stanza `dirty` so the XML representation will be
+        """Mark the stanza 'dirty' so the XML representation will be
         re-built the next time it is requested.
         
         This should be called each time the payload attached to the stanza is
@@ -332,7 +345,7 @@ class Stanza(object):
         :Parameters:
             - `payload`: XML element or stanza payload object to use
         :Types:
-            - `payload`: `ElementTree.Element` or `StanzaPayload`
+            - `payload`: :etree:`ElementTree.Element` or `StanzaPayload`
         """
         if isinstance(payload, ElementClass):
             self._payload = [ XMLPayload(payload) ]
@@ -350,7 +363,7 @@ class Stanza(object):
         :Parameters:
             - `payload`: XML element or stanza payload object to add
         :Types:
-            - `payload`: `ElementTree.Element` or `StanzaPayload`
+            - `payload`: :etree:`ElementTree.Element` or `StanzaPayload`
         """
         if self._payload is None:
             self.decode_payload()
@@ -400,7 +413,7 @@ class Stanza(object):
               `StanzaPayload`. If `None` get the first payload in whatever
               class is available.
             - `payload_key`: optional key for additional match. When used
-              with `payload_class`=`XMLPayload` this selects the element to
+              with `payload_class` = `XMLPayload` this selects the element to
               match
             - `specialize`: If `True`, and `payload_class` is `None` then
               return object of a specialized `StanzaPayload` subclass whenever

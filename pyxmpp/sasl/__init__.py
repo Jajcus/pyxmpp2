@@ -48,10 +48,10 @@ def client_authenticator_factory(mechanism, password_manager):
         - `password_manager`: name of the password manager object providing
           authentication credentials.
     :Types:
-        - `mechanism`: `unincode`
+        - `mechanism`: `unicode`
         - `password_manager`: `PasswordManager`
 
-    :raises: `KeyError` if no client authenticator is available for this
+    :raises `KeyError`: if no client authenticator is available for this
               mechanism
 
     :return: new authenticator.
@@ -71,7 +71,7 @@ def server_authenticator_factory(mechanism, password_manager):
         - `mechanism`: `str`
         - `password_manager`: `PasswordManager`
 
-    :raises: `KeyError` if no server authenticator is available for this
+    :raises `KeyError`: if no server authenticator is available for this
               mechanism
 
     :return: new authenticator.

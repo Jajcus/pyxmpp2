@@ -178,8 +178,8 @@ def stanza_factory(element, stream = None, language = None):
         - `stream`: stream where the stanza was received
         - `language`: default language for the stanza
     :Types:
-        - `element`: `ElementTree.Element`
-        - `stream`: `pyxmpp2.stream.Stream`
+        - `element`: :etree:`ElementTree.Element`
+        - `stream`: `streambase.StreamBase`
         - `language`: `unicode`
     """
     tag = element.tag
@@ -229,15 +229,15 @@ class StanzaProcessor(object):
         stanzas provided.
 
         :Parameters:
-            - `response`: the response to process. `None` or `False` means
-            'not handled'. `True` means 'handled'. Stanza or stanza list means
-            handled with the stanzas to send back
+            - `response`: the response to process. `None` or `False` means 'not
+              handled'. `True` means 'handled'. Stanza or stanza list means
+              handled with the stanzas to send back
         :Types:
             - `response`: `bool` or `Stanza` or iterable of `Stanza`
 
         :Returns:
-            - `True`: if `response` is `Stanza`, iterable or `True` (meaning the
-             stanza was processed).
+            - `True`: if `response` is `Stanza`, iterable or `True` (meaning
+              the stanza was processed).
             - `False`: when `response` is `False` or `None`
 
         :returntype: `bool`
@@ -362,7 +362,7 @@ class StanzaProcessor(object):
             - `handler_list`: list of available handlers
             - `stanza`: the stanza to handle
             - `stanza_type`: stanza type override (value of its "type"
-                            attribute)
+              attribute)
 
         :return: result of the last handler or `False` if no
             handler was found."""
@@ -514,7 +514,7 @@ class StanzaProcessor(object):
         This should be called before the stanza is sent.
 
         :Parameters:
-            - `iq`: an IQ stanza
+            - `stanza`: an IQ stanza
             - `res_handler`: result handler for the stanza. Will be called
               when matching <iq type="result"/> is received. Its only
               argument will be the stanza received. The handler may return
@@ -542,7 +542,7 @@ class StanzaProcessor(object):
 
     def _set_response_handlers(self, stanza, res_handler, err_handler,
                                 timeout_handler = None, timeout = None):
-        """Same as `Stream.set_response_handlers` but assume `self.lock` is
+        """Same as `set_response_handlers` but assume `self.lock` is
         acquired."""
         # pylint: disable-msg=R0913
         self.fix_out_stanza(stanza)

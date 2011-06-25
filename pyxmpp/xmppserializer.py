@@ -48,19 +48,34 @@ class XMPPSerializer(object):
 
     Single instance of this class should be used for a single stream and never
     reused. It will keep track of prefixes declared on the root element and 
-    used later."""
+    used later.
+    
+    :Ivariables:
+        - `stanza_namespace`: the default namespace of the stream
+        - `_prefixes`: mapping (prefix -> uri) of known namespace prefixes
+        - `_root_prefixes`: prefixes declared on the root element
+        - `_head_emitted`: `True` if the stream start tag has been emitted
+        - `_next_id`: the next sequence number to be used in auto-generated
+          prefixes.
+    :Types:
+        - `stanza_namespace`: `unicode`
+        - `_prefixes`: `dict`
+        - `_root_prefixes`: `dict`
+        - `_head_emitted`: `bool`
+        - `_next_id`: `int`
+    """
     def __init__(self, stanza_namespace, extra_prefixes = None):
         """
         :Parameters:
             - `stanza_namespace`: the default namespace used for XMPP stanzas.
-            E.g. 'jabber:client' for c2s connections.
+              E.g. 'jabber:client' for c2s connections.
             - `extra_prefixes`: mapping of namespaces to prefixes (not the
               other way) to be used on the stream. These prefixes will be
               declared on the root element and used in all descendants. That
               may be used to optimize the stream for size.
         :Types:
             - `stanza_namespace`: `unicode`
-            - `extra_prefixxes`: `unicode` to `unicode` mapping.
+            - `extra_prefixes`: `unicode` to `unicode` mapping.
         """
         self.stanza_namespace = stanza_namespace
         self._prefixes = {}
@@ -161,7 +176,7 @@ class XMPPSerializer(object):
 
     def _make_prefix(self, declared_prefixes):
         """Make up a new namespace prefix, which won't conflict
-        with `self._prefixes` and prefixes declared in the current scope.
+        with `_prefixes` and prefixes declared in the current scope.
         
         :Parameters:
             - `declared_prefixes`: namespace to prefix mapping for the current
@@ -197,8 +212,6 @@ class XMPPSerializer(object):
             - `declared_prefixes`: mapping of prefixes already declared 
               at this scope
             - `declarations`: XMLNS declarations on the current element.
-            - `level`: depth level of the element in the stream, None
-              for attributes.
         :Types:
             - `name`: `unicode`
             - `is_element`: `bool`
@@ -233,10 +246,10 @@ class XMPPSerializer(object):
         from `declared_prefixes`.
 
         :Parameters:
-            - `declarations`: namespace to prefix mapping of the new 
-                declarations
+            - `declarations`: namespace to prefix mapping of the new
+              declarations
             - `declared_prefixes`: namespace to prefix mapping of already
-                declared prefixes.
+              declared prefixes.
         :Types:
             - `declarations`: `unicode` to `unicode` dictionary
             - `declared_prefixes`: `unicode` to `unicode` dictionary
@@ -265,9 +278,9 @@ class XMPPSerializer(object):
             - `element`: the element to serialize
             - `level`: nest level (0 - root element, 1 - stanzas, etc.)
             - `declared_prefixes`: namespace to prefix mapping of already
-                declared prefixes.
+              declared prefixes.
         :Types:
-            - `element`: `ElementTree.Element`
+            - `element`: :etree:`ElementTree.Element`
             - `level`: `int`
             - `declared_prefixes`: `unicode` to `unicode` dictionary
 
@@ -313,12 +326,12 @@ class XMPPSerializer(object):
     def emit_stanza(self, element):
         """"Serialize a stanza.
 
-        Must be called after `self.emit_head`.
+        Must be called after `emit_head`.
 
         :Parameters:
             - `element`: the element to serialize
         :Types:
-            - `element`: `ElementTree.Element`
+            - `element`: :etree:`ElementTree.Element`
 
         :Return: serialized element
         :Returntype: `unicode`
@@ -343,7 +356,7 @@ def serialize(element):
         :Parameters:
             - `element`: the element to serialize
         :Types:
-            - `element`: `ElementTree.Element`
+            - `element`: :etree:`ElementTree.Element`
 
         :Return: serialized element
         :Returntype: `unicode`

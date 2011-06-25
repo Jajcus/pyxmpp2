@@ -17,7 +17,7 @@
 
 """I/O Handling classes
 
-This module has a purpose similar to `asyncore` from the base library, but
+This module has a purpose similar to :std:`asyncore` from the base library, but
 should be more usable, especially for PyXMPP.
 
 Also, these interfaces should allow building application not only in
@@ -44,18 +44,19 @@ from .wait import wait_for_read, wait_for_write
 logger = logging.getLogger("pyxmpp.mainloop.threads")
 
 class IOThread(object):
-    """Base class for `ReaderThread` and `WritterThread`
+    """Base class for `ReadingThread` and `WrittingThread`.
 
     :Ivariables:
         - `name`: thread name (for debugging)
         - `io_handler`: the I/O handler object to poll
         - `thread`: the actual thread object
-        - `exc_info`: this will hold exception information tuple
-        whenever the thread was aborted by an exception.
+        - `exc_info`: this will hold exception information tuple whenever the
+          thread was aborted by an exception.
+
     :Types:
         - `name`: `unicode`
         - `io_handler`: `IOHandler`
-        - `thread`: `threading.Thread`
+        - `thread`: :std:`threading.Thread`
         - `exc_info`: (type, value, traceback) tuple
     """
     def __init__(self, io_handler, name, daemon = True, exc_queue = None):
@@ -174,7 +175,7 @@ class WrittingThread(IOThread):
         """The thread function.
         
         Loop waiting for the handler and socket being writable and calling 
-        `handle_write`.
+        `interfaces.IOHandler.handle_write`.
         """
         while not self._quit:
             if self.io_handler.is_writable():
@@ -196,12 +197,13 @@ class EventDispatcherThread(object):
         - `name`: thread name (for debugging)
         - `event_queue`: the event queue to poll
         - `thread`: the actual thread object
-        - `exc_info`: this will hold exception information tuple
-        whenever the thread was aborted by an exception.
+        - `exc_info`: this will hold exception information tuple whenever the
+          thread was aborted by an exception.
+
     :Types:
         - `name`: `unicode`
-        - `event_queue`: `Queue.Queue`
-        - `thread`: `threading.Thread`
+        - `event_queue`: :std:`Queue.Queue`
+        - `thread`: :std:`threading.Thread`
         - `exc_info`: (type, value, traceback) tuple
     """
     def __init__(self, event_dispatcher, name = None,
@@ -251,13 +253,14 @@ class TimeoutThread(object):
         - `method`: the timout handler method
         - `name`: thread name (for debugging)
         - `thread`: the actual thread object
-        - `exc_info`: this will hold exception information tuple
-        whenever the thread was aborted by an exception.
+        - `exc_info`: this will hold exception information tuple whenever the
+          thread was aborted by an exception.
         - `exc_queue`: queue for raised exceptions
+
     :Types:
         - `name`: `unicode`
-        - `method`: a bound method decorated with `timeout_handler`
-        - `thread`: `threading.Thread`
+        - `method`: a bound method decorated with `interfaces.timeout_handler`
+        - `thread`: :std:`threading.Thread`
         - `exc_info`: (type, value, traceback) tuple
         - `exc_queue`: queue for raised exceptions
     """
@@ -430,9 +433,9 @@ class ThreadPool(MainLoop):
         """Stop the threads.
 
         :Parameters:
-            `join`: join the threads (wait until they exit)
-            `timeout`: maximum time (in seconds) to wait when `join` is `True`).
-                 No limit when `timeout` is `None`.
+            - `join`: join the threads (wait until they exit)
+            - `timeout`: maximum time (in seconds) to wait when `join` is
+              `True`).  No limit when `timeout` is `None`.
         """
         logger.debug("Closing the io handlers...")
         for handler in self.io_handlers:

@@ -149,9 +149,7 @@ class ProtocolError(Error):
     "pyxmpp.ProtocolError.reported" channel and the ignored errors using
     "pyxmpp.ProtocolError.ignored" channel. Both with the "debug" level.
     
-    :Properites:
-        - `xmpp_name` -- XMPP error name which should be reported.
-        - `message` -- the error message."""
+    """
 
     logger_reported = logging.getLogger("pyxmpp.ProtocolError.reported")
     logger_ignored = logging.getLogger("pyxmpp.ProtocolError.ignored")

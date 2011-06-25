@@ -46,7 +46,7 @@ class ExpiringDictionary(dict):
     :Types:
         - `_timeouts`: `dict`
         - `_default_timeout`: `int`
-        - `_lock`: `threading.RLock`"""
+        - `_lock`: :std:`threading.RLock`"""
 
     __slots__=['_timeouts','_default_timeout','_lock']
 

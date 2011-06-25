@@ -59,11 +59,11 @@ class CacheItem(object):
         - `address`: any hashable
         - `state`: `str`
         - `state_value`: `int`
-        - `timestamp`: `datetime`
-        - `freshness_time`: `datetime`
-        - `expire_time`: `datetime`
-        - `purge_time`: `datetime`
-        - `_lock`: `threading.RLock`"""
+        - `timestamp`: :std:`datetime`
+        - `freshness_time`: :std:`datetime`
+        - `expire_time`: :std:`datetime`
+        - `purge_time`: :std:`datetime`
+        - `_lock`: :std:`threading.RLock`"""
     __slots__ = ['value', 'address', 'state', 'timestamp', 'freshness_time',
             'expire_time', 'purge_time', 'state_value', '_lock']
     def __init__(self, address, value, freshness_period, expiration_period,
@@ -108,7 +108,7 @@ class CacheItem(object):
         state change.
 
         :return: the new state.
-        :returntype: `datetime`"""
+        :returntype: :std:`datetime`"""
         self._lock.acquire()
         try:
             now = datetime.utcnow()
@@ -158,7 +158,7 @@ class CacheFetcher:
     :Types:
         - `cache`: `Cache`
         - `address`: any hashable
-        - `timeout_time`: `datetime`
+        - `timeout_time`: :std:`datetime`
         - `active`: `bool`
     """
     def __init__(self, cache, address,
@@ -335,10 +335,10 @@ class Cache:
         - `default_purge_period`: timedelta
         - `max_items`: `int`
         - `_items`: `dict` of (`classobj`, addr) -> `CacheItem`
-        - `_items_list`: `list` of (`int`, `datetime`, `CacheItem`)
+        - `_items_list`: `list` of (`int`, :std:`datetime`, `CacheItem`)
         - `_fetcher`: `CacheFetcher` based class
         - `_active_fetchers`: `list` of (`int`, `CacheFetcher`)
-        - `_lock`: `threading.RLock`
+        - `_lock`: :std:`threading.RLock`
     """
     def __init__(self, max_items, default_freshness_period = _hour,
             default_expiration_period = 12*_hour, default_purge_period = 24*_hour):
@@ -670,7 +670,7 @@ class CacheSuite:
         - `default_purge_period`: timedelta
         - `max_items`: `int`
         - `_caches`: `dict` of (`classobj`, addr) -> `Cache`
-        - `_lock`: `threading.RLock`
+        - `_lock`: :std:`threading.RLock`
     """
     def __init__(self, max_items, default_freshness_period = _hour,
             default_expiration_period = 12*_hour, default_purge_period = 24*_hour):

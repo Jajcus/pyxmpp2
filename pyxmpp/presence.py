@@ -51,14 +51,6 @@ DENY_RESPONSES = {
 class Presence(Stanza):
     """<presence /> stanza.
     
-    :Properties:
-        - `show`: status type
-        - `status`: status message
-        - `priority`: presence priority
-    :Types:
-        - `show`: `unicode`
-        - `status`: `unicode`
-        - `priority`: `int`
     """
     # pylint: disable-msg=R0902
     element_name = "presence"
@@ -86,7 +78,7 @@ class Presence(Stanza):
             - `error_cond`: error condition name. Ignored if `stanza_type` is
               not "error"
         :Types:
-            - `element`: `ElementTree.Element`
+            - `element`: :etree:`ElementTree.Element`
             - `from_jid`: `JID`
             - `to_jid`: `JID`
             - `stanza_type`: `unicode`
@@ -155,7 +147,7 @@ class Presence(Stanza):
         Always return an independent copy of the stanza XML representation,
         which can be freely modified without affecting the stanza.
 
-        :returntype: `ElementTree.Element`"""
+        :returntype: :etree:`ElementTree.Element`"""
         result = Stanza.as_xml(self)
         if self._show:
             child = ElementTree.SubElement(result, self._show_tag)
@@ -183,7 +175,11 @@ class Presence(Stanza):
         return result
 
     @property
-    def show(self): # pylint: disable-msg=C0111,E0202
+    def show(self): # pylint: disable-msg=E0202
+        """Presence status type.
+
+        :returntype: `unicode`
+        """
         return self._show
 
     @show.setter # pylint: disable-msg=E1101
@@ -192,7 +188,11 @@ class Presence(Stanza):
         self._dirty = True
 
     @property
-    def status(self): # pylint: disable-msg=C0111,E0202
+    def status(self): # pylint: disable-msg=E0202
+        """Presence status message.
+
+        :returntype: `unicode`
+        """
         return self._status
 
     @status.setter # pylint: disable-msg=E1101
@@ -201,7 +201,11 @@ class Presence(Stanza):
         self._dirty = True
 
     @property
-    def priority(self): # pylint: disable-msg=C0111,E0202
+    def priority(self): # pylint: disable-msg=E0202
+        """Presence priority.
+
+        :returntype: `unicode`
+        """
         return self._priority
 
     @priority.setter # pylint: disable-msg=E1101
