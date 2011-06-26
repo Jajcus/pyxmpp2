@@ -16,7 +16,8 @@ doc-tstamp:
 	$(MAKE) -C .. build
 	if [ -L pyxmpp2 ] ; then rm pyxmpp2 ; fi
 	ln -s ../build/lib*/pyxmpp2 .
-	$(EPYDOC) -v --include-log --html --config=epydoc.cfg -o api pyxmpp2
+	mkdir -p www/api
+	$(EPYDOC) -v --include-log --html --config=epydoc.cfg -o www/api pyxmpp2
 	touch doc-tstamp
 	-rm -f pyxmpp2 2>/dev/null
 
