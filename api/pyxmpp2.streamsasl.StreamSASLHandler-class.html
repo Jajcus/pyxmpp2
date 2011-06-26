@@ -60,8 +60,8 @@
 <h1 class="epydoc">Class StreamSASLHandler</h1><p class="nomargin-top"></p>
 <center>
 <center>  <map id="class_hierarchy_for_streamsasl" name="class_hierarchy_for_streamsasl">
-<area shape="rect" id="node1" href="pyxmpp2.streambase.StreamFeatureHandler-class.html" title="streambase.StreamFeatureHandler" alt="" coords="5,6,245,34"/>
-<area shape="rect" id="node2" href="pyxmpp2.streamsasl.StreamSASLHandler-class.html" title="StreamSASLHandler" alt="" coords="49,65,201,93"/>
+<area shape="rect" id="node1" href="pyxmpp2.interfaces.StreamFeatureHandler-class.html" title="interfaces.StreamFeatureHandler" alt="" coords="5,6,235,34"/>
+<area shape="rect" id="node2" href="pyxmpp2.streamsasl.StreamSASLHandler-class.html" title="StreamSASLHandler" alt="" coords="44,65,196,93"/>
 </map>
   <img src="class_hierarchy_for_streamsasl.gif" alt='' usemap="#class_hierarchy_for_streamsasl" ismap="ismap" class="graph-without-title" />
 </center>
@@ -88,7 +88,7 @@ SASL authentication handler XMPP streams.
 </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.streambase.StreamFeatureHandler-class.html">streambase.StreamFeatureHandler</a></code></b>:
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html">interfaces.StreamFeatureHandler</a></code></b>:
       <code><a href="abc.ABCMeta-class.html">__metaclass__</a></code>
       </p>
     </td>
@@ -340,14 +340,14 @@ SASL authentication handler XMPP streams.
 </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.streambase.StreamFeatureHandler-class.html">streambase.StreamFeatureHandler</a></code></b>:
-      <code><a href="pyxmpp2.streambase.StreamFeatureHandler-class.html#__abstractmethods__">__abstractmethods__</a></code>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html">interfaces.StreamFeatureHandler</a></code></b>:
+      <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html#__abstractmethods__">__abstractmethods__</a></code>
       </p>
-    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.streambase.StreamFeatureHandler-class.html">streambase.StreamFeatureHandler</a></code></b> (private):
-      <code><a href="pyxmpp2.streambase.StreamFeatureHandler-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
-      <code><a href="pyxmpp2.streambase.StreamFeatureHandler-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
-      <code><a href="pyxmpp2.streambase.StreamFeatureHandler-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
-      <code><a href="pyxmpp2.streambase.StreamFeatureHandler-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html">interfaces.StreamFeatureHandler</a></code></b> (private):
+      <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
+      <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
+      <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
+      <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
       </p></div>
     </td>
   </tr>
@@ -481,7 +481,7 @@ SASL authentication handler XMPP streams.
     <dt>Returns:</dt>
         <dd>update &lt;features/&gt; element.</dd>
     <dt>Overrides:
-        <a href="pyxmpp2.streambase.StreamFeatureHandler-class.html#make_stream_features">streambase.StreamFeatureHandler.make_stream_features</a>
+        <a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html#make_stream_features">interfaces.StreamFeatureHandler.make_stream_features</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -512,17 +512,17 @@ SASL authentication handler XMPP streams.
     </ul></dd>
     <dt>Returns:</dt>
         <dd><ul class="rst-rst-rst-simple rst-rst-simple rst-simple">
-<li><p class="rst-rst-first rst-rst-first rst-first"><a href="pyxmpp2.streambase.StreamFeatureHandled-class.html" class="link">StreamFeatureHandled</a> instance if a feature was recognized and
+<li><p class="rst-rst-first rst-rst-first rst-first"><a href="pyxmpp2.interfaces.StreamFeatureHandled-class.html" class="link">StreamFeatureHandled</a> instance if a feature was recognized and
 handled</p>
 </li>
-<li><p class="rst-rst-first rst-rst-first rst-first"><a href="pyxmpp2.streambase.StreamFeatureNotHandled-class.html" class="link">StreamFeatureNotHandled</a> instance if a feature was recognized
+<li><p class="rst-rst-first rst-rst-first rst-first"><a href="pyxmpp2.interfaces.StreamFeatureNotHandled-class.html" class="link">StreamFeatureNotHandled</a> instance if a feature was recognized
 but not handled</p>
 </li>
 <li><p class="rst-rst-first rst-rst-first rst-first"><code class="link">None</code> if no feature was recognized</p>
 </li>
 </ul></dd>
     <dt>Overrides:
-        <a href="pyxmpp2.streambase.StreamFeatureHandler-class.html#handle_stream_features">streambase.StreamFeatureHandler.handle_stream_features</a>
+        <a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html#handle_stream_features">interfaces.StreamFeatureHandler.handle_stream_features</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -746,7 +746,7 @@ but not handled</p>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Jun 26 09:21:49 2011</a>
+    3.0.1 on Sun Jun 26 13:15:40 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

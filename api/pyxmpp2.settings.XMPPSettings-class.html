@@ -421,7 +421,7 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
  u'extra_ns_prefixes': {},
  u'language': 'en',
  u'languages': ('en'),
- u'prefer_ipv6': True,
+ u'poll_interval': 1,
 ..."><code class="variable-group">{</code><code class="variable-quote">u'</code><code class="variable-string">allow_ipv4</code><code class="variable-quote">'</code><code class="variable-op">: </code>True<code class="variable-op">, </code><code class="variable-quote">u'</code><code class="variable-string">authzid</code><code class="variable-quote">'</code><code class="variable-op">: </code>None<code class="variable-op">, </code><code class="variable-quote">u'</code><code class="variable-string">default_</code><code class="variable-ellipsis">...</code></code><br />
       : defaults for registered parameters.
     </td>
@@ -430,13 +430,13 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_defaults_factories"></a><span class="summary-name">_defaults_factories</span> = <code title="{'allow_ipv6': (&lt;function &lt;lambda&gt; at 0x8643b1c&gt;, True),
+        <a name="_defaults_factories"></a><span class="summary-name">_defaults_factories</span> = <code title="{'allow_ipv6': (&lt;function &lt;lambda&gt; at 0x867eae4&gt;, True),
  'dns_resolver': (&lt;class 'pyxmpp2.resolver.BlockingResolver'&gt;, False),
- 'event_queue': (&lt;function event_queue_factory at 0x87a2c34&gt;, True),
+ 'event_queue': (&lt;function event_queue_factory at 0x87d55dc&gt;, True),
  'password_manager': (&lt;class 'pyxmpp2.streamsasl.DefaultPasswordManage\
 r'&gt;,
                       False),
- 'resource': (&lt;function default_resource_factory at 0x8a6e5a4&gt;, False)\
+ 'resource': (&lt;function default_resource_factory at 0x8a7a6f4&gt;, False)\
 }">{}</code><br />
       : factory functions providing default values
 which cannot be hard-coded.
@@ -453,21 +453,21 @@ which cannot be hard-coded.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x85900ac&gt;">&lt;_weakrefset.WeakSet object at 0x85900ac&gt;</code>
+        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x85f628c&gt;">&lt;_weakrefset.WeakSet object at 0x85f628c&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x85900ec&gt;">&lt;_weakrefset.WeakSet object at 0x85900ec&gt;</code>
+        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x85f62cc&gt;">&lt;_weakrefset.WeakSet object at 0x85f62cc&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x859006c&gt;">&lt;_weakrefset.WeakSet object at 0x859006c&gt;</code>
+        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x85f624c&gt;">&lt;_weakrefset.WeakSet object at 0x85f624c&gt;</code>
     </td>
   </tr>
   <tr>
@@ -861,7 +861,7 @@ or the PyXMPP global default otherwise.</p>
  <code class="variable-quote">u'</code><code class="variable-string">extra_ns_prefixes</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-group">}</code><code class="variable-op">,</code>
  <code class="variable-quote">u'</code><code class="variable-string">language</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">en</code><code class="variable-quote">'</code><code class="variable-op">,</code>
  <code class="variable-quote">u'</code><code class="variable-string">languages</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">en</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
- <code class="variable-quote">u'</code><code class="variable-string">prefer_ipv6</code><code class="variable-quote">'</code><code class="variable-op">: </code>True<code class="variable-op">,</code>
+ <code class="variable-quote">u'</code><code class="variable-string">poll_interval</code><code class="variable-quote">'</code><code class="variable-op">: </code>1<code class="variable-op">,</code>
 <code class="variable-ellipsis">...</code>
 </pre></td></tr></table>
 </dd>
@@ -901,7 +901,7 @@ or the PyXMPP global default otherwise.</p>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Jun 26 09:21:48 2011</a>
+    3.0.1 on Sun Jun 26 13:15:39 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

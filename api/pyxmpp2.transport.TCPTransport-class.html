@@ -60,9 +60,9 @@
 <h1 class="epydoc">Class TCPTransport</h1><p class="nomargin-top"></p>
 <center>
 <center>  <map id="class_hierarchy_for_tcptranspo" name="class_hierarchy_for_tcptranspo">
-<area shape="rect" id="node1" href="pyxmpp2.mainloop.interfaces.IOHandler-class.html" title="mainloop.interfaces.IOHandler" alt="" coords="5,6,216,34"/>
-<area shape="rect" id="node2" href="pyxmpp2.transport.TCPTransport-class.html" title="TCPTransport" alt="" coords="149,65,261,93"/>
-<area shape="rect" id="node3" href="pyxmpp2.transport.XMPPTransport-class.html" title="XMPPTransport" alt="" coords="240,6,363,34"/>
+<area shape="rect" id="node1" href="pyxmpp2.interfaces.XMPPTransport-class.html" title="interfaces.XMPPTransport" alt="" coords="5,6,192,34"/>
+<area shape="rect" id="node3" href="pyxmpp2.transport.TCPTransport-class.html" title="TCPTransport" alt="" coords="153,65,265,93"/>
+<area shape="rect" id="node2" href="pyxmpp2.mainloop.interfaces.IOHandler-class.html" title="mainloop.interfaces.IOHandler" alt="" coords="216,6,427,34"/>
 </map>
   <img src="class_hierarchy_for_tcptranspo.gif" alt='' usemap="#class_hierarchy_for_tcptranspo" ismap="ismap" class="graph-without-title" />
 </center>
@@ -89,7 +89,7 @@ XMPP over TCP with optional TLS.
 </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.transport.XMPPTransport-class.html">XMPPTransport</a></code></b>:
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.interfaces.XMPPTransport-class.html">interfaces.XMPPTransport</a></code></b>:
       <code><a href="abc.ABCMeta-class.html">__metaclass__</a></code>
       </p>
     </td>
@@ -804,14 +804,14 @@ next <a href="pyxmpp2.transport.TCPTransport-class.html#prepare" class="link">pr
 </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.transport.XMPPTransport-class.html">XMPPTransport</a></code></b>:
-      <code><a href="pyxmpp2.transport.XMPPTransport-class.html#__abstractmethods__">__abstractmethods__</a></code>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.interfaces.XMPPTransport-class.html">interfaces.XMPPTransport</a></code></b>:
+      <code><a href="pyxmpp2.interfaces.XMPPTransport-class.html#__abstractmethods__">__abstractmethods__</a></code>
       </p>
-    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.transport.XMPPTransport-class.html">XMPPTransport</a></code></b> (private):
-      <code><a href="pyxmpp2.transport.XMPPTransport-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
-      <code><a href="pyxmpp2.transport.XMPPTransport-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
-      <code><a href="pyxmpp2.transport.XMPPTransport-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
-      <code><a href="pyxmpp2.transport.XMPPTransport-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.interfaces.XMPPTransport-class.html">interfaces.XMPPTransport</a></code></b> (private):
+      <code><a href="pyxmpp2.interfaces.XMPPTransport-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
+      <code><a href="pyxmpp2.interfaces.XMPPTransport-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
+      <code><a href="pyxmpp2.interfaces.XMPPTransport-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
+      <code><a href="pyxmpp2.interfaces.XMPPTransport-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
       </p></div>
     </td>
   </tr>
@@ -1269,7 +1269,7 @@ of the target will be called when appropriate content is received.</p>
 from the transport</li>
     </ul></dd>
     <dt>Overrides:
-        <a href="pyxmpp2.transport.XMPPTransport-class.html#set_target">XMPPTransport.set_target</a>
+        <a href="pyxmpp2.interfaces.XMPPTransport-class.html#set_target">interfaces.XMPPTransport.set_target</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -1306,7 +1306,7 @@ from the transport</li>
         <li><strong class="pname"><code>language</code></strong> (: <code class="link">unicode</code>) - : the 'xml:lang' of the stream</li>
     </ul></dd>
     <dt>Overrides:
-        <a href="pyxmpp2.transport.XMPPTransport-class.html#send_stream_head">XMPPTransport.send_stream_head</a>
+        <a href="pyxmpp2.interfaces.XMPPTransport-class.html#send_stream_head">interfaces.XMPPTransport.send_stream_head</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -1328,7 +1328,7 @@ from the transport</li>
   Restart the stream after SASL or StartTLS handshake.
   <dl class="fields">
     <dt>Overrides:
-        <a href="pyxmpp2.transport.XMPPTransport-class.html#restart">XMPPTransport.restart</a>
+        <a href="pyxmpp2.interfaces.XMPPTransport-class.html#restart">interfaces.XMPPTransport.restart</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -1350,7 +1350,7 @@ from the transport</li>
   Send stream tail via the transport.
   <dl class="fields">
     <dt>Overrides:
-        <a href="pyxmpp2.transport.XMPPTransport-class.html#send_stream_tail">XMPPTransport.send_stream_tail</a>
+        <a href="pyxmpp2.interfaces.XMPPTransport-class.html#send_stream_tail">interfaces.XMPPTransport.send_stream_tail</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -1373,7 +1373,7 @@ from the transport</li>
   Send an element via the transport.
   <dl class="fields">
     <dt>Overrides:
-        <a href="pyxmpp2.transport.XMPPTransport-class.html#send_element">XMPPTransport.send_element</a>
+        <a href="pyxmpp2.interfaces.XMPPTransport-class.html#send_element">interfaces.XMPPTransport.send_element</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -1653,7 +1653,7 @@ after this.
     <dt>Returns:</dt>
         <dd><code class="link">True</code> if is connected.</dd>
     <dt>Overrides:
-        <a href="pyxmpp2.transport.XMPPTransport-class.html#is_connected">XMPPTransport.is_connected</a>
+        <a href="pyxmpp2.interfaces.XMPPTransport-class.html#is_connected">interfaces.XMPPTransport.is_connected</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -1675,7 +1675,7 @@ after this.
   Disconnect the stream gracefully.
   <dl class="fields">
     <dt>Overrides:
-        <a href="pyxmpp2.transport.XMPPTransport-class.html#disconnect">XMPPTransport.disconnect</a>
+        <a href="pyxmpp2.interfaces.XMPPTransport-class.html#disconnect">interfaces.XMPPTransport.disconnect</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -1795,7 +1795,7 @@ assumed and the stream is closed.</p>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Jun 26 09:21:49 2011</a>
+    3.0.1 on Sun Jun 26 13:15:41 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
