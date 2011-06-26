@@ -1,8 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import time
-import traceback
+"""
+A simple client example.
+
+The script asks for a sender JID and password, target JID and a message.
+Then, it connects to the sender's server and sends the message to the target
+JID.
+"""
+
 import sys
 import logging
 from getpass import getpass
@@ -33,7 +39,7 @@ class MyHandler(EventHandler):
     def handle_all(self, event):
         logger.info(u"-- {0}".format(event))
 
-logger=logging.getLogger()
+logger = logging.getLogger()
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.INFO)
 
