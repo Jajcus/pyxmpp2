@@ -38,12 +38,12 @@ from .streambase import FatalStreamError
 from .exceptions import TLSNegotiationFailed, TLSError
 from .exceptions import JIDError
 from .jid import JID
-from .streambase import StreamFeatureHandler
-from .streambase import StreamFeatureHandled, StreamFeatureNotHandled
-from .streambase import stream_element_handler
 from .settings import XMPPSettings
 from .streamevents import TLSConnectingEvent, TLSConnectedEvent
 
+from .interfaces import StreamFeatureHandler
+from .interfaces import StreamFeatureHandled, StreamFeatureNotHandled
+from .interfaces import stream_element_handler
 from .mainloop.interfaces import EventHandler, event_handler
 
 STARTTLS_TAG = TLS_QNP + u"starttls"

@@ -17,36 +17,16 @@
 
 """XMPP payload classes."""
 
-from abc import ABCMeta
-from copy import deepcopy
-from collections import defaultdict
-from .etree import ElementTree, ElementClass
 import logging
+from collections import defaultdict
+
+from .etree import ElementTree, ElementClass
+from .interfaces import StanzaPayload, payload_element_name
 
 STANZA_PAYLOAD_CLASSES = {}
 STANZA_PAYLOAD_ELEMENTS = defaultdict(list)
 
 logger = logging.getLogger("pyxmpp.stanzapayload")
-
-class StanzaPayload:
-    """Abstract base class for stanza payload objects."""
-    __metaclass__ = ABCMeta
-
-    def __init__(self, element):
-        pass
-
-    def as_xml(self):
-        raise NotImplementedError
-
-    def copy(self):
-        return deepcopy(self)
-
-    @property
-    def handler_key(self):
-        """Defines a key which may be used when registering handlers
-        for stanzas with this payload."""
-        return None
-
 
 class XMLPayload(StanzaPayload):
     """Transparent XML payload for stanza.
@@ -78,28 +58,6 @@ class XMLPayload(StanzaPayload):
         """Return `xml_element_name` as the extra key for stanza
         handlers."""
         return self.xml_element_name
-
-def payload_element_name(element_name):
-    """Class decorator generator for decorationg
-    `StanzaPayload` subclasses.
-    
-    :Parameters:
-        - `element_name`: XML element qname handled by the class
-    :Types:
-        - `element_name`: `unicode`
-    """
-    def decorator(klass):
-        if hasattr(klass, "_pyxmpp_payload_element_name"):
-            klass._pyxmpp_payload_element_name.append(element_name)
-        else:
-            klass._pyxmpp_payload_element_name = [element_name]
-        if element_name in STANZA_PAYLOAD_CLASSES:
-            logger.warning("Overriding payload class for {0!r}".format(
-                                                                element_name))
-        STANZA_PAYLOAD_CLASSES[element_name] = klass
-        STANZA_PAYLOAD_ELEMENTS[klass].append(element_name)
-        return klass
-    return decorator
 
 def payload_class_for_element_name(element_name):
     logger.debug(" looking up payload class for element: {0!r}".format(

@@ -18,7 +18,7 @@
 """Handling of XMPP stanzas.
 
 Normative reference:
-  - `RFC 3920 <http://www.ietf.org/rfc/rfc3920.txt>`__
+  - :RFC:`6129`
 """
 
 from __future__ import absolute_import
@@ -28,7 +28,6 @@ __docformat__ = "restructuredtext en"
 import logging
 import threading
 from collections import defaultdict
-from abc import ABCMeta
 import inspect
 
 from .expdict import ExpiringDictionary
@@ -37,138 +36,12 @@ from .exceptions import ServiceUnavailableProtocolError
 from .stanza import Stanza
 from .message import Message
 from .presence import Presence
-from .stanzapayload import StanzaPayload, XMLPayload
+from .stanzapayload import XMLPayload
 from .iq import Iq
 
+from .interfaces import StanzaPayload, XMPPFeatureHandler
+
 logger = logging.getLogger("pyxmpp.stanzaprocessor")
-
-
-class XMPPFeatureHandler:
-    __metaclass__ = ABCMeta
-
-def _iq_handler(iq_type, payload_class, payload_key, usage_restriction):
-    """Method decorator generator for decorating <iq type='get'/> stanza
-    handler methods in `XMPPFeatureHandler` subclasses.
-    
-    :Parameters:
-        - `payload_class`: payload class expected
-        - `payload_key`: payload class specific filtering key
-        - `usage_restriction`: optional usage restriction: "pre-auth" or
-          "post-auth"
-    :Types:
-        - `payload_class`: subclass of `StanzaPayload`
-        - `usage_restriction`: `unicode`
-    """
-    def decorator(func):
-        """The decorator"""
-        func._pyxmpp_stanza_handled = ("iq", iq_type)
-        func._pyxmpp_payload_class_handled = payload_class
-        func._pyxmpp_payload_key = payload_key
-        func._pyxmpp_usage_restriction = usage_restriction
-        return func
-    return decorator
-
-
-def iq_get_stanza_handler(payload_class, payload_key = None, 
-                                            usage_restriction = "post-auth"):
-    """Method decorator generator for decorating <iq type='get'/> stanza
-    handler methods in `XMPPFeatureHandler` subclasses.
-    
-    :Parameters:
-        - `payload_class`: payload class expected
-        - `payload_key`: payload class specific filtering key
-        - `usage_restriction`: optional usage restriction: "pre-auth" or
-          "post-auth"
-    :Types:
-        - `payload_class`: subclass of `StanzaPayload`
-        - `usage_restriction`: `unicode`
-    """
-    return _iq_handler("get", payload_class, payload_key, usage_restriction)
-
-def iq_set_stanza_handler(payload_class, payload_key = None, 
-                                            usage_restriction = "post-auth"):
-    """Method decorator generator for decorating <iq type='set'/> stanza
-    handler methods in `XMPPFeatureHandler` subclasses.
-    
-    :Parameters:
-        - `payload_class`: payload class expected
-        - `payload_key`: payload class specific filtering key
-        - `usage_restriction`: optional usage restriction: "pre-auth" or
-          "post-auth"
-    :Types:
-        - `payload_class`: subclass of `StanzaPayload`
-        - `usage_restriction`: `unicode`
-    """
-    return _iq_handler("set", payload_class, payload_key, usage_restriction)
-
-def _stanza_handler(element_name, stanza_type, payload_class, payload_key,
-                                                            usage_restriction):
-    """Method decorator generator for decorating <message/> or <presence/>
-    stanza handler methods in `XMPPFeatureHandler` subclasses.
-    
-    :Parameters:
-        - `element_name`: "message" or "presence"
-        - `stanza_type`: expected value of the 'type' attribute of the stanza
-        - `payload_class`: payload class expected
-        - `payload_key`: payload class specific filtering key
-        - `usage_restriction`: optional usage restriction: "pre-auth" or
-          "post-auth"
-    :Types:
-        - `element_name`: `unicode`
-        - `stanza_type`: `unicode`
-        - `payload_class`: subclass of `StanzaPayload`
-        - `usage_restriction`: `unicode`
-    """
-    def decorator(func):
-        """The decorator"""
-        func._pyxmpp_stanza_handled = (element_name, stanza_type)
-        func._pyxmpp_payload_class_handled = payload_class
-        func._pyxmpp_payload_key = payload_key
-        func._pyxmpp_usage_restriction = usage_restriction
-        return func
-    return decorator
-
-def message_stanza_handler(stanza_type = None, payload_class = None,
-                            payload_key = None, usage_restriction = "post-auth"):
-    """Method decorator generator for decorating <message/> 
-    stanza handler methods in `XMPPFeatureHandler` subclasses.
-    
-    :Parameters:
-        - `payload_class`: payload class expected
-        - `stanza_type`: expected value of the 'type' attribute of the stanza.
-          `None` means all types except 'error'
-        - `payload_key`: payload class specific filtering key
-        - `usage_restriction`: optional usage restriction: "pre-auth" or
-          "post-auth"
-    :Types:
-        - `payload_class`: subclass of `StanzaPayload`
-        - `stanza_type`: `unicode`
-        - `usage_restriction`: `unicode`
-    """
-    if stanza_type is None:
-        stanza_type = "normal"
-    return _stanza_handler("message", stanza_type, payload_class, payload_key,
-                                                            usage_restriction)
- 
-def presence_stanza_handler(stanza_type = None, payload_class = None,
-                            payload_key = None, usage_restriction = "post-auth"):
-    """Method decorator generator for decorating <presence/> 
-    stanza handler methods in `XMPPFeatureHandler` subclasses.
-    
-    :Parameters:
-        - `payload_class`: payload class expected
-        - `stanza_type`: expected value of the 'type' attribute of the stanza.
-        - `payload_key`: payload class specific filtering key
-        - `usage_restriction`: optional usage restriction: "pre-auth" or
-          "post-auth"
-    :Types:
-        - `payload_class`: subclass of `StanzaPayload`
-        - `stanza_type`: `unicode`
-        - `usage_restriction`: `unicode`
-    """
-    return _stanza_handler("presence", stanza_type, payload_class, payload_key,
-                                                            usage_restriction)
- 
 
 def stanza_factory(element, stream = None, language = None):
     """Creates Iq, Message or Presence object for XML stanza `element`

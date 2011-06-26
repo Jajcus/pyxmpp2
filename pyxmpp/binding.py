@@ -32,16 +32,16 @@ import uuid
 from .etree import ElementTree
 
 from .constants import BIND_QNP
-from .stanzapayload import StanzaPayload, payload_element_name
-from .streambase import StreamFeatureHandler, StreamFeatureHandled
-from .stanzaprocessor import XMPPFeatureHandler
-from .stanzaprocessor import iq_set_stanza_handler
 from .settings import XMPPSettings
 from .streamevents import BindingResourceEvent, AuthorizedEvent
 from .exceptions import ResourceConstraintProtocolError, JIDError
 from .exceptions import BadRequestProtocolError, FatalStreamError
 from .iq import Iq
 from .jid import JID
+from .interfaces import XMPPFeatureHandler
+from .interfaces import iq_set_stanza_handler
+from .interfaces import StanzaPayload, payload_element_name
+from .interfaces import StreamFeatureHandler, StreamFeatureHandled
 
 logger = logging.getLogger("pyxmpp.binding")
 

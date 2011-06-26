@@ -36,9 +36,9 @@ from .exceptions import SASLNotAvailable, FatalStreamError
 from .exceptions import SASLMechanismNotAvailable, SASLAuthenticationFailed
 from .constants import SASL_QNP
 from .settings import XMPPSettings
-from .streambase import StreamFeatureHandler
-from .streambase import StreamFeatureHandled, StreamFeatureNotHandled
-from .streambase import stream_element_handler
+from .interfaces import StreamFeatureHandler
+from .interfaces import StreamFeatureHandled, StreamFeatureNotHandled
+from .interfaces import stream_element_handler
 
 logger = logging.getLogger("pyxmpp.streamsasl")
 

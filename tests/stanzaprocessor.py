@@ -9,11 +9,11 @@ from pyxmpp2.iq import Iq
 from pyxmpp2.message import Message
 from pyxmpp2.presence import Presence
 from pyxmpp2.stanzaprocessor import stanza_factory, StanzaProcessor
-from pyxmpp2.stanzaprocessor import XMPPFeatureHandler
-from pyxmpp2.stanzaprocessor import iq_get_stanza_handler
-from pyxmpp2.stanzaprocessor import iq_set_stanza_handler
-from pyxmpp2.stanzaprocessor import message_stanza_handler
-from pyxmpp2.stanzaprocessor import presence_stanza_handler
+from pyxmpp2.interfaces import XMPPFeatureHandler
+from pyxmpp2.interfaces import iq_get_stanza_handler
+from pyxmpp2.interfaces import iq_set_stanza_handler
+from pyxmpp2.interfaces import message_stanza_handler
+from pyxmpp2.interfaces import presence_stanza_handler
 from pyxmpp2.stanzapayload import XMLPayload
 from pyxmpp2.jid import JID
 from pyxmpp2.utils import xml_elements_equal

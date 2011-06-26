@@ -32,9 +32,8 @@ import logging
 import threading
 import Queue
 
-from abc import ABCMeta
-
 from .settings import XMPPSettings
+from .interfaces import Resolver
 
 logger = logging.getLogger("pyxmpp.resolver")
 
@@ -46,51 +45,6 @@ try:
     HAVE_DNSPYTHON = True
 except ImportError:
     HAVE_DNSPYTHON = False
-
-class Resolver:
-    """Abstract base class for asynchronous DNS resolvers to be used
-    with PyxMPP.
-    """
-    # pylint: disable-msg=W0232
-    __metaclass__ = ABCMeta
-    def resolve_srv(self, domain, service, protocol, callback):
-        """Start looking up an SRV record for `service` at `domain`.
-
-        `callback` will be called with a properly sorted list of (hostname,
-        port) pairs on success. The list will be empty on error and it will
-        contain only (".", 0) when the service is explicitely disabled.
-
-        :Parameters:
-            - `domain`: domain name to look up
-            - `service`: service name e.g. 'xmpp-client'
-            - `protocol`: protocol name, e.g. 'tcp'
-            - `callback`: a function to be called with a list of received
-              addresses
-        :Types:
-            - `domain`: `unicode`
-            - `service`: `unicode`
-            - `protocol`: `unicode`
-            - `callback`: function accepting a single argument
-        """
-        raise NotImplementedError
-
-    def resolve_address(self, hostname, callback, allow_cname = True):
-        """Start looking up an A or AAAA record.
-
-        `callback` will be called with a list of IPv4 or IPv6 address literals
-        on success. The list will be empty on error.
-
-        :Parameters:
-            - `hostname`: the host name to look up
-            - `callback`: a function to be called with a list of received
-              addresses
-            - `allow_cname`: `True` if CNAMEs should be followed
-        :Types:
-            - `hostname`: `unicode`
-            - `callback`: function accepting a single argument
-            - `allow_cname`: `bool`
-        """
-        raise NotImplementedError
 
 def is_ipv6_available():
     """Check if IPv6 is available.

@@ -33,7 +33,6 @@ import logging
 import ssl
 
 from functools import partial
-from abc import ABCMeta
 from collections import deque
 
 from .etree import ElementTree
@@ -47,6 +46,7 @@ from .xmppserializer import XMPPSerializer
 from .xmppparser import StreamReader
 from . import resolver
 from .mainloop.wait import wait_for_write
+from .interfaces import XMPPTransport
 
 logger = logging.getLogger("pyxmpp.transport")
 
@@ -73,78 +73,6 @@ class WriteData(WriteJob):
         self.data = data
     def __repr__(self):
         return "<WriteJob: WriteData: {0!r}>".format(self.data)
-
-class XMPPTransport:
-    """Abstract base class for XMPP transport implementations."""
-    # pylint: disable-msg=R0922,W0232
-    __metaclass__ = ABCMeta
-    def set_target(self, stream):
-        """Make the `stream` the target for this transport instance.
-
-        The 'stream_start', 'stream_end' and 'stream_element' methods
-        of the target will be called when appropriate content is received.
-
-        :Parameters:
-            - `stream`: the stream handler to receive stream content
-              from the transport
-        :Types:
-            - `stream`: `StreamBase`
-        """
-        raise NotImplementedError
-
-    def send_stream_head(self, stanza_namespace, stream_from, stream_to,
-                        stream_id = None, version = u'1.0', language = None):
-        """
-        Send stream head via the transport.
-
-        :Parameters:
-            - `stanza_namespace`: namespace of stream stanzas (e.g.
-              'jabber:client')
-            - `stream_from`: the 'from' attribute of the stream. May be `None`.
-            - `stream_to`: the 'to' attribute of the stream. May be `None`.
-            - `version`: the 'version' of the stream.
-            - `language`: the 'xml:lang' of the stream
-        :Types:
-            - `stanza_namespace`: `unicode`
-            - `stream_from`: `unicode`
-            - `stream_to`: `unicode`
-            - `version`: `unicode`
-            - `language`: `unicode`
-        """
-        # pylint: disable-msg=R0913
-        raise NotImplementedError
-    
-    def restart(self):
-        """Restart the stream after SASL or StartTLS handshake.
-        
-        For the initiator a new call to `send_stream_head` is required too."""
-        raise NotImplementedError
-
-    def send_stream_tail(self):
-        """
-        Send stream tail via the transport.
-        """
-        raise NotImplementedError
-
-    def send_element(self, element):
-        """
-        Send an element via the transport.
-        """
-        raise NotImplementedError
-
-    def is_connected(self):
-        """
-        Check if the transport is connected.
-
-        :Return: `True` if is connected.
-        """
-        raise NotImplementedReturn
-
-    def disconnect(self):
-        """
-        Gracefully disconnect the connection.
-        """
-        raise NotImplementedError
 
 class TCPTransport(XMPPTransport, IOHandler):
     """XMPP over TCP with optional TLS.

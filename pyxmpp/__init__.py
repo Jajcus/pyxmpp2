@@ -59,7 +59,7 @@ They are represented by the following PyXMPP2 classes: `message.Message`,
 The stanzas may carry arbitrary XML payload. It is bound to the stanzas
 using the `stanzapayload.StanzaPayload` interface. It can be a generic
 `stanzapayload.XMLPayload` implementation or any specialized
-`stanzapayload.StanzaPayload` subclass decoding the XML element as required.
+`interfaces.StanzaPayload` subclass decoding the XML element as required.
 
 XMPP Streams
 ------------
@@ -76,7 +76,7 @@ Transports
 The actual I/O (sending XML data over socket) has been separated from the
 `streambase.StreamBase` for cleaner code and to allow alternate transport
 implementations (like `BOSH`_). The interface is defined by the
-`transport.XMPPTransport` abstract class and the standard TCP transport
+`interfaces.XMPPTransport` abstract class and the standard TCP transport
 (:RFC:`6120`) is implemented via `transport.TCPTransport`.
 
 Main event loop
@@ -116,11 +116,11 @@ interfaces:
 
 Stream handlers should implement one or more of:
 
-    - `stanzaprocessor.XMPPFeatureHandler`: specially decorated methods of its
+    - `interfaces.XMPPFeatureHandler`: specially decorated methods of its
       subclasses are called for matching stanzas. The interface will also
       provide facilities for XMPP feature discovery and capability
       advertisement.
-    - `streambase.StreamFeatureHandler`: handle or generate
+    - `interfaces.StreamFeatureHandler`: handle or generate
       ``<stream:features>`` subelement and handle other related stream
       elements. Implemented e.g.  by `streamsasl.StreamSASLHandler` and
       `streamtls.StreamTLSHandler`.

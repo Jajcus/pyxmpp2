@@ -31,11 +31,12 @@ import weakref
 
 from .exceptions import BadRequestProtocolError, JIDMalformedProtocolError
 from .jid import JID
-from .stanzapayload import StanzaPayload, XMLPayload, payload_factory
+from .stanzapayload import XMLPayload, payload_factory
 from .stanzapayload import payload_class_for_element_name
 from .xmppserializer import serialize
 from .constants import STANZA_NAMESPACES, STANZA_CLIENT_NS, XML_LANG_QNAME
 from .error import StanzaErrorElement
+from .interfaces import StanzaPayload
 
 random.seed()
 

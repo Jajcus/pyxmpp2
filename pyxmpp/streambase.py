@@ -30,7 +30,6 @@ import inspect
 import logging
 import uuid
 import re
-from abc import ABCMeta
 
 from .etree import ElementTree
 
@@ -47,6 +46,9 @@ from .xmppserializer import serialize
 from .streamevents import ConnectedEvent
 from .streamevents import StreamConnectedEvent, GotFeaturesEvent
 from .streamevents import AuthenticatedEvent, StreamRestartedEvent
+
+from .interfaces import StreamFeatureHandler
+from .interfaces import StreamFeatureHandled, StreamFeatureNotHandled
 from .mainloop.interfaces import TimeoutHandler, timeout_handler
 
 XMPPSettings.add_defaults(
@@ -66,101 +68,6 @@ FEATURES_TAG = STREAM_QNP + u"features"
 
 # just to distinguish those from a domain name
 IP_RE = re.compile(r"^((\d+.){3}\d+)|([0-9a-f]*:[0-9a-f:]*:[0-9a-f]*)$")
-
-
-class StreamFeatureHandled(object):
-    """Object returned by a stream feature handler for recognized and handled
-    features.
-    """
-    # pylint: disable-msg=R0903
-    def __init__(self, feature_name, mandatory = False):
-        self.feature_name = feature_name
-        self.mandatory = mandatory
-    def __repr__(self):
-        if self.mandatory:
-            return "StreamFeatureHandled({0!r}, mandatory = True)".format(
-                                                            self.feature_name)
-        else:
-            return "StreamFeatureHandled({0!r})".format(self.feature_name)
-    def __str__(self):
-        return self.feature_name
-
-class StreamFeatureNotHandled(object):
-    """Object returned by a stream feature handler for recognized,
-    but unhandled features.
-    """
-    # pylint: disable-msg=R0903
-    def __init__(self, feature_name, mandatory = False):
-        self.feature_name = feature_name
-        self.mandatory = mandatory
-    def __repr__(self):
-        if self.mandatory:
-            return "StreamFeatureNotHandled({0!r}, mandatory = True)".format(
-                                                            self.feature_name)
-        else:
-            return "StreamFeatureNotHandled({0!r})".format(self.feature_name)
-    def __str__(self):
-        return self.feature_name
-
-class StreamFeatureHandler:
-    """Base class for stream feature handlers."""
-    # pylint: disable-msg=W0232
-    __metaclass__ = ABCMeta
-    def handle_stream_features(self, stream, features):
-        """Handle features announced by the stream peer.
-
-        [initiator only]
-
-        :Parameters:
-            - `stream`: the stream
-            - `features`: the features element just received
-        :Types:
-            - `stream`: `StreamBase`
-            - `features`: :etree:`ElementTree.Element`
-
-        :Return: 
-            - `StreamFeatureHandled` instance if a feature was recognized and
-              handled
-            - `StreamFeatureNotHandled` instance if a feature was recognized
-              but not handled
-            - `None` if no feature was recognized
-        """
-        # pylint: disable-msg=W0613,R0201
-        return False
-
-    def make_stream_features(self, stream, features):
-        """Update the features element announced by the stream.
-
-        [receiver only]
-
-        :Parameters:
-            - `stream`: the stream
-            - `features`: the features element about to be sent
-        :Types:
-            - `stream`: `StreamBase`
-            - `features`: :etree:`ElementTree.Element`
-        """
-        # pylint: disable-msg=W0613,R0201
-        return False
-
-def stream_element_handler(element_name, usage_restriction = None):
-    """Method decorator generator for decorating stream element
-    handler methods in `StreamFeatureHandler` subclasses.
-    
-    :Parameters:
-        - `element_name`: stream element QName
-        - `usage_restriction`: optional usage restriction: "initiator" or
-          "receiver"
-    :Types:
-        - `element_name`: `unicode`
-        - `usage_restriction`: `unicode`
-    """
-    def decorator(func):
-        """The decorator"""
-        func._pyxmpp_stream_element_handled = element_name
-        func._pyxmpp_usage_restriction = usage_restriction
-        return func
-    return decorator
 
 class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
     """Base class for a generic XMPP stream.

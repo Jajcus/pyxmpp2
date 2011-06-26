@@ -146,7 +146,8 @@ class Iq(Stanza):
         :Parameters:
             - `payload`: XML element or stanza payload object to add
         :Types:
-            - `payload`: :etree:`ElementTree.Element` or `StanzaPayload`
+            - `payload`: :etree:`ElementTree.Element` or
+              `interfaces.StanzaPayload`
         """
         if self._payload is None:
             self.decode_payload()
