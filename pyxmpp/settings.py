@@ -25,6 +25,10 @@ via function parameters would only mess up the API.
 
 Instead an `XMPPSettings` object will be used to pass all the optional
 parameters. It will also provide the defaults.
+
+This is also a mechanism for dependency injection, allowing different
+components share the same objects, like event queue or DNS resolver
+implementation.
 """
 
 from __future__ import absolute_import
