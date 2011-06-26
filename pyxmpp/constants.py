@@ -27,6 +27,9 @@ STREAM_ROOT_TAG = STREAM_QNP + "stream"
 BIND_NS = "urn:ietf:params:xml:ns:xmpp-bind"
 BIND_QNP = "{{{0}}}".format(BIND_NS)
 
+SESSION_NS = "urn:ietf:params:xml:ns:xmpp-session"
+SESSION_QNP = "{{{0}}}".format(SESSION_NS)
+
 STANZA_CLIENT_NS = "jabber:client"
 STANZA_CLIENT_QNP = "{{{0}}}".format(STANZA_CLIENT_NS)
 

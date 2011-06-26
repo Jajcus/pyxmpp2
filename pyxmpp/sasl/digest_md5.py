@@ -381,6 +381,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
                 logger.debug("Couldn't encode password to {0!r}" 
                                                             .format(charset))
                 return Failure("incompatible-charset")
+            logger.debug("Encoded password: {0!r}".format(epasswd))
             urp_hash = _make_urp_hash(username, realm, epasswd)
 
         response = _compute_response(urp_hash, nonce, cnonce, nonce_count,

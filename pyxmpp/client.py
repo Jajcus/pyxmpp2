@@ -18,7 +18,8 @@
 """Basic XMPP-IM client implementation.
 
 Normative reference:
-  - `RFC 3921 <http://www.ietf.org/rfc/rfc3921.txt>`__
+  - :RFC:`6120`
+  - :RFC:`6121` (TODO)
 """
 
 from __future__ import absolute_import
@@ -29,446 +30,128 @@ import threading
 import logging
 
 from .clientstream import ClientStream
-from .iq import Iq
-from .presence import Presence
-from .roster import Roster
-from .exceptions import ClientError, FatalClientError
-from .interfaces import IPresenceHandlersProvider, IMessageHandlersProvider
-from .interfaces import IIqHandlersProvider, IStanzaHandlersProvider
+from .mainloop import main_loop_factory
+from .mainloop.interfaces import EventHandler, event_handler
+from .streamevents import DisconnectedEvent
+from .transport import TCPTransport
+from .settings import XMPPSettings
+from .session import SessionHandler
 
-class Client:
+logger = logging.getLogger("pyxmpp.client")
+
+def base_client_handlers_factory(settings):
+    session_handler = SessionHandler(settings)
+    return [session_handler]
+
+XMPPSettings.add_default_factory("base_client_handlers",
+                                                base_client_handlers_factory)
+
+
+class Client(EventHandler):
     """Base class for an XMPP-IM client.
 
-    This class does not provide any JSF extensions to the XMPP protocol,
-    including legacy authentication methods.
-
     :Ivariables:
-        - `jid`: configured JID of the client (current actual JID
-          is avialable as `self.stream.jid`).
-        - `password`: authentication password.
-        - `server`: server to use if non-standard and not discoverable
-          by SRV lookups.
-        - `port`: port number on the server to use if non-standard and not
-          discoverable by SRV lookups.
-        - `auth_methods`: methods allowed for stream authentication. SASL
-          mechanism names should be preceded with "sasl:" prefix.
-        - `keepalive`: keepalive interval for the stream or 0 when keepalive is
-          disabled.
-        - `stream`: current stream when the client is connected,
-          `None` otherwise.
-        - `roster`: user's roster or `None` if the roster is not yet retrieved.
-        - `session_established`: `True` when an IM session is established.
-        - `lock`: lock for synchronizing `Client` attributes access.
-        - `state_changed`: condition notified the the object state changes
-          (stream becomes connected, session established etc.).
-        - `interface_providers`: list of object providing interfaces that
-          could be used by the Client object. Initialized to [`self`] by
-          the constructor if not set earlier. Put objects providing 
-          `IPresenceHandlersProvider`, `IMessageHandlersProvider`,
-          `IIqHandlersProvider` or `IStanzaHandlersProvider` into this list.
+        - `jid`: configured JID of the client (current full JID is avialable as
+          `self.stream.jid`).
+        - `mainloop`: the main loop object
     :Types:
-        - `jid`: `pyxmpp.JID`
-        - `password`: `unicode`
-        - `server`: `unicode`
-        - `port`: `int`
-        - `auth_methods`: `list` of `str`
-        - `keepalive`: `int`
-        - `stream`: `pyxmpp.ClientStream`
-        - `roster`: `pyxmpp.Roster`
-        - `session_established`: `bool`
-        - `lock`: :std:`threading.RLock`
-        - `state_changed`: :std:`threading.Condition`
-        - `interface_providers`: `list`
+        - `jid`: `jid.JID`
+        - `mainloop`: `mainloop.interfaces.MainLoop`
     """
-    def __init__(self,jid=None,password=None,server=None,port=5222,
-            auth_methods=("sasl:DIGEST-MD5",),
-            tls_settings=None,keepalive=0):
+    def __init__(self, jid, handlers, settings = None, mainloop = None):
         """Initialize a Client object.
 
         :Parameters:
-            - `jid`: user full JID for the connection.
-            - `password`: user password.
-            - `server`: server to use. If not given then address will be derived form the JID.
-            - `port`: port number to use. If not given then address will be derived form the JID.
-            - `auth_methods`: sallowed authentication methods. SASL authentication mechanisms
-              in the list should be prefixed with "sasl:" string.
-            - `tls_settings`: settings for StartTLS -- `TLSSettings` instance.
-            - `keepalive`: keepalive output interval. 0 to disable.
+            - `jid`: user JID for the connection.
+            - `settings`: client settings.
+            - `mainloop`: Main event loop to attach to. If None, a loop
+              will be created.
         :Types:
-            - `jid`: `pyxmpp.JID`
-            - `password`: `unicode`
-            - `server`: `unicode`
-            - `port`: `int`
-            - `auth_methods`: sequence of `str`
-            - `tls_settings`: `pyxmpp.TLSSettings`
-            - `keepalive`: `int`
+            - `jid`: `jid.JID`
+            - `settings`: `settings.XMPPSettings`
+            - `mainloop`: `mainloop.interfaces.MainLoop`
         """
-        self.jid=jid
-        self.password=password
-        self.server=server
-        self.port=port
-        self.auth_methods=list(auth_methods)
-        self.tls_settings=tls_settings
-        self.keepalive=keepalive
-        self.stream=None
-        self.lock=threading.RLock()
-        self.state_changed=threading.Condition(self.lock)
-        self.session_established=False
-        self.roster=None
-        self.stream_class=ClientStream
-        if not hasattr(self, "interface_providers"):
-            self.interface_providers = [self]
-        self.__logger=logging.getLogger("pyxmpp.Client")
+        self.jid = jid
+        self.settings = settings if settings else XMPPSettings()
+        self.handlers = handlers
+        self._ml_handlers = self.settings["base_client_handlers"]
+        self._ml_handlers += list(handlers) + [self]
+        if mainloop is not None:
+            self.mainloop = mainloop
+            for handler in self._ml_handlers:
+                self.mainloop.add_handler(handler)
+        else:
+            self.mainloop = main_loop_factory(settings, self._ml_handlers)
+        self.stream = None
+        self.lock = threading.RLock()
 
-# public methods
+    def __del__(self):
+        for handler in self._ml_handlers:
+            self.mainloop.remove_handler(handler)
+        self._ml_handlers = []
 
-    def connect(self, register = False):
-        """Connect to the server and set up the stream.
+    def connect(self):
+        """Schedule a new XMPP c2s connection.
+        """
+        with self.lock:
+            if self.stream:
+                logger.debug("Closing the previously used stream.")
+                self._close_stream()
 
-        Set `self.stream` and notify `self.state_changed` when connection
-        succeeds."""
-        if not self.jid:
-            raise ClientError("Cannot connect: no or bad JID given")
-        self.lock.acquire()
-        try:
-            stream = self.stream
-            self.stream = None
-            if stream:
-                stream.close()
-
-            self.__logger.debug("Creating client stream: %r, auth_methods=%r"
-                    % (self.stream_class, self.auth_methods))
-            stream=self.stream_class(jid = self.jid,
-                    password = self.password,
-                    server = self.server,
-                    port = self.port,
-                    auth_methods = self.auth_methods,
-                    tls_settings = self.tls_settings,
-                    keepalive = self.keepalive,
-                    owner = self)
-            stream.process_stream_error = self.stream_error
-            self.stream_created(stream)
-            stream.state_change = self.__stream_state_change
-            stream.connect()
+            transport = TCPTransport(self.settings)
+            transport.connect(self.jid.domain, self.settings["client_port"],
+                                            self.settings["client_service"])
+            stream = ClientStream(self.jid, self.handlers, self.settings)
+            stream.initiate(transport)
+            self.mainloop.add_handler(transport)
+            self.mainloop.add_handler(stream)
+            self._ml_handlers += [transport, stream]
             self.stream = stream
-            self.state_changed.notify()
-            self.state_changed.release()
-        except:
-            self.stream = None
-            self.state_changed.release()
-            raise
-
-    def get_stream(self):
-        """Get the connected stream object.
-
-        :return: stream object or `None` if the client is not connected.
-        :returntype: `pyxmpp.ClientStream`"""
-        self.lock.acquire()
-        stream=self.stream
-        self.lock.release()
-        return stream
 
     def disconnect(self):
-        """Disconnect from the server."""
-        stream=self.get_stream()
-        if stream:
-            stream.disconnect()
+        """Gracefully disconnect from the server."""
+        with self.lock:
+            self.stream.disconnect()
 
-    def request_session(self):
-        """Request an IM session."""
-        stream=self.get_stream()
-        if not stream.version:
-            need_session=False
-        elif not stream.features:
-            need_session=False
-        else:
-            ctxt = stream.doc_in.xpathNewContext()
-            ctxt.setContextNode(stream.features)
-            ctxt.xpathRegisterNs("sess","urn:ietf:params:xml:ns:xmpp-session")
-            # jabberd2 hack
-            ctxt.xpathRegisterNs("jsess","http://jabberd.jabberstudio.org/ns/session/1.0")
-            sess_n=None
-            try:
-                sess_n=ctxt.xpathEval("sess:session or jsess:session")
-            finally:
-                ctxt.xpathFreeContext()
-            if sess_n:
-                need_session=True
-            else:
-                need_session=False
+    def close_stream(self):
+        """Close the stream immediately.
+        """
+        with self.lock:
+            self._close_stream()
 
-        if not need_session:
-            self.state_changed.acquire()
-            self.session_established=1
-            self.state_changed.notify()
-            self.state_changed.release()
-            self._session_started()
-        else:
-            iq=Iq(stanza_type="set")
-            iq.new_query("urn:ietf:params:xml:ns:xmpp-session","session")
-            stream.set_response_handlers(iq,
-                self.__session_result,self.__session_error,self.__session_timeout)
-            stream.send(iq)
+    def _close_stream(self):
+        """Same as `close_stream` but with the `lock` acquired.
+        """
+        self.stream.close()
+        if self.stream.transport in self._ml_handlers:
+            self._ml_handlers.remove(self.stream.transport)
+            self.mainloop.remove_handler(self.stream.transport)
+        self.stream = None
 
-    def request_roster(self):
-        """Request the user's roster."""
-        stream=self.get_stream()
-        iq=Iq(stanza_type="get")
-        iq.new_query("jabber:iq:roster")
-        stream.set_response_handlers(iq,
-            self.__roster_result,self.__roster_error,self.__roster_timeout)
-        stream.set_iq_set_handler("query","jabber:iq:roster",self.__roster_push)
-        stream.send(iq)
+    def run(self, timeout = None):
+        """Call the main loop.
 
-    def get_socket(self):
-        """Get the socket object of the active connection.
+        Convenience wrapper for ``self.mainloop.loop``
+        """
+        self.mainloop.loop(timeout)
 
-        :return: socket used by the stream.
-        :returntype: :std:`socket.socket`"""
-        return self.stream.socket
+    @event_handler(DisconnectedEvent)
+    def _stream_disconnected(self, event):
+        """Handle stream disconnection event.
+        """
+        with self.lock:
+            if event.stream != self.stream:
+                return
+            if self.stream is not None and event.stream == self.stream:
+                if self.stream.transport in self._ml_handlers:
+                    self._ml_handlers.remove(self.stream.transport)
+                    self.mainloop.remove_handler(self.stream.transport)
+                self.stream = None
 
-    def loop(self,timeout=1):
-        """Simple "main loop" for the client.
+XMPPSettings.add_defaults({
+                            u"client_port": 5222, 
+                            u"client_service": "xmpp-client", 
+                            })
 
-        By default just call the `pyxmpp.Stream.loop_iter` method of
-        `self.stream`, which handles stream input and `self.idle` for some
-        "housekeeping" work until the stream is closed.
-
-        This usually will be replaced by something more sophisticated. E.g.
-        handling of other input sources."""
-        while 1:
-            stream=self.get_stream()
-            if not stream:
-                break
-            act=stream.loop_iter(timeout)
-            if not act:
-                self.idle()
-
-# private methods
-
-    def __session_timeout(self):
-        """Process session request time out.
-
-        :raise FatalClientError:"""
-        raise FatalClientError("Timeout while tryin to establish a session")
-
-    def __session_error(self,iq):
-        """Process session request failure.
-
-        :Parameters:
-            - `iq`: IQ error stanza received as result of the session request.
-        :Types:
-            - `iq`: `pyxmpp.Iq`
-
-        :raise FatalClientError:"""
-        err=iq.get_error()
-        msg=err.get_message()
-        raise FatalClientError("Failed to establish a session: "+msg)
-
-    def __session_result(self, _unused):
-        """Process session request success.
-
-        :Parameters:
-            - `_unused`: IQ result stanza received in reply to the session request.
-        :Types:
-            - `_unused`: `pyxmpp.Iq`"""
-        self.state_changed.acquire()
-        self.session_established=True
-        self.state_changed.notify()
-        self.state_changed.release()
-        self._session_started()
-
-    def _session_started(self):
-        """Called when session is started.
-        
-        Activates objects from `self.interface_provides` by installing
-        their stanza handlers, etc."""
-        for ob in self.interface_providers:
-            if IPresenceHandlersProvider.providedBy(ob):
-                for handler_data in ob.get_presence_handlers():
-                    self.stream.set_presence_handler(*handler_data)
-            if IMessageHandlersProvider.providedBy(ob):
-                for handler_data in ob.get_message_handlers():
-                    self.stream.set_message_handler(*handler_data)
-            if IIqHandlersProvider.providedBy(ob):
-                for handler_data in ob.get_iq_get_handlers():
-                    self.stream.set_iq_get_handler(*handler_data)
-                for handler_data in ob.get_iq_set_handlers():
-                    self.stream.set_iq_set_handler(*handler_data)
-        self.session_started()
-
-    def __roster_timeout(self):
-        """Process roster request time out.
-
-        :raise ClientError:"""
-        raise ClientError("Timeout while tryin to retrieve roster")
-
-    def __roster_error(self,iq):
-        """Process roster request failure.
-
-        :Parameters:
-            - `iq`: IQ error stanza received as result of the roster request.
-        :Types:
-            - `iq`: `pyxmpp.Iq`
-
-        :raise ClientError:"""
-        err=iq.get_error()
-        msg=err.get_message()
-        raise ClientError("Roster retrieval failed: "+msg)
-
-    def __roster_result(self,iq):
-        """Process roster request success.
-
-        :Parameters:
-            - `iq`: IQ result stanza received in reply to the roster request.
-        :Types:
-            - `iq`: `pyxmpp.Iq`"""
-        q=iq.get_query()
-        if q:
-            self.state_changed.acquire()
-            self.roster=Roster(q)
-            self.state_changed.notify()
-            self.state_changed.release()
-            self.roster_updated()
-        else:
-            raise ClientError("Roster retrieval failed")
-
-    def __roster_push(self,iq):
-        """Process a "roster push" (change notification) received.
-
-        :Parameters:
-            - `iq`: IQ result stanza received.
-        :Types:
-            - `iq`: `pyxmpp.Iq`"""
-        fr=iq.get_from()
-        if fr and fr != self.jid and fr != self.jid.bare():
-            resp=iq.make_error_response("forbidden")
-            self.stream.send(resp)
-            self.__logger.warning("Got roster update from wrong source")
-            return
-        if not self.roster:
-            raise ClientError("Roster update, but no roster")
-        q=iq.get_query()
-        item=self.roster.update(q)
-        if item:
-            self.roster_updated(item)
-        resp=iq.make_result_response()
-        self.stream.send(resp)
-
-    def __stream_state_change(self,state,arg):
-        """Handle stream state changes.
-
-        Call apopriate methods of self.
-
-        :Parameters:
-            - `state`: the new state.
-            - `arg`: state change argument.
-        :Types:
-            - `state`: `str`"""
-        self.stream_state_changed(state,arg)
-        if state=="fully connected":
-            self.connected()
-        elif state=="authorized":
-            self.authorized()
-        elif state=="disconnected":
-            self.state_changed.acquire()
-            try:
-                if self.stream:
-                    self.stream.close()
-                self.stream_closed(self.stream)
-                self.stream=None
-                self.state_changed.notify()
-            finally:
-                self.state_changed.release()
-            self.disconnected()
-
-# Method to override
-    def idle(self):
-        """Do some "housekeeping" work like cache expiration or timeout
-        handling. Should be called periodically from the application main
-        loop. May be overriden in derived classes."""
-        stream=self.get_stream()
-        if stream:
-            stream.idle()
-
-    def stream_created(self,stream):
-        """Handle stream creation event. May be overriden in derived classes.
-        This one does nothing.
-
-        :Parameters:
-            - `stream`: the new stream.
-        :Types:
-            - `stream`: `pyxmpp.ClientStream`"""
-        pass
-
-    def stream_closed(self,stream):
-        """Handle stream closure event. May be overriden in derived classes.
-        This one does nothing.
-
-        :Parameters:
-            - `stream`: the new stream.
-        :Types:
-            - `stream`: `pyxmpp.ClientStream`"""
-        pass
-
-    def session_started(self):
-        """Handle session started event. May be overriden in derived classes.
-        This one requests the user's roster and sends the initial presence."""
-        self.request_roster()
-        p=Presence()
-        self.stream.send(p)
-
-    def stream_error(self,err):
-        """Handle stream error received. May be overriden in derived classes.
-        This one passes an error messages to logging facilities.
-
-        :Parameters:
-            - `err`: the error element received.
-        :Types:
-            - `err`: `pyxmpp.error.StreamErrorNode`"""
-        self.__logger.error("Stream error: condition: %s %r"
-                % (err.get_condition().name,err.serialize()))
-
-    def roster_updated(self,item=None):
-        """Handle roster update event. May be overriden in derived classes.
-        This one does nothing.
-
-        :Parameters:
-            - `item`: the roster item changed or `None` if whole roster was
-              received.
-        :Types:
-            - `item`: `pyxmpp.RosterItem`"""
-        pass
-
-    def stream_state_changed(self,state,arg):
-        """Handle any stream state change. May be overriden in derived classes.
-        This one does nothing.
-
-        :Parameters:
-            - `state`: the new state.
-            - `arg`: state change argument.
-        :Types:
-            - `state`: `str`"""
-        pass
-
-    def connected(self):
-        """Handle "connected" event. May be overriden in derived classes.
-        This one does nothing."""
-        pass
-
-    def authenticated(self):
-        """Handle "authenticated" event. May be overriden in derived classes.
-        This one does nothing."""
-        pass
-
-    def authorized(self):
-        """Handle "authorized" event. May be overriden in derived classes.
-        This one requests an IM session."""
-        self.request_session()
-
-    def disconnected(self):
-        """Handle "disconnected" event. May be overriden in derived classes.
-        This one does nothing."""
-        pass
 
 # vi: sts=4 et sw=4

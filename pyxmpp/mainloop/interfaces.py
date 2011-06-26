@@ -16,6 +16,10 @@
 #
 
 """Abstract base classes for the main loop framework.
+
+:Variables:
+    - `QUIT`: event (instance of a QuitEvent class) used to terminate
+      the main event loop.
 """
 
 from __future__ import absolute_import
@@ -157,6 +161,12 @@ def event_handler(event_class = None):
     """Method decorator generator for decorating event handlers.
 
     To be used on `EventHandler` subclass methods only.
+
+    Such methods may return:
+        - `True`: if they 'completely' handled the event and no more events
+          should be called (use with care)
+        - `QUIT`: to quit the main loop. Other handlers still will be called
+          for current event and nother events in the queue.
     
     :Parameters:
         - `event_class`: event class expected

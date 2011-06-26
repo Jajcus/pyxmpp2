@@ -209,10 +209,11 @@ class DefaultPasswordManager(sasl.PasswordManager):
         """Get the service host name for SASL authentication.
 
         :return: domain of the own JID."""
-        if self.stream and self.stream.selected_host:
-            return self.stream.selected_host
-        else:
-            return self.get_serv_name()
+        if self.stream:
+            transport = self.stream.transport
+            if transport._dst_hostname:
+                return transport.selected_host
+        return self.get_serv_name()
 
 XMPPSettings.add_defaults({
                             u"username": None, 

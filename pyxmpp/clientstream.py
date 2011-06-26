@@ -30,8 +30,10 @@ import logging
 
 from .streambase import StreamBase
 from .jid import JID
-from .exceptions import StreamError,StreamAuthenticationError,FatalStreamError
-from .exceptions import ClientStreamError, FatalClientStreamError
+from .settings import XMPPSettings
+from .streamsasl import StreamSASLHandler
+from .binding import ResourceBindingHandler
+from .constants import STANZA_CLIENT_NS
 
 def base_c2s_handlers_factory(settings):
     sasl_handler = StreamSASLHandler(settings)
@@ -62,40 +64,34 @@ class ClientStream(StreamBase):
             handlers = []
         if settings is None:
             settings = TLSSettings()
-        self.me = JID(jid.local, jid.domain)
         if "resource" not in settings:
             settings["resource"] = jid.resource
         handlers = handlers + settings["base_c2s_handlers"]
-        StreamBase.__init__(STANZA_CLIENT_NS, handlers, settings)
+        StreamBase.__init__(self, STANZA_CLIENT_NS, handlers, settings)
+        self.me = JID(jid.local, jid.domain)
     
-    def connect(self, addr = None, port = 5222, service = "xmpp-client",
-                                                                    to = None):
-        """Establish XMPP connection with given address.
-
-        [initiating entity only]
-
+    def initiate(self, transport, to = None):
+        """Initiate an XMPP connection over the `transport`.
+        
         :Parameters:
-            - `addr`: peer name or IP address
-            - `port`: port number to connect to
-            - `service`: service name (to be resolved using SRV DNS records)
-            - `to`: peer name if different than `addr`
+            - `transport`: an XMPP transport instance
+            - `to`: peer name (defaults to own jid domain part)
         """
-        if addr is None:
-            addr = self.jid.domain
-        return StreamBase.connect(self, addr, port, service, to)
+        if to is None:
+            to = JID(self.me.domain)
+        return StreamBase.initiate(self, transport, to)
 
-    def accept(self, sock, myname = None):
-        """Accept an incoming client connection.
-
-        [server only]
+    def receive(self, transport, myname = None):
+        """Receive an XMPP connection over the `transport`.
 
         :Parameters:
-            - `sock`: a listening socket.
-            - `myname`: local stream endpoint name.
+            - `transport`: an XMPP transport instance
+            - `myname`: local stream endpoint name (defaults to own jid domain
+              part).
         """
         if myname is None:
-            myname = self.me.domain
-        StreamBase.accept(self, sock, myname)
+            myname = JID(self.me.domain)
+        return StreamBase.receive(transport, myname)
 
     def fix_out_stanza(self, stanza):
         """Fix outgoing stanza.
