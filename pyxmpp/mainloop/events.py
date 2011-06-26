@@ -31,7 +31,7 @@ from collections import defaultdict
 
 logger = logging.getLogger("pyxmpp.mainloop.events")
 
-from .interfaces import EventHandler, QUIT
+from .interfaces import EventHandler, Event, QUIT
 from ..settings import XMPPSettings
 
 class EventDispatcher(object):
@@ -146,7 +146,10 @@ class EventDispatcher(object):
             handlers.sort() # to restore the original order of handler objects
             for dummy, handler in handlers:
                 logger.debug(u"  passing the event to: {0!r}".format(handler))
-                if handler(event) and event is not QUIT:
+                result = handler(event)
+                if isinstance(result, Event):
+                    self.queue.put(result)
+                elif result and event is not QUIT:
                     return event
             return event
         finally:

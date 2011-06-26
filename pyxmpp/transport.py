@@ -231,7 +231,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         self._set_state("resolving-srv")
         resolver.resolve_srv(self._dst_name, self._dst_service, "tcp",
                                                     callback = self._got_srv)
-        self.event(ResolvingSRVEvent(self._dst_name))
+        self.event(ResolvingSRVEvent(self._dst_name, self._dst_service))
 
     def _got_srv(self, addrs):
         """Handle SRV lookup result.
