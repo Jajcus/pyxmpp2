@@ -59,7 +59,9 @@ class IOThread(object):
         - `thread`: :std:`threading.Thread`
         - `exc_info`: (type, value, traceback) tuple
     """
-    def __init__(self, io_handler, name, daemon = True, exc_queue = None):
+    def __init__(self, settings, io_handler, name, daemon = True,
+                                                        exc_queue = None):
+        self.settings = settings if settings else XMPPSettings()
         self.name = name
         self.io_handler = io_handler
         self.thread = threading.Thread(name = name, target = self._run)
@@ -115,11 +117,11 @@ class ReadingThread(IOThread):
     
     It can be used (together with `WrittingThread`) instead of 
     a main loop."""
-    def __init__(self, io_handler, name = None, daemon = True,
+    def __init__(self, settings, io_handler, name = None, daemon = True,
                                                             exc_queue = None):
         if name is None:
             name = u"{0!r} reader".format(io_handler)
-        IOThread.__init__(self, io_handler, name, daemon, exc_queue)
+        IOThread.__init__(self, settings, io_handler, name, daemon, exc_queue)
 
     def run(self):
         """The thread function.
@@ -129,6 +131,7 @@ class ReadingThread(IOThread):
         'handle_read' on the handler.
         """
         # pylint: disable-msg=R0912
+        interval = self.settings["poll_interval"]
         prepared = False
         timeout = 0.1
         while not self._quit:
@@ -149,7 +152,7 @@ class ReadingThread(IOThread):
                 logger.debug("{0}: readable".format(self.name))
                 fileno = self.io_handler.fileno()
                 if fileno is not None:
-                    readable = wait_for_read(fileno, 1)
+                    readable = wait_for_read(fileno, interval)
                     if readable:
                         self.io_handler.handle_read()
             elif not prepared:
@@ -165,11 +168,11 @@ class WrittingThread(IOThread):
     
     It can be used (together with `WrittingThread`) instead of 
     a main loop."""
-    def __init__(self, io_handler, name = None, daemon = True,
+    def __init__(self, settings, io_handler, name = None, daemon = True,
                                                             exc_queue = None):
         if name is None:
             name = u"{0!r} writer".format(io_handler)
-        IOThread.__init__(self, io_handler, name, daemon, exc_queue)
+        IOThread.__init__(self, settings, io_handler, name, daemon, exc_queue)
 
     def run(self):
         """The thread function.
@@ -178,11 +181,12 @@ class WrittingThread(IOThread):
         `interfaces.IOHandler.handle_write`.
         """
         while not self._quit:
+            interval = self.settings["poll_interval"]
             if self.io_handler.is_writable():
                 logger.debug("{0}: writable".format(self.name))
                 fileno = self.io_handler
                 if fileno:
-                    writable = wait_for_write(fileno, 1)
+                    writable = wait_for_write(fileno, interval)
                     if writable:
                         self.io_handler.handle_write()
             else:
@@ -369,9 +373,9 @@ class ThreadPool(MainLoop):
     def _run_io_threads(self, handler):
         """Start threads for an IOHandler.
         """
-        reader = ReadingThread(handler, daemon = self.daemon,
+        reader = ReadingThread(self.settings, handler, daemon = self.daemon,
                                                 exc_queue = self.exc_queue)
-        writter = WrittingThread(handler, daemon = self.daemon,
+        writter = WrittingThread(self.settings, handler, daemon = self.daemon,
                                                 exc_queue = self.exc_queue)
         self.io_threads += [reader, writter]
         reader.start()
@@ -483,15 +487,17 @@ class ThreadPool(MainLoop):
     def quit(self):
         self.event_queue.put(QUIT)
 
-    def loop(self, timeout = 1):
-        """Wait until the event dispatcher thread exits (on the `QUIT` event).
-
-        Raise any exceptions from the threads.
-        """
+    def loop(self, timeout = None):
         if not self.event_thread:
             return
-        while self.event_thread.is_alive():
-            self.loop_iteration(timeout)
+        interval = self.settings["poll_interval"]
+        if timeout is None:
+            while self.event_thread.is_alive():
+                self.loop_iteration(interval)
+        else:
+            timeout = time.time() + timeout
+            while self.event_thread.is_alive() and time.time() < timeout:
+                self.loop_iteration(interval)
 
     def loop_iteration(self, timeout = 0.1):
         """Wait up to `timeout` seconds, raise any exception from the

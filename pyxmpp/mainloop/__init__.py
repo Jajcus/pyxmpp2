@@ -24,6 +24,9 @@ from __future__ import absolute_import
 __docformat__ = "restructuredtext en"
 
 import select
+from ..settings import XMPPSettings
+
+XMPPSettings.add_defaults({u"poll_interval": 1})
 
 if hasattr(select, "poll"):
     from .poll import PollMainLoop as main_loop_factory

@@ -234,15 +234,24 @@ class MainLoop:
         final iteration in progress).
         """
         raise NotImplementedError
-    def loop(self, timeout = 1):
+    def loop(self, timeout = None):
         """Run the loop.
         
         :Parameters:
-            - `timeout`: default polling interval in seconds
+            - `timeout`: time to loop, if not given the method will run
+              until `finished`
         :Types:
             - `timeout`: `float`
         """
         raise NotImplementedError
     def loop_iteration(self, timeout = 1):
-        """Single loop iteration."""
+        """Single loop iteration.
+
+        :Parameters:
+            - `timeout`: maximum time (in seconds) to block for
+        :Types:
+            - `timeout`: `float`
+        
+        """
         raise NotImplementedError
+

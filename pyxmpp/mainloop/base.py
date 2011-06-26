@@ -79,9 +79,15 @@ class MainLoopBase(MainLoop):
         return self._started
     def quit(self):
         self.event_queue.put(QUIT)
-    def loop(self, timeout = 1):
-        while not self._quit:
-            self.loop_iteration(timeout)
+    def loop(self, timeout = None):
+        interval = self.settings["poll_interval"]
+        if timeout is None:
+            while not self._quit:
+                self.loop_iteration(interval)
+        else:
+            timeout = time.time() + timeout
+            while not self._quit and time.time() < timeout:
+                self.loop_iteration(interval)
     def loop_iteration(self, timeout = 1):
         if self.check_events():
             return
