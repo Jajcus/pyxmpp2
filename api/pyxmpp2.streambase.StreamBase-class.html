@@ -1,0 +1,1705 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>pyxmpp2.streambase.StreamBase</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="pyxmpp2-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/Jajcus/pyxmpp2/">PyXMPP2</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="pyxmpp2-module.html">Package&nbsp;pyxmpp2</a> ::
+        <a href="pyxmpp2.streambase-module.html">Module&nbsp;streambase</a> ::
+        Class&nbsp;StreamBase
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class StreamBase</h1><p class="nomargin-top"></p>
+<center>
+<center>  <map id="class_hierarchy_for_streambase" name="class_hierarchy_for_streambase">
+<area shape="rect" id="node1" href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html" title="mainloop.interfaces.TimeoutHandler" alt="" coords="5,6,251,34"/>
+<area shape="rect" id="node3" href="pyxmpp2.streambase.StreamBase-class.html" title="StreamBase" alt="" coords="344,65,443,93"/>
+<area shape="rect" id="node2" href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html" title="stanzaprocessor.StanzaProcessor" alt="" coords="275,6,512,34"/>
+<area shape="rect" id="node4" href="pyxmpp2.xmppparser.XMLStreamHandler-class.html" title="xmppparser.XMLStreamHandler" alt="" coords="536,6,760,34"/>
+</map>
+  <img src="class_hierarchy_for_streambase.gif" alt='' usemap="#class_hierarchy_for_streambase" ismap="ismap" class="graph-without-title" />
+</center>
+</center>
+<hr />
+<p>Base class for a generic XMPP stream.</p>
+<p>Responsible for establishing connection, parsing the stream, dispatching
+received stanzas to apopriate handlers and sending application's stanzas.
+This doesn't provide any authentication or encryption (both required by
+the XMPP specification) and is not usable on its own.</p>
+<p>Whenever we say &quot;stream&quot; here we actually mean two streams
+(incoming and outgoing) of one connections, as defined by the XMPP
+specification.</p>
+
+<!-- ==================== NESTED CLASSES ==================== -->
+<a name="section-NestedClasses"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Nested Classes</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-NestedClasses"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html">mainloop.interfaces.TimeoutHandler</a></code></b>:
+      <code><a href="abc.ABCMeta-class.html">__metaclass__</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza_namespace</span>,
+        <span class="summary-sig-arg">handlers</span>,
+        <span class="summary-sig-arg">settings</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Initialize StreamBase object</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#initiate" class="summary-sig-name">initiate</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">transport</span>,
+        <span class="summary-sig-arg">to</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Initiate an XMPP connection over the <a href="pyxmpp2.streambase.StreamBase-class.html#transport" class="link">transport</a>.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#_initiate" class="summary-sig-name" onclick="show_private();">_initiate</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Initiate an XMPP connection over a connected <a href="pyxmpp2.streambase.StreamBase-class.html#transport" class="link">transport</a>.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#receive" class="summary-sig-name">receive</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">transport</span>,
+        <span class="summary-sig-arg">myname</span>)</span><br />
+      Receive an XMPP connection over the <a href="pyxmpp2.streambase.StreamBase-class.html#transport" class="link">transport</a>.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#_setup_stream_element_handlers" class="summary-sig-name" onclick="show_private();">_setup_stream_element_handlers</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Set up stream element handlers.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="disconnect"></a><span class="summary-sig-name">disconnect</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Gracefully close the connection.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#event" class="summary-sig-name">event</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">event</span>)</span><br />
+      Handle a stream event.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="transport_connected"></a><span class="summary-sig-name">transport_connected</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="close"></a><span class="summary-sig-name">close</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Forcibly close the connection and clear the stream state.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#stream_start" class="summary-sig-name">stream_start</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">element</span>)</span><br />
+      Process &lt;stream:stream&gt; (stream start) tag received from peer.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#stream_end" class="summary-sig-name">stream_end</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Process &lt;/stream:stream&gt; (stream end) tag received from peer.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#stream_eof" class="summary-sig-name">stream_eof</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Process stream EOF.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#stream_element" class="summary-sig-name">stream_element</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">element</span>)</span><br />
+      Process first level child element of the stream).</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#stream_parse_error" class="summary-sig-name">stream_parse_error</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">descr</span>)</span><br />
+      Called when an error is encountered in the stream.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_send_stream_start"></a><span class="summary-sig-name">_send_stream_start</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stream_id</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">stream_to</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Send stream start tag.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#send_stream_error" class="summary-sig-name">send_stream_error</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">condition</span>)</span><br />
+      Send stream error element.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_send_stream_error"></a><span class="summary-sig-name">_send_stream_error</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">condition</span>)</span><br />
+      Same as <a href="pyxmpp2.streambase.StreamBase-class.html#send_stream_error" class="link">send_stream_error</a>, but expects <a href="pyxmpp2.streambase.StreamBase-class.html#lock" class="link">lock</a> acquired.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_restart_stream"></a><span class="summary-sig-name">_restart_stream</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Restart the stream as needed after SASL and StartTLS negotiation.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#_make_stream_features" class="summary-sig-name" onclick="show_private();">_make_stream_features</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Create the &lt;features/&gt; element for the stream.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#_send_stream_features" class="summary-sig-name" onclick="show_private();">_send_stream_features</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Send stream &lt;features/&gt;.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#write_element" class="summary-sig-name">write_element</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">element</span>)</span><br />
+      Write XML <code class="link">element</code> to the stream.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_write_element"></a><span class="summary-sig-name">_write_element</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">element</span>)</span><br />
+      Same as <a href="pyxmpp2.streambase.StreamBase-class.html#write_element" class="link">write_element</a> but with <a href="pyxmpp2.streambase.StreamBase-class.html#lock" class="link">lock</a> already acquired.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#send" class="summary-sig-name">send</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>)</span><br />
+      Write stanza to the stream.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_send"></a><span class="summary-sig-name">_send</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>)</span><br />
+      Same as <a href="pyxmpp2.streambase.StreamBase-class.html#send" class="link">send</a> but assume <a href="pyxmpp2.streambase.StreamBase-class.html#lock" class="link">lock</a> is acquired.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code class="link">int</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#regular_tasks" class="summary-sig-name">regular_tasks</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Do some housekeeping (cache expiration, timeout handling).</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#_process_element" class="summary-sig-name" onclick="show_private();">_process_element</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">element</span>)</span><br />
+      Process first level element of the stream.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#process_stream_error" class="summary-sig-name">process_stream_error</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">error</span>)</span><br />
+      Process stream error element received.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#check_to" class="summary-sig-name">check_to</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">to</span>)</span><br />
+      Check &quot;to&quot; attribute of received stream header.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#generate_id" class="summary-sig-name">generate_id</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Generate a random and unique stream ID.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#_got_features" class="summary-sig-name" onclick="show_private();">_got_features</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">features</span>)</span><br />
+      Process incoming &lt;stream:features/&gt; element.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#is_connected" class="summary-sig-name">is_connected</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Check if stream is is_connected and stanzas may be sent.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#set_peer_authenticated" class="summary-sig-name">set_peer_authenticated</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">peer</span>,
+        <span class="summary-sig-arg">restart_stream</span>=<span class="summary-sig-default">False</span>)</span><br />
+      Mark the other side of the stream authenticated as <a href="pyxmpp2.streambase.StreamBase-class.html#peer" class="link">peer</a></td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.streambase.StreamBase-class.html#set_authenticated" class="summary-sig-name">set_authenticated</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">me</span>,
+        <span class="summary-sig-arg">restart_stream</span>=<span class="summary-sig-default">False</span>)</span><br />
+      Mark stream authenticated as <a href="pyxmpp2.streambase.StreamBase-class.html#me" class="link">me</a>.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html">stanzaprocessor.StanzaProcessor</a></code></b>:
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#fix_in_stanza">fix_in_stanza</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#fix_out_stanza">fix_out_stanza</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#process_iq">process_iq</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#process_message">process_message</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#process_presence">process_presence</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#process_stanza">process_stanza</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#route_stanza">route_stanza</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#set_response_handlers">set_response_handlers</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#setup_stanza_handlers">setup_stanza_handlers</a></code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html">stanzaprocessor.StanzaProcessor</a></code></b> (private):
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#_get_iq_handler" onclick="show_private();">_get_iq_handler</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#_process_handler_result" onclick="show_private();">_process_handler_result</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#_process_iq_response" onclick="show_private();">_process_iq_response</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#_set_response_handlers" onclick="show_private();">_set_response_handlers</a></code>
+      </p></div>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html">mainloop.interfaces.TimeoutHandler</a></code></b>:
+      <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html#__abstractmethods__">__abstractmethods__</a></code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html">mainloop.interfaces.TimeoutHandler</a></code></b> (private):
+      <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
+      <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
+      <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
+      <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
+      </p></div>
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE VARIABLES ==================== -->
+<a name="section-InstanceVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">dict</code></span>
+    </td><td class="summary">
+        <a name="_element_handlers"></a><span class="summary-name">_element_handlers</span><br />
+      : mapping from stream element names to lists of
+methods handling them
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">unicode</code></span>
+    </td><td class="summary">
+        <a name="_input_state"></a><span class="summary-name">_input_state</span><br />
+      : <code class="link">None</code>, &quot;open&quot; (&lt;stream:stream&gt; has been received)
+&quot;restart&quot; or &quot;closed&quot; (&lt;/stream:stream&gt; or EOF has been received)
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">unicode</code></span>
+    </td><td class="summary">
+        <a name="_output_state"></a><span class="summary-name">_output_state</span><br />
+      : <code class="link">None</code>, &quot;open&quot; (&lt;stream:stream&gt; has been received)
+&quot;restart&quot; or &quot;closed&quot; (&lt;/stream:stream&gt; or EOF has been received)
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">unicode</code></span>
+    </td><td class="summary">
+        <a name="_stanza_namespace_p"></a><span class="summary-name">_stanza_namespace_p</span><br />
+      : qname prefix of the stanza namespace
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">list</code> of <a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html" class="link">StreamFeatureHandler</a></span>
+    </td><td class="summary">
+        <a name="_stream_feature_handlers"></a><span class="summary-name">_stream_feature_handlers</span><br />
+      : stream features handlers
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">bool</code></span>
+    </td><td class="summary">
+        <a name="authenticated"></a><span class="summary-name">authenticated</span><br />
+      : <code class="link">True</code> if local entity has authenticated to peer
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a></span>
+    </td><td class="summary">
+        <a name="features"></a><span class="summary-name">features</span><br />
+      : stream features as annouced by the receiver.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">list</code></span>
+    </td><td class="summary">
+        <a name="handlers"></a><span class="summary-name">handlers</span><br />
+      : handlers for stream elements and stanza payload
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">bool</code></span>
+    </td><td class="summary">
+        <a name="initiator"></a><span class="summary-name">initiator</span><br />
+      : <code class="link">True</code> if local stream endpoint is the initiating entity.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <a class="rst-reference external" href="http://docs.python.org/library/threading.html#rlock-objects" target="_top"><tt class="rst-docutils literal">threading.RLock</tt></a></span>
+    </td><td class="summary">
+        <a name="lock"></a><span class="summary-name">lock</span><br />
+      : lock object used to synchronize access to the
+<a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html" class="link">StanzaProcessor</a> object.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <a href="pyxmpp2.jid.JID-class.html" class="link">JID</a></span>
+    </td><td class="summary">
+        <a name="me"></a><span class="summary-name">me</span><br />
+      : local JID.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <a href="pyxmpp2.jid.JID-class.html" class="link">JID</a></span>
+    </td><td class="summary">
+        <a name="peer"></a><span class="summary-name">peer</span><br />
+      : remote stream endpoint JID.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">bool</code></span>
+    </td><td class="summary">
+        <a name="peer_authenticated"></a><span class="summary-name">peer_authenticated</span><br />
+      : <code class="link">True</code> if the peer has authenticated to us
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">unicode</code></span>
+    </td><td class="summary">
+        <a name="peer_language"></a><span class="summary-name">peer_language</span><br />
+      : language of human-readable stream content selected
+by the peer
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">bool</code></span>
+    </td><td class="summary">
+        <a name="process_all_stanzas"></a><span class="summary-name">process_all_stanzas</span><br />
+      : when <code class="link">True</code> then all stanzas received are
+considered local.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: XMPPSettings</span>
+    </td><td class="summary">
+        <a name="settings"></a><span class="summary-name">settings</span><br />
+      : stream settings
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">unicode</code></span>
+    </td><td class="summary">
+        <a name="stanza_namespace"></a><span class="summary-name">stanza_namespace</span><br />
+      : default namespace of the stream
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">bool</code></span>
+    </td><td class="summary">
+        <a name="tls_established"></a><span class="summary-name">tls_established</span><br />
+      : <code class="link">True</code> when the stream is protected by TLS
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <a href="pyxmpp2.interfaces.XMPPTransport-class.html" class="link">transport.XMPPTransport</a></span>
+    </td><td class="summary">
+        <a name="transport"></a><span class="summary-name">transport</span><br />
+      : transport used by this stream
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: (<code class="link">int</code>, <code class="link">int</code>) tuple</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.streambase.StreamBase-class.html#version" class="summary-name">version</a><br />
+      : Negotiated version of the XMPP protocol.
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Properties</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Properties"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza_namespace</span>,
+        <span class="sig-arg">handlers</span>,
+        <span class="sig-arg">settings</span>=<span class="sig-default">None</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Initialize StreamBase object
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stanza_namespace</code></strong> (: <code class="link">unicode</code>) - : stream's default namespace URI (&quot;jabber:client&quot;
+for client, &quot;jabber:server&quot; for server, etc.)</li>
+        <li><strong class="pname"><code>handlers</code></strong> (: <code class="link">list</code> of objects) - : objects to handle the stream events and elements</li>
+        <li><strong class="pname"><code>settings</code></strong> (: XMPPSettings) - : extra settings</li>
+    </ul></dd>
+    <dt>Overrides:
+        object.__init__
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="initiate"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">initiate</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">transport</span>,
+        <span class="sig-arg">to</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Initiate an XMPP connection over the <a href="pyxmpp2.streambase.StreamBase-class.html#transport" class="link">transport</a>.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>transport</code></strong> - : an XMPP transport instance</li>
+        <li><strong class="pname"><code>to</code></strong> - : peer name</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_initiate"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_initiate</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Initiate an XMPP connection over a connected <a href="pyxmpp2.streambase.StreamBase-class.html#transport" class="link">transport</a>.</p>
+<p>[ called with <a href="pyxmpp2.streambase.StreamBase-class.html#lock" class="link">lock</a> acquired ]</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="receive"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">receive</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">transport</span>,
+        <span class="sig-arg">myname</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Receive an XMPP connection over the <a href="pyxmpp2.streambase.StreamBase-class.html#transport" class="link">transport</a>.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>transport</code></strong> - : an XMPP transport instance</li>
+        <li><strong class="pname"><code>myname</code></strong> - : local stream endpoint name.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_setup_stream_element_handlers"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_setup_stream_element_handlers</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Set up stream element handlers.</p>
+<p>Scans the <a href="pyxmpp2.streambase.StreamBase-class.html#handlers" class="link">handlers</a> list for <a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html" class="link">StreamFeatureHandler</a>
+instances and updates <a href="pyxmpp2.streambase.StreamBase-class.html#_element_handlers" class="link" onclick="show_private();">_element_handlers</a> mapping with their
+methods decorated with &#64;`stream_element_handler`</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="event"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">event</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">event</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Handle a stream event.</p>
+<p>Called when connection state is changed.</p>
+<p>Should not be called with self.lock acquired!</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="stream_start"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">stream_start</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">element</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Process &lt;stream:stream&gt; (stream start) tag received from peer.</p>
+<p><a href="pyxmpp2.streambase.StreamBase-class.html#lock" class="link">lock</a> is acquired when this method is called.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>element</code></strong> - : root element (empty) created by the parser</li>
+    </ul></dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.xmppparser.XMLStreamHandler-class.html#stream_start">xmppparser.XMLStreamHandler.stream_start</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="stream_end"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">stream_end</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Process &lt;/stream:stream&gt; (stream end) tag received from peer.
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="pyxmpp2.xmppparser.XMLStreamHandler-class.html#stream_end">xmppparser.XMLStreamHandler.stream_end</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="stream_eof"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">stream_eof</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Process stream EOF.
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="pyxmpp2.xmppparser.XMLStreamHandler-class.html#stream_eof">xmppparser.XMLStreamHandler.stream_eof</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="stream_element"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">stream_element</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">element</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Process first level child element of the stream).
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>element</code></strong> - : stanza's full XML</li>
+    </ul></dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.xmppparser.XMLStreamHandler-class.html#stream_element">xmppparser.XMLStreamHandler.stream_element</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="stream_parse_error"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">stream_parse_error</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">descr</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Called when an error is encountered in the stream.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>descr</code></strong> (: <code class="link">unicode</code>) - : description of the error</li>
+    </ul></dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.xmppparser.XMLStreamHandler-class.html#stream_parse_error">xmppparser.XMLStreamHandler.stream_parse_error</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="send_stream_error"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">send_stream_error</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">condition</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Send stream error element.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>condition</code></strong> - : stream error condition name, as defined in the
+XMPP specification.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_make_stream_features"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_make_stream_features</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Create the &lt;features/&gt; element for the stream.</p>
+<p>[receving entity only]</p>
+  <dl class="fields">
+    <dt>Returns: <a class="rst-rst-reference external rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-rst-docutils literal rst-docutils literal">ElementTree.Element</tt></a></dt>
+        <dd>new &lt;features/&gt; element</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_send_stream_features"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_send_stream_features</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Send stream &lt;features/&gt;.</p>
+<p>[receiving entity only]</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="write_element"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">write_element</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">element</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Write XML <code class="link">element</code> to the stream.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>element</code></strong> (: <a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a>) - : Element node to send.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="send"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">send</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Write stanza to the stream.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stanza</code></strong> (: <a href="pyxmpp2.stanza.Stanza-class.html" class="link">pyxmpp2.stanza.Stanza</a>) - : XMPP stanza to send.</li>
+    </ul></dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#send">stanzaprocessor.StanzaProcessor.send</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="regular_tasks"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">regular_tasks</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Do some housekeeping (cache expiration, timeout handling).</p>
+<p>This method should be called periodically from the application's
+main loop.</p>
+  <dl class="fields">
+    <dt>Returns: <code class="link">int</code></dt>
+        <dd>suggested delay (in seconds) before the next call to this
+method.</dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@timeout_handler(1)</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_process_element"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_process_element</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">element</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Process first level element of the stream.</p>
+<p>The element may be stream error or features, StartTLS
+request/response, SASL request/response or a stanza.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>element</code></strong> (: <a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a>) - : XML element</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="process_stream_error"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">process_stream_error</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">error</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Process stream error element received.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>error</code></strong> (: <a href="pyxmpp2.error.StreamErrorElement-class.html" class="link">StreamErrorElement</a>) - : error received</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="check_to"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">check_to</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">to</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Check &quot;to&quot; attribute of received stream header.</p>
+<p>Should be overriden in derived classes which require other logic
+for handling that attribute.</p>
+  <dl class="fields">
+    <dt>Returns:</dt>
+        <dd><code class="link">to</code> if it is equal to <a href="pyxmpp2.streambase.StreamBase-class.html#me" class="link">me</a>, None otherwise.</dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#check_to">stanzaprocessor.StanzaProcessor.check_to</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="generate_id"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">generate_id</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Generate a random and unique stream ID.
+  <dl class="fields">
+    <dt>Returns:</dt>
+        <dd>the id string generated.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_got_features"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_got_features</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">features</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Process incoming &lt;stream:features/&gt; element.</p>
+<p>[initiating entity only]</p>
+<p>The received features node is available in <a href="pyxmpp2.streambase.StreamBase-class.html#features" class="link">features</a>.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="is_connected"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">is_connected</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Check if stream is is_connected and stanzas may be sent.
+  <dl class="fields">
+    <dt>Returns:</dt>
+        <dd>True if stream connection is active.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="set_peer_authenticated"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">set_peer_authenticated</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">peer</span>,
+        <span class="sig-arg">restart_stream</span>=<span class="sig-default">False</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Mark the other side of the stream authenticated as <a href="pyxmpp2.streambase.StreamBase-class.html#peer" class="link">peer</a>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>peer</code></strong> (: <a href="pyxmpp2.jid.JID-class.html" class="link">JID</a>) - : local JID just authenticated</li>
+        <li><strong class="pname"><code>restart_stream</code></strong> (: <code class="link">bool</code>) - : <code class="link">True</code> when stream should be restarted (needed
+after SASL authentication)</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="set_authenticated"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">set_authenticated</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">me</span>,
+        <span class="sig-arg">restart_stream</span>=<span class="sig-default">False</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Mark stream authenticated as <a href="pyxmpp2.streambase.StreamBase-class.html#me" class="link">me</a>.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>me</code></strong> (: <a href="pyxmpp2.jid.JID-class.html" class="link">JID</a>) - : local JID just authenticated</li>
+        <li><strong class="pname"><code>restart_stream</code></strong> (: <code class="link">bool</code>) - : <code class="link">True</code> when stream should be restarted (needed
+after SASL authentication)</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== INSTANCE VARIABLE DETAILS ==================== -->
+<a name="section-InstanceVariableDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Variable Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceVariableDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="version"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">version</h3>
+  : Negotiated version of the XMPP protocol. (0,9) for the
+legacy (pre-XMPP) Jabber protocol.
+  <dl class="fields">
+    <dt>Type:</dt>
+      <dd>: (<code class="link">int</code>, <code class="link">int</code>) tuple</dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="pyxmpp2-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/Jajcus/pyxmpp2/">PyXMPP2</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    <a href="epydoc-log.html">Generated by Epydoc
+    3.0.1 on Sun Jun 26 13:15:40 2011</a>
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>
