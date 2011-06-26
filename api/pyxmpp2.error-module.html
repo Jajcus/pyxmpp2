@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>pyxmpp2.error</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="pyxmpp2-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/Jajcus/pyxmpp2/">PyXMPP2</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="pyxmpp2-module.html">Package&nbsp;pyxmpp2</a> ::
+        Module&nbsp;error
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== MODULE DESCRIPTION ==================== -->
+<h1 class="epydoc">Module error</h1><p class="nomargin-top"></p>
+<p>XMPP error handling.</p>
+<dl class="rst-docutils">
+<dt>Normative reference:</dt>
+<dd><ul class="rst-first rst-last rst-simple">
+<li><a class="rst-reference external" href="http://xmpp.org/rfcs/rfc6120.html" target="_top">RFC 6120</a></li>
+<li><a class="rst-reference external" href="http://xmpp.org/rfcs/rfc3920.html" target="_top">RFC 3920</a></li>
+</ul>
+</dd>
+</dl>
+
+<!-- ==================== CLASSES ==================== -->
+<a name="section-Classes"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Classes</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Classes"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.error.ErrorElement-class.html" class="summary-name">ErrorElement</a><br />
+      Base class for both XMPP stream and stanza errors
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.error.StreamErrorElement-class.html" class="summary-name">StreamErrorElement</a><br />
+      Stream error element.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.error.StanzaErrorElement-class.html" class="summary-name">StanzaErrorElement</a><br />
+      Stanza error element.
+    </td>
+  </tr>
+</table>
+<!-- ==================== VARIABLES ==================== -->
+<a name="section-Variables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Variables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="logger"></a><span class="summary-name">logger</span> = <code title="logging.getLogger(&quot;pyxmpp.error&quot;)">logging.getLogger(&quot;pyxmpp.error&quot;)</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.error-module.html#STREAM_ERRORS" class="summary-name">STREAM_ERRORS</a> = <code title="{u'bad-format': ('Received XML cannot be processed'),
+ u'bad-namespace-prefix': ('Bad namespace prefix'),
+ u'conflict': ('Closing stream because of conflicting stream being ope\
+ned'),
+ u'connection-timeout': ('Connection was idle too long'),
+ u'host-gone': ('Hostname is no longer hosted on the server'),
+ u'host-unknown': ('Hostname requested is not known to the server'),
+ u'improper-addressing': ('Improper addressing'),
+..."><code class="variable-group">{</code><code class="variable-quote">u'</code><code class="variable-string">bad-format</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Received XML cannot be proce</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.error-module.html#STREAM_ERRORS_Q" class="summary-name">STREAM_ERRORS_Q</a> = <code title="{'{urn:ietf:params:xml:ns:xmpp-streams}bad-format': ('Received XML can\
+not be processed'),
+ '{urn:ietf:params:xml:ns:xmpp-streams}bad-namespace-prefix': ('Bad na\
+mespace prefix'),
+ '{urn:ietf:params:xml:ns:xmpp-streams}conflict': ('Closing stream bec\
+ause of conflicting stream being opened'),
+ '{urn:ietf:params:xml:ns:xmpp-streams}connection-timeout': ('Connecti\
+on was idle too long'),
+..."><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-streams}bad-f</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.error-module.html#UNDEFINED_STREAM_CONDITION" class="summary-name">UNDEFINED_STREAM_CONDITION</a> = <code title="'{urn:ietf:params:xml:ns:xmpp-streams}undefined-condition'"><code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-str</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.error-module.html#UNDEFINED_STANZA_CONDITION" class="summary-name">UNDEFINED_STANZA_CONDITION</a> = <code title="'{urn:ietf:params:xml:ns:xmpp-stanzas}undefined-condition'"><code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-sta</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.error-module.html#STANZA_ERRORS" class="summary-name">STANZA_ERRORS</a> = <code title="{u'bad-request': ('Bad request', 'modify'),
+ u'conflict': ('Named session or resource already exists', 'cancel'),
+ u'feature-not-implemented': ('Feature requested is not implemented',
+                              'cancel'),
+ u'forbidden': ('You are forbidden to perform requested action',
+                'auth'),
+ u'gone': ('Recipient or server can no longer be contacted at this add\
+ress',
+..."><code class="variable-group">{</code><code class="variable-quote">u'</code><code class="variable-string">bad-request</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Bad request</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">modify</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">, </code><code class="variable-quote">u'</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.error-module.html#STANZA_ERRORS_Q" class="summary-name">STANZA_ERRORS_Q</a> = <code title="{'{urn:ietf:params:xml:ns:xmpp-stanzas}bad-request': ('Bad request',
+                                                      'modify'),
+ '{urn:ietf:params:xml:ns:xmpp-stanzas}conflict': ('Named session or r\
+esource already exists',
+                                                   'cancel'),
+ '{urn:ietf:params:xml:ns:xmpp-stanzas}feature-not-implemented': ('Fea\
+ture requested is not implemented',
+                                                                  'can\
+..."><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-stanzas}bad-r</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.error-module.html#OBSOLETE_CONDITIONS" class="summary-name">OBSOLETE_CONDITIONS</a> = <code title="{'{urn:ietf:params:xml:ns:xmpp-stanzas}payment-required': '{urn:ietf:p\
+arams:xml:ns:xmpp-stanzas}undefined-condition',
+ '{urn:ietf:params:xml:ns:xmpp-streams}invalid-id': '{urn:ietf:params:\
+xml:ns:xmpp-streams}undefined-condition',
+ '{urn:ietf:params:xml:ns:xmpp-streams}xml-not-well-formed': '{urn:iet\
+f:params:xml:ns:xmpp-streams}not-well-formed'}"><code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-stanzas}p</code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="'pyxmpp2'"><code class="variable-quote">'</code><code class="variable-string">pyxmpp2</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="x"></a><span class="summary-name">x</span> = <code title="(u'unexpected-request', ('Unexpected request', 'wait'))"><code class="variable-group">(</code><code class="variable-quote">u'</code><code class="variable-string">unexpected-request</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Unexpected request</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">wait</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-group">)</code></code>
+    </td>
+  </tr>
+</table>
+<!-- ==================== VARIABLES DETAILS ==================== -->
+<a name="section-VariablesDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Variables Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-VariablesDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="STREAM_ERRORS"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">STREAM_ERRORS</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">{</code><code class="variable-quote">u'</code><code class="variable-string">bad-format</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Received XML cannot be processed</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">u'</code><code class="variable-string">bad-namespace-prefix</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Bad namespace prefix</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">u'</code><code class="variable-string">conflict</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Closing stream because of conflicting stream being ope</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">ned</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">u'</code><code class="variable-string">connection-timeout</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Connection was idle too long</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">u'</code><code class="variable-string">host-gone</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Hostname is no longer hosted on the server</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">u'</code><code class="variable-string">host-unknown</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Hostname requested is not known to the server</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">u'</code><code class="variable-string">improper-addressing</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Improper addressing</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+<code class="variable-ellipsis">...</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="STREAM_ERRORS_Q"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">STREAM_ERRORS_Q</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-streams}bad-format</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Received XML can</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">not be processed</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-streams}bad-namespace-prefix</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Bad na</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">mespace prefix</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-streams}conflict</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Closing stream bec</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">ause of conflicting stream being opened</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-streams}connection-timeout</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Connecti</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">on was idle too long</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+<code class="variable-ellipsis">...</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="UNDEFINED_STREAM_CONDITION"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">UNDEFINED_STREAM_CONDITION</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-streams}undefined-condition</code><code class="variable-quote">'</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="UNDEFINED_STANZA_CONDITION"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">UNDEFINED_STANZA_CONDITION</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-stanzas}undefined-condition</code><code class="variable-quote">'</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="STANZA_ERRORS"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">STANZA_ERRORS</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">{</code><code class="variable-quote">u'</code><code class="variable-string">bad-request</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Bad request</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">modify</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">u'</code><code class="variable-string">conflict</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Named session or resource already exists</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">cancel</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">u'</code><code class="variable-string">feature-not-implemented</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Feature requested is not implemented</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+                              <code class="variable-quote">'</code><code class="variable-string">cancel</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">u'</code><code class="variable-string">forbidden</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">You are forbidden to perform requested action</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+                <code class="variable-quote">'</code><code class="variable-string">auth</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">u'</code><code class="variable-string">gone</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Recipient or server can no longer be contacted at this add</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">ress</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+<code class="variable-ellipsis">...</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="STANZA_ERRORS_Q"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">STANZA_ERRORS_Q</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-stanzas}bad-request</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Bad request</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+                                                      <code class="variable-quote">'</code><code class="variable-string">modify</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-stanzas}conflict</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Named session or r</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">esource already exists</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+                                                   <code class="variable-quote">'</code><code class="variable-string">cancel</code><code class="variable-quote">'</code><code class="variable-group">)</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-stanzas}feature-not-implemented</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">(</code><code class="variable-quote">'</code><code class="variable-string">Fea</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">ture requested is not implemented</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+                                                                  <code class="variable-quote">'</code><code class="variable-string">can</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-ellipsis">...</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="OBSOLETE_CONDITIONS"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">OBSOLETE_CONDITIONS</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">{</code><code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-stanzas}payment-required</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">{urn:ietf:p</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">arams:xml:ns:xmpp-stanzas}undefined-condition</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-streams}invalid-id</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">xml:ns:xmpp-streams}undefined-condition</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-streams}xml-not-well-formed</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">{urn:iet</code><span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+<code class="variable-string">f:params:xml:ns:xmpp-streams}not-well-formed</code><code class="variable-quote">'</code><code class="variable-group">}</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="pyxmpp2-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/Jajcus/pyxmpp2/">PyXMPP2</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    <a href="epydoc-log.html">Generated by Epydoc
+    3.0.1 on Sun Jun 26 09:21:43 2011</a>
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

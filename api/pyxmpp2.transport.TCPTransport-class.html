@@ -1,0 +1,1817 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>pyxmpp2.transport.TCPTransport</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="pyxmpp2-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/Jajcus/pyxmpp2/">PyXMPP2</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="pyxmpp2-module.html">Package&nbsp;pyxmpp2</a> ::
+        <a href="pyxmpp2.transport-module.html">Module&nbsp;transport</a> ::
+        Class&nbsp;TCPTransport
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class TCPTransport</h1><p class="nomargin-top"></p>
+<center>
+<center>  <map id="class_hierarchy_for_tcptranspo" name="class_hierarchy_for_tcptranspo">
+<area shape="rect" id="node1" href="pyxmpp2.mainloop.interfaces.IOHandler-class.html" title="mainloop.interfaces.IOHandler" alt="" coords="5,6,216,34"/>
+<area shape="rect" id="node2" href="pyxmpp2.transport.TCPTransport-class.html" title="TCPTransport" alt="" coords="149,65,261,93"/>
+<area shape="rect" id="node3" href="pyxmpp2.transport.XMPPTransport-class.html" title="XMPPTransport" alt="" coords="240,6,363,34"/>
+</map>
+  <img src="class_hierarchy_for_tcptranspo.gif" alt='' usemap="#class_hierarchy_for_tcptranspo" ismap="ismap" class="graph-without-title" />
+</center>
+</center>
+<hr />
+XMPP over TCP with optional TLS.
+
+<!-- ==================== NESTED CLASSES ==================== -->
+<a name="section-NestedClasses"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Nested Classes</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-NestedClasses"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.transport.XMPPTransport-class.html">XMPPTransport</a></code></b>:
+      <code><a href="abc.ABCMeta-class.html">__metaclass__</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">settings</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">sock</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Initialize the <a href="pyxmpp2.transport.TCPTransport-class.html" class="link">TCPTransport</a> object.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_set_state"></a><span class="summary-sig-name">_set_state</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">state</span>)</span></td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#connect" class="summary-sig-name">connect</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">addr</span>,
+        <span class="summary-sig-arg">port</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">service</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Start establishing TCP connection with given address.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_connect"></a><span class="summary-sig-name">_connect</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">addr</span>,
+        <span class="summary-sig-arg">port</span>,
+        <span class="summary-sig-arg">service</span>)</span><br />
+      Same as <a href="pyxmpp2.transport.TCPTransport-class.html#connect" class="link">connect</a>, but assumes <a href="pyxmpp2.transport.TCPTransport-class.html#lock" class="link">lock</a> acquired.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_resolve_srv"></a><span class="summary-sig-name">_resolve_srv</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Start resolving the SRV record.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#_got_srv" class="summary-sig-name" onclick="show_private();">_got_srv</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">addrs</span>)</span><br />
+      Handle SRV lookup result.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#_resolve_hostname" class="summary-sig-name" onclick="show_private();">_resolve_hostname</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Start hostname resolution for the next name to try.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#_got_addresses" class="summary-sig-name" onclick="show_private();">_got_addresses</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">name</span>,
+        <span class="summary-sig-arg">port</span>,
+        <span class="summary-sig-arg">addrs</span>)</span><br />
+      Handler DNS address record lookup result.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#_start_connect" class="summary-sig-name" onclick="show_private();">_start_connect</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Start connecting to the next address on the <a href="pyxmpp2.transport.TCPTransport-class.html#_dst_addrs" class="link" onclick="show_private();">_dst_addrs</a> list.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#_continue_connect" class="summary-sig-name" onclick="show_private();">_continue_connect</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Continue connecting.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#_write" class="summary-sig-name" onclick="show_private();">_write</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">data</span>)</span><br />
+      Write raw data to the socket.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#set_target" class="summary-sig-name">set_target</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stream</span>)</span><br />
+      Make the <code class="link">stream</code> the target for this transport instance.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#send_stream_head" class="summary-sig-name">send_stream_head</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza_namespace</span>,
+        <span class="summary-sig-arg">stream_from</span>,
+        <span class="summary-sig-arg">stream_to</span>,
+        <span class="summary-sig-arg">stream_id</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">version</span>=<span class="summary-sig-default"><code class="variable-quote">u'</code><code class="variable-string">1.0</code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">language</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Send stream head via the transport.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#restart" class="summary-sig-name">restart</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Restart the stream after SASL or StartTLS handshake.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#send_stream_tail" class="summary-sig-name">send_stream_tail</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Send stream tail via the transport.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#send_element" class="summary-sig-name">send_element</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">element</span>)</span><br />
+      Send an element via the transport.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><a href="pyxmpp2.mainloop.interfaces.IOHandlerPrepareResult-class.html" class="link">IOHandlerPrepareResult</a></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#prepare" class="summary-sig-name">prepare</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      When connecting start the next connection step and schedule
+next <a href="pyxmpp2.transport.TCPTransport-class.html#prepare" class="link">prepare</a> call, when connected return <a href="pyxmpp2.mainloop.interfaces.HandlerReady-class.html" class="link">HandlerReady()</a></td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#fileno" class="summary-sig-name">fileno</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Return file descriptor to poll or select.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#is_readable" class="summary-sig-name">is_readable</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Returns:
+<code class="link">True</code> when the I/O channel can be read</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#wait_for_readability" class="summary-sig-name">wait_for_readability</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Stop current thread until the channel is readable.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#is_writable" class="summary-sig-name">is_writable</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Returns:
+<code class="link">False</code> as currently the data is always written synchronously</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#wait_for_writability" class="summary-sig-name">wait_for_writability</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Stop current thread until the channel is writable.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#handle_write" class="summary-sig-name">handle_write</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Handle the 'channel writable' state.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="starttls"></a><span class="summary-sig-name">starttls</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">**kwargs</span>)</span></td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="getpeercert"></a><span class="summary-sig-name">getpeercert</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_initiate_starttls"></a><span class="summary-sig-name">_initiate_starttls</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">**kwargs</span>)</span><br />
+      Initiate starttls handshake over the socket.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_continue_tls_handshake"></a><span class="summary-sig-name">_continue_tls_handshake</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Continue a TLS handshake.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#handle_read" class="summary-sig-name">handle_read</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Handle the 'channel readable' state.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#handle_hup" class="summary-sig-name">handle_hup</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Handle the 'channel hungup' state.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#handle_err" class="summary-sig-name">handle_err</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Handle an error reported.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#handle_nval" class="summary-sig-name">handle_nval</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Handle an error reported.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#is_connected" class="summary-sig-name">is_connected</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Check if the transport is connected.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#disconnect" class="summary-sig-name">disconnect</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Disconnect the stream gracefully.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#close" class="summary-sig-name">close</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Close the stream immediately, so it won't expect more events.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_close"></a><span class="summary-sig-name">_close</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#_feed_reader" class="summary-sig-name" onclick="show_private();">_feed_reader</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">data</span>)</span><br />
+      Feed the stream reader with data received.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="event"></a><span class="summary-sig-name">event</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">event</span>)</span><br />
+      Pass an event to the target stream or just log it.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.transport.XMPPTransport-class.html">XMPPTransport</a></code></b>:
+      <code><a href="pyxmpp2.transport.XMPPTransport-class.html#__abstractmethods__">__abstractmethods__</a></code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.transport.XMPPTransport-class.html">XMPPTransport</a></code></b> (private):
+      <code><a href="pyxmpp2.transport.XMPPTransport-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
+      <code><a href="pyxmpp2.transport.XMPPTransport-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
+      <code><a href="pyxmpp2.transport.XMPPTransport-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
+      <code><a href="pyxmpp2.transport.XMPPTransport-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
+      </p></div>
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE VARIABLES ==================== -->
+<a name="section-InstanceVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: tuple</span>
+    </td><td class="summary">
+        <a name="_dst_addr"></a><span class="summary-name">_dst_addr</span><br />
+      : socket address currently in use
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: list of tuples</span>
+    </td><td class="summary">
+        <a name="_dst_addrs"></a><span class="summary-name">_dst_addrs</span><br />
+      : list of (family, sockaddr) candidates to connect to
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">int</code></span>
+    </td><td class="summary">
+        <a name="_dst_family"></a><span class="summary-name">_dst_family</span><br />
+      : address family of the socket
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">unicode</code></span>
+    </td><td class="summary">
+        <a name="_dst_hostname"></a><span class="summary-name">_dst_hostname</span><br />
+      : hostname the transport is connecting to or connected
+to
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">unicode</code></span>
+    </td><td class="summary">
+        <a name="_dst_name"></a><span class="summary-name">_dst_name</span><br />
+      : requested domain name of the remote service
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: list of tuples</span>
+    </td><td class="summary">
+        <a name="_dst_nameports"></a><span class="summary-name">_dst_nameports</span><br />
+      : list of (hostname, port) candidates to connect to
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">int</code></span>
+    </td><td class="summary">
+        <a name="_dst_port"></a><span class="summary-name">_dst_port</span><br />
+      : requested port of the remote service
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">unicode</code></span>
+    </td><td class="summary">
+        <a href="pyxmpp2.transport.TCPTransport-class.html#_dst_service" class="summary-name" onclick="show_private();">_dst_service</a><br />
+      : requested service name (e.g.
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">bool</code></span>
+    </td><td class="summary">
+        <a name="_eof"></a><span class="summary-name">_eof</span><br />
+      : <code class="link">True</code> when reading side of the socket is closed
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <a class="rst-reference external" href="http://docs.python.org/library/queue.html#Queue.Queue" target="_top"><tt class="rst-docutils literal">Queue.Queue</tt></a></span>
+    </td><td class="summary">
+        <a name="_event_queue"></a><span class="summary-name">_event_queue</span><br />
+      : queue to send connection events to
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">bool</code></span>
+    </td><td class="summary">
+        <a name="_hup"></a><span class="summary-name">_hup</span><br />
+      : <code class="link">True</code> when the writing side of the socket is closed
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <a href="pyxmpp2.xmppparser.StreamReader-class.html" class="link">StreamReader</a></span>
+    </td><td class="summary">
+        <a name="_reader"></a><span class="summary-name">_reader</span><br />
+      : parser for the data received from the socket
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <a href="pyxmpp2.xmppserializer.XMPPSerializer-class.html" class="link">XMPPSerializer</a></span>
+    </td><td class="summary">
+        <a name="_serializer"></a><span class="summary-name">_serializer</span><br />
+      : XML serializer for data sent over the socket
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <a class="rst-reference external" href="http://docs.python.org/library/socket.html" target="_top"><tt class="rst-docutils literal">socket.socket</tt></a></span>
+    </td><td class="summary">
+        <a name="_socket"></a><span class="summary-name">_socket</span><br />
+      : socket currently used by the transport (<code class="link">None</code> if no
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">unicode</code></span>
+    </td><td class="summary">
+        <a name="_state"></a><span class="summary-name">_state</span><br />
+      : connection state (one of: <code class="link">None</code>, &quot;resolve-srv&quot;,
+&quot;resolve-hostname&quot;, &quot;connect&quot;, &quot;connected&quot;, &quot;tls-handshake&quot;,
+&quot;closing&quot;, &quot;closed&quot;, &quot;aborted&quot;)
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <a class="rst-reference external" href="http://docs.python.org/library/threading.html#condition-objects" target="_top"><tt class="rst-docutils literal">threading.Condition</tt></a></span>
+    </td><td class="summary">
+        <a name="_state_cond"></a><span class="summary-name">_state_cond</span><br />
+      : condition object to synchronize threads over state
+change
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <a href="pyxmpp2.streambase.StreamBase-class.html" class="link">streambase.StreamBase</a></span>
+    </td><td class="summary">
+        <a name="_stream"></a><span class="summary-name">_stream</span><br />
+      : the stream associated with this transport
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <code class="link">unicode</code></span>
+    </td><td class="summary">
+        <a name="_tls_state"></a><span class="summary-name">_tls_state</span><br />
+      : state of TLS handshake
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <a class="rst-reference external" href="http://docs.python.org/library/threading.html#rlock-objects" target="_top"><tt class="rst-docutils literal">threading.RLock</tt></a></span>
+    </td><td class="summary">
+        <a name="lock"></a><span class="summary-name">lock</span><br />
+      : the lock protecting this object
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">: <a href="pyxmpp2.settings.XMPPSettings-class.html" class="link">XMPPSettings</a></span>
+    </td><td class="summary">
+        <a name="settings"></a><span class="summary-name">settings</span><br />
+      : settings for this object
+socket is currently open)
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Properties</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Properties"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">settings</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">sock</span>=<span class="sig-default">None</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Initialize the <a href="pyxmpp2.transport.TCPTransport-class.html" class="link">TCPTransport</a> object.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>settings</code></strong> - : XMPP settings to use</li>
+        <li><strong class="pname"><code>sock</code></strong> - : existing socket, e.g. for accepted incoming connection.</li>
+    </ul></dd>
+    <dt>Overrides:
+        object.__init__
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="connect"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">connect</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">addr</span>,
+        <span class="sig-arg">port</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">service</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Start establishing TCP connection with given address.</p>
+<p>One of: <code class="link">port</code> or <code class="link">service</code> must be provided and <code class="link">addr</code> must be
+a domain name and not an IP address <code class="link">port</code> is not given.</p>
+<p>When <code class="link">service</code> is given try an SRV lookup for that service
+at domain <code class="link">addr</code>. If <code class="link">service</code> is not given or <code class="link">addr</code> is an IP address,
+or the SRV lookup fails, connect to <code class="link">port</code> at host <code class="link">addr</code> directly.</p>
+<p>[initiating entity only]</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>addr</code></strong> - : peer name or IP address</li>
+        <li><strong class="pname"><code>port</code></strong> - : port number to connect to</li>
+        <li><strong class="pname"><code>service</code></strong> - : service name (to be resolved using SRV DNS records)</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_got_srv"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_got_srv</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">addrs</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Handle SRV lookup result.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>addrs</code></strong> - : properly sorted list of (hostname, port) tuples</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_resolve_hostname"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_resolve_hostname</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Start hostname resolution for the next name to try.</p>
+<p>[called with <a href="pyxmpp2.transport.TCPTransport-class.html#lock" class="link">lock</a> acquired]</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="_got_addresses"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_got_addresses</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">name</span>,
+        <span class="sig-arg">port</span>,
+        <span class="sig-arg">addrs</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Handler DNS address record lookup result.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>name</code></strong> - : the name requested</li>
+        <li><strong class="pname"><code>port</code></strong> - : port number to connect to</li>
+        <li><strong class="pname"><code>addrs</code></strong> - : list of (family, address) tuples</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_start_connect"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_start_connect</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Start connecting to the next address on the <a href="pyxmpp2.transport.TCPTransport-class.html#_dst_addrs" class="link" onclick="show_private();">_dst_addrs</a> list.</p>
+<p>[ called with <a href="pyxmpp2.transport.TCPTransport-class.html#lock" class="link">lock</a> acquired ]</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="_continue_connect"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_continue_connect</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Continue connecting.</p>
+<p>[called with <a href="pyxmpp2.transport.TCPTransport-class.html#lock" class="link">lock</a> acquired]</p>
+  <dl class="fields">
+    <dt>Returns:</dt>
+        <dd><code class="link">True</code> when just connected</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_write"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_write</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">data</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Write raw data to the socket.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>data</code></strong> (: <code class="link">bytes</code>) - : data to send</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="set_target"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">set_target</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stream</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Make the <code class="link">stream</code> the target for this transport instance.</p>
+<p>The 'stream_start', 'stream_end' and 'stream_element' methods
+of the target will be called when appropriate content is received.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stream</code></strong> (: <a href="pyxmpp2.streambase.StreamBase-class.html" class="link">StreamBase</a>) - : the stream handler to receive stream content
+from the transport</li>
+    </ul></dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.transport.XMPPTransport-class.html#set_target">XMPPTransport.set_target</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="send_stream_head"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">send_stream_head</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza_namespace</span>,
+        <span class="sig-arg">stream_from</span>,
+        <span class="sig-arg">stream_to</span>,
+        <span class="sig-arg">stream_id</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">version</span>=<span class="sig-default"><code class="variable-quote">u'</code><code class="variable-string">1.0</code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">language</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Send stream head via the transport.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stanza_namespace</code></strong> (: <code class="link">unicode</code>) - : namespace of stream stanzas (e.g.
+'jabber:client')</li>
+        <li><strong class="pname"><code>stream_from</code></strong> (: <code class="link">unicode</code>) - : the 'from' attribute of the stream. May be <code class="link">None</code>.</li>
+        <li><strong class="pname"><code>stream_to</code></strong> (: <code class="link">unicode</code>) - : the 'to' attribute of the stream. May be <code class="link">None</code>.</li>
+        <li><strong class="pname"><code>version</code></strong> (: <code class="link">unicode</code>) - : the 'version' of the stream.</li>
+        <li><strong class="pname"><code>language</code></strong> (: <code class="link">unicode</code>) - : the 'xml:lang' of the stream</li>
+    </ul></dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.transport.XMPPTransport-class.html#send_stream_head">XMPPTransport.send_stream_head</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="restart"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">restart</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Restart the stream after SASL or StartTLS handshake.
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="pyxmpp2.transport.XMPPTransport-class.html#restart">XMPPTransport.restart</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="send_stream_tail"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">send_stream_tail</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Send stream tail via the transport.
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="pyxmpp2.transport.XMPPTransport-class.html#send_stream_tail">XMPPTransport.send_stream_tail</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="send_element"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">send_element</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">element</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Send an element via the transport.
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="pyxmpp2.transport.XMPPTransport-class.html#send_element">XMPPTransport.send_element</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="prepare"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">prepare</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  When connecting start the next connection step and schedule
+next <a href="pyxmpp2.transport.TCPTransport-class.html#prepare" class="link">prepare</a> call, when connected return <a href="pyxmpp2.mainloop.interfaces.HandlerReady-class.html" class="link">HandlerReady()</a>
+  <dl class="fields">
+    <dt>Returns: <a href="pyxmpp2.mainloop.interfaces.IOHandlerPrepareResult-class.html" class="link">IOHandlerPrepareResult</a></dt>
+        <dd><a href="pyxmpp2.mainloop.interfaces.HandlerReady-class.html" class="link">HandlerReady()</a> if there is no need to call <a href="pyxmpp2.transport.TCPTransport-class.html#prepare" class="link">prepare</a> again
+or <a href="pyxmpp2.mainloop.interfaces.PrepareAgain-class.html" class="link">PrepareAgain()</a> otherwise.</dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#prepare">mainloop.interfaces.IOHandler.prepare</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="fileno"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">fileno</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Return file descriptor to poll or select.
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#fileno">mainloop.interfaces.IOHandler.fileno</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="is_readable"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">is_readable</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  
+  <dl class="fields">
+    <dt>Returns:</dt>
+        <dd><code class="link">True</code> when the I/O channel can be read</dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#is_readable">mainloop.interfaces.IOHandler.is_readable</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="wait_for_readability"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">wait_for_readability</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Stop current thread until the channel is readable.
+  <dl class="fields">
+    <dt>Returns:</dt>
+        <dd><code class="link">False</code> if it won't be readable (e.g. is closed)</dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#wait_for_readability">mainloop.interfaces.IOHandler.wait_for_readability</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="is_writable"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">is_writable</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  
+  <dl class="fields">
+    <dt>Returns:</dt>
+        <dd><code class="link">False</code> as currently the data is always written synchronously</dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#is_writable">mainloop.interfaces.IOHandler.is_writable</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="wait_for_writability"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">wait_for_writability</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Stop current thread until the channel is writable.
+  <dl class="fields">
+    <dt>Returns:</dt>
+        <dd><code class="link">False</code> if it won't be readable (e.g. is closed)</dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#wait_for_writability">mainloop.interfaces.IOHandler.wait_for_writability</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="handle_write"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_write</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Handle the 'channel writable' state. E.g. send buffered data via a
+socket.
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#handle_write">mainloop.interfaces.IOHandler.handle_write</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="handle_read"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_read</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Handle the 'channel readable' state. E.g. read from a socket.
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#handle_read">mainloop.interfaces.IOHandler.handle_read</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="handle_hup"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_hup</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Handle the 'channel hungup' state. The handler should not be writtable
+after this.
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#handle_hup">mainloop.interfaces.IOHandler.handle_hup</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="handle_err"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_err</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Handle an error reported.
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#handle_err">mainloop.interfaces.IOHandler.handle_err</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="handle_nval"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_nval</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Handle an error reported.
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#handle_nval">mainloop.interfaces.IOHandler.handle_nval</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="is_connected"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">is_connected</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Check if the transport is connected.
+  <dl class="fields">
+    <dt>Returns:</dt>
+        <dd><code class="link">True</code> if is connected.</dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.transport.XMPPTransport-class.html#is_connected">XMPPTransport.is_connected</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="disconnect"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">disconnect</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Disconnect the stream gracefully.
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="pyxmpp2.transport.XMPPTransport-class.html#disconnect">XMPPTransport.disconnect</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="close"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">close</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Close the stream immediately, so it won't expect more events.
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#close">mainloop.interfaces.IOHandler.close</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_feed_reader"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_feed_reader</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">data</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Feed the stream reader with data received.</p>
+<p>[ called with <a href="pyxmpp2.transport.TCPTransport-class.html#lock" class="link">lock</a> acquired ]</p>
+<p>If <code class="link">data</code> is None or empty, then stream end (peer disconnected) is
+assumed and the stream is closed.</p>
+<p><a href="pyxmpp2.transport.TCPTransport-class.html#lock" class="link">lock</a> is acquired during the operation.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>data</code></strong> (: <code class="link">unicode</code>) - : data received from the stream socket.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== INSTANCE VARIABLE DETAILS ==================== -->
+<a name="section-InstanceVariableDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Variable Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceVariableDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="_dst_service"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">_dst_service</h3>
+  : requested service name (e.g. 'xmpp-client')
+  <dl class="fields">
+    <dt>Type:</dt>
+      <dd>: <code class="link">unicode</code></dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="pyxmpp2-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/Jajcus/pyxmpp2/">PyXMPP2</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    <a href="epydoc-log.html">Generated by Epydoc
+    3.0.1 on Sun Jun 26 09:21:49 2011</a>
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>pyxmpp2</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th bgcolor="#70b0f0" class="navbar-select"
+          >&nbsp;&nbsp;&nbsp;Home&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/Jajcus/pyxmpp2/">PyXMPP2</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;pyxmpp2
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PACKAGE DESCRIPTION ==================== -->
+<h1 class="epydoc">Package pyxmpp2</h1><p class="nomargin-top"></p>
+<p>PyXMPP is object-oriented, most of its fetures are implemented via classes,
+defined in various pyxmpp modules. The API is very asynchronous -- often
+requested objects are not returned immediately, but instead a callback is
+called when the object is available or an event occurs.</p>
+<div class="rst-section" id="rst-xmppsettings-objects">
+<h1 class="heading">XMPPSettings objects</h1>
+<p>As many parameters may define an XMPP implementation behaviour class
+constructors or other methods would require lots of arguments to handle them
+all. Instead, a special <a href="pyxmpp2.settings.XMPPSettings-class.html" class="link">XMPPSettings</a> object is often used, which can hold any
+parameter usefull by any part of the PyXMPP.</p>
+</div>
+<div class="rst-section" id="rst-module-hierarchy">
+<h1 class="heading">Module hierarchy</h1>
+<p>Base XMPP features (<a class="rst-reference external" href="http://www.ietf.org/rfc/rfc3920.txt" target="_top">RFC 3920</a>, <a class="rst-reference external" href="http://www.ietf.org/rfc/rfc3921.txt" target="_top">RFC
+3921</a>) are implemented in direct
+submodules of <a href="pyxmpp2-module.html" class="link">pyxmpp2</a> package.</p>
+</div>
+
+<!-- ==================== SUBMODULES ==================== -->
+<a name="section-Submodules"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Submodules</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Submodules"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr><td class="summary">
+  <ul class="nomargin">
+    <li> <strong class="uidlink"><a href="pyxmpp2.binding-module.html">pyxmpp2.binding</a></strong>: <em class="summary">Resource binding implementation.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.constants-module.html">pyxmpp2.constants</a></strong>: <em class="summary">Common XMPP constants.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.error-module.html">pyxmpp2.error</a></strong>: <em class="summary">XMPP error handling.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.etree-module.html">pyxmpp2.etree</a></strong>: <em class="summary">ElementTree API selection.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.exceptions-module.html">pyxmpp2.exceptions</a></strong>: <em class="summary">PyXMPP exceptions.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.expdict-module.html">pyxmpp2.expdict</a></strong>: <em class="summary">Dictionary with item expiration.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.iq-module.html">pyxmpp2.iq</a></strong>: <em class="summary">Iq XMPP stanza handling</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.jid-module.html">pyxmpp2.jid</a></strong>: <em class="summary">jid -- XMPP address handling</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.mainloop-module.html">pyxmpp2.mainloop</a></strong>: <em class="summary">PyXMPP main event loop - the event and I/O framework, aka re-inventing the
+wheel.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="pyxmpp2.mainloop.base-module.html">pyxmpp2.mainloop.base</a></strong>: <em class="summary">Main loop implementation Base.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.mainloop.events-module.html">pyxmpp2.mainloop.events</a></strong>: <em class="summary">PyXMPP events.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.mainloop.interfaces-module.html">pyxmpp2.mainloop.interfaces</a></strong>: <em class="summary">Abstract base classes for the main loop framework.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.mainloop.poll-module.html">pyxmpp2.mainloop.poll</a></strong>: <em class="summary">I/O Handling classes</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.mainloop.select-module.html">pyxmpp2.mainloop.select</a></strong>: <em class="summary">I/O Handling classes</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.mainloop.threads-module.html">pyxmpp2.mainloop.threads</a></strong>: <em class="summary">I/O Handling classes</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.mainloop.wait-module.html">pyxmpp2.mainloop.wait</a></strong>: <em class="summary">Utility functions to wait until a socket (or object implementing .fileno()
+in POSIX) is ready for input or output.</em>    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.message-module.html">pyxmpp2.message</a></strong>: <em class="summary">Message XMPP stanza handling</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.presence-module.html">pyxmpp2.presence</a></strong>: <em class="summary">Presence XMPP stanza handling</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.resolver-module.html">pyxmpp2.resolver</a></strong>: <em class="summary">DNS resolever with SRV record support.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.sasl-module.html">pyxmpp2.sasl</a></strong>: <em class="summary">SASL authentication implementaion for PyXMPP.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="pyxmpp2.sasl.core-module.html">pyxmpp2.sasl.core</a></strong>: <em class="summary">Base classes for PyXMPP SASL implementation.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.sasl.digest_md5-module.html">pyxmpp2.sasl.digest_md5</a></strong>: <em class="summary">DIGEST-MD5 authentication mechanism for PyXMPP SASL implementation.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.sasl.external-module.html">pyxmpp2.sasl.external</a></strong>: <em class="summary">External SASL authentication mechanism for PyXMPP SASL implementation.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.sasl.gssapi-module.html">pyxmpp2.sasl.gssapi</a></strong>: <em class="summary">GSSAPI authentication mechanism for PyXMPP SASL implementation.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.sasl.plain-module.html">pyxmpp2.sasl.plain</a></strong>: <em class="summary">PLAIN authentication mechanism for PyXMPP SASL implementation.</em>    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.settings-module.html">pyxmpp2.settings</a></strong>: <em class="summary">General settings container.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.stanza-module.html">pyxmpp2.stanza</a></strong>: <em class="summary">General XMPP Stanza handling.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.stanzapayload-module.html">pyxmpp2.stanzapayload</a></strong>: <em class="summary">XMPP payload classes.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.stanzaprocessor-module.html">pyxmpp2.stanzaprocessor</a></strong>: <em class="summary">Handling of XMPP stanzas.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.streambase-module.html">pyxmpp2.streambase</a></strong>: <em class="summary">Core XMPP stream functionality.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.streamevents-module.html">pyxmpp2.streamevents</a></strong>: <em class="summary">XMPP stream events.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.streamsasl-module.html">pyxmpp2.streamsasl</a></strong>: <em class="summary">SASL support XMPP streams.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.streamtls-module.html">pyxmpp2.streamtls</a></strong>: <em class="summary">TLS support for XMPP streams.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.transport-module.html">pyxmpp2.transport</a></strong>: <em class="summary">XMPP transport.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.utils-module.html">pyxmpp2.utils</a></strong>: <em class="summary">Utility functions for the pyxmpp package.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.version-module.html">pyxmpp2.version</a></strong>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.xmppparser-module.html">pyxmpp2.xmppparser</a></strong>: <em class="summary">ElementTree-based XMPP stream parserg</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.xmppserializer-module.html">pyxmpp2.xmppserializer</a></strong>: <em class="summary">XMPP serializer for ElementTree data.</em>    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.xmppstringprep-module.html">pyxmpp2.xmppstringprep</a></strong>: <em class="summary">Nodeprep and resourceprep stringprep profiles.</em>    </li>
+  </ul></td></tr>
+</table>
+
+<br />
+<!-- ==================== VARIABLES ==================== -->
+<a name="section-Variables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Variables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="None">None</code><br />
+      hash(x)
+    </td>
+  </tr>
+</table>
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th bgcolor="#70b0f0" class="navbar-select"
+          >&nbsp;&nbsp;&nbsp;Home&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/Jajcus/pyxmpp2/">PyXMPP2</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    <a href="epydoc-log.html">Generated by Epydoc
+    3.0.1 on Sun Jun 26 09:21:43 2011</a>
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>
