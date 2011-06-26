@@ -12,3 +12,8 @@ The goal of this project is to rewrite PyXMPP so:
 - its API is cleaned up
 - etc.
 
+Further information
+-------------------
+
+- Project GitHub page: https://github.com/Jajcus/pyxmpp2/
+- API reference: http://jajcus.github.com/pyxmpp2/api/
