@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>pyxmpp2.version</title>
+  <title>pyxmpp2.session</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -43,7 +43,7 @@
     <td width="100%">
       <span class="breadcrumbs">
         <a href="pyxmpp2-module.html">Package&nbsp;pyxmpp2</a> ::
-        Module&nbsp;version
+        Module&nbsp;session
       </span>
     </td>
     <td>
@@ -56,7 +56,47 @@
   </tr>
 </table>
 <!-- ==================== MODULE DESCRIPTION ==================== -->
-<h1 class="epydoc">Module version</h1><p class="nomargin-top"></p>
+<h1 class="epydoc">Module session</h1><p class="nomargin-top"></p>
+<p>IM Session establishement implementation.</p>
+<p>This module provides a stream feature handler to implement the
+IM session establishment request defined in <a class="rst-reference external" href="http://www.faqs.org/rfcs/rfc3921.html" target="_top">RFC 3921</a>, but dropped
+in <a class="rst-reference external" href="http://www.faqs.org/rfcs/rfc6120.html" target="_top">RFC 6120</a>. The implementation is needed for backward compatibility.</p>
+<dl class="rst-docutils">
+<dt>Normative reference:</dt>
+<dd><ul class="rst-first rst-last rst-simple">
+<li><a class="rst-reference external" href="http://www.faqs.org/rfcs/rfc3921.html" target="_top">RFC 3921</a></li>
+<li><a class="rst-reference external" href="http://www.faqs.org/rfcs/rfc6120.html" target="_top">RFC 6120</a> (Appendix E. states it should be no-op now, when implemented
+on server side)</li>
+</ul>
+</dd>
+</dl>
+
+<!-- ==================== CLASSES ==================== -->
+<a name="section-Classes"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Classes</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Classes"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.session.SessionHandler-class.html" class="summary-name">SessionHandler</a><br />
+      <a class="rst-rst-rst-rst-reference external rst-rst-rst-reference external rst-rst-reference external rst-reference external" href="http://www.faqs.org/rfcs/rfc3921.html" target="_top">RFC 3921</a> session establishment implementation.
+    </td>
+  </tr>
+</table>
 <!-- ==================== VARIABLES ==================== -->
 <a name="section-Variables"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -78,7 +118,14 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="version"></a><span class="summary-name">version</span> = <code title="'1.9.9+git'"><code class="variable-quote">'</code><code class="variable-string">1.9.9+git</code><code class="variable-quote">'</code></code>
+        <a name="logger"></a><span class="summary-name">logger</span> = <code title="logging.getLogger(&quot;pyxmpp.session&quot;)">logging.getLogger(&quot;pyxmpp.session&quot;)</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="SESSION_TAG"></a><span class="summary-name">SESSION_TAG</span> = <code title="u'{urn:ietf:params:xml:ns:xmpp-session}session'"><code class="variable-quote">u'</code><code class="variable-string">{urn:ietf:params:xml:ns:xmpp-session}session</code><code class="variable-quote">'</code></code>
     </td>
   </tr>
 </table>

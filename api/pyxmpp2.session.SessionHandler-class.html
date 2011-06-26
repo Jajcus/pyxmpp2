@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>pyxmpp2.mainloop.interfaces.IOHandler</title>
+  <title>pyxmpp2.session.SessionHandler</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -43,9 +43,8 @@
     <td width="100%">
       <span class="breadcrumbs">
         <a href="pyxmpp2-module.html">Package&nbsp;pyxmpp2</a> ::
-        <a href="pyxmpp2.mainloop-module.html">Package&nbsp;mainloop</a> ::
-        <a href="pyxmpp2.mainloop.interfaces-module.html">Module&nbsp;interfaces</a> ::
-        Class&nbsp;IOHandler
+        <a href="pyxmpp2.session-module.html">Module&nbsp;session</a> ::
+        Class&nbsp;SessionHandler
       </span>
     </td>
     <td>
@@ -58,18 +57,19 @@
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class IOHandler</h1><p class="nomargin-top"></p>
+<h1 class="epydoc">Class SessionHandler</h1><p class="nomargin-top"></p>
 <center>
-<center>  <map id="class_hierarchy_for_iohandler" name="class_hierarchy_for_iohandler">
-<area shape="rect" id="node1" href="pyxmpp2.mainloop.interfaces.IOHandler-class.html" title="IOHandler" alt="" coords="48,6,133,34"/>
-<area shape="rect" id="node2" href="pyxmpp2.transport.TCPTransport-class.html" title="transport.TCPTransport" alt="" coords="5,65,176,93"/>
+<center>  <map id="class_hierarchy_for_sessionhan" name="class_hierarchy_for_sessionhan">
+<area shape="rect" id="node1" href="pyxmpp2.interfaces.StreamFeatureHandler-class.html" title="interfaces.StreamFeatureHandler" alt="" coords="5,6,235,34"/>
+<area shape="rect" id="node4" href="pyxmpp2.session.SessionHandler-class.html" title="SessionHandler" alt="" coords="309,65,432,93"/>
+<area shape="rect" id="node2" href="pyxmpp2.interfaces.XMPPFeatureHandler-class.html" title="interfaces.XMPPFeatureHandler" alt="" coords="259,6,483,34"/>
+<area shape="rect" id="node3" href="pyxmpp2.mainloop.interfaces.EventHandler-class.html" title="mainloop.interfaces.EventHandler" alt="" coords="507,6,739,34"/>
 </map>
-  <img src="class_hierarchy_for_iohandler.gif" alt='' usemap="#class_hierarchy_for_iohandler" ismap="ismap" class="graph-without-title" />
+  <img src="class_hierarchy_for_sessionhan.gif" alt='' usemap="#class_hierarchy_for_sessionhan" ismap="ismap" class="graph-without-title" />
 </center>
 </center>
 <hr />
-Wrapper for a socket or a file descriptor to be used in event loop
-or for I/O threads.
+<a class="rst-rst-rst-rst-rst-reference external rst-rst-rst-rst-reference external rst-rst-rst-reference external rst-rst-reference external rst-reference external" href="http://www.faqs.org/rfcs/rfc3921.html" target="_top">RFC 3921</a> session establishment implementation.
 
 <!-- ==================== NESTED CLASSES ==================== -->
 <a name="section-NestedClasses"></a>
@@ -88,12 +88,11 @@ or for I/O threads.
     </table>
   </td>
 </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="abc.ABCMeta-class.html" class="summary-name">__metaclass__</a><br />
-      Metaclass for defining Abstract Base Classes (ABCs).
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html">interfaces.StreamFeatureHandler</a></code></b>:
+      <code><a href="abc.ABCMeta-class.html">__metaclass__</a></code>
+      </p>
     </td>
   </tr>
 </table>
@@ -120,8 +119,9 @@ or for I/O threads.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="fileno"></a><span class="summary-sig-name">fileno</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Return file descriptor to poll or select.</td>
+          <td><span class="summary-sig"><a href="pyxmpp2.session.SessionHandler-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">settings</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Initialize the SASL handler</td>
           <td align="right" valign="top">
             
             
@@ -137,9 +137,10 @@ or for I/O threads.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#is_readable" class="summary-sig-name">is_readable</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Returns:
-<code class="link">True</code> when the I/O channel can be read</td>
+          <td><span class="summary-sig"><a href="pyxmpp2.session.SessionHandler-class.html#make_stream_features" class="summary-sig-name">make_stream_features</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stream</span>,
+        <span class="summary-sig-arg">features</span>)</span><br />
+      Update the features element announced by the stream.</td>
           <td align="right" valign="top">
             
             
@@ -155,8 +156,10 @@ or for I/O threads.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#wait_for_readability" class="summary-sig-name">wait_for_readability</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Stop current thread until the channel is readable.</td>
+          <td><span class="summary-sig"><a href="pyxmpp2.session.SessionHandler-class.html#handle_stream_features" class="summary-sig-name">handle_stream_features</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stream</span>,
+        <span class="summary-sig-arg">features</span>)</span><br />
+      Handle features announced by the stream peer.</td>
           <td align="right" valign="top">
             
             
@@ -172,9 +175,10 @@ or for I/O threads.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#is_writable" class="summary-sig-name">is_writable</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Returns:
-<code class="link">True</code> when the I/O channel can be written to</td>
+          <td><span class="summary-sig"><a href="pyxmpp2.session.SessionHandler-class.html#handle_authorized" class="summary-sig-name">handle_authorized</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">event</span>)</span><br />
+      Send session esteblishment request if the feature was advertised by
+the server.</td>
           <td align="right" valign="top">
             
             
@@ -184,15 +188,33 @@ or for I/O threads.
       
     </td>
   </tr>
-<tr>
+<tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><a href="pyxmpp2.mainloop.interfaces.IOHandlerPrepareResult-class.html" class="link">IOHandlerPrepareResult</a></span>
+      <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#prepare" class="summary-sig-name">prepare</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Prepare the I/O handler for the event loop or an event loop
-iteration.</td>
+          <td><span class="summary-sig"><a href="pyxmpp2.session.SessionHandler-class.html#_session_success" class="summary-sig-name" onclick="show_private();">_session_success</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>)</span><br />
+      Handle session establishment success.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.session.SessionHandler-class.html#_session_error" class="summary-sig-name" onclick="show_private();">_session_error</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>)</span><br />
+      Handle resource session establishment error.</td>
           <td align="right" valign="top">
             
             
@@ -208,110 +230,9 @@ iteration.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#wait_for_writability" class="summary-sig-name">wait_for_writability</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Stop current thread until the channel is writable.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#handle_write" class="summary-sig-name">handle_write</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Handle the 'channel writable' state.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#handle_read" class="summary-sig-name">handle_read</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Handle the 'channel readable' state.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#handle_hup" class="summary-sig-name">handle_hup</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Handle the 'channel hungup' state.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="handle_err"></a><span class="summary-sig-name">handle_err</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Handle an error reported.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="handle_nval"></a><span class="summary-sig-name">handle_nval</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Handle an 'invalid file descriptor' event.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="close"></a><span class="summary-sig-name">close</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Close the channell immediately, so it won't expect more events.</td>
+          <td><span class="summary-sig"><a href="pyxmpp2.session.SessionHandler-class.html#handle_bind_iq_set" class="summary-sig-name">handle_bind_iq_set</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>)</span><br />
+      Handler &lt;iq type=&quot;set&quot;/&gt; for session establishment.</td>
           <td align="right" valign="top">
             
             
@@ -328,7 +249,6 @@ iteration.</td>
       <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
-      <code>__init__</code>,
       <code>__new__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
@@ -358,39 +278,17 @@ iteration.</td>
     </table>
   </td>
 </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="__abstractmethods__"></a><span class="summary-name">__abstractmethods__</span> = <code title="frozenset([])"><code class="variable-group">frozenset([</code><code class="variable-group">])</code></code>
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x87d0aec&gt;">&lt;_weakrefset.WeakSet object at 0x87d0aec&gt;</code>
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x87d0b2c&gt;">&lt;_weakrefset.WeakSet object at 0x87d0b2c&gt;</code>
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_abc_negative_cache_version"></a><span class="summary-name">_abc_negative_cache_version</span> = <code title="10">10</code>
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x87d0a8c&gt;">&lt;_weakrefset.WeakSet object at 0x87d0a8c&gt;</code>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html">interfaces.StreamFeatureHandler</a></code></b>:
+      <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html#__abstractmethods__">__abstractmethods__</a></code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html">interfaces.StreamFeatureHandler</a></code></b> (private):
+      <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
+      <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
+      <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
+      <code><a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
+      </p></div>
     </td>
   </tr>
 </table>
@@ -437,169 +335,199 @@ iteration.</td>
   </td>
 </tr>
 </table>
-<a name="is_readable"></a>
+<a name="__init__"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">is_readable</span>(<span class="sig-arg">self</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">settings</span>=<span class="sig-default">None</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  
+  Initialize the SASL handler
   <dl class="fields">
+    <dt>Overrides:
+        object.__init__
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="make_stream_features"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">make_stream_features</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stream</span>,
+        <span class="sig-arg">features</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Update the features element announced by the stream.</p>
+<p>[receiver only]</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stream</code></strong> - : the stream</li>
+        <li><strong class="pname"><code>features</code></strong> - : the features element about to be sent</li>
+    </ul></dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html#make_stream_features">interfaces.StreamFeatureHandler.make_stream_features</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="handle_stream_features"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_stream_features</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stream</span>,
+        <span class="sig-arg">features</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Handle features announced by the stream peer.</p>
+<p>[initiator only]</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stream</code></strong> - : the stream</li>
+        <li><strong class="pname"><code>features</code></strong> - : the features element just received</li>
+    </ul></dd>
     <dt>Returns:</dt>
-        <dd><code class="link">True</code> when the I/O channel can be read</dd>
+        <dd><ul class="rst-rst-rst-simple rst-rst-simple rst-simple">
+<li><p class="rst-rst-first rst-rst-first rst-first"><a href="pyxmpp2.interfaces.StreamFeatureHandled-class.html" class="link">StreamFeatureHandled</a> instance if a feature was recognized and
+handled</p>
+</li>
+<li><p class="rst-rst-first rst-rst-first rst-first"><a href="pyxmpp2.interfaces.StreamFeatureNotHandled-class.html" class="link">StreamFeatureNotHandled</a> instance if a feature was recognized
+but not handled</p>
+</li>
+<li><p class="rst-rst-first rst-rst-first rst-first"><code class="link">None</code> if no feature was recognized</p>
+</li>
+</ul></dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html#handle_stream_features">interfaces.StreamFeatureHandler.handle_stream_features</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
   </dl>
 </td></tr></table>
 </div>
-<a name="wait_for_readability"></a>
+<a name="handle_authorized"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">wait_for_readability</span>(<span class="sig-arg">self</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_authorized</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">event</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  Stop current thread until the channel is readable.
+  Send session esteblishment request if the feature was advertised by
+the server.
   <dl class="fields">
-    <dt>Returns:</dt>
-        <dd><code class="link">False</code> if it won't be readable (e.g. is closed)</dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@event_handler(AuthorizedEvent)</code></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
-<a name="is_writable"></a>
+<a name="_session_success"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_session_success</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Handle session establishment success.</p>
+<p>[initiating entity only]</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stanza</code></strong> - : &lt;iq type=&quot;result&quot;/&gt; stanza received.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_session_error"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_session_error</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Handle resource session establishment error.</p>
+<p>[initiating entity only]</p>
+  <dl class="fields">
+    <dt>Raises:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code><strong class='fraise'><a href="pyxmpp2.exceptions.FatalStreamError-class.html">FatalStreamError</a></strong></code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="handle_bind_iq_set"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">is_writable</span>(<span class="sig-arg">self</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_bind_iq_set</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  
+  Handler &lt;iq type=&quot;set&quot;/&gt; for session establishment.
   <dl class="fields">
-    <dt>Returns:</dt>
-        <dd><code class="link">True</code> when the I/O channel can be written to</dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="prepare"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">prepare</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  Prepare the I/O handler for the event loop or an event loop
-iteration.
-  <dl class="fields">
-    <dt>Returns: <a href="pyxmpp2.mainloop.interfaces.IOHandlerPrepareResult-class.html" class="link">IOHandlerPrepareResult</a></dt>
-        <dd><a href="pyxmpp2.mainloop.interfaces.HandlerReady-class.html" class="link">HandlerReady()</a> if there is no need to call <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#prepare" class="link">prepare</a> again
-or <a href="pyxmpp2.mainloop.interfaces.PrepareAgain-class.html" class="link">PrepareAgain()</a> otherwise.</dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="wait_for_writability"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">wait_for_writability</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  Stop current thread until the channel is writable.
-  <dl class="fields">
-    <dt>Returns:</dt>
-        <dd><code class="link">False</code> if it won't be readable (e.g. is closed)</dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="handle_write"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_write</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  Handle the 'channel writable' state. E.g. send buffered data via a
-socket.
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="handle_read"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_read</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  Handle the 'channel readable' state. E.g. read from a socket.
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="handle_hup"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_hup</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  Handle the 'channel hungup' state. The handler should not be writtable
-after this.
-  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@iq_set_stanza_handler(XMLPayload, SESSION_TAG)</code></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -636,7 +564,7 @@ after this.
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Jun 26 21:58:24 2011</a>
+    3.0.1 on Sun Jun 26 21:58:26 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
