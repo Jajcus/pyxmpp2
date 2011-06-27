@@ -133,6 +133,42 @@ Base class for main loop implementations.
       
     </td>
   </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.base.MainLoopBase-class.html#add_handler" class="summary-sig-name">add_handler</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">handler</span>)</span><br />
+      Add a new handler to the main loop.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.base.MainLoopBase-class.html#remove_handler" class="summary-sig-name">remove_handler</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">handler</span>)</span><br />
+      Add a new handler to the main loop.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -142,41 +178,6 @@ Base class for main loop implementations.
           <td><span class="summary-sig"><a name="_add_io_handler"></a><span class="summary-sig-name">_add_io_handler</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">handler</span>)</span><br />
       Add an <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html" class="link">IOHandler</a> to the loop.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="_add_timeout_handler"></a><span class="summary-sig-name">_add_timeout_handler</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">handler</span>)</span><br />
-      Add a <a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html" class="link">TimeoutHandler</a> to the main loop.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.base.MainLoopBase-class.html#_call_timeout_handlers" class="summary-sig-name" onclick="show_private();">_call_timeout_handlers</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Call the timeout handlers due.</td>
           <td align="right" valign="top">
             
             
@@ -204,50 +205,14 @@ Base class for main loop implementations.
       
     </td>
   </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="_remove_timeout_handler"></a><span class="summary-sig-name">_remove_timeout_handler</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">handler</span>)</span><br />
-      Remove <a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html" class="link">TimeoutHandler</a> from the main loop.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.base.MainLoopBase-class.html#add_handler" class="summary-sig-name">add_handler</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">handler</span>)</span><br />
-      Add a new handler to the main loop.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.base.MainLoopBase-class.html#check_events" class="summary-sig-name">check_events</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Call the event dispatcher.</td>
+          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.base.MainLoopBase-class.html#quit" class="summary-sig-name">quit</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Make the loop stop after the current iteration.</td>
           <td align="right" valign="top">
             
             
@@ -299,8 +264,8 @@ Base class for main loop implementations.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.base.MainLoopBase-class.html#quit" class="summary-sig-name">quit</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Make the loop stop after the current iteration.</td>
+          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.base.MainLoopBase-class.html#check_events" class="summary-sig-name">check_events</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Call the event dispatcher.</td>
           <td align="right" valign="top">
             
             
@@ -310,15 +275,50 @@ Base class for main loop implementations.
       
     </td>
   </tr>
-<tr>
+<tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.base.MainLoopBase-class.html#remove_handler" class="summary-sig-name">remove_handler</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a name="_add_timeout_handler"></a><span class="summary-sig-name">_add_timeout_handler</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">handler</span>)</span><br />
-      Add a new handler to the main loop.</td>
+      Add a <a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html" class="link">TimeoutHandler</a> to the main loop.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_remove_timeout_handler"></a><span class="summary-sig-name">_remove_timeout_handler</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">handler</span>)</span><br />
+      Remove <a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html" class="link">TimeoutHandler</a> from the main loop.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.base.MainLoopBase-class.html#_call_timeout_handlers" class="summary-sig-name" onclick="show_private();">_call_timeout_handlers</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Call the timeout handlers due.</td>
           <td align="right" valign="top">
             
             
@@ -464,29 +464,6 @@ final iteration in progress).
   </dl>
 </td></tr></table>
 </div>
-<a name="_call_timeout_handlers"></a>
-<div class="private">
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">_call_timeout_handlers</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  Call the timeout handlers due.
-  <dl class="fields">
-    <dt>Returns:</dt>
-        <dd>(next_event_timeout, sources_handled) tuple.
-next_event_timeout is number of seconds until the next timeout
-event, sources_handled is number of handlers called.</dd>
-  </dl>
-</td></tr></table>
-</div>
 <a name="add_handler"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -515,25 +492,55 @@ event, sources_handled is number of handlers called.</dd>
   </dl>
 </td></tr></table>
 </div>
-<a name="check_events"></a>
+<a name="remove_handler"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">check_events</span>(<span class="sig-arg">self</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">remove_handler</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">handler</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  <p>Call the event dispatcher.</p>
-<p>Quit the main loop when the QUIT event is reached.</p>
+  <p>Add a new handler to the main loop.</p>
+<p>Do nothing if the handler is not registered at the main loop.</p>
   <dl class="fields">
-    <dt>Returns:</dt>
-        <dd><code class="link">True</code> if QUIT was reached.</dd>
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>handler</code></strong> - : the handler object to add</li>
+    </ul></dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#remove_handler">interfaces.MainLoop.remove_handler</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="quit"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">quit</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Make the loop stop after the current iteration.
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#quit">interfaces.MainLoop.quit</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
   </dl>
 </td></tr></table>
 </div>
@@ -594,55 +601,48 @@ until <a href="pyxmpp2.mainloop.base.MainLoopBase-class.html#finished" class="li
   </dl>
 </td></tr></table>
 </div>
-<a name="quit"></a>
+<a name="check_events"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">quit</span>(<span class="sig-arg">self</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">check_events</span>(<span class="sig-arg">self</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  Make the loop stop after the current iteration.
+  <p>Call the event dispatcher.</p>
+<p>Quit the main loop when the QUIT event is reached.</p>
   <dl class="fields">
-    <dt>Overrides:
-        <a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#quit">interfaces.MainLoop.quit</a>
-        <dd><em class="note">(inherited documentation)</em></dd>
-    </dt>
+    <dt>Returns:</dt>
+        <dd><code class="link">True</code> if QUIT was reached.</dd>
   </dl>
 </td></tr></table>
 </div>
-<a name="remove_handler"></a>
-<div>
+<a name="_call_timeout_handlers"></a>
+<div class="private">
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">remove_handler</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">handler</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_call_timeout_handlers</span>(<span class="sig-arg">self</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  <p>Add a new handler to the main loop.</p>
-<p>Do nothing if the handler is not registered at the main loop.</p>
+  Call the timeout handlers due.
   <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>handler</code></strong> - : the handler object to add</li>
-    </ul></dd>
-    <dt>Overrides:
-        <a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#remove_handler">interfaces.MainLoop.remove_handler</a>
-        <dd><em class="note">(inherited documentation)</em></dd>
-    </dt>
+    <dt>Returns:</dt>
+        <dd>(next_event_timeout, sources_handled) tuple.
+next_event_timeout is number of seconds until the next timeout
+event, sources_handled is number of handlers called.</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -727,7 +727,7 @@ final iteration in progress).
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Jun 26 21:58:24 2011</a>
+    3.0.1 on Mon Jun 27 13:52:02 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
