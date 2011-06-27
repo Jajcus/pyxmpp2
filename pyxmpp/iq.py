@@ -75,10 +75,15 @@ class Iq(Stanza):
         elif not isinstance(element, ElementClass):
             raise TypeError("Couldn't make Iq from " + repr(element))
         
+        if element is None and stanza_id is None and stanza_type in (
+                                                                "get", "set"):
+            stanza_id = self.gen_id()
+        
         Stanza.__init__(self, element, from_jid = from_jid, to_jid = to_jid,
                         stanza_type = stanza_type, stanza_id = stanza_id,
                         error = error, error_cond = error_cond, stream = stream,
                         language = language)
+        
         
         if self.element_name != "iq":
             raise ValueError("The element is not <iq/>")

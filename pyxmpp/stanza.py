@@ -123,8 +123,6 @@ class Stanza(object):
 
         if stanza_id:
             self.stanza_id = stanza_id
-        elif self._element is None:
-            self.stanza_id = self.gen_id()
 
         if self.stanza_type == "error":
             if error:
