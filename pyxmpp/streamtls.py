@@ -89,7 +89,7 @@ class StreamTLSHandler(StreamFeatureHandler, EventHandler):
             raise ValueError("Single StreamTLSHandler instance can handle"
                                                             " only one stream")
         self.stream = stream
-        if self.settings["tls_enabled"] and not stream.tls_established:
+        if self.settings["tls_enable"] and not stream.tls_established:
             tls = ElementTree.SubElement(features, STARTTLS_TAG)
             if self.settings["tls_require"]:
                 ElementTree.SubElement(tls, REQUIRED_TAG)
@@ -118,7 +118,7 @@ class StreamTLSHandler(StreamFeatureHandler, EventHandler):
             logger.warning("StartTLS offerred when already established")
             return StreamFeatureNotHandled("StartTLS", mandatory = required)
             
-        if self.settings["tls_enabled"]:
+        if self.settings["tls_enable"]:
             logger.debug("StartTLS negotiated")
             self._request_tls()
             return StreamFeatureHandled("StartTLS", mandatory = required)
@@ -246,7 +246,7 @@ class StreamTLSHandler(StreamFeatureHandler, EventHandler):
             raise
 
 XMPPSettings.add_defaults({
-                            u"tls_enabled": True, 
+                            u"tls_enable": False, 
                             u"tls_require": False, 
                             u"tls_verify_peer": True,
                             u"tls_cert_file": None,

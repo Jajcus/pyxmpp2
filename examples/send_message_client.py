@@ -41,9 +41,9 @@ class MyHandler(EventHandler):
 
 logger = logging.getLogger()
 logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.INFO) # change to 'DEBUG' to see more
 
-your_jid = raw_input("Your jid: ").decode("utf-8")
+your_jid = raw_input("Your jid: ")
 your_password = getpass("Your password: ")
 target_jid = raw_input("Target jid: ")
 message = raw_input("Message: ")
@@ -55,7 +55,11 @@ if sys.version_info.major < 3:
     message = message.decode("utf-8")
 
 handler = MyHandler(JID(target_jid), message)
-settings = XMPPSettings({"password": your_password})
+settings = XMPPSettings({
+                            u"password": your_password,
+                            u"tls_enable": True,
+                            u"tls_verify_peer": False,
+                        })
 client = Client(JID(your_jid), [handler], settings)
 client.connect()
 client.run()

@@ -36,12 +36,14 @@ from .streamevents import DisconnectedEvent
 from .transport import TCPTransport
 from .settings import XMPPSettings
 from .session import SessionHandler
+from .streamtls import StreamTLSHandler
 
 logger = logging.getLogger("pyxmpp.client")
 
 def base_client_handlers_factory(settings):
+    tls_handler = StreamTLSHandler(settings)
     session_handler = SessionHandler(settings)
-    return [session_handler]
+    return [tls_handler, session_handler]
 
 XMPPSettings.add_default_factory("base_client_handlers",
                                                 base_client_handlers_factory)
@@ -101,7 +103,9 @@ class Client(EventHandler):
             transport = TCPTransport(self.settings)
             transport.connect(self.jid.domain, self.settings["client_port"],
                                             self.settings["client_service"])
-            stream = ClientStream(self.jid, self.handlers, self.settings)
+            handlers = self.settings["base_client_handlers"]
+            handlers += self.handlers + [self]
+            stream = ClientStream(self.jid, handlers, self.settings)
             stream.initiate(transport)
             self.mainloop.add_handler(transport)
             self.mainloop.add_handler(stream)
