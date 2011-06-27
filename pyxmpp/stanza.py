@@ -266,7 +266,10 @@ class Stanza(object):
 
     @from_jid.setter # pylint: disable-msg=E1101
     def from_jid(self, from_jid): # pylint: disable-msg=E0202,E0102,C0111
-        self._from_jid = JID(from_jid)
+        if from_jid is None:
+            self._from_jid = None
+        else:
+            self._from_jid = JID(from_jid)
         self._dirty = True
 
     @property
@@ -279,7 +282,10 @@ class Stanza(object):
 
     @to_jid.setter # pylint: disable-msg=E1101
     def to_jid(self, to_jid): # pylint: disable-msg=E0202,E0102,C0111
-        self._to_jid = JID(to_jid)
+        if to_jid is None:
+            self._to_jid = None
+        else:
+            self._to_jid = JID(to_jid)
         self._dirty = True
 
     @property
