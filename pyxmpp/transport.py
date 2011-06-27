@@ -175,7 +175,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         """Start establishing TCP connection with given address.
 
         One of: `port` or `service` must be provided and `addr` must be 
-        a domain name and not an IP address `port` is not given.
+        a domain name and not an IP address if `port` is not given.
 
         When `service` is given try an SRV lookup for that service
         at domain `addr`. If `service` is not given or `addr` is an IP address, 
