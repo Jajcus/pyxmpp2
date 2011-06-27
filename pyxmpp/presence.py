@@ -227,8 +227,8 @@ class Presence(Stanza):
                                                 "unsubscribe", "unsubscribed"):
             raise ValueError("Results may only be generated for 'subscribe',"
                 "'subscribed','unsubscribe' or 'unsubscribed' presence")
-        stanza = Presence(stanza_type = accept_responses[self.get_type()],
-                            from_jid = self.from_jid, to_jid = self.to_jid,
+        stanza = Presence(stanza_type = ACCEPT_RESPONSES[self.stanza_type],
+                            from_jid = self.to_jid, to_jid = self.from_jid,
                                                     stanza_id = self.stanza_id)
         return stanza
 
@@ -243,8 +243,8 @@ class Presence(Stanza):
                                                 "unsubscribe", "unsubscribed"):
             raise ValueError("Results may only be generated for 'subscribe',"
                 "'subscribed','unsubscribe' or 'unsubscribed' presence")
-        stanza = Presence(stanza_type = deny_responses[self.get_type()],
-                            from_jid = self.from_jid, to_jid = self.to_jid,
+        stanza = Presence(stanza_type = DENY_RESPONSES[self.stanza_type],
+                            from_jid = self.to_jid, to_jid = self.from_jid,
                                                     stanza_id = self.stanza_id)
         return stanza
 
