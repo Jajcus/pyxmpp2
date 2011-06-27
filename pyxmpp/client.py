@@ -54,11 +54,21 @@ class Client(EventHandler):
 
     :Ivariables:
         - `jid`: configured JID of the client (current full JID is avialable as
-          `self.stream.jid`).
+          ``self.stream.jid``).
         - `mainloop`: the main loop object
+        - `settings`: configuration settings
+        - `handlers`: stream and main loop handlers provided via the
+          constructor
+        - `stream`: the stream object when connected
+        - `lock`: lock protecting the object
+        - `_ml_handlers`: list of handlers installed by this object to at the
+          main loop
     :Types:
         - `jid`: `jid.JID`
         - `mainloop`: `mainloop.interfaces.MainLoop`
+        - `settings`: `XMPPSettings`
+        - `stream`: `clientstream.ClientStream`
+        - `lock`: :std:`threading.RLock`
     """
     def __init__(self, jid, handlers, settings = None, mainloop = None):
         """Initialize a Client object.
