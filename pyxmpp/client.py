@@ -111,8 +111,15 @@ class Client(EventHandler):
                 self._close_stream()
 
             transport = TCPTransport(self.settings)
-            transport.connect(self.jid.domain, self.settings["client_port"],
-                                            self.settings["client_service"])
+            
+            addr = self.settings["server"]
+            if addr:
+                service = None
+            else:
+                addr = self.jid.domain
+                service = self.settings["client_service"]
+
+            transport.connect(addr, self.settings["client_port"], service)
             handlers = self.settings["base_client_handlers"]
             handlers += self.handlers + [self]
             stream = ClientStream(self.jid, handlers, self.settings)
@@ -165,6 +172,7 @@ class Client(EventHandler):
 XMPPSettings.add_defaults({
                             u"client_port": 5222, 
                             u"client_service": "xmpp-client", 
+                            u"server": None, 
                             })
 
 
