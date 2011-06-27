@@ -37,11 +37,9 @@ class MyHandler(EventHandler):
     
     @event_handler()
     def handle_all(self, event):
-        logger.info(u"-- {0}".format(event))
+        logging.info(u"-- {0}".format(event))
 
-logger = logging.getLogger()
-logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.INFO) # change to 'DEBUG' to see more
+logging.basicConfig(level = logging.INFO) # change to 'DEBUG' to see more
 
 your_jid = raw_input("Your jid: ")
 your_password = getpass("Your password: ")
