@@ -51,14 +51,6 @@ from .interfaces import StreamFeatureHandler
 from .interfaces import StreamFeatureHandled, StreamFeatureNotHandled
 from .mainloop.interfaces import TimeoutHandler, timeout_handler
 
-XMPPSettings.add_defaults(
-        {
-            u"language": "en",
-            u"languages": ("en",),
-            u"default_stanza_timeout": 300,
-            u"extra_ns_prefixes": {},
-        })
-
 logger = logging.getLogger("pyxmpp.streambase")
 
 LANG_SPLIT_RE = re.compile(r"(.*)(?:-[a-zA-Z0-9])?-[a-zA-Z0-9]+$")
@@ -649,5 +641,29 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
                 self._restart_stream()
         self.setup_stanza_handlers(self.handlers, "post-auth")
         self.event(AuthenticatedEvent(self.me))
+
+def _languages_factory(settings):
+    """Make the default value of the "languages" setting."""
+    return [settings["language"]]
+
+XMPPSettings.add_setting(u"language", type = unicode, default = u"en",
+        cmdline_help = u"Preferred language of the XMPP stream",
+        doc = u"""The preferred language of the XMPP stream."""
+    )
+XMPPSettings.add_setting(u"languages", type = XMPPSettings.string_list_type,
+        factory = _languages_factory,
+        cmdline_help = u"Accepted languages of the XMPP stream",
+        doc = u"""When the remote entity selects one of these languages
+on their stream, the same language will be sent in our stream declaration."""
+    )
+XMPPSettings.add_setting(u"default_stanza_timeout", type = int, default = 300,
+        cmdline_help = "Time in seconds to wait for a stanza response",
+        doc = u"""Time in seconds to wait for a stanza response."""
+    )
+XMPPSettings.add_setting(u"extra_ns_prefixes", type = "prefix -> uri mapping",
+        default = {},
+        doc = u"""Extra namespace prefix declarations to use at the stream root
+element."""
+    )
 
 # vi: sts=4 et sw=4

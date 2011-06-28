@@ -222,12 +222,12 @@ class DumbBlockingResolver(Resolver):
             - `callback`: function accepting a single argument
             - `allow_cname`: `bool`
         """
-        if self.settings["allow_ipv6"]:
-            if self.settings["allow_ipv4"]:
+        if self.settings["ipv6"]:
+            if self.settings["ipv4"]:
                 family = socket.AF_UNSPEC
             else:
                 family = socket.AF_INET6
-        elif self.settings["allow_ipv4"]:
+        elif self.settings["ipv4"]:
             family = socket.AF_INET
         else:
             logger.warning("Neither IPv6 or IPv4 allowed.")
@@ -330,9 +330,9 @@ if HAVE_DNSPYTHON:
             if isinstance(hostname, unicode):
                 hostname = hostname.encode("idna")
             rtypes = []
-            if self.settings["allow_ipv6"]:
+            if self.settings["ipv6"]:
                 rtypes.append(("AAAA", socket.AF_INET6))
-            if self.settings["allow_ipv4"]:
+            if self.settings["ipv4"]:
                 rtypes.append(("A", socket.AF_INET))
             if not self.settings["prefer_ipv6"]:
                 rtypes.reverse()
@@ -365,14 +365,29 @@ if HAVE_DNSPYTHON:
         def _make_resolver(self):    
             return BlockingResolver(self.settings)
 
-    XMPPSettings.add_default_factory("dns_resolver", BlockingResolver)
+    _DEFAULT_RESOLVER = BlockingResolver
 else:
-    XMPPSettings.add_default_factory("dns_resolver", DumbBlockingResolver)
+    _DEFAULT_RESOLVER = DumbBlockingResolver
 
-XMPPSettings.add_defaults({
-            u"allow_ipv4": True,
-            u"prefer_ipv6": True,
-            })
-XMPPSettings.add_default_factory("allow_ipv6", lambda x: is_ipv6_available(),
-                                                                        True)
+XMPPSettings.add_setting(u"resolver", type = Resolver,
+        factory = _DEFAULT_RESOLVER, 
+        default_d = "A {0} instance".format(_DEFAULT_RESOLVER.__name__),
+        doc = u"""The DNS resolver implementation to be used by PyXMPP."""
+    )
+XMPPSettings.add_setting(u"ipv4", type = bool, default = True,
+        cmdline_help = "Allow IPv4 address lookup",
+        doc = u"""Look up IPv4 addresses for a server host name."""
+    )
+XMPPSettings.add_setting(u"ipv6", type = bool, basic = True,
+        factory = lambda x: is_ipv6_available(), cache = True,
+        cmdline_help = "Allow IPv6 address lookup",
+        doc = u"""Look up IPv6 addresses for a server host name."""
+    )
+XMPPSettings.add_setting(u"prefer_ipv6", type = bool, basic = True,
+        default = True,
+        cmdline_help = "Prefer IPv6",
+        doc = u"""When enabled IPv6 and connecting to a dual-stack XMPP server
+IPv6 addresses will be tried first."""
+    )
+
 # vi: sts=4 et sw=4

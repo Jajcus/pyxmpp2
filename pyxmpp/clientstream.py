@@ -35,13 +35,6 @@ from .streamsasl import StreamSASLHandler
 from .binding import ResourceBindingHandler
 from .constants import STANZA_CLIENT_NS
 
-def base_c2s_handlers_factory(settings):
-    sasl_handler = StreamSASLHandler(settings)
-    binding_handler = ResourceBindingHandler(settings)
-    return [sasl_handler, binding_handler]
-
-XMPPSettings.add_default_factory("base_c2s_handlers",
-                                                    base_c2s_handlers_factory)
 
 class ClientStream(StreamBase):
     """Handles XMPP-IM c2s stream.
@@ -114,5 +107,17 @@ class ClientStream(StreamBase):
         if not self.initiator:
             if stanza.from_jid != self.peer:
                 stanza.set_from(self.peer)
+
+def base_c2s_handlers_factory(settings):
+    sasl_handler = StreamSASLHandler(settings)
+    binding_handler = ResourceBindingHandler(settings)
+    return [sasl_handler, binding_handler]
+
+XMPPSettings.add_setting(u"base_c2s_handlers", type = "list of handler objects",
+    factory = base_c2s_handlers_factory, 
+    default_d = "A StreamSASLHandler and a ResourceBindingHandler instance",
+    doc = u"""The basic handlers used by a ClientStream in addition to the
+handlers provides in the constructor invocation."""
+    )
 
 # vi: sts=4 et sw=4

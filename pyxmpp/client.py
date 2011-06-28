@@ -117,9 +117,9 @@ class Client(EventHandler):
                 service = None
             else:
                 addr = self.jid.domain
-                service = self.settings["client_service"]
+                service = self.settings["c2s_service"]
 
-            transport.connect(addr, self.settings["client_port"], service)
+            transport.connect(addr, self.settings["c2s_port"], service)
             handlers = self.settings["base_client_handlers"]
             handlers += self.handlers + [self]
             stream = ClientStream(self.jid, handlers, self.settings)
@@ -169,11 +169,24 @@ class Client(EventHandler):
                     self.mainloop.remove_handler(self.stream.transport)
                 self.stream = None
 
-XMPPSettings.add_defaults({
-                            u"client_port": 5222, 
-                            u"client_service": "xmpp-client", 
-                            u"server": None, 
-                            })
 
+XMPPSettings.add_setting(u"c2s_port", default = 5222, type = int, basic = True,
+    cmdline_help = "Port number for XMPP client connections",
+    doc = """Port number for client to server connections."""
+    )
+
+XMPPSettings.add_setting(u"c2s_service", default = "xmpp-client",
+    type = unicode,
+    cmdline_help = "SRV service name XMPP client connections",
+    doc = """SRV service name for client to server connections."""
+    )
+
+XMPPSettings.add_setting(u"server", type = unicode, basic = True,
+    cmdline_help = "Server address. (Default: use SRV lookup)",
+    doc = """Server address to connect to. By default a DNS SRV record look-up
+is done for the requested JID domain part and if that fails – 'A' or 'AAAA'
+record lookup for the same domain. This setting may be used to force using
+a specific server or when SRV look-ups are not available."""
+    )
 
 # vi: sts=4 et sw=4

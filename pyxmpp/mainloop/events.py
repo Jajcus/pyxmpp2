@@ -186,16 +186,22 @@ class EventDispatcher(object):
         while self.dispatch(True) is not QUIT:
             pass
 
-XMPPSettings.add_defaults({
-                            u"event_queue_max_size": None, 
-                            })
-
-def event_queue_factory(settings):
+def _event_queue_factory(settings):
     """Create the default event queue object.
     
     Use the "event_queue_max_size" setting for the maximum queue size.
     """
     return Queue.Queue(settings["event_queue_max_size"])
 
-XMPPSettings.add_default_factory("event_queue", event_queue_factory, True)
+XMPPSettings.add_setting(u"event_queue", type = Queue.Queue,
+        factory = _event_queue_factory, cache = True,
+        default_d = "A QueueQueue instance",
+        doc = u"""Queue used to post events by various components and to
+dispatch them from the main loop."""
+    )
+XMPPSettings.add_setting(u"event_queue_max_size", type = int,
+        doc = u"""Maximum size of the default event loop. Posting events
+will block when the queue is full. This will cause lock-up of a single-thread,
+but may be useful in multi-threaded applications."""
+    )
 

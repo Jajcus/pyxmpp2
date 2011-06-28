@@ -215,12 +215,6 @@ class DefaultPasswordManager(sasl.PasswordManager):
                 return transport.selected_host
         return self.get_serv_name()
 
-XMPPSettings.add_defaults({
-                            u"username": None, 
-                            u"authzid": None,
-                            u"sasl_mechanisms": ("DIGEST-MD5", "PLAIN"),
-                            })
-XMPPSettings.add_default_factory("password_manager", DefaultPasswordManager)
 
 MECHANISMS_TAG = SASL_QNP + u"mechanisms"
 MECHANISM_TAG = SASL_QNP + u"mechanism"
@@ -511,5 +505,32 @@ class StreamSASLHandler(StreamFeatureHandler):
             else:
                 element.text = initial_response.data
         stream.write_element(element)
+
+XMPPSettings.add_setting(u"username", type = unicode, default = None,
+        cmdline_help = u"Username to use instead of the JID local part",
+        doc = u"""The username to use instead of the JID local part."""
+    )
+XMPPSettings.add_setting(u"password", type = unicode, basic = True,
+        default = None,
+        cmdline_help = u"User password",
+        doc = u"""A password for password-based SASL mechanisms."""
+    )
+XMPPSettings.add_setting(u"authzid", type = unicode, default = None,
+        cmdline_help = u"Authorization id for SASL",
+        doc = u"""The authorization-id (alternative JID) to request during the
+SASL authentication."""
+    )
+XMPPSettings.add_setting(u"sasl_mechanisms",
+        type = XMPPSettings.string_list_type,
+        default = ["DIGEST-MD5", "PLAIN"],
+        cmdline_help = u"SASL mechanism to enable",
+        doc = u"""SASL mechanism that can be used for stream authentication."""
+    )
+XMPPSettings.add_setting(u"password_manager", type = sasl.PasswordManager,
+        factory = DefaultPasswordManager,
+        default_d = "A DefaultPasswordManager instance",
+        doc = u"""Object providing or checking user password and other
+SASL authentication properties."""
+    )
 
 # vi: sts=4 et sw=4

@@ -50,13 +50,6 @@ FEATURE_BIND = BIND_QNP + u"bind"
 BIND_JID_TAG = BIND_QNP + u"jid"
 BIND_RESOURCE_TAG = BIND_QNP + u"resource"
 
-def default_resource_factory(settings):
-    """Factory for the 'resource' setting default: use random uuid"""
-    # pylint: disable-msg=W0613
-    return unicode(uuid.uuid4())
-
-XMPPSettings.add_default_factory("resource", default_resource_factory)
-
 @payload_element_name(FEATURE_BIND)
 class ResourceBindingPayload(StanzaPayload):
     """Resource binding <iq/> stanza payload.
@@ -105,8 +98,7 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
     constructor."""
     def __init__(self, settings = None):
         """Initialize the SASL handler"""
-        if settings is None:
-            settings = XMPPSettings()
+        self.settings = settings if settings else XMPPSettings()
 
     def make_stream_features(self, stream, features):
         """Add resource binding feature to the <features/> element of the
@@ -130,10 +122,7 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
         if element is None:
             logger.debug("No <bind/> in features")
             return None
-        if stream.me.resource:
-            resource = stream.me.resource
-        else:
-            resource = stream.settings["resource"]
+        resource = stream.settings["resource"]
         self.bind(stream, resource)
         return StreamFeatureHandled("Resource binding", mandatory = True)
 
@@ -188,6 +177,8 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
     def handle_bind_iq_set(self, stanza):
         """Handler <iq type="set"/> for resource binding."""
         # pylint: disable-msg=R0201
+        if stanza.stream.initiator:
+            return False
         peer = stanza.stream.peer
         if peer.resource:
             raise ResourceConstraintProtocolError(
@@ -208,5 +199,17 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
         stanza.stream.peer = jid
         stanza.stream.event(AuthorizedEvent(jid))
         return response
+
+def default_resource_factory(settings):
+    """Factory for the 'resource' setting default: use random uuid"""
+    # pylint: disable-msg=W0613
+    return unicode(uuid.uuid4())
+
+XMPPSettings.add_setting("resource", type = unicode, basic = False,
+    cmdline_help = "Default JID resource",
+    doc = """JID resource to bind. Use the server-provided resource if not set.
+Automatically set to the resource of the JID provided to ClientStream
+constructor."""
+    )
 
 # vi: sts=4 et sw=4

@@ -89,7 +89,7 @@ class StreamTLSHandler(StreamFeatureHandler, EventHandler):
             raise ValueError("Single StreamTLSHandler instance can handle"
                                                             " only one stream")
         self.stream = stream
-        if self.settings["tls_enable"] and not stream.tls_established:
+        if self.settings["starttls"] and not stream.tls_established:
             tls = ElementTree.SubElement(features, STARTTLS_TAG)
             if self.settings["tls_require"]:
                 ElementTree.SubElement(tls, REQUIRED_TAG)
@@ -245,15 +245,50 @@ class StreamTLSHandler(StreamFeatureHandler, EventHandler):
             logger.exception("Exception caught while checking a certificate")
             raise
 
-XMPPSettings.add_defaults({
-                            u"tls_enable": False, 
-                            u"tls_require": False, 
-                            u"tls_verify_peer": True,
-                            u"tls_cert_file": None,
-                            u"tls_key_file": None,
-                            u"tls_cacert_file": None,
-                            u"tls_verify_callback": 
-                                    StreamTLSHandler.is_certificate_valid,
-                            })
+XMPPSettings.add_setting(u"starttls", type = bool, default = False,
+        basic = True,
+        cmdline_help = "Enable StartTLS negotiation",
+        doc = u"""Enable StartTLS negotiation."""
+    )
+
+XMPPSettings.add_setting(u"tls_require", type = bool, default = False,
+        basic = True,
+        cmdline_help = "Require TLS stream encryption",
+        doc = u"""Require TLS stream encryption."""
+    )
+
+XMPPSettings.add_setting(u"tls_verify_peer", type = bool, default = True,
+        basic = True,
+        cmdline_help = "Verify the peer certificate",
+        doc = u"""Verify the peer certificate."""
+    )
+
+XMPPSettings.add_setting(u"tls_cert_file", type = str,
+        cmdline_help = "TLS certificate file",
+        doc = u"""Path to the TLS certificate file. The file should contain
+the certificate, any immediate certificates needed and it may optionally
+contain the private key. All in the PEM format, concatenated."""
+    )
+
+XMPPSettings.add_setting(u"tls_key_file", type = str,
+        cmdline_help = "TLS certificate private key file",
+        doc = u"""Path to the TLS certificate private key file (in the PEM
+format). Not needed if the key is included in the file pointed by the
+'tls_cert_file' setting."""
+    )
+
+XMPPSettings.add_setting(u"tls_cacert_file", type = str, basic = True,
+        cmdline_help = "TLS CA certificates file",
+        doc = u"""Path to the TLS CA certificates file. The file should contain
+the trusted CA certificates in the PEM format, concatenated."""
+    )
+
+XMPPSettings.add_setting(u"tls_verify_callback", type = "callable",
+        default = StreamTLSHandler.is_certificate_valid,
+        doc = u"""A function to verify if a certificate is valid and if the
+remote party presenting this certificate is authorized to use the stream.
+The function must accept two arguments: a stream and the certificate 
+to verify."""
+    )
 
 # vi: sts=4 et sw=4

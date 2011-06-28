@@ -35,7 +35,21 @@ from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 
-from collections import MutableMapping
+from collections import MutableMapping, namedtuple
+
+class _SettingDefinition(object):
+    def __init__(self, name, type = unicode, default = None, factory = None,
+                        cache = False, default_d = None, doc = None,
+                        cmdline_help = None, basic = False):
+        self.name = name
+        self.type = type
+        self.default = default
+        self.factory = factory
+        self.cache = cache
+        self.default_d = default_d
+        self.doc = doc
+        self.cmdline_help = cmdline_help
+        self.basic = basic
 
 class XMPPSettings(MutableMapping):
     """Container for various parameters used all over PyXMPP.
@@ -50,8 +64,7 @@ class XMPPSettings(MutableMapping):
     :Ivariables:
         - `_settings`: current values of the parameters explicitely set.
     """
-    _defaults = {}
-    _defaults_factories = {}
+    _defs = {}
     def __init__(self, data = None):
         """Create settings, optionally initialized with `data`.
 
@@ -123,13 +136,16 @@ class XMPPSettings(MutableMapping):
             return self._settings[key]
         if local_default is not None:
             return local_default
-        if key in self._defaults:
-            return self._defaults[key]
-        if key in self._defaults_factories:
-            factory, call_once = self._defaults_factories[key]
+        if key in self._defs:
+            setting_def = self._defs[key]
+            if setting_def.default is not None:
+                return setting_def.default
+            factory = setting_def.factory
+            if factory is None:
+                return None
             value = factory(self)
-            if call_once:
-                self._defaults[key] = value
+            if setting_def.cache is True:
+                setting_def.default = value
             return value
         if required:
             raise KeyError(key)
@@ -146,10 +162,25 @@ class XMPPSettings(MutableMapping):
         :Returntype: - `list` of tuples
         """
         return self._settings.items()
+
     @classmethod
-    def add_defaults(cls, defaults):
-        cls._defaults.update(defaults)
-    @classmethod
-    def add_default_factory(cls, setting, factory, cache = False):
-        cls._defaults_factories[setting] = (factory, cache)
+    def add_setting(cls, name, **kwargs):
+        setting_def = _SettingDefinition(name, **kwargs)
+        if name not in cls._defs:
+            cls._defs[name] = setting_def
+            return
+        duplicate = cls._defs[name]
+        if duplicate.type != setting_def.type:
+            raise ValueError("Setting duplicate, with a different type")
+        if duplicate.default != setting_def.default:
+            raise ValueError("Setting duplicate, with a different default")
+        if duplicate.factory != setting_def.factory:
+            raise ValueError("Setting duplicate, with a different factory")
+
+    @staticmethod
+    def string_list_type(value):
+        try:
+            return [x.strip() for x in value.split(u",")]
+        except (AttributeError, TypeError):
+            raise ValueError("Bad string list")
 
