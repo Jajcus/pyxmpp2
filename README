@@ -12,8 +12,17 @@ The goal of this project is to rewrite PyXMPP so:
 - its API is cleaned up
 - etc.
 
+Requirements
+------------
+
+- Python 2.7 (Python 3.2 support coming soon)
+- `DNSPython`_  Limited functionality is available without it.
+
+.. _DNSPython: http://www.dnspython.org/
+
 Further information
 -------------------
 
 - Project GitHub page: https://github.com/Jajcus/pyxmpp2/
 - API reference: http://jajcus.github.com/pyxmpp2/api/
+
