@@ -371,7 +371,7 @@ else:
 
 XMPPSettings.add_setting(u"resolver", type = Resolver,
         factory = _DEFAULT_RESOLVER, 
-        default_d = "A {0} instance".format(_DEFAULT_RESOLVER.__name__),
+        default_d = "A `{0}` instance".format(_DEFAULT_RESOLVER.__name__),
         doc = u"""The DNS resolver implementation to be used by PyXMPP."""
     )
 XMPPSettings.add_setting(u"ipv4", type = bool, default = True,

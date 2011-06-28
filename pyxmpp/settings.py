@@ -40,7 +40,7 @@ from collections import MutableMapping, namedtuple
 class _SettingDefinition(object):
     def __init__(self, name, type = unicode, default = None, factory = None,
                         cache = False, default_d = None, doc = None,
-                        cmdline_help = None, basic = False):
+                        cmdline_help = None, validator = None, basic = False):
         self.name = name
         self.type = type
         self.default = default
@@ -50,6 +50,7 @@ class _SettingDefinition(object):
         self.doc = doc
         self.cmdline_help = cmdline_help
         self.basic = basic
+        self.validator = None
 
 class XMPPSettings(MutableMapping):
     """Container for various parameters used all over PyXMPP.
@@ -180,9 +181,31 @@ class XMPPSettings(MutableMapping):
             raise ValueError("Setting duplicate, with a different factory")
 
     @staticmethod
-    def string_list_type(value):
+    def validate_string_list(value):
         try:
             return [x.strip() for x in value.split(u",")]
         except (AttributeError, TypeError):
             raise ValueError("Bad string list")
+    
+    @staticmethod
+    def validate_positive_int(value):
+        value = int(value)
+        if value <= 0:
+            raise ValueError("Positive number required")
+        return value
 
+    @staticmethod
+    def validate_positive_float(value):
+        value = float(value)
+        if value <= 0:
+            raise ValueError("Positive number required")
+        return value
+
+    @staticmethod
+    def get_int_range_validator(start, stop):
+        def validate_int_range(value):
+            value = int(value)
+            if value >= start and value < stop:
+                return value
+            raise ValueError("Not in <{0},{1}) range".format(start, stop))
+        return validate_int_range

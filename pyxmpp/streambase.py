@@ -650,13 +650,15 @@ XMPPSettings.add_setting(u"language", type = unicode, default = u"en",
         cmdline_help = u"Preferred language of the XMPP stream",
         doc = u"""The preferred language of the XMPP stream."""
     )
-XMPPSettings.add_setting(u"languages", type = XMPPSettings.string_list_type,
+XMPPSettings.add_setting(u"languages", type = u"list of ``unicode``", 
+        validator = XMPPSettings.validate_string_list,
         factory = _languages_factory,
         cmdline_help = u"Accepted languages of the XMPP stream",
         doc = u"""When the remote entity selects one of these languages
 on their stream, the same language will be sent in our stream declaration."""
     )
-XMPPSettings.add_setting(u"default_stanza_timeout", type = int, default = 300,
+XMPPSettings.add_setting(u"default_stanza_timeout", type = float, default = 300,
+        validator = XMPPSettings.validate_positive_float,
         cmdline_help = "Time in seconds to wait for a stanza response",
         doc = u"""Time in seconds to wait for a stanza response."""
     )

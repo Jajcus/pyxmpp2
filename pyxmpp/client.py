@@ -40,14 +40,6 @@ from .streamtls import StreamTLSHandler
 
 logger = logging.getLogger("pyxmpp.client")
 
-def base_client_handlers_factory(settings):
-    tls_handler = StreamTLSHandler(settings)
-    session_handler = SessionHandler(settings)
-    return [tls_handler, session_handler]
-
-XMPPSettings.add_default_factory("base_client_handlers",
-                                                base_client_handlers_factory)
-
 
 class Client(EventHandler):
     """Base class for an XMPP-IM client.
@@ -169,8 +161,21 @@ class Client(EventHandler):
                     self.mainloop.remove_handler(self.stream.transport)
                 self.stream = None
 
+def base_client_handlers_factory(settings):
+    tls_handler = StreamTLSHandler(settings)
+    session_handler = SessionHandler(settings)
+    return [tls_handler, session_handler]
 
-XMPPSettings.add_setting(u"c2s_port", default = 5222, type = int, basic = True,
+XMPPSettings.add_setting(u"base_client_handlers", 
+    type = "list of handler objects",
+    factory = base_client_handlers_factory, 
+    default_d = "A `StreamTLSHandler` and a `SessionHandler` instance",
+    doc = u"""The basic handlers used by a `Client` object in addition to the
+handlers provides in the constructor invocation."""
+    )
+
+XMPPSettings.add_setting(u"c2s_port", default = 5222, basic = True,
+    type = int, validator = XMPPSettings.get_int_range_validator(1, 65536),
     cmdline_help = "Port number for XMPP client connections",
     doc = """Port number for client to server connections."""
     )
@@ -184,7 +189,7 @@ XMPPSettings.add_setting(u"c2s_service", default = "xmpp-client",
 XMPPSettings.add_setting(u"server", type = unicode, basic = True,
     cmdline_help = "Server address. (Default: use SRV lookup)",
     doc = """Server address to connect to. By default a DNS SRV record look-up
-is done for the requested JID domain part and if that fails – 'A' or 'AAAA'
+is done for the requested JID domain part and if that fails - 'A' or 'AAAA'
 record lookup for the same domain. This setting may be used to force using
 a specific server or when SRV look-ups are not available."""
     )

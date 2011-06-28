@@ -521,14 +521,15 @@ XMPPSettings.add_setting(u"authzid", type = unicode, default = None,
 SASL authentication."""
     )
 XMPPSettings.add_setting(u"sasl_mechanisms",
-        type = XMPPSettings.string_list_type,
+        type = 'list of ``unicode``',
+        validator = XMPPSettings.validate_string_list,
         default = ["DIGEST-MD5", "PLAIN"],
         cmdline_help = u"SASL mechanism to enable",
         doc = u"""SASL mechanism that can be used for stream authentication."""
     )
 XMPPSettings.add_setting(u"password_manager", type = sasl.PasswordManager,
         factory = DefaultPasswordManager,
-        default_d = "A DefaultPasswordManager instance",
+        default_d = "A `DefaultPasswordManager` instance",
         doc = u"""Object providing or checking user password and other
 SASL authentication properties."""
     )

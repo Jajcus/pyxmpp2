@@ -115,8 +115,8 @@ def base_c2s_handlers_factory(settings):
 
 XMPPSettings.add_setting(u"base_c2s_handlers", type = "list of handler objects",
     factory = base_c2s_handlers_factory, 
-    default_d = "A StreamSASLHandler and a ResourceBindingHandler instance",
-    doc = u"""The basic handlers used by a ClientStream in addition to the
+    default_d = "A `StreamSASLHandler` and a `ResourceBindingHandler` instance",
+    doc = u"""The basic handlers used by a `ClientStream` in addition to the
 handlers provides in the constructor invocation."""
     )
 

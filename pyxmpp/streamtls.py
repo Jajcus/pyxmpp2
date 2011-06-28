@@ -274,7 +274,7 @@ XMPPSettings.add_setting(u"tls_key_file", type = str,
         cmdline_help = "TLS certificate private key file",
         doc = u"""Path to the TLS certificate private key file (in the PEM
 format). Not needed if the key is included in the file pointed by the
-'tls_cert_file' setting."""
+:r:`tls_cert_file setting`."""
     )
 
 XMPPSettings.add_setting(u"tls_cacert_file", type = str, basic = True,

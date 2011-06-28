@@ -208,7 +208,7 @@ def default_resource_factory(settings):
 XMPPSettings.add_setting("resource", type = unicode, basic = False,
     cmdline_help = "Default JID resource",
     doc = """JID resource to bind. Use the server-provided resource if not set.
-Automatically set to the resource of the JID provided to ClientStream
+Automatically set to the resource of the JID provided to the `ClientStream`
 constructor."""
     )
 

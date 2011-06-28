@@ -27,6 +27,7 @@ import select
 from ..settings import XMPPSettings
 
 XMPPSettings.add_setting(u"poll_interval", type = float, default = 1.0,
+        validator = XMPPSettings.validate_positive_float,
         cmdline_help = "Polling interval",
         doc = u"""Maximum time to wait for an event. Smaller value may increase
 response times, by the cost of higher CPU usage."""

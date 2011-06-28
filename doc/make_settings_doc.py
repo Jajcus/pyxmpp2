@@ -15,28 +15,50 @@ def import_modules():
         except ImportError:
             pass
 
+def type_string(type_spec):
+    if isinstance(type_spec, basestring):
+        return type_spec
+    try:
+        if type_spec.__module__ == '__builtin__':
+            return u"``{0}``".format(type_spec.__name__)
+        if hasattr(type_spec, "im_class"):
+            klass = type_spec.im_class
+            type_name = u".".join((klass.__module__, klass.__name__,
+                                                        type_spec.__name__))
+        else:
+            type_name = u".".join((type_spec.__module__, type_spec.__name__))
+        if type_name.startswith(u"pyxmpp2."):
+            return u"`{0}`".format(type_name)
+        else:
+            return u":std:`{0}`".format(type_name)
+    except AttributeError:
+        return u"`{0}`".format(type_spec.__name__)
+
+def default_string(setting):
+    if setting.default_d:
+        return setting.default_d
+    if setting.default is not None:
+        default = setting.default
+    elif setting.factory:
+        default = setting.factory(XMPPSettings())
+    else:
+        return u"``None``"
+    return u"``{0!r}``".format(default)
+
 def dump_settings_group(doc, index, settings):
     for setting in settings:
         print >> doc
+        #print >> doc, u".. _{0}:".format(setting.name)
+        #print >> doc
         print >> doc, setting.name
         print >> doc, u"." * len(setting.name)
         print >> doc
-        if isinstance(setting.type, basestring):
-            print >> doc, u"  * Type: {0}".format(setting.type)
-        elif setting.type is not None:
-            print >> doc, u"  * Type: ``{0}``".format(setting.type.__name__)
-        if setting.default_d:
-            default = setting.default_d
-        elif setting.default is not None:
-            default = repr(setting.default)
-        elif setting.factory:
-            default = repr(setting.factory(XMPPSettings()))
-        else:
-            default = u'None'
-        print >> doc, u"  * Default: ``{0}``".format(default)
+        print >> doc, u"  * Type: {0}".format(type_string(setting.type))
+        print >> doc, u"  * Default: {0}".format(default_string(setting))
         print >> doc
         print >> doc, setting.doc
-        print >> index, u'{0} setting\t#{0}'.format(setting.name)
+        print >> index, u'{0} setting\t#{1}'.format(
+                        setting.name, setting.name.replace("_", "-"))
 
 def dump_settings(doc, index):
     basic_settings = [ x for x in XMPPSettings._defs.values() if x.basic ]
@@ -46,6 +68,8 @@ def dump_settings(doc, index):
 
     print >> index, "settings list\t#"
 
+    print >> doc, ".. default-role:: pyxmpp2"
+    print >> doc
     print >> doc, "PyXMPP2 Settings"
     print >> doc, "================"
     print >> doc

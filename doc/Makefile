@@ -46,7 +46,11 @@ update-settings:
 	PYTHONPATH="$(PYXMPP2_PATH):$$PYTHONPATH" $(PYTHON) make_settings_doc.py
 
 www/Settings.html: Settings.rst
-	$(APIRST2HTML) --config=epydoc.cfg --link-stylesheet --stylesheet=api/epydoc.css Settings.rst www/Settings.html
+	$(APIRST2HTML) --link-stylesheet --stylesheet=api/epydoc.css \
+		--external-api=pyxmpp2 --external-api-file=pyxmpp2:www/api/api-objects.txt --external-api-root=pyxmpp2:api/ \
+		--external-api=std --external-api-file=std:std.txt --external-api-root=std:http://docs.python.org/library/ \
+		--external-api=r --external-api-file=r:settings.txt --external-api-root=r: \
+		Settings.rst www/Settings.html
 	
 clean:
 
