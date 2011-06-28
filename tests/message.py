@@ -38,14 +38,11 @@ class TestMessage(unittest.TestCase):
         self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
 
-    def check_message_empty(self, m, can_have_id):
+    def check_message_empty(self, m):
         self.assertEqual(m.from_jid, None)
         self.assertEqual(m.to_jid, None)
         self.assertEqual(m.stanza_type, None)
-        if can_have_id:
-            self.assertFalse(m.stanza_id is None)
-        else:
-            self.assertFalse(m.stanza_id is not None)
+        self.assertIsNone(m.stanza_id)
         self.assertEqual(m.subject, None)
         self.assertEqual(m.body, None)
         self.assertEqual(m.thread, None)
@@ -58,13 +55,13 @@ class TestMessage(unittest.TestCase):
 
     def test_message_empty_from_xml(self):
         m = Message(ElementTree.XML(MESSAGE2))
-        self.check_message_empty(m, False)
+        self.check_message_empty(m)
 
     def test_message_empty(self):
         m = Message()
-        self.check_message_empty(m, True)
+        self.check_message_empty(m)
         xml = m.as_xml()
-        self.check_message_empty( Message(xml), True )
+        self.check_message_empty( Message(xml) )
 
     def test_message_full(self):
         m = Message(

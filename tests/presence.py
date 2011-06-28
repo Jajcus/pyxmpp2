@@ -41,14 +41,11 @@ class TestPresence(unittest.TestCase):
         self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
 
-    def check_presence_empty(self, p, can_have_id):
+    def check_presence_empty(self, p):
         self.assertEqual(p.from_jid, None)
         self.assertEqual(p.to_jid, None)
         self.assertEqual(p.stanza_type, None)
-        if can_have_id:
-            self.assertFalse(p.stanza_id is None)
-        else:
-            self.assertFalse(p.stanza_id is not None)
+        self.assertIsNone(p.stanza_id)
         self.assertEqual(p.show, None)
         self.assertEqual(p.status, None)
         self.assertEqual(p.priority, 0)
@@ -69,7 +66,7 @@ class TestPresence(unittest.TestCase):
 
     def test_presence_empty_from_xml(self):
         p = Presence(ElementTree.XML(PRESENCE2))
-        self.check_presence_empty(p, False)
+        self.check_presence_empty(p)
 
     def test_presence_subscribe_from_xml(self):
         p = Presence(ElementTree.XML(PRESENCE3))
@@ -77,9 +74,9 @@ class TestPresence(unittest.TestCase):
 
     def test_presence_empty(self):
         p = Presence()
-        self.check_presence_empty(p, True)
+        self.check_presence_empty(p)
         xml = p.as_xml()
-        self.check_presence_empty(Presence(xml), True)
+        self.check_presence_empty(Presence(xml))
 
     def test_presence_full(self):
         p = Presence(
