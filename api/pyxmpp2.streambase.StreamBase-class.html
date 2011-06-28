@@ -794,168 +794,168 @@ specification.</p>
 </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <code class="link">dict</code></span>
+      <span class="summary-type"><code class="link">dict</code></span>
     </td><td class="summary">
         <a name="_element_handlers"></a><span class="summary-name">_element_handlers</span><br />
-      : mapping from stream element names to lists of
+      mapping from stream element names to lists of
 methods handling them
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <code class="link">unicode</code></span>
+      <span class="summary-type"><code class="link">unicode</code></span>
     </td><td class="summary">
         <a name="_input_state"></a><span class="summary-name">_input_state</span><br />
-      : <code class="link">None</code>, &quot;open&quot; (&lt;stream:stream&gt; has been received)
+      <code class="link">None</code>, &quot;open&quot; (&lt;stream:stream&gt; has been received)
 &quot;restart&quot; or &quot;closed&quot; (&lt;/stream:stream&gt; or EOF has been received)
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <code class="link">unicode</code></span>
+      <span class="summary-type"><code class="link">unicode</code></span>
     </td><td class="summary">
         <a name="_output_state"></a><span class="summary-name">_output_state</span><br />
-      : <code class="link">None</code>, &quot;open&quot; (&lt;stream:stream&gt; has been received)
+      <code class="link">None</code>, &quot;open&quot; (&lt;stream:stream&gt; has been received)
 &quot;restart&quot; or &quot;closed&quot; (&lt;/stream:stream&gt; or EOF has been received)
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <code class="link">unicode</code></span>
+      <span class="summary-type"><code class="link">unicode</code></span>
     </td><td class="summary">
         <a name="_stanza_namespace_p"></a><span class="summary-name">_stanza_namespace_p</span><br />
-      : qname prefix of the stanza namespace
+      qname prefix of the stanza namespace
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <code class="link">list</code> of <a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html" class="link">StreamFeatureHandler</a></span>
+      <span class="summary-type"><code class="link">list</code> of <a href="pyxmpp2.interfaces.StreamFeatureHandler-class.html" class="link">StreamFeatureHandler</a></span>
     </td><td class="summary">
         <a name="_stream_feature_handlers"></a><span class="summary-name">_stream_feature_handlers</span><br />
-      : stream features handlers
+      stream features handlers
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <code class="link">bool</code></span>
+      <span class="summary-type"><code class="link">bool</code></span>
     </td><td class="summary">
         <a name="authenticated"></a><span class="summary-name">authenticated</span><br />
-      : <code class="link">True</code> if local entity has authenticated to peer
+      <code class="link">True</code> if local entity has authenticated to peer
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a></span>
+      <span class="summary-type"><a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a></span>
     </td><td class="summary">
         <a name="features"></a><span class="summary-name">features</span><br />
-      : stream features as annouced by the receiver.
+      stream features as annouced by the receiver.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <code class="link">list</code></span>
+      <span class="summary-type"><code class="link">list</code></span>
     </td><td class="summary">
         <a name="handlers"></a><span class="summary-name">handlers</span><br />
-      : handlers for stream elements and stanza payload
+      handlers for stream elements and stanza payload
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <code class="link">bool</code></span>
+      <span class="summary-type"><code class="link">bool</code></span>
     </td><td class="summary">
         <a name="initiator"></a><span class="summary-name">initiator</span><br />
-      : <code class="link">True</code> if local stream endpoint is the initiating entity.
+      <code class="link">True</code> if local stream endpoint is the initiating entity.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <a class="rst-reference external" href="http://docs.python.org/library/threading.html#rlock-objects" target="_top"><tt class="rst-docutils literal">threading.RLock</tt></a></span>
+      <span class="summary-type"><a class="rst-reference external" href="http://docs.python.org/library/threading.html#rlock-objects" target="_top"><tt class="rst-docutils literal">threading.RLock</tt></a></span>
     </td><td class="summary">
         <a name="lock"></a><span class="summary-name">lock</span><br />
-      : lock object used to synchronize access to the
+      lock object used to synchronize access to the
 <a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html" class="link">StanzaProcessor</a> object.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <a href="pyxmpp2.jid.JID-class.html" class="link">JID</a></span>
+      <span class="summary-type"><a href="pyxmpp2.jid.JID-class.html" class="link">JID</a></span>
     </td><td class="summary">
         <a name="me"></a><span class="summary-name">me</span><br />
-      : local JID.
+      local JID.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <a href="pyxmpp2.jid.JID-class.html" class="link">JID</a></span>
+      <span class="summary-type"><a href="pyxmpp2.jid.JID-class.html" class="link">JID</a></span>
     </td><td class="summary">
         <a name="peer"></a><span class="summary-name">peer</span><br />
-      : remote stream endpoint JID.
+      remote stream endpoint JID.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <code class="link">bool</code></span>
+      <span class="summary-type"><code class="link">bool</code></span>
     </td><td class="summary">
         <a name="peer_authenticated"></a><span class="summary-name">peer_authenticated</span><br />
-      : <code class="link">True</code> if the peer has authenticated to us
+      <code class="link">True</code> if the peer has authenticated to us
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <code class="link">unicode</code></span>
+      <span class="summary-type"><code class="link">unicode</code></span>
     </td><td class="summary">
         <a name="peer_language"></a><span class="summary-name">peer_language</span><br />
-      : language of human-readable stream content selected
+      language of human-readable stream content selected
 by the peer
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <code class="link">bool</code></span>
+      <span class="summary-type"><code class="link">bool</code></span>
     </td><td class="summary">
         <a name="process_all_stanzas"></a><span class="summary-name">process_all_stanzas</span><br />
-      : when <code class="link">True</code> then all stanzas received are
+      when <code class="link">True</code> then all stanzas received are
 considered local.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: XMPPSettings</span>
+      <span class="summary-type">XMPPSettings</span>
     </td><td class="summary">
         <a name="settings"></a><span class="summary-name">settings</span><br />
-      : stream settings
+      stream settings
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <code class="link">unicode</code></span>
+      <span class="summary-type"><code class="link">unicode</code></span>
     </td><td class="summary">
         <a name="stanza_namespace"></a><span class="summary-name">stanza_namespace</span><br />
-      : default namespace of the stream
+      default namespace of the stream
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <code class="link">bool</code></span>
+      <span class="summary-type"><code class="link">bool</code></span>
     </td><td class="summary">
         <a name="tls_established"></a><span class="summary-name">tls_established</span><br />
-      : <code class="link">True</code> when the stream is protected by TLS
+      <code class="link">True</code> when the stream is protected by TLS
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <a href="pyxmpp2.interfaces.XMPPTransport-class.html" class="link">transport.XMPPTransport</a></span>
+      <span class="summary-type"><a href="pyxmpp2.interfaces.XMPPTransport-class.html" class="link">transport.XMPPTransport</a></span>
     </td><td class="summary">
         <a name="transport"></a><span class="summary-name">transport</span><br />
-      : transport used by this stream
+      transport used by this stream
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: (<code class="link">int</code>, <code class="link">int</code>) tuple</span>
+      <span class="summary-type">(<code class="link">int</code>, <code class="link">int</code>) tuple</span>
     </td><td class="summary">
         <a href="pyxmpp2.streambase.StreamBase-class.html#version" class="summary-name">version</a><br />
-      : Negotiated version of the XMPP protocol.
+      Negotiated version of the XMPP protocol.
     </td>
   </tr>
 </table>
@@ -1024,10 +1024,10 @@ considered local.
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>stanza_namespace</code></strong> (: <code class="link">unicode</code>) - : stream's default namespace URI (&quot;jabber:client&quot;
+        <li><strong class="pname"><code>stanza_namespace</code></strong> (<code class="link">unicode</code>) - stream's default namespace URI (&quot;jabber:client&quot;
 for client, &quot;jabber:server&quot; for server, etc.)</li>
-        <li><strong class="pname"><code>handlers</code></strong> (: <code class="link">list</code> of objects) - : objects to handle the stream events and elements</li>
-        <li><strong class="pname"><code>settings</code></strong> (: XMPPSettings) - : extra settings</li>
+        <li><strong class="pname"><code>handlers</code></strong> (<code class="link">list</code> of objects) - objects to handle the stream events and elements</li>
+        <li><strong class="pname"><code>settings</code></strong> (XMPPSettings) - extra settings</li>
     </ul></dd>
     <dt>Overrides:
         object.__init__
@@ -1055,8 +1055,8 @@ for client, &quot;jabber:server&quot; for server, etc.)</li>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>transport</code></strong> - : an XMPP transport instance</li>
-        <li><strong class="pname"><code>to</code></strong> - : peer name</li>
+        <li><strong class="pname"><code>transport</code></strong> - an XMPP transport instance</li>
+        <li><strong class="pname"><code>to</code></strong> - peer name</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -1101,8 +1101,8 @@ for client, &quot;jabber:server&quot; for server, etc.)</li>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>transport</code></strong> - : an XMPP transport instance</li>
-        <li><strong class="pname"><code>myname</code></strong> - : local stream endpoint name.</li>
+        <li><strong class="pname"><code>transport</code></strong> - an XMPP transport instance</li>
+        <li><strong class="pname"><code>myname</code></strong> - local stream endpoint name.</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -1171,7 +1171,7 @@ methods decorated with &#64;`stream_element_handler`</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>element</code></strong> - : root element (empty) created by the parser</li>
+        <li><strong class="pname"><code>element</code></strong> - root element (empty) created by the parser</li>
     </ul></dd>
     <dt>Overrides:
         <a href="pyxmpp2.xmppparser.XMLStreamHandler-class.html#stream_start">xmppparser.XMLStreamHandler.stream_start</a>
@@ -1242,7 +1242,7 @@ methods decorated with &#64;`stream_element_handler`</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>element</code></strong> - : stanza's full XML</li>
+        <li><strong class="pname"><code>element</code></strong> - stanza's full XML</li>
     </ul></dd>
     <dt>Overrides:
         <a href="pyxmpp2.xmppparser.XMLStreamHandler-class.html#stream_element">xmppparser.XMLStreamHandler.stream_element</a>
@@ -1269,7 +1269,7 @@ methods decorated with &#64;`stream_element_handler`</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>descr</code></strong> (: <code class="link">unicode</code>) - : description of the error</li>
+        <li><strong class="pname"><code>descr</code></strong> (<code class="link">unicode</code>) - description of the error</li>
     </ul></dd>
     <dt>Overrides:
         <a href="pyxmpp2.xmppparser.XMLStreamHandler-class.html#stream_parse_error">xmppparser.XMLStreamHandler.stream_parse_error</a>
@@ -1296,7 +1296,7 @@ methods decorated with &#64;`stream_element_handler`</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>condition</code></strong> - : stream error condition name, as defined in the
+        <li><strong class="pname"><code>condition</code></strong> - stream error condition name, as defined in the
 XMPP specification.</li>
     </ul></dd>
   </dl>
@@ -1363,7 +1363,7 @@ XMPP specification.</li>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>element</code></strong> (: <a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a>) - : Element node to send.</li>
+        <li><strong class="pname"><code>element</code></strong> (<a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a>) - Element node to send.</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -1387,7 +1387,7 @@ XMPP specification.</li>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>stanza</code></strong> (: <a href="pyxmpp2.stanza.Stanza-class.html" class="link">pyxmpp2.stanza.Stanza</a>) - : XMPP stanza to send.</li>
+        <li><strong class="pname"><code>stanza</code></strong> (<a href="pyxmpp2.stanza.Stanza-class.html" class="link">pyxmpp2.stanza.Stanza</a>) - XMPP stanza to send.</li>
     </ul></dd>
     <dt>Overrides:
         <a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#send">stanzaprocessor.StanzaProcessor.send</a>
@@ -1444,7 +1444,7 @@ request/response, SASL request/response or a stanza.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>element</code></strong> (: <a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a>) - : XML element</li>
+        <li><strong class="pname"><code>element</code></strong> (<a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a>) - XML element</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -1468,7 +1468,7 @@ request/response, SASL request/response or a stanza.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>error</code></strong> (: <a href="pyxmpp2.error.StreamErrorElement-class.html" class="link">StreamErrorElement</a>) - : error received</li>
+        <li><strong class="pname"><code>error</code></strong> (<a href="pyxmpp2.error.StreamErrorElement-class.html" class="link">StreamErrorElement</a>) - error received</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -1584,8 +1584,8 @@ for handling that attribute.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>peer</code></strong> (: <a href="pyxmpp2.jid.JID-class.html" class="link">JID</a>) - : local JID just authenticated</li>
-        <li><strong class="pname"><code>restart_stream</code></strong> (: <code class="link">bool</code>) - : <code class="link">True</code> when stream should be restarted (needed
+        <li><strong class="pname"><code>peer</code></strong> (<a href="pyxmpp2.jid.JID-class.html" class="link">JID</a>) - local JID just authenticated</li>
+        <li><strong class="pname"><code>restart_stream</code></strong> (<code class="link">bool</code>) - <code class="link">True</code> when stream should be restarted (needed
 after SASL authentication)</li>
     </ul></dd>
   </dl>
@@ -1611,8 +1611,8 @@ after SASL authentication)</li>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>me</code></strong> (: <a href="pyxmpp2.jid.JID-class.html" class="link">JID</a>) - : local JID just authenticated</li>
-        <li><strong class="pname"><code>restart_stream</code></strong> (: <code class="link">bool</code>) - : <code class="link">True</code> when stream should be restarted (needed
+        <li><strong class="pname"><code>me</code></strong> (<a href="pyxmpp2.jid.JID-class.html" class="link">JID</a>) - local JID just authenticated</li>
+        <li><strong class="pname"><code>restart_stream</code></strong> (<code class="link">bool</code>) - <code class="link">True</code> when stream should be restarted (needed
 after SASL authentication)</li>
     </ul></dd>
   </dl>
@@ -1643,11 +1643,11 @@ after SASL authentication)</li>
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <h3 class="epydoc">version</h3>
-  : Negotiated version of the XMPP protocol. (0,9) for the
+  Negotiated version of the XMPP protocol. (0,9) for the
 legacy (pre-XMPP) Jabber protocol.
   <dl class="fields">
     <dt>Type:</dt>
-      <dd>: (<code class="link">int</code>, <code class="link">int</code>) tuple</dd>
+      <dd>(<code class="link">int</code>, <code class="link">int</code>) tuple</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -1684,7 +1684,7 @@ legacy (pre-XMPP) Jabber protocol.
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Jun 28 20:00:53 2011</a>
+    3.0.1 on Tue Jun 28 20:51:18 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

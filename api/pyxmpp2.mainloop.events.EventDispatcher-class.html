@@ -257,34 +257,34 @@ handlers unless <a href="pyxmpp2.mainloop.events.EventDispatcher-class.html#disp
 </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <code class="link">type</code> -&gt; <code class="link">list</code> of callable mapping</span>
+      <span class="summary-type"><code class="link">type</code> -&gt; <code class="link">list</code> of callable mapping</span>
     </td><td class="summary">
         <a name="_handler_map"></a><span class="summary-name">_handler_map</span><br />
-      : mapping of event type to list of handler methods
+      mapping of event type to list of handler methods
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <code class="link">list</code> of <a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html" class="link">EventHandler</a></span>
+      <span class="summary-type"><code class="link">list</code> of <a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html" class="link">EventHandler</a></span>
     </td><td class="summary">
         <a name="handlers"></a><span class="summary-name">handlers</span><br />
-      : list of handler objects
+      list of handler objects
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <a class="rst-reference external" href="http://docs.python.org/library/threading.html#rlock-objects" target="_top"><tt class="rst-docutils literal">threading.RLock</tt></a></span>
+      <span class="summary-type"><a class="rst-reference external" href="http://docs.python.org/library/threading.html#rlock-objects" target="_top"><tt class="rst-docutils literal">threading.RLock</tt></a></span>
     </td><td class="summary">
         <a name="lock"></a><span class="summary-name">lock</span><br />
-      : the thread synchronisation lock
+      the thread synchronisation lock
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">: <a class="rst-reference external" href="http://docs.python.org/library/queue.html#Queue.Queue" target="_top"><tt class="rst-docutils literal">Queue.Queue</tt></a></span>
+      <span class="summary-type"><a class="rst-reference external" href="http://docs.python.org/library/queue.html#Queue.Queue" target="_top"><tt class="rst-docutils literal">Queue.Queue</tt></a></span>
     </td><td class="summary">
         <a name="queue"></a><span class="summary-name">queue</span><br />
-      : the event queue
+      the event queue
     </td>
   </tr>
 </table>
@@ -352,9 +352,9 @@ handlers unless <a href="pyxmpp2.mainloop.events.EventDispatcher-class.html#disp
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>settings</code></strong> (: <a href="pyxmpp2.settings.XMPPSettings-class.html" class="link">XMPPSettings</a>) - : the settings. &quot;event_queue&quot; settings provides the
+        <li><strong class="pname"><code>settings</code></strong> (<a href="pyxmpp2.settings.XMPPSettings-class.html" class="link">XMPPSettings</a>) - the settings. &quot;event_queue&quot; settings provides the
 event queue object.</li>
-        <li><strong class="pname"><code>handlers</code></strong> (: iterable of objects) - : the initial list of event handler objects.</li>
+        <li><strong class="pname"><code>handlers</code></strong> (iterable of objects) - the initial list of event handler objects.</li>
     </ul></dd>
     <dt>Overrides:
         object.__init__
@@ -381,7 +381,7 @@ event queue object.</li>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>handler</code></strong> (: <a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html" class="link">EventHandler</a>) - : the object providing event handler methods</li>
+        <li><strong class="pname"><code>handler</code></strong> (<a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html" class="link">EventHandler</a>) - the object providing event handler methods</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -405,7 +405,7 @@ event queue object.</li>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>handler</code></strong> - : the object to remove</li>
+        <li><strong class="pname"><code>handler</code></strong> - the object to remove</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -431,8 +431,8 @@ the appropriate handlers.
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>block</code></strong> (: <code class="link">bool</code>) - : wait for event if the queue is empty</li>
-        <li><strong class="pname"><code>timeout</code></strong> (: <code class="link">float</code>) - : maximum time, in seconds, to wait if <code class="link">block</code> is <code class="link">True</code></li>
+        <li><strong class="pname"><code>block</code></strong> (<code class="link">bool</code>) - wait for event if the queue is empty</li>
+        <li><strong class="pname"><code>timeout</code></strong> (<code class="link">float</code>) - maximum time, in seconds, to wait if <code class="link">block</code> is <code class="link">True</code></li>
     </ul></dd>
     <dt>Returns:</dt>
         <dd>the event handled (may be QUIT) or <code class="link">None</code></dd>
@@ -461,7 +461,7 @@ removed.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>dispatch</code></strong> - : if the events should be handled (<code class="link">True</code>) or ignored
+        <li><strong class="pname"><code>dispatch</code></strong> - if the events should be handled (<code class="link">True</code>) or ignored
 (<code class="link">False</code>)</li>
     </ul></dd>
     <dt>Returns:</dt>
@@ -502,7 +502,7 @@ removed.</p>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Jun 28 20:00:51 2011</a>
+    3.0.1 on Tue Jun 28 20:51:16 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

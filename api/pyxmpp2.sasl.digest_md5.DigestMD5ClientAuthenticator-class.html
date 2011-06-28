@@ -357,7 +357,7 @@ Provides PLAIN SASL authentication for a client.
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="password"></a><span class="summary-name">password</span><br />
-      : current authentication password
+      current authentication password
     </td>
   </tr>
 <tr>
@@ -365,7 +365,7 @@ Provides PLAIN SASL authentication for a client.
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="pformat"></a><span class="summary-name">pformat</span><br />
-      : current authentication password format
+      current authentication password format
     </td>
   </tr>
 <tr>
@@ -373,7 +373,7 @@ Provides PLAIN SASL authentication for a client.
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="realm"></a><span class="summary-name">realm</span><br />
-      : current authentication realm
+      current authentication realm
     </td>
   </tr>
 </table>
@@ -440,7 +440,7 @@ Provides PLAIN SASL authentication for a client.
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>password_manager</code></strong> (: <a href="pyxmpp2.sasl.core.PasswordManager-class.html" class="link">PasswordManager</a>) - : name of the password manager object providing
+        <li><strong class="pname"><code>password_manager</code></strong> (<a href="pyxmpp2.sasl.core.PasswordManager-class.html" class="link">PasswordManager</a>) - name of the password manager object providing
 authentication credentials.</li>
     </ul></dd>
     <dt>Overrides:
@@ -469,8 +469,8 @@ authentication credentials.</li>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>username</code></strong> (: <code class="link">unicode</code>) - : username (authentication id).</li>
-        <li><strong class="pname"><code>authzid</code></strong> (: <code class="link">unicode</code>) - : authorization id.</li>
+        <li><strong class="pname"><code>username</code></strong> (<code class="link">unicode</code>) - username (authentication id).</li>
+        <li><strong class="pname"><code>authzid</code></strong> (<code class="link">unicode</code>) - authorization id.</li>
     </ul></dd>
     <dt>Returns: <a href="pyxmpp2.sasl.core.Response-class.html" class="link">sasl.Response</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">sasl.Failure</a></dt>
         <dd>the (empty) initial response</dd>
@@ -499,7 +499,7 @@ authentication credentials.</li>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>challenge</code></strong> (: <code class="link">bytes</code>) - : the challenge from server.</li>
+        <li><strong class="pname"><code>challenge</code></strong> (<code class="link">bytes</code>) - the challenge from server.</li>
     </ul></dd>
     <dt>Returns: <a href="pyxmpp2.sasl.core.Response-class.html" class="link">sasl.Response</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">sasl.Failure</a></dt>
         <dd>the response or a failure indicator.</dd>
@@ -551,9 +551,9 @@ to its format name ('plain' or '<a class="rst-reference external" href="md5:user
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>charset</code></strong> (: <code class="link">bytes</code>) - : charset name from the challenge.</li>
-        <li><strong class="pname"><code>realms</code></strong> (: <code class="link">bytes</code>) - : realms list from the challenge.</li>
-        <li><strong class="pname"><code>nonce</code></strong> (: <code class="link">bytes</code>) - : nonce value from the challenge.</li>
+        <li><strong class="pname"><code>charset</code></strong> (<code class="link">bytes</code>) - charset name from the challenge.</li>
+        <li><strong class="pname"><code>realms</code></strong> (<code class="link">bytes</code>) - realms list from the challenge.</li>
+        <li><strong class="pname"><code>nonce</code></strong> (<code class="link">bytes</code>) - nonce value from the challenge.</li>
     </ul></dd>
     <dt>Returns: <a href="pyxmpp2.sasl.core.Response-class.html" class="link">sasl.Response</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">sasl.Failure</a></dt>
         <dd>the response or a failure indicator.</dd>
@@ -580,8 +580,8 @@ to its format name ('plain' or '<a class="rst-reference external" href="md5:user
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>realms</code></strong> (: <code class="link">list</code> of <code class="link">bytes</code>) - : the realm list.</li>
-        <li><strong class="pname"><code>charset</code></strong> (: <code class="link">bytes</code>) - : encoding of realms on the list.</li>
+        <li><strong class="pname"><code>realms</code></strong> (<code class="link">list</code> of <code class="link">bytes</code>) - the realm list.</li>
+        <li><strong class="pname"><code>charset</code></strong> (<code class="link">bytes</code>) - encoding of realms on the list.</li>
     </ul></dd>
     <dt>Returns: <code class="link">bytes</code> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">Failure</a></dt>
         <dd>the realm chosen or a failure indicator.</dd>
@@ -607,7 +607,7 @@ to its format name ('plain' or '<a class="rst-reference external" href="md5:user
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>challenge</code></strong> (: <code class="link">bytes</code>) - : the challenge from server.</li>
+        <li><strong class="pname"><code>challenge</code></strong> (<code class="link">bytes</code>) - the challenge from server.</li>
     </ul></dd>
     <dt>Returns: <a href="pyxmpp2.sasl.core.Response-class.html" class="link">sasl.Response</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">sasl.Failure</a></dt>
         <dd>the response or a failure indicator.</dd>
@@ -635,7 +635,7 @@ Fail if the server was not authenticated.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>data</code></strong> (: <code class="link">bytes</code>) - : an optional additional data with success.</li>
+        <li><strong class="pname"><code>data</code></strong> (<code class="link">bytes</code>) - an optional additional data with success.</li>
     </ul></dd>
     <dt>Returns: <a href="pyxmpp2.sasl.core.Success-class.html" class="link">sasl.Success</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">sasl.Failure</a></dt>
         <dd>success or failure indicator.</dd>
@@ -678,7 +678,7 @@ Fail if the server was not authenticated.</p>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Jun 28 20:00:52 2011</a>
+    3.0.1 on Tue Jun 28 20:51:17 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

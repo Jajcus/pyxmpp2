@@ -450,7 +450,7 @@ acquired.</td>
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="initiator"></a><span class="summary-name">initiator</span><br />
-      : <code class="link">True</code> if local stream endpoint is the initiating entity.
+      <code class="link">True</code> if local stream endpoint is the initiating entity.
     </td>
   </tr>
 <tr>
@@ -458,7 +458,7 @@ acquired.</td>
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="lock"></a><span class="summary-name">lock</span><br />
-      : lock object used to synchronize access to the
+      lock object used to synchronize access to the
 <a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html" class="link">StanzaProcessor</a> object.
     </td>
   </tr>
@@ -467,7 +467,7 @@ acquired.</td>
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="me"></a><span class="summary-name">me</span><br />
-      : local JID.
+      local JID.
     </td>
   </tr>
 <tr>
@@ -475,7 +475,7 @@ acquired.</td>
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="peer"></a><span class="summary-name">peer</span><br />
-      : remote stream endpoint JID.
+      remote stream endpoint JID.
     </td>
   </tr>
 <tr>
@@ -483,7 +483,7 @@ acquired.</td>
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="process_all_stanzas"></a><span class="summary-name">process_all_stanzas</span><br />
-      : when <code class="link">True</code> then all stanzas received are
+      when <code class="link">True</code> then all stanzas received are
 considered local.
     </td>
   </tr>
@@ -551,7 +551,7 @@ considered local.
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>default_timeout</code></strong> - : default timeout for IQ response handlers</li>
+        <li><strong class="pname"><code>default_timeout</code></strong> - default timeout for IQ response handlers</li>
     </ul></dd>
     <dt>Overrides:
         object.__init__
@@ -579,7 +579,7 @@ stanzas provided.
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>response</code></strong> (: <code class="link">bool</code> or <a href="pyxmpp2.stanza.Stanza-class.html" class="link">Stanza</a> or iterable of <a href="pyxmpp2.stanza.Stanza-class.html" class="link">Stanza</a>) - : the response to process. <code class="link">None</code> or <code class="link">False</code> means 'not
+        <li><strong class="pname"><code>response</code></strong> (<code class="link">bool</code> or <a href="pyxmpp2.stanza.Stanza-class.html" class="link">Stanza</a> or iterable of <a href="pyxmpp2.stanza.Stanza-class.html" class="link">Stanza</a>) - the response to process. <code class="link">None</code> or <code class="link">False</code> means 'not
 handled'. <code class="link">True</code> means 'handled'. Stanza or stanza list means
 handled with the stanzas to send back</li>
     </ul></dd>
@@ -614,7 +614,7 @@ ignore it if it is &quot;error&quot; or &quot;result&quot; stanza or return
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>stanza</code></strong> (: <a href="pyxmpp2.iq.Iq-class.html" class="link">Iq</a>) - : the stanza received</li>
+        <li><strong class="pname"><code>stanza</code></strong> (<a href="pyxmpp2.iq.Iq-class.html" class="link">Iq</a>) - the stanza received</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -641,7 +641,7 @@ ignore it if it is &quot;error&quot; or &quot;result&quot; stanza or return
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>stanza</code></strong> (: <a href="pyxmpp2.iq.Iq-class.html" class="link">Iq</a>) - : the stanza received</li>
+        <li><strong class="pname"><code>stanza</code></strong> (<a href="pyxmpp2.iq.Iq-class.html" class="link">Iq</a>) - the stanza received</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -670,9 +670,9 @@ the first one which returns <code class="link">True</code>.
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>handler_list</code></strong> - : list of available handlers</li>
-        <li><strong class="pname"><code>stanza</code></strong> - : the stanza to handle</li>
-        <li><strong class="pname"><code>stanza_type</code></strong> - : stanza type override (value of its &quot;type&quot;
+        <li><strong class="pname"><code>handler_list</code></strong> - list of available handlers</li>
+        <li><strong class="pname"><code>stanza</code></strong> - the stanza to handle</li>
+        <li><strong class="pname"><code>stanza_type</code></strong> - stanza type override (value of its &quot;type&quot;
 attribute)</li>
     </ul></dd>
     <dt>Returns:</dt>
@@ -703,7 +703,7 @@ for type &quot;normal&quot; are used.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>stanza</code></strong> - : message stanza to be handled</li>
+        <li><strong class="pname"><code>stanza</code></strong> - message stanza to be handled</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -728,7 +728,7 @@ for type &quot;normal&quot; are used.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>stanza</code></strong> - : presence stanza to be handled</li>
+        <li><strong class="pname"><code>stanza</code></strong> - presence stanza to be handled</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -757,7 +757,7 @@ stream endpoint.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>stanza</code></strong> - : presence stanza to be processed</li>
+        <li><strong class="pname"><code>stanza</code></strong> - presence stanza to be processed</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -786,7 +786,7 @@ or <a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#process_presence"
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>stanza</code></strong> - : the stanza received.</li>
+        <li><strong class="pname"><code>stanza</code></strong> - the stanza received.</li>
     </ul></dd>
     <dt>Returns:</dt>
         <dd><code class="link">True</code> when stanza was handled</dd>
@@ -841,21 +841,21 @@ for handling that attribute.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>stanza</code></strong> - : an IQ stanza</li>
-        <li><strong class="pname"><code>res_handler</code></strong> - : result handler for the stanza. Will be called
+        <li><strong class="pname"><code>stanza</code></strong> - an IQ stanza</li>
+        <li><strong class="pname"><code>res_handler</code></strong> - result handler for the stanza. Will be called
 when matching &lt;iq type=&quot;result&quot;/&gt; is received. Its only
 argument will be the stanza received. The handler may return
 a stanza or list of stanzas which should be sent in response.</li>
-        <li><strong class="pname"><code>err_handler</code></strong> - : error handler for the stanza. Will be called
+        <li><strong class="pname"><code>err_handler</code></strong> - error handler for the stanza. Will be called
 when matching &lt;iq type=&quot;error&quot;/&gt; is received. Its only
 argument will be the stanza received. The handler may return
 a stanza or list of stanzas which should be sent in response
 but this feature should rather not be used (it is better not to
 respond to 'error' stanzas).</li>
-        <li><strong class="pname"><code>timeout_handler</code></strong> - : timeout handler for the stanza. Will be called
+        <li><strong class="pname"><code>timeout_handler</code></strong> - timeout handler for the stanza. Will be called
 (with no arguments) when no matching &lt;iq type=&quot;result&quot;/&gt; or &lt;iq
 type=&quot;error&quot;/&gt; is received in next <code class="link">timeout</code> seconds.</li>
-        <li><strong class="pname"><code>timeout</code></strong> - : timeout value for the stanza. After that time if no
+        <li><strong class="pname"><code>timeout</code></strong> - timeout value for the stanza. After that time if no
 matching &lt;iq type=&quot;result&quot;/&gt; nor &lt;iq type=&quot;error&quot;/&gt; stanza is
 received, then timeout_handler (if given) will be called.</li>
     </ul></dd>
@@ -926,7 +926,7 @@ in derived classes.
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>stanza</code></strong> (: <a href="pyxmpp2.stanza.Stanza-class.html" class="link">pyxmpp.stanza.Stanza</a>) - : the stanza to send.</li>
+        <li><strong class="pname"><code>stanza</code></strong> (<a href="pyxmpp2.stanza.Stanza-class.html" class="link">pyxmpp.stanza.Stanza</a>) - the stanza to send.</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -964,7 +964,7 @@ in derived classes.
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Jun 28 20:00:53 2011</a>
+    3.0.1 on Tue Jun 28 20:51:18 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

@@ -366,7 +366,7 @@ processing.</td>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>password_manager</code></strong> (: <a href="pyxmpp2.sasl.core.PasswordManager-class.html" class="link">PasswordManager</a>) - : name of the password manager object providing
+        <li><strong class="pname"><code>password_manager</code></strong> (<a href="pyxmpp2.sasl.core.PasswordManager-class.html" class="link">PasswordManager</a>) - name of the password manager object providing
 authentication credential verification.</li>
     </ul></dd>
     <dt>Overrides:
@@ -394,7 +394,7 @@ authentication credential verification.</li>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>response</code></strong> (: <code class="link">bytes</code>) - : the initial response from the client (empty for
+        <li><strong class="pname"><code>response</code></strong> (<code class="link">bytes</code>) - the initial response from the client (empty for
 DIGEST-MD5).</li>
     </ul></dd>
     <dt>Returns: <a href="pyxmpp2.sasl.core.Challenge-class.html" class="link">sasl.Challenge</a>, <a href="pyxmpp2.sasl.core.Success-class.html" class="link">sasl.Success</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">sasl.Failure</a></dt>
@@ -424,7 +424,7 @@ DIGEST-MD5).</li>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>response</code></strong> (: <code class="link">str</code>) - : the response from the client.</li>
+        <li><strong class="pname"><code>response</code></strong> (<code class="link">str</code>) - the response from the client.</li>
     </ul></dd>
     <dt>Returns: <a href="pyxmpp2.sasl.core.Challenge-class.html" class="link">sasl.Challenge</a>, <a href="pyxmpp2.sasl.core.Success-class.html" class="link">sasl.Success</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">sasl.Failure</a></dt>
         <dd>a challenge, a success indicator or a failure indicator.</dd>
@@ -453,7 +453,7 @@ DIGEST-MD5).</li>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>response</code></strong> (: <code class="link">str</code>) - : the response from the client.</li>
+        <li><strong class="pname"><code>response</code></strong> (<code class="link">str</code>) - the response from the client.</li>
     </ul></dd>
     <dt>Returns: <a href="pyxmpp2.sasl.core.Challenge-class.html" class="link">sasl.Challenge</a>, <a href="pyxmpp2.sasl.core.Success-class.html" class="link">sasl.Success</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">sasl.Failure</a></dt>
         <dd>a challenge, a success indicator or a failure indicator.</dd>
@@ -486,13 +486,13 @@ processing.
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>username</code></strong> (: <code class="link">bytes</code>) - : user name.</li>
-        <li><strong class="pname"><code>realm</code></strong> (: <code class="link">bytes</code>) - : realm.</li>
-        <li><strong class="pname"><code>cnonce</code></strong> (: <code class="link">bytes</code>) - : cnonce value.</li>
-        <li><strong class="pname"><code>digest_uri</code></strong> (: <code class="link">bytes</code>) - : digest-uri value.</li>
-        <li><strong class="pname"><code>response_val</code></strong> (: <code class="link">bytes</code>) - : response value computed by the client.</li>
-        <li><strong class="pname"><code>authzid</code></strong> (: <code class="link">bytes</code>) - : authorization id.</li>
-        <li><strong class="pname"><code>nonce_count</code></strong> (: <code class="link">int</code>) - : nonce count value.</li>
+        <li><strong class="pname"><code>username</code></strong> (<code class="link">bytes</code>) - user name.</li>
+        <li><strong class="pname"><code>realm</code></strong> (<code class="link">bytes</code>) - realm.</li>
+        <li><strong class="pname"><code>cnonce</code></strong> (<code class="link">bytes</code>) - cnonce value.</li>
+        <li><strong class="pname"><code>digest_uri</code></strong> (<code class="link">bytes</code>) - digest-uri value.</li>
+        <li><strong class="pname"><code>response_val</code></strong> (<code class="link">bytes</code>) - response value computed by the client.</li>
+        <li><strong class="pname"><code>authzid</code></strong> (<code class="link">bytes</code>) - authorization id.</li>
+        <li><strong class="pname"><code>nonce_count</code></strong> (<code class="link">int</code>) - nonce count value.</li>
     </ul></dd>
     <dt>Returns: <a href="pyxmpp2.sasl.core.Challenge-class.html" class="link">sasl.Challenge</a>, <a href="pyxmpp2.sasl.core.Success-class.html" class="link">sasl.Success</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">sasl.Failure</a></dt>
         <dd>a challenge, a success indicator or a failure indicator.</dd>
@@ -524,13 +524,13 @@ processing.
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>username</code></strong> (: <code class="link">unicode</code>) - : user name.</li>
-        <li><strong class="pname"><code>realm</code></strong> (: <code class="link">unicode</code>) - : realm.</li>
-        <li><strong class="pname"><code>cnonce</code></strong> (: <code class="link">bytes</code>) - : cnonce value.</li>
-        <li><strong class="pname"><code>digest_uri</code></strong> (: <code class="link">bytes</code>) - : digest-uri value.</li>
-        <li><strong class="pname"><code>response_val</code></strong> (: <code class="link">bytes</code>) - : response value computed by the client.</li>
-        <li><strong class="pname"><code>authzid</code></strong> (: <code class="link">unicode</code>) - : authorization id.</li>
-        <li><strong class="pname"><code>nonce_count</code></strong> (: <code class="link">int</code>) - : nonce count value.</li>
+        <li><strong class="pname"><code>username</code></strong> (<code class="link">unicode</code>) - user name.</li>
+        <li><strong class="pname"><code>realm</code></strong> (<code class="link">unicode</code>) - realm.</li>
+        <li><strong class="pname"><code>cnonce</code></strong> (<code class="link">bytes</code>) - cnonce value.</li>
+        <li><strong class="pname"><code>digest_uri</code></strong> (<code class="link">bytes</code>) - digest-uri value.</li>
+        <li><strong class="pname"><code>response_val</code></strong> (<code class="link">bytes</code>) - response value computed by the client.</li>
+        <li><strong class="pname"><code>authzid</code></strong> (<code class="link">unicode</code>) - authorization id.</li>
+        <li><strong class="pname"><code>nonce_count</code></strong> (<code class="link">int</code>) - nonce count value.</li>
     </ul></dd>
     <dt>Returns: <a href="pyxmpp2.sasl.core.Challenge-class.html" class="link">sasl.Challenge</a>, <a href="pyxmpp2.sasl.core.Success-class.html" class="link">sasl.Success</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">sasl.Failure</a></dt>
         <dd>a challenge, a success indicator or a failure indicator.</dd>
@@ -570,7 +570,7 @@ processing.
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Jun 28 20:00:52 2011</a>
+    3.0.1 on Tue Jun 28 20:51:18 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

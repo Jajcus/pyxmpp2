@@ -329,7 +329,7 @@ remove the quotes and escape backslashes otherwise.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>data</code></strong> (: <code class="link">bytes</code>) - : a quoted string.</li>
+        <li><strong class="pname"><code>data</code></strong> (<code class="link">bytes</code>) - a quoted string.</li>
     </ul></dd>
     <dt>Returns: <code class="link">bytes</code></dt>
         <dd>the unquoted string.</dd>
@@ -355,7 +355,7 @@ remove the quotes and escape backslashes otherwise.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>data</code></strong> (: <code class="link">str</code>) - : a raw string.</li>
+        <li><strong class="pname"><code>data</code></strong> (<code class="link">str</code>) - a raw string.</li>
     </ul></dd>
     <dt>Returns: <code class="link">str</code></dt>
         <dd><code class="link">data</code> with '&quot;' and &quot;&quot; escaped using &quot;&quot;.</dd>
@@ -380,7 +380,7 @@ remove the quotes and escape backslashes otherwise.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>data</code></strong> (: <code class="link">str</code>) - : a byte string.</li>
+        <li><strong class="pname"><code>data</code></strong> (<code class="link">str</code>) - a byte string.</li>
     </ul></dd>
     <dt>Returns: <code class="link">str</code></dt>
         <dd>MD5 sum of the string.</dd>
@@ -406,8 +406,8 @@ remove the quotes and escape backslashes otherwise.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>k_val</code></strong> (: <code class="link">bytes</code>) - : a byte string.</li>
-        <li><strong class="pname"><code>s_val</code></strong> (: <code class="link">bytes</code>) - : a byte string.</li>
+        <li><strong class="pname"><code>k_val</code></strong> (<code class="link">bytes</code>) - a byte string.</li>
+        <li><strong class="pname"><code>s_val</code></strong> (<code class="link">bytes</code>) - a byte string.</li>
     </ul></dd>
     <dt>Returns: <code class="link">str</code></dt>
         <dd>MD5 sum of the strings joined with ':'.</dd>
@@ -434,9 +434,9 @@ remove the quotes and escape backslashes otherwise.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>username</code></strong> (: <code class="link">bytes</code>) - : a username.</li>
-        <li><strong class="pname"><code>realm</code></strong> (: <code class="link">bytes</code>) - : a realm.</li>
-        <li><strong class="pname"><code>passwd</code></strong> (: <code class="link">bytes</code>) - : a password.</li>
+        <li><strong class="pname"><code>username</code></strong> (<code class="link">bytes</code>) - a username.</li>
+        <li><strong class="pname"><code>realm</code></strong> (<code class="link">bytes</code>) - a realm.</li>
+        <li><strong class="pname"><code>passwd</code></strong> (<code class="link">bytes</code>) - a password.</li>
     </ul></dd>
     <dt>Returns: <code class="link">str</code></dt>
         <dd>the MD5 sum of the parameters joined with ':'.</dd>
@@ -466,12 +466,12 @@ remove the quotes and escape backslashes otherwise.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>urp_hash</code></strong> (: <code class="link">bytes</code>) - : MD5 sum of username:realm:password.</li>
-        <li><strong class="pname"><code>nonce</code></strong> (: <code class="link">bytes</code>) - : nonce value from a server challenge.</li>
-        <li><strong class="pname"><code>cnonce</code></strong> - : cnonce value from the client response.</li>
-        <li><strong class="pname"><code>nonce_count</code></strong> (: <code class="link">int</code>) - : nonce count value.</li>
-        <li><strong class="pname"><code>authzid</code></strong> (: <code class="link">bytes</code>) - : authorization id.</li>
-        <li><strong class="pname"><code>digest_uri</code></strong> (: <code class="link">bytes</code>) - : digest-uri value.</li>
+        <li><strong class="pname"><code>urp_hash</code></strong> (<code class="link">bytes</code>) - MD5 sum of username:realm:password.</li>
+        <li><strong class="pname"><code>nonce</code></strong> (<code class="link">bytes</code>) - nonce value from a server challenge.</li>
+        <li><strong class="pname"><code>cnonce</code></strong> - cnonce value from the client response.</li>
+        <li><strong class="pname"><code>nonce_count</code></strong> (<code class="link">int</code>) - nonce count value.</li>
+        <li><strong class="pname"><code>authzid</code></strong> (<code class="link">bytes</code>) - authorization id.</li>
+        <li><strong class="pname"><code>digest_uri</code></strong> (<code class="link">bytes</code>) - digest-uri value.</li>
     </ul></dd>
     <dt>Returns: <code class="link">bytes</code></dt>
         <dd>the computed response value.</dd>
@@ -501,12 +501,12 @@ remove the quotes and escape backslashes otherwise.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>urp_hash</code></strong> (: <code class="link">bytes</code>) - : MD5 sum of username:realm:password.</li>
-        <li><strong class="pname"><code>nonce</code></strong> (: <code class="link">bytes</code>) - : nonce value from a server challenge.</li>
-        <li><strong class="pname"><code>cnonce</code></strong> - : cnonce value from the client response.</li>
-        <li><strong class="pname"><code>nonce_count</code></strong> (: <code class="link">int</code>) - : nonce count value.</li>
-        <li><strong class="pname"><code>authzid</code></strong> (: <code class="link">bytes</code>) - : authorization id.</li>
-        <li><strong class="pname"><code>digest_uri</code></strong> (: <code class="link">bytes</code>) - : digest-uri value.</li>
+        <li><strong class="pname"><code>urp_hash</code></strong> (<code class="link">bytes</code>) - MD5 sum of username:realm:password.</li>
+        <li><strong class="pname"><code>nonce</code></strong> (<code class="link">bytes</code>) - nonce value from a server challenge.</li>
+        <li><strong class="pname"><code>cnonce</code></strong> - cnonce value from the client response.</li>
+        <li><strong class="pname"><code>nonce_count</code></strong> (<code class="link">int</code>) - nonce count value.</li>
+        <li><strong class="pname"><code>authzid</code></strong> (<code class="link">bytes</code>) - authorization id.</li>
+        <li><strong class="pname"><code>digest_uri</code></strong> (<code class="link">bytes</code>) - digest-uri value.</li>
     </ul></dd>
     <dt>Returns: <code class="link">bytes</code></dt>
         <dd>the computed rspauth value.</dd>
@@ -584,7 +584,7 @@ re.compile(r'^<code class="re-group">(?P&lt;</code><code class="re-ref">var</cod
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Jun 28 20:00:48 2011</a>
+    3.0.1 on Tue Jun 28 20:51:14 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
