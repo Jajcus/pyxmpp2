@@ -56,6 +56,8 @@ class XMPPSettings(MutableMapping):
     
     It can be used like a regular dictionary, but will provide reasonable
     defaults for PyXMPP for parameters which are not explicitely set.
+
+    All known PyXMPP settings are included in the :r:`settings list`.
     
     :CVariables:
         - `_defaults`: defaults for registered parameters.

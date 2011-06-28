@@ -643,7 +643,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
         self.event(AuthenticatedEvent(self.me))
 
 def _languages_factory(settings):
-    """Make the default value of the "languages" setting."""
+    """Make the default value of the :r:`languages setting`."""
     return [settings["language"]]
 
 XMPPSettings.add_setting(u"language", type = unicode, default = u"en",

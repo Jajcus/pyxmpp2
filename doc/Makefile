@@ -1,8 +1,10 @@
 EPYDOC=epydoc
 
-.PHONY: all doc update-doc clean check-epydoc check-docutils
+.PHONY: all doc update-doc clean check-epydoc check-docutils update-settings
 
 RST2HTML=rst2html
+PYTHON=python
+PYXMPP2_PATH=$(firstword $(wildcard ../build/lib*))
 
 all: doc
 
@@ -14,12 +16,11 @@ update-doc:
 
 doc-tstamp:
 	$(MAKE) -C .. build
-	if [ -L pyxmpp2 ] ; then rm pyxmpp2 ; fi
-	ln -s ../build/lib*/pyxmpp2 .
 	mkdir -p www/api
+	$(MAKE) update-settings
+	PYTHONPATH="$(PYXMPP2_PATH):$$PYTHONPATH" \
 	$(EPYDOC) -v --include-log --html --config=epydoc.cfg -o www/api pyxmpp2
 	touch doc-tstamp
-	-rm -f pyxmpp2 2>/dev/null
 
 check-epydoc:
 	@if ! $(EPYDOC) --help >/dev/null ; then \
@@ -38,6 +39,14 @@ check-docutils:
 		echo "*****************************************************" ; \
 		exit 1 ; \
 	fi
+
+Settings.rst settings.txt: update-settings
+
+update-settings:
+	PYTHONPATH="$(PYXMPP2_PATH):$$PYTHONPATH" $(PYTHON) make_settings_doc.py
+
+www/Settings.html: Settings.rst
+	$(RST2HTML) Settings.rst www/Settings.html
 	
 clean:
 

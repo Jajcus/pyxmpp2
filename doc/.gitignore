@@ -1,2 +1,5 @@
 doc-tstamp
 www/
+Settings.rst
+make_settings_doc.py
+settings.txt
