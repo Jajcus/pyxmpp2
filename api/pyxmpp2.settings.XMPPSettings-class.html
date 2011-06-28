@@ -74,6 +74,7 @@
 <p>Container for various parameters used all over PyXMPP.</p>
 <p>It can be used like a regular dictionary, but will provide reasonable
 defaults for PyXMPP for parameters which are not explicitely set.</p>
+<p>All known PyXMPP settings are included in the <a class="rst-reference external" href="../Settings.html#" target="_top"><tt class="rst-docutils literal">settings list</tt></a>.</p>
 
 <!-- ==================== NESTED CLASSES ==================== -->
 <a name="section-NestedClasses"></a>
@@ -355,27 +356,9 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="add_defaults"></a><span class="summary-sig-name">add_defaults</span>(<span class="summary-sig-arg">cls</span>,
-        <span class="summary-sig-arg">defaults</span>)</span></td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="add_default_factory"></a><span class="summary-sig-name">add_default_factory</span>(<span class="summary-sig-arg">cls</span>,
-        <span class="summary-sig-arg">setting</span>,
-        <span class="summary-sig-arg">factory</span>,
-        <span class="summary-sig-arg">cache</span>=<span class="summary-sig-default">False</span>)</span></td>
+          <td><span class="summary-sig"><a name="add_setting"></a><span class="summary-sig-name">add_setting</span>(<span class="summary-sig-arg">cls</span>,
+        <span class="summary-sig-arg">name</span>,
+        <span class="summary-sig-arg">**kwargs</span>)</span></td>
           <td align="right" valign="top">
             
             
@@ -390,6 +373,40 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>_abcoll.Sized</code></b>:
       <code>__subclasshook__</code>
       </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== STATIC METHODS ==================== -->
+<a name="section-StaticMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Static Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-StaticMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="string_list_type"></a><span class="summary-sig-name">string_list_type</span>(<span class="summary-sig-arg">value</span>)</span></td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
     </td>
   </tr>
 </table>
@@ -414,33 +431,7 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="pyxmpp2.settings.XMPPSettings-class.html#_defaults" class="summary-name" onclick="show_private();">_defaults</a> = <code title="{u'allow_ipv4': True,
- u'authzid': None,
- u'client_port': 5222,
- u'client_service': 'xmpp-client',
- u'default_stanza_timeout': 300,
- u'event_queue_max_size': None,
- u'extra_ns_prefixes': {},
- u'language': 'en',
-..."><code class="variable-group">{</code><code class="variable-quote">u'</code><code class="variable-string">allow_ipv4</code><code class="variable-quote">'</code><code class="variable-op">: </code>True<code class="variable-op">, </code><code class="variable-quote">u'</code><code class="variable-string">authzid</code><code class="variable-quote">'</code><code class="variable-op">: </code>None<code class="variable-op">, </code><code class="variable-quote">u'</code><code class="variable-string">client_p</code><code class="variable-ellipsis">...</code></code><br />
-      : defaults for registered parameters.
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_defaults_factories"></a><span class="summary-name">_defaults_factories</span> = <code title="{'allow_ipv6': (&lt;function &lt;lambda&gt; at 0x86789cc&gt;, True),
- 'base_c2s_handlers': (&lt;function base_c2s_handlers_factory at 0x89fd25\
-c&gt;,
-                       False),
- 'base_client_handlers': (&lt;function base_client_handlers_factory at 0x\
-89fda04&gt;,
-                          False),
- 'dns_resolver': (&lt;class 'pyxmpp2.resolver.BlockingResolver'&gt;, False),
-...">{}</code><br />
-      : factory functions providing default values
-which cannot be hard-coded.
+        <a name="_defs"></a><span class="summary-name">_defs</span> = <code title="{}">{}</code>
     </td>
   </tr>
 <tr>
@@ -454,21 +445,38 @@ which cannot be hard-coded.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x85f048c&gt;">&lt;_weakrefset.WeakSet object at 0x85f048c&gt;</code>
+        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x879010c&gt;">&lt;_weakrefset.WeakSet object at 0x879010c&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x85f04cc&gt;">&lt;_weakrefset.WeakSet object at 0x85f04cc&gt;</code>
+        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x879016c&gt;">&lt;_weakrefset.WeakSet object at 0x879016c&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x85f044c&gt;">&lt;_weakrefset.WeakSet object at 0x85f044c&gt;</code>
+        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x879012c&gt;">&lt;_weakrefset.WeakSet object at 0x879012c&gt;</code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_defaults"></a><span class="summary-name">_defaults</span><br />
+      : defaults for registered parameters.
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_defaults_factories"></a><span class="summary-name">_defaults_factories</span><br />
+      : factory functions providing default values
+which cannot be hard-coded.
     </td>
   </tr>
   <tr>
@@ -825,51 +833,6 @@ or the PyXMPP global default otherwise.</p>
 </td></tr></table>
 </div>
 <br />
-<!-- ==================== CLASS VARIABLE DETAILS ==================== -->
-<a name="section-ClassVariableDetails"></a>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Class Variable Details</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-ClassVariableDetails"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-</table>
-<a name="_defaults"></a>
-<div class="private">
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">_defaults</h3>
-  : defaults for registered parameters.
-  <dl class="fields">
-  </dl>
-  <dl class="fields">
-    <dt>Value:</dt>
-      <dd><table><tr><td><pre class="variable">
-<code class="variable-group">{</code><code class="variable-quote">u'</code><code class="variable-string">allow_ipv4</code><code class="variable-quote">'</code><code class="variable-op">: </code>True<code class="variable-op">,</code>
- <code class="variable-quote">u'</code><code class="variable-string">authzid</code><code class="variable-quote">'</code><code class="variable-op">: </code>None<code class="variable-op">,</code>
- <code class="variable-quote">u'</code><code class="variable-string">client_port</code><code class="variable-quote">'</code><code class="variable-op">: </code>5222<code class="variable-op">,</code>
- <code class="variable-quote">u'</code><code class="variable-string">client_service</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">xmpp-client</code><code class="variable-quote">'</code><code class="variable-op">,</code>
- <code class="variable-quote">u'</code><code class="variable-string">default_stanza_timeout</code><code class="variable-quote">'</code><code class="variable-op">: </code>300<code class="variable-op">,</code>
- <code class="variable-quote">u'</code><code class="variable-string">event_queue_max_size</code><code class="variable-quote">'</code><code class="variable-op">: </code>None<code class="variable-op">,</code>
- <code class="variable-quote">u'</code><code class="variable-string">extra_ns_prefixes</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-group">{</code><code class="variable-group">}</code><code class="variable-op">,</code>
- <code class="variable-quote">u'</code><code class="variable-string">language</code><code class="variable-quote">'</code><code class="variable-op">: </code><code class="variable-quote">'</code><code class="variable-string">en</code><code class="variable-quote">'</code><code class="variable-op">,</code>
-<code class="variable-ellipsis">...</code>
-</pre></td></tr></table>
-</dd>
-  </dl>
-</td></tr></table>
-</div>
-<br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">
@@ -902,7 +865,7 @@ or the PyXMPP global default otherwise.</p>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Mon Jun 27 13:52:05 2011</a>
+    3.0.1 on Tue Jun 28 15:37:19 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

@@ -118,60 +118,9 @@ Abstract base class for XMPP transport implementations.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="disconnect"></a><span class="summary-sig-name">disconnect</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Gracefully disconnect the connection.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.interfaces.XMPPTransport-class.html#is_connected" class="summary-sig-name">is_connected</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Check if the transport is connected.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.interfaces.XMPPTransport-class.html#restart" class="summary-sig-name">restart</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Restart the stream after SASL or StartTLS handshake.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="send_element"></a><span class="summary-sig-name">send_element</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">element</span>)</span><br />
-      Send an element via the transport.</td>
+          <td><span class="summary-sig"><a href="pyxmpp2.interfaces.XMPPTransport-class.html#set_target" class="summary-sig-name">set_target</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stream</span>)</span><br />
+      Make the <code class="link">stream</code> the target for this transport instance.</td>
           <td align="right" valign="top">
             
             
@@ -210,6 +159,23 @@ Abstract base class for XMPP transport implementations.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.interfaces.XMPPTransport-class.html#restart" class="summary-sig-name">restart</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Restart the stream after SASL or StartTLS handshake.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a name="send_stream_tail"></a><span class="summary-sig-name">send_stream_tail</span>(<span class="summary-sig-arg">self</span>)</span><br />
       Send stream tail via the transport.</td>
           <td align="right" valign="top">
@@ -227,9 +193,43 @@ Abstract base class for XMPP transport implementations.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.interfaces.XMPPTransport-class.html#set_target" class="summary-sig-name">set_target</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">stream</span>)</span><br />
-      Make the <code class="link">stream</code> the target for this transport instance.</td>
+          <td><span class="summary-sig"><a name="send_element"></a><span class="summary-sig-name">send_element</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">element</span>)</span><br />
+      Send an element via the transport.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.interfaces.XMPPTransport-class.html#is_connected" class="summary-sig-name">is_connected</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Check if the transport is connected.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="disconnect"></a><span class="summary-sig-name">disconnect</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Gracefully disconnect the connection.</td>
           <td align="right" valign="top">
             
             
@@ -287,14 +287,14 @@ Abstract base class for XMPP transport implementations.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x850c76c&gt;">&lt;_weakrefset.WeakSet object at 0x850c76c&gt;</code>
+        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x8644a8c&gt;">&lt;_weakrefset.WeakSet object at 0x8644a8c&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x850c7ac&gt;">&lt;_weakrefset.WeakSet object at 0x850c7ac&gt;</code>
+        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x8644acc&gt;">&lt;_weakrefset.WeakSet object at 0x8644acc&gt;</code>
     </td>
   </tr>
 <tr class="private">
@@ -308,7 +308,7 @@ Abstract base class for XMPP transport implementations.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x850c70c&gt;">&lt;_weakrefset.WeakSet object at 0x850c70c&gt;</code>
+        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x8644a2c&gt;">&lt;_weakrefset.WeakSet object at 0x8644a2c&gt;</code>
     </td>
   </tr>
 </table>
@@ -355,44 +355,30 @@ Abstract base class for XMPP transport implementations.
   </td>
 </tr>
 </table>
-<a name="is_connected"></a>
+<a name="set_target"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">is_connected</span>(<span class="sig-arg">self</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">set_target</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stream</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  Check if the transport is connected.
+  <p>Make the <code class="link">stream</code> the target for this transport instance.</p>
+<p>The 'stream_start', 'stream_end' and 'stream_element' methods
+of the target will be called when appropriate content is received.</p>
   <dl class="fields">
-    <dt>Returns:</dt>
-        <dd><code class="link">True</code> if is connected.</dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="restart"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">restart</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Restart the stream after SASL or StartTLS handshake.</p>
-<p>For the initiator a new call to <a href="pyxmpp2.interfaces.XMPPTransport-class.html#send_stream_head" class="link">send_stream_head</a> is required too.</p>
-  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stream</code></strong> (: <a href="pyxmpp2.streambase.StreamBase-class.html" class="link">StreamBase</a>) - : the stream handler to receive stream content
+from the transport</li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -430,30 +416,44 @@ Abstract base class for XMPP transport implementations.
   </dl>
 </td></tr></table>
 </div>
-<a name="set_target"></a>
+<a name="restart"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">set_target</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">stream</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">restart</span>(<span class="sig-arg">self</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  <p>Make the <code class="link">stream</code> the target for this transport instance.</p>
-<p>The 'stream_start', 'stream_end' and 'stream_element' methods
-of the target will be called when appropriate content is received.</p>
+  <p>Restart the stream after SASL or StartTLS handshake.</p>
+<p>For the initiator a new call to <a href="pyxmpp2.interfaces.XMPPTransport-class.html#send_stream_head" class="link">send_stream_head</a> is required too.</p>
   <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>stream</code></strong> (: <a href="pyxmpp2.streambase.StreamBase-class.html" class="link">StreamBase</a>) - : the stream handler to receive stream content
-from the transport</li>
-    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="is_connected"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">is_connected</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Check if the transport is connected.
+  <dl class="fields">
+    <dt>Returns:</dt>
+        <dd><code class="link">True</code> if is connected.</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -490,7 +490,7 @@ from the transport</li>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Mon Jun 27 13:52:01 2011</a>
+    3.0.1 on Tue Jun 28 15:37:15 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

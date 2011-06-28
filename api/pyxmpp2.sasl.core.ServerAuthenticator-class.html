@@ -137,13 +137,13 @@ client authentication process.</p>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><a href="pyxmpp2.sasl.core.Challenge-class.html" class="link">Challenge</a> or <a href="pyxmpp2.sasl.core.Success-class.html" class="link">Success</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">Failure</a></span>
+      <span class="summary-type"><a href="pyxmpp2.sasl.core.Challenge-class.html" class="link">Challenge</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">Failure</a> or <a href="pyxmpp2.sasl.core.Success-class.html" class="link">Success</a></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.sasl.core.ServerAuthenticator-class.html#response" class="summary-sig-name">response</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">response</span>)</span><br />
-      Process a response from a client.</td>
+          <td><span class="summary-sig"><a href="pyxmpp2.sasl.core.ServerAuthenticator-class.html#start" class="summary-sig-name">start</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">initial_response</span>)</span><br />
+      Start the authentication process.</td>
           <td align="right" valign="top">
             
             
@@ -155,13 +155,13 @@ client authentication process.</p>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><a href="pyxmpp2.sasl.core.Challenge-class.html" class="link">Challenge</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">Failure</a> or <a href="pyxmpp2.sasl.core.Success-class.html" class="link">Success</a></span>
+      <span class="summary-type"><a href="pyxmpp2.sasl.core.Challenge-class.html" class="link">Challenge</a> or <a href="pyxmpp2.sasl.core.Success-class.html" class="link">Success</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">Failure</a></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.sasl.core.ServerAuthenticator-class.html#start" class="summary-sig-name">start</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">initial_response</span>)</span><br />
-      Start the authentication process.</td>
+          <td><span class="summary-sig"><a href="pyxmpp2.sasl.core.ServerAuthenticator-class.html#response" class="summary-sig-name">response</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">response</span>)</span><br />
+      Process a response from a client.</td>
           <td align="right" valign="top">
             
             
@@ -218,14 +218,14 @@ client authentication process.</p>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x89f148c&gt;">&lt;_weakrefset.WeakSet object at 0x89f148c&gt;</code>
+        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x87b666c&gt;">&lt;_weakrefset.WeakSet object at 0x87b666c&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x89f14cc&gt;">&lt;_weakrefset.WeakSet object at 0x89f14cc&gt;</code>
+        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x87b66ac&gt;">&lt;_weakrefset.WeakSet object at 0x87b66ac&gt;</code>
     </td>
   </tr>
 <tr class="private">
@@ -239,7 +239,7 @@ client authentication process.</p>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x89f142c&gt;">&lt;_weakrefset.WeakSet object at 0x89f142c&gt;</code>
+        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x87b660c&gt;">&lt;_weakrefset.WeakSet object at 0x87b660c&gt;</code>
     </td>
   </tr>
 </table>
@@ -315,32 +315,6 @@ credential verfication.</li>
   </dl>
 </td></tr></table>
 </div>
-<a name="response"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">response</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">response</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  Process a response from a client.
-  <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>response</code></strong> (: <code class="link">bytes</code>) - : the response from the client to our challenge.</li>
-    </ul></dd>
-    <dt>Returns: <a href="pyxmpp2.sasl.core.Challenge-class.html" class="link">Challenge</a> or <a href="pyxmpp2.sasl.core.Success-class.html" class="link">Success</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">Failure</a></dt>
-        <dd>a challenge, a success or a failure indicator.</dd>
-  </dl>
-</td></tr></table>
-</div>
 <a name="start"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -364,6 +338,32 @@ credential verfication.</li>
 the authentication request.</li>
     </ul></dd>
     <dt>Returns: <a href="pyxmpp2.sasl.core.Challenge-class.html" class="link">Challenge</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">Failure</a> or <a href="pyxmpp2.sasl.core.Success-class.html" class="link">Success</a></dt>
+        <dd>a challenge, a success or a failure indicator.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="response"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">response</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">response</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Process a response from a client.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>response</code></strong> (: <code class="link">bytes</code>) - : the response from the client to our challenge.</li>
+    </ul></dd>
+    <dt>Returns: <a href="pyxmpp2.sasl.core.Challenge-class.html" class="link">Challenge</a> or <a href="pyxmpp2.sasl.core.Success-class.html" class="link">Success</a> or <a href="pyxmpp2.sasl.core.Failure-class.html" class="link">Failure</a></dt>
         <dd>a challenge, a success or a failure indicator.</dd>
   </dl>
 </td></tr></table>
@@ -401,7 +401,7 @@ the authentication request.</li>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Mon Jun 27 13:52:04 2011</a>
+    3.0.1 on Tue Jun 28 15:37:18 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

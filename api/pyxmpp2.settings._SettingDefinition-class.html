@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>pyxmpp2.exceptions.FeatureNotImplementedProtocolError</title>
+  <title>pyxmpp2.settings._SettingDefinition</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -43,8 +43,8 @@
     <td width="100%">
       <span class="breadcrumbs">
         <a href="pyxmpp2-module.html">Package&nbsp;pyxmpp2</a> ::
-        <a href="pyxmpp2.exceptions-module.html">Module&nbsp;exceptions</a> ::
-        Class&nbsp;FeatureNotImplementedProtocolError
+        <a href="pyxmpp2.settings-module.html">Module&nbsp;settings</a> ::
+        Class&nbsp;_SettingDefinition
       </span>
     </td>
     <td>
@@ -57,22 +57,15 @@
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class FeatureNotImplementedProtocolError</h1><p class="nomargin-top"></p>
+<h1 class="epydoc">Class _SettingDefinition</h1><p class="nomargin-top"></p>
 <center>
-<center>  <map id="class_hierarchy_for_featurenot" name="class_hierarchy_for_featurenot">
-<area shape="rect" id="node1" href="javascript:void(0);" title="exceptions.BaseException" alt="" coords="40,6,227,34"/>
-<area shape="rect" id="node2" href="javascript:void(0);" title="exceptions.Exception" alt="" coords="56,65,211,93"/>
-<area shape="rect" id="node3" href="javascript:void(0);" title="exceptions.StandardError" alt="" coords="43,123,224,151"/>
-<area shape="rect" id="node4" href="pyxmpp2.exceptions.Error-class.html" title="Error" alt="" coords="107,182,160,210"/>
-<area shape="rect" id="node6" href="pyxmpp2.exceptions.ProtocolError-class.html" title="ProtocolError" alt="" coords="80,241,187,269"/>
-<area shape="rect" id="node5" href="pyxmpp2.exceptions.FeatureNotImplementedProtocolError-class.html" title="FeatureNotImplementedProtocolError" alt="" coords="5,299,261,327"/>
+<center>  <map id="class_hierarchy_for__settingde" name="class_hierarchy_for__settingde">
+<area shape="rect" id="node1" href="pyxmpp2.settings._SettingDefinition-class.html" title="_SettingDefinition" alt="" coords="5,6,139,34"/>
 </map>
-  <img src="class_hierarchy_for_featurenot.gif" alt='' usemap="#class_hierarchy_for_featurenot" ismap="ismap" class="graph-without-title" />
+  <img src="class_hierarchy_for__settingde.gif" alt='' usemap="#class_hierarchy_for__settingde" ismap="ismap" class="graph-without-title" />
 </center>
 </center>
 <hr />
-Raised when stanza requests a feature which is not (yet) implemented.
-
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -96,8 +89,16 @@ Raised when stanza requests a feature which is not (yet) implemented.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.exceptions.FeatureNotImplementedProtocolError-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">message</span>)</span><br />
+          <td><span class="summary-sig"><a href="pyxmpp2.settings._SettingDefinition-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">name</span>,
+        <span class="summary-sig-arg">type</span>=<span class="summary-sig-default">&lt;type 'unicode'&gt;</span>,
+        <span class="summary-sig-arg">default</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">factory</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">cache</span>=<span class="summary-sig-default">False</span>,
+        <span class="summary-sig-arg">default_d</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">doc</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">cmdline_help</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">basic</span>=<span class="summary-sig-default">False</span>)</span><br />
       x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
             
@@ -110,57 +111,19 @@ Raised when stanza requests a feature which is not (yet) implemented.
   </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.exceptions.ProtocolError-class.html">ProtocolError</a></code></b>:
-      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#__repr__">__repr__</a></code>,
-      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#__unicode__">__unicode__</a></code>,
-      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#log_ignored">log_ignored</a></code>,
-      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#log_reported">log_reported</a></code>
-      </p>
-    <p class="indent-wrapped-lines"><b>Inherited from <code>exceptions.StandardError</code></b>:
-      <code>__new__</code>
-      </p>
-    <p class="indent-wrapped-lines"><b>Inherited from <code>exceptions.BaseException</code></b>:
-      <code>__delattr__</code>,
-      <code>__getattribute__</code>,
-      <code>__getitem__</code>,
-      <code>__getslice__</code>,
-      <code>__reduce__</code>,
-      <code>__setattr__</code>,
-      <code>__setstate__</code>,
-      <code>__str__</code>
-      </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
       <code>__format__</code>,
+      <code>__getattribute__</code>,
       <code>__hash__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
       <code>__sizeof__</code>,
+      <code>__str__</code>,
       <code>__subclasshook__</code>
-      </p>
-    </td>
-  </tr>
-</table>
-<!-- ==================== CLASS VARIABLES ==================== -->
-<a name="section-ClassVariables"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Class Variables</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-ClassVariables"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-  <tr>
-    <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.exceptions.ProtocolError-class.html">ProtocolError</a></code></b>:
-      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#logger_ignored">logger_ignored</a></code>,
-      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#logger_reported">logger_reported</a></code>
       </p>
     </td>
   </tr>
@@ -184,13 +147,6 @@ Raised when stanza requests a feature which is not (yet) implemented.
 </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.exceptions.ProtocolError-class.html">ProtocolError</a></code></b>:
-      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#message">message</a></code>,
-      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#xmpp_name">xmpp_name</a></code>
-      </p>
-    <p class="indent-wrapped-lines"><b>Inherited from <code>exceptions.BaseException</code></b>:
-      <code>args</code>
-      </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__class__</code>
       </p>
@@ -223,7 +179,15 @@ Raised when stanza requests a feature which is not (yet) implemented.
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">message</span>)</span>
+        <span class="sig-arg">name</span>,
+        <span class="sig-arg">type</span>=<span class="sig-default">&lt;type 'unicode'&gt;</span>,
+        <span class="sig-arg">default</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">factory</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">cache</span>=<span class="sig-default">False</span>,
+        <span class="sig-arg">default_d</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">doc</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">cmdline_help</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">basic</span>=<span class="sig-default">False</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
@@ -273,7 +237,7 @@ Raised when stanza requests a feature which is not (yet) implemented.
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Jun 28 15:37:13 2011</a>
+    3.0.1 on Tue Jun 28 15:37:19 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

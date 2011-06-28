@@ -72,7 +72,7 @@ pyxmpp2.mainloop	pyxmpp2.mainloop-module.html
 pyxmpp2.mainloop.base	pyxmpp2.mainloop.base-module.html
 pyxmpp2.mainloop.base.logger	pyxmpp2.mainloop.base-module.html#logger
 pyxmpp2.mainloop.events	pyxmpp2.mainloop.events-module.html
-pyxmpp2.mainloop.events.event_queue_factory	pyxmpp2.mainloop.events-module.html#event_queue_factory
+pyxmpp2.mainloop.events._event_queue_factory	pyxmpp2.mainloop.events-module.html#_event_queue_factory
 pyxmpp2.mainloop.events.logger	pyxmpp2.mainloop.events-module.html#logger
 pyxmpp2.mainloop.interfaces	pyxmpp2.mainloop.interfaces-module.html
 pyxmpp2.mainloop.interfaces.QUIT	pyxmpp2.mainloop.interfaces-module.html#QUIT
@@ -97,8 +97,8 @@ pyxmpp2.presence.DENY_RESPONSES	pyxmpp2.presence-module.html#DENY_RESPONSES
 pyxmpp2.presence.ACCEPT_RESPONSES	pyxmpp2.presence-module.html#ACCEPT_RESPONSES
 pyxmpp2.resolver	pyxmpp2.resolver-module.html
 pyxmpp2.resolver.reorder_srv	pyxmpp2.resolver-module.html#reorder_srv
-pyxmpp2.resolver.logger	pyxmpp2.resolver-module.html#logger
 pyxmpp2.resolver.HAVE_DNSPYTHON	pyxmpp2.resolver-module.html#HAVE_DNSPYTHON
+pyxmpp2.resolver.logger	pyxmpp2.resolver-module.html#logger
 pyxmpp2.resolver.is_ipv6_available	pyxmpp2.resolver-module.html#is_ipv6_available
 pyxmpp2.resolver.is_ipv4_available	pyxmpp2.resolver-module.html#is_ipv4_available
 pyxmpp2.resolver.shuffle_srv	pyxmpp2.resolver-module.html#shuffle_srv
@@ -163,6 +163,7 @@ pyxmpp2.streambase.FEATURES_TAG	pyxmpp2.streambase-module.html#FEATURES_TAG
 pyxmpp2.streambase.ERROR_TAG	pyxmpp2.streambase-module.html#ERROR_TAG
 pyxmpp2.streambase.IP_RE	pyxmpp2.streambase-module.html#IP_RE
 pyxmpp2.streambase.logger	pyxmpp2.streambase-module.html#logger
+pyxmpp2.streambase._languages_factory	pyxmpp2.streambase-module.html#_languages_factory
 pyxmpp2.streambase.LANG_SPLIT_RE	pyxmpp2.streambase-module.html#LANG_SPLIT_RE
 pyxmpp2.streambase.timeout_handler	pyxmpp2.mainloop.interfaces-module.html#timeout_handler
 pyxmpp2.streamevents	pyxmpp2.streamevents-module.html
@@ -1106,8 +1107,9 @@ pyxmpp2.session.SessionHandler.handle_bind_iq_set	pyxmpp2.session.SessionHandler
 pyxmpp2.settings.XMPPSettings	pyxmpp2.settings.XMPPSettings-class.html
 _abcoll.Sized.__metaclass__	abc.ABCMeta-class.html
 pyxmpp2.settings.XMPPSettings._abc_negative_cache	pyxmpp2.settings.XMPPSettings-class.html#_abc_negative_cache
+pyxmpp2.settings.XMPPSettings._defs	pyxmpp2.settings.XMPPSettings-class.html#_defs
+pyxmpp2.settings.XMPPSettings.add_setting	pyxmpp2.settings.XMPPSettings-class.html#add_setting
 pyxmpp2.settings.XMPPSettings.__init__	pyxmpp2.settings.XMPPSettings-class.html#__init__
-pyxmpp2.settings.XMPPSettings.add_default_factory	pyxmpp2.settings.XMPPSettings-class.html#add_default_factory
 pyxmpp2.settings.XMPPSettings._abc_cache	pyxmpp2.settings.XMPPSettings-class.html#_abc_cache
 pyxmpp2.settings.XMPPSettings.__contains__	pyxmpp2.settings.XMPPSettings-class.html#__contains__
 pyxmpp2.settings.XMPPSettings._settings	pyxmpp2.settings.XMPPSettings-class.html#_settings
@@ -1116,14 +1118,16 @@ pyxmpp2.settings.XMPPSettings.__len__	pyxmpp2.settings.XMPPSettings-class.html#_
 pyxmpp2.settings.XMPPSettings.__getitem__	pyxmpp2.settings.XMPPSettings-class.html#__getitem__
 pyxmpp2.settings.XMPPSettings.get	pyxmpp2.settings.XMPPSettings-class.html#get
 pyxmpp2.settings.XMPPSettings.keys	pyxmpp2.settings.XMPPSettings-class.html#keys
+pyxmpp2.settings.XMPPSettings.string_list_type	pyxmpp2.settings.XMPPSettings-class.html#string_list_type
 pyxmpp2.settings.XMPPSettings._defaults_factories	pyxmpp2.settings.XMPPSettings-class.html#_defaults_factories
 pyxmpp2.settings.XMPPSettings.__iter__	pyxmpp2.settings.XMPPSettings-class.html#__iter__
 pyxmpp2.settings.XMPPSettings.__delitem__	pyxmpp2.settings.XMPPSettings-class.html#__delitem__
 pyxmpp2.settings.XMPPSettings.items	pyxmpp2.settings.XMPPSettings-class.html#items
 pyxmpp2.settings.XMPPSettings._defaults	pyxmpp2.settings.XMPPSettings-class.html#_defaults
 pyxmpp2.settings.XMPPSettings.__setitem__	pyxmpp2.settings.XMPPSettings-class.html#__setitem__
-pyxmpp2.settings.XMPPSettings.add_defaults	pyxmpp2.settings.XMPPSettings-class.html#add_defaults
 pyxmpp2.settings.XMPPSettings._abc_registry	pyxmpp2.settings.XMPPSettings-class.html#_abc_registry
+pyxmpp2.settings._SettingDefinition	pyxmpp2.settings._SettingDefinition-class.html
+pyxmpp2.settings._SettingDefinition.__init__	pyxmpp2.settings._SettingDefinition-class.html#__init__
 pyxmpp2.stanza.Stanza	pyxmpp2.stanza.Stanza-class.html
 pyxmpp2.stanza.Stanza._namespace	pyxmpp2.stanza.Stanza-class.html#_namespace
 pyxmpp2.stanza.Stanza.stream	pyxmpp2.stanza.Stanza-class.html#stream

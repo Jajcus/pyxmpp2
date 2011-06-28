@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
+<title>PyXMPP Settings</title>
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 6253 2010-03-02 00:24:53Z milde $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left, .figure.align-left, object.align-left {
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
+
+img.align-right, .figure.align-right, object.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: left }
+
+/* div.align-center * { */
+/*   text-align: left } */
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font: inherit }
+
+pre.literal-block, pre.doctest-block {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="pyxmpp-settings">
+<h1 class="title">PyXMPP Settings</h1>
+
+<div class="section" id="basic-settings">
+<h1>Basic Settings</h1>
+<p>It is recommended these settings can be configured by the
+end user, as they may be required for correct operation with
+a specific service</p>
+<div class="section" id="c2s-port">
+<h2>c2s_port</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">int</tt></li>
+<li>Default: <tt class="docutils literal">5222</tt></li>
+</ul>
+</blockquote>
+<p>Port number for client to server connections.</p>
+</div>
+<div class="section" id="ipv6">
+<h2>ipv6</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">bool</tt></li>
+<li>Default: <tt class="docutils literal">True</tt></li>
+</ul>
+</blockquote>
+<p>Look up IPv6 addresses for a server host name.</p>
+</div>
+<div class="section" id="password">
+<h2>password</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">unicode</tt></li>
+<li>Default: <tt class="docutils literal">None</tt></li>
+</ul>
+</blockquote>
+<p>A password for password-based SASL mechanisms.</p>
+</div>
+<div class="section" id="prefer-ipv6">
+<h2>prefer_ipv6</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">bool</tt></li>
+<li>Default: <tt class="docutils literal">True</tt></li>
+</ul>
+</blockquote>
+<p>When enabled IPv6 and connecting to a dual-stack XMPP server
+IPv6 addresses will be tried first.</p>
+</div>
+<div class="section" id="server">
+<h2>server</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">unicode</tt></li>
+<li>Default: <tt class="docutils literal">None</tt></li>
+</ul>
+</blockquote>
+<p>Server address to connect to. By default a DNS SRV record look-up
+is done for the requested JID domain part and if that fails - 'A' or 'AAAA'
+record lookup for the same domain. This setting may be used to force using
+a specific server or when SRV look-ups are not available.</p>
+</div>
+<div class="section" id="starttls">
+<h2>starttls</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">bool</tt></li>
+<li>Default: <tt class="docutils literal">False</tt></li>
+</ul>
+</blockquote>
+<p>Enable StartTLS negotiation.</p>
+</div>
+<div class="section" id="tls-cacert-file">
+<h2>tls_cacert_file</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">str</tt></li>
+<li>Default: <tt class="docutils literal">None</tt></li>
+</ul>
+</blockquote>
+<p>Path to the TLS CA certificates file. The file should contain
+the trusted CA certificates in the PEM format, concatenated.</p>
+</div>
+<div class="section" id="tls-require">
+<h2>tls_require</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">bool</tt></li>
+<li>Default: <tt class="docutils literal">False</tt></li>
+</ul>
+</blockquote>
+<p>Require TLS stream encryption.</p>
+</div>
+<div class="section" id="tls-verify-peer">
+<h2>tls_verify_peer</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">bool</tt></li>
+<li>Default: <tt class="docutils literal">True</tt></li>
+</ul>
+</blockquote>
+<p>Verify the peer certificate.</p>
+</div>
+</div>
+<div class="section" id="extra-settings">
+<h1>Extra Settings</h1>
+<dl class="docutils">
+<dt>These settings can even further change the PyXMPP</dt>
+<dd>behaviour, but in most cases there is no need to set them.</dd>
+</dl>
+<div class="section" id="authzid">
+<h2>authzid</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">unicode</tt></li>
+<li>Default: <tt class="docutils literal">None</tt></li>
+</ul>
+</blockquote>
+<p>The authorization-id (alternative JID) to request during the
+SASL authentication.</p>
+</div>
+<div class="section" id="base-c2s-handlers">
+<h2>base_c2s_handlers</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: list of handler objects</li>
+<li>Default: <tt class="docutils literal">A StreamSASLHandler and a ResourceBindingHandler instance</tt></li>
+</ul>
+</blockquote>
+<p>The basic handlers used by a ClientStream in addition to the
+handlers provides in the constructor invocation.</p>
+</div>
+<div class="section" id="base-client-handlers">
+<h2>base_client_handlers</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: list of handler objects</li>
+<li>Default: <tt class="docutils literal">A StreamTLSHandler and a SessionHandler instance</tt></li>
+</ul>
+</blockquote>
+<p>The basic handlers used by a Client object in addition to the
+handlers provides in the constructor invocation.</p>
+</div>
+<div class="section" id="c2s-service">
+<h2>c2s_service</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">unicode</tt></li>
+<li>Default: <tt class="docutils literal"><span class="pre">'xmpp-client'</span></tt></li>
+</ul>
+</blockquote>
+<p>SRV service name for client to server connections.</p>
+</div>
+<div class="section" id="default-stanza-timeout">
+<h2>default_stanza_timeout</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">int</tt></li>
+<li>Default: <tt class="docutils literal">300</tt></li>
+</ul>
+</blockquote>
+<p>Time in seconds to wait for a stanza response.</p>
+</div>
+<div class="section" id="event-queue">
+<h2>event_queue</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">Queue</tt></li>
+<li>Default: <tt class="docutils literal">A QueueQueue instance</tt></li>
+</ul>
+</blockquote>
+<p>Queue used to post events by various components and to
+dispatch them from the main loop.</p>
+</div>
+<div class="section" id="event-queue-max-size">
+<h2>event_queue_max_size</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">int</tt></li>
+<li>Default: <tt class="docutils literal">None</tt></li>
+</ul>
+</blockquote>
+<p>Maximum size of the default event loop. Posting events
+will block when the queue is full. This will cause lock-up of a single-thread,
+but may be useful in multi-threaded applications.</p>
+</div>
+<div class="section" id="extra-ns-prefixes">
+<h2>extra_ns_prefixes</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: prefix -&gt; uri mapping</li>
+<li>Default: <tt class="docutils literal">{}</tt></li>
+</ul>
+</blockquote>
+<p>Extra namespace prefix declarations to use at the stream root
+element.</p>
+</div>
+<div class="section" id="ipv4">
+<h2>ipv4</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">bool</tt></li>
+<li>Default: <tt class="docutils literal">True</tt></li>
+</ul>
+</blockquote>
+<p>Look up IPv4 addresses for a server host name.</p>
+</div>
+<div class="section" id="language">
+<h2>language</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">unicode</tt></li>
+<li>Default: <tt class="docutils literal">u'en'</tt></li>
+</ul>
+</blockquote>
+<p>The preferred language of the XMPP stream.</p>
+</div>
+<div class="section" id="languages">
+<h2>languages</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">string_list_type</tt></li>
+<li>Default: <tt class="docutils literal">[u'en']</tt></li>
+</ul>
+</blockquote>
+<p>When the remote entity selects one of these languages
+on their stream, the same language will be sent in our stream declaration.</p>
+</div>
+<div class="section" id="password-manager">
+<h2>password_manager</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">PasswordManager</tt></li>
+<li>Default: <tt class="docutils literal">A DefaultPasswordManager instance</tt></li>
+</ul>
+</blockquote>
+<p>Object providing or checking user password and other
+SASL authentication properties.</p>
+</div>
+<div class="section" id="poll-interval">
+<h2>poll_interval</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">float</tt></li>
+<li>Default: <tt class="docutils literal">1.0</tt></li>
+</ul>
+</blockquote>
+<p>Maximum time to wait for an event. Smaller value may increase
+response times, by the cost of higher CPU usage.</p>
+</div>
+<div class="section" id="resolver">
+<h2>resolver</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">Resolver</tt></li>
+<li>Default: <tt class="docutils literal">A BlockingResolver instance</tt></li>
+</ul>
+</blockquote>
+<p>The DNS resolver implementation to be used by PyXMPP.</p>
+</div>
+<div class="section" id="resource">
+<h2>resource</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">unicode</tt></li>
+<li>Default: <tt class="docutils literal">None</tt></li>
+</ul>
+</blockquote>
+<p>JID resource to bind. Use the server-provided resource if not set.
+Automatically set to the resource of the JID provided to ClientStream
+constructor.</p>
+</div>
+<div class="section" id="sasl-mechanisms">
+<h2>sasl_mechanisms</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">string_list_type</tt></li>
+<li>Default: <tt class="docutils literal"><span class="pre">['DIGEST-MD5',</span> 'PLAIN']</tt></li>
+</ul>
+</blockquote>
+<p>SASL mechanism that can be used for stream authentication.</p>
+</div>
+<div class="section" id="tls-cert-file">
+<h2>tls_cert_file</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">str</tt></li>
+<li>Default: <tt class="docutils literal">None</tt></li>
+</ul>
+</blockquote>
+<p>Path to the TLS certificate file. The file should contain
+the certificate, any immediate certificates needed and it may optionally
+contain the private key. All in the PEM format, concatenated.</p>
+</div>
+<div class="section" id="tls-key-file">
+<h2>tls_key_file</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">str</tt></li>
+<li>Default: <tt class="docutils literal">None</tt></li>
+</ul>
+</blockquote>
+<p>Path to the TLS certificate private key file (in the PEM
+format). Not needed if the key is included in the file pointed by the
+'tls_cert_file' setting.</p>
+</div>
+<div class="section" id="tls-verify-callback">
+<h2>tls_verify_callback</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: callable</li>
+<li>Default: <tt class="docutils literal">&lt;function is_certificate_valid at 0x839c6bc&gt;</tt></li>
+</ul>
+</blockquote>
+<p>A function to verify if a certificate is valid and if the
+remote party presenting this certificate is authorized to use the stream.
+The function must accept two arguments: a stream and the certificate
+to verify.</p>
+</div>
+<div class="section" id="username">
+<h2>username</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">unicode</tt></li>
+<li>Default: <tt class="docutils literal">None</tt></li>
+</ul>
+</blockquote>
+<p>The username to use instead of the JID local part.</p>
+</div>
+</div>
+</div>
+</body>
+</html>

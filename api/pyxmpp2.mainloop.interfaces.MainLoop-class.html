@@ -140,27 +140,9 @@ Base class for main loop implementations.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#loop" class="summary-sig-name">loop</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">timeout</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Run the loop.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#loop_iteration" class="summary-sig-name">loop_iteration</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">timeout</span>=<span class="summary-sig-default">1</span>)</span><br />
-      Single loop iteration.</td>
+          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#remove_handler" class="summary-sig-name">remove_handler</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">handler</span>)</span><br />
+      Add a new handler to the main loop.</td>
           <td align="right" valign="top">
             
             
@@ -193,9 +175,27 @@ Base class for main loop implementations.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#remove_handler" class="summary-sig-name">remove_handler</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">handler</span>)</span><br />
-      Add a new handler to the main loop.</td>
+          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#loop" class="summary-sig-name">loop</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">timeout</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Run the loop.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#loop_iteration" class="summary-sig-name">loop_iteration</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">timeout</span>=<span class="summary-sig-default">1</span>)</span><br />
+      Single loop iteration.</td>
           <td align="right" valign="top">
             
             
@@ -253,14 +253,14 @@ Base class for main loop implementations.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x87fc54c&gt;">&lt;_weakrefset.WeakSet object at 0x87fc54c&gt;</code>
+        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x8799f8c&gt;">&lt;_weakrefset.WeakSet object at 0x8799f8c&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x87fc58c&gt;">&lt;_weakrefset.WeakSet object at 0x87fc58c&gt;</code>
+        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x8799fcc&gt;">&lt;_weakrefset.WeakSet object at 0x8799fcc&gt;</code>
     </td>
   </tr>
 <tr class="private">
@@ -274,7 +274,7 @@ Base class for main loop implementations.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x87fc4ec&gt;">&lt;_weakrefset.WeakSet object at 0x87fc4ec&gt;</code>
+        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x8799f2c&gt;">&lt;_weakrefset.WeakSet object at 0x8799f2c&gt;</code>
     </td>
   </tr>
 </table>
@@ -299,17 +299,17 @@ Base class for main loop implementations.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#finished" class="summary-name">finished</a><br />
-      <code class="link">True</code> then the loop has been finished or is about to finish (the
-final iteration in progress).
+        <a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#started" class="summary-name">started</a><br />
+      <code class="link">True</code> then the loop has been started.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#started" class="summary-name">started</a><br />
-      <code class="link">True</code> then the loop has been started.
+        <a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#finished" class="summary-name">finished</a><br />
+      <code class="link">True</code> then the loop has been finished or is about to finish (the
+final iteration in progress).
     </td>
   </tr>
   <tr>
@@ -354,6 +354,31 @@ final iteration in progress).
   </tr></table>
   
   Add a new handler to the main loop.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>handler</code></strong> (: <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html" class="link">IOHandler</a> or <a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html" class="link">EventHandler</a> or <a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html" class="link">TimeoutHandler</a>) - : the handler object to add</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="remove_handler"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">remove_handler</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">handler</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Add a new handler to the main loop.</p>
+<p>Do nothing if the handler is not registered at the main loop.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
@@ -411,31 +436,6 @@ until <a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#finished" class="
   </dl>
 </td></tr></table>
 </div>
-<a name="remove_handler"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">remove_handler</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">handler</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Add a new handler to the main loop.</p>
-<p>Do nothing if the handler is not registered at the main loop.</p>
-  <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>handler</code></strong> (: <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html" class="link">IOHandler</a> or <a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html" class="link">EventHandler</a> or <a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html" class="link">TimeoutHandler</a>) - : the handler object to add</li>
-    </ul></dd>
-  </dl>
-</td></tr></table>
-</div>
 <br />
 <!-- ==================== PROPERTY DETAILS ==================== -->
 <a name="section-PropertyDetails"></a>
@@ -455,6 +455,21 @@ until <a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#finished" class="
   </td>
 </tr>
 </table>
+<a name="started"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">started</h3>
+  <code class="link">True</code> then the loop has been started.
+  <dl class="fields">
+    <dt>Get Method:</dt>
+    <dd class="value"><span class="summary-sig"><i>unreachable</i>.started(<span class="summary-sig-arg">self</span>)</span>
+        - <code class="link">True</code> then the loop has been started.
+    </dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="finished"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -468,21 +483,6 @@ final iteration in progress).
     <dd class="value"><span class="summary-sig"><i>unreachable</i>.finished(<span class="summary-sig-arg">self</span>)</span>
         - <code class="link">True</code> then the loop has been finished or is about to finish (the
 final iteration in progress).
-    </dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="started"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">started</h3>
-  <code class="link">True</code> then the loop has been started.
-  <dl class="fields">
-    <dt>Get Method:</dt>
-    <dd class="value"><span class="summary-sig"><i>unreachable</i>.started(<span class="summary-sig-arg">self</span>)</span>
-        - <code class="link">True</code> then the loop has been started.
     </dd>
   </dl>
 </td></tr></table>
@@ -520,7 +520,7 @@ final iteration in progress).
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Mon Jun 27 13:52:02 2011</a>
+    3.0.1 on Tue Jun 28 15:37:16 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

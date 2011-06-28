@@ -151,13 +151,29 @@ and put them into the stanza properties.</td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type"><a href="pyxmpp2.stanza.Stanza-class.html" class="link">Stanza</a></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.stanza.Stanza-class.html#add_payload" class="summary-sig-name">add_payload</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">payload</span>)</span><br />
-      Add new the stanza payload.</td>
+          <td><span class="summary-sig"><a name="copy"></a><span class="summary-sig-name">copy</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Create a deep copy of the stanza.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code class="link">unicode</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.stanza.Stanza-class.html#serialize" class="summary-sig-name">serialize</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Serialize the stanza into a Unicode XML string.</td>
           <td align="right" valign="top">
             
             
@@ -186,12 +202,12 @@ and put them into the stanza properties.</td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><a href="pyxmpp2.stanza.Stanza-class.html" class="link">Stanza</a></span>
+      <span class="summary-type"><a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="copy"></a><span class="summary-sig-name">copy</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Create a deep copy of the stanza.</td>
+          <td><span class="summary-sig"><a href="pyxmpp2.stanza.Stanza-class.html#get_xml" class="summary-sig-name">get_xml</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Return the XML stanza representation.</td>
           <td align="right" valign="top">
             
             
@@ -210,6 +226,60 @@ and put them into the stanza properties.</td>
           <td><span class="summary-sig"><a href="pyxmpp2.stanza.Stanza-class.html#decode_payload" class="summary-sig-name">decode_payload</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">specialize</span>=<span class="summary-sig-default">False</span>)</span><br />
       Decode payload from the element passed to the stanza constructor.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.stanza.Stanza-class.html#mark_dirty" class="summary-sig-name">mark_dirty</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Mark the stanza 'dirty' so the XML representation will be
+re-built the next time it is requested.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.stanza.Stanza-class.html#set_payload" class="summary-sig-name">set_payload</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">payload</span>)</span><br />
+      Set stanza payload to a single item.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.stanza.Stanza-class.html#add_payload" class="summary-sig-name">add_payload</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">payload</span>)</span><br />
+      Add new the stanza payload.</td>
           <td align="right" valign="top">
             
             
@@ -249,76 +319,6 @@ and put them into the stanza properties.</td>
         <span class="summary-sig-arg">specialize</span>=<span class="summary-sig-default">False</span>)</span><br />
       Get the first payload item matching the given class
 and optional key.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.stanza.Stanza-class.html#get_xml" class="summary-sig-name">get_xml</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Return the XML stanza representation.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.stanza.Stanza-class.html#mark_dirty" class="summary-sig-name">mark_dirty</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Mark the stanza 'dirty' so the XML representation will be
-re-built the next time it is requested.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code class="link">unicode</code></span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.stanza.Stanza-class.html#serialize" class="summary-sig-name">serialize</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Serialize the stanza into a Unicode XML string.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.stanza.Stanza-class.html#set_payload" class="summary-sig-name">set_payload</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">payload</span>)</span><br />
-      Set stanza payload to a single item.</td>
           <td align="right" valign="top">
             
             
@@ -410,7 +410,7 @@ re-built the next time it is requested.</td>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="last_id"></a><span class="summary-name">last_id</span> = <code title="322369">322369</code>
+        <a name="last_id"></a><span class="summary-name">last_id</span> = <code title="733070">733070</code>
     </td>
   </tr>
 </table>
@@ -475,14 +475,6 @@ re-built the next time it is requested.</td>
 </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><a href="pyxmpp2.error.StanzaErrorElement-class.html" class="link">StanzaErrorElement</a></span>
-    </td><td class="summary">
-        <a href="pyxmpp2.stanza.Stanza-class.html#error" class="summary-name">error</a><br />
-      Stanza error element.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type"><a href="pyxmpp2.jid.JID-class.html" class="link">JID</a></span>
     </td><td class="summary">
         <a href="pyxmpp2.stanza.Stanza-class.html#from_jid" class="summary-name">from_jid</a><br />
@@ -491,10 +483,10 @@ re-built the next time it is requested.</td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code class="link">unicode</code></span>
+      <span class="summary-type"><a href="pyxmpp2.jid.JID-class.html" class="link">JID</a></span>
     </td><td class="summary">
-        <a href="pyxmpp2.stanza.Stanza-class.html#stanza_id" class="summary-name">stanza_id</a><br />
-      Stanza id.
+        <a href="pyxmpp2.stanza.Stanza-class.html#to_jid" class="summary-name">to_jid</a><br />
+      Destination JID of the stanza.
     </td>
   </tr>
 <tr>
@@ -507,18 +499,26 @@ re-built the next time it is requested.</td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><a href="pyxmpp2.streambase.StreamBase-class.html" class="link">streambase.StreamBase</a></span>
+      <span class="summary-type"><code class="link">unicode</code></span>
     </td><td class="summary">
-        <a href="pyxmpp2.stanza.Stanza-class.html#stream" class="summary-name">stream</a><br />
-      Stream the stanza was received from.
+        <a href="pyxmpp2.stanza.Stanza-class.html#stanza_id" class="summary-name">stanza_id</a><br />
+      Stanza id.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><a href="pyxmpp2.jid.JID-class.html" class="link">JID</a></span>
+      <span class="summary-type"><a href="pyxmpp2.error.StanzaErrorElement-class.html" class="link">StanzaErrorElement</a></span>
     </td><td class="summary">
-        <a href="pyxmpp2.stanza.Stanza-class.html#to_jid" class="summary-name">to_jid</a><br />
-      Destination JID of the stanza.
+        <a href="pyxmpp2.stanza.Stanza-class.html#error" class="summary-name">error</a><br />
+      Stanza error element.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><a href="pyxmpp2.streambase.StreamBase-class.html" class="link">streambase.StreamBase</a></span>
+    </td><td class="summary">
+        <a href="pyxmpp2.stanza.Stanza-class.html#stream" class="summary-name">stream</a><br />
+      Stream the stanza was received from.
     </td>
   </tr>
   <tr>
@@ -596,28 +596,24 @@ not &quot;error&quot; or <a href="pyxmpp2.stanza.Stanza-class.html#error" class=
   </dl>
 </td></tr></table>
 </div>
-<a name="add_payload"></a>
+<a name="serialize"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">add_payload</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">payload</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">serialize</span>(<span class="sig-arg">self</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  <p>Add new the stanza payload.</p>
-<p>Marks the stanza dirty.</p>
+  Serialize the stanza into a Unicode XML string.
   <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>payload</code></strong> (: <a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a> or <a href="pyxmpp2.interfaces.StanzaPayload-class.html" class="link">StanzaPayload</a>) - : XML element or stanza payload object to add</li>
-    </ul></dd>
+    <dt>Returns: <code class="link">unicode</code></dt>
+        <dd>serialized stanza.</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -638,6 +634,29 @@ not &quot;error&quot; or <a href="pyxmpp2.stanza.Stanza-class.html#error" class=
   <p>Return the XML stanza representation.</p>
 <p>Always return an independent copy of the stanza XML representation,
 which can be freely modified without affecting the stanza.</p>
+  <dl class="fields">
+    <dt>Returns: <a class="rst-rst-reference external rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-rst-docutils literal rst-docutils literal">ElementTree.Element</tt></a></dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="get_xml"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_xml</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Return the XML stanza representation.</p>
+<p>This returns the original or cached XML representation, which
+may be much more efficient than <a href="pyxmpp2.stanza.Stanza-class.html#as_xml" class="link">as_xml</a>.</p>
+<p>Result of this function should never be modified.</p>
   <dl class="fields">
     <dt>Returns: <a class="rst-rst-reference external rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-rst-docutils literal rst-docutils literal">ElementTree.Element</tt></a></dt>
   </dl>
@@ -669,25 +688,76 @@ payload.</p>
   </dl>
 </td></tr></table>
 </div>
-<a name="gen_id"></a>
+<a name="mark_dirty"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">gen_id</span>(<span class="sig-arg">cls</span>)</span>
-    <br /><em class="fname">Class Method</em>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">mark_dirty</span>(<span class="sig-arg">self</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  Generate stanza id unique for the session.
+  <p>Mark the stanza 'dirty' so the XML representation will be
+re-built the next time it is requested.</p>
+<p>This should be called each time the payload attached to the stanza is
+modifed.</p>
   <dl class="fields">
-    <dt>Returns:</dt>
-        <dd>the new id.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="set_payload"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">set_payload</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">payload</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Set stanza payload to a single item.</p>
+<p>All current stanza content of will be dropped.
+Marks the stanza dirty.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>payload</code></strong> (: <a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a> or <a href="pyxmpp2.interfaces.StanzaPayload-class.html" class="link">StanzaPayload</a>) - : XML element or stanza payload object to use</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="add_payload"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">add_payload</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">payload</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Add new the stanza payload.</p>
+<p>Marks the stanza dirty.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>payload</code></strong> (: <a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a> or <a href="pyxmpp2.interfaces.StanzaPayload-class.html" class="link">StanzaPayload</a>) - : XML element or stanza payload object to add</li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -760,95 +830,25 @@ possible</li>
   </dl>
 </td></tr></table>
 </div>
-<a name="get_xml"></a>
+<a name="gen_id"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_xml</span>(<span class="sig-arg">self</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">gen_id</span>(<span class="sig-arg">cls</span>)</span>
+    <br /><em class="fname">Class Method</em>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  <p>Return the XML stanza representation.</p>
-<p>This returns the original or cached XML representation, which
-may be much more efficient than <a href="pyxmpp2.stanza.Stanza-class.html#as_xml" class="link">as_xml</a>.</p>
-<p>Result of this function should never be modified.</p>
+  Generate stanza id unique for the session.
   <dl class="fields">
-    <dt>Returns: <a class="rst-rst-reference external rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-rst-docutils literal rst-docutils literal">ElementTree.Element</tt></a></dt>
-  </dl>
-</td></tr></table>
-</div>
-<a name="mark_dirty"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">mark_dirty</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Mark the stanza 'dirty' so the XML representation will be
-re-built the next time it is requested.</p>
-<p>This should be called each time the payload attached to the stanza is
-modifed.</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="serialize"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">serialize</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  Serialize the stanza into a Unicode XML string.
-  <dl class="fields">
-    <dt>Returns: <code class="link">unicode</code></dt>
-        <dd>serialized stanza.</dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="set_payload"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">set_payload</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">payload</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Set stanza payload to a single item.</p>
-<p>All current stanza content of will be dropped.
-Marks the stanza dirty.</p>
-  <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>payload</code></strong> (: <a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a> or <a href="pyxmpp2.interfaces.StanzaPayload-class.html" class="link">StanzaPayload</a>) - : XML element or stanza payload object to use</li>
-    </ul></dd>
+    <dt>Returns:</dt>
+        <dd>the new id.</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -871,27 +871,6 @@ Marks the stanza dirty.</p>
   </td>
 </tr>
 </table>
-<a name="error"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">error</h3>
-  Stanza error element.
-  <dl class="fields">
-    <dt>Get Method:</dt>
-    <dd class="value"><span class="summary-sig"><i>unreachable</i>.error(<span class="summary-sig-arg">self</span>)</span>
-        - Stanza error element.
-    </dd>
-    <dt>Set Method:</dt>
-    <dd class="value"><span class="summary-sig"><i>unreachable</i>.error(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">error</span>)</span>
-    </dd>
-    <dt>Type:</dt>
-      <dd><a href="pyxmpp2.error.StanzaErrorElement-class.html" class="link">StanzaErrorElement</a></dd>
-  </dl>
-</td></tr></table>
-</div>
 <a name="from_jid"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -913,24 +892,24 @@ Marks the stanza dirty.</p>
   </dl>
 </td></tr></table>
 </div>
-<a name="stanza_id"></a>
+<a name="to_jid"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
-  <h3 class="epydoc">stanza_id</h3>
-  Stanza id.
+  <h3 class="epydoc">to_jid</h3>
+  Destination JID of the stanza.
   <dl class="fields">
     <dt>Get Method:</dt>
-    <dd class="value"><span class="summary-sig"><i>unreachable</i>.stanza_id(<span class="summary-sig-arg">self</span>)</span>
-        - Stanza id.
+    <dd class="value"><span class="summary-sig"><i>unreachable</i>.to_jid(<span class="summary-sig-arg">self</span>)</span>
+        - Destination JID of the stanza.
     </dd>
     <dt>Set Method:</dt>
-    <dd class="value"><span class="summary-sig"><i>unreachable</i>.stanza_id(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">stanza_id</span>)</span>
+    <dd class="value"><span class="summary-sig"><i>unreachable</i>.to_jid(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">to_jid</span>)</span>
     </dd>
     <dt>Type:</dt>
-      <dd><code class="link">unicode</code></dd>
+      <dd><a href="pyxmpp2.jid.JID-class.html" class="link">JID</a></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -955,6 +934,48 @@ Marks the stanza dirty.</p>
   </dl>
 </td></tr></table>
 </div>
+<a name="stanza_id"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">stanza_id</h3>
+  Stanza id.
+  <dl class="fields">
+    <dt>Get Method:</dt>
+    <dd class="value"><span class="summary-sig"><i>unreachable</i>.stanza_id(<span class="summary-sig-arg">self</span>)</span>
+        - Stanza id.
+    </dd>
+    <dt>Set Method:</dt>
+    <dd class="value"><span class="summary-sig"><i>unreachable</i>.stanza_id(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza_id</span>)</span>
+    </dd>
+    <dt>Type:</dt>
+      <dd><code class="link">unicode</code></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="error"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">error</h3>
+  Stanza error element.
+  <dl class="fields">
+    <dt>Get Method:</dt>
+    <dd class="value"><span class="summary-sig"><i>unreachable</i>.error(<span class="summary-sig-arg">self</span>)</span>
+        - Stanza error element.
+    </dd>
+    <dt>Set Method:</dt>
+    <dd class="value"><span class="summary-sig"><i>unreachable</i>.error(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">error</span>)</span>
+    </dd>
+    <dt>Type:</dt>
+      <dd><a href="pyxmpp2.error.StanzaErrorElement-class.html" class="link">StanzaErrorElement</a></dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="stream"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -969,27 +990,6 @@ Marks the stanza dirty.</p>
     </dd>
     <dt>Type:</dt>
       <dd><a href="pyxmpp2.streambase.StreamBase-class.html" class="link">streambase.StreamBase</a></dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="to_jid"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <h3 class="epydoc">to_jid</h3>
-  Destination JID of the stanza.
-  <dl class="fields">
-    <dt>Get Method:</dt>
-    <dd class="value"><span class="summary-sig"><i>unreachable</i>.to_jid(<span class="summary-sig-arg">self</span>)</span>
-        - Destination JID of the stanza.
-    </dd>
-    <dt>Set Method:</dt>
-    <dd class="value"><span class="summary-sig"><i>unreachable</i>.to_jid(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">to_jid</span>)</span>
-    </dd>
-    <dt>Type:</dt>
-      <dd><a href="pyxmpp2.jid.JID-class.html" class="link">JID</a></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -1026,7 +1026,7 @@ Marks the stanza dirty.</p>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Mon Jun 27 13:52:06 2011</a>
+    3.0.1 on Tue Jun 28 15:37:19 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
