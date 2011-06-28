@@ -47,7 +47,7 @@ def dump_settings(doc, index):
     print >> index, "settings list\t#"
 
     print >> doc, "PyXMPP2 Settings"
-    print >> doc, "==============="
+    print >> doc, "================"
     print >> doc
     print >> doc, u"Basic Settings"
     print >> doc, u"--------------"

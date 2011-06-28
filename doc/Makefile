@@ -2,7 +2,7 @@ EPYDOC=epydoc
 
 .PHONY: all doc update-doc clean check-epydoc check-docutils update-settings
 
-RST2HTML=rst2html
+APIRST2HTML=apirst2html.py
 PYTHON=python
 PYXMPP2_PATH=$(firstword $(wildcard ../build/lib*))
 
@@ -46,7 +46,7 @@ update-settings:
 	PYTHONPATH="$(PYXMPP2_PATH):$$PYTHONPATH" $(PYTHON) make_settings_doc.py
 
 www/Settings.html: Settings.rst
-	$(RST2HTML) Settings.rst www/Settings.html
+	$(APIRST2HTML) --config=epydoc.cfg --link-stylesheet --stylesheet=api/epydoc.css Settings.rst www/Settings.html
 	
 clean:
 
