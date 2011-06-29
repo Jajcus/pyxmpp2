@@ -111,7 +111,7 @@ class TestResolver(unittest.TestCase):
 
 
     def test_resolve_address_ipv4_only(self):
-        settings = XMPPSettings({"allow_ipv6": False})
+        settings = XMPPSettings({"ipv6": False})
         resolver = self.make_resolver(settings)
         self.loop.add_handler(resolver)
         resolver.resolve_address("lo-host.test.pyxmpp.jajcus.net",
@@ -131,7 +131,7 @@ class TestResolver(unittest.TestCase):
 
     @unittest.skipUnless(is_ipv6_available(), "No IPv6 support")
     def test_resolve_address_ipv6_only(self):
-        settings = XMPPSettings({"allow_ipv4": False})
+        settings = XMPPSettings({"ipv4": False})
         resolver = self.make_resolver(settings)
         self.loop.add_handler(resolver)
         resolver.resolve_address("lo-host.test.pyxmpp.jajcus.net",
