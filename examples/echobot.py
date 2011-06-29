@@ -98,19 +98,10 @@ class EchoBot(EventHandler, XMPPFeatureHandler):
 
 def main():
     """Parse the command-line arguments and run the bot."""
-    parser = argparse.ArgumentParser(description = 'XMPP echo bot')
+    parser = argparse.ArgumentParser(description = 'XMPP echo bot',
+                                    parents = [XMPPSettings.get_arg_parser()])
     parser.add_argument('jid', metavar = 'JID', 
                                         help = 'The bot JID')
-    parser.add_argument('password', metavar = 'PASSWORD', nargs = '?',
-                                        help = 'Password for the JID account')
-    parser.add_argument('--tls', 
-                            action = 'store_true', dest = 'tls_enable', 
-                            default = False, help = 'Enable StartTLS')
-    parser.add_argument('--no-tls-peer-verify', 
-                            action = 'store_false', dest = 'tls_verify_peer', 
-                            default = True, help = 'Enable StartTLS')
-    parser.add_argument('--server', metavar = 'SERVER',
-                        help = 'Server to connect to (default: SRV lookup)')
     parser.add_argument('--debug',
                         action = 'store_const', dest = 'log_level',
                         const = logging.DEBUG, default = logging.INFO,
@@ -120,23 +111,19 @@ def main():
                         help = 'Print only error messages')
 
     args = parser.parse_args()
-    if not args.password:
-        args.password = getpass("{0!r} password: ".format(args.jid))
+    settings = XMPPSettings()
+    settings.load_arguments(args)
+
+    if settings.get("password") is None:
+        password = getpass("{0!r} password: ".format(args.jid))
+        if sys.version_info.major < 3:
+            password = password.decode("utf-8")
+        settings["password"] = password
 
     if sys.version_info.major < 3:
         args.jid = args.jid.decode("utf-8")
-        args.password = args.password.decode("utf-8")
-        if args.server is not None:
-            args.server = args.server.decode("utf-8")
 
     logging.basicConfig(level = args.log_level)
-    settings = XMPPSettings({
-                                "password": args.password,
-                                "tls_enable": args.tls_enable,
-                                "tls_verify_peer": args.tls_verify_peer,
-                                })
-    if args.server:
-        settings["server"] = args.server
 
     bot = EchoBot(JID(args.jid), settings)
     try:

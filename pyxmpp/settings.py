@@ -19,7 +19,8 @@
 """General settings container.
 
 The behaviour of the XMPP implementation may be controlled by many, many
-parameters, like addresses, authetication methods, TLS settings, keep alive, etc.
+parameters, like addresses, authetication methods, TLS settings, keep alive,
+etc.
 Those need to be passed from one component to other and passing it directly
 via function parameters would only mess up the API.
 
@@ -35,12 +36,21 @@ from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 
-from collections import MutableMapping, namedtuple
+import sys
+import argparse
+import logging
+
+from collections import MutableMapping
+
+logger = logging.getLogger("pyxmpp.settings")
 
 class _SettingDefinition(object):
+    """A PyXMPP2 setting meta-data and defaults."""
+    # pylint: disable-msg=R0902,R0903
     def __init__(self, name, type = unicode, default = None, factory = None,
                         cache = False, default_d = None, doc = None,
                         cmdline_help = None, validator = None, basic = False):
+        # pylint: disable-msg=W0622,R0913
         self.name = name
         self.type = type
         self.default = default
@@ -50,7 +60,7 @@ class _SettingDefinition(object):
         self.doc = doc
         self.cmdline_help = cmdline_help
         self.basic = basic
-        self.validator = None
+        self.validator = validator
 
 class XMPPSettings(MutableMapping):
     """Container for various parameters used all over PyXMPP.
@@ -135,6 +145,7 @@ class XMPPSettings(MutableMapping):
 
         :Return: parameter value
         """
+        # pylint: disable-msg=W0221
         if key in self._settings:
             return self._settings[key]
         if local_default is not None:
@@ -166,8 +177,58 @@ class XMPPSettings(MutableMapping):
         """
         return self._settings.items()
 
+    def load_arguments(self, args):
+        """Load settings from :std:`ArgumentParser` output.
+
+        :Parameters:
+            - `args`: output of argument parsed based on the one 
+              returned by `get_arg_parser()`
+        """
+        for name, setting in self._defs.items():
+            if sys.version_info.major < 3:
+                # pylint: disable-msg=W0404
+                from locale import getpreferredencoding
+                encoding = getpreferredencoding()
+                name = name.encode(encoding, "replace")
+            attr = "pyxmpp2_" + name
+            try:
+                self[setting.name] = getattr(args, attr)
+            except AttributeError:
+                pass
+
     @classmethod
     def add_setting(cls, name, **kwargs):
+        """Add a new setting definition.
+
+        :Parameters:
+            - `name`: setting name
+            - `type`: setting type object or type description
+            - `default`: default value
+            - `factory`: default value factory
+            - `cache`: if `True` the `factory` will be called only once
+              and its value stored as a constant default.
+            - `default_d`: description of the default value
+            - `doc`: setting documentation
+            - `cmdline_help`: command line argument description. When not 
+              provided then the setting won't be available as a command-line
+              option
+            - `basic`: when `True` the option is considered a basic option – 
+              one of those which should usually stay configurable in
+              an application.
+            - `validator`: function validating command-line option value string
+              and returning proper value for the settings objects. Defaults
+              to `type`.
+        :Types:
+            - `name`: `unicode`
+            - `type`: type or `unicode`
+            - `factory`: a callable
+            - `cache`: `bool`
+            - `default_d`: `unicode`
+            - `doc`: `unicode`
+            - `cmdline_help`: `unicode`
+            - `basic`: `bool`
+            - `validator`: a callable
+        """
         setting_def = _SettingDefinition(name, **kwargs)
         if name not in cls._defs:
             cls._defs[name] = setting_def
@@ -182,13 +243,20 @@ class XMPPSettings(MutableMapping):
 
     @staticmethod
     def validate_string_list(value):
+        """Validator for string lists to be used with `add_setting`."""
         try:
+            if sys.version_info.major < 3:
+                # pylint: disable-msg=W0404
+                from locale import getpreferredencoding
+                encoding = getpreferredencoding()
+                value = value.decode(encoding)
             return [x.strip() for x in value.split(u",")]
-        except (AttributeError, TypeError):
+        except (AttributeError, TypeError, UnicodeError):
             raise ValueError("Bad string list")
     
     @staticmethod
     def validate_positive_int(value):
+        """Positive integer validator to be used with `add_setting`."""
         value = int(value)
         if value <= 0:
             raise ValueError("Positive number required")
@@ -196,6 +264,7 @@ class XMPPSettings(MutableMapping):
 
     @staticmethod
     def validate_positive_float(value):
+        """Positive float validator to be used with `add_setting`."""
         value = float(value)
         if value <= 0:
             raise ValueError("Positive number required")
@@ -203,9 +272,143 @@ class XMPPSettings(MutableMapping):
 
     @staticmethod
     def get_int_range_validator(start, stop):
+        """Return an integer range validator to be used with `add_setting`.
+
+        :Parameters:
+            - `start`: minimum value for the integer
+            - `stop`: the upper bound (maximum value + 1)
+        :Types:
+            - `start`: `int`
+            - `stop`: `int`
+        
+        :return: a validator function
+        """
         def validate_int_range(value):
+            """Integer range validator."""
             value = int(value)
             if value >= start and value < stop:
                 return value
             raise ValueError("Not in <{0},{1}) range".format(start, stop))
         return validate_int_range
+
+    @classmethod
+    def list_all(cls, basic = None):
+        """List known settings.
+
+        :Parameters:
+            - `basic`: When `True` then limit output to the basic settings,
+              when `False` list only the extra settings.
+        """
+        if basic is None:
+            return [s for s in cls._defs]
+        else:
+            return [s.name for s in cls._defs.values() if s.basic == basic]
+
+    @classmethod
+    def get_arg_parser(cls, settings = None, option_prefix = u'--',
+                                                            add_help = False):
+        """Make a command-line option parser.
+
+        The returned parser may be used as a parent parser for application
+        argument parser.
+
+        :Parameters:
+            - `settings`: list of PyXMPP2 settings to consider. By default
+              all 'basic' settings are provided.
+            - `option_prefix`: custom prefix for PyXMPP2 options. E.g. 
+              ``'--xmpp'`` to differentiate them from not xmpp-related
+              application options.
+            - `add_help`: when `True` a '--help' option will be included
+              (probably already added in the application parser object)
+        :Types:
+            - `settings`: list of `unicode`
+            - `option_prefix`: `str`
+            - `add_help`: 
+
+        :return: an argument parser object.
+        :returntype: std:`argparse.ArgumentParser`
+        """
+        # pylint: disable-msg=R0914,R0912
+        parser = argparse.ArgumentParser(add_help = add_help, 
+                                            prefix_chars = option_prefix[0])
+        if settings is None:
+            settings = cls.list_all(basic = True)
+
+        if sys.version_info.major < 3:
+            # pylint: disable-msg=W0404
+            from locale import getpreferredencoding
+            encoding = getpreferredencoding()
+            def decode_string_option(value):
+                """Decode a string option."""
+                return value.decode(encoding)
+
+        for name in settings:
+            if name not in cls._defs:
+                logger.debug("get_arg_parser: ignoring unknown option {0}"
+                                                                .format(name))
+                return
+            setting = cls._defs[name]
+            if not setting.cmdline_help:
+                logger.debug("get_arg_parser: option {0} has no cmdline"
+                                                                .format(name))
+                return
+            if sys.version_info.major < 3:
+                name = name.encode(encoding, "replace")
+            option = option_prefix + name.replace("_", "-")
+            dest = "pyxmpp2_" + name
+            if setting.validator:
+                opt_type = setting.validator
+            elif setting.type is unicode and sys.version_info.major < 3:
+                opt_type = decode_string_option
+            else:
+                opt_type = setting.type
+            if setting.default_d:
+                default_s = setting.default_d.encode(encoding, "replace")
+            elif setting.default is not None:
+                default_s = repr(setting.default)
+            else:
+                default_s = None
+            if sys.version_info.major < 3:
+                opt_help = setting.cmdline_help.encode(encoding, "replace")
+            if default_s:
+                opt_help += " (Default: {0})".format(default_s)
+            if opt_type is bool:
+                opt_action = _YesNoAction
+            else:
+                opt_action = "store"
+            parser.add_argument(option,
+                                action = opt_action,
+                                default = setting.default,
+                                type = opt_type,
+                                help = opt_help,
+                                metavar = name.upper(),
+                                dest = dest)
+        return parser
+
+class _YesNoAction(argparse.Action):
+    """Custom std:`argparse` option to handle boolean options
+    via '--no-' prefixes.
+
+    For every "--something" option a "--no-something" option will be added
+    storing a `False` value (original option will store `True`).
+    """
+    # pylint: disable-msg=R0903
+    def __init__(self, option_strings, **kwargs):
+        strings = []
+        self.positive_strings = set()
+        for string in option_strings:
+            if string[0] != string[1]:
+                raise ValueError("Doubly-prefixed option expected")
+            strings.append(string)
+            self.positive_strings.add(string)
+            neg_string = string[:2] + "no" + string[1:]
+            strings.append(neg_string)
+        kwargs["nargs"] = 0
+        super(_YesNoAction, self).__init__(strings, **kwargs)
+
+    def __call__(self, parser, namespace, value, option_string = None):
+        if option_string in self.positive_strings:
+            setattr(namespace, self.dest, True)
+        else:
+            setattr(namespace, self.dest, False)
+
