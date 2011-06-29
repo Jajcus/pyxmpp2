@@ -212,7 +212,7 @@ class XMPPSettings(MutableMapping):
             - `cmdline_help`: command line argument description. When not 
               provided then the setting won't be available as a command-line
               option
-            - `basic`: when `True` the option is considered a basic option – 
+            - `basic`: when `True` the option is considered a basic option - 
               one of those which should usually stay configurable in
               an application.
             - `validator`: function validating command-line option value string
