@@ -124,7 +124,8 @@ class Client(EventHandler):
     def disconnect(self):
         """Gracefully disconnect from the server."""
         with self.lock:
-            self.stream.disconnect()
+            if self.stream:
+                self.stream.disconnect()
 
     def close_stream(self):
         """Close the stream immediately.

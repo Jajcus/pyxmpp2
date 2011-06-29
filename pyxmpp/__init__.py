@@ -39,6 +39,12 @@ The PyXMPP2 project is hosted at GitHub: http://github.com/Jajcus/pyxmpp/
 
 The API documentation is available at: http://jajcus.github.com/pyxmpp2/api/
 
+The simple API
+--------------
+
+If you don't care about all the PyXMPP flexibility and features and just want
+to send a Jabber message, please look at the 'Simple API': `pyxmpp2.simple`
+
 Basic components
 ----------------
 
