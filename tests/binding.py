@@ -12,6 +12,7 @@ from pyxmpp2.streamevents import *
 from pyxmpp2.exceptions import StreamParseError
 from pyxmpp2.jid import JID
 from pyxmpp2.binding import ResourceBindingHandler
+from pyxmpp2.settings import XMPPSettings
 
 from pyxmpp2.mainloop.interfaces import EventHandler, event_handler
 
@@ -82,7 +83,7 @@ class TestBindingInitiator(InitiatorSelectTestCase):
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.wait_short(1)
         self.server.write(BIND_FEATURES)
-        req_id = self.wait(
+        req_id = self.wait(1,
                     expect = re.compile(r".*<iq[^>]*id=[\"']([^\"']*)[\"']"))
         self.assertIsNotNone(req_id)
         self.server.write(BIND_GENERATED_RESPONSE.format(req_id))
@@ -96,15 +97,16 @@ class TestBindingInitiator(InitiatorSelectTestCase):
     def test_bind(self):
         handler = AuthorizedEventHandler()
         self.stream = StreamBase(u"jabber:client", 
-                                        [ResourceBindingHandler(), handler])
-        self.stream.me = JID("test@127.0.0.1/Provided")
+                                        [ResourceBindingHandler(), handler],
+                                        XMPPSettings({"resource": "Provided"}))
+        self.stream.me = JID("test@127.0.0.1")
         self.start_transport([handler])
         self.stream.initiate(self.transport)
         self.connect_transport()
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.wait_short(1)
         self.server.write(BIND_FEATURES)
-        req_id = self.wait(
+        req_id = self.wait(1,
                     expect = re.compile(r".*<iq[^>]*id=[\"']([^\"']*)[\"'].*<resource>Provided</resource>"))
         self.assertIsNotNone(req_id)
         self.server.write(BIND_PROVIDED_RESPONSE.format(req_id))
@@ -169,7 +171,7 @@ if __name__ == '__main__':
     import logging
     logger = logging.getLogger()
     logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.ERROR)
+    logger.setLevel(logging.DEBUG)
     unittest.TextTestRunner(verbosity=2).run(suite())
 
 # vi: sts=4 et sw=4
