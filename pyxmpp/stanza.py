@@ -57,7 +57,7 @@ class Stanza(object):
     def __init__(self, element, from_jid = None, to_jid = None,
                             stanza_type = None, stanza_id = None,
                             error = None, error_cond = None,
-                            stream = None, language = None): # pylint: disable-msg=R0913
+                            stream = None, language = None): 
         """Initialize a Stanza object.
 
         :Parameters:
@@ -85,6 +85,7 @@ class Stanza(object):
             - `error_cond`: `unicode`
             - `language`: `unicode`
         """
+        # pylint: disable-msg=R0913
         self._error = None
         self._from_jid = None
         self._to_jid = None
@@ -444,6 +445,7 @@ class Stanza(object):
                 return payload
             else:
                 return None
+        # pylint: disable=W0212
         elements = payload_class._pyxmpp_payload_element_name
         for i, payload in enumerate(self._payload):
             if isinstance(payload, XMLPayload):

@@ -7,8 +7,10 @@ import re
 
 from pyxmpp2.etree import ElementTree
         
-from pyxmpp2.stanzapayload import StanzaPayload, XMLPayload
-from pyxmpp2.stanzapayload import payload_element_name
+from pyxmpp2.interfaces import StanzaPayload
+from pyxmpp2.interfaces import payload_element_name
+
+from pyxmpp2.stanzapayload import XMLPayload
 
 from pyxmpp2.stanza import Stanza
 from pyxmpp2.jid import JID

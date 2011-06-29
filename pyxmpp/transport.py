@@ -44,32 +44,49 @@ from .streamevents import ConnectedEvent, ConnectingEvent, DisconnectedEvent
 from .streamevents import TLSConnectingEvent, TLSConnectedEvent
 from .xmppserializer import XMPPSerializer
 from .xmppparser import StreamReader
-from . import resolver
 from .mainloop.wait import wait_for_write
 from .interfaces import XMPPTransport
+
+# pylint: disable=W0611
+from . import resolver  
 
 logger = logging.getLogger("pyxmpp.transport")
 
 
 class WriteJob(object):
+    """Base class for objects put to the `TCPTransport` write queue."""
+    # pylint: disable-msg=R0903
     def __repr__(self):
         return "<WriteJob: {0}>".format(self.__class__.__name__)
 
 class ContinueConnect(WriteJob):
+    """Object to signal (via the write queue) a pending connect request.
+    """
+    # pylint: disable-msg=R0903
     pass
 
 class StartTLS(WriteJob):
+    """StartTLS request for the `TCPTransport` write queue."""
+    # pylint: disable-msg=R0903
     def __init__(self, **kwargs):
+        WriteJob.__init__(self)
         self.kwargs = kwargs
     def __repr__(self):
-        args = [ "{0}={1!r}".format(k,v) for (k,v) in self.kwargs.items() ]
+        args = [ "{0}={1!r}".format(k, v) for (k, v) in self.kwargs.items() ]
         return "<WriteJob: StartTLS: {0}>".format(" ".join(args))
 
 class TLSHandshake(WriteJob):
+    """Object to signal (via the write queue) a pending TLS handshake.
+    """
+    # pylint: disable-msg=R0903
     pass
 
 class WriteData(WriteJob):
+    """Data queued for write.
+    """
+    # pylint: disable-msg=R0903
     def __init__(self, data):
+        WriteJob.__init__(self)
         self.data = data
     def __repr__(self):
         return "<WriteJob: WriteData: {0!r}>".format(self.data)
@@ -125,7 +142,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         - `_stream`: `streambase.StreamBase`
         - `_tls_state`: `unicode`
     """
-    # pylint: disable-msg=R0902
+    # pylint: disable=R0902
     def __init__(self, settings = None, sock = None):
         """Initialize the `TCPTransport` object.
 
@@ -167,6 +184,8 @@ class TCPTransport(XMPPTransport, IOHandler):
         self._event_queue = self.settings["event_queue"]
 
     def _set_state(self, state):
+        """Set `_state` and notify any threads waiting for the change.
+        """
         logger.debug(" _set_state({0!r})".format(state))
         self._state = state
         self._state_cond.notify()
@@ -227,7 +246,7 @@ class TCPTransport(XMPPTransport, IOHandler):
     def _resolve_srv(self):
         """Start resolving the SRV record.
         """
-        resolver = self.settings["dns_resolver"]
+        resolver = self.settings["dns_resolver"] # pylint: disable=W0621
         self._set_state("resolving-srv")
         resolver.resolve_srv(self._dst_name, self._dst_service, "tcp",
                                                     callback = self._got_srv)
@@ -265,7 +284,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         [called with `lock` acquired]
         """
         self._set_state("resolving-hostname")
-        resolver = self.settings["dns_resolver"]
+        resolver = self.settings["dns_resolver"] # pylint: disable=W0621
         name, port = self._dst_nameports.pop(0)
         resolver.resolve_address(name, callback = partial(
                                 self._got_addresses, name, port),
@@ -428,7 +447,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             - `version`: `unicode`
             - `language`: `unicode`
         """
-        # pylint: disable-msg=R0913
+        # pylint: disable=R0913
         with self.lock:
             self._serializer = XMPPSerializer(stanza_namespace,
                                             self.settings["extra_ns_prefixes"])
@@ -571,7 +590,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             except IndexError:
                 return
             if isinstance(job, WriteData):
-                self._do_write(job.data)
+                self._do_write(job.data) # pylint: disable=E1101
             elif isinstance(job, ContinueConnect):
                 self._continue_connect()
             elif isinstance(job, StartTLS):
@@ -583,12 +602,23 @@ class TCPTransport(XMPPTransport, IOHandler):
                                         "{0!r}".format(job))
 
     def starttls(self, **kwargs):
+        """Request a TLS handshake on the socket ans switch
+        to encrypted output.
+        The handshake will start after any currently buffered data is sent.
+        
+        :Parameters:
+            - `kwargs`: arguments for :std:`ssl.wrap_socket`
+        """
         with self.lock:
             self.event(TLSConnectingEvent())
             self._write_queue.append(StartTLS(**kwargs))
             self._write_queue_cond.notify()
 
     def getpeercert(self):
+        """Return the peer certificate. The format is the same
+        as for the standard :std:`ssl.SSLSocket.getpeercert()` method,
+        but may (in future) include data not normally recognized by Python.
+        """
         with self.lock:
             if not self._socket or self._tls_state != "connected":
                 raise ValueError("Not TLS-connected")
@@ -731,6 +761,8 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._close()
 
     def _close(self):
+        """Same as `_close` but expects `lock` acquired.
+        """
         if self._state != "closed":
             self.event(DisconnectedEvent(self._dst_addr))
             self._set_state("closed")

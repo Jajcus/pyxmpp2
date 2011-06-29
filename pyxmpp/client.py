@@ -19,12 +19,12 @@
 
 Normative reference:
   - :RFC:`6120`
-  - :RFC:`6121` (TODO)
+  - :RFC:`6121` (TODO: roster and presence management)
 """
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
 import threading
 import logging
@@ -162,6 +162,8 @@ class Client(EventHandler):
                 self.stream = None
 
 def base_client_handlers_factory(settings):
+    """Build the default value for the :r:`base_client_handlers setting`
+    """
     tls_handler = StreamTLSHandler(settings)
     session_handler = SessionHandler(settings)
     return [tls_handler, session_handler]

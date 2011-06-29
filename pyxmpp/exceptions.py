@@ -36,9 +36,6 @@ class JIDError(Error, ValueError):
     "Exception raised when invalid JID is used"
     pass
 
-class AlreadyInProgressError(Error):
-    pass
-
 class PyXMPPIOError(Error):
     """Exception raised on I/O error."""
     pass

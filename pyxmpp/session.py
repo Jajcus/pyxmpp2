@@ -33,19 +33,17 @@ from __future__ import absolute_import
 __docformat__ = "restructuredtext en"
 
 import logging
-import uuid
 
 from .etree import ElementTree
 
 from .constants import SESSION_QNP
-from .settings import XMPPSettings
 from .streamevents import AuthorizedEvent
 from .exceptions import FatalStreamError
 from .stanzapayload import XMLPayload
 from .iq import Iq
 from .interfaces import XMPPFeatureHandler
 from .interfaces import iq_set_stanza_handler
-from .interfaces import StreamFeatureHandler, StreamFeatureHandled
+from .interfaces import StreamFeatureHandler
 from .mainloop.interfaces import EventHandler, event_handler
 
 logger = logging.getLogger("pyxmpp.session")
@@ -101,7 +99,7 @@ class SessionHandler(StreamFeatureHandler, XMPPFeatureHandler, EventHandler):
             - `stanza`: <iq type="result"/> stanza received.
 
         """
-        # pylint: disable-msg=R0201
+        # pylint: disable-msg=R0201,W0613
         logger.debug("Session established")
 
     def _session_error(self, stanza): # pylint: disable-msg=R0201,W0613

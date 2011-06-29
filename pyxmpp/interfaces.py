@@ -22,6 +22,8 @@ from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 
+import logging
+
 from abc import ABCMeta
 from copy import deepcopy
 
@@ -134,14 +136,13 @@ class XMPPTransport:
 
         :Return: `True` if is connected.
         """
-        raise NotImplementedReturn
+        raise NotImplementedError
 
     def disconnect(self):
         """
         Gracefully disconnect the connection.
         """
         raise NotImplementedError
-
 
 class XMPPFeatureHandler:
     """Base class for objects handling incoming stanzas.
@@ -156,6 +157,7 @@ class XMPPFeatureHandler:
       - `presence_stanza_handler`: for methods handling ``<presence />``
         stanzas
     """
+    # pylint: disable-msg=W0232,R0903
     __metaclass__ = ABCMeta
 
 def _iq_handler(iq_type, payload_class, payload_key, usage_restriction):
@@ -241,7 +243,7 @@ def _stanza_handler(element_name, stanza_type, payload_class, payload_key,
     return decorator
 
 def message_stanza_handler(stanza_type = None, payload_class = None,
-                            payload_key = None, usage_restriction = "post-auth"):
+                        payload_key = None, usage_restriction = "post-auth"):
     """Method decorator generator for decorating <message/> 
     stanza handler methods in `XMPPFeatureHandler` subclasses.
     
@@ -263,7 +265,7 @@ def message_stanza_handler(stanza_type = None, payload_class = None,
                                                             usage_restriction)
  
 def presence_stanza_handler(stanza_type = None, payload_class = None,
-                            payload_key = None, usage_restriction = "post-auth"):
+                        payload_key = None, usage_restriction = "post-auth"):
     """Method decorator generator for decorating <presence/> 
     stanza handler methods in `XMPPFeatureHandler` subclasses.
     
@@ -289,15 +291,21 @@ class StanzaPayload:
         pass
 
     def as_xml(self):
+        """Return the XML representation of the payload.
+
+        :returntype: :etree:`ElementTree.Element`
+        """
         raise NotImplementedError
 
     def copy(self):
+        """Return a deep copy of self."""
         return deepcopy(self)
 
     @property
     def handler_key(self):
         """Defines a key which may be used when registering handlers
         for stanzas with this payload."""
+        # pylint: disable-msg=R0201
         return None
 
 def payload_element_name(element_name):
@@ -310,6 +318,8 @@ def payload_element_name(element_name):
         - `element_name`: `unicode`
     """
     def decorator(klass):
+        """The payload_element_name decorator."""
+        # pylint: disable-msg=W0212
         from .stanzapayload import STANZA_PAYLOAD_CLASSES
         from .stanzapayload import STANZA_PAYLOAD_ELEMENTS
         if hasattr(klass, "_pyxmpp_payload_element_name"):
@@ -317,6 +327,7 @@ def payload_element_name(element_name):
         else:
             klass._pyxmpp_payload_element_name = [element_name]
         if element_name in STANZA_PAYLOAD_CLASSES:
+            logger = logging.getLogger('pyxmpp.payload_element_name')
             logger.warning("Overriding payload class for {0!r}".format(
                                                                 element_name))
         STANZA_PAYLOAD_CLASSES[element_name] = klass

@@ -38,6 +38,7 @@ By default the standard Python ElementTree implementation is used
 (`xml.etree.ElementTree
 <http://docs.python.org/library/xml.etree.elementtree.html>`__)
 """
+# pylint: disable=C0103
 
 from __future__ import absolute_import
 
@@ -55,6 +56,7 @@ class ElementClass:
     """Abstract class used to reference the :etree:`ElementTree.Element`
     object type of the selected Element Tree implementation.
     """
+    # pylint: disable=W0232,R0903
     __metaclass__ = ABCMeta
     element_type = None
     @classmethod

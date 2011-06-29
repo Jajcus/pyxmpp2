@@ -26,6 +26,7 @@ from .mainloop.interfaces import Event
 
 class StreamEvent(Event):
     """Base class for all stream events."""
+    # pylint: disable-msg=W0223,W0232
     stream = None
 
 class AuthenticatedEvent(StreamEvent):

@@ -20,8 +20,8 @@
 import logging
 from collections import defaultdict
 
-from .etree import ElementTree, ElementClass
-from .interfaces import StanzaPayload, payload_element_name
+from .etree import ElementClass
+from .interfaces import StanzaPayload
 
 STANZA_PAYLOAD_CLASSES = {}
 STANZA_PAYLOAD_ELEMENTS = defaultdict(list)
@@ -49,6 +49,7 @@ class XMLPayload(StanzaPayload):
             raise TypeError("ElementTree.Element required")
         self.xml_element_name = data.tag
         self.element = data
+        StanzaPayload.__init__(self, data)
 
     def as_xml(self):
         return self.element
@@ -60,6 +61,7 @@ class XMLPayload(StanzaPayload):
         return self.xml_element_name
 
 def payload_class_for_element_name(element_name):
+    """Return a payload class for given element name."""
     logger.debug(" looking up payload class for element: {0!r}".format(
                                                                 element_name))
     logger.debug("  known: {0!r}".format(STANZA_PAYLOAD_CLASSES))
@@ -69,7 +71,10 @@ def payload_class_for_element_name(element_name):
         return XMLPayload
 
 def payload_element_names_for_class(klass):
+    """Return a payload element name for given class."""
     return STANZA_PAYLOAD_ELEMENTS[klass]
 
 def payload_factory(element):
+    """Return a specialized `StanzaPayload` object for given element.
+    """
     return payload_class_for_element_name(element.tag)(element)

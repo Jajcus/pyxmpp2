@@ -26,7 +26,7 @@ from __future__ import absolute_import
 __docformat__ = "restructuredtext en"
 
 
-from .etree import ElementTree, ElementClass
+from .etree import ElementClass
 
 from .stanza import Stanza
 

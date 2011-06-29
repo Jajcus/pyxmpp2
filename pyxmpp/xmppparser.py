@@ -115,7 +115,9 @@ class ParserTarget(object):
         Call the handler's 'stream_start' methods with 
         an empty root element if it is top level.
         
-        For lower level tags use :etree:`ElementTree.TreeBuilder` to collect them."""
+        For lower level tags use :etree:`ElementTree.TreeBuilder` to collect
+        them.
+        """
         if self._level == 0:
             self._root = ElementTree.Element(tag, attrs)
             self._handler.stream_start(self._root)

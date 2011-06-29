@@ -26,8 +26,6 @@ from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 
-import logging
-
 from .streambase import StreamBase
 from .jid import JID
 from .settings import XMPPSettings
@@ -35,13 +33,13 @@ from .streamsasl import StreamSASLHandler
 from .binding import ResourceBindingHandler
 from .constants import STANZA_CLIENT_NS
 
-
 class ClientStream(StreamBase):
     """Handles XMPP-IM c2s stream.
 
     Both client and server side of the connection is supported. This class
     handles client SASL authentication, authorisation and resource binding.
     """
+    # pylint: disable=R0904
     def __init__(self, jid, handlers, settings = None):
         """Initialize the ClientStream object.
 
@@ -56,7 +54,7 @@ class ClientStream(StreamBase):
         if handlers is None:
             handlers = []
         if settings is None:
-            settings = TLSSettings()
+            settings = XMPPSettings()
         if "resource" not in settings:
             settings["resource"] = jid.resource
         handlers = handlers + settings["base_c2s_handlers"]
@@ -84,7 +82,7 @@ class ClientStream(StreamBase):
         """
         if myname is None:
             myname = JID(self.me.domain)
-        return StreamBase.receive(transport, myname)
+        return StreamBase.receive(self, transport, myname)
 
     def fix_out_stanza(self, stanza):
         """Fix outgoing stanza.
@@ -97,7 +95,7 @@ class ClientStream(StreamBase):
                 stanza.from_jid = None
         else:
             if not stanza.from_jid:
-                stanza.from_jid = self.my_jid
+                stanza.from_jid = self.me
 
     def fix_in_stanza(self, stanza):
         """Fix an incoming stanza.
@@ -109,6 +107,8 @@ class ClientStream(StreamBase):
                 stanza.set_from(self.peer)
 
 def base_c2s_handlers_factory(settings):
+    """Build the default value for the :r:`base_c2s_handlers setting`.
+    """
     sasl_handler = StreamSASLHandler(settings)
     binding_handler = ResourceBindingHandler(settings)
     return [sasl_handler, binding_handler]

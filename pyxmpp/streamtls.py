@@ -26,7 +26,6 @@ from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 
-import socket
 import logging
 import ssl
 
@@ -35,11 +34,11 @@ from ssl import SSLError
 from .etree import ElementTree
 from .constants import TLS_QNP
 from .streambase import FatalStreamError
-from .exceptions import TLSNegotiationFailed, TLSError
+from .exceptions import TLSNegotiationFailed
 from .exceptions import JIDError
 from .jid import JID
 from .settings import XMPPSettings
-from .streamevents import TLSConnectingEvent, TLSConnectedEvent
+from .streamevents import TLSConnectedEvent
 
 from .interfaces import StreamFeatureHandler
 from .interfaces import StreamFeatureHandled, StreamFeatureNotHandled
@@ -146,7 +145,7 @@ class StreamTLSHandler(StreamFeatureHandler, EventHandler):
     def _process_tls_proceed(self, stream, element):
         """Handle the <proceed /> element.
         """
-        _unused = element
+        # pylint: disable-msg=W0613
         if not self.requested:
             logger.debug("Unexpected TLS element: {0!r}".format(element))
             return False
@@ -185,6 +184,8 @@ class StreamTLSHandler(StreamFeatureHandler, EventHandler):
 
     @event_handler(TLSConnectedEvent)
     def handle_tls_connected_event(self, event):
+        """Verify the peer certificate on the `TLSConnectedEvent`.
+        """
         if self.settings["tls_verify_peer"]:
             valid = self.settings["tls_verify_callback"](event.stream,
                                                         event.peer_certificate)

@@ -121,6 +121,11 @@ def reorder_srv(records):
     return ret
 
 class ThreadedResolverBase(Resolver):
+    """Base class for threaded resolvers.
+
+    Starts worker threads, each running a blocking resolver implementation
+    and communicates with them to provide non-blocking asynchronous API.
+    """
     def __init__(self, settings =  None, max_threads = 1):
         if settings:
             self.settings = settings
@@ -133,14 +138,22 @@ class ThreadedResolverBase(Resolver):
         self.last_thread_n = 0
         
     def _make_resolver(self):
+        """Return the blocking resolver implementation that should be
+        used by the resolver threads.
+        """
         raise NotImplementedError
 
     def stop(self):
+        """Stop the resolver threads.
+        """
         with self.lock:
-            for thread in self.threads:
+            for dummy in self.threads:
                 self.queue.put(None)
         
     def _start_thread(self):
+        """Start a new working thread unless the maximum number of threads
+        has been reached or the request queue is empty.
+        """
         with self.lock:
             if self.threads and self.queue.empty():
                 return
@@ -166,6 +179,7 @@ class ThreadedResolverBase(Resolver):
         self.queue.put(request)
 
     def _run(self, thread_n):
+        """The thread function."""
         try:
             logger.debug("{0!r}: entering thread #{1}"
                                                 .format(self, thread_n))
@@ -177,7 +191,7 @@ class ThreadedResolverBase(Resolver):
                 method, args = request
                 logger.debug(" calling {0!r}.{1}{2!r}"
                                             .format(resolver, method, args))
-                getattr(resolver, method)(*args)
+                getattr(resolver, method)(*args) # pylint: disable=W0142
                 self.queue.task_done()
             logger.debug("{0!r}: leaving thread #{1}"
                                                 .format(self, thread_n))
@@ -362,6 +376,9 @@ if HAVE_DNSPYTHON:
             callback(result)
 
     class ThreadedResolver(ThreadedResolverBase):
+        """Threaded resolver implementation using the DNSPython
+        :dns:`dns.resolver` module.
+        """
         def _make_resolver(self):    
             return BlockingResolver(self.settings)
 

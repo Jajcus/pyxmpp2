@@ -61,6 +61,7 @@ class IOThread(object):
     """
     def __init__(self, settings, io_handler, name, daemon = True,
                                                         exc_queue = None):
+        # pylint: disable=R0913
         self.settings = settings if settings else XMPPSettings()
         self.name = name
         self.io_handler = io_handler
@@ -119,6 +120,7 @@ class ReadingThread(IOThread):
     a main loop."""
     def __init__(self, settings, io_handler, name = None, daemon = True,
                                                             exc_queue = None):
+        # pylint: disable=R0913
         if name is None:
             name = u"{0!r} reader".format(io_handler)
         IOThread.__init__(self, settings, io_handler, name, daemon, exc_queue)
@@ -170,6 +172,7 @@ class WrittingThread(IOThread):
     a main loop."""
     def __init__(self, settings, io_handler, name = None, daemon = True,
                                                             exc_queue = None):
+        # pylint: disable=R0913
         if name is None:
             name = u"{0!r} writer".format(io_handler)
         IOThread.__init__(self, settings, io_handler, name, daemon, exc_queue)

@@ -118,6 +118,7 @@ class XMPPSerializer(object):
             - `version`: `unicode`
             - `language`: `unicode`
         """
+        # pylint: disable-msg=R0913
         self._root_prefixes = dict(STANDARD_PREFIXES)
         self._root_prefixes[self.stanza_namespace] = None
         for namespace, prefix in self._root_prefixes.items():

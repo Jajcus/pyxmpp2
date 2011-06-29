@@ -43,7 +43,6 @@ from .exceptions import FatalStreamError, StreamParseError
 from .constants import STREAM_QNP, XML_LANG_QNAME, STREAM_ROOT_TAG
 from .settings import XMPPSettings
 from .xmppserializer import serialize
-from .streamevents import ConnectedEvent
 from .streamevents import StreamConnectedEvent, GotFeaturesEvent
 from .streamevents import AuthenticatedEvent, StreamRestartedEvent
 
@@ -253,6 +252,10 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
         return False
 
     def transport_connected(self):
+        """Called when transport has been connected.
+
+        Send the stream head if initiator.
+        """
         with self.lock:
             if self.initiator:
                 if self._output_state is None:
@@ -323,7 +326,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
                 if self.peer:
                     if peer and peer != self.peer:
                         logger.debug("peer hostname mismatch: {0!r} != {1!r}"
-                                                        .format(peer, self.peer))
+                                                    .format(peer, self.peer))
                 self.peer = peer
             else:
                 to = element.get("to")

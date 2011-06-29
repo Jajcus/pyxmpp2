@@ -33,7 +33,7 @@ MESSAGE_TYPES = ("normal", "chat", "headline", "error", "groupchat")
 class Message(Stanza):
     """<message /> stanza class.
     """
-    # pylint: disable-msg=R0902
+    # pylint: disable-msg=R0902,R0904
     element_name = "message"
     def __init__(self, element = None, from_jid = None, to_jid = None,
                             stanza_type = None, stanza_id = None,

@@ -39,7 +39,7 @@ from .presence import Presence
 from .stanzapayload import XMLPayload
 from .iq import Iq
 
-from .interfaces import StanzaPayload, XMPPFeatureHandler
+from .interfaces import XMPPFeatureHandler
 
 logger = logging.getLogger("pyxmpp.stanzaprocessor")
 
@@ -238,7 +238,9 @@ class StanzaProcessor(object):
               attribute)
 
         :return: result of the last handler or `False` if no
-            handler was found."""
+            handler was found.
+        """
+        # pylint: disable=W0212
         if stanza_type is None:
             stanza_type = stanza.stanza_type
         payload = stanza.get_all_payload()
@@ -439,13 +441,14 @@ class StanzaProcessor(object):
 
     def setup_stanza_handlers(self, handler_objects, usage_restriction):
         """Install stanza handlers provided by `handler_objects`"""
+        # pylint: disable=W0212
         iq_handlers = {"get": {}, "set": {}}
         message_handlers = []
         presence_handlers = []
         for obj in handler_objects:
             if not isinstance(obj, XMPPFeatureHandler):
                 continue
-            for name, handler in inspect.getmembers(obj, callable):
+            for dummy, handler in inspect.getmembers(obj, callable):
                 if not hasattr(handler, "_pyxmpp_stanza_handled"):
                     continue
                 element_name, stanza_type = handler._pyxmpp_stanza_handled
@@ -455,9 +458,9 @@ class StanzaProcessor(object):
                 if element_name == "iq":
                     payload_class = handler._pyxmpp_payload_class_handled
                     payload_key = handler._pyxmpp_payload_key
-                    if (payload_class,payload_key) in iq_handlers[stanza_type]:
+                    if (payload_class, payload_key) in iq_handlers[stanza_type]:
                         continue
-                    iq_handlers[stanza_type][(payload_class,payload_key)] = \
+                    iq_handlers[stanza_type][(payload_class, payload_key)] = \
                             handler
                     continue
                 elif element_name == "message":

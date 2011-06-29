@@ -46,8 +46,8 @@ cosmetics:
 	
 version:
 	if test -d ".git" ; then \
-		echo "# pylint: disable-msg=W0103,W0131" > pyxmpp/version.py ; \
-		echo "version='$(VERSION)+git'" >> pyxmpp/version.py ; \
+		echo "# pylint: disable=C0111,C0103" > pyxmpp/version.py ; \
+		echo "version = '$(VERSION)+git'" >> pyxmpp/version.py ; \
 	fi
 
 dist: build ChangeLog doc

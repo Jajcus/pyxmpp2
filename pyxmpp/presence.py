@@ -52,7 +52,7 @@ class Presence(Stanza):
     """<presence /> stanza.
     
     """
-    # pylint: disable-msg=R0902
+    # pylint: disable-msg=R0902,R0904
     element_name = "presence"
     def __init__(self, element = None, from_jid = None, to_jid = None,
                             stanza_type = None, stanza_id = None,
@@ -269,7 +269,7 @@ class Presence(Stanza):
                             status = self._status, show = self._show,
                             priority = self._priority, error_cond = cond)
 
-        if payload is None:
+        if self._payload is None:
             self.decode_payload()
 
         for payload in self._payload:
