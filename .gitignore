@@ -6,5 +6,5 @@ ChangeLog
 MANIFEST
 cl-stamp
 dist/
-TODO.pylint
+pylint.log
 log

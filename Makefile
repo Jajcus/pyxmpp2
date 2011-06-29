@@ -3,7 +3,7 @@ SNAPSHOT=
 
 DESTDIR="/"
 
-.PHONY: all build test version dist update-doc doc cosmetics TODO.pylint pylint ChangeLog www publish
+.PHONY: all build test version dist update-doc doc cosmetics pylint.log pylint ChangeLog www publish
 
 all: build test
 
@@ -29,10 +29,10 @@ www:
 publish:
 	$(MAKE) -C doc publish
 
-pylint:	TODO.pylint
+pylint:	pylint.log
 
-TODO.pylint: build
-	./auxtools/pylint.sh $(CHECK_MODULE) | tee TODO.pylint
+pylint.log: build
+	./auxtools/pylint.sh $(CHECK_MODULE) | tee pylint.log
 
 ChangeLog: 
 	test -d .git && make cl-stamp || :
