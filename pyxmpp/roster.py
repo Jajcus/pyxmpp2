@@ -25,6 +25,8 @@ from __future__ import absolute_import
 
 __docformat__="restructuredtext en"
 
+raise ImportError("{0} is not yet rewritten for PyXMPP2".format(__name__))
+
 import libxml2
 
 from .xmlextra import common_doc, get_node_ns_uri

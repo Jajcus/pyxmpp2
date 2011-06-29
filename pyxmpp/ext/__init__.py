@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2011 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -15,8 +15,16 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-"""JSF defined XMPP extension and legacy Jabber protocol elements"""
+"""
+Implementations for `XMPP Extensions`_.
+=======================================
 
-__docformat__="restructuredtext en"
+Each submodule or subpackage should implement one extension or closely
+related group of extensions.
+
+.. _XMPP Extensions: http://xmpp.org/xmpp-protocols/xmpp-extensions/
+"""
+
+__docformat__ = "restructuredtext en"
 
 # vi: sts=4 et sw=4

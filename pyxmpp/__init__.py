@@ -28,10 +28,10 @@ PyXMPP2 is a Python implementation of the XMPP protocol (:RFC:`6120`,
 
 `PyXMPP`_ was first implemented by Jacek Konieczny in year 2003, using
 `libxml2`_ as the XML framework, then it slowly evolved over years becoming
-kind of monster full of 'smart' and legacy code. Also `libxml2`_ proved to be
+kind of monster full of 'smart' and legacy code. Also libxml2 proved to be
 inadequate base for a Python library.
 
-PyXMPP2 is a rewrite of the original PyXMPP aimed to replace `libxml2`_ with
+PyXMPP2 is a rewrite of the original PyXMPP aimed to replace libxml2 with
 the more standard :etree:`ElementTree` API and to clean up the API. In fact the
 API has completely changed, hopefully for better.
 
@@ -144,6 +144,8 @@ features are implemented in direct submodules of `pyxmpp2` package.
 implementation.
 
 `pyxmpp2.mainloop` contains the main event loop and I/O framework.
+
+`pyxmpp2.ext` contains `XMPP Extensions`_ implementations.
 
 .. _XMPP Extensions: http://xmpp.org/xmpp-protocols/xmpp-extensions/
 .. _PyXMPP: http://pyxmpp.jajcus.net/

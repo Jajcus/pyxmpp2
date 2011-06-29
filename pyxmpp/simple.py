@@ -22,6 +22,8 @@ from __future__ import absolute_import
 
 __docformat__="restructuredtext en"
 
+raise ImportError("{0} is not yet rewritten for PyXMPP2".format(__name__))
+
 def xmpp_do(jid,password,function,server=None,port=None):
     """Connect as client to a Jabber/XMPP server and call the provided
     function when stream is ready for IM. The function will be called

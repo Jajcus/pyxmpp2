@@ -14,7 +14,6 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-# pylint: disable-msg=W0221, W0201
 """Component (jabber:component:accept) stream handling.
 
 Normative reference:
@@ -22,6 +21,8 @@ Normative reference:
 """
 
 from __future__ import absolute_import
+
+raise ImportError("{0} is not yet rewritten for PyXMPP2".format(__name__))
 
 __docformat__="restructuredtext en"
 
