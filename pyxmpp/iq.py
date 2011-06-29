@@ -70,14 +70,15 @@ class Iq(Stanza):
                 raise ValueError("Missing iq type")
         elif stanza_type not in IQ_TYPES:
             raise ValueError("Bad iq type")
-        if element is None:
-            element = "iq"
-        elif not isinstance(element, ElementClass):
-            raise TypeError("Couldn't make Iq from " + repr(element))
         
         if element is None and stanza_id is None and stanza_type in (
                                                                 "get", "set"):
             stanza_id = self.gen_id()
+
+        if element is None:
+            element = "iq"
+        elif not isinstance(element, ElementClass):
+            raise TypeError("Couldn't make Iq from " + repr(element))
         
         Stanza.__init__(self, element, from_jid = from_jid, to_jid = to_jid,
                         stanza_type = stanza_type, stanza_id = stanza_id,
