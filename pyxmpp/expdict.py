@@ -19,7 +19,7 @@
 
 from __future__ import absolute_import
 
-__docformat__="restructuredtext en"
+__docformat__ = "restructuredtext en"
 
 import time
 import threading
@@ -27,9 +27,7 @@ import logging
 
 logger = logging.getLogger("pyxmpp.expdict")
 
-__all__ = ['ExpiringDictionary']
-
-sentinel = object()
+_NO_DEFAULT = object()
 
 class ExpiringDictionary(dict):
     """An extension to standard Python dictionary objects which implements item
@@ -47,56 +45,47 @@ class ExpiringDictionary(dict):
         - `_timeouts`: `dict`
         - `_default_timeout`: `float`
         - `_lock`: :std:`threading.RLock`"""
-
-    __slots__=['_timeouts','_default_timeout','_lock']
-
-    def __init__(self,default_timeout=300):
+    __slots__ = ['_timeouts', '_default_timeout', '_lock']
+    def __init__(self, default_timeout = 300.0):
         """Initialize an `ExpiringDictionary` object.
 
         :Parameters:
-            - `default_timeout`: default timeout value for stored objects.
+            - `default_timeout`: default timeout value (in seconds) for stored
+              objects.
         :Types:
-            - `default_timeout`: `int`"""
+            - `default_timeout`: `float`
+        """
         dict.__init__(self)
-        self._timeouts={}
-        self._default_timeout=default_timeout
-        self._lock=threading.RLock()
+        self._timeouts = {}
+        self._default_timeout = default_timeout
+        self._lock = threading.RLock()
 
-    def __delitem__(self,key):
-        self._lock.acquire()
-        logger.debug("expdict.__delitem__({0!r})".format(key))
-        try:
+    def __delitem__(self, key):
+        with self._lock:
+            logger.debug("expdict.__delitem__({0!r})".format(key))
             del self._timeouts[key]
-            return dict.__delitem__(self,key)
-        finally:
-            self._lock.release()
+            return dict.__delitem__(self, key)
 
-    def __getitem__(self,key):
-        self._lock.acquire()
-        logger.debug("expdict.__getitem__({0!r})".format(key))
-        try:
+    def __getitem__(self, key):
+        with self._lock:
+            logger.debug("expdict.__getitem__({0!r})".format(key))
             self._expire_item(key)
-            return dict.__getitem__(self,key)
-        finally:
-            self._lock.release()
+            return dict.__getitem__(self, key)
 
-    def pop(self,key,default=sentinel):
-        self._lock.acquire()
-        try:
+    def pop(self, key, default = _NO_DEFAULT):
+        with self._lock:
             self._expire_item(key)
             del self._timeouts[key]
-            if default is not sentinel:
-                return dict.pop(self,key,default)
+            if default is not _NO_DEFAULT:
+                return dict.pop(self, key, default)
             else:
-                return dict.pop(self,key)
-        finally:
-            self._lock.release()
+                return dict.pop(self, key)
 
-    def __setitem__(self,key,value):
-        logger.debug("expdict.__setitem__({0!r},{1!r})".format(key,value))
-        return self.set_item(key,value)
+    def __setitem__(self, key, value):
+        logger.debug("expdict.__setitem__({0!r}, {1!r})".format(key, value))
+        return self.set_item(key, value)
 
-    def set_item(self,key,value,timeout=None,timeout_callback=None):
+    def set_item(self, key, value, timeout = None, timeout_callback = None):
         """Set item of the dictionary.
 
         :Parameters:
@@ -110,24 +99,25 @@ class ExpiringDictionary(dict):
             - `key`: any hashable value
             - `value`: any python object
             - `timeout`: `int`
-            - `timeout_callback`: callable"""
-        self._lock.acquire()
-        logger.debug("expdict.__setitem__({0!r},{1!r},{2!r},{3!r})"
-                            .format(key,value, timeout, timeout_callback))
-        try:
+            - `timeout_callback`: callable
+        """
+        with self._lock:
+            logger.debug("expdict.__setitem__({0!r}, {1!r}, {2!r}, {3!r})"
+                            .format(key, value, timeout, timeout_callback))
             if not timeout:
-                timeout=self._default_timeout
-            self._timeouts[key]=(time.time()+timeout,timeout_callback)
-            return dict.__setitem__(self,key,value)
-        finally:
-            self._lock.release()
+                timeout = self._default_timeout
+            self._timeouts[key] = (time.time() + timeout, timeout_callback)
+            return dict.__setitem__(self, key, value)
 
     def expire(self):
         """Do the expiration of dictionary items.
 
-        Remove items that expired by now from the dictionary."""
-        self._lock.acquire()
-        try:
+        Remove items that expired by now from the dictionary.
+
+        :Return: time, in seconds, when the next item expires or `None`
+        :returntype: `float`
+        """
+        with self._lock:
             logger.debug("expdict.expire. timeouts: {0!r}"
                                                     .format(self._timeouts))
             next_timeout = None
@@ -139,10 +129,8 @@ class ExpiringDictionary(dict):
                     else:
                         next_timeout = min(next_timeout, ret)
             return next_timeout
-        finally:
-            self._lock.release()
 
-    def _expire_item(self,key):
+    def _expire_item(self, key):
         """Do the expiration of a dictionary item.
 
         Remove the item if it has expired by now.
@@ -150,15 +138,16 @@ class ExpiringDictionary(dict):
         :Parameters:
             - `key`: key to the object.
         :Types:
-            - `key`: any hashable value"""
-        (timeout,callback)=self._timeouts[key]
+            - `key`: any hashable value
+        """
+        (timeout, callback) = self._timeouts[key]
         now = time.time()
         if timeout <= now:
             item = dict.pop(self, key)
             del self._timeouts[key]
             if callback:
                 try:
-                    callback(key,item)
+                    callback(key, item)
                 except TypeError:
                     try:
                         callback(key)
