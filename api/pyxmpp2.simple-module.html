@@ -57,8 +57,52 @@
 </table>
 <!-- ==================== MODULE DESCRIPTION ==================== -->
 <h1 class="epydoc">Module simple</h1><p class="nomargin-top"></p>
-Simple API for simple things like sendig messages or single stanzas.
+<p>Simple API for simple things like sendig messages.</p>
+<p>The simplest way to send a message:</p>
+<blockquote>
+<pre class="py-doctest">
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-keyword">from</span> pyxmpp2.simple <span class="py-keyword">import</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>send_message(<span class="py-string">&quot;bob@example.org&quot;</span>, <span class="py-string">&quot;bob's password&quot;</span>, <span class="py-string">&quot;alice@example.org&quot;</span>,
+<span class="py-more">... </span>                                                         <span class="py-string">&quot;Hello Alice&quot;</span>)</pre>
+</blockquote>
+<dl class="rst-docutils">
+<dt>Please note, though:</dt>
+<dd><ul class="rst-first rst-last rst-simple">
+<li>this is inefficient for anything more than sending a single message,
+as a new connection is established and closed for each <a href="pyxmpp2.simple-module.html#send_message" class="link">send_message</a>
+call.</li>
+<li>the default TLS settings are insecure (not peer certificate validation)</li>
+</ul>
+</dd>
+</dl>
 
+<!-- ==================== CLASSES ==================== -->
+<a name="section-Classes"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Classes</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Classes"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.simple.FireAndForget-class.html" class="summary-name">FireAndForget</a><br />
+      A minimal XMPP client that just connects to a server
+and runs single function.
+    </td>
+  </tr>
+</table>
 <!-- ==================== FUNCTIONS ==================== -->
 <a name="section-Functions"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -82,36 +126,14 @@ Simple API for simple things like sendig messages or single stanzas.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.simple-module.html#xmpp_do" class="summary-sig-name">xmpp_do</a>(<span class="summary-sig-arg">jid</span>,
+          <td><span class="summary-sig"><a href="pyxmpp2.simple-module.html#send_message" class="summary-sig-name">send_message</a>(<span class="summary-sig-arg">source_jid</span>,
         <span class="summary-sig-arg">password</span>,
-        <span class="summary-sig-arg">function</span>,
-        <span class="summary-sig-arg">server</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">port</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Connect as client to a Jabber/XMPP server and call the provided
-function when stream is ready for IM.</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.simple-module.html#send_message" class="summary-sig-name">send_message</a>(<span class="summary-sig-arg">my_jid</span>,
-        <span class="summary-sig-arg">my_password</span>,
-        <span class="summary-sig-arg">to_jid</span>,
+        <span class="summary-sig-arg">target_jid</span>,
         <span class="summary-sig-arg">body</span>,
         <span class="summary-sig-arg">subject</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">message_type</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">server</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">port</span>=<span class="summary-sig-default">None</span>)</span><br />
+        <span class="summary-sig-arg">message_type</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">chat</code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">message_thread</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">settings</span>=<span class="summary-sig-default">None</span>)</span><br />
       Star an XMPP session and send a message, then exit.</td>
           <td align="right" valign="top">
             
@@ -141,32 +163,6 @@ function when stream is ready for IM.</td>
   </td>
 </tr>
 </table>
-<a name="xmpp_do"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">xmpp_do</span>(<span class="sig-arg">jid</span>,
-        <span class="sig-arg">password</span>,
-        <span class="sig-arg">function</span>,
-        <span class="sig-arg">server</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">port</span>=<span class="sig-default">None</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    >&nbsp;
-    </td>
-  </tr></table>
-  
-  Connect as client to a Jabber/XMPP server and call the provided
-function when stream is ready for IM. The function will be called
-with one argument -- the XMPP stream. After function returns the stream is
-closed.
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
 <a name="send_message"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -174,14 +170,14 @@ closed.
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">send_message</span>(<span class="sig-arg">my_jid</span>,
-        <span class="sig-arg">my_password</span>,
-        <span class="sig-arg">to_jid</span>,
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">send_message</span>(<span class="sig-arg">source_jid</span>,
+        <span class="sig-arg">password</span>,
+        <span class="sig-arg">target_jid</span>,
         <span class="sig-arg">body</span>,
         <span class="sig-arg">subject</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">message_type</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">server</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">port</span>=<span class="sig-default">None</span>)</span>
+        <span class="sig-arg">message_type</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">chat</code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">message_thread</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">settings</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
@@ -192,16 +188,14 @@ closed.
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>my_jid</code></strong> (<a href="pyxmpp2.jid.JID-class.html" class="link">pyxmpp.jid.JID</a>) - sender JID.</li>
-        <li><strong class="pname"><code>my_password</code></strong> (<code class="link">unicode</code>) - sender password.</li>
-        <li><strong class="pname"><code>to_jid</code></strong> (<a href="pyxmpp2.jid.JID-class.html" class="link">pyxmpp.jid.JID</a>) - recipient JID.</li>
-        <li><strong class="pname"><code>body</code></strong> (<code class="link">unicode</code>) - message body.</li>
-        <li><strong class="pname"><code>subject</code></strong> (<code class="link">unicode</code>) - message subject.</li>
-        <li><strong class="pname"><code>message_type</code></strong> (<code class="link">str</code>) - message type.</li>
-        <li><strong class="pname"><code>server</code></strong> (<code class="link">unicode</code> or <code class="link">str</code>) - server to connect to (default: derivied from <code class="link">my_jid</code> using
-DNS records).</li>
-        <li><strong class="pname"><code>port</code></strong> (<code class="link">int</code>) - TCP port number to connect to (default: retrieved using SRV
-DNS record, or 5222).</li>
+        <li><strong class="pname"><code>source_jid</code></strong> (<a href="pyxmpp2.jid.JID-class.html" class="link">pyxmpp2.jid.JID</a> or <code class="link">basestring</code>) - sender JID</li>
+        <li><strong class="pname"><code>password</code></strong> (<code class="link">basestring</code>) - sender password</li>
+        <li><strong class="pname"><code>target_jid</code></strong> (<a href="pyxmpp2.jid.JID-class.html" class="link">pyxmpp.jid.JID</a> or <code class="link">basestring</code>) - recipient JID</li>
+        <li><strong class="pname"><code>body</code></strong> (<code class="link">basestring</code>) - message body</li>
+        <li><strong class="pname"><code>subject</code></strong> (<code class="link">basestring</code>) - message subject</li>
+        <li><strong class="pname"><code>message_type</code></strong> (<code class="link">basestring</code>) - message type</li>
+        <li><strong class="pname"><code>message_thread</code></strong> - message thread id</li>
+        <li><strong class="pname"><code>settings</code></strong> (<a href="pyxmpp2.settings.XMPPSettings-class.html" class="link">pyxmpp2.settings.XMPPSettings</a>) - other settings</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -239,7 +233,7 @@ DNS record, or 5222).</li>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Wed Jun 29 20:12:10 2011</a>
+    3.0.1 on Wed Jun 29 21:53:24 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

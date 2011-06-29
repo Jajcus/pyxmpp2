@@ -53,7 +53,7 @@ pyxmpp2.error.x	pyxmpp2.error-module.html#x
 pyxmpp2.etree	pyxmpp2.etree-module.html
 pyxmpp2.exceptions	pyxmpp2.exceptions-module.html
 pyxmpp2.expdict	pyxmpp2.expdict-module.html
-pyxmpp2.expdict.sentinel	pyxmpp2.expdict-module.html#sentinel
+pyxmpp2.expdict._NO_DEFAULT	pyxmpp2.expdict-module.html#_NO_DEFAULT
 pyxmpp2.expdict.logger	pyxmpp2.expdict-module.html#logger
 pyxmpp2.interfaces	pyxmpp2.interfaces-module.html
 pyxmpp2.interfaces._iq_handler	pyxmpp2.interfaces-module.html#_iq_handler
@@ -144,7 +144,7 @@ pyxmpp2.settings	pyxmpp2.settings-module.html
 pyxmpp2.settings.logger	pyxmpp2.settings-module.html#logger
 pyxmpp2.simple	pyxmpp2.simple-module.html
 pyxmpp2.simple.send_message	pyxmpp2.simple-module.html#send_message
-pyxmpp2.simple.xmpp_do	pyxmpp2.simple-module.html#xmpp_do
+pyxmpp2.simple.event_handler	pyxmpp2.mainloop.interfaces-module.html#event_handler
 pyxmpp2.stanza	pyxmpp2.stanza-module.html
 pyxmpp2.stanza.serialize	pyxmpp2.xmppserializer-module.html#serialize
 pyxmpp2.stanza.payload_factory	pyxmpp2.stanzapayload-module.html#payload_factory
@@ -1139,6 +1139,18 @@ pyxmpp2.settings._SettingDefinition.__init__	pyxmpp2.settings._SettingDefinition
 pyxmpp2.settings._YesNoAction	pyxmpp2.settings._YesNoAction-class.html
 pyxmpp2.settings._YesNoAction.__call__	pyxmpp2.settings._YesNoAction-class.html#__call__
 pyxmpp2.settings._YesNoAction.__init__	pyxmpp2.settings._YesNoAction-class.html#__init__
+pyxmpp2.simple.FireAndForget	pyxmpp2.simple.FireAndForget-class.html
+pyxmpp2.mainloop.interfaces.EventHandler.__metaclass__	abc.ABCMeta-class.html
+pyxmpp2.mainloop.interfaces.EventHandler._abc_negative_cache	pyxmpp2.mainloop.interfaces.EventHandler-class.html#_abc_negative_cache
+pyxmpp2.simple.FireAndForget.__init__	pyxmpp2.simple.FireAndForget-class.html#__init__
+pyxmpp2.mainloop.interfaces.EventHandler._abc_cache	pyxmpp2.mainloop.interfaces.EventHandler-class.html#_abc_cache
+pyxmpp2.simple.FireAndForget.disconnect	pyxmpp2.simple.FireAndForget-class.html#disconnect
+pyxmpp2.mainloop.interfaces.EventHandler.__abstractmethods__	pyxmpp2.mainloop.interfaces.EventHandler-class.html#__abstractmethods__
+pyxmpp2.simple.FireAndForget.run	pyxmpp2.simple.FireAndForget-class.html#run
+pyxmpp2.simple.FireAndForget.handle_disconnected	pyxmpp2.simple.FireAndForget-class.html#handle_disconnected
+pyxmpp2.simple.FireAndForget.handle_authorized	pyxmpp2.simple.FireAndForget-class.html#handle_authorized
+pyxmpp2.mainloop.interfaces.EventHandler._abc_negative_cache_version	pyxmpp2.mainloop.interfaces.EventHandler-class.html#_abc_negative_cache_version
+pyxmpp2.mainloop.interfaces.EventHandler._abc_registry	pyxmpp2.mainloop.interfaces.EventHandler-class.html#_abc_registry
 pyxmpp2.stanza.Stanza	pyxmpp2.stanza.Stanza-class.html
 pyxmpp2.stanza.Stanza._namespace	pyxmpp2.stanza.Stanza-class.html#_namespace
 pyxmpp2.stanza.Stanza.stream	pyxmpp2.stanza.Stanza-class.html#stream
