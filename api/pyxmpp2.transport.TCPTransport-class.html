@@ -138,7 +138,8 @@ XMPP over TCP with optional TLS.
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="_set_state"></a><span class="summary-sig-name">_set_state</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">state</span>)</span></td>
+        <span class="summary-sig-arg">state</span>)</span><br />
+      Set <a href="pyxmpp2.transport.TCPTransport-class.html#_state" class="link" onclick="show_private();">_state</a> and notify any threads waiting for the change.</td>
           <td align="right" valign="top">
             
             
@@ -533,8 +534,10 @@ next <a href="pyxmpp2.transport.TCPTransport-class.html#prepare" class="link">pr
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="starttls"></a><span class="summary-sig-name">starttls</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">**kwargs</span>)</span></td>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#starttls" class="summary-sig-name">starttls</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">**kwargs</span>)</span><br />
+      Request a TLS handshake on the socket ans switch
+to encrypted output.</td>
           <td align="right" valign="top">
             
             
@@ -550,7 +553,8 @@ next <a href="pyxmpp2.transport.TCPTransport-class.html#prepare" class="link">pr
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="getpeercert"></a><span class="summary-sig-name">getpeercert</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td><span class="summary-sig"><a href="pyxmpp2.transport.TCPTransport-class.html#getpeercert" class="summary-sig-name">getpeercert</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Return the peer certificate.</td>
           <td align="right" valign="top">
             
             
@@ -720,7 +724,8 @@ next <a href="pyxmpp2.transport.TCPTransport-class.html#prepare" class="link">pr
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="_close"></a><span class="summary-sig-name">_close</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td><span class="summary-sig"><a name="_close"></a><span class="summary-sig-name">_close</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Same as <a href="pyxmpp2.transport.TCPTransport-class.html#_close" class="link" onclick="show_private();">_close</a> but expects <a href="pyxmpp2.transport.TCPTransport-class.html#lock" class="link">lock</a> acquired.</td>
           <td align="right" valign="top">
             
             
@@ -1545,6 +1550,53 @@ socket.
   </dl>
 </td></tr></table>
 </div>
+<a name="starttls"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">starttls</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">**kwargs</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Request a TLS handshake on the socket ans switch
+to encrypted output.
+The handshake will start after any currently buffered data is sent.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>kwargs</code></strong> - arguments for <a class="rst-reference external" href="http://docs.python.org/library/ssl.html#ssl.wrap_socket" target="_top"><tt class="rst-docutils literal">ssl.wrap_socket</tt></a></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="getpeercert"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">getpeercert</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Return the peer certificate. The format is the same
+as for the standard <a class="rst-reference external" href="http://docs.python.org/library/ssl.html#sslsocket-objects" target="_top"><tt class="rst-docutils literal">ssl.SSLSocket.getpeercert()</tt></a> method,
+but may (in future) include data not normally recognized by Python.
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
 <a name="handle_read"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -1795,7 +1847,7 @@ assumed and the stream is closed.</p>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Jun 28 20:51:19 2011</a>
+    3.0.1 on Wed Jun 29 20:12:16 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

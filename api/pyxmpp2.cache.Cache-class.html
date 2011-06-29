@@ -1,0 +1,819 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>pyxmpp2.cache.Cache</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="pyxmpp2-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/Jajcus/pyxmpp2/">PyXMPP2</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="pyxmpp2-module.html">Package&nbsp;pyxmpp2</a> ::
+        <a href="pyxmpp2.cache-module.html">Module&nbsp;cache</a> ::
+        Class&nbsp;Cache
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class Cache</h1><p class="nomargin-top"></p>
+<p>Caching proxy for object retrieval and caching.</p>
+<p>Object factories (&quot;fetchers&quot;) are registered in the <a href="pyxmpp2.cache.Cache-class.html" class="link">Cache</a> object and used
+to e.g. retrieve requested objects from network.  They are called only when
+the requested object is not in the cache or is not fresh enough.</p>
+<p>A state (freshness level) name may be provided when requesting an object.
+When the cached item state is &quot;less fresh&quot; then requested, then new object
+will be retrieved.</p>
+<p>Following states are defined:</p>
+<blockquote>
+<ul class="rst-simple">
+<li>'new': always a new object should be retrieved.</li>
+<li>'fresh': a fresh object (not older than freshness time)</li>
+<li>'old': object not fresh, but most probably still valid.</li>
+<li>'stale': object known to be expired.</li>
+</ul>
+</blockquote>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.cache.Cache-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">max_items</span>,
+        <span class="summary-sig-arg">default_freshness_period</span>=<span class="summary-sig-default">datetime.timedelta(0, 3600)</span>,
+        <span class="summary-sig-arg">default_expiration_period</span>=<span class="summary-sig-default">datetime.timedelta(0, 43200)</span>,
+        <span class="summary-sig-arg">default_purge_period</span>=<span class="summary-sig-default">datetime.timedelta(1)</span>)</span><br />
+      Initialize a <a href="pyxmpp2.cache.Cache-class.html" class="link">Cache</a> object.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.cache.Cache-class.html#request_object" class="summary-sig-name">request_object</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">address</span>,
+        <span class="summary-sig-arg">state</span>,
+        <span class="summary-sig-arg">object_handler</span>,
+        <span class="summary-sig-arg">error_handler</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">timeout_handler</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">backup_state</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">timeout</span>=<span class="summary-sig-default">datetime.timedelta(0, 3600)</span>,
+        <span class="summary-sig-arg">freshness_period</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">expiration_period</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">purge_period</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Request an object with given address and state not worse than
+<code class="link">state</code>.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.cache.Cache-class.html#invalidate_object" class="summary-sig-name">invalidate_object</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">address</span>,
+        <span class="summary-sig-arg">state</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">stale</code><code class="variable-quote">'</code></span>)</span><br />
+      Force cache item state change (to 'worse' state only).</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code class="link">str</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.cache.Cache-class.html#add_item" class="summary-sig-name">add_item</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">item</span>)</span><br />
+      Add an item to the cache.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><a href="pyxmpp2.cache.CacheItem-class.html" class="link">CacheItem</a></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.cache.Cache-class.html#get_item" class="summary-sig-name">get_item</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">address</span>,
+        <span class="summary-sig-arg">state</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">fresh</code><code class="variable-quote">'</code></span>)</span><br />
+      Get an item from the cache.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code class="link">str</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.cache.Cache-class.html#update_item" class="summary-sig-name">update_item</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">item</span>)</span><br />
+      Update state of an item in the cache.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code class="link">int</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.cache.Cache-class.html#num_items" class="summary-sig-name">num_items</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Get the number of items in the cache.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.cache.Cache-class.html#purge_items" class="summary-sig-name">purge_items</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Remove purged and overlimit items from the cache.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.cache.Cache-class.html#tick" class="summary-sig-name">tick</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Do the regular cache maintenance.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.cache.Cache-class.html#remove_fetcher" class="summary-sig-name">remove_fetcher</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">fetcher</span>)</span><br />
+      Remove a running fetcher from the list of active fetchers.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.cache.Cache-class.html#set_fetcher" class="summary-sig-name">set_fetcher</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">fetcher_class</span>)</span><br />
+      Set the fetcher class.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE VARIABLES ==================== -->
+<a name="section-InstanceVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code class="link">list</code> of (<code class="link">int</code>, <a href="pyxmpp2.cache.CacheFetcher-class.html" class="link">CacheFetcher</a>)</span>
+    </td><td class="summary">
+        <a name="_active_fetchers"></a><span class="summary-name">_active_fetchers</span><br />
+      list of active fetchers sorted by the time of
+its expiration time.
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><a href="pyxmpp2.cache.CacheFetcher-class.html" class="link">CacheFetcher</a> based class</span>
+    </td><td class="summary">
+        <a name="_fetcher"></a><span class="summary-name">_fetcher</span><br />
+      fetcher class for this cache.
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code class="link">dict</code> of (<code class="link">classobj</code>, addr) -&gt; <a href="pyxmpp2.cache.CacheItem-class.html" class="link">CacheItem</a></span>
+    </td><td class="summary">
+        <a name="_items"></a><span class="summary-name">_items</span><br />
+      dictionary of stored items.
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code class="link">list</code> of (<code class="link">int</code>, <a class="rst-reference external" href="http://docs.python.org/library/datetime.html" target="_top"><tt class="rst-docutils literal">datetime</tt></a>, <a href="pyxmpp2.cache.CacheItem-class.html" class="link">CacheItem</a>)</span>
+    </td><td class="summary">
+        <a name="_items_list"></a><span class="summary-name">_items_list</span><br />
+      list of stored items with the most suitable for
+purging first.
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><a class="rst-reference external" href="http://docs.python.org/library/threading.html#rlock-objects" target="_top"><tt class="rst-docutils literal">threading.RLock</tt></a></span>
+    </td><td class="summary">
+        <a name="_lock"></a><span class="summary-name">_lock</span><br />
+      lock for thread safety.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">timedelta</span>
+    </td><td class="summary">
+        <a name="default_expiration_period"></a><span class="summary-name">default_expiration_period</span><br />
+      default expiration period (in seconds).
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">timedelta</span>
+    </td><td class="summary">
+        <a name="default_freshness_period"></a><span class="summary-name">default_freshness_period</span><br />
+      default freshness period (in seconds).
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">timedelta</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.cache.Cache-class.html#default_purge_period" class="summary-name">default_purge_period</a><br />
+      default purge period (in seconds).
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code class="link">int</code></span>
+    </td><td class="summary">
+        <a name="max_items"></a><span class="summary-name">max_items</span><br />
+      maximum number of items to store.
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">max_items</span>,
+        <span class="sig-arg">default_freshness_period</span>=<span class="sig-default">datetime.timedelta(0, 3600)</span>,
+        <span class="sig-arg">default_expiration_period</span>=<span class="sig-default">datetime.timedelta(0, 43200)</span>,
+        <span class="sig-arg">default_purge_period</span>=<span class="sig-default">datetime.timedelta(1)</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Initialize a <a href="pyxmpp2.cache.Cache-class.html" class="link">Cache</a> object.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>default_freshness_period</code></strong> (number) - default freshness period (in seconds).</li>
+        <li><strong class="pname"><code>default_expiration_period</code></strong> (number) - default expiration period (in seconds).</li>
+        <li><strong class="pname"><code>default_purge_period</code></strong> (number) - default purge period (in seconds). When
+0 then items are never purged because of their age.</li>
+        <li><strong class="pname"><code>max_items</code></strong> (number) - maximum number of items to store.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="request_object"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">request_object</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">address</span>,
+        <span class="sig-arg">state</span>,
+        <span class="sig-arg">object_handler</span>,
+        <span class="sig-arg">error_handler</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">timeout_handler</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">backup_state</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">timeout</span>=<span class="sig-default">datetime.timedelta(0, 3600)</span>,
+        <span class="sig-arg">freshness_period</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">expiration_period</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">purge_period</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Request an object with given address and state not worse than
+<code class="link">state</code>. The object will be taken from cache if available, and
+created/fetched otherwise. The request is asynchronous -- this metod
+doesn't return the object directly, but the <code class="link">object_handler</code> is called
+as soon as the object is available (this may be before <a href="pyxmpp2.cache.Cache-class.html#request_object" class="link">request_object</a>
+returns and may happen in other thread). On error the <code class="link">error_handler</code>
+will be called, and on timeout -- the <code class="link">timeout_handler</code>.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>address</code></strong> (any hashable) - address of the object requested.</li>
+        <li><strong class="pname"><code>state</code></strong> (&quot;new&quot;, &quot;fresh&quot;, &quot;old&quot; or &quot;stale&quot;) - the worst acceptable object state. When 'new' then always
+a new object will be created/fetched. 'stale' will select any
+item available in cache.</li>
+        <li><strong class="pname"><code>object_handler</code></strong> (callable(address, value, state)) - function to be called when object is available.
+It will be called with the following arguments: address, object
+and its state.</li>
+        <li><strong class="pname"><code>error_handler</code></strong> (callable(address, error_data)) - function to be called on object retrieval error.
+It will be called with two arguments: requested address and
+additional error information (fetcher-specific, may be
+StanzaError for XMPP objects).  If not given, then the object
+handler will be called with object set to <code class="link">None</code> and state
+&quot;error&quot;.</li>
+        <li><strong class="pname"><code>timeout_handler</code></strong> (callable(address)) - function to be called on object retrieval
+timeout.  It will be called with only one argument: the requested
+address. If not given, then the <code class="link">error_handler</code> will be called
+instead, with error details set to <code class="link">None</code>.</li>
+        <li><strong class="pname"><code>backup_state</code></strong> (&quot;new&quot;, &quot;fresh&quot;, &quot;old&quot; or &quot;stale&quot;) - when set and object in state <code class="link">state</code> is not
+available in the cache and object retrieval failed then object
+with this state will also be looked-up in the cache and provided
+if available.</li>
+        <li><strong class="pname"><code>timeout</code></strong> (timedelta) - time interval after which retrieval of the object
+should be given up.</li>
+        <li><strong class="pname"><code>freshness_period</code></strong> (timedelta) - time interval after which the item created
+should become 'old'.</li>
+        <li><strong class="pname"><code>expiration_period</code></strong> (timedelta) - time interval after which the item created
+should become 'stale'.</li>
+        <li><strong class="pname"><code>purge_period</code></strong> (timedelta) - time interval after which the item created
+shuld be removed from the cache.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="invalidate_object"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">invalidate_object</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">address</span>,
+        <span class="sig-arg">state</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">stale</code><code class="variable-quote">'</code></span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Force cache item state change (to 'worse' state only).
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>state</code></strong> (<code class="link">str</code>) - the new state requested.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="add_item"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">add_item</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">item</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Add an item to the cache.</p>
+<p>Item state is updated before adding it (it will not be 'new' any more).</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>item</code></strong> (<a href="pyxmpp2.cache.CacheItem-class.html" class="link">CacheItem</a>) - the item to add.</li>
+    </ul></dd>
+    <dt>Returns: <code class="link">str</code></dt>
+        <dd>state of the item after addition.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="get_item"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_item</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">address</span>,
+        <span class="sig-arg">state</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">fresh</code><code class="variable-quote">'</code></span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Get an item from the cache.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>address</code></strong> (any hashable) - its address.</li>
+        <li><strong class="pname"><code>state</code></strong> (<code class="link">str</code>) - the worst state that is acceptable.</li>
+    </ul></dd>
+    <dt>Returns: <a href="pyxmpp2.cache.CacheItem-class.html" class="link">CacheItem</a></dt>
+        <dd>the item or <code class="link">None</code> if it was not found.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="update_item"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">update_item</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">item</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Update state of an item in the cache.</p>
+<p>Update item's state and remove the item from the cache
+if its new state is 'purged'</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>item</code></strong> (<a href="pyxmpp2.cache.CacheItem-class.html" class="link">CacheItem</a>) - item to update.</li>
+    </ul></dd>
+    <dt>Returns: <code class="link">str</code></dt>
+        <dd>new state of the item.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="num_items"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">num_items</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Get the number of items in the cache.
+  <dl class="fields">
+    <dt>Returns: <code class="link">int</code></dt>
+        <dd>number of items.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="purge_items"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">purge_items</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Remove purged and overlimit items from the cache.</p>
+<p>TODO: optimize somehow.</p>
+<p>Leave no more than 75% of <a href="pyxmpp2.cache.Cache-class.html#max_items" class="link">self.max_items</a> items in the cache.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="tick"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">tick</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Do the regular cache maintenance.</p>
+<p>Must be called from time to time for timeouts and cache old items
+purging to work.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="remove_fetcher"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">remove_fetcher</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">fetcher</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Remove a running fetcher from the list of active fetchers.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>fetcher</code></strong> (<a href="pyxmpp2.cache.CacheFetcher-class.html" class="link">CacheFetcher</a>) - fetcher instance.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="set_fetcher"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">set_fetcher</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">fetcher_class</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Set the fetcher class.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>fetcher_class</code></strong> (<a href="pyxmpp2.cache.CacheFetcher-class.html" class="link">CacheFetcher</a> based class) - the fetcher class.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== INSTANCE VARIABLE DETAILS ==================== -->
+<a name="section-InstanceVariableDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Variable Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceVariableDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="default_purge_period"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">default_purge_period</h3>
+  default purge period (in seconds). When
+0 then items are never purged because of their age.
+  <dl class="fields">
+    <dt>Type:</dt>
+      <dd>timedelta</dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="pyxmpp2-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/Jajcus/pyxmpp2/">PyXMPP2</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    <a href="epydoc-log.html">Generated by Epydoc
+    3.0.1 on Wed Jun 29 17:59:48 2011</a>
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

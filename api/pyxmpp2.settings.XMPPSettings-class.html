@@ -301,6 +301,24 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
       
     </td>
   </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.settings.XMPPSettings-class.html#load_arguments" class="summary-sig-name">load_arguments</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">args</span>)</span><br />
+      Load settings from <tt class="rst-docutils literal">ArgumentParser</tt> output.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>_abcoll.MutableMapping</code></b>:
@@ -356,9 +374,48 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="add_setting"></a><span class="summary-sig-name">add_setting</span>(<span class="summary-sig-arg">cls</span>,
+          <td><span class="summary-sig"><a href="pyxmpp2.settings.XMPPSettings-class.html#add_setting" class="summary-sig-name">add_setting</a>(<span class="summary-sig-arg">cls</span>,
         <span class="summary-sig-arg">name</span>,
-        <span class="summary-sig-arg">**kwargs</span>)</span></td>
+        <span class="summary-sig-arg">**kwargs</span>)</span><br />
+      Add a new setting definition.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.settings.XMPPSettings-class.html#list_all" class="summary-sig-name">list_all</a>(<span class="summary-sig-arg">cls</span>,
+        <span class="summary-sig-arg">basic</span>=<span class="summary-sig-default">None</span>)</span><br />
+      List known settings.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">std:<code class="link">argparse.ArgumentParser</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.settings.XMPPSettings-class.html#get_arg_parser" class="summary-sig-name">get_arg_parser</a>(<span class="summary-sig-arg">cls</span>,
+        <span class="summary-sig-arg">settings</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">option_prefix</span>=<span class="summary-sig-default"><code class="variable-quote">u'</code><code class="variable-string">--</code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">add_help</span>=<span class="summary-sig-default">False</span>)</span><br />
+      Make a command-line option parser.</td>
           <td align="right" valign="top">
             
             
@@ -399,7 +456,8 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="validate_string_list"></a><span class="summary-sig-name">validate_string_list</span>(<span class="summary-sig-arg">value</span>)</span></td>
+          <td><span class="summary-sig"><a name="validate_string_list"></a><span class="summary-sig-name">validate_string_list</span>(<span class="summary-sig-arg">value</span>)</span><br />
+      Validator for string lists to be used with <a href="pyxmpp2.settings.XMPPSettings-class.html#add_setting" class="link">add_setting</a>.</td>
           <td align="right" valign="top">
             
             
@@ -415,7 +473,8 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="validate_positive_int"></a><span class="summary-sig-name">validate_positive_int</span>(<span class="summary-sig-arg">value</span>)</span></td>
+          <td><span class="summary-sig"><a name="validate_positive_int"></a><span class="summary-sig-name">validate_positive_int</span>(<span class="summary-sig-arg">value</span>)</span><br />
+      Positive integer validator to be used with <a href="pyxmpp2.settings.XMPPSettings-class.html#add_setting" class="link">add_setting</a>.</td>
           <td align="right" valign="top">
             
             
@@ -431,7 +490,8 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="validate_positive_float"></a><span class="summary-sig-name">validate_positive_float</span>(<span class="summary-sig-arg">value</span>)</span></td>
+          <td><span class="summary-sig"><a name="validate_positive_float"></a><span class="summary-sig-name">validate_positive_float</span>(<span class="summary-sig-arg">value</span>)</span><br />
+      Positive float validator to be used with <a href="pyxmpp2.settings.XMPPSettings-class.html#add_setting" class="link">add_setting</a>.</td>
           <td align="right" valign="top">
             
             
@@ -447,8 +507,9 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="get_int_range_validator"></a><span class="summary-sig-name">get_int_range_validator</span>(<span class="summary-sig-arg">start</span>,
-        <span class="summary-sig-arg">stop</span>)</span></td>
+          <td><span class="summary-sig"><a href="pyxmpp2.settings.XMPPSettings-class.html#get_int_range_validator" class="summary-sig-name">get_int_range_validator</a>(<span class="summary-sig-arg">start</span>,
+        <span class="summary-sig-arg">stop</span>)</span><br />
+      Return an integer range validator to be used with <a href="pyxmpp2.settings.XMPPSettings-class.html#add_setting" class="link">add_setting</a>.</td>
           <td align="right" valign="top">
             
             
@@ -494,21 +555,21 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x8708c6c&gt;">&lt;_weakrefset.WeakSet object at 0x8708c6c&gt;</code>
+        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x872138c&gt;">&lt;_weakrefset.WeakSet object at 0x872138c&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x8708ccc&gt;">&lt;_weakrefset.WeakSet object at 0x8708ccc&gt;</code>
+        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x87213cc&gt;">&lt;_weakrefset.WeakSet object at 0x87213cc&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x8708c8c&gt;">&lt;_weakrefset.WeakSet object at 0x8708c8c&gt;</code>
+        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x872134c&gt;">&lt;_weakrefset.WeakSet object at 0x872134c&gt;</code>
     </td>
   </tr>
 <tr class="private">
@@ -881,6 +942,164 @@ or the PyXMPP global default otherwise.</p>
   </dl>
 </td></tr></table>
 </div>
+<a name="load_arguments"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">load_arguments</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">args</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Load settings from <tt class="rst-rst-docutils literal rst-docutils literal">ArgumentParser</tt> output.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>args</code></strong> - output of argument parsed based on the one
+returned by <a href="pyxmpp2.settings.XMPPSettings-class.html#get_arg_parser" class="link">get_arg_parser()</a></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="add_setting"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">add_setting</span>(<span class="sig-arg">cls</span>,
+        <span class="sig-arg">name</span>,
+        <span class="sig-arg">**kwargs</span>)</span>
+    <br /><em class="fname">Class Method</em>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Add a new setting definition.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>name</code></strong> (<code class="link">unicode</code>) - setting name</li>
+        <li><strong class="pname"><code>type</code></strong> (type or <code class="link">unicode</code>) - setting type object or type description</li>
+        <li><strong class="pname"><code>default</code></strong> - default value</li>
+        <li><strong class="pname"><code>factory</code></strong> (a callable) - default value factory</li>
+        <li><strong class="pname"><code>cache</code></strong> (<code class="link">bool</code>) - if <code class="link">True</code> the <code class="link">factory</code> will be called only once
+and its value stored as a constant default.</li>
+        <li><strong class="pname"><code>default_d</code></strong> (<code class="link">unicode</code>) - description of the default value</li>
+        <li><strong class="pname"><code>doc</code></strong> (<code class="link">unicode</code>) - setting documentation</li>
+        <li><strong class="pname"><code>cmdline_help</code></strong> (<code class="link">unicode</code>) - command line argument description. When not
+provided then the setting won't be available as a command-line
+option</li>
+        <li><strong class="pname"><code>basic</code></strong> (<code class="link">bool</code>) - when <code class="link">True</code> the option is considered a basic option -
+one of those which should usually stay configurable in
+an application.</li>
+        <li><strong class="pname"><code>validator</code></strong> (a callable) - function validating command-line option value string
+and returning proper value for the settings objects. Defaults
+to <code class="link">type</code>.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="get_int_range_validator"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_int_range_validator</span>(<span class="sig-arg">start</span>,
+        <span class="sig-arg">stop</span>)</span>
+    <br /><em class="fname">Static Method</em>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Return an integer range validator to be used with <a href="pyxmpp2.settings.XMPPSettings-class.html#add_setting" class="link">add_setting</a>.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>start</code></strong> (<code class="link">int</code>) - minimum value for the integer</li>
+        <li><strong class="pname"><code>stop</code></strong> (<code class="link">int</code>) - the upper bound (maximum value + 1)</li>
+    </ul></dd>
+    <dt>Returns:</dt>
+        <dd>a validator function</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="list_all"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">list_all</span>(<span class="sig-arg">cls</span>,
+        <span class="sig-arg">basic</span>=<span class="sig-default">None</span>)</span>
+    <br /><em class="fname">Class Method</em>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  List known settings.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>basic</code></strong> - When <code class="link">True</code> then limit output to the basic settings,
+when <code class="link">False</code> list only the extra settings.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="get_arg_parser"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_arg_parser</span>(<span class="sig-arg">cls</span>,
+        <span class="sig-arg">settings</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">option_prefix</span>=<span class="sig-default"><code class="variable-quote">u'</code><code class="variable-string">--</code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">add_help</span>=<span class="sig-default">False</span>)</span>
+    <br /><em class="fname">Class Method</em>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Make a command-line option parser.</p>
+<p>The returned parser may be used as a parent parser for application
+argument parser.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>settings</code></strong> (list of <code class="link">unicode</code>) - list of PyXMPP2 settings to consider. By default
+all 'basic' settings are provided.</li>
+        <li><strong class="pname"><code>option_prefix</code></strong> (<code class="link">str</code>) - custom prefix for PyXMPP2 options. E.g.
+<tt class="rst-docutils literal"><span class="pre">'--xmpp'</span></tt> to differentiate them from not xmpp-related
+application options.</li>
+        <li><strong class="pname"><code>add_help</code></strong> () - when <code class="link">True</code> a '--help' option will be included
+(probably already added in the application parser object)</li>
+    </ul></dd>
+    <dt>Returns: std:<code class="link">argparse.ArgumentParser</code></dt>
+        <dd>an argument parser object.</dd>
+  </dl>
+</td></tr></table>
+</div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
@@ -914,7 +1133,7 @@ or the PyXMPP global default otherwise.</p>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Jun 28 20:51:18 2011</a>
+    3.0.1 on Wed Jun 29 20:12:14 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

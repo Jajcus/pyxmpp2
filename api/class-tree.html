@@ -72,8 +72,6 @@ interpreter exiting.</em>
     <li> <strong class="uidlink"><a href="pyxmpp2.exceptions.Error-class.html">pyxmpp2.exceptions.Error</a></strong>:
       <em class="summary">Base class for all PyXMPP exceptions.</em>
     <ul>
-    <li> <strong class="uidlink"><a href="pyxmpp2.exceptions.AlreadyInProgressError-class.html">pyxmpp2.exceptions.AlreadyInProgressError</a></strong>
-    </li>
     <li> <strong class="uidlink"><a href="pyxmpp2.exceptions.ClientError-class.html">pyxmpp2.exceptions.ClientError</a></strong>:
       <em class="summary">Raised on a client error.</em>
     <ul>
@@ -445,9 +443,12 @@ with PyxMPP.</em>
     <li> <strong class="uidlink"><a href="pyxmpp2.resolver.DumbBlockingResolver-class.html">pyxmpp2.resolver.DumbBlockingResolver</a></strong>:
       <em class="summary">Simple blocking resolver using only the standard Python library.</em>
     </li>
-    <li> <strong class="uidlink"><a href="pyxmpp2.resolver.ThreadedResolverBase-class.html">pyxmpp2.resolver.ThreadedResolverBase</a></strong>
+    <li> <strong class="uidlink"><a href="pyxmpp2.resolver.ThreadedResolverBase-class.html">pyxmpp2.resolver.ThreadedResolverBase</a></strong>:
+      <em class="summary">Base class for threaded resolvers.</em>
     <ul>
-    <li> <strong class="uidlink"><a href="pyxmpp2.resolver.ThreadedResolver-class.html">pyxmpp2.resolver.ThreadedResolver</a></strong>
+    <li> <strong class="uidlink"><a href="pyxmpp2.resolver.ThreadedResolver-class.html">pyxmpp2.resolver.ThreadedResolver</a></strong>:
+      <em class="summary">Threaded resolver implementation using the DNSPython
+<a class="rst-reference external" href="http://www.dnspython.org/docs/1.9.4/html/dns.resolver-module.html" target="_top"><tt class="rst-docutils literal">dns.resolver</tt></a> module.</em>
     </li>
     </ul>
     </li>
@@ -561,15 +562,20 @@ but unhandled features.</em>
     <li> <strong class="uidlink"><a href="pyxmpp2.mainloop.threads.TimeoutThread-class.html">pyxmpp2.mainloop.threads.TimeoutThread</a></strong>:
       <em class="summary">Thread to handle <a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html" class="link">TimeoutHandler</a> methods.</em>
     </li>
-    <li> <strong class="uidlink"><a href="pyxmpp2.transport.WriteJob-class.html">pyxmpp2.transport.WriteJob</a></strong>
+    <li> <strong class="uidlink"><a href="pyxmpp2.transport.WriteJob-class.html">pyxmpp2.transport.WriteJob</a></strong>:
+      <em class="summary">Base class for objects put to the <a href="pyxmpp2.transport.TCPTransport-class.html" class="link">TCPTransport</a> write queue.</em>
     <ul>
-    <li> <strong class="uidlink"><a href="pyxmpp2.transport.ContinueConnect-class.html">pyxmpp2.transport.ContinueConnect</a></strong>
+    <li> <strong class="uidlink"><a href="pyxmpp2.transport.ContinueConnect-class.html">pyxmpp2.transport.ContinueConnect</a></strong>:
+      <em class="summary">Object to signal (via the write queue) a pending connect request.</em>
     </li>
-    <li> <strong class="uidlink"><a href="pyxmpp2.transport.StartTLS-class.html">pyxmpp2.transport.StartTLS</a></strong>
+    <li> <strong class="uidlink"><a href="pyxmpp2.transport.StartTLS-class.html">pyxmpp2.transport.StartTLS</a></strong>:
+      <em class="summary">StartTLS request for the <a href="pyxmpp2.transport.TCPTransport-class.html" class="link">TCPTransport</a> write queue.</em>
     </li>
-    <li> <strong class="uidlink"><a href="pyxmpp2.transport.TLSHandshake-class.html">pyxmpp2.transport.TLSHandshake</a></strong>
+    <li> <strong class="uidlink"><a href="pyxmpp2.transport.TLSHandshake-class.html">pyxmpp2.transport.TLSHandshake</a></strong>:
+      <em class="summary">Object to signal (via the write queue) a pending TLS handshake.</em>
     </li>
-    <li> <strong class="uidlink"><a href="pyxmpp2.transport.WriteData-class.html">pyxmpp2.transport.WriteData</a></strong>
+    <li> <strong class="uidlink"><a href="pyxmpp2.transport.WriteData-class.html">pyxmpp2.transport.WriteData</a></strong>:
+      <em class="summary">Data queued for write.</em>
     </li>
     </ul>
     </li>
@@ -609,7 +615,22 @@ or XMPP transports.</em>
     </li>
     </ul>
     </li>
-    <li> <strong class="uidlink"><a href="pyxmpp2.settings._SettingDefinition-class.html" onclick="show_private();">pyxmpp2.settings._SettingDefinition</a></strong>
+    <li> <strong class="uidlink">argparse._AttributeHolder</strong>:
+      <em class="summary">Abstract base class that provides __repr__.</em>
+    <ul>
+    <li> <strong class="uidlink">argparse.Action</strong>:
+      <em class="summary">Information about how to convert command line strings to Python objects.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="pyxmpp2.settings._YesNoAction-class.html" onclick="show_private();">pyxmpp2.settings._YesNoAction</a></strong>:
+      <em class="summary">Custom std:argparse option to handle boolean options
+via '--no-' prefixes.</em>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="pyxmpp2.settings._SettingDefinition-class.html" onclick="show_private();">pyxmpp2.settings._SettingDefinition</a></strong>:
+      <em class="summary">A PyXMPP2 setting meta-data and defaults.</em>
     </li>
     <li> <strong class="uidlink">dict</strong>:
       <em class="summary">dict() -&gt; new empty dictionary
@@ -672,7 +693,7 @@ type(name, bases, dict) -&gt; a new type</em>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Jun 28 20:51:13 2011</a>
+    3.0.1 on Wed Jun 29 20:12:09 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
