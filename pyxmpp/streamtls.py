@@ -118,7 +118,7 @@ class StreamTLSHandler(StreamFeatureHandler, EventHandler):
             logger.warning("StartTLS offerred when already established")
             return StreamFeatureNotHandled("StartTLS", mandatory = required)
             
-        if self.settings["tls_enable"]:
+        if self.settings["starttls"]:
             logger.debug("StartTLS negotiated")
             self._request_tls()
             return StreamFeatureHandled("StartTLS", mandatory = required)
