@@ -41,7 +41,7 @@ class TestInitiator(InitiatorSelectTestCase):
     def test_enabled_optional(self):
         """Test TLS enabled in settings, and optional on the server."""
         settings = XMPPSettings({
-                                u"tls_enable": True, 
+                                u"starttls": True, 
                                 u"tls_cacert_file": "data/ca.pem", 
                                 })
         handler = EventRecorder()
@@ -52,7 +52,7 @@ class TestInitiator(InitiatorSelectTestCase):
         self.connect_transport()
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.server.write(TLS_FEATURES)
-        xml = self.wait(expect = re.compile(r".*(<starttls.*/>)"))
+        xml = self.wait(2, expect = re.compile(r".*(<starttls.*/>)"))
         self.assertIsNotNone(xml)
         element = XML(xml)
         self.assertEqual(element.tag, 
@@ -84,7 +84,7 @@ class TestInitiator(InitiatorSelectTestCase):
         addr, port = self.start_server()
         handler = EventRecorder()
         settings = XMPPSettings({
-                                u"tls_enable": True, 
+                                u"starttls": True, 
                                 u"tls_cacert_file": "data/ca.pem", 
                                 })
         stream = StreamBase(u"jabber:client", [StreamTLSHandler(settings), 
@@ -125,7 +125,7 @@ class TestInitiator(InitiatorSelectTestCase):
         addr, port = self.start_server()
         handler = EventRecorder()
         settings = XMPPSettings({
-                                u"tls_enable": True, 
+                                u"starttls": True, 
                                 u"tls_cacert_file": "data/ca.pem", 
                                 })
         stream = StreamBase(u"jabber:client", [StreamTLSHandler(settings), 
@@ -148,7 +148,7 @@ class TestInitiator(InitiatorSelectTestCase):
         addr, port = self.start_server()
         handler = EventRecorder()
         settings = XMPPSettings({
-                                u"tls_enable": True, 
+                                u"starttls": True, 
                                 u"tls_require": True, 
                                 u"tls_cacert_file": "data/ca.pem", 
                                 })
