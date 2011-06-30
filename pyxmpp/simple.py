@@ -19,7 +19,7 @@
 
 The simplest way to send a message:
 
-    >>> from pyxmpp2.simple import
+    >>> from pyxmpp2.simple import send_message
     >>> send_message("bob@example.org", "bob's password", "alice@example.org",
     ...                                                          "Hello Alice")
 

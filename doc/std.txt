@@ -14,6 +14,9 @@ threading	threading.html
 threading.RLock	threading.html#rlock-objects
 threading.Thread	threading.html#thread-objects
 threading.Condition	threading.html#condition-objects
-select	http://docs.python.org/library/select.html
-select.select	http://docs.python.org/library/select.html#select.select
-select.poll	http://docs.python.org/library/select.html#select.poll
+select	select.html
+select.select	select.html#select.select
+select.poll	select.html#select.poll
+argparse	argparse.html
+argparse.ArgumentParser	argparse.html#argumentparser-objects
+logging	logging.html

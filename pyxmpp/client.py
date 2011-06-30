@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2003-2010 Jacek Konieczny <jajcus@jajcus.net>
+# (C) Copyright 2003-2011 Jacek Konieczny <jajcus@jajcus.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License Version
@@ -40,9 +40,11 @@ from .streamtls import StreamTLSHandler
 
 logger = logging.getLogger("pyxmpp.client")
 
-
 class Client(EventHandler):
     """Base class for an XMPP-IM client.
+
+    Joins the `MainLoop`, `ClientStream` and some basic handlers together,
+    so a client application needs only to add its handlers.
 
     :Ivariables:
         - `jid`: configured JID of the client (current full JID is avialable as

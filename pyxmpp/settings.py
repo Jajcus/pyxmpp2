@@ -197,7 +197,9 @@ class XMPPSettings(MutableMapping):
                 pass
 
     @classmethod
-    def add_setting(cls, name, **kwargs):
+    def add_setting(cls, name, type = unicode, default = None, factory = None,
+                        cache = False, default_d = None, doc = None,
+                        cmdline_help = None, validator = None, basic = False):
         """Add a new setting definition.
 
         :Parameters:
@@ -229,7 +231,10 @@ class XMPPSettings(MutableMapping):
             - `basic`: `bool`
             - `validator`: a callable
         """
-        setting_def = _SettingDefinition(name, **kwargs)
+        # pylint: disable-msg=W0622,R0913
+        setting_def = _SettingDefinition(name, type, default, factory,
+                                            cache, default_d, doc, 
+                                            cmdline_help, validator, basic)
         if name not in cls._defs:
             cls._defs[name] = setting_def
             return
@@ -326,7 +331,7 @@ class XMPPSettings(MutableMapping):
             - `add_help`: 
 
         :return: an argument parser object.
-        :returntype: std:`argparse.ArgumentParser`
+        :returntype: :std:`argparse.ArgumentParser`
         """
         # pylint: disable-msg=R0914,R0912
         parser = argparse.ArgumentParser(add_help = add_help, 
