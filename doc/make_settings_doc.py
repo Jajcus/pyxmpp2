@@ -45,6 +45,13 @@ def default_string(setting):
         return u"``None``"
     return u"``{0!r}``".format(default)
 
+def cmdline_string(setting):
+    option = setting.name.replace("_", "-")
+    if setting.type is bool:
+        return "--{0} | --no-{0}".format(option)
+    else:
+        return "--{0} {1}".format(option, setting.name.upper())
+
 def dump_settings_group(doc, index, settings):
     for setting in settings:
         print >> doc
@@ -55,6 +62,9 @@ def dump_settings_group(doc, index, settings):
         print >> doc
         print >> doc, u"  * Type: {0}".format(type_string(setting.type))
         print >> doc, u"  * Default: {0}".format(default_string(setting))
+        if setting.cmdline_help:
+            print >> doc, u"  * Command line: ``{0}``".format(cmdline_string(
+                                                                    setting))
         print >> doc
         print >> doc, setting.doc
         print >> index, u'{0} setting\t#{1}'.format(
