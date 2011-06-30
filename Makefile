@@ -1,6 +1,3 @@
-VERSION=1.9.9
-SNAPSHOT=
-
 DESTDIR="/"
 
 .PHONY: all build test version dist update-doc doc cosmetics pylint.log pylint ChangeLog www publish
@@ -45,14 +42,10 @@ cosmetics:
 	./auxtools/cosmetics.sh
 	
 version:
-	if test -d ".git" ; then \
-		echo "# pylint: disable=C0111,C0103" > pyxmpp/version.py ; \
-		echo "version = '$(VERSION)+git'" >> pyxmpp/version.py ; \
-	fi
+	python setup.py make_version
 
 dist: build ChangeLog doc
 	-rm -f MANIFEST
-	echo "version='$(VERSION)$(SNAPSHOT)'" > pyxmpp/version.py
 	python setup.py sdist
 
 clean:
