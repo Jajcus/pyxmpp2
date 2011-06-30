@@ -19,7 +19,7 @@ else:
 if version.endswith("-git"):
     download_url = None
 else:
-    download_url = 'http://github.com/downloads/Jajcus/pyxmpp2/pyxmpp-{0}.tar.gz'.format(version),
+    download_url = 'http://github.com/downloads/Jajcus/pyxmpp2/pyxmpp2-{0}.tar.gz'.format(version),
 
 from distutils.core import setup
 
