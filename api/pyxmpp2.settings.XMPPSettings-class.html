@@ -309,7 +309,7 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
         <tr>
           <td><span class="summary-sig"><a href="pyxmpp2.settings.XMPPSettings-class.html#load_arguments" class="summary-sig-name">load_arguments</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">args</span>)</span><br />
-      Load settings from <tt class="rst-docutils literal">ArgumentParser</tt> output.</td>
+      Load settings from <a class="rst-reference external" href="http://docs.python.org/library/argparse.html#argumentparser-objects" target="_top"><tt class="rst-docutils literal">ArgumentParser</tt></a> output.</td>
           <td align="right" valign="top">
             
             
@@ -376,7 +376,15 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
         <tr>
           <td><span class="summary-sig"><a href="pyxmpp2.settings.XMPPSettings-class.html#add_setting" class="summary-sig-name">add_setting</a>(<span class="summary-sig-arg">cls</span>,
         <span class="summary-sig-arg">name</span>,
-        <span class="summary-sig-arg">**kwargs</span>)</span><br />
+        <span class="summary-sig-arg">type</span>=<span class="summary-sig-default">&lt;type 'unicode'&gt;</span>,
+        <span class="summary-sig-arg">default</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">factory</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">cache</span>=<span class="summary-sig-default">False</span>,
+        <span class="summary-sig-arg">default_d</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">doc</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">cmdline_help</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">validator</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">basic</span>=<span class="summary-sig-default">False</span>)</span><br />
       Add a new setting definition.</td>
           <td align="right" valign="top">
             
@@ -407,7 +415,7 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">std:<code class="link">argparse.ArgumentParser</code></span>
+      <span class="summary-type"><a class="rst-reference external" href="http://docs.python.org/library/argparse.html#argumentparser-objects" target="_top"><tt class="rst-docutils literal">argparse.ArgumentParser</tt></a></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -555,21 +563,21 @@ defaults for PyXMPP for parameters which are not explicitely set.</p>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x86c674c&gt;">&lt;_weakrefset.WeakSet object at 0x86c674c&gt;</code>
+        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x8740a8c&gt;">&lt;_weakrefset.WeakSet object at 0x8740a8c&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x86c682c&gt;">&lt;_weakrefset.WeakSet object at 0x86c682c&gt;</code>
+        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x8740b6c&gt;">&lt;_weakrefset.WeakSet object at 0x8740b6c&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x86c668c&gt;">&lt;_weakrefset.WeakSet object at 0x86c668c&gt;</code>
+        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x87409cc&gt;">&lt;_weakrefset.WeakSet object at 0x87409cc&gt;</code>
     </td>
   </tr>
 <tr class="private">
@@ -957,7 +965,7 @@ or the PyXMPP global default otherwise.</p>
     </td>
   </tr></table>
   
-  Load settings from <tt class="rst-rst-docutils literal rst-docutils literal">ArgumentParser</tt> output.
+  Load settings from <a class="rst-rst-reference external rst-reference external" href="http://docs.python.org/library/argparse.html#argumentparser-objects" target="_top"><tt class="rst-rst-docutils literal rst-docutils literal">ArgumentParser</tt></a> output.
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
@@ -976,7 +984,15 @@ returned by <a href="pyxmpp2.settings.XMPPSettings-class.html#get_arg_parser" cl
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">add_setting</span>(<span class="sig-arg">cls</span>,
         <span class="sig-arg">name</span>,
-        <span class="sig-arg">**kwargs</span>)</span>
+        <span class="sig-arg">type</span>=<span class="sig-default">&lt;type 'unicode'&gt;</span>,
+        <span class="sig-arg">default</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">factory</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">cache</span>=<span class="sig-default">False</span>,
+        <span class="sig-arg">default_d</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">doc</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">cmdline_help</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">validator</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">basic</span>=<span class="sig-default">False</span>)</span>
     <br /><em class="fname">Class Method</em>
   </h3>
   </td><td align="right" valign="top"
@@ -1095,7 +1111,7 @@ application options.</li>
         <li><strong class="pname"><code>add_help</code></strong> () - when <code class="link">True</code> a '--help' option will be included
 (probably already added in the application parser object)</li>
     </ul></dd>
-    <dt>Returns: std:<code class="link">argparse.ArgumentParser</code></dt>
+    <dt>Returns: <a class="rst-rst-reference external rst-reference external" href="http://docs.python.org/library/argparse.html#argumentparser-objects" target="_top"><tt class="rst-rst-docutils literal rst-docutils literal">argparse.ArgumentParser</tt></a></dt>
         <dd>an argument parser object.</dd>
   </dl>
 </td></tr></table>
@@ -1133,7 +1149,7 @@ application options.</li>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Wed Jun 29 21:53:29 2011</a>
+    3.0.1 on Thu Jun 30 11:08:26 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
