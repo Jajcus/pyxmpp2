@@ -47,7 +47,7 @@ git checkout "$release" || exit 1
 
 if sed -i -e's/^version.*/version = "'$release'"/' setup.py ; then
 	rm -f pyxmpp/version.py 2>/dev/null
-	if python setup.py sdist ; then
+	if make dist ; then
 		python setup.py --dry-run --verbose register --strict
 	fi
 fi

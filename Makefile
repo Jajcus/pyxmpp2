@@ -44,7 +44,7 @@ cosmetics:
 version:
 	python setup.py make_version
 
-dist: build ChangeLog doc
+dist: build ChangeLog update-doc
 	-rm -f MANIFEST
 	python setup.py sdist
 
