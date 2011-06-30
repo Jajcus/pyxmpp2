@@ -262,7 +262,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             if not addrs:
                 self._dst_service = None
                 if self._dst_port:
-                    self._dst_nameports = (self._dst_name, self._dst_port)
+                    self._dst_nameports = [(self._dst_name, self._dst_port)]
                 else:
                     self._dst_nameports = []
                     self._set_state("aborted")
