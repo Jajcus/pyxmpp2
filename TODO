@@ -1,15 +1,2 @@
-- finish the big pyxmpp->pyxmpp2 refactorisation
-- multi-language text for stanza elements (like message/body,
-  presence/status) and error text
-- implement SCRAM-SHA-1 and SCRAM-SHA-1-PLUS SASL mechanisms
 
-xmpp-base:
-- jabber:server stream support (including diallback)
-- TLS: verify othername (SRVName and XmppAddr), probably require ASN.1 decoder
-
-xmpp-im:
-- privacy lists
-
-other:
-- jabber:iq:version
-- jabber:iq:search
+See: https://github.com/Jajcus/pyxmpp2/issues
