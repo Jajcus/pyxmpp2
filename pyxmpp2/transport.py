@@ -50,7 +50,7 @@ from .interfaces import XMPPTransport
 # pylint: disable=W0611
 from . import resolver  
 
-logger = logging.getLogger("pyxmpp.transport")
+logger = logging.getLogger("pyxmpp2.transport")
 
 
 class WriteJob(object):
@@ -388,7 +388,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         :Types:
             - `data`: `bytes`
         """
-        logging.getLogger("pyxmpp.tcp.out").debug("OUT: %r", data)
+        logging.getLogger("pyxmpp2.tcp.out").debug("OUT: %r", data)
         if self._hup or not self._socket:
             raise PyXMPPIOError(u"Connection closed.")
         try:
@@ -792,7 +792,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         :Types:
             - `data`: `unicode`
         """
-        logging.getLogger("pyxmpp.tcp.in").debug("IN: %r", data)
+        logging.getLogger("pyxmpp2.tcp.in").debug("IN: %r", data)
         if data:
             self._reader.feed(data)
         else:

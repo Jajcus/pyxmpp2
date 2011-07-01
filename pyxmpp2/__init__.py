@@ -152,12 +152,12 @@ Logging
 -------
 
 PyXMPP2 does all it logging via the standard :std:`logging` module. Most
-of the PyXMPP2 modules log via 'pyxmpp.module-name' loggers. There are some
+of the PyXMPP2 modules log via 'pyxmpp2.module-name' loggers. There are some
 special cases though:
 
-  * 'pyxmpp.tcp.in' logger, which is used for XML data received over the TCP
+  * 'pyxmpp2.tcp.in' logger, which is used for XML data received over the TCP
     transport.
-  * 'pyxmpp.tcp.out' logger, which is used for XML data send over the TCP
+  * 'pyxmpp2.tcp.out' logger, which is used for XML data send over the TCP
     transport.
 
 Those two can be used to intercept the data for application-specific monitoring

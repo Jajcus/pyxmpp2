@@ -40,7 +40,7 @@ from .interfaces import StreamFeatureHandler
 from .interfaces import StreamFeatureHandled, StreamFeatureNotHandled
 from .interfaces import stream_element_handler
 
-logger = logging.getLogger("pyxmpp.streamsasl")
+logger = logging.getLogger("pyxmpp2.streamsasl")
 
 class DefaultPasswordManager(sasl.PasswordManager):
     """Default password manager."""

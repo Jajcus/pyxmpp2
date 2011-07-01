@@ -148,8 +148,8 @@ class ProtocolError(Error):
     
     """
 
-    logger_reported = logging.getLogger("pyxmpp.ProtocolError.reported")
-    logger_ignored = logging.getLogger("pyxmpp.ProtocolError.ignored")
+    logger_reported = logging.getLogger("pyxmpp2.ProtocolError.reported")
+    logger_ignored = logging.getLogger("pyxmpp2.ProtocolError.ignored")
 
     def __init__(self, xmpp_name, message):
         Error.__init__(self, xmpp_name, message)

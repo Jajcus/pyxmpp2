@@ -33,7 +33,7 @@ import logging
 from .core import ClientAuthenticator, Response, Success
 from .core import sasl_mechanism
         
-logger = logging.getLogger("pyxmpp.sasl.gssapi")
+logger = logging.getLogger("pyxmpp2.sasl.gssapi")
 
 @sasl_mechanism("GSSAPI", 75)
 class GSSAPIClientAuthenticator(ClientAuthenticator):

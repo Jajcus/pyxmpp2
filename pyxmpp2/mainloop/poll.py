@@ -34,7 +34,7 @@ import select
 from .interfaces import HandlerReady, PrepareAgain
 from .base import MainLoopBase
 
-logger = logging.getLogger("pyxmpp.mainloop.poll")
+logger = logging.getLogger("pyxmpp2.mainloop.poll")
 
 class PollMainLoop(MainLoopBase):
     """Main event loop based on the poll() syscall."""

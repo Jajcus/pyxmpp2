@@ -25,7 +25,7 @@ import time
 import threading
 import logging
 
-logger = logging.getLogger("pyxmpp.expdict")
+logger = logging.getLogger("pyxmpp2.expdict")
 
 _NO_DEFAULT = object()
 

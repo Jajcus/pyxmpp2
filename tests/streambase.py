@@ -33,7 +33,7 @@ PARSE_ERROR_RESPONSE = ('<stream:error><not-well-formed'
                     '  xmlns="urn:ietf:params:xml:ns:xmpp-streams"/>'
                                         '</stream:error></stream:stream>')
 
-logger = logging.getLogger("pyxmpp.test.streambase")
+logger = logging.getLogger("pyxmpp2.test.streambase")
 
 class JustConnectEventHandler(EventRecorder):
     @event_handler(ConnectedEvent)

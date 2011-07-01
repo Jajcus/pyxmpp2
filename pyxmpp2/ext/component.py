@@ -69,7 +69,7 @@ class ComponentStream(Stream):
         self.me=jid
         self.secret=secret
         self.process_all_stanzas=1
-        self.__logger=logging.getLogger("pyxmpp.jabberd.ComponentStream")
+        self.__logger=logging.getLogger("pyxmpp2.jabberd.ComponentStream")
 
     def _reset(self):
         """Reset `ComponentStream` object state, making the object ready to

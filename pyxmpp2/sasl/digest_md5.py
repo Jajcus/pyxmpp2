@@ -34,7 +34,7 @@ from .core import ClientAuthenticator, ServerAuthenticator
 from .core import Failure, Response, Challenge, Success, Failure
 from .core import sasl_mechanism
         
-logger = logging.getLogger("pyxmpp.sasl.digest_md5")
+logger = logging.getLogger("pyxmpp2.sasl.digest_md5")
 
 QUOTE_RE = re.compile(r"(?<!\\)\\(.)")
 PARAM_RE = re.compile(r'^(?P<var>[^=]+)\=(?P<val>(\"(([^"\\]+)|(\\\")'

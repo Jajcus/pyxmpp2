@@ -18,7 +18,7 @@ from pyxmpp2.mainloop.select import SelectMainLoop
 from pyxmpp2.mainloop.poll import PollMainLoop
 from pyxmpp2.mainloop.threads import ThreadPool
 
-logger = logging.getLogger("pyxmpp.test.test_util")
+logger = logging.getLogger("pyxmpp2.test.test_util")
 
 socket.setdefaulttimeout(5)
 

@@ -46,7 +46,7 @@ from .interfaces import iq_set_stanza_handler
 from .interfaces import StreamFeatureHandler
 from .mainloop.interfaces import EventHandler, event_handler
 
-logger = logging.getLogger("pyxmpp.session")
+logger = logging.getLogger("pyxmpp2.session")
 
 SESSION_TAG = SESSION_QNP + u"session"
 

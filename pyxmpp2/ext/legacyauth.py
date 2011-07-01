@@ -72,7 +72,7 @@ class LegacyClientStream(ClientStream):
                 self.registration_callback, self.registration_form, self.__register) = (None,) * 8
         ClientStream.__init__(self, jid, password, server, port,
                             auth_methods, tls_settings, keepalive, owner)
-        self.__logger=logging.getLogger("pyxmpp.jabber.LegacyClientStream")
+        self.__logger=logging.getLogger("pyxmpp2.jabber.LegacyClientStream")
 
     def _reset(self):
         """Reset the `LegacyClientStream` object state, making the object ready

@@ -37,7 +37,7 @@ from .constants import STANZA_CLIENT_QNP, STANZA_SERVER_QNP, STANZA_NAMESPACES
 from .constants import XML_LANG_QNAME
 from .xmppserializer import serialize
 
-logger = logging.getLogger("pyxmpp.error")
+logger = logging.getLogger("pyxmpp2.error")
 
 STREAM_ERRORS = {
             u"bad-format":

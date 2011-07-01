@@ -50,7 +50,7 @@ REQUIRED_TAG = TLS_QNP + u"required"
 PROCEED_TAG = TLS_QNP + u"proceed"
 FAILURE_TAG = TLS_QNP + u"failure"
         
-logger = logging.getLogger("pyxmpp.streamtls")
+logger = logging.getLogger("pyxmpp2.streamtls")
 
 class StreamTLSHandler(StreamFeatureHandler, EventHandler):
     """Handler for stream TLS support.

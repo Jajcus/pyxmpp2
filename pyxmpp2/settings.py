@@ -42,7 +42,7 @@ import logging
 
 from collections import MutableMapping
 
-logger = logging.getLogger("pyxmpp.settings")
+logger = logging.getLogger("pyxmpp2.settings")
 
 class _SettingDefinition(object):
     """A PyXMPP2 setting meta-data and defaults."""

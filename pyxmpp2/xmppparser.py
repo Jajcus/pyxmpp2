@@ -30,7 +30,7 @@ from .exceptions import StreamParseError
 
 COMMON_NS = "http://pyxmpp.jajcus.net/xmlns/common"
 
-logger = logging.getLogger("pyxmpp.xmppparser")
+logger = logging.getLogger("pyxmpp2.xmppparser")
 
 class XMLStreamHandler(object):
     """Base class for stream handler, used as a target for XMPP parser

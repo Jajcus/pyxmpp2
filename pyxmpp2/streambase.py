@@ -50,7 +50,7 @@ from .interfaces import StreamFeatureHandler
 from .interfaces import StreamFeatureHandled, StreamFeatureNotHandled
 from .mainloop.interfaces import TimeoutHandler, timeout_handler
 
-logger = logging.getLogger("pyxmpp.streambase")
+logger = logging.getLogger("pyxmpp2.streambase")
 
 LANG_SPLIT_RE = re.compile(r"(.*)(?:-[a-zA-Z0-9])?-[a-zA-Z0-9]+$")
 

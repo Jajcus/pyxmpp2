@@ -127,7 +127,7 @@ class Register(StanzaPayloadObject):
         :Types:
             - `xmlnode`: `libxml2.xmlNode`
         """
-        self.__logger=logging.getLogger("pyxmpp.jabber.Register")
+        self.__logger=logging.getLogger("pyxmpp2.jabber.Register")
         self.form = None
         self.registered = False
         self.instructions = None

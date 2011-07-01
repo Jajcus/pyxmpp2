@@ -41,7 +41,7 @@ from .iq import Iq
 
 from .interfaces import XMPPFeatureHandler
 
-logger = logging.getLogger("pyxmpp.stanzaprocessor")
+logger = logging.getLogger("pyxmpp2.stanzaprocessor")
 
 def stanza_factory(element, stream = None, language = None):
     """Creates Iq, Message or Presence object for XML stanza `element`

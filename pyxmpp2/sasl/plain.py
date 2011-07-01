@@ -30,7 +30,7 @@ from .core import ClientAuthenticator, ServerAuthenticator
 from .core import Success, Failure, Challenge, Response
 from .core import sasl_mechanism
         
-logger = logging.getLogger("pyxmpp.sasl.plain")
+logger = logging.getLogger("pyxmpp2.sasl.plain")
 
 @sasl_mechanism("PLAIN", 10)
 class PlainClientAuthenticator(ClientAuthenticator):

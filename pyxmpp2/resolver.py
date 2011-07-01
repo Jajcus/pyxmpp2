@@ -35,7 +35,7 @@ import Queue
 from .settings import XMPPSettings
 from .interfaces import Resolver
 
-logger = logging.getLogger("pyxmpp.resolver")
+logger = logging.getLogger("pyxmpp2.resolver")
 
 try:
     import dns.resolver

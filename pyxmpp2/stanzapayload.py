@@ -26,7 +26,7 @@ from .interfaces import StanzaPayload
 STANZA_PAYLOAD_CLASSES = {}
 STANZA_PAYLOAD_ELEMENTS = defaultdict(list)
 
-logger = logging.getLogger("pyxmpp.stanzapayload")
+logger = logging.getLogger("pyxmpp2.stanzapayload")
 
 class XMLPayload(StanzaPayload):
     """Transparent XML payload for stanza.

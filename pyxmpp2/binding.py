@@ -43,7 +43,7 @@ from .interfaces import iq_set_stanza_handler
 from .interfaces import StanzaPayload, payload_element_name
 from .interfaces import StreamFeatureHandler, StreamFeatureHandled
 
-logger = logging.getLogger("pyxmpp.binding")
+logger = logging.getLogger("pyxmpp2.binding")
 
 
 FEATURE_BIND = BIND_QNP + u"bind"

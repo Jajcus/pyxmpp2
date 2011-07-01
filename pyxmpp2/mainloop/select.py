@@ -35,7 +35,7 @@ import logging
 from .interfaces import HandlerReady, PrepareAgain
 from .base import MainLoopBase
 
-logger = logging.getLogger("pyxmpp.mainloop.select")
+logger = logging.getLogger("pyxmpp2.mainloop.select")
 
 class SelectMainLoop(MainLoopBase):
     """Main event loop implementation based on the `select.select()` call."""

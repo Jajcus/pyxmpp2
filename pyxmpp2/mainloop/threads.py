@@ -41,7 +41,7 @@ from .events import EventDispatcher
 from ..settings import XMPPSettings
 from .wait import wait_for_read, wait_for_write
 
-logger = logging.getLogger("pyxmpp.mainloop.threads")
+logger = logging.getLogger("pyxmpp2.mainloop.threads")
 
 class IOThread(object):
     """Base class for `ReadingThread` and `WrittingThread`.

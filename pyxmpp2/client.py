@@ -38,7 +38,7 @@ from .settings import XMPPSettings
 from .session import SessionHandler
 from .streamtls import StreamTLSHandler
 
-logger = logging.getLogger("pyxmpp.client")
+logger = logging.getLogger("pyxmpp2.client")
 
 class Client(EventHandler):
     """Base class for an XMPP-IM client.

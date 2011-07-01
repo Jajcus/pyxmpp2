@@ -4,7 +4,7 @@
 import sys
 import logging
 
-logger = logging.getLogger("pyxmpp.test.stream_reader")
+logger = logging.getLogger("pyxmpp2.test.stream_reader")
 
 import unittest
 from xml.etree import ElementTree

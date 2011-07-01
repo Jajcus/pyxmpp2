@@ -29,7 +29,7 @@ import inspect
 
 from collections import defaultdict
 
-logger = logging.getLogger("pyxmpp.mainloop.events")
+logger = logging.getLogger("pyxmpp2.mainloop.events")
 
 from .interfaces import EventHandler, Event, QUIT
 from ..settings import XMPPSettings

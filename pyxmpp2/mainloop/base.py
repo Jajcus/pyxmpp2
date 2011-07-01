@@ -30,7 +30,7 @@ from .events import EventDispatcher
 from .interfaces import EventHandler, IOHandler, TimeoutHandler, MainLoop, QUIT
 from ..settings import XMPPSettings
 
-logger = logging.getLogger("pyxmpp.mainloop.base")
+logger = logging.getLogger("pyxmpp2.mainloop.base")
 
 class MainLoopBase(MainLoop):
     """Base class for main loop implementations."""
