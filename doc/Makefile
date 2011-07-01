@@ -4,7 +4,7 @@ EPYDOC=epydoc
 
 APIRST2HTML=apirst2html.py
 PYTHON=python
-PYXMPP2_PATH=$(firstword $(wildcard ../build/lib*))
+PYXMPP2_PATH=$(firstword $(wildcard ../build/lib*) ..)
 
 all: doc
 

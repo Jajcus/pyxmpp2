@@ -5,15 +5,15 @@ import sys
 
 version = "1.99.0-git"
 
-if (not os.path.exists(os.path.join("pyxmpp","version.py"))
+if (not os.path.exists(os.path.join("pyxmpp2","version.py"))
                                     or "make_version" in sys.argv):
-    with open("pyxmpp/version.py", "w") as version_py:
+    with open("pyxmpp2/version.py", "w") as version_py:
         version_py.write("# pylint: disable=C0111,C0103\n")
         version_py.write("version = {0!r}\n".format(version))
     if "make_version" in sys.argv:
         sys.exit(0)
 else:
-    execfile(os.path.join("pyxmpp", "version.py"))
+    execfile(os.path.join("pyxmpp2", "version.py"))
     
     
 if version.endswith("-git"):
@@ -45,7 +45,6 @@ setup(
         ],
     license =   'LGPL',
     requires = ['dnspython(>= 1.6.0)'],
-    package_dir = {'pyxmpp2': 'pyxmpp'},
     packages = [
         'pyxmpp2',
         'pyxmpp2.mainloop',
