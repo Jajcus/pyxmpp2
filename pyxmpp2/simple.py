@@ -142,7 +142,7 @@ def send_message(source_jid, password, target_jid, body, subject = None,
     handler = FireAndForget(source_jid, action, settings)
     try:
         handler.run()
-    except:
+    except KeyboardInterrupt:
         handler.disconnect()
         raise
 
