@@ -19,7 +19,7 @@
 """PyXMPP main event loop - the event and I/O framework, aka re-inventing the
 wheel."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 

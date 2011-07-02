@@ -40,7 +40,7 @@ By default the standard Python ElementTree implementation is used
 """
 # pylint: disable=C0103
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 

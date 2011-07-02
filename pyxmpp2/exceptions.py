@@ -21,7 +21,7 @@ This module defines all exceptions raised by PyXMPP.
 """
 # pylint: disable-msg=R0901
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 

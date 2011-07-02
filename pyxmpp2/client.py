@@ -22,7 +22,7 @@ Normative reference:
   - :RFC:`6121` (TODO: roster and presence management)
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 

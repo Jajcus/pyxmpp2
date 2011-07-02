@@ -23,7 +23,7 @@ Normative reference:
   - `RFC 2426 <http://www.ietf.org/rfc/rfc2426.txt>`__
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 
 __docformat__="restructuredtext en"

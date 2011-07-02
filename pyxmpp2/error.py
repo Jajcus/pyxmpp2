@@ -22,7 +22,7 @@ Normative reference:
   - `RFC 3920 <http://xmpp.org/rfcs/rfc3920.html>`__
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 

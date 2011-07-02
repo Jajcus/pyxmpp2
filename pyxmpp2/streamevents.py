@@ -20,7 +20,7 @@
 
 # pylint: disable-msg=R0903,W0231
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 from .mainloop.interfaces import Event
 

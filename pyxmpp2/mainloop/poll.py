@@ -24,7 +24,7 @@ Also, these interfaces should allow building application not only in
 asynchronous event loop model, but also threaded model.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 

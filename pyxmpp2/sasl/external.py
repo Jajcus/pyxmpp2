@@ -23,7 +23,7 @@ Normative reference:
   - `XEP-0178 <http://xmpp.org/extensions/xep-0178.html#c2s>`__
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 

@@ -30,7 +30,7 @@ Please note, though:
     - the default TLS settings are insecure (not peer certificate validation)
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 

@@ -19,7 +19,7 @@
 """Utility functions to wait until a socket (or object implementing .fileno()
 in POSIX) is ready for input or output."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 

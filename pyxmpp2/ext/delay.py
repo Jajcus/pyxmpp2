@@ -21,7 +21,7 @@ Normative reference:
   - `JEP 91 <http://www.jabber.org/jeps/jep-0091.html>`__
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 __docformat__="restructuredtext en"
 

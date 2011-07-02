@@ -21,7 +21,7 @@ Normative reference:
   - `RFC 6120 <http://www.ietf.org/rfc/rfc6120.txt>`__
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 

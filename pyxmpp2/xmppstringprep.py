@@ -24,7 +24,7 @@ Normative reference:
   - `RFC 3454 <http://tools.ietf.org/html/rfc3454>`__
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 
@@ -109,14 +109,14 @@ class Profile(object):
         if isinstance(result, list):
             result = u"".join()
         if len(self.cache_items) >= _stringprep_cache_size:
-            remove = self.cache_items[: -_stringprep_cache_size / 2]
+            remove = self.cache_items[: -_stringprep_cache_size // 2]
             for profile, key in remove:
                 try:
                     del profile.cache[key]
                 except KeyError:
                     pass
             self.cache_items[:] = self.cache_items[
-                                                -_stringprep_cache_size / 2 :]
+                                                -_stringprep_cache_size // 2 :]
         self.cache_items.append((self, data))
         self.cache[data] = result
         return result

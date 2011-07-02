@@ -17,7 +17,7 @@
 
 """Utility functions for the pyxmpp package."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 
@@ -98,7 +98,7 @@ def datetime_utc_to_local(utc):
             offset -= d
         else:
             offset += d
-        d /= 2
+        d //= 2
     return local
 
 def datetime_local_to_utc(local):

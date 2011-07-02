@@ -22,7 +22,7 @@ namespace prefixes must be used, including no prefix for the stanza
 namespace (which may be one of, at least, two different namespaces:
 'jabber:client' and 'jabber:server')"""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 import threading
 import re

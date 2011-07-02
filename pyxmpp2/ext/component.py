@@ -20,7 +20,7 @@ Normative reference:
   - `JEP 114 <http://www.jabber.org/jeps/jep-0114.html>`__
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 raise ImportError("{0} is not yet rewritten for PyXMPP2".format(__name__))
 

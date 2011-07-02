@@ -32,7 +32,7 @@ components share the same objects, like event queue or DNS resolver
 implementation.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 

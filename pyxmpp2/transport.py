@@ -22,7 +22,7 @@ used to send and receive XMPP content, not to be confused with protocol
 gateways sometimes also called 'transports') and the standard TCP transport.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 
