@@ -298,8 +298,8 @@ if HAVE_DNSPYTHON:
                 - `callback`: function accepting a single argument
             """
             if isinstance(domain, unicode):
-                domain = domain.encode("idna")
-            domain = b"_{0}._{1}.{2}".format(service, protocol, domain)
+                domain = domain.encode("idna").decode("us-ascii")
+            domain = "_{0}._{1}.{2}".format(service, protocol, domain)
             try:
                 records = dns.resolver.query(domain, 'SRV')
             except dns.exception.DNSException, err:
@@ -342,7 +342,7 @@ if HAVE_DNSPYTHON:
                 - `allow_cname`: `bool`
             """
             if isinstance(hostname, unicode):
-                hostname = hostname.encode("idna")
+                hostname = hostname.encode("idna").decode("us-ascii")
             rtypes = []
             if self.settings["ipv6"]:
                 rtypes.append(("AAAA", socket.AF_INET6))
