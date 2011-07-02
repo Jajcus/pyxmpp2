@@ -154,7 +154,7 @@ class JID(object):
         :Parameters:
             - `data`: localpart of the JID
         :Types:
-            - `data`: unicode
+            - `data`: `unicode`
 
         :raise JIDError: if the local name is too long.
         :raise pyxmpp.xmppstringprep.StringprepError: if the
@@ -174,7 +174,7 @@ class JID(object):
         :Parameters:
             - `data`: Domain part of the JID
         :Types:
-            - `data`: unicode
+            - `data`: `unicode`
 
         :raise JIDError: if the domain name is too long."""
         if not data:
@@ -227,12 +227,6 @@ class JID(object):
         if len(resource.encode("utf-8")) > 1023:
             raise JIDError("Resource name too long")
         return resource
-
-    def __str__(self):
-        if sys.version_info.major < 3:
-            return self.as_unicode().encode("us-ascii")
-        else:
-            return self.as_unicode()
 
     def __unicode__(self):
         return self.as_unicode()

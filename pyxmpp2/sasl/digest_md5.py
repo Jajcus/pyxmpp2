@@ -66,10 +66,10 @@ def _quote(data):
     :Parameters:
         - `data`: a raw string.
     :Types:
-        - `data`: `str`
+        - `data`: `bytes`
 
     :return: `data` with '"' and "\\" escaped using "\\".
-    :returntype: `str`
+    :returntype: `bytes`
     """
     data = data.replace(b'\\', b'\\\\')
     data = data.replace(b'"', b'\\"')
@@ -81,10 +81,10 @@ def _h_value(data):
     :Parameters:
         - `data`: a byte string.
     :Types:
-        - `data`: `str`
+        - `data`: `bytes`
 
     :return: MD5 sum of the string.
-    :returntype: `str`"""
+    :returntype: `bytes`"""
     # pylint: disable-msg=E1101
     return hashlib.md5(data).digest()
 
@@ -99,7 +99,7 @@ def _kd_value(k_val, s_val):
         - `s_val`: `bytes`
 
     :return: MD5 sum of the strings joined with ':'.
-    :returntype: `str`"""
+    :returntype: `bytes`"""
     return _h_value(b"{0}:{1}".format(k_val, s_val))
 
 def _make_urp_hash(username, realm, passwd):
@@ -115,7 +115,7 @@ def _make_urp_hash(username, realm, passwd):
         - `passwd`: `bytes`
 
     :return: the MD5 sum of the parameters joined with ':'.
-    :returntype: `str`"""
+    :returntype: `bytes`"""
     if realm is None:
         realm = b""
     return _h_value(b"{0}:{1}:{2}".format(username, realm, passwd))
@@ -543,7 +543,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         :Parameters:
             - `response`: the response from the client.
         :Types:
-            - `response`: `str`
+            - `response`: `bytes`
 
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
@@ -559,7 +559,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         :Parameters:
             - `response`: the response from the client.
         :Types:
-            - `response`: `str`
+            - `response`: `bytes`
 
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""

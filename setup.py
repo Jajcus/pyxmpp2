@@ -26,6 +26,7 @@ extra = {}
 if sys.version_info >= (3,):
     from setuptools import setup
     extra['use_2to3'] = True
+    extra['use_2to3_fixers'] = ['custom_2to3']
     requires = []
 else:
     from distutils.core import setup

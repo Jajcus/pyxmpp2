@@ -55,7 +55,7 @@ class ExternalClientAuthenticator(ClientAuthenticator):
         :Parameters:
             - `data`: the optional additional data returned with the success.
         :Types:
-            - `data`: `str`
+            - `data`: `bytes`
 
         :return: a success indicator.
         :returntype: `Success`"""

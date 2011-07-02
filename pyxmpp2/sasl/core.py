@@ -75,7 +75,7 @@ class PasswordManager:
             - `acceptable_formats`: sequence of `unicode`
 
         :return: the password and its encoding (format).
-        :returntype: `unicode`,`str` tuple.
+        :returntype: `unicode`,`unicode` tuple.
         """
         # pylint: disable-msg=W0613
         return None, None
@@ -287,7 +287,7 @@ class Failure(Reply):
     :Ivariables:
         - `reason`: the failure reason.
     :Types:
-        - `reason`: unicode.
+        - `reason`: `unicode`.
     """
     # pylint: disable-msg=R0903
     def __init__(self, reason):
@@ -296,7 +296,7 @@ class Failure(Reply):
         :Parameters:
             - `reason`: the failure reason.
         :Types:
-            - `reason`: unicode.
+            - `reason`: `unicode`.
         """
         Reply.__init__(self, None)
         self.reason = reason
@@ -322,7 +322,7 @@ class Success(Reply):
             - `username`: `unicode`
             - `realm`: `unicode`
             - `authzid`: `unicode`
-            - `data`: `str`
+            - `data`: `bytes`
             - `encode`: `bool`
         """
         # pylint: disable-msg=R0913

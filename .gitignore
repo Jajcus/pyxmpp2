@@ -8,3 +8,6 @@ cl-stamp
 dist/
 pylint.log
 log
+py3-build/
+py3-dist/
+py3-examples/

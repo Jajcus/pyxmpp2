@@ -762,8 +762,8 @@ class DiscoInfo(StanzaPayloadWrapperObject):
             - `item_type`: the type name. If `None` then only the category is
               checked.
         :Types:
-            - `item_category`: unicode
-            - `item_type`: unicode
+            - `item_category`: `unicode`
+            - `item_type`: `unicode`
 
         :return: `True` if `self` contains at least one <identity/> object with
             given type and category.

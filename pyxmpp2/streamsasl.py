@@ -124,7 +124,7 @@ class DefaultPasswordManager(sasl.PasswordManager):
               from the authentication backend. This mapping will
               usually contain at least 'username' item.
         :Types:
-            - `authzid`: unicode
+            - `authzid`: `unicode`
             - `extra_info`: mapping
 
         :return: `True` if user is authorized to use that `authzid`.

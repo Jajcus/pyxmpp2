@@ -75,7 +75,7 @@ class PlainClientAuthenticator(ClientAuthenticator):
         :Parameters:
             - `challenge`: the challenge.
         :Types:
-            - `challenge`: `str`
+            - `challenge`: `bytes`
 
         :return: the response or a failure indicator.
         :returntype: `sasl.Response` or `sasl.Failure`"""
@@ -99,7 +99,7 @@ class PlainClientAuthenticator(ClientAuthenticator):
         :Parameters:
             - `data`: the optional additional data returned with the success.
         :Types:
-            - `data`: `str`
+            - `data`: `bytes`
 
         :return: a success indicator.
         :returntype: `Success`"""
@@ -126,7 +126,7 @@ class PlainServerAuthenticator(ServerAuthenticator):
         :Parameters:
             - `response`: the initial response from the client.
         :Types:
-            - `response`: `str`
+            - `response`: `bytes`
 
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
