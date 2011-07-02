@@ -301,11 +301,12 @@ class StreamSASLHandler(StreamFeatureHandler):
         if not mechanism:
             stream.send_stream_error("bad-format")
             raise FatalStreamError("<sasl:auth/> with no mechanism")
-        content = element.text
 
         stream.auth_method_used = mechanism
         self.authenticator = sasl.server_authenticator_factory(mechanism, 
                                                         self.password_manager)
+        
+        content = element.text.encode("us-ascii")
         ret = self.authenticator.start(base64.decodestring(content))
 
         if isinstance(ret, sasl.Success):
@@ -341,8 +342,7 @@ class StreamSASLHandler(StreamFeatureHandler):
             logger.debug("Unexpected SASL challenge")
             return False
 
-        content = element.text
-
+        content = element.text.encode("us-ascii")
         ret = self.authenticator.challenge(base64.decodestring(content))
         if isinstance(ret, sasl.Response):
             element = ElementTree.Element(RESPONSE_TAG)
@@ -368,8 +368,7 @@ class StreamSASLHandler(StreamFeatureHandler):
             logger.debug("Unexpected SASL response")
             return False
 
-        content = element.text
-
+        content = element.text.encode("us-ascii")
         ret = self.authenticator.response(base64.decodestring(content))
         if isinstance(ret, sasl.Success):
             element = ElementTree.Element(SUCCESS_TAG)
@@ -409,7 +408,7 @@ class StreamSASLHandler(StreamFeatureHandler):
         content = element.text
 
         if content:
-            data = base64.decodestring(content)
+            data = base64.decodestring(content.encode("us-ascii"))
         else:
             data = None
         ret = self.authenticator.finish(data)
