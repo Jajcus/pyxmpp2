@@ -143,7 +143,8 @@ class EventDispatcher(object):
             if klass in self._handler_map:
                 handlers += self._handler_map[klass]
             logger.debug("    handlers: {0!r}".format(handlers))
-            handlers.sort() # to restore the original order of handler objects
+            # to restore the original order of handler objects
+            handlers.sort(key = lambda x: x[0])
             for dummy, handler in handlers:
                 logger.debug(u"  passing the event to: {0!r}".format(handler))
                 result = handler(event)
@@ -200,6 +201,7 @@ XMPPSettings.add_setting(u"event_queue", type = Queue.Queue,
 dispatch them from the main loop."""
     )
 XMPPSettings.add_setting(u"event_queue_max_size", type = int,
+        default = 0,
         doc = u"""Maximum size of the default event loop. Posting events
 will block when the queue is full. This will cause lock-up of a single-thread,
 but may be useful in multi-threaded applications."""

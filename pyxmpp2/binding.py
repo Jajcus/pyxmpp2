@@ -29,7 +29,7 @@ __docformat__ = "restructuredtext en"
 import logging
 import uuid
 
-from .etree import ElementTree
+from .etree import ElementTree, element_to_unicode
 
 from .constants import BIND_QNP
 from .settings import XMPPSettings
@@ -116,8 +116,8 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
         [initiating entity only]
 
         The received features element is available in `features`."""
-        logger.debug("Handling stream features: {0}".format(
-                                        ElementTree.tostring(features)))
+        logger.debug(u"Handling stream features: {0}".format(
+                                        element_to_unicode(features)))
         element = features.find(FEATURE_BIND)
         if element is None:
             logger.debug("No <bind/> in features")

@@ -35,7 +35,7 @@ import ssl
 from functools import partial
 from collections import deque
 
-from .etree import ElementTree
+from .etree import ElementTree, element_to_unicode
 from .mainloop.interfaces import IOHandler, HandlerReady, PrepareAgain
 from .settings import XMPPSettings
 from .exceptions import DNSError, PyXMPPIOError
@@ -492,7 +492,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         with self.lock:
             if self._eof or self._socket is None or not self._serializer:
                 logger.debug("Dropping element: {0}".format(
-                                                ElementTree.tostring(element)))
+                                                element_to_unicode(element)))
                 return
             data = self._serializer.emit_stanza(element)
             self._write(data.encode("utf-8"))

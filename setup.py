@@ -13,7 +13,7 @@ if (not os.path.exists(os.path.join("pyxmpp2","version.py"))
     if "make_version" in sys.argv:
         sys.exit(0)
 else:
-    execfile(os.path.join("pyxmpp2", "version.py"))
+    exec(open(os.path.join("pyxmpp2", "version.py")).read())
     
     
 if version.endswith("-git"):
@@ -21,7 +21,15 @@ if version.endswith("-git"):
 else:
     download_url = 'http://github.com/downloads/Jajcus/pyxmpp2/pyxmpp2-{0}.tar.gz'.format(version),
 
-from distutils.core import setup
+
+extra = {}
+if sys.version_info >= (3,):
+    from setuptools import setup
+    extra['use_2to3'] = True
+    requires = []
+else:
+    from distutils.core import setup
+    requires = ['dnspython(>= 1.6.0)']
 
 setup(
     name =      'pyxmpp2',
@@ -44,11 +52,12 @@ setup(
             "Topic :: Software Development :: Libraries :: Python Modules",
         ],
     license =   'LGPL',
-    requires = ['dnspython(>= 1.6.0)'],
+    requires = requires,
     packages = [
         'pyxmpp2',
         'pyxmpp2.mainloop',
         'pyxmpp2.sasl',
     #   'pyxmpp2.ext',
     ],
+    **extra
 )

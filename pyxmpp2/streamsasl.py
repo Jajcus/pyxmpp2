@@ -28,7 +28,7 @@ __docformat__ = "restructuredtext en"
 
 import base64
 import logging
-from .etree import ElementTree
+from .etree import ElementTree, element_to_unicode
 
 from .jid import JID
 from . import sasl
@@ -438,7 +438,7 @@ class StreamSASLHandler(StreamFeatureHandler):
             return False
 
         logger.debug("SASL authentication failed: {0!r}".format(
-                                                ElementTree.tostring(element)))
+                                                element_to_unicode(element)))
         raise SASLAuthenticationFailed("SASL authentication failed")
 
     @stream_element_handler(ABORT_TAG, "receiver")

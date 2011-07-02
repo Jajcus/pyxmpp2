@@ -205,7 +205,7 @@ class StreamReader(object):
                 if not self._started:
                     # workaround for lxml bug when fed with a big chunk at once
                     if len(data) > 1:
-                        self.parser.feed(data[0])
+                        self.parser.feed(data[:1])
                         data = data[1:]
                     self._started = True
                 if data:

@@ -45,6 +45,7 @@ from __future__ import absolute_import, division
 __docformat__ = "restructuredtext en"
 
 import os
+import sys
 from abc import ABCMeta
 
 if "PYXMPP2_ETREE" in os.environ:
@@ -66,4 +67,13 @@ class ElementClass:
         if cls is ElementClass:
             return other is cls.element_type or hasattr(other, "tag")
         return NotImplemented
+
+def element_to_unicode(element):
+    if hasattr(ElementTree, 'tounicode'):
+        return ElementTree.tounicode("element")
+    elif sys.version_info.major < 3:
+        return unicode(ElementTree.tostring(element))
+    else:
+        return ElementTree.tostring(element, encoding = "unicode")
+
 

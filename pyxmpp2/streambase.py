@@ -31,7 +31,7 @@ import logging
 import uuid
 import re
 
-from .etree import ElementTree
+from .etree import ElementTree, element_to_unicode
 
 
 from .xmppparser import XMLStreamHandler
@@ -273,7 +273,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
         :Parameters:
             - `element`: root element (empty) created by the parser"""
         with self.lock:
-            logger.debug("input document: " + ElementTree.tostring(element))
+            logger.debug("input document: " + element_to_unicode(element))
             if not element.tag.startswith(STREAM_QNP):
                 self._send_stream_error("invalid-namespace")
                 raise FatalStreamError("Bad stream namespace")

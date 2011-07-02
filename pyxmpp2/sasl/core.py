@@ -258,7 +258,7 @@ class Reply(object):
         """
         if self.data is not None and self._encode:
             ret = standard_b64encode(self.data)
-            return ret
+            return ret.decode("us-ascii")
         else:
             return self.data
 

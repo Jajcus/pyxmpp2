@@ -368,13 +368,16 @@ class XMPPSettings(MutableMapping):
             else:
                 opt_type = setting.type
             if setting.default_d:
-                default_s = setting.default_d.encode(encoding, "replace")
+                default_s = setting.default_d
+                if sys.version_info.major < 3:
+                    default_s = default_s.encode(encoding, "replace")
             elif setting.default is not None:
                 default_s = repr(setting.default)
             else:
                 default_s = None
+            opt_help = setting.cmdline_help
             if sys.version_info.major < 3:
-                opt_help = setting.cmdline_help.encode(encoding, "replace")
+                opt_help = opt_help.encode(encoding, "replace")
             if default_s:
                 opt_help += " (Default: {0})".format(default_s)
             if opt_type is bool:

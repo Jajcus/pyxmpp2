@@ -25,6 +25,7 @@ from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 
+import sys
 import weakref
 import warnings
 import socket
@@ -228,9 +229,10 @@ class JID(object):
         return resource
 
     def __str__(self):
-        warnings.warn("JIDs should not be used as strings",
-                                    DeprecationWarning, stacklevel = 2)
-        return self.as_utf8()
+        if sys.version_info.major < 3:
+            return self.as_unicode().encode("us-ascii")
+        else:
+            return self.as_unicode()
 
     def __unicode__(self):
         return self.as_unicode()

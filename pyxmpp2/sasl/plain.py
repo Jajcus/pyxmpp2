@@ -89,9 +89,9 @@ class PlainClientAuthenticator(ClientAuthenticator):
         if self.password is None or pformat != "plain":
             logger.debug(u"Couldn't retrieve plain password")
             return Failure(u"password-unavailable")
-        return Response(b"%s\000%s\000%s" % ( self.authzid.encode("utf-8"),
+        return Response(b"\000".join(( self.authzid.encode("utf-8"),
                             self.username.encode("utf-8"),
-                            self.password.encode("utf-8")))
+                            self.password.encode("utf-8"))))
 
     def finish(self, data):
         """Handle authentication succes information from the server.
