@@ -24,8 +24,13 @@ Python 3 support
 ----------------
 
 The source code is written for Python 2.7, but automated facilities are
-available for conversion to 3.2. To build or install the py3k package
-run the ``setup.py`` script using the Python 3 interpreter::
+available for conversion to 3.2. For this to work you need the `Distribute`_
+package installed for Python 3.
+
+.. _Distribute: http://pypi.python.org/pypi/distribute
+
+To build or install the py3k package run the ``setup.py`` script using the
+Python 3 interpreter::
 
     python3 setup.py build
     python3 setup.py install
