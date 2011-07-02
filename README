@@ -25,7 +25,7 @@ Python 3 support
 
 The source code is written for Python 2.7, but automated facilities are
 available for conversion to 3.2. To build or install the py3k package
-run the ``setup.py`` script using the Python 3 interpreter:
+run the ``setup.py`` script using the Python 3 interpreter::
 
     python3 setup.py build
     python3 setup.py install
@@ -34,7 +34,7 @@ You may want to give ``--build-base py3-build`` option to build if you are
 also building Python 2 version.
 
 If you have the GNU Make utility (every Linux distribution provides it) you
-may use ``make`` command instead:
+may use ``make`` command instead::
 
     make py3-build
     make py3-install
