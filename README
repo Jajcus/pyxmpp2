@@ -15,10 +15,38 @@ The goal of this project is to rewrite PyXMPP so:
 Requirements
 ------------
 
-- Python 2.7 (Python 3.2 support coming soon)
+- Python 2.7 or 3.2
 - `DNSPython`_  Limited functionality is available without it.
 
 .. _DNSPython: http://www.dnspython.org/
+
+Python 3 support
+----------------
+
+The source code is written for Python 2.7, but automated facilities are
+available for conversion to 3.2. To build or install the py3k package
+run the ``setup.py`` script using the Python 3 interpreter:
+
+    python3 setup.py build
+    python3 setup.py install
+
+You may want to give ``--build-base py3-build`` option to build if you are
+also building Python 2 version.
+
+If you have the GNU Make utility (every Linux distribution provides it) you
+may use ``make`` command instead:
+
+    make py3-build
+    make py3-install
+
+Those will also make the Python3 version of the examples in the py3-examples
+directory if you are using a GIT checkout (source distributions already
+provide those).
+
+As for now (2011-07-02) there is no official `DNSPython`_ release for
+Python 3, you may want to check their `experimental branch`_.
+
+.. _experimental branch: http://www.mail-archive.com/dnspython-dev@howl.play-bow.org/msg00008.html
 
 Further information
 -------------------
