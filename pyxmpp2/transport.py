@@ -729,7 +729,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._socket = None
             self._set_state("aborted")
             self._write_queue.clear()
-            self._write_queue.notify()
+            self._write_queue_cond.notify()
         raise PyXMPPIOError("Unhandled error on socket")
 
     def handle_nval(self):
