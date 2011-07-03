@@ -21,12 +21,13 @@
     - `QUIT`: event (instance of a QuitEvent class) used to terminate
       the main event loop.
 """
+# pylint: disable=R0201
 
 from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod, abstractproperty
 
 class IOHandlerPrepareResult(object):
     """Result of the `IOHandler.prepare` method."""
@@ -67,26 +68,36 @@ class IOHandler:
     or for I/O threads."""
     # pylint: disable-msg=W0232,R0921
     __metaclass__ = ABCMeta
+
+    @abstractmethod
     def fileno(self):
         """Return file descriptor to poll or select."""
-        raise NotImplementedError
+        return None
+
+    @abstractmethod
     def is_readable(self):
         """
         :Return: `True` when the I/O channel can be read
         """
-        raise NotImplementedError
+        return False
+
+    @abstractmethod
     def wait_for_readability(self):
         """
         Stop current thread until the channel is readable.
 
         :Return: `False` if it won't be readable (e.g. is closed)
         """
-        raise NotImplementedError
+        return False
+
+    @abstractmethod
     def is_writable(self):
         """
         :Return: `True` when the I/O channel can be written to
         """
-        raise NotImplementedError
+        return False
+
+    @abstractmethod
     def prepare(self):
         """
         Prepare the I/O handler for the event loop or an event loop 
@@ -96,52 +107,68 @@ class IOHandler:
             or `PrepareAgain()` otherwise.
         :Returntype: `IOHandlerPrepareResult`
         """
-        raise NotImplementedError
+        return HandlerReady()
+
+    @abstractmethod
     def wait_for_writability(self):
         """
         Stop current thread until the channel is writable.
 
         :Return: `False` if it won't be readable (e.g. is closed)
         """
-        raise NotImplementedError
+        return False
+
+    @abstractmethod
     def handle_write(self):
         """
         Handle the 'channel writable' state. E.g. send buffered data via a
         socket.
         """
-        raise NotImplementedError
+        pass
+
+    @abstractmethod
     def handle_read(self):
         """
         Handle the 'channel readable' state. E.g. read from a socket.
         """
-        raise NotImplementedError
+        pass
+
+    @abstractmethod
     def handle_hup(self):
         """
         Handle the 'channel hungup' state. The handler should not be writtable
         after this.
         """
-        raise NotImplementedError
+        pass
+
+    @abstractmethod
     def handle_err(self):
         """
         Handle an error reported.
         """
-        raise NotImplementedError
+        pass
+
+    @abstractmethod
     def handle_nval(self):
         """
         Handle an 'invalid file descriptor' event.
         """
-        raise NotImplementedError
+        pass
+
+    @abstractmethod
     def close(self):
         """Close the channell immediately, so it won't expect more events."""
-        raise NotImplementedError
+        pass
 
 class Event:
     """Base class for PyXMPP2 events.
     """
     # pylint: disable-msg=W0232,R0903,R0921,R0922
     __metaclass__ = ABCMeta
+
+    @abstractmethod
     def __unicode__(self):
-        raise NotImplementedError
+        return repr(self)
 
 QUIT = None
 class QuitEvent(Event):
@@ -210,6 +237,7 @@ class MainLoop:
     """Base class for main loop implementations."""
     # pylint: disable-msg=W0232
     __metaclass__ = ABCMeta
+    @abstractmethod
     def add_handler(self, handler):
         """Add a new handler to the main loop.
 
@@ -218,7 +246,9 @@ class MainLoop:
         :Types:
             - `handler`: `IOHandler` or `EventHandler` or `TimeoutHandler`
         """
-        raise NotImplementedError
+        pass
+
+    @abstractmethod
     def remove_handler(self, handler):
         """Add a new handler to the main loop.
 
@@ -229,21 +259,27 @@ class MainLoop:
         :Types:
             - `handler`: `IOHandler` or `EventHandler` or `TimeoutHandler`
         """
-        raise NotImplementedError
+        pass
+
+    @abstractmethod
     def quit(self):
         """Make the loop stop after the current iteration."""
-        raise NotImplementedError
-    @property
+        pass
+
+    @abstractproperty
     def started(self):
         """`True` then the loop has been started.
         """
-        raise NotImplementedError
-    @property
+        return False
+
+    @abstractproperty
     def finished(self):
         """`True` then the loop has been finished or is about to finish (the
         final iteration in progress).
         """
-        raise NotImplementedError
+        return False
+
+    @abstractmethod
     def loop(self, timeout = None):
         """Run the loop.
         
@@ -253,7 +289,9 @@ class MainLoop:
         :Types:
             - `timeout`: `float`
         """
-        raise NotImplementedError
+        pass
+
+    @abstractmethod
     def loop_iteration(self, timeout = 1):
         """Single loop iteration.
 
@@ -263,5 +301,5 @@ class MainLoop:
             - `timeout`: `float`
         
         """
-        raise NotImplementedError
+        pass
 

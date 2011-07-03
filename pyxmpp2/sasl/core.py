@@ -29,7 +29,7 @@ import hashlib
 
 from base64 import standard_b64encode
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 
 CLIENT_MECHANISMS_D = {}
 CLIENT_MECHANISMS = []
@@ -353,6 +353,7 @@ class ClientAuthenticator:
         """
         self.password_manager = password_manager
 
+    @abstractmethod
     def start(self, username, authzid):
         """Start the authentication process.
 
@@ -368,6 +369,7 @@ class ClientAuthenticator:
         :returntype: `Response` or `Failure`"""
         raise NotImplementedError
 
+    @abstractmethod
     def challenge(self, challenge):
         """Process the server's challenge.
 
@@ -380,6 +382,7 @@ class ClientAuthenticator:
         :returntype: `Response` or `Failure`"""
         raise NotImplementedError
 
+    @abstractmethod
     def finish(self, data):
         """Handle authentication succes information from the server.
 
@@ -410,6 +413,7 @@ class ServerAuthenticator:
             - `password_manager`: `PasswordManager`"""
         self.password_manager = password_manager
 
+    @abstractmethod
     def start(self, initial_response):
         """Start the authentication process.
 
@@ -424,6 +428,7 @@ class ServerAuthenticator:
         :returntype: `Challenge` or `Failure` or `Success`"""
         raise NotImplementedError
 
+    @abstractmethod
     def response(self, response):
         """Process a response from a client.
 

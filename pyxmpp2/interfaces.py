@@ -17,6 +17,7 @@
 
 """Base interfaces of PyXMPP2.
 """
+# pylint: disable-msg=R0201
 
 from __future__ import absolute_import, division
 
@@ -24,7 +25,7 @@ __docformat__ = "restructuredtext en"
 
 import logging
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from copy import deepcopy
 
 # pylint: disable=W0611
@@ -38,6 +39,8 @@ class Resolver:
     """
     # pylint: disable-msg=W0232
     __metaclass__ = ABCMeta
+
+    @abstractmethod
     def resolve_srv(self, domain, service, protocol, callback):
         """Start looking up an SRV record for `service` at `domain`.
 
@@ -59,6 +62,7 @@ class Resolver:
         """
         raise NotImplementedError
 
+    @abstractmethod
     def resolve_address(self, hostname, callback, allow_cname = True):
         """Start looking up an A or AAAA record.
 
@@ -81,6 +85,8 @@ class XMPPTransport:
     """Abstract base class for XMPP transport implementations."""
     # pylint: disable-msg=R0922,W0232
     __metaclass__ = ABCMeta
+    
+    @abstractmethod
     def set_target(self, stream):
         """Make the `stream` the target for this transport instance.
 
@@ -93,8 +99,9 @@ class XMPPTransport:
         :Types:
             - `stream`: `StreamBase`
         """
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def send_stream_head(self, stanza_namespace, stream_from, stream_to,
                         stream_id = None, version = u'1.0', language = None):
         """
@@ -115,50 +122,57 @@ class XMPPTransport:
             - `language`: `unicode`
         """
         # pylint: disable-msg=R0913
-        raise NotImplementedError
+        pass
     
+    @abstractmethod
     def restart(self):
         """Restart the stream after SASL or StartTLS handshake.
         
         For the initiator a new call to `send_stream_head` is required too."""
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def send_stream_tail(self):
         """
         Send stream tail via the transport.
         """
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def send_element(self, element):
         """
         Send an element via the transport.
         """
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def is_connected(self):
         """
         Check if the transport is connected.
 
         :Return: `True` if is connected.
         """
-        raise NotImplementedError
+        return False
 
+    @abstractmethod
     def disconnect(self):
         """
         Gracefully disconnect the connection.
         """
-        raise NotImplementedError
+        pass
 
 class StanzaRoute:
     """Base class for objects that can send and receive stanzas."""
     # pylint: disable=W0232
+    @abstractmethod
     def send(self, stanza):
         """Send stanza through this route."""
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def uplink_receive(self, stanza):
         """Handle stanza received from 'uplink'."""
-        raise NotImplementedError
+        pass
 
 class XMPPFeatureHandler:
     """Base class for objects handling incoming stanzas.
@@ -306,12 +320,13 @@ class StanzaPayload:
     def __init__(self, element):
         pass
 
+    @abstractmethod
     def as_xml(self):
         """Return the XML representation of the payload.
 
         :returntype: :etree:`ElementTree.Element`
         """
-        raise NotImplementedError
+        pass
 
     def copy(self):
         """Return a deep copy of self."""
