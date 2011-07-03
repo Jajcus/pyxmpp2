@@ -146,7 +146,7 @@ class XMPPTransport:
 
 class StanzaRoute:
     """Base class for objects that can send and receive stanzas."""
-    # pulint: disable-msg=W0232
+    # pylint: disable=W0232
     def send(self, stanza):
         """Send stanza through this route."""
         raise NotImplementedError

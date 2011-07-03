@@ -25,7 +25,6 @@ from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 
-import sys
 import weakref
 import warnings
 import socket

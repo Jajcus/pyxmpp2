@@ -35,7 +35,7 @@ import ssl
 from functools import partial
 from collections import deque
 
-from .etree import ElementTree, element_to_unicode
+from .etree import element_to_unicode
 from .mainloop.interfaces import IOHandler, HandlerReady, PrepareAgain
 from .settings import XMPPSettings
 from .exceptions import DNSError, PyXMPPIOError

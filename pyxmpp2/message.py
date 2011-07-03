@@ -80,8 +80,8 @@ class Message(Stanza):
 
         Stanza.__init__(self, element, from_jid = from_jid, to_jid = to_jid,
                         stanza_type = stanza_type, stanza_id = stanza_id,
-                        error = error, error_cond = error_cond, return_path = return_path,
-                        language = language)
+                        error = error, error_cond = error_cond,
+                        return_path = return_path, language = language)
 
         if self.element_name != "message":
             raise ValueError("The element is not <message/>")
