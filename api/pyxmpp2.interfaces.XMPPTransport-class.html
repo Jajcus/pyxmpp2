@@ -176,7 +176,7 @@ Abstract base class for XMPP transport implementations.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="send_stream_tail"></a><span class="summary-sig-name">send_stream_tail</span>(<span class="summary-sig-arg">self</span>)</span><br />
+          <td><span class="summary-sig"><a href="pyxmpp2.interfaces.XMPPTransport-class.html#send_stream_tail" class="summary-sig-name">send_stream_tail</a>(<span class="summary-sig-arg">self</span>)</span><br />
       Send stream tail via the transport.</td>
           <td align="right" valign="top">
             
@@ -193,7 +193,7 @@ Abstract base class for XMPP transport implementations.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="send_element"></a><span class="summary-sig-name">send_element</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="pyxmpp2.interfaces.XMPPTransport-class.html#send_element" class="summary-sig-name">send_element</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">element</span>)</span><br />
       Send an element via the transport.</td>
           <td align="right" valign="top">
@@ -228,7 +228,7 @@ Abstract base class for XMPP transport implementations.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="disconnect"></a><span class="summary-sig-name">disconnect</span>(<span class="summary-sig-arg">self</span>)</span><br />
+          <td><span class="summary-sig"><a href="pyxmpp2.interfaces.XMPPTransport-class.html#disconnect" class="summary-sig-name">disconnect</a>(<span class="summary-sig-arg">self</span>)</span><br />
       Gracefully disconnect the connection.</td>
           <td align="right" valign="top">
             
@@ -280,21 +280,27 @@ Abstract base class for XMPP transport implementations.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="__abstractmethods__"></a><span class="summary-name">__abstractmethods__</span> = <code title="frozenset([])"><code class="variable-group">frozenset([</code><code class="variable-group">])</code></code>
+        <a href="pyxmpp2.interfaces.XMPPTransport-class.html#__abstractmethods__" class="summary-name">__abstractmethods__</a> = <code title="frozenset(['disconnect',
+           'is_connected',
+           'restart',
+           'send_element',
+           'send_stream_head',
+           'send_stream_tail',
+           'set_target'])"><code class="variable-group">frozenset([</code><code class="variable-quote">'</code><code class="variable-string">disconnect</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">is_connected</code><code class="variable-quote">'</code><code class="variable-op">,</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x864abcc&gt;">&lt;_weakrefset.WeakSet object at 0x864abcc&gt;</code>
+        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x860daac&gt;">&lt;_weakrefset.WeakSet object at 0x860daac&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x864ac0c&gt;">&lt;_weakrefset.WeakSet object at 0x864ac0c&gt;</code>
+        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x860daec&gt;">&lt;_weakrefset.WeakSet object at 0x860daec&gt;</code>
     </td>
   </tr>
 <tr class="private">
@@ -308,7 +314,7 @@ Abstract base class for XMPP transport implementations.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x864ab6c&gt;">&lt;_weakrefset.WeakSet object at 0x864ab6c&gt;</code>
+        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x860da4c&gt;">&lt;_weakrefset.WeakSet object at 0x860da4c&gt;</code>
     </td>
   </tr>
 </table>
@@ -379,6 +385,10 @@ of the target will be called when appropriate content is received.</p>
         <li><strong class="pname"><code>stream</code></strong> (<a href="pyxmpp2.streambase.StreamBase-class.html" class="link">StreamBase</a>) - the stream handler to receive stream content
 from the transport</li>
     </ul></dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -413,6 +423,10 @@ from the transport</li>
         <li><strong class="pname"><code>version</code></strong> (<code class="link">unicode</code>) - the 'version' of the stream.</li>
         <li><strong class="pname"><code>language</code></strong> (<code class="link">unicode</code>) - the 'xml:lang' of the stream</li>
     </ul></dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -433,6 +447,57 @@ from the transport</li>
   <p>Restart the stream after SASL or StartTLS handshake.</p>
 <p>For the initiator a new call to <a href="pyxmpp2.interfaces.XMPPTransport-class.html#send_stream_head" class="link">send_stream_head</a> is required too.</p>
   <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="send_stream_tail"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">send_stream_tail</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Send stream tail via the transport.
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="send_element"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">send_element</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">element</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Send an element via the transport.
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -454,6 +519,76 @@ from the transport</li>
   <dl class="fields">
     <dt>Returns:</dt>
         <dd><code class="link">True</code> if is connected.</dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="disconnect"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">disconnect</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Gracefully disconnect the connection.
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== CLASS VARIABLE DETAILS ==================== -->
+<a name="section-ClassVariableDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variable Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariableDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__abstractmethods__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">__abstractmethods__</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">frozenset([</code><code class="variable-quote">'</code><code class="variable-string">disconnect</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">is_connected</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">restart</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">send_element</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">send_stream_head</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">send_stream_tail</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">set_target</code><code class="variable-quote">'</code><code class="variable-group">])</code>
+</pre></td></tr></table>
+</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -490,7 +625,7 @@ from the transport</li>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Jun 30 11:08:22 2011</a>
+    3.0.1 on Sun Jul  3 22:34:32 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

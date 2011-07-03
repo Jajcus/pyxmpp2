@@ -158,7 +158,7 @@ Base class for main loop implementations.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="quit"></a><span class="summary-sig-name">quit</span>(<span class="summary-sig-arg">self</span>)</span><br />
+          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#quit" class="summary-sig-name">quit</a>(<span class="summary-sig-arg">self</span>)</span><br />
       Make the loop stop after the current iteration.</td>
           <td align="right" valign="top">
             
@@ -246,21 +246,27 @@ Base class for main loop implementations.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="__abstractmethods__"></a><span class="summary-name">__abstractmethods__</span> = <code title="frozenset([])"><code class="variable-group">frozenset([</code><code class="variable-group">])</code></code>
+        <a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#__abstractmethods__" class="summary-name">__abstractmethods__</a> = <code title="frozenset(['add_handler',
+           'finished',
+           'loop',
+           'loop_iteration',
+           'quit',
+           'remove_handler',
+           'started'])"><code class="variable-group">frozenset([</code><code class="variable-quote">'</code><code class="variable-string">add_handler</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">finished</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">l</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x879d9ac&gt;">&lt;_weakrefset.WeakSet object at 0x879d9ac&gt;</code>
+        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x860808c&gt;">&lt;_weakrefset.WeakSet object at 0x860808c&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x879d9ec&gt;">&lt;_weakrefset.WeakSet object at 0x879d9ec&gt;</code>
+        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x86080cc&gt;">&lt;_weakrefset.WeakSet object at 0x86080cc&gt;</code>
     </td>
   </tr>
 <tr class="private">
@@ -274,7 +280,7 @@ Base class for main loop implementations.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x879d94c&gt;">&lt;_weakrefset.WeakSet object at 0x879d94c&gt;</code>
+        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x860802c&gt;">&lt;_weakrefset.WeakSet object at 0x860802c&gt;</code>
     </td>
   </tr>
 </table>
@@ -359,6 +365,10 @@ final iteration in progress).
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>handler</code></strong> (<a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html" class="link">IOHandler</a> or <a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html" class="link">EventHandler</a> or <a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html" class="link">TimeoutHandler</a>) - the handler object to add</li>
     </ul></dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -383,6 +393,33 @@ final iteration in progress).
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>handler</code></strong> (<a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html" class="link">IOHandler</a> or <a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html" class="link">EventHandler</a> or <a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html" class="link">TimeoutHandler</a>) - the handler object to add</li>
+    </ul></dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="quit"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">quit</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Make the loop stop after the current iteration.
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -409,6 +446,10 @@ final iteration in progress).
         <li><strong class="pname"><code>timeout</code></strong> (<code class="link">float</code>) - time to loop, if not given the method will run
 until <a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#finished" class="link">finished</a></li>
     </ul></dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -433,6 +474,53 @@ until <a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#finished" class="
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>timeout</code></strong> (<code class="link">float</code>) - maximum time (in seconds) to block for</li>
     </ul></dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== CLASS VARIABLE DETAILS ==================== -->
+<a name="section-ClassVariableDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variable Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariableDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__abstractmethods__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">__abstractmethods__</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">frozenset([</code><code class="variable-quote">'</code><code class="variable-string">add_handler</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">finished</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">loop</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">loop_iteration</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">quit</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">remove_handler</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">started</code><code class="variable-quote">'</code><code class="variable-group">])</code>
+</pre></td></tr></table>
+</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -520,7 +608,7 @@ final iteration in progress).
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Jun 30 11:08:23 2011</a>
+    3.0.1 on Sun Jul  3 22:34:32 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

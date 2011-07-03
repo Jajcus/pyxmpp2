@@ -22,6 +22,7 @@ a specific service</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">int</tt></li>
 <li>Default: <tt class="docutils literal">5222</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--c2s-port</span> C2S_PORT</tt></li>
 </ul>
 </blockquote>
 <p>Port number for client to server connections.</p>
@@ -32,6 +33,7 @@ a specific service</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">bool</tt></li>
 <li>Default: <tt class="docutils literal">True</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--ipv6</span> | <span class="pre">--no-ipv6</span></tt></li>
 </ul>
 </blockquote>
 <p>Look up IPv6 addresses for a server host name.</p>
@@ -42,6 +44,7 @@ a specific service</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">unicode</tt></li>
 <li>Default: <tt class="docutils literal">None</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--password</span> PASSWORD</tt></li>
 </ul>
 </blockquote>
 <p>A password for password-based SASL mechanisms.</p>
@@ -52,6 +55,7 @@ a specific service</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">bool</tt></li>
 <li>Default: <tt class="docutils literal">True</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--prefer-ipv6</span> | <span class="pre">--no-prefer-ipv6</span></tt></li>
 </ul>
 </blockquote>
 <p>When enabled IPv6 and connecting to a dual-stack XMPP server
@@ -63,6 +67,7 @@ IPv6 addresses will be tried first.</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">unicode</tt></li>
 <li>Default: <tt class="docutils literal">None</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--server</span> SERVER</tt></li>
 </ul>
 </blockquote>
 <p>Server address to connect to. By default a DNS SRV record look-up
@@ -76,6 +81,7 @@ a specific server or when SRV look-ups are not available.</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">bool</tt></li>
 <li>Default: <tt class="docutils literal">False</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--starttls</span> | <span class="pre">--no-starttls</span></tt></li>
 </ul>
 </blockquote>
 <p>Enable StartTLS negotiation.</p>
@@ -86,6 +92,7 @@ a specific server or when SRV look-ups are not available.</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">str</tt></li>
 <li>Default: <tt class="docutils literal">None</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--tls-cacert-file</span> TLS_CACERT_FILE</tt></li>
 </ul>
 </blockquote>
 <p>Path to the TLS CA certificates file. The file should contain
@@ -97,6 +104,7 @@ the trusted CA certificates in the PEM format, concatenated.</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">bool</tt></li>
 <li>Default: <tt class="docutils literal">False</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--tls-require</span> | <span class="pre">--no-tls-require</span></tt></li>
 </ul>
 </blockquote>
 <p>Require TLS stream encryption.</p>
@@ -107,6 +115,7 @@ the trusted CA certificates in the PEM format, concatenated.</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">bool</tt></li>
 <li>Default: <tt class="docutils literal">True</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--tls-verify-peer</span> | <span class="pre">--no-tls-verify-peer</span></tt></li>
 </ul>
 </blockquote>
 <p>Verify the peer certificate.</p>
@@ -124,32 +133,11 @@ the trusted CA certificates in the PEM format, concatenated.</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">unicode</tt></li>
 <li>Default: <tt class="docutils literal">None</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--authzid</span> AUTHZID</tt></li>
 </ul>
 </blockquote>
 <p>The authorization-id (alternative JID) to request during the
 SASL authentication.</p>
-</div>
-<div class="section" id="base-c2s-handlers">
-<h2>base_c2s_handlers</h2>
-<blockquote>
-<ul class="simple">
-<li>Type: list of handler objects</li>
-<li>Default: A <a class="reference external" href="api/pyxmpp2.streamsasl.StreamSASLHandler-class.html"><tt class="docutils literal">StreamSASLHandler</tt></a> and a <a class="reference external" href="api/pyxmpp2.binding.ResourceBindingHandler-class.html"><tt class="docutils literal">ResourceBindingHandler</tt></a> instance</li>
-</ul>
-</blockquote>
-<p>The basic handlers used by a <a class="reference external" href="api/pyxmpp2.clientstream.ClientStream-class.html"><tt class="docutils literal">ClientStream</tt></a> in addition to the
-handlers provides in the constructor invocation.</p>
-</div>
-<div class="section" id="base-client-handlers">
-<h2>base_client_handlers</h2>
-<blockquote>
-<ul class="simple">
-<li>Type: list of handler objects</li>
-<li>Default: A <a class="reference external" href="api/pyxmpp2.streamtls.StreamTLSHandler-class.html"><tt class="docutils literal">StreamTLSHandler</tt></a> and a <a class="reference external" href="api/pyxmpp2.session.SessionHandler-class.html"><tt class="docutils literal">SessionHandler</tt></a> instance</li>
-</ul>
-</blockquote>
-<p>The basic handlers used by a <a class="reference external" href="api/pyxmpp2.client.Client-class.html"><tt class="docutils literal">Client</tt></a> object in addition to the
-handlers provides in the constructor invocation.</p>
 </div>
 <div class="section" id="c2s-service">
 <h2>c2s_service</h2>
@@ -157,6 +145,7 @@ handlers provides in the constructor invocation.</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">unicode</tt></li>
 <li>Default: <tt class="docutils literal"><span class="pre">'xmpp-client'</span></tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--c2s-service</span> C2S_SERVICE</tt></li>
 </ul>
 </blockquote>
 <p>SRV service name for client to server connections.</p>
@@ -167,9 +156,20 @@ handlers provides in the constructor invocation.</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">float</tt></li>
 <li>Default: <tt class="docutils literal">300</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--default-stanza-timeout</span> DEFAULT_STANZA_TIMEOUT</tt></li>
 </ul>
 </blockquote>
 <p>Time in seconds to wait for a stanza response.</p>
+</div>
+<div class="section" id="dns-resolver">
+<h2>dns_resolver</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <a class="reference external" href="api/pyxmpp2.interfaces.Resolver-class.html"><tt class="docutils literal">pyxmpp2.interfaces.Resolver</tt></a></li>
+<li>Default: A <a class="reference external" href="api/pyxmpp2.resolver.BlockingResolver-class.html"><tt class="docutils literal">BlockingResolver</tt></a> instance</li>
+</ul>
+</blockquote>
+<p>The DNS resolver implementation to be used by PyXMPP.</p>
 </div>
 <div class="section" id="event-queue">
 <h2>event_queue</h2>
@@ -187,7 +187,7 @@ dispatch them from the main loop.</p>
 <blockquote>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">int</tt></li>
-<li>Default: <tt class="docutils literal">None</tt></li>
+<li>Default: <tt class="docutils literal">0</tt></li>
 </ul>
 </blockquote>
 <p>Maximum size of the default event loop. Posting events
@@ -211,6 +211,7 @@ element.</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">bool</tt></li>
 <li>Default: <tt class="docutils literal">True</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--ipv4</span> | <span class="pre">--no-ipv4</span></tt></li>
 </ul>
 </blockquote>
 <p>Look up IPv4 addresses for a server host name.</p>
@@ -221,6 +222,7 @@ element.</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">unicode</tt></li>
 <li>Default: <tt class="docutils literal">u'en'</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--language</span> LANGUAGE</tt></li>
 </ul>
 </blockquote>
 <p>The preferred language of the XMPP stream.</p>
@@ -231,6 +233,7 @@ element.</p>
 <ul class="simple">
 <li>Type: list of <tt class="docutils literal">unicode</tt></li>
 <li>Default: <tt class="docutils literal">[u'en']</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--languages</span> LANGUAGES</tt></li>
 </ul>
 </blockquote>
 <p>When the remote entity selects one of these languages
@@ -253,20 +256,11 @@ SASL authentication properties.</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">float</tt></li>
 <li>Default: <tt class="docutils literal">1.0</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--poll-interval</span> POLL_INTERVAL</tt></li>
 </ul>
 </blockquote>
 <p>Maximum time to wait for an event. Smaller value may increase
 response times, by the cost of higher CPU usage.</p>
-</div>
-<div class="section" id="resolver">
-<h2>resolver</h2>
-<blockquote>
-<ul class="simple">
-<li>Type: <a class="reference external" href="api/pyxmpp2.interfaces.Resolver-class.html"><tt class="docutils literal">pyxmpp2.interfaces.Resolver</tt></a></li>
-<li>Default: A <a class="reference external" href="api/pyxmpp2.resolver.BlockingResolver-class.html"><tt class="docutils literal">BlockingResolver</tt></a> instance</li>
-</ul>
-</blockquote>
-<p>The DNS resolver implementation to be used by PyXMPP.</p>
 </div>
 <div class="section" id="resource">
 <h2>resource</h2>
@@ -274,6 +268,7 @@ response times, by the cost of higher CPU usage.</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">unicode</tt></li>
 <li>Default: <tt class="docutils literal">None</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--resource</span> RESOURCE</tt></li>
 </ul>
 </blockquote>
 <p>JID resource to bind. Use the server-provided resource if not set.
@@ -286,9 +281,43 @@ constructor.</p>
 <ul class="simple">
 <li>Type: list of <tt class="docutils literal">unicode</tt></li>
 <li>Default: <tt class="docutils literal"><span class="pre">['DIGEST-MD5',</span> 'PLAIN']</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--sasl-mechanisms</span> SASL_MECHANISMS</tt></li>
 </ul>
 </blockquote>
 <p>SASL mechanism that can be used for stream authentication.</p>
+</div>
+<div class="section" id="software-name">
+<h2>software_name</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">unicode</tt></li>
+<li>Default: <tt class="docutils literal">'PyXMPP2'</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--software-name</span> SOFTWARE_NAME</tt></li>
+</ul>
+</blockquote>
+<p>Software name for XEP-0092 query.</p>
+</div>
+<div class="section" id="software-os">
+<h2>software_os</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">unicode</tt></li>
+<li>Default: Operating system running this code</li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--software-os</span> SOFTWARE_OS</tt></li>
+</ul>
+</blockquote>
+<p>Operating system name for XEP-0092 query.</p>
+</div>
+<div class="section" id="software-version">
+<h2>software_version</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">unicode</tt></li>
+<li>Default: <tt class="docutils literal"><span class="pre">u'1.99.0-git'</span></tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--software-version</span> SOFTWARE_VERSION</tt></li>
+</ul>
+</blockquote>
+<p>Software version for XEP-0092 query.</p>
 </div>
 <div class="section" id="tls-cert-file">
 <h2>tls_cert_file</h2>
@@ -296,6 +325,7 @@ constructor.</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">str</tt></li>
 <li>Default: <tt class="docutils literal">None</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--tls-cert-file</span> TLS_CERT_FILE</tt></li>
 </ul>
 </blockquote>
 <p>Path to the TLS certificate file. The file should contain
@@ -308,6 +338,7 @@ contain the private key. All in the PEM format, concatenated.</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">str</tt></li>
 <li>Default: <tt class="docutils literal">None</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--tls-key-file</span> TLS_KEY_FILE</tt></li>
 </ul>
 </blockquote>
 <p>Path to the TLS certificate private key file (in the PEM
@@ -319,7 +350,7 @@ format). Not needed if the key is included in the file pointed by the
 <blockquote>
 <ul class="simple">
 <li>Type: callable</li>
-<li>Default: <tt class="docutils literal">&lt;function is_certificate_valid at 0x825a1ec&gt;</tt></li>
+<li>Default: <tt class="docutils literal">&lt;function is_certificate_valid at 0x824c374&gt;</tt></li>
 </ul>
 </blockquote>
 <p>A function to verify if a certificate is valid and if the
@@ -333,6 +364,7 @@ to verify.</p>
 <ul class="simple">
 <li>Type: <tt class="docutils literal">unicode</tt></li>
 <li>Default: <tt class="docutils literal">None</tt></li>
+<li>Command line: <tt class="docutils literal"><span class="pre">--username</span> USERNAME</tt></li>
 </ul>
 </blockquote>
 <p>The username to use instead of the JID local part.</p>

@@ -120,7 +120,7 @@ or for I/O threads.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="fileno"></a><span class="summary-sig-name">fileno</span>(<span class="summary-sig-arg">self</span>)</span><br />
+          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#fileno" class="summary-sig-name">fileno</a>(<span class="summary-sig-arg">self</span>)</span><br />
       Return file descriptor to poll or select.</td>
           <td align="right" valign="top">
             
@@ -276,7 +276,7 @@ iteration.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="handle_err"></a><span class="summary-sig-name">handle_err</span>(<span class="summary-sig-arg">self</span>)</span><br />
+          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#handle_err" class="summary-sig-name">handle_err</a>(<span class="summary-sig-arg">self</span>)</span><br />
       Handle an error reported.</td>
           <td align="right" valign="top">
             
@@ -293,7 +293,7 @@ iteration.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="handle_nval"></a><span class="summary-sig-name">handle_nval</span>(<span class="summary-sig-arg">self</span>)</span><br />
+          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#handle_nval" class="summary-sig-name">handle_nval</a>(<span class="summary-sig-arg">self</span>)</span><br />
       Handle an 'invalid file descriptor' event.</td>
           <td align="right" valign="top">
             
@@ -310,7 +310,7 @@ iteration.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="close"></a><span class="summary-sig-name">close</span>(<span class="summary-sig-arg">self</span>)</span><br />
+          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#close" class="summary-sig-name">close</a>(<span class="summary-sig-arg">self</span>)</span><br />
       Close the channell immediately, so it won't expect more events.</td>
           <td align="right" valign="top">
             
@@ -362,21 +362,29 @@ iteration.</td>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="__abstractmethods__"></a><span class="summary-name">__abstractmethods__</span> = <code title="frozenset([])"><code class="variable-group">frozenset([</code><code class="variable-group">])</code></code>
+        <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#__abstractmethods__" class="summary-name">__abstractmethods__</a> = <code title="frozenset(['close',
+           'fileno',
+           'handle_err',
+           'handle_hup',
+           'handle_nval',
+           'handle_read',
+           'handle_write',
+           'is_readable',
+..."><code class="variable-group">frozenset([</code><code class="variable-quote">'</code><code class="variable-string">close</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">fileno</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">handle_er</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x879d1ac&gt;">&lt;_weakrefset.WeakSet object at 0x879d1ac&gt;</code>
+        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x8603a6c&gt;">&lt;_weakrefset.WeakSet object at 0x8603a6c&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x879d1ec&gt;">&lt;_weakrefset.WeakSet object at 0x879d1ec&gt;</code>
+        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x8603aac&gt;">&lt;_weakrefset.WeakSet object at 0x8603aac&gt;</code>
     </td>
   </tr>
 <tr class="private">
@@ -390,7 +398,7 @@ iteration.</td>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x879d14c&gt;">&lt;_weakrefset.WeakSet object at 0x879d14c&gt;</code>
+        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x8603a0c&gt;">&lt;_weakrefset.WeakSet object at 0x8603a0c&gt;</code>
     </td>
   </tr>
 </table>
@@ -437,6 +445,29 @@ iteration.</td>
   </td>
 </tr>
 </table>
+<a name="fileno"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">fileno</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Return file descriptor to poll or select.
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="is_readable"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -455,6 +486,10 @@ iteration.</td>
   <dl class="fields">
     <dt>Returns:</dt>
         <dd><code class="link">True</code> when the I/O channel can be read</dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -476,6 +511,10 @@ iteration.</td>
   <dl class="fields">
     <dt>Returns:</dt>
         <dd><code class="link">False</code> if it won't be readable (e.g. is closed)</dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -497,6 +536,10 @@ iteration.</td>
   <dl class="fields">
     <dt>Returns:</dt>
         <dd><code class="link">True</code> when the I/O channel can be written to</dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -520,6 +563,10 @@ iteration.
     <dt>Returns: <a href="pyxmpp2.mainloop.interfaces.IOHandlerPrepareResult-class.html" class="link">IOHandlerPrepareResult</a></dt>
         <dd><a href="pyxmpp2.mainloop.interfaces.HandlerReady-class.html" class="link">HandlerReady()</a> if there is no need to call <a href="pyxmpp2.mainloop.interfaces.IOHandler-class.html#prepare" class="link">prepare</a> again
 or <a href="pyxmpp2.mainloop.interfaces.PrepareAgain-class.html" class="link">PrepareAgain()</a> otherwise.</dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -541,6 +588,10 @@ or <a href="pyxmpp2.mainloop.interfaces.PrepareAgain-class.html" class="link">Pr
   <dl class="fields">
     <dt>Returns:</dt>
         <dd><code class="link">False</code> if it won't be readable (e.g. is closed)</dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -561,6 +612,10 @@ or <a href="pyxmpp2.mainloop.interfaces.PrepareAgain-class.html" class="link">Pr
   Handle the 'channel writable' state. E.g. send buffered data via a
 socket.
   <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -580,6 +635,10 @@ socket.
   
   Handle the 'channel readable' state. E.g. read from a socket.
   <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -600,6 +659,124 @@ socket.
   Handle the 'channel hungup' state. The handler should not be writtable
 after this.
   <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="handle_err"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_err</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Handle an error reported.
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="handle_nval"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_nval</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Handle an 'invalid file descriptor' event.
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="close"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">close</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Close the channell immediately, so it won't expect more events.
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== CLASS VARIABLE DETAILS ==================== -->
+<a name="section-ClassVariableDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variable Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariableDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__abstractmethods__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">__abstractmethods__</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">frozenset([</code><code class="variable-quote">'</code><code class="variable-string">close</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">fileno</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">handle_err</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">handle_hup</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">handle_nval</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">handle_read</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">handle_write</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">is_readable</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+<code class="variable-ellipsis">...</code>
+</pre></td></tr></table>
+</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -636,7 +813,7 @@ after this.
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Jun 30 11:08:23 2011</a>
+    3.0.1 on Sun Jul  3 22:34:32 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

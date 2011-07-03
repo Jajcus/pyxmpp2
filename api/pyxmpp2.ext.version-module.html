@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>pyxmpp2.ext.version</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="pyxmpp2-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/Jajcus/pyxmpp2/">PyXMPP2</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="pyxmpp2-module.html">Package&nbsp;pyxmpp2</a> ::
+        <a href="pyxmpp2.ext-module.html">Package&nbsp;ext</a> ::
+        Module&nbsp;version
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== MODULE DESCRIPTION ==================== -->
+<h1 class="epydoc">Module version</h1><p class="nomargin-top"></p>
+<p>Software Version query and advertisement.</p>
+<p>To advertise software version in your client or component add
+a <a href="pyxmpp2.ext.version.VersionProvider-class.html" class="link">VersionProvider</a> instance to your payload.</p>
+<p>To request a remote entity version information, use the
+<a href="pyxmpp2.ext.version-module.html#request_software_version" class="link">request_software_version</a> function.</p>
+<dl class="rst-docutils">
+<dt>Normative reference:</dt>
+<dd><ul class="rst-first rst-last rst-simple">
+<li><a class="rst-reference external" href="http://xmpp.org/extensions/xep-0092.html" target="_top">XEP-0092</a></li>
+</ul>
+</dd>
+</dl>
+
+<!-- ==================== CLASSES ==================== -->
+<a name="section-Classes"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Classes</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Classes"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.ext.version.VersionPayload-class.html" class="summary-name">VersionPayload</a><br />
+      Software version (XEP-0092) stanza payload.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.ext.version.VersionProvider-class.html" class="summary-name">VersionProvider</a><br />
+      Provides the Software version (XEP-0092) service.
+    </td>
+  </tr>
+</table>
+<!-- ==================== FUNCTIONS ==================== -->
+<a name="section-Functions"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Functions</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Functions"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.ext.version-module.html#request_software_version" class="summary-sig-name">request_software_version</a>(<span class="summary-sig-arg">stanza_processor</span>,
+        <span class="summary-sig-arg">target_jid</span>,
+        <span class="summary-sig-arg">callback</span>,
+        <span class="summary-sig-arg">error_callback</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Request software version information from a remote entity.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_os_name_factory"></a><span class="summary-sig-name">_os_name_factory</span>(<span class="summary-sig-arg">settings</span>)</span><br />
+      Factory for the <a class="rst-reference external" href="../Settings.html#software-os" target="_top"><tt class="rst-docutils literal">software_os setting</tt></a> default.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_version_factory"></a><span class="summary-sig-name">_version_factory</span>(<span class="summary-sig-arg">settings</span>)</span><br />
+      Factory for the <a class="rst-reference external" href="../Settings.html#software-version" target="_top"><tt class="rst-docutils literal">software_version setting</tt></a> default.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<!-- ==================== VARIABLES ==================== -->
+<a name="section-Variables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Variables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="logger"></a><span class="summary-name">logger</span> = <code title="logging.getLogger(&quot;pyxmpp2.ext.version&quot;)">logging.getLogger(&quot;pyxmpp2.ext.version&quot;)</code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_QNP"></a><span class="summary-name">_QNP</span> = <code title="u'{jabber:iq:version}'"><code class="variable-quote">u'</code><code class="variable-string">{jabber:iq:version}</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="QUERY_TAG"></a><span class="summary-name">QUERY_TAG</span> = <code title="u'{jabber:iq:version}query'"><code class="variable-quote">u'</code><code class="variable-string">{jabber:iq:version}query</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="NAME_TAG"></a><span class="summary-name">NAME_TAG</span> = <code title="u'{jabber:iq:version}name'"><code class="variable-quote">u'</code><code class="variable-string">{jabber:iq:version}name</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="VERSION_TAG"></a><span class="summary-name">VERSION_TAG</span> = <code title="u'{jabber:iq:version}version'"><code class="variable-quote">u'</code><code class="variable-string">{jabber:iq:version}version</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="OS_TAG"></a><span class="summary-name">OS_TAG</span> = <code title="u'{jabber:iq:version}os'"><code class="variable-quote">u'</code><code class="variable-string">{jabber:iq:version}os</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+</table>
+<!-- ==================== FUNCTION DETAILS ==================== -->
+<a name="section-FunctionDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Function Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-FunctionDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="request_software_version"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">request_software_version</span>(<span class="sig-arg">stanza_processor</span>,
+        <span class="sig-arg">target_jid</span>,
+        <span class="sig-arg">callback</span>,
+        <span class="sig-arg">error_callback</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Request software version information from a remote entity.</p>
+<p>When a valid response is received the <code class="link">callback</code> will be handled
+with a <a href="pyxmpp2.ext.version.VersionPayload-class.html" class="link">VersionPayload</a> instance as its only argument. The object will
+provide the requested infromation.</p>
+<p>In case of error stanza received or invalid response the <code class="link">error_callback</code>
+(if provided) will be called with the offending stanza (which can
+be <tt class="rst-docutils literal">&lt;iq <span class="pre">type='error'/&gt;</span></tt> or <tt class="rst-docutils literal">&lt;iq <span class="pre">type='result'&gt;</span></tt>) as its argument.</p>
+<p>The same function will be called on timeout, with the argument set to
+<code class="link">None</code>.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stanza_processor</code></strong> (<a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html" class="link">StanzaProcessor</a>) - a object used to send the query and handle
+response. E.g. a <a href="pyxmpp2.client.Client-class.html" class="link">pyxmpp2.client.Client</a> instance</li>
+        <li><strong class="pname"><code>target_jid</code></strong> (<a href="pyxmpp2.jid.JID-class.html" class="link">JID</a>) - the JID of the entity to query</li>
+        <li><strong class="pname"><code>callback</code></strong> - function to be called with a valid response</li>
+        <li><strong class="pname"><code>error_callback</code></strong> - function to be called on error</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="pyxmpp2-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="https://github.com/Jajcus/pyxmpp2/">PyXMPP2</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    <a href="epydoc-log.html">Generated by Epydoc
+    3.0.1 on Sun Jul  3 22:34:29 2011</a>
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

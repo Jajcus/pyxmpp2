@@ -60,9 +60,9 @@
 <h1 class="epydoc">Class StanzaProcessor</h1><p class="nomargin-top"></p>
 <center>
 <center>  <map id="class_hierarchy_for_stanzaproc" name="class_hierarchy_for_stanzaproc">
-<area shape="rect" id="node1" href="pyxmpp2.clientstream.ClientStream-class.html" title="clientstream.ClientStream" alt="" coords="5,123,187,151"/>
-<area shape="rect" id="node2" href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html" title="StanzaProcessor" alt="" coords="31,6,161,34"/>
-<area shape="rect" id="node3" href="pyxmpp2.streambase.StreamBase-class.html" title="streambase.StreamBase" alt="" coords="9,65,183,93"/>
+<area shape="rect" id="node1" href="pyxmpp2.client.Client-class.html" title="client.Client" alt="" coords="43,123,136,151"/>
+<area shape="rect" id="node2" href="pyxmpp2.interfaces.StanzaRoute-class.html" title="interfaces.StanzaRoute" alt="" coords="5,6,173,34"/>
+<area shape="rect" id="node3" href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html" title="StanzaProcessor" alt="" coords="24,65,155,93"/>
 </map>
   <img src="class_hierarchy_for_stanzaproc.gif" alt='' usemap="#class_hierarchy_for_stanzaproc" ismap="ismap" class="graph-without-title" />
 </center>
@@ -342,6 +342,23 @@ acquired.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a name="clear_response_handlers"></a><span class="summary-sig-name">clear_response_handlers</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Remove all registered response handlers.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a name="setup_stanza_handlers"></a><span class="summary-sig-name">setup_stanza_handlers</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">handler_objects</span>,
         <span class="summary-sig-arg">usage_restriction</span>)</span><br />
@@ -397,6 +414,24 @@ acquired.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#uplink_receive" class="summary-sig-name">uplink_receive</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>)</span><br />
+      Handle stanza received from 'uplink'.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#send" class="summary-sig-name">send</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">stanza</span>)</span><br />
       Send a stanza somwhere.</td>
@@ -407,24 +442,6 @@ acquired.</td>
         </tr>
       </table>
       
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
-      <code>__delattr__</code>,
-      <code>__format__</code>,
-      <code>__getattribute__</code>,
-      <code>__hash__</code>,
-      <code>__new__</code>,
-      <code>__reduce__</code>,
-      <code>__reduce_ex__</code>,
-      <code>__repr__</code>,
-      <code>__setattr__</code>,
-      <code>__sizeof__</code>,
-      <code>__str__</code>,
-      <code>__subclasshook__</code>
-      </p>
     </td>
   </tr>
 </table>
@@ -447,15 +464,7 @@ acquired.</td>
 </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="initiator"></a><span class="summary-name">initiator</span><br />
-      <code class="link">True</code> if local stream endpoint is the initiating entity.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type"><a class="rst-rst-reference external rst-reference external" href="http://docs.python.org/library/threading.html#rlock-objects" target="_top"><tt class="rst-rst-docutils literal rst-docutils literal">threading.RLock</tt></a></span>
     </td><td class="summary">
         <a name="lock"></a><span class="summary-name">lock</span><br />
       lock object used to synchronize access to the
@@ -464,7 +473,7 @@ acquired.</td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type"><a href="pyxmpp2.jid.JID-class.html" class="link">JID</a></span>
     </td><td class="summary">
         <a name="me"></a><span class="summary-name">me</span><br />
       local JID.
@@ -472,44 +481,27 @@ acquired.</td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type"><a href="pyxmpp2.jid.JID-class.html" class="link">JID</a></span>
     </td><td class="summary">
         <a name="peer"></a><span class="summary-name">peer</span><br />
-      remote stream endpoint JID.
+      remote endpoint JID.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type"><code class="link">bool</code></span>
     </td><td class="summary">
         <a name="process_all_stanzas"></a><span class="summary-name">process_all_stanzas</span><br />
-      when <code class="link">True</code> then all stanzas received are
-considered local.
+      when <code class="link">True</code> then all stanzas received (and
+not only those addressed to <a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#me" class="link">me</a>) are considered local.
     </td>
   </tr>
-</table>
-<!-- ==================== PROPERTIES ==================== -->
-<a name="section-Properties"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Properties</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-Properties"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-  <tr>
-    <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
-      <code>__class__</code>
-      </p>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><a href="pyxmpp2.interfaces.StanzaRoute-class.html" class="link">StanzaRoute</a></span>
+    </td><td class="summary">
+        <a name="uplink"></a><span class="summary-name">uplink</span><br />
+      object to route outgoing stanzas through
     </td>
   </tr>
 </table>
@@ -553,9 +545,6 @@ considered local.
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>default_timeout</code></strong> - default timeout for IQ response handlers</li>
     </ul></dd>
-    <dt>Overrides:
-        object.__init__
-    </dt>
   </dl>
 </td></tr></table>
 </div>
@@ -906,6 +895,30 @@ classes if needed.</p>
   </dl>
 </td></tr></table>
 </div>
+<a name="uplink_receive"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">uplink_receive</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Handle stanza received from 'uplink'.
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="pyxmpp2.interfaces.StanzaRoute-class.html#uplink_receive">interfaces.StanzaRoute.uplink_receive</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
 <a name="send"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -921,13 +934,17 @@ classes if needed.</p>
     </td>
   </tr></table>
   
-  Send a stanza somwhere. This one does nothing. Should be overriden
-in derived classes.
+  <p>Send a stanza somwhere.</p>
+<p>The default implementation sends it via the <a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#uplink" class="link">uplink</a> if it is defined
+or raises the <a href="pyxmpp2.exceptions.NoRouteError-class.html" class="link">NoRouteError</a>.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>stanza</code></strong> (<a href="pyxmpp2.stanza.Stanza-class.html" class="link">pyxmpp.stanza.Stanza</a>) - the stanza to send.</li>
     </ul></dd>
+    <dt>Overrides:
+        <a href="pyxmpp2.interfaces.StanzaRoute-class.html#send">interfaces.StanzaRoute.send</a>
+    </dt>
   </dl>
 </td></tr></table>
 </div>
@@ -964,7 +981,7 @@ in derived classes.
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Jun 30 11:08:27 2011</a>
+    3.0.1 on Sun Jul  3 22:34:35 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

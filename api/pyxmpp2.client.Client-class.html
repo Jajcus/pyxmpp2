@@ -60,8 +60,11 @@
 <h1 class="epydoc">Class Client</h1><p class="nomargin-top"></p>
 <center>
 <center>  <map id="class_hierarchy_for_client" name="class_hierarchy_for_client">
-<area shape="rect" id="node1" href="pyxmpp2.client.Client-class.html" title="Client" alt="" coords="92,65,151,93"/>
-<area shape="rect" id="node2" href="pyxmpp2.mainloop.interfaces.EventHandler-class.html" title="mainloop.interfaces.EventHandler" alt="" coords="5,6,237,34"/>
+<area shape="rect" id="node1" href="pyxmpp2.client.Client-class.html" title="Client" alt="" coords="355,123,413,151"/>
+<area shape="rect" id="node2" href="pyxmpp2.interfaces.StanzaRoute-class.html" title="interfaces.StanzaRoute" alt="" coords="565,6,733,34"/>
+<area shape="rect" id="node5" href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html" title="stanzaprocessor.StanzaProcessor" alt="" coords="531,65,768,93"/>
+<area shape="rect" id="node3" href="pyxmpp2.mainloop.interfaces.EventHandler-class.html" title="mainloop.interfaces.EventHandler" alt="" coords="5,65,237,93"/>
+<area shape="rect" id="node4" href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html" title="mainloop.interfaces.TimeoutHandler" alt="" coords="261,65,507,93"/>
 </map>
   <img src="class_hierarchy_for_client.gif" alt='' usemap="#class_hierarchy_for_client" ismap="ismap" class="graph-without-title" />
 </center>
@@ -90,7 +93,7 @@ so a client application needs only to add its handlers.</p>
 </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html">mainloop.interfaces.EventHandler</a></code></b>:
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html">mainloop.interfaces.TimeoutHandler</a></code></b>:
       <code><a href="abc.ABCMeta-class.html">__metaclass__</a></code>
       </p>
     </td>
@@ -242,6 +245,24 @@ so a client application needs only to add its handlers.</p>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.client.Client-class.html#_stream_authenticated" class="summary-sig-name" onclick="show_private();">_stream_authenticated</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">event</span>)</span><br />
+      Handle the <a href="pyxmpp2.streamevents.AuthenticatedEvent-class.html" class="link">AuthenticatedEvent</a>.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a href="pyxmpp2.client.Client-class.html#_stream_disconnected" class="summary-sig-name" onclick="show_private();">_stream_disconnected</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">event</span>)</span><br />
       Handle stream disconnection event.</td>
@@ -254,8 +275,63 @@ so a client application needs only to add its handlers.</p>
       
     </td>
   </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code class="link">int</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.client.Client-class.html#regular_tasks" class="summary-sig-name">regular_tasks</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Do some housekeeping (cache expiration, timeout handling).</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.client.Client-class.html#base_handlers_factory" class="summary-sig-name">base_handlers_factory</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Default base client handlers factory.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
   <tr>
     <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html">stanzaprocessor.StanzaProcessor</a></code></b>:
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#check_to">check_to</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#clear_response_handlers">clear_response_handlers</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#fix_in_stanza">fix_in_stanza</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#fix_out_stanza">fix_out_stanza</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#process_iq">process_iq</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#process_message">process_message</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#process_presence">process_presence</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#process_stanza">process_stanza</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#route_stanza">route_stanza</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#send">send</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#set_response_handlers">set_response_handlers</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#setup_stanza_handlers">setup_stanza_handlers</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#uplink_receive">uplink_receive</a></code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html">stanzaprocessor.StanzaProcessor</a></code></b> (private):
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#_get_iq_handler" onclick="show_private();">_get_iq_handler</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#_process_handler_result" onclick="show_private();">_process_handler_result</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#_process_iq_response" onclick="show_private();">_process_iq_response</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#_set_response_handlers" onclick="show_private();">_set_response_handlers</a></code>
+      </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
       <code>__format__</code>,
@@ -292,14 +368,14 @@ so a client application needs only to add its handlers.</p>
 </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html">mainloop.interfaces.EventHandler</a></code></b>:
-      <code><a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html#__abstractmethods__">__abstractmethods__</a></code>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html">mainloop.interfaces.TimeoutHandler</a></code></b>:
+      <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html#__abstractmethods__">__abstractmethods__</a></code>
       </p>
-    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html">mainloop.interfaces.EventHandler</a></code></b> (private):
-      <code><a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
-      <code><a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
-      <code><a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
-      <code><a href="pyxmpp2.mainloop.interfaces.EventHandler-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html">mainloop.interfaces.TimeoutHandler</a></code></b> (private):
+      <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
+      <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
+      <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
+      <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
       </p></div>
     </td>
   </tr>
@@ -353,7 +429,8 @@ constructor
       <span class="summary-type"><a class="rst-reference external" href="http://docs.python.org/library/threading.html#rlock-objects" target="_top"><tt class="rst-docutils literal">threading.RLock</tt></a></span>
     </td><td class="summary">
         <a name="lock"></a><span class="summary-name">lock</span><br />
-      lock protecting the object
+      lock object used to synchronize access to the
+<a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html" class="link">StanzaProcessor</a> object.
     </td>
   </tr>
 <tr>
@@ -378,6 +455,16 @@ constructor
     </td><td class="summary">
         <a name="stream"></a><span class="summary-name">stream</span><br />
       the stream object when connected
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html">stanzaprocessor.StanzaProcessor</a></code></b>:
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#me">me</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#peer">peer</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#process_all_stanzas">process_all_stanzas</a></code>,
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#uplink">uplink</a></code>
+      </p>
     </td>
   </tr>
 </table>
@@ -479,6 +566,30 @@ will be created.</li>
   </dl>
 </td></tr></table>
 </div>
+<a name="_stream_authenticated"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_stream_authenticated</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">event</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Handle the <a href="pyxmpp2.streamevents.AuthenticatedEvent-class.html" class="link">AuthenticatedEvent</a>.
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@event_handler(AuthenticatedEvent)</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="_stream_disconnected"></a>
 <div class="private">
 <table class="details" border="1" cellpadding="3"
@@ -500,6 +611,56 @@ will be created.</li>
     <dd><ul class="nomargin-top">
         <li><code>@event_handler(DisconnectedEvent)</code></li>
     </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="regular_tasks"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">regular_tasks</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Do some housekeeping (cache expiration, timeout handling).</p>
+<p>This method should be called periodically from the application's
+main loop.</p>
+  <dl class="fields">
+    <dt>Returns: <code class="link">int</code></dt>
+        <dd>suggested delay (in seconds) before the next call to this
+method.</dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@timeout_handler(1)</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="base_handlers_factory"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">base_handlers_factory</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Default base client handlers factory.</p>
+<p>Subclasses can provide different behaviour by overriding this.</p>
+  <dl class="fields">
+    <dt>Returns:</dt>
+        <dd>list of handlers</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -536,7 +697,7 @@ will be created.</li>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Jun 30 11:08:19 2011</a>
+    3.0.1 on Sun Jul  3 22:34:30 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

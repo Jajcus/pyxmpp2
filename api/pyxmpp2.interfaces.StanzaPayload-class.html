@@ -61,8 +61,9 @@
 <center>
 <center>  <map id="class_hierarchy_for_stanzapayl" name="class_hierarchy_for_stanzapayl">
 <area shape="rect" id="node1" href="pyxmpp2.binding.ResourceBindingPayload-class.html" title="binding.ResourceBindingPayload" alt="" coords="5,65,232,93"/>
-<area shape="rect" id="node2" href="pyxmpp2.interfaces.StanzaPayload-class.html" title="StanzaPayload" alt="" coords="177,6,295,34"/>
-<area shape="rect" id="node3" href="pyxmpp2.stanzapayload.XMLPayload-class.html" title="stanzapayload.XMLPayload" alt="" coords="256,65,453,93"/>
+<area shape="rect" id="node2" href="pyxmpp2.ext.version.VersionPayload-class.html" title="ext.version.VersionPayload" alt="" coords="256,65,448,93"/>
+<area shape="rect" id="node3" href="pyxmpp2.interfaces.StanzaPayload-class.html" title="StanzaPayload" alt="" coords="293,6,411,34"/>
+<area shape="rect" id="node4" href="pyxmpp2.stanzapayload.XMLPayload-class.html" title="stanzapayload.XMLPayload" alt="" coords="472,65,669,93"/>
 </map>
   <img src="class_hierarchy_for_stanzapayl.gif" alt='' usemap="#class_hierarchy_for_stanzapayl" ismap="ismap" class="graph-without-title" />
 </center>
@@ -133,11 +134,11 @@ Abstract base class for stanza payload objects.
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><a class="rst-rst-rst-reference external rst-rst-reference external rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">ElementTree.Element</tt></a></span>
+      <span class="summary-type"><a class="rst-rst-rst-rst-rst-reference external rst-rst-rst-rst-reference external rst-rst-rst-reference external rst-rst-reference external rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-rst-rst-rst-rst-docutils literal rst-rst-rst-rst-docutils literal rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">ElementTree.Element</tt></a></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="as_xml"></a><span class="summary-sig-name">as_xml</span>(<span class="summary-sig-arg">self</span>)</span><br />
+          <td><span class="summary-sig"><a href="pyxmpp2.interfaces.StanzaPayload-class.html#as_xml" class="summary-sig-name">as_xml</a>(<span class="summary-sig-arg">self</span>)</span><br />
       Return the XML representation of the payload.</td>
           <td align="right" valign="top">
             
@@ -205,21 +206,21 @@ Abstract base class for stanza payload objects.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="__abstractmethods__"></a><span class="summary-name">__abstractmethods__</span> = <code title="frozenset([])"><code class="variable-group">frozenset([</code><code class="variable-group">])</code></code>
+        <a name="__abstractmethods__"></a><span class="summary-name">__abstractmethods__</span> = <code title="frozenset(['as_xml'])"><code class="variable-group">frozenset([</code><code class="variable-quote">'</code><code class="variable-string">as_xml</code><code class="variable-quote">'</code><code class="variable-group">])</code></code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x864ae2c&gt;">&lt;_weakrefset.WeakSet object at 0x864ae2c&gt;</code>
+        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x860ddac&gt;">&lt;_weakrefset.WeakSet object at 0x860ddac&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x864ae6c&gt;">&lt;_weakrefset.WeakSet object at 0x864ae6c&gt;</code>
+        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x860ddec&gt;">&lt;_weakrefset.WeakSet object at 0x860ddec&gt;</code>
     </td>
   </tr>
 <tr class="private">
@@ -233,7 +234,7 @@ Abstract base class for stanza payload objects.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x864adcc&gt;">&lt;_weakrefset.WeakSet object at 0x864adcc&gt;</code>
+        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x860dd4c&gt;">&lt;_weakrefset.WeakSet object at 0x860dd4c&gt;</code>
     </td>
   </tr>
 </table>
@@ -314,6 +315,30 @@ for stanzas with this payload.
   </dl>
 </td></tr></table>
 </div>
+<a name="as_xml"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">as_xml</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Return the XML representation of the payload.
+  <dl class="fields">
+    <dt>Returns: <a class="rst-rst-rst-rst-rst-rst-reference external rst-rst-rst-rst-rst-reference external rst-rst-rst-rst-reference external rst-rst-rst-reference external rst-rst-reference external rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-rst-rst-rst-rst-rst-docutils literal rst-rst-rst-rst-rst-docutils literal rst-rst-rst-rst-docutils literal rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">ElementTree.Element</tt></a></dt>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractmethod</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
 <br />
 <!-- ==================== PROPERTY DETAILS ==================== -->
 <a name="section-PropertyDetails"></a>
@@ -383,7 +408,7 @@ for stanzas with this payload.
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Jun 30 11:08:22 2011</a>
+    3.0.1 on Sun Jul  3 22:34:32 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

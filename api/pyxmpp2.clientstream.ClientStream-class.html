@@ -60,45 +60,17 @@
 <h1 class="epydoc">Class ClientStream</h1><p class="nomargin-top"></p>
 <center>
 <center>  <map id="class_hierarchy_for_clientstre" name="class_hierarchy_for_clientstre">
-<area shape="rect" id="node1" href="pyxmpp2.clientstream.ClientStream-class.html" title="ClientStream" alt="" coords="343,123,444,151"/>
-<area shape="rect" id="node2" href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html" title="mainloop.interfaces.TimeoutHandler" alt="" coords="5,6,251,34"/>
-<area shape="rect" id="node4" href="pyxmpp2.streambase.StreamBase-class.html" title="streambase.StreamBase" alt="" coords="307,65,480,93"/>
-<area shape="rect" id="node3" href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html" title="stanzaprocessor.StanzaProcessor" alt="" coords="275,6,512,34"/>
-<area shape="rect" id="node5" href="pyxmpp2.xmppparser.XMLStreamHandler-class.html" title="xmppparser.XMLStreamHandler" alt="" coords="536,6,760,34"/>
+<area shape="rect" id="node1" href="pyxmpp2.clientstream.ClientStream-class.html" title="ClientStream" alt="" coords="67,123,168,151"/>
+<area shape="rect" id="node2" href="pyxmpp2.streambase.StreamBase-class.html" title="streambase.StreamBase" alt="" coords="31,65,204,93"/>
+<area shape="rect" id="node3" href="pyxmpp2.xmppparser.XMLStreamHandler-class.html" title="xmppparser.XMLStreamHandler" alt="" coords="5,6,229,34"/>
 </map>
   <img src="class_hierarchy_for_clientstre.gif" alt='' usemap="#class_hierarchy_for_clientstre" ismap="ismap" class="graph-without-title" />
 </center>
 </center>
 <hr />
 <p>Handles XMPP-IM c2s stream.</p>
-<p>Both client and server side of the connection is supported. This class
-handles client SASL authentication, authorisation and resource binding.</p>
+<p>Both client and server side of the connection is supported.</p>
 
-<!-- ==================== NESTED CLASSES ==================== -->
-<a name="section-NestedClasses"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Nested Classes</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-NestedClasses"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-  <tr>
-    <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html">mainloop.interfaces.TimeoutHandler</a></code></b>:
-      <code><a href="abc.ABCMeta-class.html">__metaclass__</a></code>
-      </p>
-    </td>
-  </tr>
-</table>
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -124,6 +96,7 @@ handles client SASL authentication, authorisation and resource binding.</p>
         <tr>
           <td><span class="summary-sig"><a href="pyxmpp2.clientstream.ClientStream-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">jid</span>,
+        <span class="summary-sig-arg">stanza_route</span>,
         <span class="summary-sig-arg">handlers</span>,
         <span class="summary-sig-arg">settings</span>=<span class="summary-sig-default">None</span>)</span><br />
       Initialize the ClientStream object.</td>
@@ -220,7 +193,6 @@ handles client SASL authentication, authorisation and resource binding.</p>
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#generate_id">generate_id</a></code>,
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#is_connected">is_connected</a></code>,
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#process_stream_error">process_stream_error</a></code>,
-      <code><a href="pyxmpp2.streambase.StreamBase-class.html#regular_tasks">regular_tasks</a></code>,
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#send">send</a></code>,
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#send_stream_error">send_stream_error</a></code>,
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#set_authenticated">set_authenticated</a></code>,
@@ -231,6 +203,7 @@ handles client SASL authentication, authorisation and resource binding.</p>
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#stream_parse_error">stream_parse_error</a></code>,
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#stream_start">stream_start</a></code>,
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#transport_connected">transport_connected</a></code>,
+      <code><a href="pyxmpp2.streambase.StreamBase-class.html#uplink_receive">uplink_receive</a></code>,
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#write_element">write_element</a></code>
       </p>
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.streambase.StreamBase-class.html">streambase.StreamBase</a></code></b> (private):
@@ -246,21 +219,6 @@ handles client SASL authentication, authorisation and resource binding.</p>
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#_setup_stream_element_handlers" onclick="show_private();">_setup_stream_element_handlers</a></code>,
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#_write_element" onclick="show_private();">_write_element</a></code>
       </p></div>
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html">stanzaprocessor.StanzaProcessor</a></code></b>:
-      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#process_iq">process_iq</a></code>,
-      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#process_message">process_message</a></code>,
-      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#process_presence">process_presence</a></code>,
-      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#process_stanza">process_stanza</a></code>,
-      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#route_stanza">route_stanza</a></code>,
-      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#set_response_handlers">set_response_handlers</a></code>,
-      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#setup_stanza_handlers">setup_stanza_handlers</a></code>
-      </p>
-    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html">stanzaprocessor.StanzaProcessor</a></code></b> (private):
-      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#_get_iq_handler" onclick="show_private();">_get_iq_handler</a></code>,
-      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#_process_handler_result" onclick="show_private();">_process_handler_result</a></code>,
-      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#_process_iq_response" onclick="show_private();">_process_iq_response</a></code>,
-      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#_set_response_handlers" onclick="show_private();">_set_response_handlers</a></code>
-      </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
       <code>__format__</code>,
@@ -275,37 +233,6 @@ handles client SASL authentication, authorisation and resource binding.</p>
       <code>__str__</code>,
       <code>__subclasshook__</code>
       </p>
-    </td>
-  </tr>
-</table>
-<!-- ==================== CLASS VARIABLES ==================== -->
-<a name="section-ClassVariables"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Class Variables</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-ClassVariables"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-  <tr>
-    <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html">mainloop.interfaces.TimeoutHandler</a></code></b>:
-      <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html#__abstractmethods__">__abstractmethods__</a></code>
-      </p>
-    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html">mainloop.interfaces.TimeoutHandler</a></code></b> (private):
-      <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
-      <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
-      <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
-      <code><a href="pyxmpp2.mainloop.interfaces.TimeoutHandler-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
-      </p></div>
     </td>
   </tr>
 </table>
@@ -338,7 +265,6 @@ handles client SASL authentication, authorisation and resource binding.</p>
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#peer">peer</a></code>,
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#peer_authenticated">peer_authenticated</a></code>,
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#peer_language">peer_language</a></code>,
-      <code><a href="pyxmpp2.streambase.StreamBase-class.html#process_all_stanzas">process_all_stanzas</a></code>,
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#settings">settings</a></code>,
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#stanza_namespace">stanza_namespace</a></code>,
       <code><a href="pyxmpp2.streambase.StreamBase-class.html#tls_established">tls_established</a></code>,
@@ -407,6 +333,7 @@ handles client SASL authentication, authorisation and resource binding.</p>
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">jid</span>,
+        <span class="sig-arg">stanza_route</span>,
         <span class="sig-arg">handlers</span>,
         <span class="sig-arg">settings</span>=<span class="sig-default">None</span>)</span>
     <br /><em class="fname">(Constructor)</em>
@@ -509,7 +436,7 @@ part).</li>
 address to the own JID if the address is not set yet.</p>
   <dl class="fields">
     <dt>Overrides:
-        <a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#fix_out_stanza">stanzaprocessor.StanzaProcessor.fix_out_stanza</a>
+        <a href="pyxmpp2.streambase.StreamBase-class.html#fix_out_stanza">streambase.StreamBase.fix_out_stanza</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -533,7 +460,7 @@ address to the own JID if the address is not set yet.</p>
 <p>Ona server replace the sender address with authorized client JID.</p>
   <dl class="fields">
     <dt>Overrides:
-        <a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#fix_in_stanza">stanzaprocessor.StanzaProcessor.fix_in_stanza</a>
+        <a href="pyxmpp2.streambase.StreamBase-class.html#fix_in_stanza">streambase.StreamBase.fix_in_stanza</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -571,7 +498,7 @@ address to the own JID if the address is not set yet.</p>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Jun 30 11:08:19 2011</a>
+    3.0.1 on Sun Jul  3 22:34:30 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

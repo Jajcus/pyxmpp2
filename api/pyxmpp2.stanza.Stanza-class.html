@@ -102,7 +102,7 @@ Base class for all XMPP stanzas.
         <span class="summary-sig-arg">stanza_id</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">error</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">error_cond</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">stream</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">return_path</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">language</span>=<span class="summary-sig-default">None</span>)</span><br />
       Initialize a Stanza object.</td>
           <td align="right" valign="top">
@@ -410,7 +410,7 @@ and optional key.</td>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="last_id"></a><span class="summary-name">last_id</span> = <code title="966965">966965</code>
+        <a name="last_id"></a><span class="summary-name">last_id</span> = <code title="404651">404651</code>
     </td>
   </tr>
 </table>
@@ -453,6 +453,14 @@ and optional key.</td>
     </td><td class="summary">
         <a name="_payload"></a><span class="summary-name">_payload</span><br />
       the stanza payload
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">weakref to <a href="pyxmpp2.interfaces.StanzaRoute-class.html" class="link">StanzaRoute</a></span>
+    </td><td class="summary">
+        <a name="_return_path"></a><span class="summary-name">_return_path</span><br />
+      weak reference to the return route object
     </td>
   </tr>
 </table>
@@ -515,9 +523,9 @@ and optional key.</td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><a href="pyxmpp2.streambase.StreamBase-class.html" class="link">streambase.StreamBase</a></span>
+      <span class="summary-type"><a href="pyxmpp2.interfaces.StanzaRoute-class.html" class="link">StanzaRoute</a></span>
     </td><td class="summary">
-        <a href="pyxmpp2.stanza.Stanza-class.html#stream" class="summary-name">stream</a><br />
+        <a href="pyxmpp2.stanza.Stanza-class.html#return_path" class="summary-name">return_path</a><br />
       Stream the stanza was received from.
     </td>
   </tr>
@@ -562,7 +570,7 @@ and optional key.</td>
         <span class="sig-arg">stanza_id</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">error</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">error_cond</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">stream</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">return_path</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">language</span>=<span class="sig-default">None</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
@@ -588,6 +596,8 @@ not given, then unique for the session value is generated.</li>
         <li><strong class="pname"><code>error</code></strong> (<a href="pyxmpp2.error.StanzaErrorElement-class.html" class="link">pyxmpp.error.StanzaErrorElement</a>) - error object. Ignored if <a href="pyxmpp2.stanza.Stanza-class.html#stanza_type" class="link">stanza_type</a> is not &quot;error&quot;.</li>
         <li><strong class="pname"><code>error_cond</code></strong> (<code class="link">unicode</code>) - error condition name. Ignored if <a href="pyxmpp2.stanza.Stanza-class.html#stanza_type" class="link">stanza_type</a> is
 not &quot;error&quot; or <a href="pyxmpp2.stanza.Stanza-class.html#error" class="link">error</a> is not None.</li>
+        <li><strong class="pname"><code>return_path</code></strong> (<a href="pyxmpp2.interfaces.StanzaRoute-class.html" class="link">StanzaRoute</a>) - route for sending responses to this stanza. Will
+be weakly referenced.</li>
         <li><strong class="pname"><code>language</code></strong> (<code class="link">unicode</code>) - default language for the stanza content</li>
     </ul></dd>
     <dt>Overrides:
@@ -976,20 +986,20 @@ possible</li>
   </dl>
 </td></tr></table>
 </div>
-<a name="stream"></a>
+<a name="return_path"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
-  <h3 class="epydoc">stream</h3>
+  <h3 class="epydoc">return_path</h3>
   Stream the stanza was received from.
   <dl class="fields">
     <dt>Get Method:</dt>
-    <dd class="value"><span class="summary-sig"><i>unreachable</i>.stream(<span class="summary-sig-arg">self</span>)</span>
+    <dd class="value"><span class="summary-sig"><i>unreachable</i>.return_path(<span class="summary-sig-arg">self</span>)</span>
         - Stream the stanza was received from.
     </dd>
     <dt>Type:</dt>
-      <dd><a href="pyxmpp2.streambase.StreamBase-class.html" class="link">streambase.StreamBase</a></dd>
+      <dd><a href="pyxmpp2.interfaces.StanzaRoute-class.html" class="link">StanzaRoute</a></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -1026,7 +1036,7 @@ possible</li>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Jun 30 11:08:27 2011</a>
+    3.0.1 on Sun Jul  3 22:34:34 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
