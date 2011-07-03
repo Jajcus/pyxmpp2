@@ -43,7 +43,7 @@ from .streamevents import TLSConnectedEvent
 from .interfaces import StreamFeatureHandler
 from .interfaces import StreamFeatureHandled, StreamFeatureNotHandled
 from .interfaces import stream_element_handler
-from .mainloop.interfaces import EventHandler, event_handler
+from .interfaces import EventHandler, event_handler
 
 STARTTLS_TAG = TLS_QNP + u"starttls"
 REQUIRED_TAG = TLS_QNP + u"required"

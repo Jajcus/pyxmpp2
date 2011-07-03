@@ -15,7 +15,7 @@ from pyxmpp2.exceptions import StreamParseError
 from pyxmpp2.jid import JID
 from pyxmpp2.message import Message
 
-from pyxmpp2.mainloop.interfaces import EventHandler, event_handler, QUIT
+from pyxmpp2.interfaces import EventHandler, event_handler, QUIT
 from pyxmpp2.interfaces import StanzaRoute
 
 from test_util import EventRecorder

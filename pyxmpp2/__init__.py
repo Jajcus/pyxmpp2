@@ -111,22 +111,24 @@ expect a 'handlers' argument with a list of object to handle various events
 or elements. Main loop handlers should implement one or more of these
 interfaces:
 
-    - `mainloop.interfaces.IOHandler`: provides a socket or file descriptor to
-      poll and handles reads from and writes to it. Implemented e.g. by the
-      `transport.TCPTransport` class.
-    - `mainloop.interfaces.EventHandler`: specially decorated methods
+    - `pyxmpp2.mainloop.interfaces.IOHandler`: provides a socket or file
+      descriptor to poll and handles reads from and writes to it. Implemented
+      e.g. by the `transport.TCPTransport` class.
+    - `pyxmpp2.mainloop.interfaces.EventHandler`: specially decorated methods
       of its subclasess are called on events raise by other components (like
-      the transport or stream).
-    - `mainloop.interfaces.TimeoutHandler`: specially decorated methods
-      of its subclasess are called on selected intervals.
+      the transport or stream). Also available as
+      `pyxmpp2.interfaces.EventHandler`
+    - `pyxmpp2.mainloop.interfaces.TimeoutHandler`: specially decorated methods
+      of its subclasess are called on selected intervals. Also available as
+      'pyxmpp2.interfaces.TimeoutHandler`
 
 Stream handlers should implement one or more of:
 
-    - `interfaces.XMPPFeatureHandler`: specially decorated methods of its
-      subclasses are called for matching stanzas. The interface will also
+    - `pyxmpp2.interfaces.XMPPFeatureHandler`: specially decorated methods of
+      its subclasses are called for matching stanzas. The interface will also
       provide facilities for XMPP feature discovery and capability
       advertisement.
-    - `interfaces.StreamFeatureHandler`: handle or generate
+    - `pyxmpp2.interfaces.StreamFeatureHandler`: handle or generate
       ``<stream:features>`` subelement and handle other related stream
       elements. Implemented e.g.  by `streamsasl.StreamSASLHandler` and
       `streamtls.StreamTLSHandler`.

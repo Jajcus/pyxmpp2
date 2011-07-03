@@ -36,7 +36,7 @@ __docformat__ = "restructuredtext en"
 
 import sys
 
-from .mainloop.interfaces import EventHandler, event_handler, QUIT
+from .interfaces import EventHandler, event_handler, QUIT
 from .client import Client
 from .jid import JID
 from .streamevents import AuthorizedEvent, DisconnectedEvent

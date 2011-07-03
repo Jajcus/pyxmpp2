@@ -15,7 +15,7 @@ from pyxmpp2.binding import ResourceBindingHandler
 from pyxmpp2.settings import XMPPSettings
 from pyxmpp2.stanzaprocessor import StanzaProcessor
 
-from pyxmpp2.mainloop.interfaces import EventHandler, event_handler
+from pyxmpp2.interfaces import EventHandler, event_handler
 
 from test_util import EventRecorder
 from test_util import InitiatorSelectTestCase

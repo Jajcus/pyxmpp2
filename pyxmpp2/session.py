@@ -44,7 +44,7 @@ from .iq import Iq
 from .interfaces import XMPPFeatureHandler
 from .interfaces import iq_set_stanza_handler
 from .interfaces import StreamFeatureHandler
-from .mainloop.interfaces import EventHandler, event_handler
+from .interfaces import EventHandler, event_handler
 
 logger = logging.getLogger("pyxmpp2.session")
 

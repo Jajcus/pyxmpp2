@@ -23,7 +23,7 @@ from pyxmpp2.exceptions import SASLAuthenticationFailed
 from pyxmpp2.jid import JID
 from pyxmpp2.settings import XMPPSettings
 
-from pyxmpp2.mainloop.interfaces import EventHandler, event_handler
+from pyxmpp2.interfaces import EventHandler, event_handler
 
 from test_util import EventRecorder
 from test_util import InitiatorSelectTestCase

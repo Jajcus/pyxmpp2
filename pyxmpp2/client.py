@@ -30,8 +30,8 @@ import logging
 
 from .clientstream import ClientStream
 from .mainloop import main_loop_factory
-from .mainloop.interfaces import EventHandler, event_handler
-from .mainloop.interfaces import TimeoutHandler, timeout_handler
+from .interfaces import EventHandler, event_handler
+from .interfaces import TimeoutHandler, timeout_handler
 from .streamevents import DisconnectedEvent, AuthenticatedEvent
 from .transport import TCPTransport
 from .settings import XMPPSettings

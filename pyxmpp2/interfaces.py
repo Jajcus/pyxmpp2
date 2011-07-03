@@ -27,6 +27,11 @@ import logging
 from abc import ABCMeta
 from copy import deepcopy
 
+# pylint: disable=W0611
+from .mainloop.interfaces import Event, QUIT, EventHandler, event_handler
+# pylint: disable=W0611
+from .mainloop.interfaces import TimeoutHandler, timeout_handler
+
 class Resolver:
     """Abstract base class for asynchronous DNS resolvers to be used
     with PyxMPP.

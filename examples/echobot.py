@@ -16,7 +16,7 @@ from pyxmpp2.message import Message
 from pyxmpp2.presence import Presence
 from pyxmpp2.client import Client
 from pyxmpp2.settings import XMPPSettings
-from pyxmpp2.mainloop.interfaces import EventHandler, event_handler, QUIT
+from pyxmpp2.interfaces import EventHandler, event_handler, QUIT
 from pyxmpp2.streamevents import AuthorizedEvent, DisconnectedEvent
 from pyxmpp2.interfaces import XMPPFeatureHandler
 from pyxmpp2.interfaces import presence_stanza_handler, message_stanza_handler
