@@ -25,9 +25,7 @@ To request a remote entity version information, use the
 `request_software_version` function.
 
 Normative reference:
-  - `XEP-0092`
-
-.. _XEP-0092: http://xmpp.org/extensions/xep-0092.html
+  - `XEP-0092 <http://xmpp.org/extensions/xep-0092.html>`__
 """
 
 from __future__ import absolute_import, division
@@ -61,7 +59,8 @@ class VersionPayload(StanzaPayload):
     :Ivariables:
         - `name`: software name
         - `version`: software version
-        - 'os_name`: operating system name
+        - `os_name`: operating system name
+
     :Types:
         - `name`: `unicode`
         - `version`: `unicode`

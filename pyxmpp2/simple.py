@@ -47,7 +47,7 @@ class FireAndForget(EventHandler):
     """A minimal XMPP client that just connects to a server
     and runs single function.
 
-    :Parameters:
+    :Ivariables:
         - `action`: the function to run after the stream is authorized
         - `client`: a `Client` instance to do the rest of the job
     :Types:

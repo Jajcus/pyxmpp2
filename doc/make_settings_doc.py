@@ -8,7 +8,7 @@ from pyxmpp2.settings import XMPPSettings
 
 def import_modules():
     base = pyxmpp2.__path__[0]
-    for filename in glob(base + "/*.py") + glob(base + "/mainloop/*.py"):
+    for filename in glob(base + "/*.py") + glob(base + "/*/*.py"):
         try:
             module_name = "pyxmpp2" + filename[len(base):-3].replace("/", ".")
             __import__(module_name)
