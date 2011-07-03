@@ -84,7 +84,7 @@ class EchoBot(EventHandler, XMPPFeatureHandler):
     @event_handler(AuthorizedEvent)
     def handle_authorized(self, event):
         """Send the initial presence after log-in."""
-        event.stream.send(Presence())
+        self.client.send(Presence())
 
     @event_handler(DisconnectedEvent)
     def handle_disconnected(self, event):

@@ -37,7 +37,7 @@ class Message(Stanza):
     element_name = "message"
     def __init__(self, element = None, from_jid = None, to_jid = None,
                             stanza_type = None, stanza_id = None,
-                            error = None, error_cond = None, stream = None,
+                            error = None, error_cond = None, return_path = None,
                             language = None,
                             subject = None, body = None, thread = None):
         """Initialize a `Message` object.
@@ -80,7 +80,7 @@ class Message(Stanza):
 
         Stanza.__init__(self, element, from_jid = from_jid, to_jid = to_jid,
                         stanza_type = stanza_type, stanza_id = stanza_id,
-                        error = error, error_cond = error_cond, stream = stream,
+                        error = error, error_cond = error_cond, return_path = return_path,
                         language = language)
 
         if self.element_name != "message":
@@ -135,7 +135,8 @@ class Message(Stanza):
         :returntype: `Message`"""
         result = Message(None, self.from_jid, self.to_jid, 
                         self.stanza_type, self.stanza_id, self.error,
-                        self._stream(), self._subject, self._body, self._thread)
+                        self._return_path(), self._subject, self._body,
+                                                            self._thread)
         for payload in self._payload:
             result.add_payload(payload.copy())
         return result

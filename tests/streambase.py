@@ -13,10 +13,10 @@ from pyxmpp2.streambase import StreamBase
 from pyxmpp2.streamevents import *
 from pyxmpp2.exceptions import StreamParseError
 from pyxmpp2.jid import JID
-from pyxmpp2.iq import Iq
-from pyxmpp2.stanzapayload import XMLPayload
+from pyxmpp2.message import Message
 
 from pyxmpp2.mainloop.interfaces import EventHandler, event_handler, QUIT
+from pyxmpp2.interfaces import StanzaRoute
 
 from test_util import EventRecorder
 from test_util import InitiatorSelectTestCase
@@ -34,6 +34,15 @@ PARSE_ERROR_RESPONSE = ('<stream:error><not-well-formed'
                                         '</stream:error></stream:stream>')
 
 logger = logging.getLogger("pyxmpp2.test.streambase")
+
+class RecordingRoute(StanzaRoute):
+    def __init__(self):
+        self.received = []
+        self.sent = []
+    def send(self, stanza):
+        self.sent.append(stanza)
+    def uplink_receive(self, stanza):
+        self.received.append(stanza)
 
 class JustConnectEventHandler(EventRecorder):
     @event_handler(ConnectedEvent)
@@ -59,7 +68,7 @@ class IgnoreEventHandler(EventRecorder):
 class TestInitiatorSelect(InitiatorSelectTestCase):
     def test_connect_close(self):
         handler = JustConnectEventHandler()
-        self.stream = StreamBase(u"jabber:client", [])
+        self.stream = StreamBase(u"jabber:client", None, [])
         self.start_transport([handler])
         self.stream.initiate(self.transport)
         self.connect_transport()
@@ -71,7 +80,7 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
 
     def test_stream_connect_disconnect(self):
         handler = JustStreamConnectEventHandler()
-        self.stream = StreamBase(u"jabber:client", [])
+        self.stream = StreamBase(u"jabber:client", None, [])
         self.start_transport([handler])
         self.stream.initiate(self.transport)
         self.connect_transport()
@@ -89,7 +98,7 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
  
     def test_parse_error(self):
         handler = IgnoreEventHandler()
-        self.stream = StreamBase(u"jabber:client", [])
+        self.stream = StreamBase(u"jabber:client", None, [])
         self.start_transport([handler])
         self.stream.initiate(self.transport)
         self.connect_transport()
@@ -117,38 +126,56 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         self.assertEqual(event_classes, [ConnectingEvent, ConnectedEvent,
                                     StreamConnectedEvent])
 
-    def test_stanza_timeout(self):
-        handler = JustStreamConnectEventHandler()
-        self.stream = StreamBase(u"jabber:client", [])
+    def test_stanza_send(self):
+        handler = IgnoreEventHandler()
+        route = RecordingRoute()
+        self.stream = StreamBase(u"jabber:client", route, [])
         self.start_transport([handler])
-        self.loop.add_handler(self.stream)
         self.stream.initiate(self.transport)
         self.connect_transport()
         self.wait_short(0.5)
         self.assertTrue(self.stream.is_connected())
         self.server.write(C2S_SERVER_STREAM_HEAD)
-        self.wait(1)
-        iq = Iq(to_jid = "127.0.0.1", stanza_type = "get")
-        payload = XMLPayload(XML(
-                        "<test xmlns='http://pyxmpp.jajcus.net/test' />"))
-        iq.set_payload(payload)
-        handlers_called = []
-        def res_handler(stanza):
-            handlers_called.append("res_handler")
-        def err_handler(stanza):
-            handlers_called.append("err_handler")
-        def tim_handler():
-            handlers_called.append("tim_handler")
-        self.stream.set_response_handlers(iq, res_handler, err_handler,
-                                                        tim_handler, 2)
-        self.wait(0.5)
-        self.assertEqual(handlers_called, [])
-        self.wait(4)
-        self.assertEqual(handlers_called, ["tim_handler"])
+        self.stream.send(Message(to_jid = JID(u"test@example.org"),
+                                                            body = u"Test"))
+        xml = self.wait(expect = re.compile(".*(<message.*</message>)"))
+        self.assertIsNotNone(xml)
+        if "xmlns" not in xml:
+            xml = xml.replace(u"<message", u"<message xmlns='jabber:client'")
+        element = XML(xml)
+        stanza = Message(element)
+        self.assertEqual(stanza.body, u"Test")
+        self.stream.disconnect()
         self.server.write(STREAM_TAIL)
         self.server.close()
         self.wait(1)
-        self.assertFalse(self.stream.is_connected())
+        self.assertEqual(route.sent, [])
+        self.assertEqual(route.received, [])
+        event_classes = [e.__class__ for e in handler.events_received]
+        self.assertEqual(event_classes, [ConnectingEvent, ConnectedEvent,
+                                    StreamConnectedEvent, DisconnectedEvent])
+ 
+    def test_stanza_receive(self):
+        handler = IgnoreEventHandler()
+        route = RecordingRoute()
+        self.stream = StreamBase(u"jabber:client", route, [])
+        self.start_transport([handler])
+        self.stream.initiate(self.transport)
+        self.connect_transport()
+        self.wait_short(0.5)
+        self.assertTrue(self.stream.is_connected())
+        self.server.write(C2S_SERVER_STREAM_HEAD)
+        self.server.write("<message><body>Test</body></message>")
+        self.server.write(STREAM_TAIL)
+        self.server.disconnect()
+        self.wait(expect = re.compile(".*(</stream:stream>)"))
+        self.stream.disconnect()
+        self.wait(1)
+        self.assertEqual(route.sent, [])
+        self.assertEqual(len(route.received), 1)
+        stanza = route.received[0]
+        self.assertIsInstance(stanza, Message)
+        self.assertEqual(stanza.body, u"Test")
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [ConnectingEvent, ConnectedEvent,
                                     StreamConnectedEvent, DisconnectedEvent])
@@ -164,7 +191,7 @@ class TestReceiverSelect(ReceiverSelectTestCase):
     def test_stream_connect_disconnect(self):
         handler = JustStreamConnectEventHandler()
         self.start_transport([handler])
-        self.stream = StreamBase(u"jabber:client", [])
+        self.stream = StreamBase(u"jabber:client", None, [])
         self.stream.receive(self.transport, self.addr[0])
         self.client.write(C2S_CLIENT_STREAM_HEAD)
         self.wait_short(0.5)
@@ -178,7 +205,7 @@ class TestReceiverSelect(ReceiverSelectTestCase):
     def test_parse_error(self):
         handler = IgnoreEventHandler()
         self.start_transport([handler])
-        self.stream = StreamBase(u"jabber:client", [])
+        self.stream = StreamBase(u"jabber:client", None, [])
         self.stream.receive(self.transport, self.addr[0])
         self.client.write(C2S_CLIENT_STREAM_HEAD)
         self.wait_short(0.2)

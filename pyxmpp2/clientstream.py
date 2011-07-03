@@ -29,18 +29,15 @@ __docformat__ = "restructuredtext en"
 from .streambase import StreamBase
 from .jid import JID
 from .settings import XMPPSettings
-from .streamsasl import StreamSASLHandler
-from .binding import ResourceBindingHandler
 from .constants import STANZA_CLIENT_NS
 
 class ClientStream(StreamBase):
     """Handles XMPP-IM c2s stream.
 
-    Both client and server side of the connection is supported. This class
-    handles client SASL authentication, authorisation and resource binding.
+    Both client and server side of the connection is supported.
     """
     # pylint: disable=R0904
-    def __init__(self, jid, handlers, settings = None):
+    def __init__(self, jid, stanza_route, handlers, settings = None):
         """Initialize the ClientStream object.
 
         :Parameters:
@@ -57,8 +54,8 @@ class ClientStream(StreamBase):
             settings = XMPPSettings()
         if "resource" not in settings:
             settings["resource"] = jid.resource
-        handlers = handlers + settings["base_c2s_handlers"]
-        StreamBase.__init__(self, STANZA_CLIENT_NS, handlers, settings)
+        StreamBase.__init__(self, STANZA_CLIENT_NS, stanza_route, 
+                                                        handlers, settings)
         self.me = JID(jid.local, jid.domain)
     
     def initiate(self, transport, to = None):
@@ -105,19 +102,5 @@ class ClientStream(StreamBase):
         if not self.initiator:
             if stanza.from_jid != self.peer:
                 stanza.set_from(self.peer)
-
-def base_c2s_handlers_factory(settings):
-    """Build the default value for the :r:`base_c2s_handlers setting`.
-    """
-    sasl_handler = StreamSASLHandler(settings)
-    binding_handler = ResourceBindingHandler(settings)
-    return [sasl_handler, binding_handler]
-
-XMPPSettings.add_setting(u"base_c2s_handlers", type = "list of handler objects",
-    factory = base_c2s_handlers_factory, 
-    default_d = "A `StreamSASLHandler` and a `ResourceBindingHandler` instance",
-    doc = u"""The basic handlers used by a `ClientStream` in addition to the
-handlers provides in the constructor invocation."""
-    )
 
 # vi: sts=4 et sw=4

@@ -56,7 +56,7 @@ class Presence(Stanza):
     element_name = "presence"
     def __init__(self, element = None, from_jid = None, to_jid = None,
                             stanza_type = None, stanza_id = None,
-                            error = None, error_cond = None, stream = None,
+                            error = None, error_cond = None, return_path = None,
                             language = None,
                             show = None, status = None, priority = None):
         """Initialize a `Presence` object.
@@ -105,8 +105,8 @@ class Presence(Stanza):
         
         Stanza.__init__(self, element, from_jid = from_jid, to_jid = to_jid,
                         stanza_type = stanza_type, stanza_id = stanza_id,
-                        error = error, error_cond = error_cond, stream = stream,
-                        language = language)
+                        error = error, error_cond = error_cond,
+                        return_path = return_path, language = language)
 
         if self.element_name != "presence":
             raise ValueError("The element is not <presence />")
@@ -166,7 +166,7 @@ class Presence(Stanza):
         :returntype: `Presence`"""
         result = Presence(None, self.from_jid, self.to_jid, 
                         self.stanza_type, self.stanza_id, self.error,
-                        self._stream(), 
+                        self._return_path(), 
                         self._show, self._status, self._priority)
         if self._payload is None:
             self.decode_payload()

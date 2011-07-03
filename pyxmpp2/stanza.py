@@ -47,17 +47,19 @@ class Stanza(object):
         - `_payload`: the stanza payload
         - `_error`: error associated a stanza of type "error"
         - `_namespace`: namespace of this stanza element
+        - `_return_path`: weak reference to the return route object
     :Types:
         - `_payload`: `list` of (`unicode`, `StanzaPayload`) 
         - `_error`: `pyxmpp2.error.StanzaErrorElement`
         - `_namespace`: `unicode`
+        - `_return_path`: weakref to `StanzaRoute`
     """
     # pylint: disable-msg=R0902
     element_name = "Unknown"
     def __init__(self, element, from_jid = None, to_jid = None,
                             stanza_type = None, stanza_id = None,
                             error = None, error_cond = None,
-                            stream = None, language = None): 
+                            return_path = None, language = None): 
         """Initialize a Stanza object.
 
         :Parameters:
@@ -74,6 +76,8 @@ class Stanza(object):
             - `error`: error object. Ignored if `stanza_type` is not "error".
             - `error_cond`: error condition name. Ignored if `stanza_type` is
               not "error" or `error` is not None.
+            - `return_path`: route for sending responses to this stanza. Will
+              be weakly referenced.
             - `language`: default language for the stanza content
         :Types:
             - `element`: `unicode` or :etree:`ElementTree.Element`
@@ -83,6 +87,7 @@ class Stanza(object):
             - `stanza_id`: `unicode`
             - `error`: `pyxmpp.error.StanzaErrorElement`
             - `error_cond`: `unicode`
+            - `return_path`: `StanzaRoute`
             - `language`: `unicode`
         """
         # pylint: disable-msg=R0913
@@ -133,8 +138,8 @@ class Stanza(object):
             else:
                 self._decode_error()
 
-        if stream is not None:
-            self._stream = weakref.ref(stream)
+        if return_path is not None:
+            self._return_path = weakref.ref(return_path)
     
     def _decode_attributes(self):
         """Decode attributes of the stanza XML element
@@ -170,7 +175,7 @@ class Stanza(object):
         :returntype: `Stanza`"""
         result = Stanza(self.element_name, self.from_jid, self.to_jid, 
                         self.stanza_type, self.stanza_id, self.error,
-                        self._stream())
+                        self._return_path())
         if self._payload is None:
             self.decode_payload()
         for payload in self._payload:
@@ -327,12 +332,12 @@ class Stanza(object):
         self._dirty = True
 
     @property
-    def stream(self): # pylint: disable-msg=E0202
+    def return_path(self): # pylint: disable-msg=E0202
         """Stream the stanza was received from.
 
-        :returntype: `streambase.StreamBase`
+        :returntype: `StanzaRoute`
         """
-        return self._stream()
+        return self._return_path()
 
     def mark_dirty(self):
         """Mark the stanza 'dirty' so the XML representation will be
