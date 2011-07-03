@@ -29,7 +29,10 @@ if sys.version_info >= (3,):
     extra['use_2to3_fixers'] = ['custom_2to3']
     requires = []
 else:
-    from distutils.core import setup
+    try:
+        from setuptools import setup
+    except ImportError:
+        from distutils.core import setup
     requires = ['dnspython(>= 1.6.0)']
 
 setup(
