@@ -690,6 +690,9 @@ class TCPTransport(XMPPTransport, IOHandler):
                             continue
                         elif err.args[0] == errno.EWOULDBLOCK:
                             break
+                        elif err.args[0] == errno.ECONNRESET:
+                            logger.warning("Connection reset by peer")
+                            data = None
                         else:
                             raise
                     self._feed_reader(data)
@@ -703,6 +706,9 @@ class TCPTransport(XMPPTransport, IOHandler):
                             continue
                         elif err.args[0] == errno.EWOULDBLOCK:
                             break
+                        elif err.args[0] == errno.ECONNRESET:
+                            logger.warning("Connection reset by peer")
+                            data = None
                         else:
                             raise
                     self._feed_reader(data)
