@@ -450,6 +450,7 @@ class StanzaProcessor(StanzaRoute):
         for obj in handler_objects:
             if not isinstance(obj, XMPPFeatureHandler):
                 continue
+            obj.stanza_processor = self
             for dummy, handler in inspect.getmembers(obj, callable):
                 if not hasattr(handler, "_pyxmpp_stanza_handled"):
                     continue

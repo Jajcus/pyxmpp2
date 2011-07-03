@@ -213,8 +213,8 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
         """
         tls_handler = StreamTLSHandler(self.settings)
         sasl_handler = StreamSASLHandler(self.settings)
-        session_handler = SessionHandler(self)
-        binding_handler = ResourceBindingHandler(self, self.settings)
+        session_handler = SessionHandler()
+        binding_handler = ResourceBindingHandler(self.settings)
         return [tls_handler, sasl_handler, binding_handler, session_handler]
 
 XMPPSettings.add_setting(u"c2s_port", default = 5222, basic = True,

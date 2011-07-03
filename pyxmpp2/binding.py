@@ -99,9 +99,8 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
     To be used e.g. as one of the handlers passed to a client class
     constructor.
     """
-    def __init__(self, stanza_processor, settings = None):
+    def __init__(self, settings = None):
         self.stream = None
-        self.processor = stanza_processor
         self.settings = settings if settings else XMPPSettings()
 
     def make_stream_features(self, stream, features):
@@ -150,7 +149,7 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
         stanza = Iq(stanza_type = "set")
         payload = ResourceBindingPayload(resource = resource)
         stanza.set_payload(payload)
-        self.processor.set_response_handlers(stanza, 
+        self.stanza_processor.set_response_handlers(stanza, 
                                         self._bind_success, self._bind_error)
         stream.send(stanza)
         stream.event(BindingResourceEvent(resource))

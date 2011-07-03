@@ -75,8 +75,8 @@ class AuthorizedEventHandler(EventRecorder):
 class TestBindingInitiator(InitiatorSelectTestCase):
     def test_bind_no_resource(self):
         handler = AuthorizedEventHandler()
+        handlers = [ResourceBindingHandler(), handler]
         processor = StanzaProcessor()
-        handlers = [ResourceBindingHandler(processor), handler]
         processor.setup_stanza_handlers(handlers, "post-auth")
         self.stream = StreamBase(u"jabber:client", processor, handlers)
         processor.uplink = self.stream
@@ -100,8 +100,8 @@ class TestBindingInitiator(InitiatorSelectTestCase):
  
     def test_bind(self):
         handler = AuthorizedEventHandler()
+        handlers = [ResourceBindingHandler(), handler]
         processor = StanzaProcessor()
-        handlers = [ResourceBindingHandler(processor), handler]
         processor.setup_stanza_handlers(handlers, "post-auth")
         self.stream = StreamBase(u"jabber:client", processor, handlers,
                                         XMPPSettings({"resource": "Provided"}))

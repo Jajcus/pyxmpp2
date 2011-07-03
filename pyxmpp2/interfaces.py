@@ -186,9 +186,16 @@ class XMPPFeatureHandler:
       - `message_stanza_handler`: for methods handling ``<message />`` stanzas
       - `presence_stanza_handler`: for methods handling ``<presence />``
         stanzas
+
+    :Ivariables:
+        - `stanza_processor`: a stanza processor where this object was
+          registered most recently (injected by `StanzaProcessor`)
+    :Types:
+        - `stanza_processor`: `StanzaProcessor`
     """
     # pylint: disable-msg=W0232,R0903
     __metaclass__ = ABCMeta
+    stanza_processor = None
 
 def _iq_handler(iq_type, payload_class, payload_key, usage_restriction):
     """Method decorator generator for decorating <iq type='get'/> stanza
