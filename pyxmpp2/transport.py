@@ -690,6 +690,8 @@ class TCPTransport(XMPPTransport, IOHandler):
                             continue
                         elif err.args[0] == errno.EWOULDBLOCK:
                             break
+                        else:
+                            raise
                     self._feed_reader(data)
             else:
                 while self._socket and not self._eof:
@@ -701,6 +703,8 @@ class TCPTransport(XMPPTransport, IOHandler):
                             continue
                         elif err.args[0] == errno.EWOULDBLOCK:
                             break
+                        else:
+                            raise
                     self._feed_reader(data)
 
     def handle_hup(self):
