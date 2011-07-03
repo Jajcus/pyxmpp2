@@ -20,11 +20,13 @@ from pyxmpp2.interfaces import EventHandler, event_handler, QUIT
 from pyxmpp2.streamevents import AuthorizedEvent, DisconnectedEvent
 from pyxmpp2.interfaces import XMPPFeatureHandler
 from pyxmpp2.interfaces import presence_stanza_handler, message_stanza_handler
+from pyxmpp2.ext.version import VersionProvider
 
 class EchoBot(EventHandler, XMPPFeatureHandler):
     """Echo Bot implementation."""
     def __init__(self, my_jid, settings):
-        self.client = Client(my_jid, [self], settings)
+        version_provider = VersionProvider(settings)
+        self.client = Client(my_jid, [self, version_provider], settings)
 
     def run(self):
         """Request client connection and start the main loop."""
@@ -111,7 +113,9 @@ def main():
                         help = 'Print only error messages')
 
     args = parser.parse_args()
-    settings = XMPPSettings()
+    settings = XMPPSettings({
+                            "software_name": "Echo Bot"
+                            })
     settings.load_arguments(args)
 
     if settings.get("password") is None:

@@ -17,7 +17,7 @@ if "PYXMPP2_ETREE" not in os.environ:
 all_modules=[ "jid", "stream_reader", "xmppserializer", "stanza",
             "message", "presence", "iq", "stanzaprocessor",
             "streambase", "sasl_gsasl", "binding", "streamsasl",
-            "streamtls",
+            "streamtls", "ext_version",
 #             "cache", 
 #          "vcard", "disco", "dataforms", "interface"
                 ]

@@ -11,3 +11,4 @@ log
 py3-build/
 py3-dist/
 py3-examples/
+pyxmpp2/version.py

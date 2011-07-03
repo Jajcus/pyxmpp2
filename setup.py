@@ -61,7 +61,7 @@ setup(
         'pyxmpp2',
         'pyxmpp2.mainloop',
         'pyxmpp2.sasl',
-    #   'pyxmpp2.ext',
+        'pyxmpp2.ext',
     ],
     **extra
 )
