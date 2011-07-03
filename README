@@ -63,10 +63,13 @@ Contact
 -------
 
 - Author: Jacek Konieczny <jajcus@jajcus.net>, <xmpp:jajcus@jajcus.net>
-- Mailing lists:
-  - general discussion: `pyxmpp@jajcus.net`_
-  - code commits: `pyxmpp2-commits@jajcus.net`_
 
-.. pyxmpp@lists.jajcus.net: http://lists.jajcus.net/mailman/listinfo/pyxmpp
-.. pyxmpp2-commits@lists.jajcus.net: http://lists.jajcus.net/mailman/listinfo/pyxmpp2-commits
+- Mailing lists:
+
+  - general discussion: `pyxmpp@lists.jajcus.net`_
+
+  - code commits: `pyxmpp2-commits@lists.jajcus.net`_
+
+.. _pyxmpp@lists.jajcus.net: http://lists.jajcus.net/mailman/listinfo/pyxmpp
+.. _pyxmpp2-commits@lists.jajcus.net: http://lists.jajcus.net/mailman/listinfo/pyxmpp2-commits
 
