@@ -26,21 +26,24 @@ from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 
-import threading
 import logging
 
 from .clientstream import ClientStream
 from .mainloop import main_loop_factory
 from .mainloop.interfaces import EventHandler, event_handler
-from .streamevents import DisconnectedEvent
+from .mainloop.interfaces import TimeoutHandler, timeout_handler
+from .streamevents import DisconnectedEvent, AuthenticatedEvent
 from .transport import TCPTransport
 from .settings import XMPPSettings
 from .session import SessionHandler
 from .streamtls import StreamTLSHandler
+from .streamsasl import StreamSASLHandler
+from .binding import ResourceBindingHandler
+from .stanzaprocessor import StanzaProcessor
 
 logger = logging.getLogger("pyxmpp2.client")
 
-class Client(EventHandler):
+class Client(StanzaProcessor, TimeoutHandler, EventHandler):
     """Base class for an XMPP-IM client.
 
     Joins the `MainLoop`, `ClientStream` and some basic handlers together,
@@ -64,6 +67,7 @@ class Client(EventHandler):
         - `stream`: `clientstream.ClientStream`
         - `lock`: :std:`threading.RLock`
     """
+    # pylint: disable-msg=R0902
     def __init__(self, jid, handlers, settings = None, mainloop = None):
         """Initialize a Client object.
 
@@ -77,10 +81,13 @@ class Client(EventHandler):
             - `settings`: `settings.XMPPSettings`
             - `mainloop`: `mainloop.interfaces.MainLoop`
         """
+        self._ml_handlers = []
         self.jid = jid
         self.settings = settings if settings else XMPPSettings()
+        StanzaProcessor.__init__(self, self.settings[u"default_stanza_timeout"])
         self.handlers = handlers
-        self._ml_handlers = self.settings["base_client_handlers"]
+        self._base_handlers = self.base_handlers_factory()
+        self._ml_handlers += self._base_handlers
         self._ml_handlers += list(handlers) + [self]
         if mainloop is not None:
             self.mainloop = mainloop
@@ -89,7 +96,6 @@ class Client(EventHandler):
         else:
             self.mainloop = main_loop_factory(settings, self._ml_handlers)
         self.stream = None
-        self.lock = threading.RLock()
 
     def __del__(self):
         for handler in self._ml_handlers:
@@ -114,14 +120,17 @@ class Client(EventHandler):
                 service = self.settings["c2s_service"]
 
             transport.connect(addr, self.settings["c2s_port"], service)
-            handlers = self.settings["base_client_handlers"]
+            handlers = self._base_handlers
             handlers += self.handlers + [self]
-            stream = ClientStream(self.jid, handlers, self.settings)
+            self.clear_response_handlers()
+            self.setup_stanza_handlers(handlers, "pre-auth")
+            stream = ClientStream(self.jid, self, handlers, self.settings)
             stream.initiate(transport)
             self.mainloop.add_handler(transport)
             self.mainloop.add_handler(stream)
             self._ml_handlers += [transport, stream]
             self.stream = stream
+            self.uplink = stream
 
     def disconnect(self):
         """Gracefully disconnect from the server."""
@@ -143,6 +152,7 @@ class Client(EventHandler):
             self._ml_handlers.remove(self.stream.transport)
             self.mainloop.remove_handler(self.stream.transport)
         self.stream = None
+        self.uplink = None
 
     def run(self, timeout = None):
         """Call the main loop.
@@ -150,6 +160,17 @@ class Client(EventHandler):
         Convenience wrapper for ``self.mainloop.loop``
         """
         self.mainloop.loop(timeout)
+
+    @event_handler(AuthenticatedEvent)
+    def _stream_authenticated(self, event):
+        """Handle the `AuthenticatedEvent`.
+        """
+        with self.lock:
+            if event.stream != self.stream:
+                return
+            handlers = self._base_handlers
+            handlers += self.handlers + [self]
+            self.setup_stanza_handlers(handlers, "post-auth")
 
     @event_handler(DisconnectedEvent)
     def _stream_disconnected(self, event):
@@ -163,21 +184,38 @@ class Client(EventHandler):
                     self._ml_handlers.remove(self.stream.transport)
                     self.mainloop.remove_handler(self.stream.transport)
                 self.stream = None
+                self.uplink = None
 
-def base_client_handlers_factory(settings):
-    """Build the default value for the :r:`base_client_handlers setting`
-    """
-    tls_handler = StreamTLSHandler(settings)
-    session_handler = SessionHandler(settings)
-    return [tls_handler, session_handler]
+    @timeout_handler(1)
+    def regular_tasks(self):
+        """Do some housekeeping (cache expiration, timeout handling).
 
-XMPPSettings.add_setting(u"base_client_handlers", 
-    type = "list of handler objects",
-    factory = base_client_handlers_factory, 
-    default_d = "A `StreamTLSHandler` and a `SessionHandler` instance",
-    doc = u"""The basic handlers used by a `Client` object in addition to the
-handlers provides in the constructor invocation."""
-    )
+        This method should be called periodically from the application's
+        main loop.
+        
+        :Return: suggested delay (in seconds) before the next call to this
+                                                                    method.
+        :Returntype: `int`
+        """
+        with self.lock:
+            ret = self._iq_response_handlers.expire()
+            if ret is None:
+                return 1
+            else:
+                return min(1, ret)
+
+    def base_handlers_factory(self):
+        """Default base client handlers factory.
+
+        Subclasses can provide different behaviour by overriding this.
+
+        :Return: list of handlers
+        """
+        tls_handler = StreamTLSHandler(self.settings)
+        sasl_handler = StreamSASLHandler(self.settings)
+        session_handler = SessionHandler(self)
+        binding_handler = ResourceBindingHandler(self, self.settings)
+        return [tls_handler, sasl_handler, binding_handler, session_handler]
 
 XMPPSettings.add_setting(u"c2s_port", default = 5222, basic = True,
     type = int, validator = XMPPSettings.get_int_range_validator(1, 65536),
@@ -197,6 +235,11 @@ XMPPSettings.add_setting(u"server", type = unicode, basic = True,
 is done for the requested JID domain part and if that fails - 'A' or 'AAAA'
 record lookup for the same domain. This setting may be used to force using
 a specific server or when SRV look-ups are not available."""
+    )
+XMPPSettings.add_setting(u"default_stanza_timeout", type = float, default = 300,
+        validator = XMPPSettings.validate_positive_float,
+        cmdline_help = "Time in seconds to wait for a stanza response",
+        doc = u"""Time in seconds to wait for a stanza response."""
     )
 
 # vi: sts=4 et sw=4

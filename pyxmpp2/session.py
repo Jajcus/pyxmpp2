@@ -54,9 +54,9 @@ class SessionHandler(StreamFeatureHandler, XMPPFeatureHandler, EventHandler):
     """:RFC:`3921` session establishment implementation.
 
     """
-    def __init__(self, settings = None):
+    def __init__(self, stanza_processor):
         """Initialize the SASL handler"""
-        pass
+        self.processor = stanza_processor
 
     def make_stream_features(self, stream, features):
         established = getattr(stream, "_session_established", False)
@@ -85,7 +85,7 @@ class SessionHandler(StreamFeatureHandler, XMPPFeatureHandler, EventHandler):
         stanza = Iq(stanza_type = "set")
         payload = XMLPayload(ElementTree.Element(SESSION_TAG))
         stanza.set_payload(payload)
-        stream.set_response_handlers(stanza, 
+        self.processor.set_response_handlers(stanza, 
                                         self._session_success,
                                         self._session_error)
         stream.send(stanza)

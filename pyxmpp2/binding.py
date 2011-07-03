@@ -94,10 +94,14 @@ class ResourceBindingPayload(StanzaPayload):
 class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
     """Resource binding implementation.
 
-    To be used as one of the handlers passed to a stream class
-    constructor."""
-    def __init__(self, settings = None):
-        """Initialize the SASL handler"""
+    Can handle only one stream at time.
+
+    To be used e.g. as one of the handlers passed to a client class
+    constructor.
+    """
+    def __init__(self, stanza_processor, settings = None):
+        self.stream = None
+        self.processor = stanza_processor
         self.settings = settings if settings else XMPPSettings()
 
     def make_stream_features(self, stream, features):
@@ -106,7 +110,9 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
 
         [receving entity only]
 
-        :returns: update <features/> element."""
+        :returns: update <features/> element.
+        """
+        self.stream = stream
         if stream.peer_authenticated and not stream.peer.resource:
             ElementTree.SubElement(features, FEATURE_BIND)
 
@@ -115,7 +121,8 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
 
         [initiating entity only]
 
-        The received features element is available in `features`."""
+        The received features element is available in `features`.
+        """
         logger.debug(u"Handling stream features: {0}".format(
                                         element_to_unicode(features)))
         element = features.find(FEATURE_BIND)
@@ -139,10 +146,11 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
         XMPP stream is authenticated for bare JID only. To use
         the full JID it must be bound to a resource.
         """
+        self.stream = stream
         stanza = Iq(stanza_type = "set")
         payload = ResourceBindingPayload(resource = resource)
         stanza.set_payload(payload)
-        stream.set_response_handlers(stanza, 
+        self.processor.set_response_handlers(stanza, 
                                         self._bind_success, self._bind_error)
         stream.send(stanza)
         stream.event(BindingResourceEvent(resource))
@@ -162,8 +170,8 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
         if not jid:
             raise BadRequestProtocolError(u"<jid/> element mising in"
                                                     " the bind response")
-        stanza.stream.me = jid
-        stanza.stream.event(AuthorizedEvent(stanza.stream.me))
+        self.stream.me = jid
+        self.stream.event(AuthorizedEvent(self.stream.me))
 
     def _bind_error(self, stanza): # pylint: disable-msg=R0201,W0613
         """Handle resource binding success.
@@ -177,9 +185,12 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
     def handle_bind_iq_set(self, stanza):
         """Handler <iq type="set"/> for resource binding."""
         # pylint: disable-msg=R0201
-        if stanza.stream.initiator:
+        if not self.stream:
+            logger.error("Got bind stanza before stream feature has been set")
             return False
-        peer = stanza.stream.peer
+        if self.stream.initiator:
+            return False
+        peer = self.stream.peer
         if peer.resource:
             raise ResourceConstraintProtocolError(
                         u"Only one resource per client supported")
@@ -196,8 +207,8 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
         response = stanza.make_result_response()
         payload = ResourceBindingPayload(jid = jid)
         response.set_payload(payload)
-        stanza.stream.peer = jid
-        stanza.stream.event(AuthorizedEvent(jid))
+        self.stream.peer = jid
+        self.stream.event(AuthorizedEvent(jid))
         return response
 
 def default_resource_factory(settings):

@@ -32,40 +32,41 @@ import inspect
 
 from .expdict import ExpiringDictionary
 from .exceptions import ProtocolError, BadRequestProtocolError
-from .exceptions import ServiceUnavailableProtocolError
+from .exceptions import ServiceUnavailableProtocolError, NoRouteError
 from .stanza import Stanza
 from .message import Message
 from .presence import Presence
 from .stanzapayload import XMLPayload
 from .iq import Iq
 
-from .interfaces import XMPPFeatureHandler
+from .interfaces import XMPPFeatureHandler, StanzaRoute
 
 logger = logging.getLogger("pyxmpp2.stanzaprocessor")
 
-def stanza_factory(element, stream = None, language = None):
+def stanza_factory(element, return_path = None, language = None):
     """Creates Iq, Message or Presence object for XML stanza `element`
     
     :Parameters:
         - `element`: the stanza XML element
-        - `stream`: stream where the stanza was received
+        - `return_path`: object through which responses to this stanza should 
+          be sent (will be weakly referenced by the stanza object).
         - `language`: default language for the stanza
     :Types:
         - `element`: :etree:`ElementTree.Element`
-        - `stream`: `streambase.StreamBase`
+        - `return_path`: `StanzaRoute`
         - `language`: `unicode`
     """
     tag = element.tag
     if tag.endswith("}iq") or tag == "iq":
-        return Iq(element, stream = stream, language = language)
+        return Iq(element, return_path = return_path, language = language)
     if tag.endswith("}message") or tag == "message":
-        return Message(element, stream = stream, language = language)
+        return Message(element, return_path = return_path, language = language)
     if tag.endswith("}presence") or tag == "presence":
-        return Presence(element, stream = stream, language = language)
+        return Presence(element, return_path = return_path, language = language)
     else:
-        return Stanza(element, stream = stream, language = language)
+        return Stanza(element, return_path = return_path, language = language)
 
-class StanzaProcessor(object):
+class StanzaProcessor(StanzaRoute):
     """Universal stanza handler/router class.
 
     Provides facilities to set up custom handlers for various types of stanzas.
@@ -74,10 +75,16 @@ class StanzaProcessor(object):
         - `lock`: lock object used to synchronize access to the
           `StanzaProcessor` object.
         - `me`: local JID.
-        - `peer`: remote stream endpoint JID.
-        - `process_all_stanzas`: when `True` then all stanzas received are
-          considered local.
-        - `initiator`: `True` if local stream endpoint is the initiating entity.
+        - `peer`: remote endpoint JID.
+        - `process_all_stanzas`: when `True` then all stanzas received (and
+          not only those addressed to `me`) are considered local.
+        - `uplink`: object to route outgoing stanzas through
+    :Types:
+        - `lock`: :std:`threading.RLock`
+        - `me`: `JID`
+        - `peer`: `JID`
+        - `process_all_stanzas`: `bool`
+        - `uplink`: `StanzaRoute`
     """
     # pylint: disable-msg=R0902
     def __init__(self, default_timeout = 300):
@@ -88,8 +95,7 @@ class StanzaProcessor(object):
         """
         self.me = None
         self.peer = None
-        self.initiator = None
-        self.peer_authenticated = False
+        self.uplink = None
         self.process_all_stanzas = True
         self._iq_response_handlers = ExpiringDictionary(default_timeout)
         self._iq_handlers = defaultdict(dict)
@@ -273,10 +279,6 @@ class StanzaProcessor(object):
             - `stanza`: message stanza to be handled
         """
 
-        if not self.initiator and not self.peer_authenticated:
-            logger.debug("Ignoring message - peer not authenticated yet")
-            return True
-
         stanza_type = stanza.stanza_type
         if stanza_type is None:
             stanza_type = "normal"
@@ -299,10 +301,6 @@ class StanzaProcessor(object):
         :Parameters:
             - `stanza`: presence stanza to be handled
         """
-
-        if not self.initiator and not self.peer_authenticated:
-            logger.debug("Ignoring presence - peer not authenticated yet")
-            return True
 
         stanza_type = stanza.stanza_type
         return self.__try_handlers(self._presence_handlers, stanza, stanza_type)
@@ -439,6 +437,10 @@ class StanzaProcessor(object):
                                     (res_handler, err_handler),
                                     timeout)
 
+    def clear_response_handlers(self):
+        """Remove all registered response handlers."""
+        self._iq_response_handlers.clear()
+
     def setup_stanza_handlers(self, handler_objects, usage_restriction):
         """Install stanza handlers provided by `handler_objects`"""
         # pylint: disable=W0212
@@ -489,16 +491,22 @@ class StanzaProcessor(object):
         classes if needed."""
         pass
 
+    def uplink_receive(self, stanza):
+        self.process_stanza(stanza)
 
     def send(self, stanza):
-        """Send a stanza somwhere. This one does nothing. Should be overriden
-        in derived classes.
+        """Send a stanza somwhere. 
+
+        The default implementation sends it via the `uplink` if it is defined
+        or raises the `NoRouteError`.
 
         :Parameters:
             - `stanza`: the stanza to send.
         :Types:
             - `stanza`: `pyxmpp.stanza.Stanza`"""
-        raise NotImplementedError("This method must be overriden in derived"
-                                    " classes.")
+        if self.uplink:
+            self.uplink.send(stanza)
+        else:
+            raise NoRouteError("No route for stanza")
 
 # vi: sts=4 et sw=4

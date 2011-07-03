@@ -62,8 +62,8 @@ class TestInitiator(InitiatorSelectTestCase):
                                 u"username": u"user", 
                                 u"password": u"secret",
                                 })
-        self.stream = StreamBase(u"jabber:client", [StreamSASLHandler(settings), 
-                                                            handler], settings)
+        self.stream = StreamBase(u"jabber:client", None,
+                            [StreamSASLHandler(settings), handler], settings)
         self.start_transport([handler])
         self.stream.initiate(self.transport)
         self.connect_transport()
@@ -99,8 +99,8 @@ class TestInitiator(InitiatorSelectTestCase):
                                 u"username": u"user", 
                                 u"password": u"bad",
                                 })
-        self.stream = StreamBase(u"jabber:client", [StreamSASLHandler(settings), 
-                                                            handler], settings)
+        self.stream = StreamBase(u"jabber:client", None,
+                            [StreamSASLHandler(settings), handler], settings)
         self.start_transport([handler])
         self.stream.initiate(self.transport)
         self.connect_transport()
@@ -133,7 +133,7 @@ class TestReceiver(ReceiverSelectTestCase):
                                         u"user": u"secret",
                                     },
                                 })
-        self.stream = StreamBase(u"jabber:client", 
+        self.stream = StreamBase(u"jabber:client", None,
                             [StreamSASLHandler(settings), handler], settings)
         self.stream.receive(self.transport, self.addr[0])
         self.client.write(C2S_CLIENT_STREAM_HEAD)
@@ -170,7 +170,7 @@ class TestReceiver(ReceiverSelectTestCase):
                                         u"user": u"secret",
                                     },
                                 })
-        self.stream = StreamBase(u"jabber:client", 
+        self.stream = StreamBase(u"jabber:client", None,
                             [StreamSASLHandler(settings), handler], settings)
         self.stream.receive(self.transport, self.addr[0])
         self.client.write(C2S_CLIENT_STREAM_HEAD)

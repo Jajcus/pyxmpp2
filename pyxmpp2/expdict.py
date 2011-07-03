@@ -130,6 +130,11 @@ class ExpiringDictionary(dict):
                         next_timeout = min(next_timeout, ret)
             return next_timeout
 
+    def clear(self):
+        with self._lock:
+            self._timeouts.clear()
+            dict.clear(self)
+
     def _expire_item(self, key):
         """Do the expiration of a dictionary item.
 

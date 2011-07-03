@@ -46,7 +46,7 @@ class TestInitiator(InitiatorSelectTestCase):
                                 })
         handler = EventRecorder()
         handlers = [StreamTLSHandler(settings), handler]
-        self.stream = StreamBase(u"jabber:client", handlers, settings)
+        self.stream = StreamBase(u"jabber:client", None, handlers, settings)
         self.start_transport(handlers)
         self.stream.initiate(self.transport, to = "server.example.org")
         self.connect_transport()
@@ -87,7 +87,7 @@ class TestInitiator(InitiatorSelectTestCase):
                                 u"starttls": True, 
                                 u"tls_cacert_file": "data/ca.pem", 
                                 })
-        stream = StreamBase(u"jabber:client", [StreamTLSHandler(settings), 
+        stream = StreamBase(u"jabber:client", None, [StreamTLSHandler(settings), 
                                                             handler], settings)
         stream.connect(addr, port, to = "server.example.org")
         self.server.write(C2S_SERVER_STREAM_HEAD)
@@ -128,7 +128,7 @@ class TestInitiator(InitiatorSelectTestCase):
                                 u"starttls": True, 
                                 u"tls_cacert_file": "data/ca.pem", 
                                 })
-        stream = StreamBase(u"jabber:client", [StreamTLSHandler(settings), 
+        stream = StreamBase(u"jabber:client", None, [StreamTLSHandler(settings), 
                                                             handler], settings)
         stream.connect(addr, port, to = "server.example.org")
         self.server.write(C2S_SERVER_STREAM_HEAD)
@@ -152,7 +152,7 @@ class TestInitiator(InitiatorSelectTestCase):
                                 u"tls_require": True, 
                                 u"tls_cacert_file": "data/ca.pem", 
                                 })
-        stream = StreamBase(u"jabber:client", [StreamTLSHandler(settings), 
+        stream = StreamBase(u"jabber:client", None, [StreamTLSHandler(settings), 
                                                             handler], settings)
         stream.connect(addr, port, to = "server.example.org")
         self.server.write(C2S_SERVER_STREAM_HEAD)

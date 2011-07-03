@@ -30,14 +30,13 @@ import inspect
 import logging
 import uuid
 import re
+import threading
 
 from .etree import ElementTree, element_to_unicode
-
 
 from .xmppparser import XMLStreamHandler
 from .error import StreamErrorElement
 from .jid import JID
-from .stanzaprocessor import StanzaProcessor, stanza_factory
 from .exceptions import StreamError
 from .exceptions import FatalStreamError, StreamParseError
 from .constants import STREAM_QNP, XML_LANG_QNAME, STREAM_ROOT_TAG
@@ -45,10 +44,10 @@ from .settings import XMPPSettings
 from .xmppserializer import serialize
 from .streamevents import StreamConnectedEvent, GotFeaturesEvent
 from .streamevents import AuthenticatedEvent, StreamRestartedEvent
+from .stanzaprocessor import stanza_factory
 
 from .interfaces import StreamFeatureHandler
 from .interfaces import StreamFeatureHandled, StreamFeatureNotHandled
-from .mainloop.interfaces import TimeoutHandler, timeout_handler
 
 logger = logging.getLogger("pyxmpp2.streambase")
 
@@ -60,11 +59,11 @@ FEATURES_TAG = STREAM_QNP + u"features"
 # just to distinguish those from a domain name
 IP_RE = re.compile(r"^((\d+.){3}\d+)|([0-9a-f]*:[0-9a-f:]*:[0-9a-f]*)$")
 
-class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
+class StreamBase(XMLStreamHandler):
     """Base class for a generic XMPP stream.
 
-    Responsible for establishing connection, parsing the stream, dispatching
-    received stanzas to apopriate handlers and sending application's stanzas.
+    Responsible for establishing connection, parsing the stream, handling
+    stream elements and passing stanzas receiver to other object.
     This doesn't provide any authentication or encryption (both required by
     the XMPP specification) and is not usable on its own.
 
@@ -75,7 +74,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
     :Ivariables:
         - `authenticated`: `True` if local entity has authenticated to peer
         - `features`: stream features as annouced by the receiver.
-        - `handlers`: handlers for stream elements and stanza payload
+        - `handlers`: handlers for stream elements
         - `initiator`: `True` if local stream endpoint is the initiating entity.
         - `lock`: RLock object used to synchronize access to Stream object.
         - `me`: local stream endpoint JID.
@@ -83,8 +82,6 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
         - `peer_language`: language of human-readable stream content selected
           by the peer
         - `peer`: remote stream endpoint JID.
-        - `process_all_stanzas`: when `True` then all stanzas received are
-          considered local.
         - `settings`: stream settings
         - `stanza_namespace`: default namespace of the stream
         - `tls_established`: `True` when the stream is protected by TLS
@@ -109,7 +106,6 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
         - `peer_authenticated`: `bool`
         - `peer_language`: `unicode`
         - `peer`: `JID`
-        - `process_all_stanzas`: `bool`
         - `settings`: XMPPSettings
         - `stanza_namespace`: `unicode`
         - `tls_established`: `bool`
@@ -122,27 +118,30 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
         - `_stream_feature_handlers`: `list` of `StreamFeatureHandler`
     """
     # pylint: disable-msg=R0902,R0904
-    def __init__(self, stanza_namespace, handlers, settings = None):
+    def __init__(self, stanza_namespace, stanza_route, handlers,
+                                                            settings = None):
         """Initialize StreamBase object
 
         :Parameters:
           - `stanza_namespace`: stream's default namespace URI ("jabber:client"
             for client, "jabber:server" for server, etc.)
+          - `stanza_route`: object to handle received stanzas
           - `handlers`: objects to handle the stream events and elements
           - `settings`: extra settings
         :Types:
           - `stanza_namespace`: `unicode`
+          - `stanza_route`: `StanzaRoute`
           - `settings`: XMPPSettings
           - `handlers`: `list` of objects
         """
         XMLStreamHandler.__init__(self)
+        self.lock = threading.RLock()
         if settings is None:
             settings = XMPPSettings()
         self.settings = settings
-        StanzaProcessor.__init__(self, settings[u"default_stanza_timeout"])
         self.stanza_namespace = stanza_namespace
         self._stanza_namespace_p = "{{{0}}}".format(stanza_namespace)
-        self.process_all_stanzas = False
+        self.stanza_route = stanza_route
         self.handlers = handlers
         self._stream_feature_handlers = []
         for handler in handlers:
@@ -189,7 +188,6 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
         [ called with `lock` acquired ]
         """
         self._setup_stream_element_handlers()
-        self.setup_stanza_handlers(self.handlers, "pre-auth")
         self._send_stream_start()
 
     def receive(self, transport, myname):
@@ -205,7 +203,6 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
             self.me = JID(myname)
             self.initiator = False
             self._setup_stream_element_handlers()
-            self.setup_stanza_handlers(self.handlers, "pre-auth")
 
     def _setup_stream_element_handlers(self):
         """Set up stream element handlers.
@@ -362,7 +359,9 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
         """Process first level child element of the stream).
 
         :Parameters:
-            - `element`: stanza's full XML
+            - `element`: XML element received
+        :Types:
+            - `element`: :etree:`ElementTree.Element`
         """
         with self.lock:
             self._process_element(element)
@@ -482,24 +481,6 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
         element = stanza.as_xml()
         self._write_element(element)
 
-    @timeout_handler(1)
-    def regular_tasks(self):
-        """Do some housekeeping (cache expiration, timeout handling).
-
-        This method should be called periodically from the application's
-        main loop.
-        
-        :Return: suggested delay (in seconds) before the next call to this
-                                                                    method.
-        :Returntype: `int`
-        """
-        with self.lock:
-            ret = self._iq_response_handlers.expire()
-            if ret is None:
-                return 1
-            else:
-                return min(1, ret)
-
     def _process_element(self, element):
         """Process first level element of the stream.
 
@@ -521,7 +502,7 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
                 return
         if tag.startswith(self._stanza_namespace_p):
             stanza = stanza_factory(element, self, self.language)
-            self.process_stanza(stanza)
+            self.uplink_receive(stanza)
         elif tag == ERROR_TAG:
             error = StreamErrorElement(element)
             self.process_stream_error(error)
@@ -532,6 +513,14 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
             logger.debug("Unhandled element: {0}".format(serialize(element)))
             logger.debug(" known handlers: {0!r}".format(
                                                     self._element_handlers))
+
+    def uplink_receive(self, stanza):
+        """Handle stanza received from the stream."""
+        with self.lock:
+            if self.stanza_route:
+                self.stanza_route.uplink_receive(stanza)
+            else:
+                logger.debug(u"Stanza dropped (no route): {0!r}".format(stanza))
 
     def process_stream_error(self, error):
         """Process stream error element received.
@@ -623,7 +612,6 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
             self.peer = peer
             if restart_stream:
                 self._restart_stream()
-        self.setup_stanza_handlers(self.handlers, "post-auth")
         self.event(AuthenticatedEvent(self.peer))
 
     def set_authenticated(self, me, restart_stream = False):
@@ -642,8 +630,24 @@ class StreamBase(StanzaProcessor, XMLStreamHandler, TimeoutHandler):
             self.me = me
             if restart_stream:
                 self._restart_stream()
-        self.setup_stanza_handlers(self.handlers, "post-auth")
         self.event(AuthenticatedEvent(self.me))
+
+    def fix_in_stanza(self, stanza):
+        """Fix incoming stanza, setting the implicit fields.
+
+        Used for for servers side of client stream to set proper stanza from.
+        """
+        # pylint: disable-msg=R0201
+        return stanza
+
+    def fix_out_stanza(self, stanza):
+        """Fix outgoing, setting or clearing the implicit fields.
+
+        Used for for client side of client stream to clear the 'from'
+        attribute.
+        """
+        # pylint: disable-msg=R0201
+        return stanza
 
 def _languages_factory(settings):
     """Make the default value of the :r:`languages setting`."""
@@ -659,11 +663,6 @@ XMPPSettings.add_setting(u"languages", type = u"list of ``unicode``",
         cmdline_help = u"Accepted languages of the XMPP stream",
         doc = u"""When the remote entity selects one of these languages
 on their stream, the same language will be sent in our stream declaration."""
-    )
-XMPPSettings.add_setting(u"default_stanza_timeout", type = float, default = 300,
-        validator = XMPPSettings.validate_positive_float,
-        cmdline_help = "Time in seconds to wait for a stanza response",
-        doc = u"""Time in seconds to wait for a stanza response."""
     )
 XMPPSettings.add_setting(u"extra_ns_prefixes", type = "prefix -> uri mapping",
         default = {},

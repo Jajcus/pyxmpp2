@@ -103,6 +103,10 @@ class ClientError(Error):
     """Raised on a client error."""
     pass
 
+class NoRouteError(Error):
+    """Raised when a stanza cannot be routed internally."""
+    pass
+
 class FatalClientError(ClientError):
     """Raised on a fatal client error."""
     pass
@@ -143,8 +147,8 @@ class ProtocolError(Error):
 
     ProtocolErrors handled internally by PyXMPP will be logged via the logging
     interface. Errors reported to the sender will be logged using
-    "pyxmpp.ProtocolError.reported" channel and the ignored errors using
-    "pyxmpp.ProtocolError.ignored" channel. Both with the "debug" level.
+    "pyxmpp2.ProtocolError.reported" channel and the ignored errors using
+    "pyxmpp2.ProtocolError.ignored" channel. Both with the "debug" level.
     
     """
 
