@@ -126,11 +126,14 @@ class TestBindingInitiator(InitiatorSelectTestCase):
 class TestBindingReceiver(ReceiverSelectTestCase):
     def test_bind_no_resource(self):
         handler = EventRecorder()
-        self.start_transport([handler])
-        self.stream = StreamBase(u"jabber:client",
-                                        [ResourceBindingHandler(), handler])
+        handlers = [ResourceBindingHandler(), handler]
+        processor = StanzaProcessor()
+        self.start_transport(handlers)
+        self.stream = StreamBase(u"jabber:client", processor, handlers)
+        processor.uplink = self.stream
         self.stream.receive(self.transport, self.addr[0])
         self.stream.set_peer_authenticated(JID("test@127.0.0.1"))
+        processor.setup_stanza_handlers(handlers, "post-auth")
         self.client.write(C2S_CLIENT_STREAM_HEAD)
         features = self.wait(
                 expect = re.compile(r".*<stream:features>(.*<bind.*urn:ietf:params:xml:ns:xmpp-bind.*)</stream:features>"))
@@ -148,11 +151,14 @@ class TestBindingReceiver(ReceiverSelectTestCase):
  
     def test_bind_resource(self):
         handler = EventRecorder()
-        self.start_transport([handler])
-        self.stream = StreamBase(u"jabber:client",
-                                        [ResourceBindingHandler(), handler])
+        handlers = [ResourceBindingHandler(), handler]
+        processor = StanzaProcessor()
+        self.start_transport(handlers)
+        self.stream = StreamBase(u"jabber:client", processor, handlers)
+        processor.uplink = self.stream
         self.stream.receive(self.transport, self.addr[0])
         self.stream.set_peer_authenticated(JID("test@127.0.0.1"))
+        processor.setup_stanza_handlers(handlers, "post-auth")
         self.client.write(C2S_CLIENT_STREAM_HEAD)
         features = self.wait(
                 expect = re.compile(r".*<stream:features>(.*<bind.*urn:ietf:params:xml:ns:xmpp-bind.*)</stream:features>"))
@@ -171,7 +177,7 @@ class TestBindingReceiver(ReceiverSelectTestCase):
 def suite():
      suite = unittest.TestSuite()
      suite.addTest(unittest.makeSuite(TestBindingInitiator))
-     #suite.addTest(unittest.makeSuite(TestBindingReceiver))
+     suite.addTest(unittest.makeSuite(TestBindingReceiver))
      return suite
 
 if __name__ == '__main__':
