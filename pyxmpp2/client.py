@@ -40,6 +40,7 @@ from .streamtls import StreamTLSHandler
 from .streamsasl import StreamSASLHandler
 from .binding import ResourceBindingHandler
 from .stanzaprocessor import StanzaProcessor
+from .roster import RosterClient
 
 logger = logging.getLogger("pyxmpp2.client")
 
@@ -87,8 +88,9 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
         StanzaProcessor.__init__(self, self.settings[u"default_stanza_timeout"])
         self.handlers = handlers
         self._base_handlers = self.base_handlers_factory()
-        self._ml_handlers += self._base_handlers
-        self._ml_handlers += list(handlers) + [self]
+        self.roster_client = self.roster_client_factory()
+        self._base_handlers += [self.roster_client]
+        self._ml_handlers += list(handlers) + self._base_handlers + [self]
         if mainloop is not None:
             self.mainloop = mainloop
             for handler in self._ml_handlers:
@@ -101,6 +103,17 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
         for handler in self._ml_handlers:
             self.mainloop.remove_handler(handler)
         self._ml_handlers = []
+
+    @property
+    def roster(self):
+        """Current roster.
+
+        Shortcut for ``self.roster_client.roster``.
+        """
+        if self.roster_client is not None:
+            return self.roster_client.roster
+        else:
+            return None
 
     def connect(self):
         """Schedule a new XMPP c2s connection.
@@ -216,6 +229,17 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
         session_handler = SessionHandler()
         binding_handler = ResourceBindingHandler(self.settings)
         return [tls_handler, sasl_handler, binding_handler, session_handler]
+
+    def roster_client_factory(self):
+        """Creates the `RosterClient` instance for the `roster_client`
+        attribute.
+        
+        Subclasses can provide different behaviour by overriding this. The
+        overriding method can return `None` if no roster client is needed.
+
+        :Return: `RosterClient`
+        """
+        return RosterClient(self.settings)
 
 XMPPSettings.add_setting(u"c2s_port", default = 5222, basic = True,
     type = int, validator = XMPPSettings.get_int_range_validator(1, 65536),
