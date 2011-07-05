@@ -210,15 +210,21 @@ class TestReceiverSelect(ReceiverSelectTestCase):
         self.client.write(C2S_CLIENT_STREAM_HEAD)
         self.wait_short(0.2)
         self.client.write("</stream:test>")
+        logger.debug("waiting for exception...")
         with self.assertRaises(StreamParseError):
             self.wait()
+        logger.debug(" got it!")
         self.assertFalse(self.stream.is_connected())
         self.wait_short(0.1)
+        logger.debug("waiting for connection close...")
         self.client.wait(1)
+        logger.debug(" done")
         self.assertTrue(self.client.eof)
         self.assertTrue(self.client.rdata.endswith(PARSE_ERROR_RESPONSE))
         self.client.close()
+        logger.debug("final wait...")
         self.wait()
+        logger.debug(" done")
         event_classes = [e.__class__ for e in handler.events_received]
         
         # when exception was raised by a thread DisconnectedEvent won't
