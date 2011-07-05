@@ -66,26 +66,24 @@ class VersionPayload(StanzaPayload):
         - `version`: `unicode`
         - `os_name`: `unicode`
     """
-    def __init__(self, element = None, name = None, version = None, 
-                                                            os_name = None):
-        self.name = None
-        self.version = None
-        self.os_name = None
-        StanzaPayload.__init__(self, element)
-        if element is not None:
-            for child in element:
-                if child.tag == NAME_TAG:
-                    self.name = child.text
-                elif child.tag == VERSION_TAG:
-                    self.version = child.text
-                elif child.tag == OS_TAG:
-                    self.os_name = child.text
-        if name is not None:
-            self.name = name
-        if version is not None:
-            self.version = version
-        if os_name is not None:
-            self.os_name = os_name
+    def __init__(self, name = None, version = None, os_name = None):
+        self.name = name
+        self.version = version
+        self.os_name = os_name
+
+    @classmethod
+    def from_xml(cls, element):
+        name = None
+        version = None
+        os_name = None
+        for child in element:
+            if child.tag == NAME_TAG:
+                name = child.text
+            elif child.tag == VERSION_TAG:
+                version = child.text
+            elif child.tag == OS_TAG:
+                os_name = child.text
+        return cls(name, version, os_name)
 
     def as_xml(self):
         element = ElementTree.Element(QUERY_TAG)

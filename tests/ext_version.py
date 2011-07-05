@@ -32,14 +32,14 @@ IQ2 = '''<iq type="response" id="1" xmlns="jabber:client">
 class TestVersionPayload(unittest.TestCase):
     def test_parse_empty(self):
         element = ElementTree.XML(IQ1)
-        payload = VersionPayload(element[0])
+        payload = VersionPayload.from_xml(element[0])
         self.assertIsNone(payload.name)
         self.assertIsNone(payload.version)
         self.assertIsNone(payload.os_name)
 
     def test_parse_full(self):
         element = ElementTree.XML(IQ2)
-        payload = VersionPayload(element[0])
+        payload = VersionPayload.from_xml(element[0])
         self.assertEqual(payload.name, 'NAME')
         self.assertEqual(payload.version, 'VERSION')
         self.assertEqual(payload.os_name, 'OS')

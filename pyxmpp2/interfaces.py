@@ -26,6 +26,14 @@ __docformat__ = "restructuredtext en"
 import logging
 
 from abc import ABCMeta, abstractmethod
+
+try:
+    # pylint: disable=E0611
+    from abc import abstractclassmethod
+except ImportError:
+    # pylint: disable=C0103
+    abstractclassmethod = classmethod
+
 from copy import deepcopy
 
 # pylint: disable=W0611
@@ -321,11 +329,26 @@ def presence_stanza_handler(stanza_type = None, payload_class = None,
                                                             usage_restriction)
 
 class StanzaPayload:
-    """Abstract base class for stanza payload objects."""
+    """Abstract base class for stanza payload objects.
+
+    Subclasses are used to encapsulate stanza payload data
+    and to reference payload type in stanza handlers or when
+    requesting particular payload from a stanza.
+    """
+    # pylint: disable=W0232
     __metaclass__ = ABCMeta
 
-    def __init__(self, element):
-        pass
+    @abstractclassmethod
+    def from_xml(cls, element):
+        """Create a `cls` instance from an XML element.
+
+        :Parameters:
+            - `element`: the XML element
+        :Types:
+            - `element`: :etree:`ElementTree.Element`
+        """
+        # pylint: disable=E0213
+        raise NotImplementedError
 
     @abstractmethod
     def as_xml(self):
@@ -333,7 +356,7 @@ class StanzaPayload:
 
         :returntype: :etree:`ElementTree.Element`
         """
-        pass
+        raise NotImplementedError
 
     def copy(self):
         """Return a deep copy of self."""
@@ -357,7 +380,7 @@ def payload_element_name(element_name):
     """
     def decorator(klass):
         """The payload_element_name decorator."""
-        # pylint: disable-msg=W0212
+        # pylint: disable-msg=W0212,W0404
         from .stanzapayload import STANZA_PAYLOAD_CLASSES
         from .stanzapayload import STANZA_PAYLOAD_ELEMENTS
         if hasattr(klass, "_pyxmpp_payload_element_name"):

@@ -402,10 +402,10 @@ class Stanza(object):
         elif specialize:
             for i, payload in enumerate(self._payload):
                 if isinstance(payload, XMLPayload):
-                    factory = payload_class_for_element_name(
+                    klass = payload_class_for_element_name(
                                                         payload.element.tag)
-                    if factory is not XMLPayload:
-                        payload = factory(payload.element)
+                    if klass is not XMLPayload:
+                        payload = klass.from_xml(payload.element)
                         self._payload[i] = payload
         return list(self._payload)
 
@@ -442,10 +442,10 @@ class Stanza(object):
             if self._payload:
                 payload = self._payload[0]
                 if specialize and isinstance(payload, XMLPayload):
-                    factory = payload_class_for_element_name(
+                    klass = payload_class_for_element_name(
                                                         payload.element.tag)
-                    if factory is not XMLPayload:
-                        payload = factory(payload.element)
+                    if klass is not XMLPayload:
+                        payload = klass.from_xml(payload.element)
                         self._payload[0] = payload
                 return payload
             else:
@@ -457,7 +457,7 @@ class Stanza(object):
                 if payload_class is not XMLPayload:
                     if payload.xml_element_name not in elements:
                         continue
-                    payload = payload_class(payload.element)
+                    payload = payload_class.from_xml(payload.element)
             elif not isinstance(payload, payload_class):
                 continue
             if payload_key is not None and payload_key != payload.handler_key():

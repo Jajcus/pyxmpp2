@@ -53,14 +53,17 @@ STANZA7 = """
 
 @payload_element_name(u"{http://pyxmpp.jajcus.net/test/ns}element")
 class TestPayload(StanzaPayload):
-    def __init__(self, element = None, data = None):
-        self.data = None
-        if element is not None:
-            for child in element:
-                if child.tag == u"{http://pyxmpp.jajcus.net/test/ns}data":
-                    self.data = child.text
-        if data:
-            self.data = data
+    def __init__(self, data = None):
+        self.data = data
+
+    @classmethod
+    def from_xml(cls, element):
+        data = None
+        for child in element:
+            if child.tag == u"{http://pyxmpp.jajcus.net/test/ns}data":
+                data = child.text
+        return cls(data)
+
     def as_xml(self):
         element = ElementTree.Element(
                                 u"{http://pyxmpp.jajcus.net/test/ns}element")

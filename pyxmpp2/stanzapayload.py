@@ -49,7 +49,10 @@ class XMLPayload(StanzaPayload):
             raise TypeError("ElementTree.Element required")
         self.xml_element_name = data.tag
         self.element = data
-        StanzaPayload.__init__(self, data)
+
+    @classmethod
+    def from_xml(cls, element):
+        return cls(element)
 
     def as_xml(self):
         return self.element
@@ -77,4 +80,4 @@ def payload_element_names_for_class(klass):
 def payload_factory(element):
     """Return a specialized `StanzaPayload` object for given element.
     """
-    return payload_class_for_element_name(element.tag)(element)
+    return payload_class_for_element_name(element.tag).from_xml(element)

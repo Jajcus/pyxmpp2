@@ -61,26 +61,27 @@ class ResourceBindingPayload(StanzaPayload):
         - `jid`: `JID`
         - `resource`: `unicode`
     """
-    def __init__(self, element = None, jid = None, resource = None):
-        StanzaPayload.__init__(self, element)
-        self.jid = None
-        self.resource = None
-        if element is not None:
-            for child in element:
-                if child.tag == BIND_JID_TAG:
-                    if self.jid:
-                        raise BadRequestProtocolError(
-                                    "<bind/> contains multiple <jid/> elements")
-                    self.jid = JID(child.text)
-                if child.tag == BIND_RESOURCE_TAG:
-                    if self.resource:
-                        raise BadRequestProtocolError(
-                                    "<bind/> contains multiple <jid/> elements")
-                    self.resource = child.text
-        if jid:
-            self.jid = jid
-        if resource:
-            self.resource = resource
+    def __init__(self, jid = None, resource = None):
+        self.jid = jid
+        self.resource = resource
+
+    @classmethod
+    def from_xml(cls, element):
+        jid = None
+        resource = None
+        for child in element:
+            if child.tag == BIND_JID_TAG:
+                if jid:
+                    raise BadRequestProtocolError(
+                                "<bind/> contains multiple <jid/> elements")
+                jid = JID(child.text)
+            if child.tag == BIND_RESOURCE_TAG:
+                if resource:
+                    raise BadRequestProtocolError(
+                            "<bind/> contains multiple <resource/> elements")
+                resource = child.text
+        return cls(jid, resource)
+
     def as_xml(self):
         element = ElementTree.Element(FEATURE_BIND)
         if self.jid:
