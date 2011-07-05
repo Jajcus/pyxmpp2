@@ -50,8 +50,8 @@ class IOThread(object):
         - `name`: thread name (for debugging)
         - `io_handler`: the I/O handler object to poll
         - `thread`: the actual thread object
-        - `exc_info`: this will hold exception information tuple whenever the
-          thread was aborted by an exception.
+        - `exc_info`: this will hold exception information tuple for the
+          last exception raised in the thread.
 
     :Types:
         - `name`: `unicode`
@@ -89,26 +89,33 @@ class IOThread(object):
         return self.thread.join(timeout)
 
     def _run(self):
-        """The thread function. Calls `self.run()` and if it raises
-        an exception, sotres it in self.exc_info
+        """The thread function. Calls `self.run()` in loop and if it raises an
+        exception, stores it in self.exc_queue. If `exc_queue` is None
+        the exception will abort the thread.
         """
         logger.debug("{0}: entering thread".format(self.name))
-        try:
-            self.run()
-        except Exception: # pylint: disable-msg=W0703
-            logger.debug("{0}: aborting thread".format(self.name))
-            self.exc_info = sys.exc_info()
-            logger.debug(u"exception in the {0!r} thread:"
-                            .format(self.name), exc_info = self.exc_info)
-            if self.exc_queue:
-                self.exc_queue.put( (self, self.exc_info) )
-        else:
-            logger.debug("{0}: exiting thread".format(self.name))
+        while True:
+            try:
+                self.run()
+            except Exception: # pylint: disable-msg=W0703
+                self.exc_info = sys.exc_info()
+                logger.debug(u"exception in the {0!r} thread:"
+                                .format(self.name), exc_info = self.exc_info)
+                if self.exc_queue:
+                    self.exc_queue.put( (self, self.exc_info) )
+                    continue
+                else:
+                    logger.debug("{0}: aborting thread".format(self.name))
+                    return
+            except:
+                logger.debug("{0}: aborting thread".format(self.name))
+                return
+            break
+        logger.debug("{0}: exiting thread".format(self.name))
 
     def run(self):
         """The thread function."""
         raise NotImplementedError
-
 
 class ReadingThread(IOThread):
     """A thread reading from io_handler.
@@ -241,17 +248,24 @@ class EventDispatcherThread(object):
         an exception, stores it in self.exc_info and exc_queue
         """
         logger.debug("{0}: entering thread".format(self.name))
-        try:
-            self.event_dispatcher.loop()
-        except Exception: # pylint: disable-msg=W0703
-            logger.debug("{0}: aborting thread".format(self.name))
-            self.exc_info = sys.exc_info()
-            logger.debug(u"exception in the {0!r} thread:"
-                            .format(self.name), exc_info = self.exc_info)
-            if self.exc_queue:
-                self.exc_queue.put( (self, self.exc_info) )
-        else:
-            logger.debug("{0}: exiting thread".format(self.name))
+        while True:
+            try:
+                self.event_dispatcher.loop()
+            except Exception: # pylint: disable-msg=W0703
+                self.exc_info = sys.exc_info()
+                logger.debug(u"exception in the {0!r} thread:"
+                                .format(self.name), exc_info = self.exc_info)
+                if self.exc_queue:
+                    self.exc_queue.put( (self, self.exc_info) )
+                    continue
+                else:
+                    logger.debug("{0}: aborting thread".format(self.name))
+                    return
+            except:
+                logger.debug("{0}: aborting thread".format(self.name))
+                return
+            break
+        logger.debug("{0}: exiting thread".format(self.name))
 
 class TimeoutThread(object):
     """Thread to handle `TimeoutHandler` methods.
@@ -304,17 +318,24 @@ class TimeoutThread(object):
         an exception, stores it in self.exc_info
         """
         logger.debug("{0}: entering thread".format(self.name))
-        try:
-            self.run()
-        except Exception: # pylint: disable-msg=W0703
-            logger.debug("{0}: aborting thread".format(self.name))
-            self.exc_info = sys.exc_info()
-            logger.debug(u"exception in the {0!r} thread:"
-                            .format(self.name), exc_info = self.exc_info)
-            if self.exc_queue:
-                self.exc_queue.put( (self, self.exc_info) )
-        else:
-            logger.debug("{0}: exiting thread".format(self.name))
+        while True:
+            try:
+                self.run()
+            except Exception: # pylint: disable-msg=W0703
+                self.exc_info = sys.exc_info()
+                logger.debug(u"exception in the {0!r} thread:"
+                                .format(self.name), exc_info = self.exc_info)
+                if self.exc_queue:
+                    self.exc_queue.put( (self, self.exc_info) )
+                    continue
+                else:
+                    logger.debug("{0}: aborting thread".format(self.name))
+                    return
+            except:
+                logger.debug("{0}: aborting thread".format(self.name))
+                return
+            break
+        logger.debug("{0}: exiting thread".format(self.name))
 
     def run(self):
         """The thread function."""

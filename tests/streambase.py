@@ -117,14 +117,8 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         self.server.disconnect()
         self.wait()
         event_classes = [e.__class__ for e in handler.events_received]
-       
-        # when exception was raised by a thread DisconnectedEvent won't
-        # be sent
-        if event_classes[-1] == DisconnectedEvent:
-            event_classes = event_classes[:-1]
-
         self.assertEqual(event_classes, [ConnectingEvent, ConnectedEvent,
-                                    StreamConnectedEvent])
+                                    StreamConnectedEvent, DisconnectedEvent])
 
     def test_stanza_send(self):
         handler = IgnoreEventHandler()
@@ -226,13 +220,8 @@ class TestReceiverSelect(ReceiverSelectTestCase):
         self.wait()
         logger.debug(" done")
         event_classes = [e.__class__ for e in handler.events_received]
-        
-        # when exception was raised by a thread DisconnectedEvent won't
-        # be sent
-        if event_classes[-1] == DisconnectedEvent:
-            event_classes = event_classes[:-1]
-            
-        self.assertEqual(event_classes, [StreamConnectedEvent])
+        self.assertEqual(event_classes, [StreamConnectedEvent,
+                                                        DisconnectedEvent])
 
 @unittest.skipIf(not hasattr(select, "poll"), "No poll() support")
 class TestReceiverPoll(ReceiverPollTestMixIn, TestReceiverSelect):
