@@ -715,7 +715,7 @@ class TCPTransport(XMPPTransport, IOHandler):
 
     def handle_hup(self):
         """
-        Handle the 'channel hungup' state. The handler should not be writtable
+        Handle the 'channel hungup' state. The handler should not be writable
         after this.
         """
         self._hup = True
