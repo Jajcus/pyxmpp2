@@ -17,6 +17,7 @@ from pyxmpp2.mainloop.interfaces import EventHandler, event_handler, QUIT
 from pyxmpp2.mainloop.select import SelectMainLoop
 from pyxmpp2.mainloop.poll import PollMainLoop
 from pyxmpp2.mainloop.threads import ThreadPool
+from pyxmpp2.settings import XMPPSettings
 
 logger = logging.getLogger("pyxmpp2.test.test_util")
 
@@ -290,7 +291,7 @@ class InitiatorPollTestMixIn(object):
 
 class InitiatorThreadedTestMixIn(object):
     def make_loop(self, handlers):
-        self.loop = ThreadPool(None, handlers)
+        self.loop = ThreadPool(XMPPSettings({"upoll_interval": 0.1}), handlers)
 
     def connect_transport(self):
         InitiatorSelectTestCase.connect_transport(self)
@@ -352,7 +353,7 @@ class ReceiverPollTestMixIn(object):
 
 class ReceiverThreadedTestMixIn(object):
     def make_loop(self, handlers):
-        self.loop = ThreadPool(None, handlers)
+        self.loop = ThreadPool(XMPPSettings({"upoll_interval": 0.1}), handlers)
 
     def start_transport(self, handlers):
         super(ReceiverThreadedTestMixIn, self).start_transport(handlers)
