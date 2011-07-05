@@ -185,6 +185,12 @@ class BadRequestProtocolError(ProtocolError):
     def __init__(self, message):
         ProtocolError.__init__(self, "bad-request", message)
 
+class NotAcceptableProtocolError(ProtocolError):
+    """Raised when invalid stanza is processed and 'not-acceptable' error
+    should be reported."""
+    def __init__(self, message):
+        ProtocolError.__init__(self, "not-acceptable", message)
+
 class JIDMalformedProtocolError(ProtocolError, JIDError):
     """Raised when invalid JID is encountered."""
     def __init__(self, message):
