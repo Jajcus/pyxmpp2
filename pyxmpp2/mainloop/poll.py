@@ -132,14 +132,15 @@ class PollMainLoop(MainLoopBase):
         events = self.poll.poll(timeout)
         self._timeout = None
         for (fileno, event) in events:
-            if event & select.POLLERR:
-                self._handlers[fileno].handle_err()
             if event & select.POLLHUP:
                 self._handlers[fileno].handle_hup()
             if event & select.POLLNVAL:
                 self._handlers[fileno].handle_nval()
             if event & select.POLLIN:
                 self._handlers[fileno].handle_read()
+            elif event & select.POLLERR:
+                # if POLLIN was set this condition should be already handled
+                self._handlers[fileno].handle_err()
             if event & select.POLLOUT:
                 self._handlers[fileno].handle_write()
             sources_handled += 1
