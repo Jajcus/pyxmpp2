@@ -406,6 +406,7 @@ class TCPTransport(XMPPTransport, IOHandler):
                     if err.args[0] == errno.EWOULDBLOCK:
                         wait_for_write(self._socket)
                         continue
+                    raise
                 data = data[sent:]
         except (IOError, OSError, socket.error), err:
             raise PyXMPPIOError(u"IO Error: {0}".format(err))
