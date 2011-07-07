@@ -44,6 +44,17 @@ from .roster import RosterClient
 
 logger = logging.getLogger("pyxmpp2.client")
 
+def _move_session_handler(handlers):
+    """Find a SessionHandler instance in the list and move it to the beginning.
+    """
+    index = 0
+    for i, handler in enumerate(handlers):
+        if isinstance(handler, SessionHandler):
+            index = i
+            break
+    if index:
+        handlers[:i + 1] = [handlers[i]] + handlers[:i]
+
 class Client(StanzaProcessor, TimeoutHandler, EventHandler):
     """Base class for an XMPP-IM client.
 
@@ -91,6 +102,7 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
         self.roster_client = self.roster_client_factory()
         self._base_handlers += [self.roster_client]
         self._ml_handlers += list(handlers) + self._base_handlers + [self]
+        _move_session_handler(self._ml_handlers)
         if mainloop is not None:
             self.mainloop = mainloop
             for handler in self._ml_handlers:
