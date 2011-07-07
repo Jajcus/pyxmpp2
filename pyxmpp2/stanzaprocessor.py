@@ -166,7 +166,7 @@ class StanzaProcessor(StanzaRoute):
                                                     (stanza_id, ufrom))
         except KeyError:
             if ( (from_jid == self.peer or from_jid == self.me 
-                                        or from_jid == self.me.bare()) ):
+                            or self.me and from_jid == self.me.bare()) ):
                 try:
                     res_handler, err_handler = \
                             self._iq_response_handlers.pop(
