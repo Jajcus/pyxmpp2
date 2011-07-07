@@ -58,7 +58,7 @@ class PrepareAgain(IOHandlerPrepareResult):
         IOHandlerPrepareResult.__init__(self)
         self.timeout = timeout
     def __repr__(self):
-        if self.timeout is None:
+        if self.timeout is not None:
             return "PrepareAgain({0!r})".format(self.timeout)
         else:
             return "PrepareAgain()"
