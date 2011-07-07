@@ -289,6 +289,11 @@ class InitiatorPollTestMixIn(object):
     def make_loop(self, handlers):
         self.loop = PollMainLoop(None, handlers)
 
+class InitiatorGLibTestMixIn(object):
+    def make_loop(self, handlers):
+        from pyxmpp2.mainloop.glib import GLibMainLoop
+        self.loop = GLibMainLoop(None, handlers)
+
 class InitiatorThreadedTestMixIn(object):
     def make_loop(self, handlers):
         self.loop = ThreadPool(XMPPSettings({"upoll_interval": 0.1}), handlers)
@@ -350,6 +355,11 @@ class ReceiverSelectTestCase(NetworkTestCase):
 class ReceiverPollTestMixIn(object):
     def make_loop(self, handlers):
         self.loop = PollMainLoop(None, handlers)
+
+class ReceiverGLibTestMixIn(object):
+    def make_loop(self, handlers):
+        from pyxmpp2.mainloop.glib import GLibMainLoop
+        self.loop = GLibMainLoop(None, handlers)
 
 class ReceiverThreadedTestMixIn(object):
     def make_loop(self, handlers):

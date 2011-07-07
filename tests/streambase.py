@@ -9,6 +9,11 @@ import select
 
 from xml.etree.ElementTree import Element, SubElement, XML
 
+try:
+    import glib
+except ImportError:
+    glib = None
+
 from pyxmpp2.streambase import StreamBase
 from pyxmpp2.streamevents import *
 from pyxmpp2.exceptions import StreamParseError
@@ -21,6 +26,7 @@ from pyxmpp2.interfaces import StanzaRoute
 from test_util import EventRecorder
 from test_util import InitiatorSelectTestCase
 from test_util import InitiatorPollTestMixIn, InitiatorThreadedTestMixIn
+from test_util import InitiatorGLibTestMixIn, ReceiverGLibTestMixIn
 from test_util import ReceiverSelectTestCase
 from test_util import ReceiverPollTestMixIn, ReceiverThreadedTestMixIn
 
@@ -84,7 +90,8 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         self.start_transport([handler])
         self.stream.initiate(self.transport)
         self.connect_transport()
-        self.wait_short(0.5)
+        self.wait_short(0.25)
+        self.wait_short(0.25)
         self.assertTrue(self.stream.is_connected())
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.wait(expect = re.compile(".*(</stream:stream>)"))
@@ -127,7 +134,8 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         self.start_transport([handler])
         self.stream.initiate(self.transport)
         self.connect_transport()
-        self.wait_short(0.5)
+        self.wait_short(0.25)
+        self.wait_short(0.25)
         self.assertTrue(self.stream.is_connected())
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.stream.send(Message(to_jid = JID(u"test@example.org"),
@@ -156,7 +164,10 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         self.start_transport([handler])
         self.stream.initiate(self.transport)
         self.connect_transport()
-        self.wait_short(0.5)
+        logger.debug("-- waiting for connect")
+        self.wait_short(0.25)
+        self.wait_short(0.25)
+        logger.debug("-- checking connected")
         self.assertTrue(self.stream.is_connected())
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.server.write("<message><body>Test</body></message>")
@@ -178,6 +189,10 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
 class TestInitiatorPoll(InitiatorPollTestMixIn, TestInitiatorSelect):
     pass
 
+@unittest.skipIf(glib is None, "No glib module")
+class TestInitiatorGLib(InitiatorGLibTestMixIn, TestInitiatorSelect):
+    pass
+
 class TestInitiatorThreaded(InitiatorThreadedTestMixIn, TestInitiatorSelect):
     pass
 
@@ -188,7 +203,8 @@ class TestReceiverSelect(ReceiverSelectTestCase):
         self.stream = StreamBase(u"jabber:client", None, [])
         self.stream.receive(self.transport, self.addr[0])
         self.client.write(C2S_CLIENT_STREAM_HEAD)
-        self.wait_short(0.5)
+        self.wait_short(0.25)
+        self.wait_short(0.25)
         self.client.write(STREAM_TAIL)
         self.wait()
         self.assertFalse(self.stream.is_connected())
@@ -202,7 +218,8 @@ class TestReceiverSelect(ReceiverSelectTestCase):
         self.stream = StreamBase(u"jabber:client", None, [])
         self.stream.receive(self.transport, self.addr[0])
         self.client.write(C2S_CLIENT_STREAM_HEAD)
-        self.wait_short(0.2)
+        self.wait_short(0.25)
+        self.wait_short(0.25)
         self.client.write("</stream:test>")
         logger.debug("waiting for exception...")
         with self.assertRaises(StreamParseError):
@@ -230,6 +247,10 @@ class TestReceiverPoll(ReceiverPollTestMixIn, TestReceiverSelect):
 class TestReceiverThreaded(ReceiverThreadedTestMixIn, TestReceiverSelect):
     pass
 
+@unittest.skipIf(glib is None, "No glib module")
+class TestReceiverGLib(ReceiverGLibTestMixIn, TestReceiverSelect):
+    pass
+
 def suite():
      suite = unittest.TestSuite()
      suite.addTest(unittest.makeSuite(TestInitiatorSelect))
@@ -238,13 +259,15 @@ def suite():
      suite.addTest(unittest.makeSuite(TestReceiverPoll))
      suite.addTest(unittest.makeSuite(TestInitiatorThreaded))
      suite.addTest(unittest.makeSuite(TestReceiverThreaded))
+     suite.addTest(unittest.makeSuite(TestInitiatorGLib))
+     suite.addTest(unittest.makeSuite(TestReceiverGLib))
      return suite
 
 if __name__ == '__main__':
     import logging
     logger = logging.getLogger()
     logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.ERROR)
+    logger.setLevel(logging.INFO)
     unittest.TextTestRunner(verbosity=2).run(suite())
 
 # vi: sts=4 et sw=4
