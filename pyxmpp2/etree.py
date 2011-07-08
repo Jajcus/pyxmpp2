@@ -51,7 +51,7 @@ from abc import ABCMeta
 if "PYXMPP2_ETREE" in os.environ:
     ElementTree = __import__(os.environ["PYXMPP2_ETREE"], fromlist=[""])
 else:
-    from xml.etree import ElementTree
+    from xml.etree import ElementTree # pylint: disable=W0404
 
 class ElementClass:
     """Abstract class used to reference the :etree:`ElementTree.Element`

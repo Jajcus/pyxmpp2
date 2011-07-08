@@ -56,7 +56,9 @@ def hold_exception(method):
     return wrapper
 
 class GLibMainLoop(MainLoopBase):
-    """Wrapper for the GLib main event loop."""
+    """Wrapper for the GLib main event loop.
+    """
+    # pylint: disable=R0902
     def __init__(self, settings = None, handlers = None):
         self._unprepared_handlers = {}
         self._io_sources = {}
@@ -192,10 +194,10 @@ class GLibMainLoop(MainLoopBase):
             del self._unprepared_handlers[handler]
         tag = self._prepare_sources.pop(handler, None)
         if tag is not None:
-            glib.remove_source(tag)
+            glib.source_remove(tag)
         tag = self._io_sources.pop(handler, None)
         if tag is not None:
-            glib.remove_source(tag)
+            glib.source_remove(tag)
 
     def _add_timeout_handler(self, handler):
         """Add a `TimeoutHandler` to the main loop."""

@@ -38,9 +38,9 @@ from .interfaces import Resolver
 logger = logging.getLogger("pyxmpp2.resolver")
 
 try:
-    import dns.resolver
-    import dns.name
-    import dns.exception
+    import dns.resolver     # pylint: disable=W0404
+    import dns.name         # pylint: disable=W0404
+    import dns.exception    # pylint: disable=W0404
 
     HAVE_DNSPYTHON = True
 except ImportError:

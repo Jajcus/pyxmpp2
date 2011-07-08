@@ -34,6 +34,8 @@ response times, by the cost of higher CPU usage."""
     )
 
 if hasattr(select, "poll"):
+    # pylint: disable=W0404
     from .poll import PollMainLoop as main_loop_factory
 else:
+    # pylint: disable=W0404
     from .select import SelectMainLoop as main_loop_factory

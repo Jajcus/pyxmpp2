@@ -19,7 +19,7 @@
 
 Normative reference:
   - :RFC:`6120`
-  - :RFC:`6121` (TODO: roster and presence management)
+  - :RFC:`6121` (TODO: presence management)
 """
 
 from __future__ import absolute_import, division
@@ -53,7 +53,7 @@ def _move_session_handler(handlers):
             index = i
             break
     if index:
-        handlers[:i + 1] = [handlers[i]] + handlers[:i]
+        handlers[:index + 1] = [handlers[index]] + handlers[:index]
 
 class Client(StanzaProcessor, TimeoutHandler, EventHandler):
     """Base class for an XMPP-IM client.
