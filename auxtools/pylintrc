@@ -12,7 +12,7 @@ profile=no
 
 # Add <file or directory> to the black list. It should be a base name, not a
 # path. You may set this option multiple times.
-ignore=cache.py,roster.py,muc,component.py,dataforms.py,delay.py,disco.py,legacyauth.py,register.py,vcard.py
+ignore=cache.py,muc,component.py,dataforms.py,delay.py,disco.py,legacyauth.py,register.py,vcard.py
 
 # Pickle collected data for later comparisons.
 persistent=yes
