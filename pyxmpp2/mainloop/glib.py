@@ -45,6 +45,10 @@ def hold_exception(method):
         except Exception:
             if self.exc_info:
                 raise
+            if not self._stack:
+                logger.debug('@hold_exception wrapped method {0!r} called'
+                            ' from outside of the main loop'.format(method))
+                raise
             self.exc_info = sys.exc_info()
             logger.debug(u"exception in glib main loop callback:",
                                                 exc_info = self.exc_info)
