@@ -3,6 +3,27 @@
 
 """
 A roster interface example.
+
+Usage:
+
+    roster.py JID show
+
+    roster.py JID monitor
+
+    roster.py JID add CONTACT [NAME] [GROUP [GROUP ...]]
+
+    roster.py JID remove CONTACT
+
+    roster.py JID update CONTACT [NAME] [GROUP [GROUP ...]]
+
+        positional arguments:
+            CONTACT     The JID to add
+            NAME        Contact name
+            GROUP       Group names
+
+    roster.py --help 
+
+        for the general help
 """
 
 import sys
@@ -52,8 +73,21 @@ class RosterTool(EventHandler):
 
     @event_handler(RosterReceivedEvent)
     def handle_roster_received(self, event):
-        if self.args.action not in ("show", "monitor"):
-            return
+        if self.args.action == "show":
+            self.print_roster()
+            self.client.disconnect()
+        elif self.args.action == "monitor":
+            self.show_roster()
+        elif self.args.action == "add":
+            self.add_contact()
+        elif self.args.action == "remove":
+            self.remove_contact()
+        elif self.args.action == "update":
+            self.update_contact()
+        else:
+            self.client.disconnect()
+
+    def print_roster(self):
         roster = self.client.roster  # event.roster would also do
         print "Roster received:"
         if roster.version is None:
@@ -68,8 +102,77 @@ class RosterTool(EventHandler):
         else:
             print "  Empty"
             print
-        if self.args.action == "show":
-            self.client.disconnect()
+
+    def add_contact(self):
+        roster_client = self.client.roster_client
+        roster_client.add_item(jid = JID(self.args.contact),
+                name = self.args.name, groups = self.args.groups,
+                                        callback = self._add_success,
+                                            error_callback = self._add_error)
+
+    def _add_success(self, item):
+        print "Roster item added: {0}".format(item.jid)
+        self.client.disconnect()
+
+    def _add_error(self, stanza):
+        if stanza:
+            error = stanza.error
+            if error.text:
+                print "Roster item add failed: {0}".format(
+                                                        error.condition_name)
+            else:
+                print "Roster item add failed: {0} ({1})".format(
+                                            error.condition_name, error.text)
+        else:
+            print "Roster item add failed: timeout"
+        self.client.disconnect()
+
+    def update_contact(self):
+        roster_client = self.client.roster_client
+        roster_client.update_item(jid = JID(self.args.contact),
+                name = self.args.name, groups = self.args.groups,
+                                        callback = self._update_success,
+                                            error_callback = self._update_error)
+
+    def _update_success(self, item):
+        print "Roster item updateed: {0}".format(item.jid)
+        self.client.disconnect()
+
+    def _update_error(self, stanza):
+        if stanza:
+            error = stanza.error
+            if error.text:
+                print "Roster item update failed: {0}".format(
+                                                        error.condition_name)
+            else:
+                print "Roster item update failed: {0} ({1})".format(
+                                            error.condition_name, error.text)
+        else:
+            print "Roster item update failed: timeout"
+        self.client.disconnect()
+
+    def remove_contact(self):
+        roster_client = self.client.roster_client
+        roster_client.remove_item(jid = JID(self.args.contact),
+                                        callback = self._rm_success,
+                                            error_callback = self._rm_error)
+
+    def _rm_success(self, item):
+        print "Roster item removed: {0}".format(item.jid)
+        self.client.disconnect()
+
+    def _rm_error(self, stanza):
+        if stanza:
+            error = stanza.error
+            if error.text:
+                print "Roster item remove failed: {0}".format(
+                                                        error.condition_name)
+            else:
+                print "Roster item remove failed: {0} ({1})".format(
+                                            error.condition_name, error.text)
+        else:
+            print "Roster item remove failed: timeout"
+        self.client.disconnect()
 
     @event_handler(RosterUpdatedEvent)
     def handle_roster_update(self, event):
@@ -115,6 +218,25 @@ def main():
     subparsers.add_parser('show', help = 'Show roster and exit')
     subparsers.add_parser('monitor', help = 
                                         'Show roster and subsequent changes')
+    add_p = subparsers.add_parser('add', help = 'Add an item to the roster')
+    add_p.add_argument('contact', metavar = 'CONTACT', help = 'The JID to add')
+    add_p.add_argument('name', metavar = 'NAME', nargs = '?',
+                                            help = 'Contact name')
+    add_p.add_argument('groups', metavar = 'GROUP', nargs = '*',
+                                            help = 'Group names')
+    rm_p = subparsers.add_parser('remove',
+                                    help = 'Remove an item from the roster')
+    rm_p.add_argument('contact', metavar = 'CONTACT',
+                                    help = 'The JID to remove')
+    upd_p = subparsers.add_parser('update', 
+                                    help = 'Update an item in the roster')
+    upd_p.add_argument('contact', metavar = 'CONTACT',
+                                    help = 'The JID to update')
+    upd_p.add_argument('name', metavar = 'NAME', nargs = '?',
+                                            help = 'Contact name')
+    upd_p.add_argument('groups', metavar = 'GROUP', nargs = '*',
+                                            help = 'Group names')
+
     args = parser.parse_args()
     settings = XMPPSettings()
     settings.load_arguments(args)
@@ -127,6 +249,12 @@ def main():
 
     if sys.version_info.major < 3:
         args.jid = args.jid.decode("utf-8")
+        if getattr(args, "contact", None):
+            args.contact = args.contact.decode("utf-8")
+        if getattr(args, "name", None):
+            args.name = args.name.decode("utf-8")
+        if getattr(args, "groups", None):
+            args.groups = [g.decode("utf-8") for g in args.groups]
 
     logging.basicConfig(level = args.log_level)
     if args.trace:
