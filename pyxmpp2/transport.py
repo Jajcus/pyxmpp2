@@ -52,6 +52,8 @@ from . import resolver
 
 logger = logging.getLogger("pyxmpp2.transport")
 
+IN_LOGGER = logging.getLogger("pyxmpp2.IN")
+OUT_LOGGER = logging.getLogger("pyxmpp2.OUT")
 
 class WriteJob(object):
     """Base class for objects put to the `TCPTransport` write queue."""
@@ -388,7 +390,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         :Types:
             - `data`: `bytes`
         """
-        logging.getLogger("pyxmpp2.tcp.out").debug("OUT: %r", data)
+        OUT_LOGGER.debug("OUT: %r", data)
         if self._hup or not self._socket:
             raise PyXMPPIOError(u"Connection closed.")
         try:
@@ -803,7 +805,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         :Types:
             - `data`: `unicode`
         """
-        logging.getLogger("pyxmpp2.tcp.in").debug("IN: %r", data)
+        IN_LOGGER.debug("IN: %r", data)
         if data:
             self._reader.feed(data)
         else:

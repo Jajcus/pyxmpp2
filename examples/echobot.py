@@ -106,6 +106,8 @@ def main():
     parser.add_argument('--quiet', const = logging.ERROR,
                         action = 'store_const', dest = 'log_level',
                         help = 'Print only error messages')
+    parser.add_argument('--trace', action = 'store_true',
+                        help = 'Print XML data sent and received')
 
     args = parser.parse_args()
     settings = XMPPSettings({
@@ -123,6 +125,15 @@ def main():
         args.jid = args.jid.decode("utf-8")
 
     logging.basicConfig(level = args.log_level)
+    if args.trace:
+        print "enabling trace"
+        handler = logging.StreamHandler()
+        handler.setLevel(logging.DEBUG)
+        for logger in ("pyxmpp2.IN", "pyxmpp2.OUT"):
+            logger = logging.getLogger(logger)
+            logger.setLevel(logging.DEBUG)
+            logger.addHandler(handler)
+            logger.propagate = False
 
     bot = EchoBot(JID(args.jid), settings)
     try:

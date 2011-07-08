@@ -107,6 +107,8 @@ def main():
     parser.add_argument('--quiet', const = logging.ERROR,
                         action = 'store_const', dest = 'log_level',
                         help = 'Print only error messages')
+    parser.add_argument('--trace', action = 'store_true',
+                        help = 'Print XML data sent and received')
     parser.add_argument('jid', metavar = 'JID', 
                                         help = 'The bot JID')
     subparsers = parser.add_subparsers(help = 'Action', dest = "action")
@@ -127,7 +129,16 @@ def main():
         args.jid = args.jid.decode("utf-8")
 
     logging.basicConfig(level = args.log_level)
-            
+    if args.trace:
+        print "enabling trace"
+        handler = logging.StreamHandler()
+        handler.setLevel(logging.DEBUG)
+        for logger in ("pyxmpp2.IN", "pyxmpp2.OUT"):
+            logger = logging.getLogger(logger)
+            logger.setLevel(logging.DEBUG)
+            logger.addHandler(handler)
+            logger.propagate = False
+           
     if args.action == "monitor":        
         # According to RFC6121 it could be None (no need to send initial
         # presence to request roster), but Google seems to require
