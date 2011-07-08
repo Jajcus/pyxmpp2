@@ -83,11 +83,6 @@ class EchoBot(EventHandler, XMPPFeatureHandler):
                         thread = stanza.thread)
         return msg
 
-    @event_handler(AuthorizedEvent)
-    def handle_authorized(self, event):
-        """Send the initial presence after log-in."""
-        self.client.send(Presence())
-
     @event_handler(DisconnectedEvent)
     def handle_disconnected(self, event):
         """Quit the main loop upon disconnection."""

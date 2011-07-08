@@ -33,6 +33,7 @@ from .mainloop import main_loop_factory
 from .interfaces import EventHandler, event_handler
 from .interfaces import TimeoutHandler, timeout_handler
 from .streamevents import DisconnectedEvent, AuthenticatedEvent
+from .streamevents import AuthorizedEvent
 from .transport import TCPTransport
 from .settings import XMPPSettings
 from .session import SessionHandler
@@ -41,6 +42,7 @@ from .streamsasl import StreamSASLHandler
 from .binding import ResourceBindingHandler
 from .stanzaprocessor import StanzaProcessor
 from .roster import RosterClient
+from .presence import Presence
 
 logger = logging.getLogger("pyxmpp2.client")
 
@@ -161,6 +163,8 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
         """Gracefully disconnect from the server."""
         with self.lock:
             if self.stream:
+                if self.settings[u"initial_presence"]:
+                    self.send(Presence(stanza_type = "unavailable"))
                 self.stream.disconnect()
 
     def close_stream(self):
@@ -196,6 +200,17 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
             handlers = self._base_handlers
             handlers += self.handlers + [self]
             self.setup_stanza_handlers(handlers, "post-auth")
+
+    @event_handler(AuthorizedEvent)
+    def _stream_authorized(self, event):
+        """Handle the `AuthorizedEvent`.
+        """
+        with self.lock:
+            if event.stream != self.stream:
+                return
+            presence = self.settings[u"initial_presence"]
+            if presence:
+                self.send(presence)
 
     @event_handler(DisconnectedEvent)
     def _stream_disconnected(self, event):
@@ -252,6 +267,18 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
         :Return: `RosterClient`
         """
         return RosterClient(self.settings)
+
+def _initial_presence_factory(settings):
+    """Factory for the :r:`initial_presence setting` default.
+    """
+    return Presence()
+
+XMPPSettings.add_setting(u"initial_presence",
+    factory = _initial_presence_factory,
+    default_d = u"Just ``Presence()``",
+    doc = """Default initial presence stanza, to be send on login.
+Set to ``None`` not to send the initial presence."""
+    )
 
 XMPPSettings.add_setting(u"c2s_port", default = 5222, basic = True,
     type = int, validator = XMPPSettings.get_int_range_validator(1, 65536),

@@ -70,9 +70,6 @@ class RosterTool(EventHandler):
             print
         if self.args.action == "show":
             self.client.disconnect()
-        elif self.args.action == "monitor":
-            # not needed by RFC 6121, but required by Google
-            self.client.send(Presence(priority = -1))
 
     @event_handler(RosterUpdatedEvent)
     def handle_roster_update(self, event):
@@ -130,6 +127,14 @@ def main():
         args.jid = args.jid.decode("utf-8")
 
     logging.basicConfig(level = args.log_level)
+            
+    if args.action == "monitor":        
+        # According to RFC6121 it could be None (no need to send initial
+        # presence to request roster), but Google seems to require
+        # that to send roster pushes
+        settings["initial_presence"] = Presence(priority = -1)
+    else:
+        settings["initial_presence"] = None
 
     tool = RosterTool(JID(args.jid), args, settings)
     try:
