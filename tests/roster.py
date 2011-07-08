@@ -23,19 +23,6 @@ from pyxmpp2.roster import RosterClient
 from pyxmpp2.roster import RosterReceivedEvent, RosterNotReceivedEvent
 from pyxmpp2.roster import RosterUpdatedEvent
 
-
-IQ1 = '''<iq type="get" id="1" xmlns="jabber:client">
-<query xmlns="jabber:iq:version"/>
-</iq>'''
-
-IQ2 = '''<iq type="response" id="1" xmlns="jabber:client">
-<query xmlns="jabber:iq:version">
-  <name>NAME</name>
-  <version>VERSION</version>
-  <os>OS</os>
-</query>
-</iq>'''
-
 class TestRosterItem(unittest.TestCase):
     def test_parse_empty(self):
         element = ElementTree.XML('<item xmlns="jabber:iq:roster"/>')
@@ -197,6 +184,50 @@ class TestRosterItem(unittest.TestCase):
         self.assertIsNone(item.subscription)
         self.assertIsNone(item.ask, None)
         self.assertFalse(item.approved)
+
+    def test_build_empty(self):
+        item = RosterItem(JID("test@example.org"))
+        self.assertEqual(item.jid, JID("test@example.org"))
+        self.assertIsNone(item.name)
+        self.assertIsNone(item.subscription)
+        self.assertIsNone(item.ask)
+        self.assertFalse(item.approved)
+        self.assertEqual(item.groups, set())
+        xml = item.as_xml()
+        self.assertEqual(xml.tag, "{jabber:iq:roster}item")
+        self.assertEqual(len(xml), 0)
+        self.assertEqual(xml.get("jid"), u"test@example.org")
+        self.assertEqual(xml.get("name"), None)
+        self.assertEqual(xml.get("subscription"), None)
+        self.assertEqual(xml.get("ask"), None)
+        self.assertEqual(xml.get("approved"), None)
+
+        # check if serializable
+        self.assertTrue(ElementTree.tostring(xml))
+
+    def test_build_empty(self):
+        item = RosterItem(JID("test@example.org"), "NAME", ["G1", "G2"],
+                                "from", "subscribe", "true")
+        self.assertEqual(item.jid, JID("test@example.org"))
+        self.assertEqual(item.name, "NAME")
+        self.assertEqual(item.subscription, "from")
+        self.assertEqual(item.ask, "subscribe")
+        self.assertTrue(item.approved)
+        self.assertEqual(item.groups, set(["G1", "G2"]))
+        xml = item.as_xml()
+        self.assertEqual(xml.tag, "{jabber:iq:roster}item")
+        self.assertEqual(len(xml), 2)
+        self.assertEqual(xml.get("jid"), u"test@example.org")
+        self.assertEqual(xml.get("name"), "NAME")
+        self.assertEqual(xml.get("subscription"), "from")
+        self.assertEqual(xml.get("ask"), "subscribe")
+        self.assertEqual(xml.get("approved"), "true")
+        self.assertEqual(xml[0].tag, "{jabber:iq:roster}group")
+        self.assertEqual(xml[1].tag, "{jabber:iq:roster}group")
+        self.assertEqual(set([xml[0].text, xml[1].text]), set(["G1", "G2"]))
+
+        # check if serializable
+        self.assertTrue(ElementTree.tostring(xml))
 
 class Processor(StanzaProcessor):
     def __init__(self, handlers):
