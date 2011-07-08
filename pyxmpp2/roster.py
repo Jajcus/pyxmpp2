@@ -41,7 +41,7 @@ from .interfaces import NO_CHANGE
 from .streamevents import AuthorizedEvent
 from .exceptions import BadRequestProtocolError, NotAcceptableProtocolError
 
-logger = logging.getLogger("pyxmpp2.ext.version")
+logger = logging.getLogger("pyxmpp2.roster")
 
 ROSTER_NS = u"jabber:iq:roster"
 ROSTER_QNP = u"{{{0}}}".format(ROSTER_NS)
