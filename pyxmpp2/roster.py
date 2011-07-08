@@ -27,7 +27,7 @@ __docformat__ = "restructuredtext en"
 
 import logging
 
-from collections import Mapping
+from collections import Sequence, Mapping
 
 from .etree import ElementTree
 from .settings import XMPPSettings
@@ -356,19 +356,19 @@ class RosterItem(object):
         return "<RosterItem {0!r}>".format(unicode(self.jid))
 
 @payload_element_name(QUERY_TAG)
-class RosterPayload(StanzaPayload, Mapping):
+class RosterPayload(StanzaPayload, Sequence):
     """<query/> element carried via a roster Iq stanza.
     
     Can contain a single item or whole roster with optional version 
     information.
 
-    Works like a mapping from JIDs to roster items.
+    len(), "in" and [] work like for a sequence of roster items.
 
     :Ivariables:
         - `version`: the version attribute
-        - `_items`: jid -> roster item dictionary
+        - `_items`: roster item list
     :Types:
-        - `_items`: `dict` of `JID` -> `RosterItem`
+        - `_items`: `list` of `RosterItem`
     """
     def __init__(self, items = None, version = None):
         """
@@ -380,9 +380,9 @@ class RosterPayload(StanzaPayload, Mapping):
             - `version`: `unicode`
         """
         if items is not None:
-            self._items = dict((item.jid, item) for item in items)
+            self._items = list(items)
         else:
-            self._items = {}
+            self._items = []
         self.version = version
 
     @classmethod
@@ -425,7 +425,7 @@ class RosterPayload(StanzaPayload, Mapping):
         element = ElementTree.Element(QUERY_TAG)
         if self.version is not None:
             element.set("ver", self.version)
-        for item in self._items.values():
+        for item in self._items:
             item.as_xml(element)
         return element
     
@@ -434,32 +434,41 @@ class RosterPayload(StanzaPayload, Mapping):
 
     def __len__(self):
         return len(self._items)
+    
+    def __getitem__(self, index):
+        return self._items[index]
 
-    def __contains__(self, jid):
-        return jid in self._items
+    def __eq__(self, other):
+        # pylint: disable=W0212
+        if not isinstance(other, RosterPayload):
+            return False
+        return set(self._items) == set(other._items)
 
-    def __getitem__(self, jid):
-        return self._items[jid]
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
-    def keys(self):
-        """Return the JIDs in the roster.
-        
-        :Returntype: iterable of `JID`
-        """
-        return self._items.keys()
-
-    def values(self):
+    def items(self):
         """Return the roster items.
         
         :Returntype: iterable of `RosterType`
         """
-        return self._items.values()
+        return self._items
 
-class Roster(RosterPayload):
+class Roster(RosterPayload, Mapping):
     """Represents the XMPP roster (contact list).
+
+    Works like an ordered JID->RosterItem dictionary with a few exceptions:
+        
+        - the `items()` method returns roster items (values), not JIDs (keys)
+        - for [] or get() a JID or a numeric index can be used
 
     Please note that changes to this object do not automatically affect
     any remote copy of the roster.
+
+    :Ivariables:
+        - `_jids`: jid -> item index dictionary
+    :Types:
+        - `_jids`: `dict` of `JID` -> `int`
     """
     def __init__(self, items = None, version = None):
         if items:
@@ -468,6 +477,9 @@ class Roster(RosterPayload):
                     raise ValueError("Roster item subscription cannot be"
                                                                 " 'remove'")
         RosterPayload.__init__(self, items, version)
+        self._jids = dict((item.jid, i) for i, item in enumerate(self._items))
+        if len(self._items) != len(self._jids):
+            raise ValueError(u"Duplicate JIDs")
 
     @classmethod
     def from_xml(cls, element):
@@ -475,6 +487,37 @@ class Roster(RosterPayload):
             return RosterPayload.from_xml(cls, element)
         except ValueError, err:
             raise BadRequestProtocolError(unicode(err))
+
+    def __contains__(self, value):
+        if isinstance(value, JID):
+            return value in self._jids
+        else:
+            return RosterPayload.__contains__(self, value)
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return RosterPayload.__getitem__(self, key)
+        elif isinstance(key, JID):
+            jid = self._jids[key]
+            return self._items[jid]
+        else:
+            raise TypeError("Roster items may be indexed by int or JID only")
+
+    def keys(self):
+        """Return the JIDs in the roster.
+        
+        :Returntype: iterable of `JID`
+        """
+        return self._jids.keys()
+
+    def values(self):
+        """Return the roster items.
+        
+        :Returntype: iterable of `RosterType`
+        """
+        return self._items
+
+    items = values
 
     @property
     def groups(self):
@@ -484,7 +527,7 @@ class Roster(RosterPayload):
         :ReturnType: `set` of `unicode`
         """
         groups = set()
-        for item in self._items.values():
+        for item in self._items:
             groups |= item.groups
         return groups
 
@@ -505,7 +548,7 @@ class Roster(RosterPayload):
         if not case_sensitive and name:
             name = name.lower()
         result = []
-        for item in self._items.values():
+        for item in self._items:
             if item.name == name:
                 result.append(item)
             elif item.name is None:
@@ -530,13 +573,13 @@ class Roster(RosterPayload):
         """
         result = []
         if not group:
-            for item in self._items.values():
+            for item in self._items:
                 if not item.groups:
                     result.append(item)
             return result
         if not case_sensitive:
             group = group.lower()
-        for item in self._items.values():
+        for item in self._items:
             if group in item.groups:
                 result.append(item)
             elif not case_sensitive and group in [g.lower() for g 
@@ -558,9 +601,14 @@ class Roster(RosterPayload):
             - `item`: `RosterItem`
             - `replace`: `bool`
         """
-        if item.jid in self._items and not replace:
-            raise ValueError("JID already in the roster")
-        self._items[item.jid] = item
+        if item.jid in self._jids:
+            if replace:
+                self.remove_item(item.jid)
+            else:
+                raise ValueError("JID already in the roster")
+        index = len(self._items)
+        self._items.append(item)
+        self._jids[item.jid] = index
 
     def remove_item(self, jid):
         """Remove item from the roster.
@@ -570,7 +618,10 @@ class Roster(RosterPayload):
         :Types:
             - `jid`: `JID`
         """
-        del self._items[jid]
+        if jid not in self._jids:
+            raise KeyError(jid)
+        index = self._jids.pop(jid)
+        del self._items[index]
 
 class RosterClient(XMPPFeatureHandler, EventHandler):
     """Client side implementation of the roster management (:RFC:`6121`,
@@ -624,7 +675,7 @@ class RosterClient(XMPPFeatureHandler, EventHandler):
             logger.warning("Bad roster response")
             self.event_queue.put(RosterNotReceivedEvent(self, stanza))
             return
-        items = list(payload.values())
+        items = list(payload)
         for item in items:
             item.verify_roster_result(True)
         self.roster = Roster(items, payload.version)
