@@ -634,10 +634,10 @@ class RosterClient(XMPPFeatureHandler, EventHandler):
         """Handle failure of the roster request.
         """
         if stanza:
-            logger.warning(u"Roster request failed: {0}".format(
+            logger.debug(u"Roster request failed: {0}".format(
                                                 stanza.error.condition_name))
         else:
-            logger.warning(u"Roster request failed: timeout")
+            logger.debug(u"Roster request failed: timeout")
         self.event_queue.put(RosterNotReceivedEvent(self, stanza))
 
     @iq_set_stanza_handler(RosterPayload)
