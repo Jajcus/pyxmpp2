@@ -218,7 +218,7 @@ VERSION_FEATURES = (
     "</features>")
 
 class TestRosterClient(unittest.TestCase):
-    def test_request_no_version(self):
+    def test_get_no_version(self):
         event_queue = Queue()
         settings = XMPPSettings()
         settings["event_queue"] = event_queue
@@ -259,7 +259,7 @@ class TestRosterClient(unittest.TestCase):
         self.assertEqual(event.roster_client, client)
         self.assertEqual(event.roster, client.roster)
 
-    def test_request_version(self):
+    def test_get_version(self):
         event_queue = Queue()
         settings = XMPPSettings()
         settings["event_queue"] = event_queue
@@ -297,6 +297,350 @@ class TestRosterClient(unittest.TestCase):
         self.assertEqual(event.roster_client, client)
         self.assertEqual(event.roster, client.roster)
 
+    def test_get_error(self):
+        event_queue = Queue()
+        settings = XMPPSettings()
+        settings["event_queue"] = event_queue
+        client = RosterClient(settings)
+        dispatcher = EventDispatcher(settings, [client])
+        self.assertIsNone(client.roster)
+        self.assertTrue(event_queue.empty())
+        processor = Processor([client])
+        stream = DummyStream(ElementTree.XML(EMPTY_FEATURES),
+                                                JID("test@example.org/Test"))
+        event = AuthorizedEvent(JID("test@example.org/Test"))
+        event.stream = stream
+        event_queue.put(event)
+        dispatcher.dispatch()
+        stanza = processor.stanzas_sent[0]
+        response = stanza.make_error_response("item-not-found")
+        processor.uplink_receive(response)
+        self.assertIsNone(client.roster)
+        event = event_queue.get_nowait()
+        self.assertIsInstance(event, RosterNotReceivedEvent)
+        self.assertEqual(event.roster_client, client)
+        self.assertIsNotNone(event.stanza)
+        self.assertEqual(event.stanza.stanza_id, response.stanza_id)
+
+    def test_add_item(self):
+        event_queue = Queue()
+        settings = XMPPSettings()
+        settings["event_queue"] = event_queue
+        client = RosterClient(settings)
+        dispatcher = EventDispatcher(settings, [client])
+        processor = Processor([client])
+        stream = DummyStream(ElementTree.XML(VERSION_FEATURES),
+                                                JID("test@example.org/Test"))
+        item1 = RosterItem(JID("item1@example.org"))
+        item2 = RosterItem(JID("item2@example.org"))
+        client.roster = Roster([item1, item2])
+
+        # simple add
+        client.add_item(JID("item3@example.org"))
+        self.assertEqual(len(processor.stanzas_sent), 1)
+        stanza = processor.stanzas_sent[0]
+        payload = stanza.get_payload(RosterPayload)
+        self.assertIsNotNone(payload)
+        self.assertEqual(len(payload), 1)
+        item = payload[0]
+        self.assertEqual(item.jid, JID("item3@example.org"))
+        self.assertIsNone(item.name)
+        self.assertIsNone(item.subscription)
+        self.assertFalse(item.approved)
+        self.assertFalse(item.groups)
+        response = stanza.make_result_response()
+        processor.uplink_receive(response)
+        self.assertEqual(len(client.roster), 2) # not added yet, push needed
+
+        # duplicate
+        processor.stanzas_sent = []
+        with self.assertRaises(ValueError):
+            client.add_item(JID("item2@example.org"))
+        self.assertEqual(len(processor.stanzas_sent), 0)
+
+        # add with name and groups
+        processor.stanzas_sent = []
+        client.add_item(JID("item4@example.org"), "NAME", ["GROUP1", "GROUP2"])
+        self.assertEqual(len(processor.stanzas_sent), 1)
+        stanza = processor.stanzas_sent[0]
+        payload = stanza.get_payload(RosterPayload)
+        self.assertIsNotNone(payload)
+        self.assertEqual(len(payload), 1)
+        item = payload[0]
+        self.assertEqual(item.jid, JID("item4@example.org"))
+        self.assertEqual(item.name, "NAME")
+        self.assertEqual(item.groups, set(["GROUP1", "GROUP2"]))
+        self.assertIsNone(item.subscription)
+        self.assertFalse(item.approved)
+        response = stanza.make_result_response()
+        processor.uplink_receive(response)
+
+        def callback(item):
+            callback_calls.append(item)
+        def error_callback(stanza):
+            error_callback_calls.append(stanza)
+
+        # callback
+        processor.stanzas_sent = []
+        callback_calls = []
+        error_callback_calls = []
+        client.add_item(JID("item5@example.org"),
+                            callback = callback,
+                            error_callback = error_callback)
+        self.assertEqual(len(processor.stanzas_sent), 1)
+        stanza = processor.stanzas_sent[0]
+        payload = stanza.get_payload(RosterPayload)
+        self.assertIsNotNone(payload)
+        self.assertEqual(len(payload), 1)
+        item = payload[0]
+        self.assertEqual(item.jid, JID("item5@example.org"))
+        response = stanza.make_result_response()
+        processor.uplink_receive(response)
+        self.assertEqual(len(callback_calls), 1)
+        self.assertEqual(callback_calls[0].jid, JID("item5@example.org"))
+        self.assertEqual(len(error_callback_calls), 0)
+
+        # error callback
+        processor.stanzas_sent = []
+        callback_calls = []
+        error_callback_calls = []
+        client.add_item(JID("item5@example.org"),
+                            callback = callback,
+                            error_callback = error_callback)
+        self.assertEqual(len(processor.stanzas_sent), 1)
+        stanza = processor.stanzas_sent[0]
+        payload = stanza.get_payload(RosterPayload)
+        self.assertIsNotNone(payload)
+        self.assertEqual(len(payload), 1)
+        item = payload[0]
+        self.assertEqual(item.jid, JID("item5@example.org"))
+        response = stanza.make_error_response("not-acceptable")
+        processor.uplink_receive(response)
+        self.assertEqual(len(callback_calls), 0)
+        self.assertEqual(len(error_callback_calls), 1)
+        stanza = error_callback_calls[0]
+        self.assertIsInstance(stanza, Iq)
+        self.assertEqual(stanza.stanza_id, response.stanza_id)
+
+    def test_update_item(self):
+        event_queue = Queue()
+        settings = XMPPSettings()
+        settings["event_queue"] = event_queue
+        client = RosterClient(settings)
+        dispatcher = EventDispatcher(settings, [client])
+        processor = Processor([client])
+        stream = DummyStream(ElementTree.XML(VERSION_FEATURES),
+                                                JID("test@example.org/Test"))
+        item1 = RosterItem(JID("item1@example.org"), "ITEM1")
+        item2 = RosterItem(JID("item2@example.org"), groups = [
+                                                        "GROUP1", "GROUP2"])
+        client.roster = Roster([item1, item2])
+
+        # update name
+        client.update_item(JID("item2@example.org"), "NEW_NAME")
+        self.assertEqual(len(processor.stanzas_sent), 1)
+        stanza = processor.stanzas_sent[0]
+        payload = stanza.get_payload(RosterPayload)
+        self.assertIsNotNone(payload)
+        self.assertEqual(len(payload), 1)
+        item = payload[0]
+        self.assertEqual(item.jid, JID("item2@example.org"))
+        self.assertEqual(item.name, "NEW_NAME")
+        self.assertEqual(item.groups, set(["GROUP1", "GROUP2"]))
+        self.assertIsNone(item.subscription)
+        self.assertFalse(item.approved)
+        response = stanza.make_result_response()
+        processor.uplink_receive(response)
+
+        # update groups
+        processor.stanzas_sent = []
+        client.update_item(JID("item2@example.org"), groups = ["GROUP3"])
+        self.assertEqual(len(processor.stanzas_sent), 1)
+        stanza = processor.stanzas_sent[0]
+        payload = stanza.get_payload(RosterPayload)
+        self.assertIsNotNone(payload)
+        self.assertEqual(len(payload), 1)
+        item = payload[0]
+        self.assertEqual(item.jid, JID("item2@example.org"))
+        self.assertIsNone(item.name)
+        self.assertEqual(item.groups, set(["GROUP3"]))
+        self.assertIsNone(item.subscription)
+        self.assertFalse(item.approved)
+        response = stanza.make_result_response()
+        processor.uplink_receive(response)
+
+        # clear name
+        processor.stanzas_sent = []
+        client.update_item(JID("item1@example.org"), name = None)
+        self.assertEqual(len(processor.stanzas_sent), 1)
+        stanza = processor.stanzas_sent[0]
+        payload = stanza.get_payload(RosterPayload)
+        self.assertIsNotNone(payload)
+        self.assertEqual(len(payload), 1)
+        item = payload[0]
+        self.assertEqual(item.jid, JID("item1@example.org"))
+        self.assertIsNone(item.name)
+        self.assertEqual(item.groups, set([]))
+        self.assertIsNone(item.subscription)
+        self.assertFalse(item.approved)
+        response = stanza.make_result_response()
+        processor.uplink_receive(response)
+
+        # clear groups
+        processor.stanzas_sent = []
+        client.update_item(JID("item2@example.org"), groups = None)
+        self.assertEqual(len(processor.stanzas_sent), 1)
+        stanza = processor.stanzas_sent[0]
+        payload = stanza.get_payload(RosterPayload)
+        self.assertIsNotNone(payload)
+        self.assertEqual(len(payload), 1)
+        item = payload[0]
+        self.assertEqual(item.jid, JID("item2@example.org"))
+        self.assertIsNone(item.name)
+        self.assertEqual(item.groups, set([]))
+        self.assertIsNone(item.subscription)
+        self.assertFalse(item.approved)
+        response = stanza.make_result_response()
+        processor.uplink_receive(response)
+
+        # missing item
+        processor.stanzas_sent = []
+        with self.assertRaises(KeyError):
+            client.update_item(JID("item3@example.org"), name = "NEW_NAME")
+        self.assertEqual(len(processor.stanzas_sent), 0)
+
+        def callback(item):
+            callback_calls.append(item)
+        def error_callback(stanza):
+            error_callback_calls.append(stanza)
+
+        # callback
+        processor.stanzas_sent = []
+        callback_calls = []
+        error_callback_calls = []
+        client.update_item(JID("item1@example.org"),
+                            name = "NEW_NAME",
+                            callback = callback,
+                            error_callback = error_callback)
+        self.assertEqual(len(processor.stanzas_sent), 1)
+        stanza = processor.stanzas_sent[0]
+        payload = stanza.get_payload(RosterPayload)
+        self.assertIsNotNone(payload)
+        self.assertEqual(len(payload), 1)
+        item = payload[0]
+        self.assertEqual(item.jid, JID("item1@example.org"))
+        self.assertEqual(item.name, "NEW_NAME")
+        response = stanza.make_result_response()
+        processor.uplink_receive(response)
+        self.assertEqual(len(callback_calls), 1)
+        self.assertEqual(callback_calls[0].jid, JID("item1@example.org"))
+        self.assertEqual(len(error_callback_calls), 0)
+
+        # error callback
+        processor.stanzas_sent = []
+        callback_calls = []
+        error_callback_calls = []
+        client.update_item(JID("item1@example.org"),
+                            name = "NEW_NAME",
+                            callback = callback,
+                            error_callback = error_callback)
+        self.assertEqual(len(processor.stanzas_sent), 1)
+        stanza = processor.stanzas_sent[0]
+        payload = stanza.get_payload(RosterPayload)
+        self.assertIsNotNone(payload)
+        self.assertEqual(len(payload), 1)
+        item = payload[0]
+        self.assertEqual(item.jid, JID("item1@example.org"))
+        response = stanza.make_error_response("not-acceptable")
+        processor.uplink_receive(response)
+        self.assertEqual(len(callback_calls), 0)
+        self.assertEqual(len(error_callback_calls), 1)
+        stanza = error_callback_calls[0]
+        self.assertIsInstance(stanza, Iq)
+        self.assertEqual(stanza.stanza_id, response.stanza_id)
+
+    def test_remove_item(self):
+        event_queue = Queue()
+        settings = XMPPSettings()
+        settings["event_queue"] = event_queue
+        client = RosterClient(settings)
+        dispatcher = EventDispatcher(settings, [client])
+        processor = Processor([client])
+        stream = DummyStream(ElementTree.XML(VERSION_FEATURES),
+                                                JID("test@example.org/Test"))
+        item1 = RosterItem(JID("item1@example.org"))
+        item2 = RosterItem(JID("item2@example.org"))
+        client.roster = Roster([item1, item2])
+
+        # simple remove
+        client.remove_item(JID("item1@example.org"))
+        self.assertEqual(len(processor.stanzas_sent), 1)
+        stanza = processor.stanzas_sent[0]
+        payload = stanza.get_payload(RosterPayload)
+        self.assertIsNotNone(payload)
+        self.assertEqual(len(payload), 1)
+        item = payload[0]
+        self.assertEqual(item.jid, JID("item1@example.org"))
+        self.assertIsNone(item.name)
+        self.assertEquals(item.subscription, "remove")
+        self.assertFalse(item.approved)
+        self.assertFalse(item.groups)
+        response = stanza.make_result_response()
+        processor.uplink_receive(response)
+        self.assertEqual(len(client.roster), 2) # not added yet, push needed
+
+        # missing
+        processor.stanzas_sent = []
+        with self.assertRaises(KeyError):
+            client.remove_item(JID("item3@example.org"))
+        self.assertEqual(len(processor.stanzas_sent), 0)
+
+        def callback(item):
+            callback_calls.append(item)
+        def error_callback(stanza):
+            error_callback_calls.append(stanza)
+
+        # callback
+        processor.stanzas_sent = []
+        callback_calls = []
+        error_callback_calls = []
+        client.remove_item(JID("item1@example.org"),
+                            callback = callback,
+                            error_callback = error_callback)
+        self.assertEqual(len(processor.stanzas_sent), 1)
+        stanza = processor.stanzas_sent[0]
+        payload = stanza.get_payload(RosterPayload)
+        self.assertIsNotNone(payload)
+        self.assertEqual(len(payload), 1)
+        item = payload[0]
+        self.assertEqual(item.jid, JID("item1@example.org"))
+        response = stanza.make_result_response()
+        processor.uplink_receive(response)
+        self.assertEqual(len(callback_calls), 1)
+        self.assertEqual(callback_calls[0].jid, JID("item1@example.org"))
+        self.assertEqual(len(error_callback_calls), 0)
+
+        # error callback
+        processor.stanzas_sent = []
+        callback_calls = []
+        error_callback_calls = []
+        client.remove_item(JID("item1@example.org"),
+                            callback = callback,
+                            error_callback = error_callback)
+        self.assertEqual(len(processor.stanzas_sent), 1)
+        stanza = processor.stanzas_sent[0]
+        payload = stanza.get_payload(RosterPayload)
+        self.assertIsNotNone(payload)
+        self.assertEqual(len(payload), 1)
+        item = payload[0]
+        self.assertEqual(item.jid, JID("item1@example.org"))
+        response = stanza.make_error_response("not-acceptable")
+        processor.uplink_receive(response)
+        self.assertEqual(len(callback_calls), 0)
+        self.assertEqual(len(error_callback_calls), 1)
+        stanza = error_callback_calls[0]
+        self.assertIsInstance(stanza, Iq)
+        self.assertEqual(stanza.stanza_id, response.stanza_id)
 
 def suite():
      suite = unittest.TestSuite()
