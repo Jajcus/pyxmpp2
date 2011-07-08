@@ -16,6 +16,9 @@
 #
 
 """Base interfaces of PyXMPP2.
+
+:Variables:
+    - `NO_CHANGE`: constant used as the default for some function arguments
 """
 # pylint: disable-msg=R0201
 
@@ -497,5 +500,17 @@ def stream_element_handler(element_name, usage_restriction = None):
         func._pyxmpp_usage_restriction = usage_restriction
         return func
     return decorator
+
+class _NO_CHANGE(object):
+    """Class for the `NO_CHANGE` constant.
+    """
+    # pylint: disable=C0103,R0903
+    def __str__(self):
+        return "NO_CHANGE"
+    def __repr__(self):
+        return "NO_CHANGE"
+
+NO_CHANGE = _NO_CHANGE()
+del _NO_CHANGE
 
 # vi: sts=4 et sw=4

@@ -37,6 +37,7 @@ from .interfaces import XMPPFeatureHandler
 from .interfaces import iq_set_stanza_handler
 from .interfaces import StanzaPayload, payload_element_name
 from .interfaces import EventHandler, event_handler, Event
+from .interfaces import NO_CHANGE
 from .streamevents import AuthorizedEvent
 from .exceptions import BadRequestProtocolError, NotAcceptableProtocolError
 
@@ -669,6 +670,107 @@ class RosterClient(XMPPFeatureHandler, EventHandler):
             self.roster.add_item(item, replace = True)
         self.event_queue.put(RosterUpdatedEvent(self, old_item, item))
         return stanza.make_result_response()
+
+    def add_item(self, jid, name = None, groups = None,
+                                callback = None, error_callback = None):
+        """Add a contact to the roster.
+
+        :Parameters:
+            - `jid`: contact's jid
+            - `name`: name for the contact
+            - `groups`: sequence of group names the contact should belong to
+            - `callback`: function to call when the request succeeds. It should
+              accept a single argument - a `RosterItem` describing the
+              requested change
+            - `error_callback`: function to call when the request fails. It
+              should accept a single argument - an error stanza received
+              (`None` in case of timeout)
+        :Types:
+            - `jid`: `JID`
+            - `name`: `unicode`
+            - `groups`: sequence of `unicode`
+        """
+        # pylint: disable=R0913
+        if jid in self.roster:
+            raise ValueError("{0!r} already in the roster".format(jid))
+        item = RosterItem(jid, name, groups)
+        self._roster_set(item, callback, error_callback)
+
+    def update_item(self, jid, name = NO_CHANGE, groups = NO_CHANGE,
+                                callback = None, error_callback = None):
+        """Modify a contact in the roster.
+
+        :Parameters:
+            - `jid`: contact's jid
+            - `name`: a new name for the contact
+            - `groups`: a sequence of group names the contact should belong to
+            - `callback`: function to call when the request succeeds. It should
+              accept a single argument - a `RosterItem` describing the
+              requested change
+            - `error_callback`: function to call when the request fails. It
+              should accept a single argument - an error stanza received
+              (`None` in case of timeout)
+        :Types:
+            - `jid`: `JID`
+            - `name`: `unicode`
+            - `groups`: sequence of `unicode`
+        """
+        # pylint: disable=R0913
+        item = self.roster[jid]
+        if name is NO_CHANGE and groups is NO_CHANGE:
+            return
+        if name is NO_CHANGE:
+            name = item.name
+        if groups is NO_CHANGE:
+            groups = item.groups
+        item = RosterItem(jid, name, groups)
+        self._roster_set(item, callback, error_callback)
+
+    def remove_item(self, jid, callback = None, error_callback = None):
+        """Remove a contact from the roster.
+
+        :Parameters:
+            - `jid`: contact's jid
+            - `callback`: function to call when the request succeeds. It should
+              accept a single argument - a `RosterItem` describing the
+              requested change
+            - `error_callback`: function to call when the request fails. It
+              should accept a single argument - an error stanza received
+              (`None` in case of timeout)
+        :Types:
+            - `jid`: `JID`
+        """
+        item = self.roster[jid]
+        if jid not in self.roster:
+            raise KeyError(jid)
+        item = RosterItem(jid, subscription = "remove")
+        self._roster_set(item, callback, error_callback)
+
+    def _roster_set(self, item, callback, error_callback):
+        """Send a 'roster set' to the server.
+
+        :Parameters:
+            - `item`: the requested change
+        :Types:
+            - `item`: `RosterItem`
+        """
+        stanza = Iq(to_jid = self.server, stanza_type = "set")
+        payload = RosterPayload([item])
+        stanza.set_payload(payload)
+        def success_cb(result_stanza):
+            """Success callback for roster set."""
+            if callback:
+                callback(item)
+        def error_cb(error_stanza):
+            """Error callback for roster set."""
+            if error_callback:
+                error_callback(error_stanza)
+            else:
+                logger.error("Roster change of '{0}' failed".format(item.jid))
+        processor = self.stanza_processor
+        processor.set_response_handlers(stanza, 
+                                    success_cb, error_cb)
+        processor.send(stanza)
 
 XMPPSettings.add_setting(u"roster_name_length_limit", type = int,
         default = 1023,
