@@ -73,6 +73,7 @@ Features
    
     - initiator (client) side implemented
     - cerificate verification:
+
       - 'Subject Alt Name' / 'DNS' field
       - 'Subject' / 'Common Name' field
 
@@ -80,6 +81,7 @@ Features
 
     - both initiator and receiver side
     - supported mechanisms:
+
       - PLAIN
       - DIGEST-MD5
 
