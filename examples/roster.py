@@ -31,19 +31,23 @@ import logging
 from getpass import getpass
 import argparse
 
+from collections import defaultdict
+
 from pyxmpp2.jid import JID
 from pyxmpp2.presence import Presence
 from pyxmpp2.client import Client
 from pyxmpp2.settings import XMPPSettings
 from pyxmpp2.interfaces import EventHandler, event_handler, QUIT
+from pyxmpp2.interfaces import XMPPFeatureHandler, presence_stanza_handler
 from pyxmpp2.streamevents import AuthorizedEvent, DisconnectedEvent
 from pyxmpp2.roster import RosterReceivedEvent, RosterUpdatedEvent
 
-class RosterTool(EventHandler):
+class RosterTool(EventHandler, XMPPFeatureHandler):
     """Echo Bot implementation."""
     def __init__(self, my_jid, args, settings):
         self.args = args
         self.client = Client(my_jid, [self], settings)
+        self.presence = defaultdict(dict)
 
     def run(self):
         """Request client connection and start the main loop."""
@@ -70,12 +74,35 @@ class RosterTool(EventHandler):
             groups = u",".join(
                             [u"'{0}'".format(g) for g in item.groups])
             print u"    Groups: {0}".format(groups)
+        if not self.args.presence:
+            return
+        presences = self.presence.get(item.jid)
+        if not presences:
+            print u"    OFFLINE"
+        else:
+            print u"    ONLINE:"
+            for jid, presence in presences.items():
+                if presence.show:
+                    show = u": [{0}]".format(presence.show)
+                elif not presence.status:
+                    show = u""
+                else:
+                    show = u":"
+                if presence.status:
+                    status = u" '{0}'".format(presence.status)
+                else:
+                    status = u""
+                print u"      /{0}{1}{2}".format(jid.resource, show, status)
 
     @event_handler(RosterReceivedEvent)
     def handle_roster_received(self, event):
         if self.args.action == "show":
-            self.print_roster()
-            self.client.disconnect()
+            if self.args.presence:
+                logging.info(u"Waiting for incoming presence information...")
+                self.client.main_loop.delayed_call(5, self.delayed_show)
+            else:
+                self.print_roster()
+                self.client.disconnect()
         elif self.args.action == "monitor":
             self.show_roster()
         elif self.args.action == "add":
@@ -86,6 +113,10 @@ class RosterTool(EventHandler):
             self.update_contact()
         else:
             self.client.disconnect()
+
+    def delayed_show(self):
+        self.print_roster()
+        self.client.disconnect()
 
     def print_roster(self):
         roster = self.client.roster  # event.roster would also do
@@ -199,6 +230,16 @@ class RosterTool(EventHandler):
         """Log all events."""
         logging.info(u"-- {0}".format(event))
 
+    @presence_stanza_handler()
+    def handle_available_presence(self, stanza):
+        jid = stanza.from_jid
+        self.presence[jid.bare()][jid] = stanza
+    
+    @presence_stanza_handler("unavailable")
+    def handle_unavailable_presence(self, stanza):
+        jid = stanza.from_jid
+        self.presence[jid.bare()].pop(jid, None)
+
 def main():
     """Parse the command-line arguments and run the bot."""
     parser = argparse.ArgumentParser(description = 'XMPP echo bot',
@@ -215,7 +256,10 @@ def main():
     parser.add_argument('jid', metavar = 'JID', 
                                         help = 'The bot JID')
     subparsers = parser.add_subparsers(help = 'Action', dest = "action")
-    subparsers.add_parser('show', help = 'Show roster and exit')
+    show_p = subparsers.add_parser('show', help = 'Show roster and exit')
+    show_p.add_argument('--presence', action = 'store_true',
+                        help = 'Wait 5 s for contact presence information'
+                                ' and display it with the roster')
     subparsers.add_parser('monitor', help = 
                                         'Show roster and subsequent changes')
     add_p = subparsers.add_parser('add', help = 'Add an item to the roster')
@@ -267,10 +311,10 @@ def main():
             logger.addHandler(handler)
             logger.propagate = False
            
-    if args.action == "monitor":        
-        # According to RFC6121 it could be None (no need to send initial
-        # presence to request roster), but Google seems to require
-        # that to send roster pushes
+    if args.action == "monitor" or args.presence:
+        # According to RFC6121 it could be None for 'monitor' (no need to send
+        # initial presence to request roster), but Google seems to require that
+        # to send roster pushes
         settings["initial_presence"] = Presence(priority = -1)
     else:
         settings["initial_presence"] = None
