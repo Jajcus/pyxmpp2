@@ -165,9 +165,15 @@ class StanzaProcessor(StanzaRoute):
             res_handler, err_handler = self._iq_response_handlers.pop(
                                                     (stanza_id, ufrom))
         except KeyError:
+            logger.debug("No response handler for id={0!r} from={1!r}"
+                                                .format(stanza_id, ufrom))
+            logger.debug(" from_jid: {0!r} peer: {1!r}  me: {2!r}"
+                                        .format(from_jid, self.peer, self.me))
             if ( (from_jid == self.peer or from_jid == self.me 
                             or self.me and from_jid == self.me.bare()) ):
                 try:
+                    logger.debug("  trying id={0!r} from=None"
+                                                        .format(stanza_id))
                     res_handler, err_handler = \
                             self._iq_response_handlers.pop(
                                                     (stanza_id, None))
