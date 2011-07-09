@@ -1,6 +1,6 @@
 DESTDIR="/"
 
-EXAMPLES=echobot.py send_message_client.py  simple_send_message.py
+EXAMPLES=echobot.py send_message_client.py  simple_send_message.py check_version.py roster.py
 PY2_EXAMPLES=$(addprefix examples/,$(EXAMPLES))
 PY3_EXAMPLES=$(addprefix py3-examples/,$(EXAMPLES))
 

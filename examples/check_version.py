@@ -109,7 +109,7 @@ def main():
     try:
         checker.run()
     except KeyboardInterrupt:
-        bot.disconnect()
+        checker.disconnect()
 
 if __name__ == '__main__':
     main()
