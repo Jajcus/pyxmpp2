@@ -38,7 +38,7 @@ from .interfaces import iq_set_stanza_handler
 from .interfaces import StanzaPayload, payload_element_name
 from .interfaces import EventHandler, event_handler, Event
 from .interfaces import NO_CHANGE
-from .streamevents import AuthorizedEvent
+from .streamevents import AuthorizedEvent, GotFeaturesEvent
 from .exceptions import BadRequestProtocolError, NotAcceptableProtocolError
 
 logger = logging.getLogger("pyxmpp2.roster")
@@ -49,6 +49,7 @@ QUERY_TAG = ROSTER_QNP + u"query"
 ITEM_TAG = ROSTER_QNP + u"item"
 GROUP_TAG = ROSTER_QNP + u"group"
 FEATURE_ROSTERVER = "{urn:xmpp:features:rosterver}ver"
+FEATURE_APPROVALS = "{urn:xmpp:features:pre-approval}sub"
 
 class RosterReceivedEvent(Event):
     """Event emitted when roster is received from server.
@@ -628,23 +629,45 @@ class Roster(RosterPayload, Mapping):
 class RosterClient(XMPPFeatureHandler, EventHandler):
     """Client side implementation of the roster management (:RFC:`6121`,
     section 2.)
+
+    :Parameters:
+        - `settings`: roster client settings
+        - `roster`: the roster
+        - `server`: roster server JID (usually the domain part of user JID)
+        - `server_features`: set of features supported by the server. May
+          contain ``"versioning"`` and ``"pre-approvals"``
+        - `_event_queue`: the event queue
+    :Types:
+        - `settings`: `XMPPSettings`
+        - `roster`: `Roster`
+        - `server`: `JID`
+        - `server_features`: `set` of `unicode`
+        - `_event_queue`: :std:`Queue.Queue`
     """
     def __init__(self, settings = None):
         self.settings = settings if settings else XMPPSettings()
         self.roster = None
         self.server = None
-        self.event_queue = self.settings["event_queue"]
+        self._event_queue = self.settings["event_queue"]
+        self.server_features = set()
+
+    @event_handler(GotFeaturesEvent)
+    def handle_got_features_event(self, event):
+        server_features = set()
+        logger.debug("Checking roster-related features")
+        if event.features.find(FEATURE_ROSTERVER) is not None:
+            logger.debug("  Roster versioning available")
+            server_features.add("versioning")
+        if event.features.find(FEATURE_APPROVALS) is not None:
+            logger.debug("  Subscription pre-approvals available")
+            server_features.add("pre-approvals")
+        self.server_features = server_features
 
     @event_handler(AuthorizedEvent)
     def handle_authorized_event(self, event):
         """Request roster upon login."""
-        stream = event.stream
         self.server = event.authorized_jid.bare()
-        versioning = False
-        if stream and stream.features is not None:
-            if stream.features.find(FEATURE_ROSTERVER) is not None:
-                versioning = True
-        if versioning:
+        if "versioning" in self.server_features:
             if self.roster is not None and self.roster.version is not None:
                 version = self.roster.version
             else:
@@ -673,15 +696,15 @@ class RosterClient(XMPPFeatureHandler, EventHandler):
         """Handle successful response to the roster request.
         """
         payload = stanza.get_payload(RosterPayload)
-        if not payload:
+        if payload is None:
             logger.warning("Bad roster response")
-            self.event_queue.put(RosterNotReceivedEvent(self, stanza))
+            self._event_queue.put(RosterNotReceivedEvent(self, stanza))
             return
         items = list(payload)
         for item in items:
             item.verify_roster_result(True)
         self.roster = Roster(items, payload.version)
-        self.event_queue.put(RosterReceivedEvent(self, self.roster))
+        self._event_queue.put(RosterReceivedEvent(self, self.roster))
 
     def _get_error(self, stanza):
         """Handle failure of the roster request.
@@ -691,7 +714,7 @@ class RosterClient(XMPPFeatureHandler, EventHandler):
                                                 stanza.error.condition_name))
         else:
             logger.debug(u"Roster request failed: timeout")
-        self.event_queue.put(RosterNotReceivedEvent(self, stanza))
+        self._event_queue.put(RosterNotReceivedEvent(self, stanza))
 
     @iq_set_stanza_handler(RosterPayload)
     def handle_roster_push(self, stanza):
@@ -713,7 +736,7 @@ class RosterClient(XMPPFeatureHandler, EventHandler):
         if self.roster is None:
             logger.debug("Dropping roster push - no roster here")
             return True
-        item = payload.values()[0]
+        item = payload[0]
         item.verify_roster_push(True)
         old_item = self.roster.get(item.jid)
         if item.subscription == "remove":
@@ -721,7 +744,7 @@ class RosterClient(XMPPFeatureHandler, EventHandler):
                 self.roster.remove_item(item.jid)
         else:
             self.roster.add_item(item, replace = True)
-        self.event_queue.put(RosterUpdatedEvent(self, old_item, item))
+        self._event_queue.put(RosterUpdatedEvent(self, old_item, item))
         return stanza.make_result_response()
 
     def add_item(self, jid, name = None, groups = None,
