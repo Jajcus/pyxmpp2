@@ -142,13 +142,16 @@ all. Instead, a special `settings.XMPPSettings` object is often used, which can
 hold any parameter useful by any part of the PyXMPP2. It is also used as a
 simple form of dependency injection.
 
-The `Client` class
+The Client class
 ------------------
 
-The `client.Client` joins a main loop, a client stream and some basic handlers
-together, so a client application has only to add its handlers to make it work.
+The `pyxmpp2.client.Client` joins a main loop, a client stream and some basic
+handlers (for stream encryption, authentication, resource binding and roster
+handling) together, so a client application has only to add its handlers to
+make it work.
 
-This should be the start point for most XMPP client applications.
+See the `pyxmpp2.client` module for details.  This should be the start point
+for most XMPP client applications.
 
 Logging
 -------

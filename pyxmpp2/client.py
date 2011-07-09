@@ -17,9 +17,33 @@
 
 """Basic XMPP-IM client implementation.
 
+The `Client` class provides the base for client applications.
+
+To create an XMPP client session applications should create a `Client` instance 
+providing in the constructor: a client JID, settings and handlers providing
+application behaviour (the list may contain a single handler object which will
+be 'the application). The `Client` class will provide some other handlers:
+`StreamTLSHandler`, `StreamSASLHandler`, `SessionHandler`,
+`ResourceBindingHandler` and `RosterClient`. The last one is available via the
+`Client.roster_client` attribute and should be used to manipulate the roster.
+The roster itself is available via the `Client.roster` property.
+
+The `Client` object will open an XMPP stream after the `Client.connect` method
+is called. It will send the initial presence (specified by 
+the :r:`initial_presence setting` ) upon log-in and the final presence on
+log-out.  Other presence handling, including subscriptions is the
+responsibility of the application.
+
+The API is asynchronous and actual connection is made and data exchanged in the
+main event loop. A `MainLoop` object can be passed to the `Client` constructor,
+but this is not needed, as `Client` will create one if needed. The main loop
+can be started by `Client.run()`.
+
+To close the XMPP session use the `Client.disconnect()` method.
+
 Normative reference:
   - :RFC:`6120`
-  - :RFC:`6121` (TODO: presence management)
+  - :RFC:`6121`
 """
 
 from __future__ import absolute_import, division
@@ -66,34 +90,34 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
     :Ivariables:
         - `jid`: configured JID of the client (current full JID is avialable as
           ``self.stream.jid``).
-        - `mainloop`: the main loop object
+        - `main_loop`: the main loop object
         - `settings`: configuration settings
         - `handlers`: stream and main loop handlers provided via the
           constructor
         - `stream`: the stream object when connected
-        - `lock`: lock protecting the object
+        - `roster_client`: the roster interface object
         - `_ml_handlers`: list of handlers installed by this object to at the
           main loop
     :Types:
         - `jid`: `jid.JID`
-        - `mainloop`: `mainloop.interfaces.MainLoop`
+        - `main_loop`: `main_loop.interfaces.MainLoop`
         - `settings`: `XMPPSettings`
         - `stream`: `clientstream.ClientStream`
-        - `lock`: :std:`threading.RLock`
+        - `roster_client`: `RosterClient`
     """
     # pylint: disable-msg=R0902
-    def __init__(self, jid, handlers, settings = None, mainloop = None):
+    def __init__(self, jid, handlers, settings = None, main_loop = None):
         """Initialize a Client object.
 
         :Parameters:
             - `jid`: user JID for the connection.
             - `settings`: client settings.
-            - `mainloop`: Main event loop to attach to. If None, a loop
+            - `main_loop`: Main event loop to attach to. If None, a loop
               will be created.
         :Types:
             - `jid`: `jid.JID`
             - `settings`: `settings.XMPPSettings`
-            - `mainloop`: `mainloop.interfaces.MainLoop`
+            - `main_loop`: `main_loop.interfaces.MainLoop`
         """
         self._ml_handlers = []
         self.jid = jid
@@ -105,17 +129,17 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
         self._base_handlers += [self.roster_client]
         self._ml_handlers += list(handlers) + self._base_handlers + [self]
         _move_session_handler(self._ml_handlers)
-        if mainloop is not None:
-            self.mainloop = mainloop
+        if main_loop is not None:
+            self.main_loop = main_loop
             for handler in self._ml_handlers:
-                self.mainloop.add_handler(handler)
+                self.main_loop.add_handler(handler)
         else:
-            self.mainloop = main_loop_factory(settings, self._ml_handlers)
+            self.main_loop = main_loop_factory(settings, self._ml_handlers)
         self.stream = None
 
     def __del__(self):
         for handler in self._ml_handlers:
-            self.mainloop.remove_handler(handler)
+            self.main_loop.remove_handler(handler)
         self._ml_handlers = []
 
     @property
@@ -124,10 +148,11 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
 
         Shortcut for ``self.roster_client.roster``.
         """
-        if self.roster_client is not None:
-            return self.roster_client.roster
-        else:
-            return None
+        with self.lock:
+            if self.roster_client is not None:
+                return self.roster_client.roster
+            else:
+                return None
 
     def connect(self):
         """Schedule a new XMPP c2s connection.
@@ -153,8 +178,8 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
             self.setup_stanza_handlers(handlers, "pre-auth")
             stream = ClientStream(self.jid, self, handlers, self.settings)
             stream.initiate(transport)
-            self.mainloop.add_handler(transport)
-            self.mainloop.add_handler(stream)
+            self.main_loop.add_handler(transport)
+            self.main_loop.add_handler(stream)
             self._ml_handlers += [transport, stream]
             self.stream = stream
             self.uplink = stream
@@ -179,16 +204,16 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
         self.stream.close()
         if self.stream.transport in self._ml_handlers:
             self._ml_handlers.remove(self.stream.transport)
-            self.mainloop.remove_handler(self.stream.transport)
+            self.main_loop.remove_handler(self.stream.transport)
         self.stream = None
         self.uplink = None
 
     def run(self, timeout = None):
         """Call the main loop.
 
-        Convenience wrapper for ``self.mainloop.loop``
+        Convenience wrapper for ``self.main_loop.loop``
         """
-        self.mainloop.loop(timeout)
+        self.main_loop.loop(timeout)
 
     @event_handler(AuthenticatedEvent)
     def _stream_authenticated(self, event):
@@ -226,7 +251,7 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
             if self.stream is not None and event.stream == self.stream:
                 if self.stream.transport in self._ml_handlers:
                     self._ml_handlers.remove(self.stream.transport)
-                    self.mainloop.remove_handler(self.stream.transport)
+                    self.main_loop.remove_handler(self.stream.transport)
                 self.stream = None
                 self.uplink = None
 

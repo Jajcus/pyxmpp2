@@ -17,6 +17,19 @@
 
 """XMPP-IM roster handling.
 
+This module provides a `Roster` class representing the roster (XMPP contact
+list), a `RosterClient` class for requesting the roster and manipulating 
+the roster on server and related clases (`RosterItem`, `RosterPayload`).
+
+The roster contains JIDs of the contacts, their display names, names of the
+groups they belong to and presence subscription information. 
+
+The interface provided by this module can be used to add  and remove items
+in the roster and to change the name and group infromation of the items,
+however the presence subscription should be managed by different means (handling
+of the `Presence` stanzas) and the `Roster` object provides only the current
+subscription state information.
+
 Normative reference:
   - :RFC:`6121`
 """

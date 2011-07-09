@@ -52,6 +52,7 @@ class IOThread(object):
         - `thread`: the actual thread object
         - `exc_info`: this will hold exception information tuple for the
           last exception raised in the thread.
+        - `exc_queue`: queue to put all exceptions raised in the thread.
 
     :Types:
         - `name`: `unicode`

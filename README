@@ -53,6 +53,87 @@ Python 3, you may want to check their `experimental branch`_.
 
 .. _experimental branch: http://www.mail-archive.com/dnspython-dev@howl.play-bow.org/msg00008.html
 
+Features
+--------
+
+- `RFC 6120`_ – XMPP Core:
+
+  - SRV record look-up (requires `DNSPython`_)
+
+  - XML streams:
+
+    - both initiator and receiver side
+    - 'xml:lang' attribute handling on the root element
+    - 'version' attribute handling, including special '0.9' (no version) case
+    - full XML namespace support
+    - does not generate and does not accept XML that is not well-formed
+    - stream errors
+
+  - StartTLS:
+   
+    - initiator (client) side implemented
+    - cerificate verification:
+      - 'Subject Alt Name' / 'DNS' field
+      - 'Subject' / 'Common Name' field
+
+  - SASL:
+
+    - both initiator and receiver side
+    - supported mechanisms:
+      - PLAIN
+      - DIGEST-MD5
+
+  - Resource binding
+
+  - XMPP Stanzas:
+
+    - ``<iq/>``, ``<presence/>`` and ``<message/>`` stanzas
+    - stanza errors
+
+- `RFC 6121`_ – XMPP Instant Messaging and Presence:
+
+  - Roster Management:
+
+    - versioned rosters
+    - subscription pre-approval flag
+
+- `RFC 6122`_ – XMPP Address Format:
+
+  - Full unicode support
+  - 'Nameprep' strinprep profile for the local part (for validation and
+    comparision)
+  - 'Resourceprep' for the resource part
+  - 'IDNA' encoding for the domain part
+
+- XMPP Extensions:
+
+  - `XEP-0092`_ – Software Version
+
+- I/O framework:
+
+  - asynchronous main event loop
+  - alternative implementation with threads
+  - non-blocking connect
+  - non-blocking TLS handshake
+
+- stanza processing framework:
+
+  - chained handlers for ``<message/>`` and ``<presence/>`` stanzas,
+    matched by stanza type and, optionally, payload class (derivied from
+    namespace-qualified element name)
+
+  - handlers for ``<iq type='get'/>`` and ``<iq type='set'/>`` stanzas,
+    matched by payload element name (namespace-qualified)
+
+  - handlers for ``<iq type='result'/>`` and ``<iq type='error'/>``
+    registered for outbound ``<iq type='get'/>`` and ``<iq type='set'/>``
+    stanzas and matched by the stanza id
+ 
+.. _RFC 6120: http://xmpp.org/rfcs/rfc6120.html
+.. _RFC 6121: http://xmpp.org/rfcs/rfc6121.html
+.. _RFC 6122: http://xmpp.org/rfcs/rfc6122.html
+.. _XEP-0092: http://xmpp.org/extensions/xep-0092.html
+
 Further information
 -------------------
 
