@@ -26,6 +26,7 @@ Usage:
         for the general help
 """
 
+import os
 import sys
 import logging
 from getpass import getpass
@@ -51,6 +52,13 @@ class RosterTool(EventHandler, XMPPFeatureHandler):
 
     def run(self):
         """Request client connection and start the main loop."""
+        if self.args.roster_cache and os.path.exists(self.args.roster_cache):
+            logging.info(u"Loading roster from {0!r}"
+                                            .format(self.args.roster_cache))
+            try:
+                self.client.roster_client.load_roster(self.args.roster_cache)
+            except (IOError, ValueError), err:
+                logging.error(u"Could not load the roster: {0!r}".format(err))
         self.client.connect()
         self.client.run()
 
@@ -235,6 +243,10 @@ class RosterTool(EventHandler, XMPPFeatureHandler):
     
     @event_handler(DisconnectedEvent)
     def handle_disconnected(self, event):
+        if self.client.roster and self.args.roster_cache:
+            logging.info(u"Saving roster to {0!r}"
+                                            .format(self.args.roster_cache))
+            self.client.roster_client.save_roster(self.args.roster_cache)
         return QUIT
 
     @event_handler()
@@ -294,6 +306,8 @@ def main():
                         help = 'Print only error messages')
     parser.add_argument('--trace', action = 'store_true',
                         help = 'Print XML data sent and received')
+    parser.add_argument('--roster-cache', 
+                        help = 'Store roster in this file')
     parser.add_argument('jid', metavar = 'JID', 
                                         help = 'The bot JID')
     subparsers = parser.add_subparsers(help = 'Action', dest = "action")

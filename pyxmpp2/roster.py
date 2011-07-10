@@ -500,7 +500,7 @@ class Roster(RosterPayload, Mapping):
     @classmethod
     def from_xml(cls, element):
         try:
-            return RosterPayload.from_xml(cls, element)
+            return super(Roster, cls).from_xml(element)
         except ValueError, err:
             raise BadRequestProtocolError(unicode(err))
 
@@ -664,8 +664,69 @@ class RosterClient(XMPPFeatureHandler, EventHandler):
         self._event_queue = self.settings["event_queue"]
         self.server_features = set()
 
+    def load_roster(self, source):
+        """Load roster from an XML file.
+
+        Can be used before the connection is started to load saved
+        roster copy, for efficient retrieval of versioned roster.
+
+        :Parameters:
+            - `source`: file name or a file object
+        :Types:
+            - `source`: `str` or file-like object
+        """
+        try:
+            tree = ElementTree.parse(source)
+        except ElementTree.ParseError, err:
+            raise ValueError("Invalid roster format: {0}".format(err))
+        roster = Roster.from_xml(tree.getroot())
+        for item in roster:
+            item.verify_roster_result(True)
+        self.roster = roster
+
+    def save_roster(self, dest, pretty = True):
+        """Save the roster to an XML file.
+
+        Can be used to save the last know roster copy for faster loading
+        of a verisoned roster (if server supports that).
+
+        :Parameters:
+            - `dest`: file name or a file object
+            - `pretty`: pretty-format the roster XML
+        :Types:
+            - `dest`: `str` or file-like object
+            - `pretty`: `bool`
+        """
+        if self.roster is None:
+            raise ValueError("No roster")
+        element = self.roster.as_xml()
+        if pretty:
+            if len(element):
+                element.text = u'\n  '
+            p_child = None
+            for child in element:
+                if p_child is not None:
+                    p_child.tail = u'\n  '
+                if len(child):
+                    child.text = u'\n    '
+                p_grand = None
+                for grand in child:
+                    if p_grand is not None:
+                        p_grand.tail = u'\n    '
+                    p_grand = grand
+                if p_grand is not None:
+                    p_grand.tail = u'\n  '
+                p_child = child
+            if p_child is not None:
+                p_child.tail = u"\n"
+        tree = ElementTree.ElementTree(element)
+        tree.write(dest, "utf-8")
+
     @event_handler(GotFeaturesEvent)
     def handle_got_features_event(self, event):
+        """Check for roster related features in the stream features received
+        and set `server_features` accordingly.
+        """
         server_features = set()
         logger.debug("Checking roster-related features")
         if event.features.find(FEATURE_ROSTERVER) is not None:
@@ -710,13 +771,17 @@ class RosterClient(XMPPFeatureHandler, EventHandler):
         """
         payload = stanza.get_payload(RosterPayload)
         if payload is None:
-            logger.warning("Bad roster response")
-            self._event_queue.put(RosterNotReceivedEvent(self, stanza))
-            return
-        items = list(payload)
-        for item in items:
-            item.verify_roster_result(True)
-        self.roster = Roster(items, payload.version)
+            if "versioning" in self.server_features and self.roster:
+                logger.debug("Server will send roster delta in pushes")
+            else:
+                logger.warning("Bad roster response (no payload)")
+                self._event_queue.put(RosterNotReceivedEvent(self, stanza))
+                return
+        else:
+            items = list(payload)
+            for item in items:
+                item.verify_roster_result(True)
+            self.roster = Roster(items, payload.version)
         self._event_queue.put(RosterReceivedEvent(self, self.roster))
 
     def _get_error(self, stanza):
