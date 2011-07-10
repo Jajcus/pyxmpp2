@@ -104,7 +104,7 @@ class RosterTool(EventHandler, XMPPFeatureHandler):
                 self.print_roster()
                 self.client.disconnect()
         elif self.args.action == "monitor":
-            self.show_roster()
+            self.print_roster()
         elif self.args.action == "add":
             self.add_contact()
         elif self.args.action == "remove":
@@ -220,6 +220,7 @@ class RosterTool(EventHandler, XMPPFeatureHandler):
                 print u"Item added:"
             print u"  JID: {0}".format(item.jid)
             self.print_item(item)
+        print
     
     @event_handler(DisconnectedEvent)
     def handle_disconnected(self, event):
@@ -311,7 +312,7 @@ def main():
             logger.addHandler(handler)
             logger.propagate = False
            
-    if args.action == "monitor" or args.presence:
+    if args.action == "monitor" or args.action == "show" and args.presence:
         # According to RFC6121 it could be None for 'monitor' (no need to send
         # initial presence to request roster), but Google seems to require that
         # to send roster pushes
