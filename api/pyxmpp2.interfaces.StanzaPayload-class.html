@@ -69,7 +69,10 @@
 </center>
 </center>
 <hr />
-Abstract base class for stanza payload objects.
+<p>Abstract base class for stanza payload objects.</p>
+<p>Subclasses are used to encapsulate stanza payload data
+and to reference payload type in stanza handlers or when
+requesting particular payload from a stanza.</p>
 
 <!-- ==================== NESTED CLASSES ==================== -->
 <a name="section-NestedClasses"></a>
@@ -116,24 +119,6 @@ Abstract base class for stanza payload objects.
 </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="pyxmpp2.interfaces.StanzaPayload-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">element</span>)</span><br />
-      x.__init__(...) initializes x; see help(type(x)) for signature</td>
-          <td align="right" valign="top">
-            
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type"><a class="rst-rst-rst-rst-rst-reference external rst-rst-rst-rst-reference external rst-rst-rst-reference external rst-rst-reference external rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-rst-rst-rst-rst-docutils literal rst-rst-rst-rst-docutils literal rst-rst-rst-docutils literal rst-rst-docutils literal rst-docutils literal">ElementTree.Element</tt></a></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -173,6 +158,7 @@ Abstract base class for stanza payload objects.
       <code>__format__</code>,
       <code>__getattribute__</code>,
       <code>__hash__</code>,
+      <code>__init__</code>,
       <code>__new__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
@@ -182,6 +168,42 @@ Abstract base class for stanza payload objects.
       <code>__str__</code>,
       <code>__subclasshook__</code>
       </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS METHODS ==================== -->
+<a name="section-ClassMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.interfaces.StanzaPayload-class.html#from_xml" class="summary-sig-name">from_xml</a>(<span class="summary-sig-arg">cls</span>,
+        <span class="summary-sig-arg">element</span>)</span><br />
+      Create a <code class="link">cls</code> instance from an XML element.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
     </td>
   </tr>
 </table>
@@ -213,14 +235,14 @@ Abstract base class for stanza payload objects.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x860ddac&gt;">&lt;_weakrefset.WeakSet object at 0x860ddac&gt;</code>
+        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x86cc12c&gt;">&lt;_weakrefset.WeakSet object at 0x86cc12c&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x860ddec&gt;">&lt;_weakrefset.WeakSet object at 0x860ddec&gt;</code>
+        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x86cc16c&gt;">&lt;_weakrefset.WeakSet object at 0x86cc16c&gt;</code>
     </td>
   </tr>
 <tr class="private">
@@ -234,7 +256,7 @@ Abstract base class for stanza payload objects.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x860dd4c&gt;">&lt;_weakrefset.WeakSet object at 0x860dd4c&gt;</code>
+        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x86cc0cc&gt;">&lt;_weakrefset.WeakSet object at 0x86cc0cc&gt;</code>
     </td>
   </tr>
 </table>
@@ -290,28 +312,32 @@ for stanzas with this payload.
   </td>
 </tr>
 </table>
-<a name="__init__"></a>
+<a name="from_xml"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">from_xml</span>(<span class="sig-arg">cls</span>,
         <span class="sig-arg">element</span>)</span>
-    <br /><em class="fname">(Constructor)</em>
+    <br /><em class="fname">Class Method</em>
   </h3>
   </td><td align="right" valign="top"
     >&nbsp;
     </td>
   </tr></table>
   
-  x.__init__(...) initializes x; see help(type(x)) for signature
+  Create a <code class="link">cls</code> instance from an XML element.
   <dl class="fields">
-    <dt>Overrides:
-        object.__init__
-        <dd><em class="note">(inherited documentation)</em></dd>
-    </dt>
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>element</code></strong> (<a class="rst-reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" target="_top"><tt class="rst-docutils literal">ElementTree.Element</tt></a>) - the XML element</li>
+    </ul></dd>
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@abstractclassmethod</code></li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -408,7 +434,7 @@ for stanzas with this payload.
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Jul  3 22:34:32 2011</a>
+    3.0.1 on Sun Jul 10 09:22:48 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

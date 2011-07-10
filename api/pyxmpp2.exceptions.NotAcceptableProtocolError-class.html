@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>pyxmpp2.exceptions.SASLAuthenticationFailed</title>
+  <title>pyxmpp2.exceptions.NotAcceptableProtocolError</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -44,7 +44,7 @@
       <span class="breadcrumbs">
         <a href="pyxmpp2-module.html">Package&nbsp;pyxmpp2</a> ::
         <a href="pyxmpp2.exceptions-module.html">Module&nbsp;exceptions</a> ::
-        Class&nbsp;SASLAuthenticationFailed
+        Class&nbsp;NotAcceptableProtocolError
       </span>
     </td>
     <td>
@@ -57,23 +57,22 @@
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class SASLAuthenticationFailed</h1><p class="nomargin-top"></p>
+<h1 class="epydoc">Class NotAcceptableProtocolError</h1><p class="nomargin-top"></p>
 <center>
-<center>  <map id="class_hierarchy_for_saslauthen" name="class_hierarchy_for_saslauthen">
-<area shape="rect" id="node1" href="javascript:void(0);" title="exceptions.BaseException" alt="" coords="5,6,192,34"/>
-<area shape="rect" id="node2" href="javascript:void(0);" title="exceptions.Exception" alt="" coords="21,65,176,93"/>
-<area shape="rect" id="node3" href="javascript:void(0);" title="exceptions.StandardError" alt="" coords="8,123,189,151"/>
-<area shape="rect" id="node4" href="pyxmpp2.exceptions.Error-class.html" title="Error" alt="" coords="72,182,125,210"/>
-<area shape="rect" id="node8" href="pyxmpp2.exceptions.StreamError-class.html" title="StreamError" alt="" coords="49,241,148,269"/>
-<area shape="rect" id="node5" href="pyxmpp2.exceptions.FatalStreamError-class.html" title="FatalStreamError" alt="" coords="33,299,164,327"/>
-<area shape="rect" id="node7" href="pyxmpp2.exceptions.StreamAuthenticationError-class.html" title="StreamAuthenticationError" alt="" coords="5,358,192,386"/>
-<area shape="rect" id="node6" href="pyxmpp2.exceptions.SASLAuthenticationFailed-class.html" title="SASLAuthenticationFailed" alt="" coords="7,417,191,445"/>
+<center>  <map id="class_hierarchy_for_notaccepta" name="class_hierarchy_for_notaccepta">
+<area shape="rect" id="node1" href="javascript:void(0);" title="exceptions.BaseException" alt="" coords="11,6,197,34"/>
+<area shape="rect" id="node2" href="javascript:void(0);" title="exceptions.Exception" alt="" coords="27,65,181,93"/>
+<area shape="rect" id="node3" href="javascript:void(0);" title="exceptions.StandardError" alt="" coords="13,123,195,151"/>
+<area shape="rect" id="node4" href="pyxmpp2.exceptions.Error-class.html" title="Error" alt="" coords="77,182,131,210"/>
+<area shape="rect" id="node6" href="pyxmpp2.exceptions.ProtocolError-class.html" title="ProtocolError" alt="" coords="51,241,157,269"/>
+<area shape="rect" id="node5" href="pyxmpp2.exceptions.NotAcceptableProtocolError-class.html" title="NotAcceptableProtocolError" alt="" coords="5,299,203,327"/>
 </map>
-  <img src="class_hierarchy_for_saslauthen.gif" alt='' usemap="#class_hierarchy_for_saslauthen" ismap="ismap" class="graph-without-title" />
+  <img src="class_hierarchy_for_notaccepta.gif" alt='' usemap="#class_hierarchy_for_notaccepta" ismap="ismap" class="graph-without-title" />
 </center>
 </center>
 <hr />
-Raised when stream SASL authentication fails.
+Raised when invalid stanza is processed and 'not-acceptable' error
+should be reported.
 
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
@@ -92,10 +91,33 @@ Raised when stream SASL authentication fails.
     </table>
   </td>
 </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.exceptions.NotAcceptableProtocolError-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">message</span>)</span><br />
+      x.__init__(...) initializes x; see help(type(x)) for signature</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
   <tr>
     <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.exceptions.ProtocolError-class.html">ProtocolError</a></code></b>:
+      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#__repr__">__repr__</a></code>,
+      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#__unicode__">__unicode__</a></code>,
+      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#log_ignored">log_ignored</a></code>,
+      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#log_reported">log_reported</a></code>
+      </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>exceptions.StandardError</code></b>:
-      <code>__init__</code>,
       <code>__new__</code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>exceptions.BaseException</code></b>:
@@ -104,11 +126,9 @@ Raised when stream SASL authentication fails.
       <code>__getitem__</code>,
       <code>__getslice__</code>,
       <code>__reduce__</code>,
-      <code>__repr__</code>,
       <code>__setattr__</code>,
       <code>__setstate__</code>,
-      <code>__str__</code>,
-      <code>__unicode__</code>
+      <code>__str__</code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__format__</code>,
@@ -116,6 +136,32 @@ Raised when stream SASL authentication fails.
       <code>__reduce_ex__</code>,
       <code>__sizeof__</code>,
       <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.exceptions.ProtocolError-class.html">ProtocolError</a></code></b>:
+      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#logger_ignored">logger_ignored</a></code>,
+      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#logger_reported">logger_reported</a></code>
       </p>
     </td>
   </tr>
@@ -139,9 +185,12 @@ Raised when stream SASL authentication fails.
 </tr>
   <tr>
     <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.exceptions.ProtocolError-class.html">ProtocolError</a></code></b>:
+      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#message">message</a></code>,
+      <code><a href="pyxmpp2.exceptions.ProtocolError-class.html#xmpp_name">xmpp_name</a></code>
+      </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>exceptions.BaseException</code></b>:
-      <code>args</code>,
-      <code>message</code>
+      <code>args</code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__class__</code>
@@ -149,6 +198,50 @@ Raised when stream SASL authentication fails.
     </td>
   </tr>
 </table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">message</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  x.__init__(...) initializes x; see help(type(x)) for signature
+  <dl class="fields">
+    <dt>Overrides:
+        object.__init__
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">

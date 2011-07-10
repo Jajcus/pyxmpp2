@@ -58,11 +58,30 @@
 <!-- ==================== MODULE DESCRIPTION ==================== -->
 <h1 class="epydoc">Module client</h1><p class="nomargin-top"></p>
 <p>Basic XMPP-IM client implementation.</p>
+<p>The <a href="pyxmpp2.client.Client-class.html" class="link">Client</a> class provides the base for client applications.</p>
+<p>To create an XMPP client session applications should create a <a href="pyxmpp2.client.Client-class.html" class="link">Client</a> instance
+providing in the constructor: a client JID, settings and handlers providing
+application behaviour (the list may contain a single handler object which will
+be 'the application). The <a href="pyxmpp2.client.Client-class.html" class="link">Client</a> class will provide some other handlers:
+<a href="pyxmpp2.streamtls.StreamTLSHandler-class.html" class="link">StreamTLSHandler</a>, <a href="pyxmpp2.streamsasl.StreamSASLHandler-class.html" class="link">StreamSASLHandler</a>, <a href="pyxmpp2.session.SessionHandler-class.html" class="link">SessionHandler</a>,
+<a href="pyxmpp2.binding.ResourceBindingHandler-class.html" class="link">ResourceBindingHandler</a> and RosterClient. The last one is available via the
+<a href="pyxmpp2.client.Client-class.html#roster_client" class="link">Client.roster_client</a> attribute and should be used to manipulate the roster.
+The roster itself is available via the <a href="pyxmpp2.client.Client-class.html#roster" class="link">Client.roster</a> property.</p>
+<p>The <a href="pyxmpp2.client.Client-class.html" class="link">Client</a> object will open an XMPP stream after the <a href="pyxmpp2.client.Client-class.html#connect" class="link">Client.connect</a> method
+is called. It will send the initial presence (specified by
+the <a class="rst-reference external" href="../Settings.html#initial-presence" target="_top"><tt class="rst-docutils literal">initial_presence setting</tt></a> ) upon log-in and the final presence on
+log-out.  Other presence handling, including subscriptions is the
+responsibility of the application.</p>
+<p>The API is asynchronous and actual connection is made and data exchanged in the
+main event loop. A <a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html" class="link">MainLoop</a> object can be passed to the <a href="pyxmpp2.client.Client-class.html" class="link">Client</a> constructor,
+but this is not needed, as <a href="pyxmpp2.client.Client-class.html" class="link">Client</a> will create one if needed. The main loop
+can be started by <a href="pyxmpp2.client.Client-class.html#run" class="link">Client.run()</a>.</p>
+<p>To close the XMPP session use the <a href="pyxmpp2.client.Client-class.html#disconnect" class="link">Client.disconnect()</a> method.</p>
 <dl class="rst-docutils">
 <dt>Normative reference:</dt>
 <dd><ul class="rst-first rst-last rst-simple">
 <li><a class="rst-reference external" href="http://www.faqs.org/rfcs/rfc6120.html" target="_top">RFC 6120</a></li>
-<li><a class="rst-reference external" href="http://www.faqs.org/rfcs/rfc6121.html" target="_top">RFC 6121</a> (TODO: roster and presence management)</li>
+<li><a class="rst-reference external" href="http://www.faqs.org/rfcs/rfc6121.html" target="_top">RFC 6121</a></li>
 </ul>
 </dd>
 </dl>
@@ -90,6 +109,58 @@
     </td><td class="summary">
         <a href="pyxmpp2.client.Client-class.html" class="summary-name">Client</a><br />
       Base class for an XMPP-IM client.
+    </td>
+  </tr>
+</table>
+<!-- ==================== FUNCTIONS ==================== -->
+<a name="section-Functions"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Functions</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Functions"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_move_session_handler"></a><span class="summary-sig-name">_move_session_handler</span>(<span class="summary-sig-arg">handlers</span>)</span><br />
+      Find a SessionHandler instance in the list and move it to the beginning.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_initial_presence_factory"></a><span class="summary-sig-name">_initial_presence_factory</span>(<span class="summary-sig-arg">settings</span>)</span><br />
+      Factory for the <a class="rst-reference external" href="../Settings.html#initial-presence" target="_top"><tt class="rst-docutils literal">initial_presence setting</tt></a> default.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
     </td>
   </tr>
 </table>
@@ -150,7 +221,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Jul  3 22:34:29 2011</a>
+    3.0.1 on Sun Jul 10 09:22:45 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

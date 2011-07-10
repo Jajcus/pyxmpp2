@@ -205,6 +205,17 @@ but may be useful in multi-threaded applications.</p>
 <p>Extra namespace prefix declarations to use at the stream root
 element.</p>
 </div>
+<div class="section" id="initial-presence">
+<h2>initial_presence</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">unicode</tt></li>
+<li>Default: Just <tt class="docutils literal">Presence()</tt></li>
+</ul>
+</blockquote>
+<p>Default initial presence stanza, to be send on login.
+Set to <tt class="docutils literal">None</tt> not to send the initial presence.</p>
+</div>
 <div class="section" id="ipv4">
 <h2>ipv4</h2>
 <blockquote>
@@ -274,6 +285,26 @@ response times, by the cost of higher CPU usage.</p>
 <p>JID resource to bind. Use the server-provided resource if not set.
 Automatically set to the resource of the JID provided to the <a class="reference external" href="api/pyxmpp2.clientstream.ClientStream-class.html"><tt class="docutils literal">ClientStream</tt></a>
 constructor.</p>
+</div>
+<div class="section" id="roster-group-name-length-limit">
+<h2>roster_group_name_length_limit</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">int</tt></li>
+<li>Default: <tt class="docutils literal">1023</tt></li>
+</ul>
+</blockquote>
+<p>Maximum length of roster group name.</p>
+</div>
+<div class="section" id="roster-name-length-limit">
+<h2>roster_name_length_limit</h2>
+<blockquote>
+<ul class="simple">
+<li>Type: <tt class="docutils literal">int</tt></li>
+<li>Default: <tt class="docutils literal">1023</tt></li>
+</ul>
+</blockquote>
+<p>Maximum length of roster item name.</p>
 </div>
 <div class="section" id="sasl-mechanisms">
 <h2>sasl_mechanisms</h2>
@@ -350,7 +381,7 @@ format). Not needed if the key is included in the file pointed by the
 <blockquote>
 <ul class="simple">
 <li>Type: callable</li>
-<li>Default: <tt class="docutils literal">&lt;function is_certificate_valid at 0x824c374&gt;</tt></li>
+<li>Default: <tt class="docutils literal">&lt;function is_certificate_valid at 0x840c4c4&gt;</tt></li>
 </ul>
 </blockquote>
 <p>A function to verify if a certificate is valid and if the

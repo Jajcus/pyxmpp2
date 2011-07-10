@@ -126,7 +126,7 @@ so a client application needs only to add its handlers.</p>
         <span class="summary-sig-arg">jid</span>,
         <span class="summary-sig-arg">handlers</span>,
         <span class="summary-sig-arg">settings</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">mainloop</span>=<span class="summary-sig-default">None</span>)</span><br />
+        <span class="summary-sig-arg">main_loop</span>=<span class="summary-sig-default">None</span>)</span><br />
       Initialize a Client object.</td>
           <td align="right" valign="top">
             
@@ -211,7 +211,7 @@ so a client application needs only to add its handlers.</p>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="_close_stream"></a><span class="summary-sig-name">_close_stream</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Same as <a href="pyxmpp2.client.Client-class.html#close_stream" class="link">close_stream</a> but with the <a href="pyxmpp2.client.Client-class.html#lock" class="link">lock</a> acquired.</td>
+      Same as <a href="pyxmpp2.client.Client-class.html#close_stream" class="link">close_stream</a> but with the <a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#lock" class="link">lock</a> acquired.</td>
           <td align="right" valign="top">
             
             
@@ -248,6 +248,24 @@ so a client application needs only to add its handlers.</p>
           <td><span class="summary-sig"><a href="pyxmpp2.client.Client-class.html#_stream_authenticated" class="summary-sig-name" onclick="show_private();">_stream_authenticated</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">event</span>)</span><br />
       Handle the <a href="pyxmpp2.streamevents.AuthenticatedEvent-class.html" class="link">AuthenticatedEvent</a>.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.client.Client-class.html#_stream_authorized" class="summary-sig-name" onclick="show_private();">_stream_authorized</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">event</span>)</span><br />
+      Handle the <a href="pyxmpp2.streamevents.AuthorizedEvent-class.html" class="link">AuthorizedEvent</a>.</td>
           <td align="right" valign="top">
             
             
@@ -300,6 +318,24 @@ so a client application needs only to add its handlers.</p>
         <tr>
           <td><span class="summary-sig"><a href="pyxmpp2.client.Client-class.html#base_handlers_factory" class="summary-sig-name">base_handlers_factory</a>(<span class="summary-sig-arg">self</span>)</span><br />
       Default base client handlers factory.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.client.Client-class.html#roster_client_factory" class="summary-sig-name">roster_client_factory</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Creates the RosterClient instance for the <a href="pyxmpp2.client.Client-class.html#roster_client" class="link">roster_client</a>
+attribute.</td>
           <td align="right" valign="top">
             
             
@@ -426,19 +462,18 @@ constructor
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><a class="rst-reference external" href="http://docs.python.org/library/threading.html#rlock-objects" target="_top"><tt class="rst-docutils literal">threading.RLock</tt></a></span>
+      <span class="summary-type"><a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html" class="link">main_loop.interfaces.MainLoop</a></span>
     </td><td class="summary">
-        <a name="lock"></a><span class="summary-name">lock</span><br />
-      lock object used to synchronize access to the
-<a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html" class="link">StanzaProcessor</a> object.
+        <a name="main_loop"></a><span class="summary-name">main_loop</span><br />
+      the main loop object
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html" class="link">mainloop.interfaces.MainLoop</a></span>
+      <span class="summary-type">RosterClient</span>
     </td><td class="summary">
-        <a name="mainloop"></a><span class="summary-name">mainloop</span><br />
-      the main loop object
+        <a name="roster_client"></a><span class="summary-name">roster_client</span><br />
+      the roster interface object
     </td>
   </tr>
 <tr>
@@ -460,6 +495,7 @@ constructor
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html">stanzaprocessor.StanzaProcessor</a></code></b>:
+      <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#lock">lock</a></code>,
       <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#me">me</a></code>,
       <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#peer">peer</a></code>,
       <code><a href="pyxmpp2.stanzaprocessor.StanzaProcessor-class.html#process_all_stanzas">process_all_stanzas</a></code>,
@@ -485,6 +521,14 @@ constructor
     </table>
   </td>
 </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="pyxmpp2.client.Client-class.html#roster" class="summary-name">roster</a><br />
+      Current roster.
+    </td>
+  </tr>
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
@@ -522,7 +566,7 @@ constructor
         <span class="sig-arg">jid</span>,
         <span class="sig-arg">handlers</span>,
         <span class="sig-arg">settings</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">mainloop</span>=<span class="sig-default">None</span>)</span>
+        <span class="sig-arg">main_loop</span>=<span class="sig-default">None</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
@@ -536,7 +580,7 @@ constructor
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>jid</code></strong> (<a href="pyxmpp2.jid.JID-class.html" class="link">jid.JID</a>) - user JID for the connection.</li>
         <li><strong class="pname"><code>settings</code></strong> (<a href="pyxmpp2.settings.XMPPSettings-class.html" class="link">settings.XMPPSettings</a>) - client settings.</li>
-        <li><strong class="pname"><code>mainloop</code></strong> (<a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html" class="link">mainloop.interfaces.MainLoop</a>) - Main event loop to attach to. If None, a loop
+        <li><strong class="pname"><code>main_loop</code></strong> (<a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html" class="link">main_loop.interfaces.MainLoop</a>) - Main event loop to attach to. If None, a loop
 will be created.</li>
     </ul></dd>
     <dt>Overrides:
@@ -561,7 +605,7 @@ will be created.</li>
   </tr></table>
   
   <p>Call the main loop.</p>
-<p>Convenience wrapper for <tt class="rst-docutils literal">self.mainloop.loop</tt></p>
+<p>Convenience wrapper for <tt class="rst-docutils literal">self.main_loop.loop</tt></p>
   <dl class="fields">
   </dl>
 </td></tr></table>
@@ -586,6 +630,30 @@ will be created.</li>
     <dt>Decorators:</dt>
     <dd><ul class="nomargin-top">
         <li><code>@event_handler(AuthenticatedEvent)</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_stream_authorized"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_stream_authorized</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">event</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Handle the <a href="pyxmpp2.streamevents.AuthorizedEvent-class.html" class="link">AuthorizedEvent</a>.
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@event_handler(AuthorizedEvent)</code></li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -664,6 +732,65 @@ method.</dd>
   </dl>
 </td></tr></table>
 </div>
+<a name="roster_client_factory"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">roster_client_factory</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Creates the RosterClient instance for the <a href="pyxmpp2.client.Client-class.html#roster_client" class="link">roster_client</a>
+attribute.</p>
+<p>Subclasses can provide different behaviour by overriding this. The
+overriding method can return <code class="link">None</code> if no roster client is needed.</p>
+  <dl class="fields">
+    <dt>Returns:</dt>
+        <dd>RosterClient</dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== PROPERTY DETAILS ==================== -->
+<a name="section-PropertyDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Property Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-PropertyDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="roster"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">roster</h3>
+  <p>Current roster.</p>
+<p>Shortcut for <tt class="rst-docutils literal">self.roster_client.roster</tt>.</p>
+  <dl class="fields">
+    <dt>Get Method:</dt>
+    <dd class="value"><span class="summary-sig"><i>unreachable</i>.roster(<span class="summary-sig-arg">self</span>)</span>
+        - Current roster.
+    </dd>
+  </dl>
+</td></tr></table>
+</div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
@@ -697,7 +824,7 @@ method.</dd>
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Jul  3 22:34:30 2011</a>
+    3.0.1 on Sun Jul 10 09:22:46 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

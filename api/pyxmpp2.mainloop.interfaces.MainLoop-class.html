@@ -61,11 +61,12 @@
 <h1 class="epydoc">Class MainLoop</h1><p class="nomargin-top"></p>
 <center>
 <center>  <map id="class_hierarchy_for_mainloop" name="class_hierarchy_for_mainloop">
-<area shape="rect" id="node1" href="pyxmpp2.mainloop.base.MainLoopBase-class.html" title="base.MainLoopBase" alt="" coords="83,65,232,93"/>
-<area shape="rect" id="node3" href="pyxmpp2.mainloop.poll.PollMainLoop-class.html" title="poll.PollMainLoop" alt="" coords="5,123,139,151"/>
-<area shape="rect" id="node4" href="pyxmpp2.mainloop.select.SelectMainLoop-class.html" title="select.SelectMainLoop" alt="" coords="163,123,325,151"/>
-<area shape="rect" id="node2" href="pyxmpp2.mainloop.interfaces.MainLoop-class.html" title="MainLoop" alt="" coords="200,6,285,34"/>
-<area shape="rect" id="node5" href="pyxmpp2.mainloop.threads.ThreadPool-class.html" title="threads.ThreadPool" alt="" coords="256,65,403,93"/>
+<area shape="rect" id="node1" href="pyxmpp2.mainloop.base.MainLoopBase-class.html" title="base.MainLoopBase" alt="" coords="160,65,309,93"/>
+<area shape="rect" id="node2" href="pyxmpp2.mainloop.glib.GLibMainLoop-class.html" title="glib.GLibMainLoop" alt="" coords="5,123,144,151"/>
+<area shape="rect" id="node4" href="pyxmpp2.mainloop.poll.PollMainLoop-class.html" title="poll.PollMainLoop" alt="" coords="168,123,301,151"/>
+<area shape="rect" id="node5" href="pyxmpp2.mainloop.select.SelectMainLoop-class.html" title="select.SelectMainLoop" alt="" coords="325,123,488,151"/>
+<area shape="rect" id="node3" href="pyxmpp2.mainloop.interfaces.MainLoop-class.html" title="MainLoop" alt="" coords="277,6,363,34"/>
+<area shape="rect" id="node6" href="pyxmpp2.mainloop.threads.ThreadPool-class.html" title="threads.ThreadPool" alt="" coords="333,65,480,93"/>
 </map>
   <img src="class_hierarchy_for_mainloop.gif" alt='' usemap="#class_hierarchy_for_mainloop" ismap="ismap" class="graph-without-title" />
 </center>
@@ -143,6 +144,26 @@ Base class for main loop implementations.
           <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#remove_handler" class="summary-sig-name">remove_handler</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">handler</span>)</span><br />
       Add a new handler to the main loop.</td>
+          <td align="right" valign="top">
+            
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyxmpp2.mainloop.interfaces.MainLoop-class.html#delayed_call" class="summary-sig-name">delayed_call</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">delay</span>,
+        <span class="summary-sig-arg">function</span>)</span><br />
+      Schedule function to be called from the main loop after <code class="link">delay</code>
+seconds.</td>
           <td align="right" valign="top">
             
             
@@ -259,14 +280,14 @@ Base class for main loop implementations.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x860808c&gt;">&lt;_weakrefset.WeakSet object at 0x860808c&gt;</code>
+        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x86c13ec&gt;">&lt;_weakrefset.WeakSet object at 0x86c13ec&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x86080cc&gt;">&lt;_weakrefset.WeakSet object at 0x86080cc&gt;</code>
+        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x86c142c&gt;">&lt;_weakrefset.WeakSet object at 0x86c142c&gt;</code>
     </td>
   </tr>
 <tr class="private">
@@ -280,7 +301,7 @@ Base class for main loop implementations.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x860802c&gt;">&lt;_weakrefset.WeakSet object at 0x860802c&gt;</code>
+        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x86c138c&gt;">&lt;_weakrefset.WeakSet object at 0x86c138c&gt;</code>
     </td>
   </tr>
 </table>
@@ -397,6 +418,32 @@ final iteration in progress).
     <dt>Decorators:</dt>
     <dd><ul class="nomargin-top">
         <li><code>@abstractmethod</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="delayed_call"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">delayed_call</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">delay</span>,
+        <span class="sig-arg">function</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    >&nbsp;
+    </td>
+  </tr></table>
+  
+  Schedule function to be called from the main loop after <code class="link">delay</code>
+seconds.
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>delay</code></strong> (<code class="link">float</code>) - seconds to wait</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -608,7 +655,7 @@ final iteration in progress).
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Jul  3 22:34:32 2011</a>
+    3.0.1 on Sun Jul 10 09:22:49 2011</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
