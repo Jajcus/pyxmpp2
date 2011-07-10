@@ -6,9 +6,9 @@ A roster interface example.
 
 Usage:
 
-    roster.py JID show
+    roster.py JID show [--presence]
 
-    roster.py JID monitor
+    roster.py JID monitor [--presence]
 
     roster.py JID add CONTACT [NAME] [GROUP [GROUP ...]]
 
@@ -235,12 +235,41 @@ class RosterTool(EventHandler, XMPPFeatureHandler):
     def handle_available_presence(self, stanza):
         jid = stanza.from_jid
         self.presence[jid.bare()][jid] = stanza
+        if self.args.action != "monitor":
+            return
+        if not self.args.presence:
+            return
+        print u"Presence change:"
+        if stanza.show:
+            show = u": [{0}]".format(stanza.show)
+        elif not stanza.status:
+            show = u""
+        else:
+            show = u":"
+        if stanza.status:
+            status = u" '{0}'".format(stanza.status)
+        else:
+            status = u""
+        print u"  {0} is now ONLINE{1}{2}".format(jid, show, status)
+        print
     
     @presence_stanza_handler("unavailable")
     def handle_unavailable_presence(self, stanza):
         jid = stanza.from_jid
         self.presence[jid.bare()].pop(jid, None)
 
+        if self.args.action != "monitor":
+            return
+        if not self.args.presence:
+            return
+        print u"Presence change:"
+        if stanza.status:
+            status = u": '{0}'".format(stanza.status)
+        else:
+            status = u""
+        print u"  {0} is now OFFLINE{1}".format(jid, status)
+        print
+ 
 def main():
     """Parse the command-line arguments and run the bot."""
     parser = argparse.ArgumentParser(description = 'XMPP echo bot',
@@ -261,8 +290,10 @@ def main():
     show_p.add_argument('--presence', action = 'store_true',
                         help = 'Wait 5 s for contact presence information'
                                 ' and display it with the roster')
-    subparsers.add_parser('monitor', help = 
+    mon_p = subparsers.add_parser('monitor', help = 
                                         'Show roster and subsequent changes')
+    mon_p.add_argument('--presence', action = 'store_true',
+                        help = 'Show contact presence changes too')
     add_p = subparsers.add_parser('add', help = 'Add an item to the roster')
     add_p.add_argument('contact', metavar = 'CONTACT', help = 'The JID to add')
     add_p.add_argument('name', metavar = 'NAME', nargs = '?',
