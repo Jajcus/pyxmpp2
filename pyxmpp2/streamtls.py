@@ -112,7 +112,10 @@ class StreamTLSHandler(StreamFeatureHandler, EventHandler):
                 raise TLSNegotiationFailed("StartTLS required,"
                                                 " but not supported by peer")
             return None
-        required = element.find(REQUIRED_TAG) is not None
+        if len(features) == 1:
+            required = True
+        else:
+            required = element.find(REQUIRED_TAG) is not None
         if stream.tls_established:
             logger.warning("StartTLS offerred when already established")
             return StreamFeatureNotHandled("StartTLS", mandatory = required)
