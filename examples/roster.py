@@ -10,7 +10,7 @@ Usage:
 
     roster.py JID monitor [--presence]
 
-    roster.py JID add CONTACT [NAME] [GROUP [GROUP ...]]
+    roster.py JID add [--subscribe] [--approve] CONTACT [NAME] [GROUP ...]
 
     roster.py JID remove CONTACT
 
@@ -140,6 +140,17 @@ class RosterTool(EventHandler, XMPPFeatureHandler):
                 name = self.args.name, groups = self.args.groups,
                                         callback = self._add_success,
                                             error_callback = self._add_error)
+        if self.args.subscribe:
+            presence = Presence(to_jid = self.args.contact,
+                                            stanza_type = 'subscribe')
+            self.client.send(presence)
+        if self.args.approve:
+            if "pre-approvals" not in roster_client.server_features:
+                logging.error("Subscription pre-approvals not available")
+            else:
+                presence = Presence(to_jid = self.args.contact,
+                                                stanza_type = 'subscribed')
+                self.client.send(presence)
 
     def _add_success(self, item):
         print "Roster item added: {0}".format(item.jid)
@@ -295,6 +306,11 @@ def main():
     mon_p.add_argument('--presence', action = 'store_true',
                         help = 'Show contact presence changes too')
     add_p = subparsers.add_parser('add', help = 'Add an item to the roster')
+    add_p.add_argument('--subscribe', action = 'store_true', dest = 'subscribe',
+                        help = 'Request a presence subscription too')
+    add_p.add_argument('--approve', action = 'store_true', dest = 'approve',
+                        help = 'Pre-approve subscription from the contact'
+                                                ' (requires server support)')
     add_p.add_argument('contact', metavar = 'CONTACT', help = 'The JID to add')
     add_p.add_argument('name', metavar = 'NAME', nargs = '?',
                                             help = 'Contact name')
