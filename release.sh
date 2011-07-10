@@ -35,19 +35,20 @@ require_clean_work_tree
 
 release="$1"
 
-if [[ -z "$release" || ! "$release" =~ ^[12]\.[0-9]+\.[0-9]+([-._].*)?$ ]] ; then
+if [[ -z "$release" || ! "$release" =~ ^2\.[0-9]+(\.[0-9]+|alpha[0-9]+|beta[0-9]+)$ ]] ; then
 	echo "Usage:"
 	echo "  $0  release-tag"
 	echo
-	echo "Release tag must match r'[12]\.\d+\.\d+([-._].*)?'"
+	echo "Release tag must match r'2\.\d+(\.\d+|alpha\d+|beta\d+)'"
 	exit 1
 fi
 
 git checkout "$release" || exit 1
 
+make clean
 if sed -i -e's/^version.*/version = "'$release'"/' setup.py ; then
 	rm -f pyxmpp2/version.py 2>/dev/null
-	if make dist ; then
+	if python setup.py check && make dist && python setup.py bdist_egg && python3 setup.py build --build-base=py3-build bdist_egg ; then
 		python setup.py --verbose register --strict
 	fi
 fi

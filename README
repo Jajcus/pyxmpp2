@@ -130,6 +130,9 @@ Features
   - handlers for ``<iq type='result'/>`` and ``<iq type='error'/>``
     registered for outbound ``<iq type='get'/>`` and ``<iq type='set'/>``
     stanzas and matched by the stanza id
+
+A bit more formal list of the XMPP features implemented is available in the
+wiki: https://github.com/Jajcus/pyxmpp2/wiki/Conformance-declaration
  
 .. _RFC 6120: http://xmpp.org/rfcs/rfc6120.html
 .. _RFC 6121: http://xmpp.org/rfcs/rfc6121.html
