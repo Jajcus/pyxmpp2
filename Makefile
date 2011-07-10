@@ -8,7 +8,7 @@ PY2TO3=2to3-3.2
 
 .PHONY: all build test version dist install
 .PHONY: py3-all py3-build py3-test py3-install
-.PHONY: update-doc doc cosmetics pylint.log pylint ChangeLog www publish
+.PHONY: update-doc doc pylint.log pylint ChangeLog www publish
 
 all: build test
 
