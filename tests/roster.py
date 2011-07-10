@@ -16,7 +16,7 @@ from pyxmpp2.stanzapayload import XMLPayload
 from pyxmpp2.exceptions import BadRequestProtocolError
 from pyxmpp2.exceptions import NotAcceptableProtocolError
 from pyxmpp2.mainloop.events import EventDispatcher
-from pyxmpp2.streamevents import AuthorizedEvent
+from pyxmpp2.streamevents import AuthorizedEvent, GotFeaturesEvent
 
 from pyxmpp2.roster import RosterItem, RosterPayload, Roster
 from pyxmpp2.roster import RosterClient
@@ -301,6 +301,10 @@ class TestRosterClient(unittest.TestCase):
         processor = Processor([client])
         stream = DummyStream(ElementTree.XML(VERSION_FEATURES),
                                                 JID("test@example.org/Test"))
+        event = GotFeaturesEvent(stream.features)
+        event.stream = stream
+        event_queue.put(event)
+        dispatcher.dispatch()
         event = AuthorizedEvent(JID("test@example.org/Test"))
         event.stream = stream
         event_queue.put(event)
