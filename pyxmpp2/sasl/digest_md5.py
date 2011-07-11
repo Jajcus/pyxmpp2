@@ -180,7 +180,7 @@ def _compute_response_auth(urp_hash, nonce, cnonce, nonce_count, authzid,
 
 @sasl_mechanism("DIGEST-MD5", 70)
 class DigestMD5ClientAuthenticator(ClientAuthenticator):
-    """Provides PLAIN SASL authentication for a client.
+    """Provides DIGEST-MD5 SASL authentication for a client.
 
     :Ivariables:
         - `password`: current authentication password
