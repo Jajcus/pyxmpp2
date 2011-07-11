@@ -30,7 +30,7 @@ import logging
 import hashlib
 import hmac
 
-from binascii import b2a_hex, a2b_hex, a2b_base64
+from binascii import a2b_base64
 from base64 import standard_b64encode
 
 from .core import ClientAuthenticator, ServerAuthenticator
@@ -40,13 +40,13 @@ from .saslprep import SASLPREP
         
 logger = logging.getLogger("pyxmpp2.sasl.scram")
 
-hash_factories = {
-        "SHA-1": hashlib.sha1,
-        "SHA-224": hashlib.sha224,
-        "SHA-256": hashlib.sha256,
-        "SHA-384": hashlib.sha384,
-        "SHA-512": hashlib.sha512,
-        "MD-5": hashlib.md5,
+HASH_FACTORIES = {
+        "SHA-1": hashlib.sha1,      # pylint: disable=E1101
+        "SHA-224": hashlib.sha224,  # pylint: disable=E1101
+        "SHA-256": hashlib.sha256,  # pylint: disable=E1101
+        "SHA-384": hashlib.sha384,  # pylint: disable=E1101
+        "SHA-512": hashlib.sha512,  # pylint: disable=E1101
+        "MD-5": hashlib.md5,        # pylint: disable=E1101
         }
 
 VALUE_CHARS_RE = re.compile(br"^[\x21-\x2B\x2D-\x7E]+$")
@@ -61,36 +61,55 @@ SERVER_FINAL_MESSAGE_RE = re.compile(
         br"^(?:e=(?P<error>[^,]+)|v=(?P<verifier>[a-zA-Z0-9/+=]+)(?:,.*)?)$")
 
 class SCRAMOperations(object):
+    """Functions used during SCRAM authentication and defined in the RFC.
+
+    """
     def __init__(self, hash_function_name):
         self.hash_function_name = hash_function_name
-        self.hash_factory = hash_factories[hash_function_name]
+        self.hash_factory = HASH_FACTORIES[hash_function_name]
         self.digest_size = self.hash_factory().digest_size
 
     @staticmethod
     def Normalize(str_):
+        """The Normalize(str) function.
+
+        This one also accepts Unicode string input (in the RFC only UTF-8
+        strings are used).
+        """
+        # pylint: disable=C0103
         if isinstance(str_, bytes):
             str_ = str_.decode("utf-8")
         return SASLPREP.prepare(str_).encode("utf-8")
 
     def HMAC(self, key, str_):
+        """The HMAC(key, str) function."""
+        # pylint: disable=C0103
         return hmac.new(key, str_, self.hash_factory).digest()
 
     def H(self, str_):
+        """The H(str) function."""
+        # pylint: disable=C0103
         return self.hash_factory(str_).digest()
 
     if sys.version_info.major >= 3:
         @staticmethod
+        # pylint: disable=C0103
         def XOR(str1, str2):
-            return bytes(a^b for a,b in zip(str1, str2))
+            """The XOR operator for two byte strings."""
+            return bytes(a ^ b for a, b in zip(str1, str2))
     else:
         @staticmethod
+        # pylint: disable=C0103
         def XOR(str1, str2):
-            return "".join(chr(ord(a)^ord(b)) for a,b in zip(str1, str2))
+            """The XOR operator for two byte strings."""
+            return "".join(chr(ord(a) ^ ord(b)) for a, b in zip(str1, str2))
 
     def Hi(self, str_, salt, i):
+        """The Hi(str, salt, i) function."""
+        # pylint: disable=C0103
         Uj = self.HMAC(str_, salt + b"\000\000\000\001") # U1
         result = Uj
-        for j in range(2, i + 1):
+        for _ in range(2, i + 1):
             Uj = self.HMAC(str_, Uj)               # Uj = HMAC(str, Uj-1)
             result = self.XOR(result,  Uj)         # ... XOR Uj-1 XOR Uj
         return result
@@ -128,6 +147,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         self._gs2_header = None
         self._finished = False
         self._auth_message = None
+        self._salted_password = None
 
     def start(self, username, authzid):
         """Start the authentication process initializing client state.
@@ -147,9 +167,6 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
             self.authzid = authzid
         else:
             self.authzid = ""
-        self.password = None
-        self.pformat = None
-  
         c_nonce = self.password_manager.generate_nonce().encode("utf-8")
         if not VALUE_CHARS_RE.match(c_nonce):
             c_nonce = standard_b64encode(c_nonce)
@@ -187,7 +204,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         :return: the response or a failure indicator.
         :returntype: `sasl.Response` or `sasl.Failure`
         """
-
+        # pylint: disable=R0911
         if not challenge:
             logger.debug("Empty challenge")
             return Failure("bad-challenge")
@@ -238,7 +255,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         if password is None or pformat != "plain":
             logger.debug("Couldn't get plain password."
                             " Password: {0!} Format: {0!r}".format(
-                                                self.password, self.pformat))
+                                                    password, pformat))
             return None
 
         salted_password = self.Hi(self.Normalize(password), salt,
@@ -263,6 +280,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         else:
             channel_binding = b"c=" + standard_b64encode(self._gs2_header)
 
+        # pylint: disable=C0103
         client_final_message_without_proof = (channel_binding + b",r=" + nonce)
         
         client_key = self.HMAC(salted_password, "Client Key")
@@ -349,12 +367,18 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
 
 @sasl_mechanism("SCRAM-SHA-1", 80)
 class SCRAM_SHA_1_ClientAuthenticator(SCRAMClientAuthenticator):
+    """The SCRAM-SHA-1 client authenticator.
+    """
+    # pylint: disable=C0103
     def __init__(self, password_manager):
         SCRAMClientAuthenticator.__init__(self, "SHA-1", False,
                                                             password_manager)
 
 @sasl_mechanism("SCRAM-SHA-1-PLUS", 0)
-class SCRAM_SHA_1_ClientAuthenticator(SCRAMClientAuthenticator):
+class SCRAM_SHA_1_PLIS_ClientAuthenticator(SCRAMClientAuthenticator):
+    """The SCRAM-SHA-1-PLUS client authenticator.
+    """
+    # pylint: disable=C0103
     def __init__(self, password_manager):
         SCRAMClientAuthenticator.__init__(self, "SHA-1", True,
                                                             password_manager)
