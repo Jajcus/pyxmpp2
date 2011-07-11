@@ -522,7 +522,7 @@ SASL authentication."""
 XMPPSettings.add_setting(u"sasl_mechanisms",
         type = 'list of ``unicode``',
         validator = XMPPSettings.validate_string_list,
-        default = ["DIGEST-MD5", "PLAIN"],
+        default = ["SCRAM-SHA-1", "DIGEST-MD5", "PLAIN"],
         cmdline_help = u"SASL mechanism to enable",
         doc = u"""SASL mechanism that can be used for stream authentication."""
     )

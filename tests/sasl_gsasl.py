@@ -167,6 +167,40 @@ class TestSASLClientvsGSASL(unittest.TestCase):
                          "--service-name=pyxmpp.jajcus.net"])
         self.assertFalse(ok)
 
+    def test_SCRAM_SHA_1_good_pass_no_authzid(self):
+        if "SCRAM-SHA-1" not in gsasl_server_mechanisms:
+            raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
+        pm = PasswordManager("username", "good")
+        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1", pm)
+        ok = self.try_with_gsasl("SCRAM-SHA-1", authenticator, None,
+                        ["--service=xmpp", "--realm=jajcus.net",
+                         "--host=test.pyxmpp.jajcus.net", 
+                         "--service-name=pyxmpp.jajcus.net"])
+        self.assertTrue(ok)
+
+    def test_SCRAM_SHA_1_good_pass_authzid(self):
+        if "SCRAM-SHA-1" not in gsasl_server_mechanisms:
+            raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
+        pm = PasswordManager("username", "good")
+        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1", pm)
+        ok = self.try_with_gsasl("SCRAM-SHA-1", authenticator, "zid",
+                        ["--service=xmpp", "--realm=jajcus.net",
+                         "--host=test.pyxmpp.jajcus.net", 
+                         "--service-name=pyxmpp.jajcus.net"])
+        self.assertTrue(ok)
+
+    def test_SCRAM_SHA_1_bad_pass_no_authzid(self):
+        if "SCRAM-SHA-1" not in gsasl_server_mechanisms:
+            raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
+        pm = PasswordManager("username", "bad")
+        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1", pm)
+        ok = self.try_with_gsasl("SCRAM-SHA-1", authenticator, None,
+                        ["--service=xmpp", "--realm=jajcus.net",
+                         "--host=test.pyxmpp.jajcus.net", 
+                         "--service-name=pyxmpp.jajcus.net"])
+        self.assertFalse(ok)
+
+
     @staticmethod
     def try_with_gsasl(mechanism, authenticator, authzid = None, 
                                                             gsasl_args = []):
@@ -176,7 +210,7 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         logger.debug("cmd: %r", " ".join(cmd))
         pipe = subprocess.Popen(cmd, bufsize = 1,
                         stdout = subprocess.PIPE, stdin = subprocess.PIPE,
-                                                stderr = open("/dev/null", "w"))
+                                             stderr = open("/dev/null", "w"))
         mech = pipe.stdout.readline().strip()
         logger.debug("IN: %r", mech)
         if mech != mechanism:
@@ -188,10 +222,18 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         if response:
             logger.debug("OUT: %r", response)
             pipe.stdin.write(response + "\n")
+            ignore_empty_challenge = True
+        else:
+            ignore_empty_challenge = False
         while True:
             challenge = pipe.stdout.readline().strip()
             if not challenge:
-                break
+                if ignore_empty_challenge:
+                    logger.debug("Ignoring empty initial challenge")
+                    ignore_empty_challenge = False
+                    continue
+                else:
+                    break
             if challenge.startswith('Mechanism requested'):
                 continue
             try:
@@ -339,7 +381,7 @@ def suite():
 if __name__ == '__main__':
     logger = logging.getLogger()
     logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.ERROR)
+    logger.setLevel(logging.INFO)
     unittest.TextTestRunner(verbosity=2).run(suite())
 
 # vi: sts=4 et sw=4

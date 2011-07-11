@@ -24,14 +24,14 @@ from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 
-from binascii import b2a_hex, a2b_hex
-from base64 import standard_b64encode
-
+import sys
 import re
 import logging
-
 import hashlib
 import hmac
+
+from binascii import b2a_hex, a2b_hex, a2b_base64
+from base64 import standard_b64encode
 
 from .core import ClientAuthenticator, ServerAuthenticator
 from .core import Failure, Response, Challenge, Success, Failure
@@ -53,12 +53,12 @@ VALUE_CHARS_RE = re.compile(br"^[\x21-\x2B\x2D-\x7E]+$")
 SERVER_FIRST_MESSAGE_RE = re.compile(
                                 br"^(?P<mext>m=[^\000=]+,)?"
                                 br"(?:r=(?P<nonce>[\x21-\x2B\x2D-\x7E]+)),"
-                                br"(?:s=(?P<salt>[a-zA-Z/+=]+)),"
+                                br"(?:s=(?P<salt>[a-zA-Z0-9/+=]+)),"
                                 br"(?:i=(?P<iteration_count>\d+))"
-                                br"(?:,.*)$"
+                                br"(?:,.*)?$"
                                 )
 SERVER_FINAL_MESSAGE_RE = re.compile(
-        br"^(?:e=(?P<error>[^,]+)|v=(?P<verifier>[a-zA-Z/+=]+)(?:,.*))$")
+        br"^(?:e=(?P<error>[^,]+)|v=(?P<verifier>[a-zA-Z0-9/+=]+)(?:,.*)?)$")
 
 class SCRAMOperations(object):
     def __init__(self, hash_function_name):
@@ -69,14 +69,14 @@ class SCRAMOperations(object):
     @staticmethod
     def Normalize(str_):
         if isinstance(str_, bytes):
-            str_ = data.decode("utf-8")
-        return SASLPREP.prepare(str_)
+            str_ = str_.decode("utf-8")
+        return SASLPREP.prepare(str_).encode("utf-8")
 
     def HMAC(self, key, str_):
         return hmac.new(key, str_, self.hash_factory).digest()
 
     def H(self, str_):
-        return self.hash_factory.new(str_).digest()
+        return self.hash_factory(str_).digest()
 
     if sys.version_info.major >= 3:
         @staticmethod
@@ -91,7 +91,7 @@ class SCRAMOperations(object):
         Uj = self.HMAC(str_, salt + b"\000\000\000\001") # U1
         result = Uj
         for j in range(2, i + 1):
-            Uj = self.HMAC(str_, Up)               # Uj = HMAC(str, Uj-1)
+            Uj = self.HMAC(str_, Uj)               # Uj = HMAC(str, Uj-1)
             result = self.XOR(result,  Uj)         # ... XOR Uj-1 XOR Uj
         return result
 
@@ -123,11 +123,11 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         self.username = None
         self.authzid = None
         self._c_nonce = None
-        self._nonce = None
         self._server_first_message = False
         self._client_first_message_bare = False
         self._gs2_header = None
         self._finished = False
+        self._auth_message = None
 
     def start(self, username, authzid):
         """Start the authentication process initializing client state.
@@ -156,12 +156,12 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         self._c_nonce = c_nonce
 
         if self.channel_binding:
+            # TODO: actual channel binding type
+            cb_flag = b"p=tls-server-end-point"
+        else:
             # TODO: 'y' flag - when channel binding is supported, server
             #                  did not provided it
             cb_flag = b"n"
-        else:
-            # TODO: actual channel binding type
-            cb_flag = b"p=tls-server-end-point"
 
         if authzid:
             authzid = b"a=" + authzid.encode("utf-8")
@@ -170,8 +170,8 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         gs2_header = cb_flag + b"," + authzid + b","
         self._gs2_header = gs2_header
         nonce = b"r=" + c_nonce 
-        client_first_message_bare = (self.username.encode("utf-8") + 
-                                                        b"," + self.nonce)
+        client_first_message_bare = (b"n=" + self.username.encode("utf-8") + 
+                                                        b"," + nonce)
         self._client_first_message_bare = client_first_message_bare
         client_first_message = gs2_header + client_first_message_bare
         return Response(client_first_message)
@@ -214,7 +214,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
 
         salt = match.group("salt")
         try:
-            salt = salt.decode("base64")
+            salt = a2b_base64(salt)
         except ValueError:
             logger.debug("Bad base64 encoding for salt: {0!r}".format(salt))
             return Failure("bad-challenge")
@@ -228,7 +228,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
 
         return self._make_response(nonce, salt, iteration_count)
 
-    def _get_client_key(self, salt, iteration_count):
+    def _get_salted_password(self, salt, iteration_count):
         """Compute the ClientKey from the password provided by the password
         manager.
         """
@@ -241,9 +241,10 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
                                                 self.password, self.pformat))
             return None
 
-        salted_password = self.Hi(Normalize(password), salt, iteration_count)
-        client_key = self.HMAC(salted_password, "Client Key")
-        return client_key
+        salted_password = self.Hi(self.Normalize(password), salt,
+                                                            iteration_count)
+        self._salted_password = salted_password
+        return salted_password
 
     def _make_response(self, nonce, salt, iteration_count):
         """Make a response for the first challenge from the server.
@@ -251,8 +252,8 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         :return: the response or a failure indicator.
         :returntype: `sasl.Response` or `sasl.Failure`"""
 
-        client_key = self.get_client_key(salt, iteration_count)
-        if client_key is None:
+        salted_password = self._get_salted_password(salt, iteration_count)
+        if salted_password is None:
             return Failure("password-unavailable")
 
         if self.channel_binding:
@@ -262,9 +263,14 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         else:
             channel_binding = b"c=" + standard_b64encode(self._gs2_header)
 
-        client_final_message_without_proof = (channel_binding + b"," +
-                                                                self._nonce)
+        client_final_message_without_proof = (channel_binding + b",r=" + nonce)
+        
+        client_key = self.HMAC(salted_password, "Client Key")
         stored_key = self.H(client_key)
+        auth_message = ( self._client_first_message_bare + b"," +
+                                    self._server_first_message + b"," +
+                                        client_final_message_without_proof )
+        self._auth_message = auth_message
         client_signature = self.HMAC(stored_key, auth_message)
         client_proof = self.XOR(client_key, client_signature)
         proof = b"p=" + standard_b64encode(client_proof)
@@ -294,14 +300,20 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
 
         error = match.group("error")
         if error:
-            return Failure(error.decode("utf-8"))
+            logger.debug("Server returned SCRAM error: {0!r}".format(error))
+            return Failure(u"scram-" + error.decode("utf-8"))
 
         verifier = match.group("verifier")
         if not verifier:
             logger.debug("No verifier value in the final message")
             return Failure("bad-succes")
-
-        # TODO: check the verifier
+        
+        salted_password = self._salted_password
+        server_key = self.HMAC(salted_password, "Server Key")
+        server_signature = self.HMAC(server_key, self._auth_message)
+        if server_signature != a2b_base64(verifier):
+            logger.debug("Server verifier does not match")
+            return Failure("bad-succes")
 
         self._finished = True
         return Response(b"")

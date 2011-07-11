@@ -32,6 +32,7 @@ from .core import CLIENT_MECHANISMS_D, SERVER_MECHANISMS_D
 from . import plain
 from . import external
 from . import digest_md5
+from . import scram
 
 try:
     from . import gssapi
