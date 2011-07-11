@@ -45,6 +45,19 @@ def b1_mapping(char):
     else:
         return None
 
+def c12_mapping(char):
+    """Do mapping of RFC 3454 C.1.2 space characters to ' '.
+
+    :Parameters:
+        - `char`: Unicode character to map.
+
+    :returns: u" " if there is `char` code in the table, `None` otherwise.
+    """
+    if stringprep.in_table_c12(char):
+        return u" "
+    else:
+        return None
+
 def nfkc(data):
     """Do NFKC normalization of Unicode data.
 
