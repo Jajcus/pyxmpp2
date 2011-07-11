@@ -283,7 +283,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         # pylint: disable=C0103
         client_final_message_without_proof = (channel_binding + b",r=" + nonce)
         
-        client_key = self.HMAC(salted_password, "Client Key")
+        client_key = self.HMAC(salted_password, b"Client Key")
         stored_key = self.H(client_key)
         auth_message = ( self._client_first_message_bare + b"," +
                                     self._server_first_message + b"," +
@@ -327,7 +327,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
             return Failure("bad-succes")
         
         salted_password = self._salted_password
-        server_key = self.HMAC(salted_password, "Server Key")
+        server_key = self.HMAC(salted_password, b"Server Key")
         server_signature = self.HMAC(server_key, self._auth_message)
         if server_signature != a2b_base64(verifier):
             logger.debug("Server verifier does not match")
