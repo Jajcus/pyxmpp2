@@ -178,6 +178,7 @@ class PasswordManager:
         elif pwd_format in (u"md5:user:realm:password"):
             logger.debug("got md5:user:realm:password password: {0!r}"
                                                             .format(pwd))
+            realm = properties.get("realm")
             if realm is None:
                 realm = ""
             else:
@@ -299,7 +300,7 @@ class Success(Reply):
 
     def __repr__(self):
         return "<sasl.Success: {0!r} data: {1!r}>".format(
-                                                    self.properites, self.data)
+                                                    self.properties, self.data)
 
 class ClientAuthenticator:
     """Base class for client authenticators.
@@ -336,6 +337,7 @@ class ClientAuthenticator:
 
         :Return: if the mechanism can be used with those properties
         """
+        # pylint: disable=E0213,W0613,R0201
         return False
 
     @abstractmethod

@@ -548,6 +548,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         self.last_nonce_count = None
         self.in_properties = None
         self.out_properties = None
+        self.realm = None
 
     def start(self, properties, initial_response):
         _unused = initial_response
@@ -556,12 +557,15 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         params = []
         realms = properties.get("realms")
         if realms:
-            self.realm = _quote(realms[0])
+            self.realm = realms[0]
             for realm in realms:
-                realm = _quote(realm)
+                realm = _quote(realm.encode("utf-8"))
                 params.append(b'realm="' + realm + b'"')
         else:
             self.realm = properties.get("realm")
+            if self.realm:
+                realm = _quote(self.realm.encode("utf-8"))
+                params.append(b'realm="' + realm + b'"')
         nonce = _quote(self.password_manager.generate_nonce())
         self.nonce = nonce
         params.append(b'nonce="' + nonce + b'"')

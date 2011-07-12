@@ -190,7 +190,7 @@ class StreamSASLHandler(StreamFeatureHandler):
         stream.write_element(element)
 
         if isinstance(ret, sasl.Success):
-            if not self._check_authorization(ret.properties):
+            if not self._check_authorization(ret.properties, stream):
                 element = ElementTree.Element(FAILURE_TAG)
                 ElementTree.SubElement(element, SASL_QNP + "invalid-authzid")
                 return True
@@ -259,7 +259,7 @@ class StreamSASLHandler(StreamFeatureHandler):
         stream.write_element(element)
 
         if isinstance(ret, sasl.Success):
-            if not self._check_authorization(ret.properties):
+            if not self._check_authorization(ret.properties, stream):
                 element = ElementTree.Element(FAILURE_TAG)
                 ElementTree.SubElement(element, SASL_QNP + "invalid-authzid")
                 return True
@@ -277,7 +277,7 @@ class StreamSASLHandler(StreamFeatureHandler):
                                                             .format(ret.reson))
         return True
 
-    def _check_authorization(self, properties):
+    def _check_authorization(self, properties, stream):
         """Check authorization id and other properties returned by the
         authentication mechanism.
         
@@ -307,7 +307,7 @@ class StreamSASLHandler(StreamFeatureHandler):
             result = False
         elif jid.local != properties["username"]:
             result = False
-        elif jid.domain != self.me.domain:
+        elif jid.domain != stream.me.domain:
             result = False
         elif jid.resource:
             result = False

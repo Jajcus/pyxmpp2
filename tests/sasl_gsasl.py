@@ -129,6 +129,7 @@ class TestSASLClientvsGSASL(unittest.TestCase):
                       }
         ok, props = self.try_with_gsasl("PLAIN", authenticator, auth_prop)
         self.assertFalse(ok)
+        self.assertFalse(props.get("authzid"))
 
     def test_DIGEST_MD5_good_pass_no_authzid(self):
         if "DIGEST-MD5" not in gsasl_server_mechanisms:
@@ -184,50 +185,59 @@ class TestSASLClientvsGSASL(unittest.TestCase):
                          "--service-name=pyxmpp.jajcus.net"])
         self.assertFalse(ok)
 
-    def no_test_SCRAM_SHA_1_good_pass_no_authzid(self):
+    def test_SCRAM_SHA_1_good_pass_no_authzid(self):
         if "SCRAM-SHA-1" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
         pm = PasswordManager("username", "good")
         authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1", pm)
-        ok = self.try_with_gsasl("SCRAM-SHA-1", authenticator, None,
-                        ["--service=xmpp", "--realm=jajcus.net",
-                         "--host=test.pyxmpp.jajcus.net", 
-                         "--service-name=pyxmpp.jajcus.net"])
+        auth_prop = {
+                        "username": u"username",
+                      }
+        ok, props = self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
+                                            ["--no-cb"])
         self.assertTrue(ok)
+        self.assertFalse(props.get("authzid"))
 
-    def no_test_SCRAM_SHA_1_good_pass_authzid(self):
+    def test_SCRAM_SHA_1_good_pass_authzid(self):
         if "SCRAM-SHA-1" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
         pm = PasswordManager("username", "good")
         authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1", pm)
-        ok = self.try_with_gsasl("SCRAM-SHA-1", authenticator, "zid",
-                        ["--service=xmpp", "--realm=jajcus.net",
-                         "--host=test.pyxmpp.jajcus.net", 
-                         "--service-name=pyxmpp.jajcus.net"])
+        auth_prop = {
+                        "username": u"username",
+                        "authzid": u"zid",
+                      }
+        ok, props = self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
+                                            ["--no-cb"])
         self.assertTrue(ok)
+        self.assertEqual(props.get("authzid"), "zid")
 
-    def no_test_SCRAM_SHA_1_bad_pass_no_authzid(self):
+    def test_SCRAM_SHA_1_bad_pass_no_authzid(self):
         if "SCRAM-SHA-1" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
         pm = PasswordManager("username", "bad")
         authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1", pm)
-        ok = self.try_with_gsasl("SCRAM-SHA-1", authenticator, None,
-                        ["--service=xmpp", "--realm=jajcus.net",
-                         "--host=test.pyxmpp.jajcus.net", 
-                         "--service-name=pyxmpp.jajcus.net"])
+        auth_prop = {
+                        "username": u"username",
+                      }
+        ok, props = self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
+                                            ["--no-cb"])
         self.assertFalse(ok)
-
 
     @staticmethod
     def try_with_gsasl(mechanism, authenticator, auth_properties, 
                                                             gsasl_args = []):
-        cmd = ["gsasl", "--server", "--quiet",
+        cmd = ["gsasl", "--server",
                 "--mechanism=" + mechanism, "--password=good", 
                 "-a username"] + gsasl_args
-        logger.debug("cmd: %r", " ".join(cmd))
-        pipe = subprocess.Popen(cmd, bufsize = 1,
-                        stdout = subprocess.PIPE, stdin = subprocess.PIPE,
-                                             stderr = open("/dev/null", "w"))
+        if logger.isEnabledFor(logging.DEBUG):
+            stderr = None
+            logger.debug("cmd: %r", " ".join(cmd))
+        else:
+            cmd.append("--quiet")
+            stderr = open("/dev/null", "w")
+        pipe = subprocess.Popen(cmd, bufsize = 1, stdout = subprocess.PIPE,
+                        stdin = subprocess.PIPE, stderr = stderr)
         mech = pipe.stdout.readline().strip()
         logger.debug("IN: %r", mech)
         if mech != mechanism:
@@ -345,13 +355,17 @@ class TestSASLServervsGSASL(unittest.TestCase):
 
     @staticmethod
     def try_with_gsasl(mechanism, authenticator, auth_prop, gsasl_args = []):
-        cmd = ["gsasl", "--client", "--quiet",
+        cmd = ["gsasl", "--client",
                 "--mechanism=" + mechanism, "--password=good",
                 "--authentication-id=username"] + gsasl_args
-        logger.debug("cmd: %r", " ".join(cmd))
-        pipe = subprocess.Popen(cmd, bufsize = 1,
-                        stdout = subprocess.PIPE, stdin = subprocess.PIPE,
-                                                stderr = open("/dev/null", "w"))
+        if logger.isEnabledFor(logging.DEBUG):
+            stderr = None
+            logger.debug("cmd: %r", " ".join(cmd))
+        else:
+            cmd.append("--quiet")
+            stderr = open("/dev/null", "w")
+        pipe = subprocess.Popen(cmd, bufsize = 1, stdout = subprocess.PIPE,
+                                    stdin = subprocess.PIPE, stderr = stderr)
         mech = pipe.stdout.readline().strip()
         logger.debug("IN: %r", mech)
         if mech != mechanism:

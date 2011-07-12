@@ -47,10 +47,14 @@ class GSSAPIClientAuthenticator(ClientAuthenticator):
         self.step = None
         self.authzid = None
 
-    def start(self, username, authzid):
-        self.username = username
-        self.authzid = authzid
-        _unused, self._gss = kerberos.authGSSClientInit(authzid or 
+    @classmethod
+    def are_properies_sufficient(cls, properites):
+        return "username" in properites
+
+    def start(self, properties):
+        self.username = properties["username"]
+        self.authzid = properties.get("authzid")
+        _unused, self._gss = kerberos.authGSSClientInit(self.authzid or 
                         "{0}@{1}".format("xmpp", 
                                     self.password_manager.get_serv_host()))
         self.step = 0
@@ -77,7 +81,6 @@ class GSSAPIClientAuthenticator(ClientAuthenticator):
         self.username = kerberos.authGSSClientUserName(self._gss)
         logger.debug("Authenticated as {0!r}".format(
                                     kerberos.authGSSClientUserName(self._gss)))
-        return Success(self.username, None, self.authzid)
-
+        return Success({"username": self.username, "authzid": self.authzid})
 
 # vi: sts=4 et sw=4

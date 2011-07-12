@@ -149,24 +149,13 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         self._auth_message = None
         self._salted_password = None
 
-    def start(self, username, authzid):
-        """Start the authentication process initializing client state.
+    @classmethod
+    def are_properies_sufficient(cls, properites):
+        return "username" in properites
 
-        :Parameters:
-            - `username`: username (authentication id).
-            - `authzid`: authorization id.
-        :Types:
-            - `username`: `unicode`
-            - `authzid`: `unicode`
-
-        :return: the (empty) initial response
-        :returntype: `sasl.Response` or `sasl.Failure`
-        """
-        self.username = username
-        if authzid:
-            self.authzid = authzid
-        else:
-            self.authzid = ""
+    def start(self, properties):
+        self.username = properties["username"]
+        self.authzid = properties.get("authzid", u"")
         c_nonce = self.password_manager.generate_nonce().encode("utf-8")
         if not VALUE_CHARS_RE.match(c_nonce):
             c_nonce = standard_b64encode(c_nonce)
@@ -180,8 +169,8 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
             #                  did not provided it
             cb_flag = b"n"
 
-        if authzid:
-            authzid = b"a=" + authzid.encode("utf-8")
+        if self.authzid:
+            authzid = b"a=" + self.authzid.encode("utf-8")
         else:
             authzid = b""
         gs2_header = cb_flag + b"," + authzid + b","
@@ -250,7 +239,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         manager.
         """
         password, pformat = self.password_manager.get_password(self.username, 
-                                                                    ["plain"])
+                                                        ["plain"], {})
 
         if password is None or pformat != "plain":
             logger.debug("Couldn't get plain password."
@@ -353,13 +342,14 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
             logger.debug("Got success too early")
             return Failure("bad-success")
         if self._finished:
-            return Success(self.username, None, self.authzid)
+            return Success({"username": self.username, "authzid": self.authzid})
         else:
             ret = self._final_challenge(data)
             if isinstance(ret, Failure):
                 return ret
             if self._finished:
-                return Success(self.username, None, self.authzid)
+                return Success({"username": self.username,
+                                                    "authzid": self.authzid})
             else:
                 logger.debug("Something went wrong when processing additional"
                                                         " data with success?")

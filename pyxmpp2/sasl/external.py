@@ -19,7 +19,6 @@
 
 Normative reference:
   - `RFC 6120 <http://www.ietf.org/rfc/rfc3920.txt>`__
-  - `RFC 3920bis <http://xmpp.org/internet-drafts/draft-saintandre-rfc3920bis-08.html#security>`__
   - `XEP-0178 <http://xmpp.org/extensions/xep-0178.html#c2s>`__
 """
 
@@ -36,17 +35,22 @@ class ExternalClientAuthenticator(ClientAuthenticator):
     def __init__(self, password_manager):
         ClientAuthenticator.__init__(self, password_manager)
         self.password_manager = password_manager
-        self.username = None
         self.authzid = None
 
-    def start(self, username, authzid):
-        self.username = username
-        self.authzid = authzid
+    @classmethod
+    def are_properies_sufficient(cls, properites):
+        return True
+
+    def start(self, properties):
+        self.authzid = properties.get("authzid")
         # TODO: This isn't very XEP-0178'ish.
         # XEP-0178 says "=" should be sent when only one id-on-xmppAddr is 
         # in the cert, but we don't know that. Still, this conforms to the
         # standard and works.
-        return Response(self.authzid)
+        if self.authzid:
+            return Response(self.authzid)
+        else:
+            return Response(b"")
 
     def finish(self, data):
         """Handle authentication success information from the server.
@@ -58,6 +62,4 @@ class ExternalClientAuthenticator(ClientAuthenticator):
 
         :return: a success indicator.
         :returntype: `Success`"""
-        return Success(self.username, None, self.authzid)
-
-# vi: sts=4 et sw=4
+        return Success({"authzid": self.authzid})
