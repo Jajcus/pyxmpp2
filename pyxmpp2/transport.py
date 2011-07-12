@@ -184,6 +184,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._state = "connected"
             self._socket.setblocking(False)
         self._event_queue = self.settings["event_queue"]
+        self._auth_properties = {}
 
     def _set_state(self, state):
         """Set `_state` and notify any threads waiting for the change.
@@ -351,6 +352,14 @@ class TCPTransport(XMPPTransport, IOHandler):
                 self._write_queue.clear()
                 self._write_queue_cond.notify()
                 raise
+        self._connected()
+
+    def _connected(self):
+        """Handle connection success."""
+        self._auth_properties['remote-ip'] = self._dst_addr[0]
+        self._auth_properties['service-domain'] = self._dst_name
+        self._auth_properties['service-hostname'] = self._dst_hostname
+        self._auth_properties['security-layer'] = None
         self.event(ConnectedEvent(self._dst_addr))
         self._set_state("connected")
         self._stream.transport_connected()
@@ -378,9 +387,7 @@ class TCPTransport(XMPPTransport, IOHandler):
                 self._socket = None
                 self._set_state("aborted")
                 raise
-        self._set_state("connected")
-        self._stream.transport_connected()
-        self.event(ConnectedEvent(self._dst_addr))
+        self._connected()
 
     def _write(self, data):
         """Write raw data to the socket.
@@ -658,6 +665,8 @@ class TCPTransport(XMPPTransport, IOHandler):
                 raise
         self._tls_state = "connected"
         self._set_state("connected")
+        self._auth_properties['security-layer'] = "TLS"
+        self._auth_properties['channel-binding'] = {}
         self.event(TLSConnectedEvent(self._socket.cipher(),
                                                 self._socket.getpeercert()))
 
@@ -822,4 +831,8 @@ class TCPTransport(XMPPTransport, IOHandler):
         if self._stream:
             event.stream = self._stream
         self._event_queue.put(event)
+
+    @property
+    def auth_properties(self):
+        return self._auth_properties
 

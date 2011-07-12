@@ -649,6 +649,15 @@ class StreamBase(XMLStreamHandler):
         # pylint: disable-msg=R0201
         return stanza
 
+    @property
+    def auth_properties(self):
+        if self.transport:
+            props = dict(self.transport.auth_properties)
+        else:
+            props = {}
+        props["local_jid"] = self.me
+        return props
+
 def _languages_factory(settings):
     """Make the default value of the :r:`languages setting`."""
     return [settings["language"]]

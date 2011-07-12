@@ -34,58 +34,45 @@ logger = logging.getLogger("pyxmpp2.sasl.plain")
 
 @sasl_mechanism("PLAIN", 10)
 class PlainClientAuthenticator(ClientAuthenticator):
-    """Provides PLAIN SASL authentication for a client."""
-    def __init__(self, password_manager):
-        """Initialize a `PlainClientAuthenticator` object.
+    """Provides PLAIN SASL authentication for a client.
 
-        :Parameters:
-            - `password_manager`: name of the password manager object providing
-              authentication credentials.
-        :Types:
-            - `password_manager`: `PasswordManager`"""
+    Authentication properties used:
+
+        - ``"username"`` - user name (required)
+        - ``"authzid"`` - authorization id (optional)
+
+    Authentication properties returned:
+        
+        - ``"username"`` - user name
+        - ``"authzid"`` - authorization id
+    """
+    def __init__(self, password_manager):
         ClientAuthenticator.__init__(self, password_manager)
         self.username = None
         self.finished = None
         self.password = None
         self.authzid = None
+        self.properties = None
 
-    def start(self, username, authzid):
-        """Start the authentication process and return the initial response.
+    @classmethod
+    def are_properies_sufficient(cls, properites):
+        return "username" in roperites
 
-        :Parameters:
-            - `username`: username (authentication id).
-            - `authzid`: authorization id.
-        :Types:
-            - `username`: `unicode`
-            - `authzid`: `unicode`
-
-        :return: the initial response or a failure indicator.
-        :returntype: `sasl.Response` or `sasl.Failure`"""
-        self.username = username
-        if authzid:
-            self.authzid = authzid
-        else:
-            self.authzid = u""
+    def start(self, properties):
+        self.properties = properties
+        self.username = properties["username"]
+        self.authzid = properties.get("authzid", u"")
         self.finished = False
         return self.challenge(b"")
 
     def challenge(self, challenge):
-        """Process the challenge and return the response.
-
-        :Parameters:
-            - `challenge`: the challenge.
-        :Types:
-            - `challenge`: `bytes`
-
-        :return: the response or a failure indicator.
-        :returntype: `sasl.Response` or `sasl.Failure`"""
         if self.finished:
             logger.debug(u"Already authenticated")
             return Failure(u"extra-challenge")
         self.finished = True
         if self.password is None:
             self.password, pformat = self.password_manager.get_password(
-                                                                self.username)
+                                    self.username, "plain", self.properties)
         if self.password is None or pformat != "plain":
             logger.debug(u"Couldn't retrieve plain password")
             return Failure(u"password-unavailable")
@@ -94,57 +81,30 @@ class PlainClientAuthenticator(ClientAuthenticator):
                             self.password.encode("utf-8"))))
 
     def finish(self, data):
-        """Handle authentication succes information from the server.
-
-        :Parameters:
-            - `data`: the optional additional data returned with the success.
-        :Types:
-            - `data`: `bytes`
-
-        :return: a success indicator.
-        :returntype: `Success`
-        """
-        return Success(self.username, None, self.authzid)
+        return Success({"username": self.username, "authzid": self.authzid})
 
 @sasl_mechanism("PLAIN", 10)
 class PlainServerAuthenticator(ServerAuthenticator):
     """Provides PLAIN SASL authentication for a server.
+
+    Authentication properties used: None
+
+    Authentication properties returned:
+        
+        - ``"username"`` - user name
+        - ``"authzid"`` - authorization id
     """
     def __init__(self, password_manager):
-        """Initialize a `PlainServerAuthenticator` object.
-
-        :Parameters:
-            - `password_manager`: name of the password manager object providing
-              authentication credential verification.
-        :Types:
-            - `password_manager`: `PasswordManager`
-        """
         ServerAuthenticator.__init__(self, password_manager)
+        self.properties = None
 
-    def start(self, response):
-        """Start the authentication process.
-
-        :Parameters:
-            - `response`: the initial response from the client.
-        :Types:
-            - `response`: `bytes`
-
-        :return: a challenge, a success indicator or a failure indicator.
-        :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
-        if not response:
+    def start(self, properties, initial_response):
+        self.properties = properties
+        if not initial_response:
             return Challenge(b"")
-        return self.response(response)
+        return self.response(initial_response)
 
     def response(self, response):
-        """Process a client reponse.
-
-        :Parameters:
-            - `response`: the response from the client.
-        :Types:
-            - `response`: `bytes`
-
-        :return: a challenge, a success indicator or a failure indicator.
-        :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
         fields = response.split(b"\000")
         if len(fields) != 3:
             logger.debug(u"Bad response: {0!r}".format(response))
@@ -153,14 +113,13 @@ class PlainServerAuthenticator(ServerAuthenticator):
         authzid = authzid.decode("utf8")
         username = username.decode("utf8")
         password = password.decode("utf8")
-        if not self.password_manager.check_password(username, password):
+        out_props = {"username": username, "authzid": authzid}
+        props = dict(self.properties)
+        props.update(out_props)
+        if not self.password_manager.check_password(username, password,
+                                                            self.properties):
             logger.debug("Bad password. Response was: {0!r}".format(response))
             return Failure("not-authorized")
-        info = {"mechanism": "PLAIN", "username": username}
-        if self.password_manager.check_authzid(authzid, info):
-            return Success(username, None, authzid)
-        else:
-            logger.debug("Authzid verification failed.")
-            return Failure("invalid-authzid")
+        return Success(out_props)
 
 # vi: sts=4 et sw=4

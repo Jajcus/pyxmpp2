@@ -18,6 +18,54 @@
 
 Normative reference:
   - `RFC 4422 <http://www.ietf.org/rfc/rfc4422.txt>`__
+
+
+Authentication properties
+-------------------------
+
+Most authentication mechanisms needs some data to identify the
+authenticating entity and/or to provide characteristics of the communication
+channel. These are passed as a `properites` mapping to the ``.start()``
+method to a server or client authenticator.
+
+Similar mechanism is used to return data obtained via the authentication
+process: the `Success` object has a `Success.properties` attribute with
+the data obtained.
+
+The mapping contains name->value pairs. Meaning of those is generally
+mechanism-dependant, but these are the usually expected properties:
+
+  * For input to the ``start()`` method:
+
+    * ``"username"`` - the user name. Required by all password based mechanisms.
+    * ``"authzid"`` - authorization id. Optional for most mechanisms.
+    * ``"security-layer"`` - security layer if any. ``"TLS"`` when TLS is in
+      use.
+    * ``"channel-binding"`` - mapping of 'channel binding type' to 'channel
+      binding date' if available on the channel
+    * ``"service-type"`` - service type as required by the DIGEST-MD5 protocol
+    * ``"service-domain"`` - service domain (the 'serv-name' or 'host' part of
+      diges-uri of DIGEST-MD5)
+    * ``"service-hostname"`` - service host name (the 'host' par of diges-uri
+      of DIGEST-MD5)
+    * ``"remote-ip"`` - remote IP address
+    * ``"realm"`` - the realm to use if needed
+    * ``"realms"`` - list of acceptable realms
+
+  * For output, via the `Success.properties` attribute:
+
+    * ``"username"`` - the authenticated user name
+    * ``"authzid"`` - the authorization id
+    * ``"realm"`` - the realm
+
+Password manager
+----------------
+
+Authentication properties are bound to specific connection or even an
+authentication session and the password is not included there. That is because
+password retrieval may be more complicated or require user action.
+
+The `PasswordManager` object is used to provide or check a user password.
 """
 
 from __future__ import absolute_import, division
@@ -26,10 +74,20 @@ __docformat__ = "restructuredtext en"
 
 import uuid
 import hashlib
+import logging
 
 from base64 import standard_b64encode
 
 from abc import ABCMeta, abstractmethod
+
+try:
+    # pylint: disable=E0611
+    from abc import abstractclassmethod
+except ImportError:
+    # pylint: disable=C0103
+    abstractclassmethod = classmethod
+
+logger = logging.getLogger("pyxmpp2.sasl.core")
 
 CLIENT_MECHANISMS_D = {}
 CLIENT_MECHANISMS = []
@@ -45,34 +103,35 @@ class PasswordManager:
     Password manager is an object responsible for providing or verification
     of authentication credentials.
 
-    All the methods of `PasswordManager` class may be overriden in derived
-    classes for specific authentication and authorization policy."""
+    All the methods of `PasswordManager` class may be overridden in derived
+    classes for specific authentication and authorization policy.
+    """
     # pylint: disable-msg=W0232,R0201
     __metaclass__ = ABCMeta
-    def get_password(self, username, realm = None,
-                                            acceptable_formats = (u"plain", )):
+    def get_password(self, username, acceptable_formats, properties):
         """Get the password for user authentication.
 
         [both client or server]
 
         By default returns (None, None) providing no password. Should be
-        overriden in derived classes unless only `check_password` functionality
+        overridden in derived classes unless only `check_password` functionality
         is available.
 
         :Parameters:
             - `username`: the username for which the password is requested.
-            - `realm`: the authentication realm for which the password is
-              requested.
             - `acceptable_formats`: a sequence of acceptable formats of the
               password data. Could be "plain" (plain text password),
               "md5:user:realm:password" (MD5 hex digest of user:realm:password)
               or any other mechanism-specific encoding. This allows
               non-plain-text storage of passwords. But only "plain" format will
               work with all password authentication mechanisms.
+            - `properties`: mapping with authentication properties (those
+              provided to the authenticator's ``start()`` method plus some
+              already obtained via the mechanism).
         :Types:
             - `username`: `unicode`
-            - `realm`: `unicode`
             - `acceptable_formats`: sequence of `unicode`
+            - `properties`: mapping
 
         :return: the password and its encoding (format).
         :returntype: `unicode`,`unicode` tuple.
@@ -80,7 +139,7 @@ class PasswordManager:
         # pylint: disable-msg=W0613
         return None, None
 
-    def check_password(self, username, password, realm = None):
+    def check_password(self, username, password, properties):
         """Check the password validity.
 
         [server only]
@@ -91,28 +150,34 @@ class PasswordManager:
         and `realm` using `self.get_password` and compare it with the password
         provided.
 
-        May be overrided e.g. to check the password against some external
+        May be overridden e.g. to check the password against some external
         authentication mechanism (PAM, LDAP, etc.).
 
         :Parameters:
             - `username`: the username for which the password verification is
               requested.
             - `password`: the password to verify.
-            - `realm`: the authentication realm for which the password
-              verification is requested.
+            - `properties`: mapping with authentication properties (those
+              provided to the authenticator's ``start()`` method plus some
+              already obtained via the mechanism).
         :Types:
             - `username`: `unicode`
             - `password`: `unicode`
-            - `realm`: `unicode`
+            - `properties`: mapping
 
         :return: `True` if the password is valid.
         :returntype: `bool`
         """
-        pwd, pwd_format = self.get_password(username, realm, (
-                                        u"plain", u"md5:user:realm:password"))
+        logger.debug("check_password{0!r}".format(
+                                            (username, password, properties))) 
+        pwd, pwd_format = self.get_password(username,
+                    (u"plain", u"md5:user:realm:password"), properties)
         if pwd_format == u"plain":
+            logger.debug("got plain password: {0!r}".format(pwd))
             return pwd is not None and password == pwd
         elif pwd_format in (u"md5:user:realm:password"):
+            logger.debug("got md5:user:realm:password password: {0!r}"
+                                                            .format(pwd))
             if realm is None:
                 realm = ""
             else:
@@ -123,98 +188,8 @@ class PasswordManager:
             # pylint: disable-msg=E1101
             urp_hash = hashlib.md5(b"%s:%s:%s").hexdigest()
             return urp_hash == pwd
+        logger.debug("got password in unknown format: {0!r}".format(pwd_format))
         return False
-
-    def get_realms(self):
-        """Get available realms list.
-
-        [server only]
-
-        :return: a list of realms available for authentication. May be empty --
-            the client may choose its own realm then or use no realm at all.
-        :returntype: `list` of `unicode`
-        """
-        return []
-
-    def choose_realm(self, realm_list):
-        """Choose an authentication realm from the list provided by the server.
-
-        [client only]
-
-        By default return the first realm from the list or `None` if the list
-        is empty.
-
-        :Parameters:
-            - `realm_list`: the list of realms provided by a server.
-        :Types:
-            - `realm_list`: sequence of `unicode`
-
-        :return: the realm chosen.
-        :returntype: `unicode`
-        """
-        if realm_list:
-            return realm_list[0]
-        else:
-            return None
-
-    def check_authzid(self, authzid, extra_info = None):
-        """Check if the authenticated entity is allowed to use given
-        authorization id.
-
-        [server only]
-
-        By default return `True` if the `authzid` is `None` or empty or it is
-        equal to extra_info["username"] (if the latter is present).
-
-        :Parameters:
-            - `authzid`: an authorization id.
-            - `extra_info`: information about an entity got during the
-              authentication process. This is a mapping with arbitrary,
-              mechanism-dependent items. Common keys are 'username' or
-              'realm'.
-        :Types:
-            - `authzid`: `unicode`
-            - `extra_info`: mapping
-
-        :return: `True` if the authenticated entity is authorized to use
-            the provided authorization id.
-        :returntype: `bool`
-        """
-        if not extra_info:
-            extra_info = {}
-        return (not authzid
-                or extra_info.has_key("username")
-                        and extra_info["username"] == authzid)
-
-    def get_serv_type(self):
-        """Return the service type for DIGEST-MD5 'digest-uri' field.
-
-        Should be overriden in derived classes.
-
-        :return: the service type ("unknown" by default)
-        :returntype: `unicode`
-        """
-        return u"unknown"
-
-    def get_serv_host(self):
-        """Return the host name for DIGEST-MD5 'digest-uri' field.
-
-        Should be overriden in derived classes.
-
-        :return: the host name ("unknown" by default)
-        :returntype: `unicode`
-        """
-        return u"unknown"
-
-    def get_serv_name(self):
-        """Return the service name for DIGEST-MD5 'digest-uri' field.
-
-        Should be overriden in derived classes.
-
-        :return: the service name or `None` (which is the default).
-        :returntype: `unicode`
-        """
-        return None
 
     def generate_nonce(self):
         """Generate a random string for digest authentication challenges.
@@ -224,7 +199,7 @@ class PasswordManager:
         :return: the string generated.
         :returntype: `bytes`
         """
-        return uuid.uuid4().hex
+        return uuid.uuid4().hex.encode("us-ascii")
 
 class Reply(object):
     """Base class for SASL authentication reply objects.
@@ -305,31 +280,26 @@ class Success(Reply):
     success).
     """
     # pylint: disable-msg=R0903
-    def __init__(self, username, realm = None, authzid = None, data = None):
+    def __init__(self, properties = None, data = None):
         """Initialize the `Success` object.
 
         :Parameters:
-            - `username`: authenticated username (authentication id).
-            - `realm`: authentication realm used.
-            - `authzid`: authorization id.
-            - `data`: the success data to be sent to the client.
-            - `encode`: whether to base64 encode the data or not
+            - `properties`: the `authentication properties`_ obtained
+            - `data`: the success data to be sent to the client
         :Types:
-            - `username`: `unicode`
-            - `realm`: `unicode`
-            - `authzid`: `unicode`
+            - `properties`: mapping
             - `data`: `bytes`
-            - `encode`: `bool`
         """
         # pylint: disable-msg=R0913
         Reply.__init__(self, data)
-        self.username = username
-        self.realm = realm
-        self.authzid = authzid
+        if properties:
+            self.properties = properties
+        else:
+            self.properties = {}
 
     def __repr__(self):
-        return "<sasl.Success: authzid: {0!r} data: {1!r}>".format(
-                                                    self.authzid, self.data)
+        return "<sasl.Success: {0!r} data: {1!r}>".format(
+                                                    self.properites, self.data)
 
 class ClientAuthenticator:
     """Base class for client authenticators.
@@ -350,20 +320,37 @@ class ClientAuthenticator:
         """
         self.password_manager = password_manager
 
+    @abstractclassmethod
+    def are_properies_sufficient(cls, properites):
+        """Check if the provided properties are sufficient for
+        this authentication mechanism.
+
+        If `are_properies_sufficient` returns False for given `properties`
+        mapping, the `start` method of `cls` instance will also fail with
+        such argument.
+
+        :Parameters:
+            - `properties`: the `authentication properties`_
+        :Types:
+            `properties`: mapping
+
+        :Return: if the mechanism can be used with those properties
+        """
+        return False
+
     @abstractmethod
-    def start(self, username, authzid):
+    def start(self, properties):
         """Start the authentication process.
 
         :Parameters:
-            - `username`: the username (authentication id).
-            - `authzid`: the authorization id requester.
+            - `properties`: the `authentication properties`_
         :Types:
-            - `username`: `unicode`
-            - `authzid`: `unicode`
+            - `properties`: mapping
 
         :return: the initial response to send to the server or a failuer
             indicator.
-        :returntype: `Response` or `Failure`"""
+        :returntype: `Response` or `Failure`
+        """
         raise NotImplementedError
 
     @abstractmethod
@@ -411,14 +398,16 @@ class ServerAuthenticator:
         self.password_manager = password_manager
 
     @abstractmethod
-    def start(self, initial_response):
+    def start(self, properties, initial_response):
         """Start the authentication process.
 
         :Parameters:
+            - `properties`: the `authentication properties`_
             - `initial_response`: the initial response send by the client with
               the authentication request.
 
         :Types:
+            - `properties`: mapping
             - `initial_response`: `bytes`
 
         :return: a challenge, a success or a failure indicator.

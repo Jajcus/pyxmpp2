@@ -167,10 +167,15 @@ class XMPPTransport:
 
     @abstractmethod
     def disconnect(self):
-        """
-        Gracefully disconnect the connection.
+        """Gracefully disconnect the connection.
         """
         pass
+
+    @property
+    def auth_properties(self):
+        """Channel properties for authentication and authorization.
+        """
+        return {}
 
 class StanzaRoute:
     """Base class for objects that can send and receive stanzas."""

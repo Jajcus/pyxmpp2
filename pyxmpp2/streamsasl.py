@@ -42,178 +42,46 @@ from .interfaces import stream_element_handler
 
 logger = logging.getLogger("pyxmpp2.streamsasl")
 
-class DefaultPasswordManager(sasl.PasswordManager):
+class DefaultClientPasswordManager(sasl.PasswordManager):
     """Default password manager."""
     def __init__(self, settings):
         self.settings = settings
-        self.stream = None
 
-    def set_stream(self, stream):
-        """Set a stream associated with this password manager.
-
-        :Parameters:
-            - `stream`: the stream object
-        :Types:
-            - `stream`: `StreamBase`
-        """
-        self.stream = stream
-
-    def get_password(self, username, realm = None, acceptable_formats = (
-                                                                    "plain",)):
-        """Get the password for user authentication.
-
-        [both client or server]
-
-        If stream initiator: return the value of the "password" setting
-        if `username` patches the "username" setting or local jid localpart.
-
-        If stream receiver - lookup the password in the "user_passwords"
-        setting.
-
-        :Parameters:
-            - `username`: the username for which the password is requested.
-            - `realm`: the authentication realm for which the password is
-              requested.
-            - `acceptable_formats`: a sequence of acceptable formats of the
-              password data. Could be "plain", "md5:user:realm:password" or any
-              other mechanism-specific encoding. This allows non-plain-text
-              storage of passwords. But only "plain" format will work with
-              all password authentication mechanisms.
-        :Types:
-            - `username`: `unicode`
-            - `realm`: `unicode`
-            - `acceptable_formats`: sequence of `str`
-
-        :return: the password and its encoding (format).
-        :returntype: `unicode`,`str` tuple."""
-        _unused = realm
+    def get_password(self, username, acceptable_formats, properties):
         if "plain" not in acceptable_formats:
-            return
-        stream = self.stream
-        if stream:
-            if stream.initiator:
-                our_name = self.settings.get("username")
-                if our_name is None and self.stream and self.stream.me:
-                    our_name = self.stream.me.local
-                if our_name == username:
-                    password = self.settings["password"]
-                else:
-                    password = None
-            else:
-                try:
-                    password = self.settings["user_passwords"].get(username)
-                except KeyError:
-                    password = None
+            return None, None
+
+        if "username" in self.settings:
+            our_name = self.settings["username"]
+        elif "local_jid" in properties:
+            our_name = properties["local_jid"].local
         else:
-            password = self.settings["password"]
-        if password is not None:
-            return password, "plain"
+            our_name = None
+
+        if (our_name is not None and our_name == username) or our_name is None:
+            return self.settings["password"], "plain"
         else:
             return None, None
 
-    def check_authzid(self, authzid, extra_info = None):
-        """Check authorization id provided by the client.
+class DefaultServerPasswordManager(sasl.PasswordManager):
+    """Default password manager."""
+    def __init__(self, settings):
+        self.settings = settings
 
-        [server only]
+    def get_password(self, username, acceptable_formats, properties):
+        if "plain" not in acceptable_formats:
+            return None, None
 
-        Allow only no authzid or authzid equal to current username@domain
-
-        :Parameters:
-            - `authzid`: authorization id provided.
-            - `extra_info`: additional information about the user
-              from the authentication backend. This mapping will
-              usually contain at least 'username' item.
-        :Types:
-            - `authzid`: `unicode`
-            - `extra_info`: mapping
-
-        :return: `True` if user is authorized to use that `authzid`.
-        :returntype: `bool`"""
-        if not extra_info:
-            extra_info = {}
-        if not authzid:
-            return True
-        if self.stream and self.stream.initiator:
-            return False
-        if self.stream and not self.stream.initiator:
-            jid = JID(authzid)
-            if not extra_info.has_key("username"):
-                ret = False
-            elif jid.local != extra_info["username"]:
-                ret = False
-            elif jid.domain != self.stream.me.domain:
-                ret = False
-            elif not jid.resource:
-                ret = False
+        if "user_passwords" in self.settings:
+            pwd_map = self.settings["user_passwords"]
+            if username in pwd_map:
+                return pwd_map[username], "plain"
             else:
-                ret = True
+                return None, None
+        if "username" in self.settings and "password" in self.settings:
+            return self.settings["password"], "plain"
         else:
-            ret = False
-        return ret
-
-    def get_realms(self):
-        """Get realms available for client authentication.
-
-        [server only]
-
-        :return: list of realms.
-        :returntype: `list` of `unicode`"""
-        if self.stream:
-            return [self.stream.me.domain]
-        else:
-            return []
-
-    def choose_realm(self, realm_list):
-        """Choose authentication realm from the list provided by the server.
-
-        [client only]
-
-        Use domain of the own JID if no realm list was provided or the domain
-        is on the list or the first realm on the list otherwise.
-
-        :Parameters:
-            - `realm_list`: realm list provided by the server.
-        :Types:
-            - `realm_list`: `list` of `unicode`
-
-        :return: the realm chosen.
-        :returntype: `unicode`"""
-        if not self.stream:
-            if realm_list:
-                return realm_list[0]
-            else:
-                return None
-        jid = self.stream.me
-        if not realm_list:
-            return jid.domain
-        if jid.domain in realm_list:
-            return jid.domain
-        return realm_list[0]
-
-    def get_serv_type(self):
-        """Get the server name for SASL authentication.
-
-        :return: 'xmpp'."""
-        return "xmpp"
-
-    def get_serv_name(self):
-        """Get the service name for SASL authentication.
-
-        :return: domain of the own JID."""
-        if self.stream:
-            return self.stream.me.domain
-        else:
-            return "unknown"
-
-    def get_serv_host(self):
-        """Get the service host name for SASL authentication.
-
-        :return: domain of the own JID."""
-        if self.stream:
-            transport = self.stream.transport
-            if transport._dst_hostname:
-                return transport.selected_host
-        return self.get_serv_name()
+            return None, None
 
 
 MECHANISMS_TAG = SASL_QNP + u"mechanisms"
@@ -241,10 +109,8 @@ class StreamSASLHandler(StreamFeatureHandler):
         if settings is None:
             settings = XMPPSettings()
         self.settings = settings
-        self.password_manager = settings["password_manager"]
         self.peer_sasl_mechanisms = None
         self.authenticator = None
-        self._username = None
 
     def make_stream_features(self, stream, features):
         """Add SASL features to the <features/> element of the stream.
@@ -279,11 +145,12 @@ class StreamSASLHandler(StreamFeatureHandler):
 
         username = self.settings.get("username")
         if not username:
+            # TODO: other rules for s2s
             if stream.me.local:
                 username = stream.me.local
             else:
-                username = stream.me.domain
-        self._sasl_authenticate(stream, username, self.settings["authzid"])
+                username = None
+        self._sasl_authenticate(stream, username, self.settings.get("authzid"))
         return StreamFeatureHandled("SASL", mandatory = True)
 
     @stream_element_handler(AUTH_TAG, "receiver")
@@ -295,8 +162,8 @@ class StreamSASLHandler(StreamFeatureHandler):
         if self.authenticator:
             logger.debug("Authentication already started")
             return False
-        if hasattr(self.password_manager, "set_stream"):
-            self.password_manager.set_stream(stream)
+
+        password_manager = self.settings["server_password_manager"]
         mechanism = element.get("mechanism")
         if not mechanism:
             stream.send_stream_error("bad-format")
@@ -304,10 +171,11 @@ class StreamSASLHandler(StreamFeatureHandler):
 
         stream.auth_method_used = mechanism
         self.authenticator = sasl.server_authenticator_factory(mechanism, 
-                                                        self.password_manager)
+                                                            password_manager)
         
         content = element.text.encode("us-ascii")
-        ret = self.authenticator.start(base64.decodestring(content))
+        ret = self.authenticator.start(stream.auth_properties,
+                                                base64.decodestring(content))
 
         if isinstance(ret, sasl.Success):
             element = ElementTree.Element(SUCCESS_TAG)
@@ -322,10 +190,18 @@ class StreamSASLHandler(StreamFeatureHandler):
         stream.write_element(element)
 
         if isinstance(ret, sasl.Success):
-            if ret.authzid:
+            if not self._check_authorization(ret.properties):
+                element = ElementTree.Element(FAILURE_TAG)
+                ElementTree.SubElement(element, SASL_QNP + "invalid-authzid")
+                return True
+            authzid = ret.properties.get("authzid")
+            if authzid:
                 peer = JID(ret.authzid)
+            elif "username" in ret.properties:
+                peer = JID(ret.properties["username"], stream.me.domain)
             else:
-                peer = JID(ret.username, stream.me.domain)
+                # anonymous
+                peer = None
             stream.set_peer_authenticated(peer, True)
         elif isinstance(ret, sasl.Failure):
             raise SASLAuthenticationFailed("SASL authentication failed: {0}"
@@ -383,16 +259,61 @@ class StreamSASLHandler(StreamFeatureHandler):
         stream.write_element(element)
 
         if isinstance(ret, sasl.Success):
-            authzid = ret.authzid
+            if not self._check_authorization(ret.properties):
+                element = ElementTree.Element(FAILURE_TAG)
+                ElementTree.SubElement(element, SASL_QNP + "invalid-authzid")
+                return True
+            authzid = ret.properties.get("authzid")
             if authzid:
                 peer = JID(ret.authzid)
+            elif "username" in ret.properties:
+                peer = JID(ret.properties["username"], stream.me.domain)
             else:
-                peer = JID(ret.username, stream.me.domain)
+                # anonymous
+                peer = None
             stream.set_peer_authenticated(peer, True)
         elif isinstance(ret, sasl.Failure):
             raise SASLAuthenticationFailed("SASL authentication failed: {0!r}"
                                                             .format(ret.reson))
         return True
+
+    def _check_authorization(self, properties):
+        """Check authorization id and other properties returned by the
+        authentication mechanism.
+        
+        [receiving entity only]
+
+        Allow only no authzid or authzid equal to current username@domain
+
+        FIXME: other rules in s2s
+
+        :Parameters:
+            - `properties`: data obtained during authentication
+        :Types:
+            - `properties`: mapping
+
+        :return: `True` if user is authorized to use a provided authzid
+        :returntype: `bool`
+        """
+        authzid = properties.get("authzid")
+        if not authzid:
+            return True
+        try:
+            jid = JID(authzid)
+        except ValueError:
+            return False
+
+        if "username" not in properties:
+            result = False
+        elif jid.local != properties["username"]:
+            result = False
+        elif jid.domain != self.me.domain:
+            result = False
+        elif jid.resource:
+            result = False
+        else:
+            result = True
+        return result
 
     @stream_element_handler(SUCCESS_TAG, "initiator")
     def _process_sasl_success(self, stream, element):
@@ -414,10 +335,14 @@ class StreamSASLHandler(StreamFeatureHandler):
         ret = self.authenticator.finish(data)
         if isinstance(ret, sasl.Success):
             logger.debug("SASL authentication succeeded")
-            if ret.authzid:
-                me = JID(ret.authzid)
+            authzid = ret.properties.get("authzid")
+            if authzid:
+                me = JID(authzid)
+            elif "username" in ret.properties:
+                # FIXME: other rules for server
+                me = JID(ret.properties["username"], stream.peer.domain)
             else:
-                me = JID(ret.username, ret.realm)
+                me = None
             stream.set_authenticated(me, True)
         else:
             logger.debug("SASL authentication failed")
@@ -469,8 +394,7 @@ class StreamSASLHandler(StreamFeatureHandler):
         if stream.features is None or not self.peer_sasl_mechanisms:
             raise SASLNotAvailable("Peer doesn't support SASL")
 
-        if hasattr(self.password_manager, "set_stream"):
-            self.password_manager.set_stream(stream)
+        password_manager = self.settings["client_password_manager"]
 
         mechs = self.settings['sasl_mechanisms'] 
         if not mechanism:
@@ -490,9 +414,13 @@ class StreamSASLHandler(StreamFeatureHandler):
 
         stream.auth_method_used = mechanism
         self.authenticator = sasl.client_authenticator_factory(mechanism,
-                                                        self.password_manager)
-        initial_response = self.authenticator.start(username, authzid)
-        self._username = username
+                                                            password_manager)
+        props = dict(stream.auth_properties)
+        if username is not None:
+            props["username"] = username
+        if authzid is not None:
+            props["authzid"] = authzid
+        initial_response = self.authenticator.start(props)
         if not isinstance(initial_response, sasl.Response):
             raise SASLAuthenticationFailed("SASL initiation failed")
 
@@ -526,11 +454,18 @@ XMPPSettings.add_setting(u"sasl_mechanisms",
         cmdline_help = u"SASL mechanism to enable",
         doc = u"""SASL mechanism that can be used for stream authentication."""
     )
-XMPPSettings.add_setting(u"password_manager", type = sasl.PasswordManager,
-        factory = DefaultPasswordManager,
-        default_d = "A `DefaultPasswordManager` instance",
-        doc = u"""Object providing or checking user password and other
-SASL authentication properties."""
+XMPPSettings.add_setting(u"client_password_manager", 
+        type = sasl.PasswordManager,
+        factory = DefaultClientPasswordManager,
+        default_d = "A `DefaultClientPasswordManager` instance",
+        doc = u"""Object providing user password on client."""
     )
+XMPPSettings.add_setting(u"server_password_manager", 
+        type = sasl.PasswordManager,
+        factory = DefaultServerPasswordManager,
+        default_d = "A `DefaultServerPasswordManager` instance",
+        doc = u"""Object providing or checking user passwords on server."""
+    )
+
 
 # vi: sts=4 et sw=4

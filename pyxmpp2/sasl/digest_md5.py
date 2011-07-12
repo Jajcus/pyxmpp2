@@ -140,6 +140,8 @@ def _compute_response(urp_hash, nonce, cnonce, nonce_count, authzid,
 
     :return: the computed response value.
     :returntype: `bytes`"""
+    logger.debug("_compute_response{0!r}".format((urp_hash, nonce, cnonce,
+                                            nonce_count, authzid,digest_uri)))
     # pylint: disable-msg=C0103,R0913
     if authzid:
         a1 = b":".join((urp_hash, nonce, cnonce, authzid))
@@ -182,10 +184,23 @@ def _compute_response_auth(urp_hash, nonce, cnonce, nonce_count, authzid,
 class DigestMD5ClientAuthenticator(ClientAuthenticator):
     """Provides DIGEST-MD5 SASL authentication for a client.
 
-    :Ivariables:
-        - `password`: current authentication password
-        - `pformat`: current authentication password format
-        - `realm`: current authentication realm
+    Authentication properties used:
+
+        - ``"username"`` - user name (required)
+        - ``"authzid"`` - authorization id (optional)
+        - ``"service-type"`` - service type as required by the DIGEST-MD5
+          protocol (required)
+        - ``"service-domain"`` - service domain (the 'serv-name' or 'host' part
+          of diges-uri of DIGEST-MD5) (required)
+        - ``"service-hostname"`` - service host name (the 'host' par of
+          diges-uri of DIGEST-MD5) (required)
+        - ``"realm"`` - the realm to use if needed (optional)
+        - ``"realms"`` - list of acceptable realms (optional)
+
+    Authentication properties returned:
+        
+        - ``"username"`` - user name
+        - ``"authzid"`` - authorization id
     """
     # pylint: disable-msg=R0902
     def __init__(self, password_manager):
@@ -205,24 +220,18 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         self.realm = None
         self.password = None
         self.nonce_count = None
+        self.in_properties = None
 
-    def start(self, username, authzid):
-        """Start the authentication process initializing client state.
+    @classmethod
+    def are_properies_sufficient(cls, properties):
+        return ("username" in properties
+                and "service-type" in properties
+                and "service-domain" in properties)
 
-        :Parameters:
-            - `username`: username (authentication id).
-            - `authzid`: authorization id.
-        :Types:
-            - `username`: `unicode`
-            - `authzid`: `unicode`
-
-        :return: the (empty) initial response
-        :returntype: `sasl.Response` or `sasl.Failure`"""
-        self.username = username
-        if authzid:
-            self.authzid = authzid
-        else:
-            self.authzid = ""
+    def start(self, properties):
+        self.username = properties["username"]
+        self.authzid = properties.get("authzid", "")
+        self.in_properties = properties
         self.password = None
         self.pformat = None
         self.nonce_count = 0
@@ -297,7 +306,8 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         to its format name ('plain' or 'md5:user:realm:pass')."""
         if self.password is None:
             self.password, self.pformat = self.password_manager.get_password(
-                        self.username, ["plain","md5:user:realm:pass"])
+                        self.username, ["plain", "md5:user:realm:pass"], 
+                                                        self.in_properties)
         if not self.password or self.pformat not in (
                                             "plain", "md5:user:realm:pass"):
             logger.debug("Couldn't get plain password."
@@ -350,9 +360,12 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 
         params.append(b'qop=auth')
 
-        serv_type = self.password_manager.get_serv_type().encode("us-ascii")
-        host = self.password_manager.get_serv_host().encode("idna")
-        serv_name = self.password_manager.get_serv_name().encode("idna")
+        serv_type = self.in_properties["service-type"]
+        serv_type = serv_type.encode("us-ascii")
+        serv_name = self.in_properties["service-domain"]
+        host = self.in_properties.get("service-hostname", serv_name)
+        serv_name = serv_name.encode("idna")
+        host = host.encode("idna")
 
         if serv_name and serv_name != host:
             digest_uri = b"/".join((serv_type, host, serv_name))
@@ -406,10 +419,16 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         :return: the realm chosen or a failure indicator.
         :returntype: `bytes` or `Failure`"""
         if realms:
-            realms = [unicode(r, charset) for r in realms]
-            realm = self.password_manager.choose_realm(realms)
+            realm = realms[0]
+            ap_realms = self.in_properties.get("realms")
+            if ap_realms is not None:
+                realms = (unicode(r, charset) for r in realms)
+                for ap_realm in ap_realms:
+                    if ap_realm in realms:
+                        realm = ap_realm
+                        break
         else:
-            realm = self.password_manager.choose_realm([])
+            realm = self.in_properties.get("realm")
         if realm is not None:
             self.realm = realm
             try:
@@ -429,7 +448,8 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
             - `challenge`: `bytes`
 
         :return: the response or a failure indicator.
-        :returntype: `sasl.Response` or `sasl.Failure`"""
+        :returntype: `sasl.Response` or `sasl.Failure`
+        """
         if self.rspauth_checked:
             return Failure("extra-challenge")
         challenge = challenge.split(b'\x00')[0]
@@ -473,13 +493,23 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
             logger.debug("Got success too early")
             return Failure("bad-success")
         if self.rspauth_checked:
-            return Success(self.username, self.realm, self.authzid)
+            properties = {
+                    "username": self.username,
+                    "realm": self.realm,
+                    "authzid": self.authzid
+                    }
+            return Success(properties)
         else:
             ret = self._final_challenge(data)
             if isinstance(ret, Failure):
                 return ret
             if self.rspauth_checked:
-                return Success(self.username, self.realm, self.authzid)
+                properties = {
+                        "username": self.username,
+                        "realm": self.realm,
+                        "authzid": self.authzid
+                        }
+                return Success(properties)
             else:
                 logger.debug("Something went wrong when processing additional"
                                                         " data with success?")
@@ -488,6 +518,22 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
 @sasl_mechanism("DIGEST-MD5", 70)
 class DigestMD5ServerAuthenticator(ServerAuthenticator):
     """Provides DIGEST-MD5 SASL authentication for a server.
+
+    Authentication properties used:
+
+        - ``"service-type"`` - service type as required by the DIGEST-MD5
+          protocol (optional, verified if provided)
+        - ``"service-domain"`` - service domain (the 'serv-name' or 'host' part
+          of diges-uri of DIGEST-MD5) (optional, verified if provided)
+        - ``"service-hostname"`` - service host name (the 'host' par of
+          diges-uri of DIGEST-MD5) (optional, verified if provided)
+        - ``"realms"`` - list of acceptable realms (optional)
+        - ``"realm"`` - the realm to use ``"realms"`` is not set (optional)
+
+    Authentication properties returned:
+        
+        - ``"username"`` - user name
+        - ``"authzid"`` - authorization id
     """
     def __init__(self, password_manager):
         """Initialize a `DigestMD5ServerAuthenticator` object.
@@ -499,42 +545,30 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
             - `password_manager`: `PasswordManager`"""
         ServerAuthenticator.__init__(self, password_manager)
         self.nonce = None
-        self.username = None
-        self.realm = None
-        self.authzid = None
-        self.done = None
         self.last_nonce_count = None
+        self.in_properties = None
+        self.out_properties = None
 
-    def start(self, response):
-        """Start the authentication process.
-
-        :Parameters:
-            - `response`: the initial response from the client (empty for
-              DIGEST-MD5).
-        :Types:
-            - `response`: `bytes`
-
-        :return: a challenge, a success indicator or a failure indicator.
-        :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
-        _unused = response
+    def start(self, properties, initial_response):
+        _unused = initial_response
+        self.in_properties = properties
         self.last_nonce_count = 0
         params = []
-        realms = self.password_manager.get_realms()
+        realms = properties.get("realms")
         if realms:
             self.realm = _quote(realms[0])
             for realm in realms:
                 realm = _quote(realm)
                 params.append(b'realm="' + realm + b'"')
         else:
-            self.realm = None
+            self.realm = properties.get("realm")
         nonce = _quote(self.password_manager.generate_nonce())
         self.nonce = nonce
         params.append(b'nonce="' + nonce + b'"')
         params.append(b'qop="auth"')
         params.append(b'charset=utf-8')
         params.append(b'algorithm=md5-sess')
-        self.authzid = None
-        self.done = False
+        self.out_properties = None
         return Challenge(b",".join(params))
 
     def response(self, response):
@@ -547,8 +581,8 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
 
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
-        if self.done:
-            return Success(self.username, self.realm, self.authzid)
+        if self.out_properties:
+            return Success(self.out_properties)
         if not response:
             return Failure("not-authorized")
         return self._parse_response(response)
@@ -588,9 +622,9 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
             response = match.group("rest")
             var = match.group("var")
             val = match.group("val")
-            logger.debug("{0!r}: {0!r}".format(var, val))
+            logger.debug("{0!r}: {1!r}".format(var, val))
             if var == b"realm":
-                realm = val[1:-1].decode("utf-8")
+                realm = val[1:-1]
             elif var == b"cnonce":
                 if cnonce:
                     logger.debug("Duplicate cnonce")
@@ -603,9 +637,9 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
             elif var == b"digest-uri":
                 digest_uri = val[1:-1]
             elif var == b"authzid":
-                authzid = val[1:-1].decode("utf-8")
+                authzid = val[1:-1]
             elif var == b"username":
-                username = val[1:-1].decode("utf-8")
+                username = val[1:-1]
             elif var == b"response":
                 response_val = val
             elif var == b"nc":
@@ -638,7 +672,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
             - `digest_uri`: `bytes`
             - `response_val`: `bytes`
             - `authzid`: `bytes`
-            - `nonce_count`: `int`
+            - `nonce_count`: `bytes`
 
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
@@ -674,31 +708,33 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
             - `authzid`: authorization id.
             - `nonce_count`: nonce count value.
         :Types:
-            - `username`: `unicode`
-            - `realm`: `unicode`
+            - `username`: `bytes`
+            - `realm`: `bytes`
             - `cnonce`: `bytes`
             - `digest_uri`: `bytes`
             - `response_val`: `bytes`
-            - `authzid`: `unicode`
-            - `nonce_count`: `int`
+            - `authzid`: `bytes`
+            - `nonce_count`: `bytes`
 
         :return: a challenge, a success indicator or a failure indicator.
-        :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
+        :returntype: `sasl.Success` or `sasl.Failure`
+        """
         # pylint: disable-msg=R0912,R0913,R0914
-        username_uq = username.replace(u'\\', u'')
+        username_uq = username.replace(b'\\', b'')
         if authzid:
-            authzid_uq = authzid.replace(u'\\', u'')
+            authzid_uq = authzid.replace(b'\\', b'')
         else:
             authzid_uq = None
         if realm:
-            realm_uq = realm.replace(u'\\', u'')
+            realm_uq = realm.replace(b'\\', b'')
         else:
             realm_uq = None
-        digest_uri_uq = digest_uri.replace('\\','')
-        self.username = username_uq
-        self.realm = realm_uq
+        digest_uri_uq = digest_uri.replace(b'\\', b'')
+        props = dict(self.in_properties)
+        props["realm"] = realm_uq.decode("utf-8")
         password, pformat = self.password_manager.get_password(
-                    username_uq, realm_uq, (u"plain", u"md5:user:realm:pass"))
+                                        username_uq.decode("utf-8"),
+                            (u"plain", u"md5:user:realm:pass"), props)
         if pformat == u"md5:user:realm:pass":
             urp_hash = password.a2b_hex()
         elif pformat == u"plain":
@@ -714,32 +750,49 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
             logger.debug(u"Response mismatch: {0!r} != {1!r}".format(
                                                 response_val, valid_response))
             return Failure(u"not-authorized")
-        fields = digest_uri_uq.split(b"/")
-        if len(fields) == 3:
-            serv_type, host, serv_name = fields
-        elif len(fields) == 2:
-            serv_type, host = fields
-            serv_name = None
-        else:
+        try:
+            fields = digest_uri_uq.split(b"/")
+            if len(fields) == 3:
+                serv_type, host, serv_name = [f.decode("utf-8") for f in fields]
+            elif len(fields) == 2:
+                serv_type, host = [f.decode("utf-8") for f in fields]
+                serv_name = None
+            else:
+                raise ValueError
+        except (ValueError, UnicodeError):
             logger.debug("Bad digest_uri: {0!r}".format(digest_uri_uq))
             return Failure("not-authorized")
-        info = {}
-        info[u"mechanism"] = u"DIGEST-MD5"
-        info[u"username"] = username_uq
-        info[u"serv-type"] = serv_type.decode("utf-8")
-        info[u"host"] = host.decode("idna")
-        if serv_name is not None:
-            info[u"serv-name"] = serv_name.decode("idna")
-        else:
-            info[u"serv-name"] = None
-        if self.password_manager.check_authzid(authzid_uq, info):
-            rspauth = _compute_response_auth(urp_hash, self.nonce, cnonce,
-                                            nonce_count, authzid, digest_uri)
-            self.authzid = authzid
-            self.done = True
-            return Challenge(b"rspauth=" + rspauth)
-        else:
-            logger.debug(u"Authzid check failed")
-            return Failure(u"invalid_authzid")
-
-# vi: sts=4 et sw=4
+        if "service-type" in self.in_properties:
+            if serv_type != self.in_properties["service-type"]:
+                logger.debug(u"Bad serv-type: {0!r} != {1!r}"
+                        .format(serv_type, self.in_properties["service-type"]))
+                return Failure("not-authorized")
+        if "service-domain" in self.in_properties:
+            if serv_name:
+                if serv_name != self.in_properties["service-domain"]:
+                    logger.debug(u"serv-name: {0!r} != {1!r}".format(serv_name,
+                                        self.in_properties["service-domain"]))
+                return Failure("not-authorized")
+            elif (host != self.in_properties["service-domain"]
+                    and host != self.in_properties.get("service-hostname")):
+                logger.debug(u"bad host: {0!r} != {1!r}"
+                            u" & {0!r} != {2!r}".format(host,
+                            self.in_properties["service-domain"],
+                            self.in_properties.get("service-hostname")))
+                return Failure("not-authorized")
+        if "service-hostname" in self.in_properties:
+            if host != self.in_properties["service-hostname"]:
+                logger.debug(u"bad host: {0!r} != {1!r}".format(host,
+                                        self.in_properties["service-hostname"]))
+                return Failure("not-authorized")
+        rspauth = _compute_response_auth(urp_hash, self.nonce, cnonce,
+                                        nonce_count, authzid, digest_uri)
+        self.out_properties = {
+                        "username": username.decode("utf-8"),
+                        "realm": realm.decode("utf-8"),
+                        "authzid": authzid_uq.decode("utf-8"),
+                        "service-type": serv_type,
+                        "service-domain": serv_name if serv_name else host,
+                        "service-hostname": host
+                        }
+        return Success(self.out_properties, b"rspauth=" + rspauth)
