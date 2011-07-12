@@ -54,7 +54,7 @@ class GSSAPIClientAuthenticator(ClientAuthenticator):
                         "{0}@{1}".format("xmpp", 
                                     self.password_manager.get_serv_host()))
         self.step = 0
-        return self.challenge("")
+        return self.challenge(b"")
 
     def challenge(self, challenge):
         if self.step == 0:
@@ -69,7 +69,7 @@ class GSSAPIClientAuthenticator(ClientAuthenticator):
             ret = kerberos.authGSSClientWrap(self._gss, response, self.username)
         response = kerberos.authGSSClientResponse(self._gss)
         if response is None:
-            return Response("")
+            return Response(b"")
         else:
             return Response(base64.b64decode(response))
 

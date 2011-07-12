@@ -231,53 +231,50 @@ class Reply(object):
 
     :Ivariables:
         - `data`: optional reply data.
-        - `_encode`: whether to base64 encode the data or not
     :Types:
         - `data`: `bytes`
-        - `_encode`: `bool`
     """
     # pylint: disable-msg=R0903
-    def __init__(self, data = b"", encode = True):
+    def __init__(self, data = None):
         """Initialize the `Reply` object.
 
         :Parameters:
             - `data`: optional reply data.
-            - `encode`: whether to base64 encode the data or not
         :Types:
             - `data`: `bytes`
-            - `encode`: `bool`
         """
         self.data = data
-        self._encode = encode
 
     def encode(self):
         """Base64-encode the data contained in the reply when appropriate.
 
         :return: encoded data.
-        :returntype: `bytes`
+        :returntype: `unicode`
         """
-        if self.data is not None and self._encode:
+        if self.data is None:
+            return ""
+        elif not self.data:
+            return "="
+        else:
             ret = standard_b64encode(self.data)
             return ret.decode("us-ascii")
-        else:
-            return self.data
 
 class Challenge(Reply):
     """The challenge SASL message (server's challenge for the client)."""
     # pylint: disable-msg=R0903
-    def __init__(self, data, encode = True):
+    def __init__(self, data):
         """Initialize the `Challenge` object."""
-        Reply.__init__(self, data, encode)
+        Reply.__init__(self, data)
     def __repr__(self):
         return "<sasl.Challenge: {0!r}>".format(self.data)
 
 class Response(Reply):
-    """The response SASL message (clients's reply the the server's
+    """The response SASL message (clients's reply the server's
     challenge)."""
     # pylint: disable-msg=R0903
-    def __init__(self, data = b"", encode = True):
+    def __init__(self, data):
         """Initialize the `Response` object."""
-        Reply.__init__(self, data, encode)
+        Reply.__init__(self, data)
     def __repr__(self):
         return "<sasl.Response: {0!r}>".format(self.data)
 
@@ -308,8 +305,7 @@ class Success(Reply):
     success).
     """
     # pylint: disable-msg=R0903
-    def __init__(self, username, realm = None, authzid = None, data = None,
-                                                                encode = True):
+    def __init__(self, username, realm = None, authzid = None, data = None):
         """Initialize the `Success` object.
 
         :Parameters:
@@ -326,10 +322,11 @@ class Success(Reply):
             - `encode`: `bool`
         """
         # pylint: disable-msg=R0913
-        Reply.__init__(self, data, encode)
+        Reply.__init__(self, data)
         self.username = username
         self.realm = realm
         self.authzid = authzid
+
     def __repr__(self):
         return "<sasl.Success: authzid: {0!r} data: {1!r}>".format(
                                                     self.authzid, self.data)

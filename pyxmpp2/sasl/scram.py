@@ -334,7 +334,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
             return Failure("bad-succes")
 
         self._finished = True
-        return Response(b"")
+        return Response(None)
 
     def finish(self, data):
         """Process success indicator from the server.

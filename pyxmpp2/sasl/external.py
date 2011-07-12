@@ -46,8 +46,7 @@ class ExternalClientAuthenticator(ClientAuthenticator):
         # XEP-0178 says "=" should be sent when only one id-on-xmppAddr is 
         # in the cert, but we don't know that. Still, this conforms to the
         # standard and works.
-        return Response(self.authzid, encode = True)
-        #return Response("=", encode = False)
+        return Response(self.authzid)
 
     def finish(self, data):
         """Handle authentication success information from the server.

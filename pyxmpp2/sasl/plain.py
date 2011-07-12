@@ -102,7 +102,8 @@ class PlainClientAuthenticator(ClientAuthenticator):
             - `data`: `bytes`
 
         :return: a success indicator.
-        :returntype: `Success`"""
+        :returntype: `Success`
+        """
         return Success(self.username, None, self.authzid)
 
 @sasl_mechanism("PLAIN", 10)

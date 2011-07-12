@@ -229,7 +229,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         self.response_auth = None
         self.rspauth_checked = False
         self.realm = None
-        return Response()
+        return Response(None)
 
     def challenge(self, challenge):
         """Process a challenge and return the response.
@@ -450,7 +450,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
             return Failure("bad-success")
         if rspauth == self.response_auth:
             self.rspauth_checked = True
-            return Response(b"")
+            return Response(None)
         else:
             logger.debug("Wrong rspauth value - peer is cheating?")
             logger.debug("my rspauth: {0!r}".format(self.response_auth))
