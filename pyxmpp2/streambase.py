@@ -656,6 +656,7 @@ class StreamBase(XMLStreamHandler):
         else:
             props = {}
         props["local_jid"] = self.me
+        props["service-type"] = "xmpp"
         return props
 
 def _languages_factory(settings):

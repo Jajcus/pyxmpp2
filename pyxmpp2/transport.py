@@ -289,6 +289,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         self._set_state("resolving-hostname")
         resolver = self.settings["dns_resolver"] # pylint: disable=W0621
         name, port = self._dst_nameports.pop(0)
+        self._dst_hostname = name
         resolver.resolve_address(name, callback = partial(
                                 self._got_addresses, name, port),
                                 allow_cname = self._dst_service is None)
