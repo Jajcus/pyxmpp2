@@ -347,7 +347,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         username = _quote(username)
         params.append(b'username="' + username + b'"')
 
-        cnonce = self.password_manager.generate_nonce().encode(charset)
+        cnonce = self.password_manager.generate_nonce()
         cnonce = _quote(cnonce)
         params.append(b'cnonce="' + cnonce + b'"')
 

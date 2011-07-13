@@ -156,7 +156,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
     def start(self, properties):
         self.username = properties["username"]
         self.authzid = properties.get("authzid", u"")
-        c_nonce = self.password_manager.generate_nonce().encode("utf-8")
+        c_nonce = self.password_manager.generate_nonce()
         if not VALUE_CHARS_RE.match(c_nonce):
             c_nonce = standard_b64encode(c_nonce)
         self._c_nonce = c_nonce
