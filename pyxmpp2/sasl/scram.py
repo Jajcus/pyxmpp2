@@ -29,6 +29,7 @@ import re
 import logging
 import hashlib
 import hmac
+import ssl
 
 from binascii import a2b_base64
 from base64 import standard_b64encode
@@ -138,6 +139,9 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         """
         ClientAuthenticator.__init__(self, password_manager)
         SCRAMOperations.__init__(self, hash_name)
+        self.name = "SCRAM-{0}".format(hash_name)
+        if channel_binding:
+            self.name += "-PLUS"
         self.channel_binding = channel_binding
         self.username = None
         self.authzid = None
@@ -148,6 +152,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         self._finished = False
         self._auth_message = None
         self._salted_password = None
+        self._cb_data = None
 
     @classmethod
     def are_properies_sufficient(cls, properites):
@@ -162,12 +167,23 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         self._c_nonce = c_nonce
 
         if self.channel_binding:
-            # TODO: actual channel binding type
-            cb_flag = b"p=tls-server-end-point"
+            cb_data = properties.get("channel-binding")
+            if not cb_data:
+                raise ValueError("No channel binding data provided")
+            if "tls-unique" in cb_data:
+                cb_type = "tls-unique"
+            elif "tls-server-end-point" in cb_data:
+                cb_type = "tls-server-end-point"
+            elif cb_data:
+                cb_type = cb_data.keys()[0]
+            self._cb_data = cb_data[cb_type]
+            cb_flag = b"p=" + cb_type.encode("utf-8")
         else:
-            # TODO: 'y' flag - when channel binding is supported, server
-            #                  did not provided it
-            cb_flag = b"n"
+            plus_name = self.name + "-PLUS"
+            if plus_name in properties.get("enabled_mechanisms", []):
+                cb_flag = b"y"
+            else:
+                cb_flag = b"n"
 
         if self.authzid:
             authzid = b"a=" + self.authzid.encode("utf-8")
@@ -256,16 +272,15 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         """Make a response for the first challenge from the server.
 
         :return: the response or a failure indicator.
-        :returntype: `sasl.Response` or `sasl.Failure`"""
-
+        :returntype: `sasl.Response` or `sasl.Failure`
+        """
         salted_password = self._get_salted_password(salt, iteration_count)
         if salted_password is None:
             return Failure("password-unavailable")
 
         if self.channel_binding:
-            # TODO
-            channel_binding = b"c=" + standard_b64encode(
-                                                    self._gs2_header + cb_data)
+            channel_binding = b"c=" + standard_b64encode(self._gs2_header +
+                                                                self._cb_data)
         else:
             channel_binding = b"c=" + standard_b64encode(self._gs2_header)
 
@@ -364,12 +379,20 @@ class SCRAM_SHA_1_ClientAuthenticator(SCRAMClientAuthenticator):
         SCRAMClientAuthenticator.__init__(self, "SHA-1", False,
                                                             password_manager)
 
-@sasl_mechanism("SCRAM-SHA-1-PLUS", 0)
-class SCRAM_SHA_1_PLIS_ClientAuthenticator(SCRAMClientAuthenticator):
-    """The SCRAM-SHA-1-PLUS client authenticator.
-    """
-    # pylint: disable=C0103
-    def __init__(self, password_manager):
-        SCRAMClientAuthenticator.__init__(self, "SHA-1", True,
+if getattr(ssl, "HAS_TLS_UNIQUE", None):
+    @sasl_mechanism("SCRAM-SHA-1-PLUS", 90)
+    class SCRAM_SHA_1_PLUS_ClientAuthenticator(SCRAMClientAuthenticator):
+        """The SCRAM-SHA-1-PLUS client authenticator.
+        """
+        # pylint: disable=C0103
+        def __init__(self, password_manager):
+            SCRAMClientAuthenticator.__init__(self, "SHA-1", True,
                                                             password_manager)
+        @classmethod
+        def are_properies_sufficient(cls, properites):
+            ret = SCRAMClientAuthenticator.are_properies_sufficient(cls,
+                                                                    properties)
+            if not ret:
+                return False
+            return bool(properites.get("channel-binding"))
 
