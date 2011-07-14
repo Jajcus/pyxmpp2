@@ -38,7 +38,7 @@ class ExternalClientAuthenticator(ClientAuthenticator):
         self.authzid = None
 
     @classmethod
-    def are_properies_sufficient(cls, properites):
+    def are_properties_sufficient(cls, properties):
         return True
 
     def start(self, properties):

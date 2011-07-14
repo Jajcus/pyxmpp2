@@ -24,6 +24,8 @@ from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 
+import logging
+
 from .core import Reply, Response, Challenge, Success, Failure, PasswordManager
 from .core import CLIENT_MECHANISMS, SECURE_CLIENT_MECHANISMS
 from .core import SERVER_MECHANISMS, SECURE_SERVER_MECHANISMS
@@ -38,6 +40,8 @@ try:
     from . import gssapi
 except ImportError:
     pass # Kerberos not available
+
+logger = logging.getLogger("pyxmpp2.sasl")
 
 def client_authenticator_factory(mechanism, password_manager):
     """Create a client authenticator object for given SASL mechanism and
@@ -98,10 +102,14 @@ def filter_mechanism_list(mechanisms, properties, allow_insecure = False,
     """
     result = []
     for mechanism in mechanisms:
-        if server_side:
-            klass = SERVER_MECHANISMS_D[mechanism]
-        else:
-            klass = CLIENT_MECHANISMS_D[mechanism]
+        try:
+            if server_side:
+                klass = SERVER_MECHANISMS_D[mechanism]
+            else:
+                klass = CLIENT_MECHANISMS_D[mechanism]
+        except KeyError:
+            logger.debug(" skipping {0} - not supported".format(mechanism))
+            continue
         secure = properties.get("security-layer")
         if not allow_insecure and not klass._pyxmpp_sasl_secure and not secure:
             logger.debug(" skipping {0}, as it is not secure".format(mechanism))

@@ -667,7 +667,14 @@ class TCPTransport(XMPPTransport, IOHandler):
         self._tls_state = "connected"
         self._set_state("connected")
         self._auth_properties['security-layer'] = "TLS"
-        self._auth_properties['channel-binding'] = {}
+        if self._socket.hasattr("get_channel_binding"):
+            try:
+                tls_unique = self._socket.get_channel_binding("tls-unique")
+            except ValueError:
+                pass
+            else:
+                self._auth_properties['channel-binding'] = {
+                                                    "tls-unique": tls_unique}
         self.event(TLSConnectedEvent(self._socket.cipher(),
                                                 self._socket.getpeercert()))
 

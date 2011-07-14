@@ -190,23 +190,32 @@ class StreamSASLHandler(StreamFeatureHandler):
         stream.write_element(element)
 
         if isinstance(ret, sasl.Success):
-            if not self._check_authorization(ret.properties, stream):
-                element = ElementTree.Element(FAILURE_TAG)
-                ElementTree.SubElement(element, SASL_QNP + "invalid-authzid")
-                return True
-            authzid = ret.properties.get("authzid")
-            if authzid:
-                peer = JID(ret.authzid)
-            elif "username" in ret.properties:
-                peer = JID(ret.properties["username"], stream.me.domain)
-            else:
-                # anonymous
-                peer = None
-            stream.set_peer_authenticated(peer, True)
+            self._handle_auth_success(stream, ret)
         elif isinstance(ret, sasl.Failure):
             raise SASLAuthenticationFailed("SASL authentication failed: {0}"
                                                             .format(ret.reason))
         return True
+
+    def _handle_auth_success(self, stream, success):
+        """Handle successful authentication.
+
+        Send <success/> and mark the stream peer authenticated.
+
+        [receiver only]
+        """
+        if not self._check_authorization(ret.properties, stream):
+            element = ElementTree.Element(FAILURE_TAG)
+            ElementTree.SubElement(element, SASL_QNP + "invalid-authzid")
+            return True
+        authzid = ret.properties.get("authzid")
+        if authzid:
+            peer = JID(ret.authzid)
+        elif "username" in ret.properties:
+            peer = JID(ret.properties["username"], stream.me.domain)
+        else:
+            # anonymous
+            peer = None
+        stream.set_peer_authenticated(peer, True)
 
     @stream_element_handler(CHALLENGE_TAG, "initiator")
     def _process_sasl_challenge(self, stream, element):
@@ -259,19 +268,7 @@ class StreamSASLHandler(StreamFeatureHandler):
         stream.write_element(element)
 
         if isinstance(ret, sasl.Success):
-            if not self._check_authorization(ret.properties, stream):
-                element = ElementTree.Element(FAILURE_TAG)
-                ElementTree.SubElement(element, SASL_QNP + "invalid-authzid")
-                return True
-            authzid = ret.properties.get("authzid")
-            if authzid:
-                peer = JID(ret.authzid)
-            elif "username" in ret.properties:
-                peer = JID(ret.properties["username"], stream.me.domain)
-            else:
-                # anonymous
-                peer = None
-            stream.set_peer_authenticated(peer, True)
+            self._handle_auth_success(stream, ret)
         elif isinstance(ret, sasl.Failure):
             raise SASLAuthenticationFailed("SASL authentication failed: {0!r}"
                                                             .format(ret.reson))
@@ -379,7 +376,7 @@ class StreamSASLHandler(StreamFeatureHandler):
         logger.debug("SASL authentication aborted")
         return True
 
-    def _sasl_authenticate(self, stream, username, authzid, mechanism = None):
+    def _sasl_authenticate(self, stream, username, authzid):
         """Start SASL authentication process.
 
         [initiating entity only]
@@ -394,32 +391,34 @@ class StreamSASLHandler(StreamFeatureHandler):
         if stream.features is None or not self.peer_sasl_mechanisms:
             raise SASLNotAvailable("Peer doesn't support SASL")
 
-        password_manager = self.settings["client_password_manager"]
-
-        mechs = self.settings['sasl_mechanisms'] 
-        if not mechanism:
-            mechanism = None
-            for mech in mechs:
-                if mech in self.peer_sasl_mechanisms:
-                    mechanism = mech
-                    break
-            if not mechanism:
-                raise SASLMechanismNotAvailable("Peer doesn't support any of"
-                                                        " our SASL mechanisms")
-            logger.debug("Our mechanism: {0!r}".format(mechanism))
-        else:
-            if mechanism not in self.peer_sasl_mechanisms:
-                raise SASLMechanismNotAvailable("{0!r} is not available"
-                                                            .format(mechanism))
-
-        stream.auth_method_used = mechanism
-        self.authenticator = sasl.client_authenticator_factory(mechanism,
-                                                            password_manager)
         props = dict(stream.auth_properties)
         if username is not None:
             props["username"] = username
         if authzid is not None:
             props["authzid"] = authzid
+        props["available_mechanisms"] = self.peer_sasl_mechanisms
+        enabled = sasl.filter_mechanism_list(
+                            self.settings['sasl_mechanisms'], props,
+                                            self.settings['insecure_auth'])
+        if not enabled:
+            raise SASLNotAvailable(
+                                "None of SASL mechanism selected can be used")
+        props["enabled_mechanisms"] = enabled
+
+        mechanism = None
+        for mech in enabled:
+            if mech in self.peer_sasl_mechanisms:
+                mechanism = mech
+                break
+        if not mechanism:
+            raise SASLMechanismNotAvailable("Peer doesn't support any of"
+                                                    " our SASL mechanisms")
+        logger.debug("Our mechanism: {0!r}".format(mechanism))
+
+        password_manager = self.settings["client_password_manager"]
+        stream.auth_method_used = mechanism
+        self.authenticator = sasl.client_authenticator_factory(mechanism,
+                                                            password_manager)
         initial_response = self.authenticator.start(props)
         if not isinstance(initial_response, sasl.Response):
             raise SASLAuthenticationFailed("SASL initiation failed")
@@ -450,9 +449,15 @@ SASL authentication."""
 XMPPSettings.add_setting(u"sasl_mechanisms",
         type = 'list of ``unicode``',
         validator = XMPPSettings.validate_string_list,
-        default = ["SCRAM-SHA-1", "DIGEST-MD5", "PLAIN"],
+        default = ["SCRAM-SHA-1-PLUS", "SCRAM-SHA-1", "DIGEST-MD5", "PLAIN"],
         cmdline_help = u"SASL mechanism to enable",
         doc = u"""SASL mechanism that can be used for stream authentication."""
+    )
+XMPPSettings.add_setting(u"insecure_auth", basic = True,
+        type = bool,
+        default = False,
+        cmdline_help = u"Enable insecure SASL mechanisms over unencrypted channels",
+        doc = u"""Enable insecure SASL mechanisms over unencrypted channels"""
     )
 XMPPSettings.add_setting(u"client_password_manager", 
         type = sasl.PasswordManager,

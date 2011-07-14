@@ -25,7 +25,7 @@ Authentication properties
 
 Most authentication mechanisms needs some data to identify the
 authenticating entity and/or to provide characteristics of the communication
-channel. These are passed as a `properites` mapping to the ``.start()``
+channel. These are passed as a `properties` mapping to the ``.start()``
 method to a server or client authenticator.
 
 Similar mechanism is used to return data obtained via the authentication
@@ -51,6 +51,8 @@ mechanism-dependant, but these are the usually expected properties:
     * ``"remote-ip"`` - remote IP address
     * ``"realm"`` - the realm to use if needed
     * ``"realms"`` - list of acceptable realms
+    * ``"available_mechanisms"`` - mechanism list provided by peer
+    * ``"enabled_mechanisms"`` - mechanisms enabled on our side
 
   * For output, via the `Success.properties` attribute:
 
@@ -322,11 +324,11 @@ class ClientAuthenticator:
         self.password_manager = password_manager
 
     @abstractclassmethod
-    def are_properies_sufficient(cls, properites):
+    def are_properties_sufficient(cls, properties):
         """Check if the provided properties are sufficient for
         this authentication mechanism.
 
-        If `are_properies_sufficient` returns False for given `properties`
+        If `are_properties_sufficient` returns False for given `properties`
         mapping, the `start` method of `cls` instance will also fail with
         such argument.
 

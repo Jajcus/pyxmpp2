@@ -155,8 +155,8 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         self._cb_data = None
 
     @classmethod
-    def are_properies_sufficient(cls, properites):
-        return "username" in properites
+    def are_properties_sufficient(cls, properties):
+        return "username" in properties
 
     def start(self, properties):
         self.username = properties["username"]
@@ -389,10 +389,10 @@ if getattr(ssl, "HAS_TLS_UNIQUE", None):
             SCRAMClientAuthenticator.__init__(self, "SHA-1", True,
                                                             password_manager)
         @classmethod
-        def are_properies_sufficient(cls, properites):
-            ret = SCRAMClientAuthenticator.are_properies_sufficient(cls,
-                                                                    properties)
+        def are_properties_sufficient(cls, properties):
+            ret = super(SCRAM_SHA_1_PLUS_ClientAuthenticator, cls
+                                    ).are_properties_sufficient(properties)
             if not ret:
                 return False
-            return bool(properites.get("channel-binding"))
+            return bool(properties.get("channel-binding"))
 

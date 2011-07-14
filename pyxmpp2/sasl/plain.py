@@ -55,8 +55,8 @@ class PlainClientAuthenticator(ClientAuthenticator):
         self.properties = None
 
     @classmethod
-    def are_properies_sufficient(cls, properites):
-        return "username" in properites
+    def are_properties_sufficient(cls, properties):
+        return "username" in properties
 
     def start(self, properties):
         self.properties = properties

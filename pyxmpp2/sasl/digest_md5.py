@@ -225,7 +225,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         self.in_properties = None
 
     @classmethod
-    def are_properies_sufficient(cls, properties):
+    def are_properties_sufficient(cls, properties):
         return ("username" in properties
                 and "service-type" in properties
                 and "service-domain" in properties)
