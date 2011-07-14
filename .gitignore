@@ -11,5 +11,6 @@ log
 py3-build/
 py3-dist/
 py3-examples/
+py3-tests/
 pyxmpp2/version.py
 pyxmpp2.egg-info
