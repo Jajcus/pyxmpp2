@@ -140,9 +140,9 @@ def _compute_response(urp_hash, nonce, cnonce, nonce_count, authzid,
 
     :return: the computed response value.
     :returntype: `bytes`"""
+    # pylint: disable-msg=C0103,R0913
     logger.debug("_compute_response{0!r}".format((urp_hash, nonce, cnonce,
                                             nonce_count, authzid,digest_uri)))
-    # pylint: disable-msg=C0103,R0913
     if authzid:
         a1 = b":".join((urp_hash, nonce, cnonce, authzid))
     else:
@@ -172,6 +172,8 @@ def _compute_response_auth(urp_hash, nonce, cnonce, nonce_count, authzid,
     :return: the computed rspauth value.
     :returntype: `bytes`"""
     # pylint: disable-msg=C0103,R0913
+    logger.debug("_compute_response_auth{0!r}".format((urp_hash, nonce, cnonce,
+                                            nonce_count, authzid, digest_uri)))
     if authzid:
         a1 = b":".join((urp_hash, nonce, cnonce, authzid))
     else:
@@ -427,6 +429,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
                     if ap_realm in realms:
                         realm = ap_realm
                         break
+            realm = realm.decode(charset)
         else:
             realm = self.in_properties.get("realm")
         if realm is not None:
@@ -742,9 +745,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         if pformat == u"md5:user:realm:pass":
             urp_hash = password.a2b_hex()
         elif pformat == u"plain":
-            urp_hash = _make_urp_hash(username.encode("utf-8"),
-                                        realm.encode("utf-8"),
-                                        password.encode("utf-8"))
+            urp_hash = _make_urp_hash(username, realm, password.encode("utf-8"))
         else:
             logger.debug(u"Couldn't get password.")
             return Failure(u"not-authorized")
@@ -791,10 +792,12 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
                 return Failure("not-authorized")
         rspauth = _compute_response_auth(urp_hash, self.nonce, cnonce,
                                         nonce_count, authzid, digest_uri)
+        if authzid_uq is not None:
+            authzid_uq =  authzid_uq.decode("utf-8")
         self.out_properties = {
                         "username": username.decode("utf-8"),
                         "realm": realm.decode("utf-8"),
-                        "authzid": authzid_uq.decode("utf-8"),
+                        "authzid": authzid_uq,
                         "service-type": serv_type,
                         "service-domain": serv_name if serv_name else host,
                         "service-hostname": host
