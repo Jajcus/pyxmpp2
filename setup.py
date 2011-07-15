@@ -3,6 +3,11 @@
 import os.path
 import sys
 
+from distribute_setup import use_setuptools
+use_setuptools("0.6.14")
+    
+from setuptools import setup
+
 version = "2.0alpha2-git"
 
 if (not os.path.exists(os.path.join("pyxmpp2","version.py"))
@@ -24,17 +29,11 @@ else:
 
 extra = {}
 if sys.version_info >= (3,):
-    from setuptools import setup
     extra['use_2to3'] = True
     extra['use_2to3_fixers'] = ['custom_2to3']
-    requires = []
+    install_requires = []
 else:
-    requires = ['dnspython(>=1.6.0)']
-    try:
-        from setuptools import setup
-        extra["install_requires"] = requires[0].replace("(","").replace(")","")
-    except ImportError:
-        from distutils.core import setup
+    install_requires = ['dnspython >=1.6.0']
 
 setup(
     name =      'pyxmpp2',
@@ -60,7 +59,7 @@ setup(
             "Topic :: Software Development :: Libraries :: Python Modules",
         ],
     license =   'LGPL',
-    requires = requires,
+    install_requires = install_requires,
     packages = [
         'pyxmpp2',
         'pyxmpp2.mainloop',
