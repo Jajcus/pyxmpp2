@@ -28,7 +28,7 @@ else:
 
 
 extra = {}
-if sys.version_info >= (3,):
+if sys.version_info[0] >= 3:
     extra['use_2to3'] = True
     extra['use_2to3_fixers'] = ['custom_2to3']
     install_requires = []
