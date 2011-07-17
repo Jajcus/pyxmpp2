@@ -1,18 +1,16 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+# pylint: disable=C0111
 
 import unittest
-import os
 from Queue import Queue
 
 from pyxmpp2.etree import ElementTree
 
-import pyxmpp2.version
 from pyxmpp2.iq import Iq
 from pyxmpp2.jid import JID
 from pyxmpp2.stanzaprocessor import StanzaProcessor
 from pyxmpp2.settings import XMPPSettings
-from pyxmpp2.stanzapayload import XMLPayload
 from pyxmpp2.exceptions import BadRequestProtocolError
 from pyxmpp2.exceptions import NotAcceptableProtocolError
 from pyxmpp2.mainloop.events import EventDispatcher
@@ -21,13 +19,12 @@ from pyxmpp2.streamevents import AuthorizedEvent, GotFeaturesEvent
 from pyxmpp2.roster import RosterItem, RosterPayload, Roster
 from pyxmpp2.roster import RosterClient
 from pyxmpp2.roster import RosterReceivedEvent, RosterNotReceivedEvent
-from pyxmpp2.roster import RosterUpdatedEvent
 
 class TestRosterItem(unittest.TestCase):
     def test_parse_empty(self):
         element = ElementTree.XML('<item xmlns="jabber:iq:roster"/>')
         with self.assertRaises(BadRequestProtocolError):
-            item = RosterItem.from_xml(element)
+            RosterItem.from_xml(element)
 
     def test_parse_only_jid(self):
         element = ElementTree.XML('<item xmlns="jabber:iq:roster"'
@@ -205,7 +202,7 @@ class TestRosterItem(unittest.TestCase):
         # check if serializable
         self.assertTrue(ElementTree.tostring(xml))
 
-    def test_build_empty(self):
+    def test_build_full(self):
         item = RosterItem(JID("test@example.org"), "NAME", ["G1", "G2"],
                                 "from", "subscribe", "true")
         self.assertEqual(item.jid, JID("test@example.org"))
@@ -238,6 +235,7 @@ class Processor(StanzaProcessor):
         self.stanzas_sent.append(stanza)
 
 class DummyStream(object):
+    # pylint: disable=R0903
     def __init__(self, features, me):
         self.features = features
         self.me = me
@@ -362,10 +360,7 @@ class TestRosterClient(unittest.TestCase):
         settings = XMPPSettings()
         settings["event_queue"] = event_queue
         client = RosterClient(settings)
-        dispatcher = EventDispatcher(settings, [client])
         processor = Processor([client])
-        stream = DummyStream(ElementTree.XML(VERSION_FEATURES),
-                                                JID("test@example.org/Test"))
         item1 = RosterItem(JID("item1@example.org"))
         item2 = RosterItem(JID("item2@example.org"))
         client.roster = Roster([item1, item2])
@@ -462,10 +457,7 @@ class TestRosterClient(unittest.TestCase):
         settings = XMPPSettings()
         settings["event_queue"] = event_queue
         client = RosterClient(settings)
-        dispatcher = EventDispatcher(settings, [client])
         processor = Processor([client])
-        stream = DummyStream(ElementTree.XML(VERSION_FEATURES),
-                                                JID("test@example.org/Test"))
         item1 = RosterItem(JID("item1@example.org"), "ITEM1")
         item2 = RosterItem(JID("item2@example.org"), groups = [
                                                         "GROUP1", "GROUP2"])
@@ -599,10 +591,7 @@ class TestRosterClient(unittest.TestCase):
         settings = XMPPSettings()
         settings["event_queue"] = event_queue
         client = RosterClient(settings)
-        dispatcher = EventDispatcher(settings, [client])
         processor = Processor([client])
-        stream = DummyStream(ElementTree.XML(VERSION_FEATURES),
-                                                JID("test@example.org/Test"))
         item1 = RosterItem(JID("item1@example.org"))
         item2 = RosterItem(JID("item2@example.org"))
         client.roster = Roster([item1, item2])
@@ -677,6 +666,7 @@ class TestRosterClient(unittest.TestCase):
         self.assertIsInstance(stanza, Iq)
         self.assertEqual(stanza.stanza_id, response.stanza_id)
 
+# pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():

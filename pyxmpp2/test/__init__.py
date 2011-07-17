@@ -30,7 +30,9 @@ except ImportError:
     pass
 
 def discover():
+    """Discover all the test suites in pyxmpp2.test."""
     suite = unittest.TestSuite()
     for mod in unittest.defaultTestLoader.discover("pyxmpp2.test", "[a-z]*.py"):
         suite.addTest(mod)
     return suite
+

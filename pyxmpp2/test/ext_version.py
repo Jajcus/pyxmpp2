@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+# pylint: disable=C0111
 
 import unittest
 import os
@@ -170,6 +171,7 @@ class TestVersionRequest(unittest.TestCase):
         self.assertIsInstance(received, Iq)
         self.assertEqual(received.stanza_type, "error")
 
+# pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():

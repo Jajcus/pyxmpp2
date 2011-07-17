@@ -1,30 +1,31 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+# pylint: disable=C0111
 
 import unittest
-import time
 import re
 
-from xml.etree.ElementTree import Element, SubElement, XML
-
 from pyxmpp2.streambase import StreamBase
-from pyxmpp2.streamevents import *
-from pyxmpp2.exceptions import StreamParseError
+from pyxmpp2.streamevents import * # pylint: disable=W0401,W0614
 from pyxmpp2.jid import JID
 from pyxmpp2.binding import ResourceBindingHandler
 from pyxmpp2.settings import XMPPSettings
 from pyxmpp2.stanzaprocessor import StanzaProcessor
 
-from pyxmpp2.interfaces import EventHandler, event_handler
+from pyxmpp2.interfaces import event_handler
 
 from pyxmpp2.test._util import EventRecorder
 from pyxmpp2.test._util import InitiatorSelectTestCase
-from pyxmpp2.test._util import InitiatorPollTestMixIn, InitiatorThreadedTestMixIn
 from pyxmpp2.test._util import ReceiverSelectTestCase
-from pyxmpp2.test._util import ReceiverPollTestMixIn, ReceiverThreadedTestMixIn
 
-C2S_SERVER_STREAM_HEAD = '<stream:stream version="1.0" from="127.0.0.1" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
-C2S_CLIENT_STREAM_HEAD = '<stream:stream version="1.0" to="127.0.0.1" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
+C2S_SERVER_STREAM_HEAD = ('<stream:stream version="1.0"'
+                            ' from="127.0.0.1"'
+                            ' xmlns:stream="http://etherx.jabber.org/streams"'
+                            ' xmlns="jabber:client">')
+C2S_CLIENT_STREAM_HEAD = ('<stream:stream version="1.0"'
+                            ' to="127.0.0.1"'
+                            ' xmlns:stream="http://etherx.jabber.org/streams"'
+                            ' xmlns="jabber:client">')
 
 BIND_FEATURES = """<stream:features>
      <bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>
@@ -69,6 +70,7 @@ TIMEOUT = 1.0 # seconds
 class AuthorizedEventHandler(EventRecorder):
     @event_handler(AuthorizedEvent)
     def handle_authorized_event(self, event):
+        # pylint: disable=R0201
         event.stream.close()
         return True
 
@@ -114,7 +116,8 @@ class TestBindingInitiator(InitiatorSelectTestCase):
         self.wait_short(1)
         self.server.write(BIND_FEATURES)
         req_id = self.wait(1,
-                    expect = re.compile(r".*<iq[^>]*id=[\"']([^\"']*)[\"'].*<resource>Provided</resource>"))
+                    expect = re.compile(r".*<iq[^>]*id=[\"']([^\"']*)[\"'].*"
+                                            r"<resource>Provided</resource>"))
         self.assertIsNotNone(req_id)
         self.server.write(BIND_PROVIDED_RESPONSE.format(req_id))
         self.wait()
@@ -136,11 +139,14 @@ class TestBindingReceiver(ReceiverSelectTestCase):
         processor.setup_stanza_handlers(handlers, "post-auth")
         self.client.write(C2S_CLIENT_STREAM_HEAD)
         features = self.wait(
-                expect = re.compile(r".*<stream:features>(.*<bind.*urn:ietf:params:xml:ns:xmpp-bind.*)</stream:features>"))
+                expect = re.compile(r".*<stream:features>"
+                        r"(.*<bind.*urn:ietf:params:xml:ns:xmpp-bind.*)"
+                                                    r"</stream:features>"))
         self.assertIsNotNone(features)
         self.client.write(BIND_GENERATED_REQUEST)
         resource = self.wait(
-                expect = re.compile(r".*<iq.*id=(?:\"42\"|'42').*><bind.*<jid>test@127.0.0.1/(.*)</jid>.*</bind>"))
+                expect = re.compile(r".*<iq.*id=(?:\"42\"|'42').*>"
+                            r"<bind.*<jid>test@127.0.0.1/(.*)</jid>.*</bind>"))
         self.assertTrue(resource)
         self.client.write(STREAM_TAIL)
         self.client.disconnect()
@@ -161,11 +167,14 @@ class TestBindingReceiver(ReceiverSelectTestCase):
         processor.setup_stanza_handlers(handlers, "post-auth")
         self.client.write(C2S_CLIENT_STREAM_HEAD)
         features = self.wait(
-                expect = re.compile(r".*<stream:features>(.*<bind.*urn:ietf:params:xml:ns:xmpp-bind.*)</stream:features>"))
+                expect = re.compile(r".*<stream:features>"
+                    r"(.*<bind.*urn:ietf:params:xml:ns:xmpp-bind.*)"
+                                                    r"</stream:features>"))
         self.assertIsNotNone(features)
         self.client.write(BIND_PROVIDED_REQUEST)
         resource = self.wait(
-                expect = re.compile(r".*<iq.*id=(?:\"42\"|'42').*><bind.*<jid>test@127.0.0.1/(.*)</jid>.*</bind>"))
+                expect = re.compile(r".*<iq.*id=(?:\"42\"|'42').*>"
+                            r"<bind.*<jid>test@127.0.0.1/(.*)</jid>.*</bind>"))
         self.assertEqual(resource, u"Provided")
         self.client.write(STREAM_TAIL)
         self.client.disconnect()
@@ -173,7 +182,8 @@ class TestBindingReceiver(ReceiverSelectTestCase):
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [AuthenticatedEvent,
                     StreamConnectedEvent, AuthorizedEvent, DisconnectedEvent])
- 
+
+# pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():

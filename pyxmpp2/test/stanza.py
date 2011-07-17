@@ -1,5 +1,6 @@
 #!/usr/bin/python -u
 # -*- coding: UTF-8 -*-
+# pylint: disable=C0111
 
 import unittest
 
@@ -19,7 +20,7 @@ from pyxmpp2.utils import xml_elements_equal
 
 
 STANZA0 = "<presence xmlns='jabber:client' />"
-STANZA1 = "<presence xmlns='jabber:server'><status>XXXX</status></presence>"
+STANZA1 = "<presence xmlns='jabber:server'><status>STATUS</status></presence>"
 STANZA2 = "<message xmlns='jabber:client' />"
 STANZA3 = """
 <presence from='a@b.c/d' to='e@f.g/h' id='666' type='unavailable' 
@@ -103,11 +104,13 @@ class TestStanza(unittest.TestCase):
         stanza = Stanza("presence", from_jid = JID('a@b.c/d'), 
                             to_jid = JID('e@f.g/h'), stanza_id = '666',
                             stanza_type = 'unavailable')
-        self.assertTrue(xml_elements_equal(stanza.as_xml(), ElementTree.XML(STANZA3)))
+        self.assertTrue(xml_elements_equal(stanza.as_xml(),
+                                                    ElementTree.XML(STANZA3)))
     def test_serialize1(self):
         for xml in (STANZA0, STANZA1, STANZA2, STANZA3, STANZA4, STANZA5):
             stanza = Stanza(ElementTree.XML(xml))
-            element1 = ElementTree.XML(re.sub(r" xmlns='jabber:[^'\":]*'", "", xml))
+            element1 = ElementTree.XML(re.sub(r" xmlns='jabber:[^'\":]*'",
+                                                                    "", xml))
             element2 = ElementTree.XML(stanza.serialize())
             self.assertTrue(xml_elements_equal(element1, element2, True))
     def test_serialize2(self):
@@ -122,7 +125,8 @@ class TestStanza(unittest.TestCase):
         # STANZA1 and STANZA2 won't match as have no namespace
         for xml in (STANZA0, STANZA3, STANZA4, STANZA5):
             stanza = Stanza(ElementTree.XML(xml))
-            self.assertTrue(xml_elements_equal(stanza.as_xml(), ElementTree.XML(xml), True))
+            self.assertTrue(xml_elements_equal(stanza.as_xml(),
+                                                ElementTree.XML(xml), True))
     def test_stanza_get_xml(self):
         for xml in (STANZA0, STANZA1, STANZA2, STANZA3, STANZA4, STANZA5):
             element = ElementTree.XML(xml)
@@ -143,8 +147,9 @@ class TestStanza(unittest.TestCase):
         stanza6 = Stanza(ElementTree.XML(STANZA6))
         payload = stanza6.get_payload(TestPayload)
         self.assertIsInstance(payload, TestPayload)
-        self.assertIsNone(payload.data)
-        self.assertTrue(xml_elements_equal(ElementTree.XML(STANZA6)[0], payload.as_xml()))
+        self.assertIsNone(payload.data) # pylint: disable=E1103
+        self.assertTrue(xml_elements_equal(ElementTree.XML(STANZA6)[0],
+                                                            payload.as_xml()))
 
     def test_stanza_set_custom_payload(self):
         stanza7 = Stanza("iq", from_jid = JID('a@b.c/d'), 
@@ -154,9 +159,10 @@ class TestStanza(unittest.TestCase):
         stanza7.set_payload(payload)
         payload1 = stanza7.get_payload(TestPayload)
         self.assertTrue(payload1 is payload)
-        self.assertTrue(xml_elements_equal(ElementTree.XML(STANZA7), stanza7.as_xml(),
-                                                                        True))
+        self.assertTrue(xml_elements_equal(ElementTree.XML(STANZA7),
+                                                    stanza7.as_xml(), True))
 
+# pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():

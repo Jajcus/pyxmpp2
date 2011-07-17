@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+# pylint: disable=C0111
 
 import unittest
 import logging
@@ -23,6 +24,7 @@ NO_RESULT = object()
 DUPLICATE = object()
 
 class DummyEvent(Event):
+    # pylint: disable=W0232,R0903
     def __unicode__(self):
         return u"Dummy event"
 
@@ -170,7 +172,8 @@ class _TestResolver(unittest.TestCase):
         self.assertEqual(len(self.address_result), len(addresses))
         expected = [[]] * 20
         if is_ipv6_available():
-            expected += [[(2, '127.0.0.1')], [(10, '::1')], [(10, '::1'), (2, '127.0.0.1')]]
+            expected += [[(2, '127.0.0.1')], [(10, '::1')],
+                                            [(10, '::1'), (2, '127.0.0.1')]]
         else:
             expected += [[], [(2, '127.0.0.1')], [(2, '127.0.0.1')]]
         results = sorted(self.address_result)
@@ -178,6 +181,7 @@ class _TestResolver(unittest.TestCase):
 
 class _TestDumbResolver(_TestResolver):
     def make_resolver(self, settings = None):
+        # pylint: disable=E0602
         return DumbResolver(settings)
     def test_resolve_srv(self):
         resolver = self.make_resolver()
@@ -190,7 +194,7 @@ class _TestDumbResolver(_TestResolver):
 
 @unittest.skipIf("network" not in _support.RESOURCES, "network usage disabled")
 class TestBlockingResolver(_TestResolver):
-    def wait(self, timeout):
+    def wait(self, timeout = 1):
         return
 
     def make_resolver(self, settings = None):
@@ -206,7 +210,7 @@ class TestThreadedResolver(_TestResolver):
     def make_resolver(self, settings = None):
         return ThreadedResolver(settings, 10)
 
-
+# pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():

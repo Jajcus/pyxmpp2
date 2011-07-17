@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+# pylint: disable=C0111
 
 import unittest
 
@@ -7,7 +8,6 @@ from pyxmpp2.etree import ElementTree
 
 from pyxmpp2.presence import Presence
 from pyxmpp2.jid import JID
-from pyxmpp2.utils import xml_elements_equal
 from pyxmpp2.stanzapayload import XMLPayload
 
 PRESENCE1 = """
@@ -25,15 +25,15 @@ PRESENCE3 = """<presence xmlns="jabber:client" from='source@example.com/res'
                                 to='dest@example.com' type="subscribe" />"""
 
 class TestPresence(unittest.TestCase):
-    def check_presence_full(self, p):
-        self.assertEqual(p.from_jid, JID("source@example.com/res"))
-        self.assertEqual(p.to_jid, JID("dest@example.com"))
-        self.assertEqual(p.stanza_type, None)
-        self.assertEqual(p.stanza_id, "1")
-        self.assertEqual(p.show, "away")
-        self.assertEqual(p.status, "The Status")
-        self.assertEqual(p.priority, 10)
-        payload = p.get_all_payload()
+    def check_presence_full(self, pres):
+        self.assertEqual(pres.from_jid, JID("source@example.com/res"))
+        self.assertEqual(pres.to_jid, JID("dest@example.com"))
+        self.assertEqual(pres.stanza_type, None)
+        self.assertEqual(pres.stanza_id, "1")
+        self.assertEqual(pres.show, "away")
+        self.assertEqual(pres.status, "The Status")
+        self.assertEqual(pres.priority, 10)
+        payload = pres.get_all_payload()
         self.assertTrue(payload)
         self.assertEqual(payload[0].xml_element_name, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}payload")
@@ -41,45 +41,45 @@ class TestPresence(unittest.TestCase):
         self.assertEqual(payload[0].element[0].tag, 
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
 
-    def check_presence_empty(self, p):
-        self.assertEqual(p.from_jid, None)
-        self.assertEqual(p.to_jid, None)
-        self.assertEqual(p.stanza_type, None)
-        self.assertIsNone(p.stanza_id)
-        self.assertEqual(p.show, None)
-        self.assertEqual(p.status, None)
-        self.assertEqual(p.priority, 0)
-        payload = p.get_all_payload()
+    def check_presence_empty(self, pres):
+        self.assertEqual(pres.from_jid, None)
+        self.assertEqual(pres.to_jid, None)
+        self.assertEqual(pres.stanza_type, None)
+        self.assertIsNone(pres.stanza_id)
+        self.assertEqual(pres.show, None)
+        self.assertEqual(pres.status, None)
+        self.assertEqual(pres.priority, 0)
+        payload = pres.get_all_payload()
         self.assertFalse(payload)
 
-    def check_presence_subscribe(self, p):
-        self.assertEqual(p.from_jid, JID("source@example.com/res"))
-        self.assertEqual(p.to_jid, JID("dest@example.com"))
-        self.assertEqual(p.stanza_type, "subscribe")
-        self.assertEqual(p.stanza_id, None)
-        self.assertEqual(p.show, None)
-        self.assertEqual(p.status, None)
+    def check_presence_subscribe(self, pres):
+        self.assertEqual(pres.from_jid, JID("source@example.com/res"))
+        self.assertEqual(pres.to_jid, JID("dest@example.com"))
+        self.assertEqual(pres.stanza_type, "subscribe")
+        self.assertEqual(pres.stanza_id, None)
+        self.assertEqual(pres.show, None)
+        self.assertEqual(pres.status, None)
 
     def test_presence_full_from_xml(self):
-        p = Presence(ElementTree.XML(PRESENCE1))
-        self.check_presence_full(p)
+        pres = Presence(ElementTree.XML(PRESENCE1))
+        self.check_presence_full(pres)
 
     def test_presence_empty_from_xml(self):
-        p = Presence(ElementTree.XML(PRESENCE2))
-        self.check_presence_empty(p)
+        pres = Presence(ElementTree.XML(PRESENCE2))
+        self.check_presence_empty(pres)
 
     def test_presence_subscribe_from_xml(self):
-        p = Presence(ElementTree.XML(PRESENCE3))
-        self.check_presence_subscribe(p)
+        pres = Presence(ElementTree.XML(PRESENCE3))
+        self.check_presence_subscribe(pres)
 
     def test_presence_empty(self):
-        p = Presence()
-        self.check_presence_empty(p)
-        xml = p.as_xml()
+        pres = Presence()
+        self.check_presence_empty(pres)
+        xml = pres.as_xml()
         self.check_presence_empty(Presence(xml))
 
     def test_presence_full(self):
-        p = Presence(
+        pres = Presence(
                 from_jid = JID("source@example.com/res"),
                 to_jid = JID("dest@example.com"),
                 stanza_type = None,
@@ -87,14 +87,17 @@ class TestPresence(unittest.TestCase):
                 show = u"away",
                 status = u"The Status",
                 priority = 10)
-        payload = ElementTree.Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        ElementTree.SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        payload = ElementTree.Element(
+                                "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+        ElementTree.SubElement(payload, 
+                                    "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
-        p.add_payload(payload)
-        self.check_presence_full(p)
-        xml = p.as_xml()
-        self.check_presence_full( Presence(xml) )
+        pres.add_payload(payload)
+        self.check_presence_full(pres)
+        xml = pres.as_xml()
+        self.check_presence_full(Presence(xml))
 
+# pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():

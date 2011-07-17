@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+# pylint: disable=C0111
 
 import unittest
-import time
 import re
 import base64
 import os
@@ -12,8 +12,8 @@ import pyxmpp2.etree
 if "PYXMPP2_ETREE" not in os.environ:
     # one of tests fails when xml.etree.ElementTree is used
     try:
-        import xml.etree.cElementTree
-        pyxmpp2.etree.ElementTree = xml.etree.cElementTree
+        from xml.etree import cElementTree
+        pyxmpp2.etree.ElementTree = cElementTree
     except ImportError:
         pass
 
@@ -21,22 +21,20 @@ from pyxmpp2.etree import ElementTree
 
 from pyxmpp2.streambase import StreamBase
 from pyxmpp2.streamsasl import StreamSASLHandler
-from pyxmpp2.streamevents import *
+from pyxmpp2.streamevents import * # pylint: disable=W0614,W0401
 from pyxmpp2.exceptions import SASLAuthenticationFailed
-from pyxmpp2.jid import JID
 from pyxmpp2.settings import XMPPSettings
-
-from pyxmpp2.interfaces import EventHandler, event_handler
 
 from pyxmpp2.test._util import EventRecorder
 from pyxmpp2.test._util import InitiatorSelectTestCase
-from pyxmpp2.test._util import InitiatorPollTestMixIn, InitiatorThreadedTestMixIn
 from pyxmpp2.test._util import ReceiverSelectTestCase
-from pyxmpp2.test._util import ReceiverPollTestMixIn, ReceiverThreadedTestMixIn
 
-
-C2S_SERVER_STREAM_HEAD = '<stream:stream version="1.0" from="127.0.0.1" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
-C2S_CLIENT_STREAM_HEAD = '<stream:stream version="1.0" to="127.0.0.1" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
+C2S_SERVER_STREAM_HEAD = ('<stream:stream version="1.0" from="127.0.0.1"'
+                            ' xmlns:stream="http://etherx.jabber.org/streams"'
+                            'xmlns="jabber:client">')
+C2S_CLIENT_STREAM_HEAD = ('<stream:stream version="1.0" to="127.0.0.1"'
+                            ' xmlns:stream="http://etherx.jabber.org/streams"'
+                            ' xmlns="jabber:client">')
 
 AUTH_FEATURES = """<stream:features>
      <mechanisms xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>
@@ -48,7 +46,8 @@ BIND_FEATURES = """<stream:features>
      <bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>
 </stream:features>"""
 
-PLAIN_AUTH = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>{0}</auth>"
+PLAIN_AUTH = ("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl'"
+                                            " mechanism='PLAIN'>{0}</auth>")
 
 STREAM_TAIL = '</stream:stream>'
         
@@ -81,7 +80,8 @@ class TestInitiator(InitiatorSelectTestCase):
         data = element.text.decode("base64")
         self.assertEqual(data, b"\000user\000secret")
         self.server.rdata = b""
-        self.server.write(b"<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>")
+        self.server.write(
+                        b"<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>")
         stream_start = self.wait(expect = re.compile(r"(<stream:stream[^>]*>)"))
         self.assertIsNotNone(stream_start)
         self.assertTrue(self.stream.authenticated)
@@ -144,10 +144,13 @@ class TestReceiver(ReceiverSelectTestCase):
                                 r".*<stream:features>(.*)</stream:features>"))
         self.assertIsNotNone(xml)
         element = ElementTree.XML(xml)
-        self.assertEqual(element.tag, "{urn:ietf:params:xml:ns:xmpp-sasl}mechanisms")
-        self.assertEqual(element[0].tag, "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
+        self.assertEqual(element.tag,
+                                "{urn:ietf:params:xml:ns:xmpp-sasl}mechanisms")
+        self.assertEqual(element[0].tag,
+                                "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
         self.assertEqual(element[0].text, "DIGEST-MD5")
-        self.assertEqual(element[1].tag, "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
+        self.assertEqual(element[1].tag,
+                                "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
         self.assertEqual(element[1].text, "PLAIN")
         self.client.write(PLAIN_AUTH.format(
                                     base64.b64encode(b"\000user\000secret")))
@@ -181,10 +184,13 @@ class TestReceiver(ReceiverSelectTestCase):
                                 r".*<stream:features>(.*)</stream:features>"))
         self.assertIsNotNone(xml)
         element = ElementTree.XML(xml)
-        self.assertEqual(element.tag, "{urn:ietf:params:xml:ns:xmpp-sasl}mechanisms")
-        self.assertEqual(element[0].tag, "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
+        self.assertEqual(element.tag,
+                                "{urn:ietf:params:xml:ns:xmpp-sasl}mechanisms")
+        self.assertEqual(element[0].tag,
+                                "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
         self.assertEqual(element[0].text, "DIGEST-MD5")
-        self.assertEqual(element[1].tag, "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
+        self.assertEqual(element[1].tag,
+                                "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
         self.assertEqual(element[1].text, "PLAIN")
         self.client.write(PLAIN_AUTH.format(
                                     base64.b64encode(b"\000user\000bad")))
@@ -194,8 +200,10 @@ class TestReceiver(ReceiverSelectTestCase):
         self.client.disconnect()
         self.wait()
         event_classes = [e.__class__ for e in handler.events_received]
-        self.assertEqual(event_classes, [StreamConnectedEvent, DisconnectedEvent])
- 
+        self.assertEqual(event_classes, [StreamConnectedEvent,
+                                                            DisconnectedEvent])
+
+# pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():

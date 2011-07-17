@@ -1,14 +1,14 @@
 #!/usr/bin/python -u
 # -*- coding: UTF-8 -*-
+# pylint: disable=C0111
 
 import unittest
-
-import re
 
 from pyxmpp2.exceptions import StringprepError
 from pyxmpp2.sasl.saslprep import SASLPREP        
 
 class TestSASLprep(unittest.TestCase):
+    # pylint: disable=R0903
     def test_rfc_examples(self):
         for input_, output in (
                                 (u"I\u00ADX",   u"IX"),
@@ -23,6 +23,7 @@ class TestSASLprep(unittest.TestCase):
             with self.assertRaises(StringprepError):
                 SASLPREP.prepare(input_)
 
+# pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():

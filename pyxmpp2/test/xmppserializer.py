@@ -1,11 +1,11 @@
 #!/usr/bin/python -u
 # -*- coding: UTF-8 -*-
+# pylint: disable=C0111
 
 import unittest
 from xml.etree import ElementTree
 
-from pyxmpp2.xmppserializer import XMPPSerializer, serialize
-from pyxmpp2.jid import JID
+from pyxmpp2.xmppserializer import XMPPSerializer
 
 from pyxmpp2.utils import xml_elements_equal
 
@@ -69,6 +69,7 @@ class TestXMPPSerializer(unittest.TestCase):
         # prefix for other namespace child
         self.assertTrue("<sub2" in output)
 
+# pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():

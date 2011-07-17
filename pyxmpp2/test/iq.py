@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+# pylint: disable=C0111
 
 import unittest
 
@@ -8,7 +9,6 @@ from pyxmpp2.etree import ElementTree
 from pyxmpp2.iq import Iq
 from pyxmpp2.jid import JID
 from pyxmpp2.stanzapayload import XMLPayload
-from pyxmpp2.xmppserializer import serialize
 from pyxmpp2.error import StanzaErrorElement
 
 IQ1 = """
@@ -131,8 +131,10 @@ class TestIq(unittest.TestCase):
                 to_jid = JID("dest@example.com"),
                 stanza_type = "get",
                 stanza_id = 1)
-        payload = ElementTree.Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        ElementTree.SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        payload = ElementTree.Element(
+                                "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+        ElementTree.SubElement(payload, 
+                                "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         iq.add_payload(payload)
         self.check_iq1(iq)
@@ -144,8 +146,10 @@ class TestIq(unittest.TestCase):
                 from_jid = JID("dest@example.com"),
                 stanza_type = "result",
                 stanza_id = 1)
-        payload = ElementTree.Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        ElementTree.SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        payload = ElementTree.Element(
+                                "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+        ElementTree.SubElement(payload, 
+                                "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         iq.add_payload(payload)
         self.check_iq2(iq)
@@ -157,8 +161,10 @@ class TestIq(unittest.TestCase):
                 to_jid = JID("dest@example.com"),
                 stanza_type = "set",
                 stanza_id = 2)
-        payload = ElementTree.Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        ElementTree.SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        payload = ElementTree.Element(
+                                "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+        ElementTree.SubElement(payload, 
+                                "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         iq.add_payload(payload)
         self.check_iq3(iq)
@@ -177,8 +183,10 @@ class TestIq(unittest.TestCase):
     def test_iq_make_result_response(self):
         iq = Iq(ElementTree.XML(IQ1))
         iq2 = iq.make_result_response()
-        payload = ElementTree.Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        ElementTree.SubElement(payload, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        payload = ElementTree.Element(
+                                "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+        ElementTree.SubElement(payload,
+                                "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         iq2.add_payload(payload)
         self.check_iq2(iq2)
@@ -190,6 +198,7 @@ class TestIq(unittest.TestCase):
         xml = iq5.as_xml()
         self.check_iq5( Iq(xml) )
 
+# pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():

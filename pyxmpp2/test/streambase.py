@@ -1,38 +1,46 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+# pylint: disable=C0111
 
 import unittest
-import time
 import re
 import logging
 import select
 
-from xml.etree.ElementTree import Element, SubElement, XML
+from xml.etree.ElementTree import XML
 
 try:
     import glib
 except ImportError:
+    # pylint: disable=C0103
     glib = None
 
 from pyxmpp2.streambase import StreamBase
-from pyxmpp2.streamevents import *
+from pyxmpp2.streamevents import * # pylint: disable=W0401,W0614
 from pyxmpp2.exceptions import StreamParseError
 from pyxmpp2.jid import JID
 from pyxmpp2.message import Message
 from pyxmpp2.settings import XMPPSettings
 
-from pyxmpp2.interfaces import EventHandler, event_handler, QUIT
+from pyxmpp2.interfaces import event_handler
 from pyxmpp2.interfaces import StanzaRoute
 
 from pyxmpp2.test._util import EventRecorder
 from pyxmpp2.test._util import InitiatorSelectTestCase
-from pyxmpp2.test._util import InitiatorPollTestMixIn, InitiatorThreadedTestMixIn
+from pyxmpp2.test._util import InitiatorPollTestMixIn
+from pyxmpp2.test._util import InitiatorThreadedTestMixIn
 from pyxmpp2.test._util import InitiatorGLibTestMixIn, ReceiverGLibTestMixIn
 from pyxmpp2.test._util import ReceiverSelectTestCase
 from pyxmpp2.test._util import ReceiverPollTestMixIn, ReceiverThreadedTestMixIn
 
-C2S_SERVER_STREAM_HEAD = '<stream:stream version="1.0" from="127.0.0.1" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
-C2S_CLIENT_STREAM_HEAD = '<stream:stream version="1.0" to="127.0.0.1" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
+C2S_SERVER_STREAM_HEAD = ('<stream:stream version="1.0"'
+                            ' from="127.0.0.1"'
+                            ' xmlns:stream="http://etherx.jabber.org/streams"'
+                            ' xmlns="jabber:client">')
+C2S_CLIENT_STREAM_HEAD = ('<stream:stream version="1.0"'
+                            ' to="127.0.0.1"'
+                            ' xmlns:stream="http://etherx.jabber.org/streams"'
+                            ' xmlns="jabber:client">')
 
 STREAM_TAIL = '</stream:stream>'
         
@@ -54,18 +62,21 @@ class RecordingRoute(StanzaRoute):
 class JustConnectEventHandler(EventRecorder):
     @event_handler(ConnectedEvent)
     def handle_connected_event(self, event):
+        # pylint: disable=R0201
         event.stream.close()
         return True
 
 class JustStreamConnectEventHandler(EventRecorder):
     @event_handler(StreamConnectedEvent)
     def handle_stream_conencted_event(self, event):
+        # pylint: disable=R0201
         event.stream.disconnect()
         return True
 
 class AuthorizedEventHandler(EventRecorder):
     @event_handler(AuthorizedEvent)
     def handle_authorized_event(self, event):
+        # pylint: disable=R0201
         event.stream.close()
         return True
 
@@ -252,14 +263,17 @@ class TestReceiverThreaded(ReceiverThreadedTestMixIn, TestReceiverSelect):
 class TestReceiverGLib(ReceiverGLibTestMixIn, TestReceiverSelect):
     pass
 
+# pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():
+    # pylint: disable=W0212
     # reset the event queue
     XMPPSettings._defs['event_queue'].default = None
     setup_logging()
 
 def tearDownModule():
+    # pylint: disable=W0212
     # reset the event queue
     XMPPSettings._defs['event_queue'].default = None
 

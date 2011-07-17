@@ -1,8 +1,8 @@
 #!/usr/bin/python -u
 # -*- coding: UTF-8 -*-
+# pylint: disable=C0111
 
 import os
-import sys
 import logging
 
 from pyxmpp2.test._support import DATA_DIR
@@ -13,14 +13,13 @@ import unittest
 from xml.etree import ElementTree
 
 from pyxmpp2 import xmppparser
-from pyxmpp2.jid import JID, JIDError
-from pyxmpp2 import xmppstringprep
 
 from pyxmpp2.utils import xml_elements_equal
 
 class EventTemplate:
+    # pylint: disable=R0903
     def __init__(self, template):
-        self.event, offset, xml = template.split(None,2)
+        self.event, offset, xml = template.split(None, 2)
         self.offset = int(offset)
         self.xml = ElementTree.XML(eval(xml))
 
@@ -34,10 +33,12 @@ class EventTemplate:
         return True
 
     def __repr__(self):
-        return "<EventTemplate %r at %r: %r>" % (self.event, self.offset, ElementTree.dump(self.xml))
+        return "<EventTemplate %r at %r: %r>" % (self.event, self.offset,
+                                                    ElementTree.dump(self.xml))
 
 class StreamHandler(xmppparser.XMLStreamHandler):
     def __init__(self, test_case):
+        xmppparser.XMLStreamHandler.__init__()
         self.test_case = test_case
     def stream_start(self, element):
         self.test_case.event("start", element)
@@ -46,17 +47,20 @@ class StreamHandler(xmppparser.XMLStreamHandler):
     def stream_element(self, element):
         self.test_case.event("node", element)
 
+# pylint: disable=C0103
 expected_events = []
+# pylint: disable=C0103
 whole_stream = None
 
 def load_expected_events():
-    for l in file(os.path.join(DATA_DIR, "stream_info.txt")):
-        if l.startswith("#"):
+    for line in open(os.path.join(DATA_DIR, "stream_info.txt")):
+        if line.startswith("#"):
             continue
-        l = l.strip()
-        expected_events.append(EventTemplate(l))
+        line = line.strip()
+        expected_events.append(EventTemplate(line))
 
 def load_whole_stream():
+    # pylint: disable=W0603
     global whole_stream
     whole_stream = ElementTree.parse(os.path.join(DATA_DIR, "stream.xml"))
 
@@ -102,32 +106,38 @@ class TestStreamReader(unittest.TestCase):
                 self.event("end", None)
                 break
             self.chunk_start = self.chunk_end
-        r1 = self.whole_stream.getroot()
-        self.assertIsNotNone(r1)
-        r2 = whole_stream.getroot()
-        if not xml_elements_equal(r1, r2, True):
+        root1 = self.whole_stream.getroot()
+        self.assertIsNotNone(root1)
+        root2 = whole_stream.getroot()
+        if not xml_elements_equal(root1, root2, True):
             self.fail("Whole stream invalid. Got: %r, Expected: %r"
-                    % (ElementTree.tostring(r1), ElementTree.tostring(r2)))
+                                    % (ElementTree.tostring(root1),
+                                                ElementTree.tostring(root2)))
 
     def event(self, event, element):
         logger.debug(" event: {0!r} element: {1!r}".format(event, element))
         expected = self.expected_events.pop(0)
-        self.assertTrue(event==expected.event, "Got %r, expected %r" % (event, expected.event))
+        self.assertTrue(event==expected.event, "Got %r, expected %r" % 
+                                                    (event, expected.event))
         if expected.offset < self.chunk_start:
             self.fail("Delayed event: %r. Expected at: %i, found at %i:%i"
-                    % (event, expected.offset, self.chunk_start, self.chunk_end))
+                    % (event, expected.offset, self.chunk_start,
+                                                            self.chunk_end))
         if expected.offset > self.chunk_end:
             self.fail("Early event: %r. Expected at: %i, found at %i:%i"
-                    % (event, expected.offset, self.chunk_start, self.chunk_end))
-        if not expected.match(event,element):
+                    % (event, expected.offset, self.chunk_start,
+                                                            self.chunk_end))
+        if not expected.match(event, element):
             self.fail("Unmatched event. Expected: %r, got: %r;%r"
                     % (expected, event, ElementTree.dump(element)))
         if event == "start":
+            # pylint: disable=W0212
             self.whole_stream._setroot(element)
         elif event == "node":
-            r = self.whole_stream.getroot()
-            r.append(element)
+            root = self.whole_stream.getroot()
+            root.append(element)
 
+# pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():

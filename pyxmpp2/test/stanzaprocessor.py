@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+# pylint: disable=C0111
 
 import unittest
 
@@ -93,14 +94,15 @@ class TestStanzaFactory(unittest.TestCase):
         self.assertTrue( isinstance(stanza, Presence) )
 
 class TestStanzaProcessor(unittest.TestCase):
+    # pylint: disable=R0904
     def setUp(self):
         self.handlers_called = []
         self.stanzas_sent = []
-        self.p = StanzaProcessor()
-        self.p.me = JID("dest@example.com/xx")
-        self.p.peer = JID("source@example.com/yy")
-        self.p.send = self.send
-        self.p.initiator = True
+        self.proc = StanzaProcessor()
+        self.proc.me = JID("dest@example.com/xx")
+        self.proc.peer = JID("source@example.com/yy")
+        self.proc.send = self.send
+        self.proc.initiator = True
 
     def send(self, stanza):
         self.stanzas_sent.append(stanza)
@@ -108,7 +110,7 @@ class TestStanzaProcessor(unittest.TestCase):
     def process_stanzas(self, xml_elements):
         for xml in xml_elements:
             stanza = stanza_factory(ElementTree.XML(xml))
-            self.p.process_stanza(stanza)
+            self.proc.process_stanza(stanza)
 
     def ignore_iq_get(self, stanza):
         self.handlers_called.append("ignore_iq_get")
@@ -127,8 +129,10 @@ class TestStanzaProcessor(unittest.TestCase):
         self.assertIsInstance(stanza, Iq)
         self.assertEqual(stanza.stanza_type, "get")
         reply = stanza.make_result_response()
-        element = ElementTree.Element("{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        ElementTree.SubElement(element, "{http://pyxmpp.jajcus.net/xmlns/test}abc")
+        element = ElementTree.Element(
+                                "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+        ElementTree.SubElement(element,
+                                    "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         reply.set_payload(element)
         return reply
 
@@ -152,27 +156,34 @@ class TestStanzaProcessor(unittest.TestCase):
         return message
     
     def eat1(self, stanza):
+        # pylint: disable=W0613
         self.handlers_called.append("eat1")
         return True
     def eat2(self, stanza):
+        # pylint: disable=W0613
         self.handlers_called.append("eat2")
         return True
     def pass1(self, stanza):
+        # pylint: disable=W0613
         self.handlers_called.append("pass1")
     def pass2(self, stanza):
+        # pylint: disable=W0613
         self.handlers_called.append("pass2")
 
     def test_iq_ignore_handlers(self):
         parent = self
         class Handlers(XMPPFeatureHandler):
-            @iq_get_stanza_handler(XMLPayload, "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+            # pylint: disable=W0232,R0201,R0903
+            @iq_get_stanza_handler(XMLPayload,
+                                "{http://pyxmpp.jajcus.net/xmlns/test}payload")
             def handler1(self, stanza):
                 return parent.ignore_iq_get(stanza)
-            @iq_set_stanza_handler(XMLPayload, "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+            @iq_set_stanza_handler(XMLPayload,
+                                "{http://pyxmpp.jajcus.net/xmlns/test}payload")
             def handler2(self, stanza):
                 return parent.ignore_iq_set(stanza)
-        self.p.setup_stanza_handlers([Handlers()], "post-auth")
-        self.process_stanzas(ALL_STANZAS)
+        self.proc.setup_stanza_handlers([Handlers()], "post-auth")
+        self.procrocess_stanzas(ALL_STANZAS)
         self.assertEqual(self.handlers_called, ["ignore_iq_get",
                                                     "ignore_iq_set"])
         self.assertFalse(self.stanzas_sent)
@@ -180,24 +191,29 @@ class TestStanzaProcessor(unittest.TestCase):
     def test_iq_reply_handlers(self):
         parent = self
         class Handlers(XMPPFeatureHandler):
-            @iq_get_stanza_handler(XMLPayload, "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+            # pylint: disable=W0232,R0201,R0903
+            @iq_get_stanza_handler(XMLPayload,
+                                "{http://pyxmpp.jajcus.net/xmlns/test}payload")
             def handler1(self, stanza):
                 return parent.reply_iq_get(stanza)
-            @iq_set_stanza_handler(XMLPayload, "{http://pyxmpp.jajcus.net/xmlns/test}payload")
+            @iq_set_stanza_handler(XMLPayload,
+                                "{http://pyxmpp.jajcus.net/xmlns/test}payload")
             def handler2(self, stanza):
                 return parent.reply_iq_set(stanza)
-        self.p.setup_stanza_handlers([Handlers()], "post-auth")
-        self.process_stanzas(ALL_STANZAS)
+        self.proc.setup_stanza_handlers([Handlers()], "post-auth")
+        self.procrocess_stanzas(ALL_STANZAS)
         self.assertEqual(self.handlers_called, ["reply_iq_get",
                                                     "reply_iq_set"])
         self.assertEqual(len(self.stanzas_sent), 2)
         stanza1 = self.stanzas_sent[0]
-        self.assertTrue(xml_elements_equal(stanza1.as_xml(), ElementTree.XML(IQ2), True))
+        self.assertTrue(xml_elements_equal(stanza1.as_xml(),
+                                                    ElementTree.XML(IQ2), True))
         stanza2 = self.stanzas_sent[1]
-        self.assertTrue(xml_elements_equal(stanza2.as_xml(), ElementTree.XML(IQ4), True))
+        self.assertTrue(xml_elements_equal(stanza2.as_xml(), 
+                                                    ElementTree.XML(IQ4), True))
 
     def test_no_handlers(self):
-        self.process_stanzas(ALL_STANZAS)
+        self.procrocess_stanzas(ALL_STANZAS)
         self.assertEqual(self.handlers_called, [])
         self.assertFalse(self.handlers_called)
         self.assertEqual(len(self.stanzas_sent), 2)
@@ -217,11 +233,12 @@ class TestStanzaProcessor(unittest.TestCase):
     def test_message_handler(self):
         parent = self
         class Handlers(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @message_stanza_handler()
             def handler1(self, stanza):
                 return parent.echo_message(stanza)
-        self.p.setup_stanza_handlers([Handlers()], "post-auth")
-        self.process_stanzas(NON_IQ_STANZAS)
+        self.proc.setup_stanza_handlers([Handlers()], "post-auth")
+        self.procrocess_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["echo_message", "echo_message",
                                                         "echo_message"])
         self.assertEqual(len(self.stanzas_sent), 3)
@@ -238,15 +255,17 @@ class TestStanzaProcessor(unittest.TestCase):
     def test_message_pass1_pass2(self):
         parent = self
         class Handlers1(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @message_stanza_handler()
             def handler1(self, stanza):
                 return parent.pass1(stanza)
         class Handlers2(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @message_stanza_handler()
             def handler1(self, stanza):
                 return parent.pass2(stanza)
-        self.p.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
-        self.process_stanzas(NON_IQ_STANZAS)
+        self.proc.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
+        self.procrocess_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1", "pass2",
                                         "pass1", "pass2", "pass1", "pass2"])
         self.assertEqual(len(self.stanzas_sent), 0)
@@ -254,15 +273,17 @@ class TestStanzaProcessor(unittest.TestCase):
     def test_message_pass2_pass1(self):
         parent = self
         class Handlers1(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @message_stanza_handler()
             def handler1(self, stanza):
                 return parent.pass1(stanza)
         class Handlers2(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @message_stanza_handler()
             def handler1(self, stanza):
                 return parent.pass2(stanza)
-        self.p.setup_stanza_handlers([Handlers2(), Handlers1()], "post-auth")
-        self.process_stanzas(NON_IQ_STANZAS)
+        self.proc.setup_stanza_handlers([Handlers2(), Handlers1()], "post-auth")
+        self.procrocess_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass2", "pass1",
                                         "pass2", "pass1", "pass2", "pass1"])
         self.assertEqual(len(self.stanzas_sent), 0)
@@ -271,30 +292,34 @@ class TestStanzaProcessor(unittest.TestCase):
     def test_message_eat1_eat2(self):
         parent = self
         class Handlers1(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @message_stanza_handler()
             def handler1(self, stanza):
                 return parent.eat1(stanza)
         class Handlers2(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @message_stanza_handler()
             def handler1(self, stanza):
                 return parent.eat2(stanza)
-        self.p.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
-        self.process_stanzas(NON_IQ_STANZAS)
+        self.proc.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
+        self.procrocess_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["eat1", "eat1", "eat1"])
         self.assertEqual(len(self.stanzas_sent), 0)
 
     def test_message_pass1_eat2(self):
         parent = self
         class Handlers1(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @message_stanza_handler()
             def handler1(self, stanza):
                 return parent.pass1(stanza)
         class Handlers2(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @message_stanza_handler()
             def handler1(self, stanza):
                 return parent.eat2(stanza)
-        self.p.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
-        self.process_stanzas(NON_IQ_STANZAS)
+        self.proc.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
+        self.procrocess_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1", "eat2", 
                                         "pass1", "eat2", "pass1", "eat2"])
         self.assertEqual(len(self.stanzas_sent), 0)
@@ -302,26 +327,29 @@ class TestStanzaProcessor(unittest.TestCase):
     def test_message_chat_handler(self):
         parent = self
         class Handlers(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @message_stanza_handler("chat")
             def handler1(self, stanza):
                 return parent.pass1(stanza)
-        self.p.setup_stanza_handlers([Handlers()], "post-auth")
-        self.process_stanzas(NON_IQ_STANZAS)
+        self.proc.setup_stanza_handlers([Handlers()], "post-auth")
+        self.procrocess_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1"])
         self.assertEqual(len(self.stanzas_sent), 0)
 
     def test_presence_pass1_pass2(self):
         parent = self
         class Handlers1(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @presence_stanza_handler()
             def handler1(self, stanza):
                 return parent.pass1(stanza)
         class Handlers2(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @presence_stanza_handler()
             def handler1(self, stanza):
                 return parent.pass2(stanza)
-        self.p.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
-        self.process_stanzas(NON_IQ_STANZAS)
+        self.proc.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
+        self.procrocess_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1", "pass2",
                                                         "pass1", "pass2"])
         self.assertEqual(len(self.stanzas_sent), 0)
@@ -329,15 +357,17 @@ class TestStanzaProcessor(unittest.TestCase):
     def test_presence_pass2_pass1(self):
         parent = self
         class Handlers1(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @presence_stanza_handler()
             def handler1(self, stanza):
                 return parent.pass1(stanza)
         class Handlers2(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @presence_stanza_handler()
             def handler1(self, stanza):
                 return parent.pass2(stanza)
-        self.p.setup_stanza_handlers([Handlers2(), Handlers1()], "post-auth")
-        self.process_stanzas(NON_IQ_STANZAS)
+        self.proc.setup_stanza_handlers([Handlers2(), Handlers1()], "post-auth")
+        self.procrocess_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass2", "pass1",
                                                         "pass2", "pass1"])
         self.assertEqual(len(self.stanzas_sent), 0)
@@ -346,30 +376,34 @@ class TestStanzaProcessor(unittest.TestCase):
     def test_presence_eat1_eat2(self):
         parent = self
         class Handlers1(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @presence_stanza_handler()
             def handler1(self, stanza):
                 return parent.eat1(stanza)
         class Handlers2(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @presence_stanza_handler()
             def handler1(self, stanza):
                 return parent.eat2(stanza)
-        self.p.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
-        self.process_stanzas(NON_IQ_STANZAS)
+        self.proc.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
+        self.procrocess_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["eat1", "eat1"])
         self.assertEqual(len(self.stanzas_sent), 0)
 
     def test_presence_pass1_eat2(self):
         parent = self
         class Handlers1(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @presence_stanza_handler()
             def handler1(self, stanza):
                 return parent.pass1(stanza)
         class Handlers2(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @presence_stanza_handler()
             def handler1(self, stanza):
                 return parent.eat2(stanza)
-        self.p.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
-        self.process_stanzas(NON_IQ_STANZAS)
+        self.proc.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
+        self.procrocess_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1", "eat2", 
                                                     "pass1", "eat2"])
         self.assertEqual(len(self.stanzas_sent), 0)
@@ -377,14 +411,16 @@ class TestStanzaProcessor(unittest.TestCase):
     def test_presence_subscribe_handler(self):
         parent = self
         class Handlers(XMPPFeatureHandler):
+            # pylint: disable=W0232,R0201,R0903
             @presence_stanza_handler("subscribe")
             def handler1(self, stanza):
                 return parent.pass1(stanza)
-        self.p.setup_stanza_handlers([Handlers()], "post-auth")
-        self.process_stanzas(NON_IQ_STANZAS)
+        self.proc.setup_stanza_handlers([Handlers()], "post-auth")
+        self.procrocess_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1"])
         self.assertEqual(len(self.stanzas_sent), 0)
 
+# pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():

@@ -1,11 +1,9 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+# pylint: disable=C0111
 
 import unittest
-import time
 import re
-import base64
-import ssl
 import os
 
 from pyxmpp2.test._support import DATA_DIR
@@ -14,15 +12,20 @@ from xml.etree.ElementTree import XML
 
 from pyxmpp2.streambase import StreamBase
 from pyxmpp2.streamtls import StreamTLSHandler
-from pyxmpp2.streamevents import *
+from pyxmpp2.streamevents import *  # pylint: disable=W0614,W0401
 from pyxmpp2.exceptions import TLSNegotiationFailed
-from pyxmpp2.jid import JID
 from pyxmpp2.settings import XMPPSettings
 
 from pyxmpp2.test._util import EventRecorder, InitiatorSelectTestCase
 
-C2S_SERVER_STREAM_HEAD = '<stream:stream version="1.0" from="server.example.org" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
-C2S_CLIENT_STREAM_HEAD = '<stream:stream version="1.0" to="server.example.org" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
+C2S_SERVER_STREAM_HEAD = ('<stream:stream version="1.0"'
+                            ' from="server.example.org"'
+                            ' xmlns:stream="http://etherx.jabber.org/streams"'
+                            ' xmlns="jabber:client">')
+C2S_CLIENT_STREAM_HEAD = ('<stream:stream version="1.0"'
+                            ' to="server.example.org"'
+                            ' xmlns:stream="http://etherx.jabber.org/streams"'
+                            ' xmlns="jabber:client">')
 
 TLS_FEATURES = """<stream:features>
      <starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls' />
@@ -84,7 +87,7 @@ class TestInitiator(InitiatorSelectTestCase):
 
     def test_enabled_required(self):
         """Test TLS enabled in settings, and required on the server."""
-        addr, port = self.start_server()
+        self.start_server()
         settings = XMPPSettings({
                         u"starttls": True, 
                         u"tls_cacert_file": os.path.join(DATA_DIR, "ca.pem"), 
@@ -126,7 +129,7 @@ class TestInitiator(InitiatorSelectTestCase):
 
     def test_enabled_missing(self):
         """Test TLS enabled in settings, and missing on the server."""
-        addr, port = self.start_server()
+        self.start_server()
         settings = XMPPSettings({
                         u"starttls": True, 
                         u"tls_cacert_file": os.path.join(DATA_DIR, "ca.pem"), 
@@ -140,7 +143,7 @@ class TestInitiator(InitiatorSelectTestCase):
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.server.write(EMPTY_FEATURES)
         self.server.write(b"</stream:stream>")
-        xml = self.wait()
+        self.wait()
         self.assertFalse(self.stream.tls_established)
         self.stream.disconnect()
         self.server.disconnect()
@@ -152,7 +155,7 @@ class TestInitiator(InitiatorSelectTestCase):
 
     def test_required_missing(self):
         """Test TLS required in settings, and missing on the server."""
-        addr, port = self.start_server()
+        self.start_server()
         settings = XMPPSettings({
                         u"starttls": True, 
                         u"tls_require": True, 
@@ -177,6 +180,7 @@ class TestInitiator(InitiatorSelectTestCase):
                     DisconnectedEvent])
 
 
+# pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():
