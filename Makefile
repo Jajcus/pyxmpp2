@@ -1,5 +1,7 @@
 DESTDIR="/"
 
+TEST_USE=network lo-network gsasl
+
 EXAMPLES=echobot.py send_message_client.py  simple_send_message.py check_version.py roster.py
 PY2_EXAMPLES=$(addprefix examples/,$(EXAMPLES))
 PY3_EXAMPLES=$(addprefix py3-examples/,$(EXAMPLES))
@@ -35,10 +37,10 @@ py3-examples/%.py: examples/%.py
 	sed -i -e's/^\(#!.*python\)/\13/' $@
 
 test:
-	$(PYTHON) setup.py test
+	TEST_USE="$(TEST_USE)" $(PYTHON) setup.py test
 
 py3-test:
-	$(PYTHON3) setup.py build --build-base=py3-build test
+	TEST_USE="$(TEST_USE)" $(PYTHON3) setup.py build --build-base=py3-build test
 
 doc:
 	$(MAKE) -C doc

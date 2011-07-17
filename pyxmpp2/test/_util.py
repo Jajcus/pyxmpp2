@@ -10,6 +10,8 @@ import select
 import logging
 import ssl
 
+from pyxmpp2.test import _support
+
 from pyxmpp2.streamevents import DisconnectedEvent
 
 from pyxmpp2.transport import TCPTransport
@@ -166,6 +168,8 @@ class NetworkTestCase(unittest.TestCase):
     can_do_ipv6 = False
     @classmethod
     def setUpClass(cls):
+        if "lo-network" not in _support.RESOURCES:
+            raise unittest.SkipTest("loopback network usage disabled")
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.bind(("127.0.0.1", 0))

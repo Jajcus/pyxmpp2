@@ -9,6 +9,8 @@ from base64 import standard_b64encode
 
 from pyxmpp2 import sasl
 from pyxmpp2.sasl.core import CLIENT_MECHANISMS_D
+
+from pyxmpp2.test import _support
     
 import logging
 
@@ -90,6 +92,7 @@ class GSASLError(Exception):
 class OurSASLError(Exception):
     pass
 
+@unittest.skipIf("gsasl" not in _support.RESOURCES, "GSASL usage disabled")
 class TestSASLClientvsGSASL(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -395,6 +398,7 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         else:
             return False, {}
 
+@unittest.skipIf("gsasl" not in _support.RESOURCES, "GSASL usage disabled")
 class TestSASLServervsGSASL(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

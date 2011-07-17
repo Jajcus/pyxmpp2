@@ -7,6 +7,11 @@ import unittest
 TEST_DIR = os.path.dirname(__file__)
 DATA_DIR = os.path.join(TEST_DIR, "data")
 
+RESOURCES = ['network', 'lo-network', 'gsasl']
+
+if "TEST_USE" in os.environ:
+    RESOURCES = os.environ["TEST_USE"].split()
+
 logging_ready = False
 def setup_logging():
     global logging_ready
