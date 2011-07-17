@@ -33,20 +33,20 @@ from pyxmpp2.test._util import InitiatorGLibTestMixIn, ReceiverGLibTestMixIn
 from pyxmpp2.test._util import ReceiverSelectTestCase
 from pyxmpp2.test._util import ReceiverPollTestMixIn, ReceiverThreadedTestMixIn
 
-C2S_SERVER_STREAM_HEAD = ('<stream:stream version="1.0"'
-                            ' from="127.0.0.1"'
-                            ' xmlns:stream="http://etherx.jabber.org/streams"'
-                            ' xmlns="jabber:client">')
-C2S_CLIENT_STREAM_HEAD = ('<stream:stream version="1.0"'
-                            ' to="127.0.0.1"'
-                            ' xmlns:stream="http://etherx.jabber.org/streams"'
-                            ' xmlns="jabber:client">')
+C2S_SERVER_STREAM_HEAD = (b'<stream:stream version="1.0"'
+                            b' from="127.0.0.1"'
+                            b' xmlns:stream="http://etherx.jabber.org/streams"'
+                            b' xmlns="jabber:client">')
+C2S_CLIENT_STREAM_HEAD = (b'<stream:stream version="1.0"'
+                            b' to="127.0.0.1"'
+                            b' xmlns:stream="http://etherx.jabber.org/streams"'
+                            b' xmlns="jabber:client">')
 
-STREAM_TAIL = '</stream:stream>'
+STREAM_TAIL = b'</stream:stream>'
         
-PARSE_ERROR_RESPONSE = ('<stream:error><not-well-formed'
-                    '  xmlns="urn:ietf:params:xml:ns:xmpp-streams"/>'
-                                        '</stream:error></stream:stream>')
+PARSE_ERROR_RESPONSE = (b'<stream:error><not-well-formed'
+                    b'  xmlns="urn:ietf:params:xml:ns:xmpp-streams"/>'
+                                        b'</stream:error></stream:stream>')
 
 logger = logging.getLogger("pyxmpp2.test.streambase")
 
@@ -106,7 +106,7 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         self.wait_short(0.25)
         self.assertTrue(self.stream.is_connected())
         self.server.write(C2S_SERVER_STREAM_HEAD)
-        self.wait(expect = re.compile(".*(</stream:stream>)"))
+        self.wait(expect = re.compile(b".*(</stream:stream>)"))
         self.server.write(STREAM_TAIL)
         self.server.close()
         self.wait(1)
@@ -123,7 +123,7 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         self.connect_transport()
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.wait_short()
-        self.server.write("</stream:test>")
+        self.server.write(b"</stream:test>")
         with self.assertRaises(StreamParseError):
             logger.debug("-- WAIT start")
             self.wait()
@@ -152,10 +152,10 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.stream.send(Message(to_jid = JID(u"test@example.org"),
                                                             body = u"Test"))
-        xml = self.wait(expect = re.compile(".*(<message.*</message>)"))
+        xml = self.wait(expect = re.compile(b".*(<message.*</message>)"))
         self.assertIsNotNone(xml)
-        if "xmlns" not in xml:
-            xml = xml.replace(u"<message", u"<message xmlns='jabber:client'")
+        if b"xmlns" not in xml:
+            xml = xml.replace(b"<message", b"<message xmlns='jabber:client'")
         element = XML(xml)
         stanza = Message(element)
         self.assertEqual(stanza.body, u"Test")
@@ -182,10 +182,10 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         logger.debug("-- checking connected")
         self.assertTrue(self.stream.is_connected())
         self.server.write(C2S_SERVER_STREAM_HEAD)
-        self.server.write("<message><body>Test</body></message>")
+        self.server.write(b"<message><body>Test</body></message>")
         self.server.write(STREAM_TAIL)
         self.server.disconnect()
-        self.wait(expect = re.compile(".*(</stream:stream>)"))
+        self.wait(expect = re.compile(b".*(</stream:stream>)"))
         self.stream.disconnect()
         self.wait(1)
         self.assertEqual(route.sent, [])
@@ -232,7 +232,7 @@ class TestReceiverSelect(ReceiverSelectTestCase):
         self.client.write(C2S_CLIENT_STREAM_HEAD)
         self.wait_short(0.25)
         self.wait_short(0.25)
-        self.client.write("</stream:test>")
+        self.client.write(b"</stream:test>")
         logger.debug("waiting for exception...")
         with self.assertRaises(StreamParseError):
             self.wait()

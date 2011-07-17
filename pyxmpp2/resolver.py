@@ -52,7 +52,7 @@ def is_ipv6_available():
     :Return: `True` when an IPv6 socket can be created.
     """
     try:
-        socket.socket(socket.AF_INET6)
+        socket.socket(socket.AF_INET6).close()
     except (socket.error, AttributeError):
         return False
     return True
@@ -63,7 +63,7 @@ def is_ipv4_available():
     :Return: `True` when an IPv4 socket can be created.
     """
     try:
-        socket.socket(socket.AF_INET)
+        socket.socket(socket.AF_INET).close()
     except socket.error:
         return False
     return True

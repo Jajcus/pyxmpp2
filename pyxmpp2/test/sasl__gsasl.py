@@ -329,6 +329,7 @@ class TestSASLClientvsGSASL(unittest.TestCase):
             stderr = open("/dev/null", "w")
         pipe = subprocess.Popen(cmd, bufsize = 1, stdout = subprocess.PIPE,
                         stdin = subprocess.PIPE, stderr = stderr)
+        stderr.close()
         if extra_data:
             data = extra_data + b"\n"
             logger.debug("OUT: %r", data)
@@ -341,9 +342,13 @@ class TestSASLClientvsGSASL(unittest.TestCase):
             logger.debug("IN: %r", mech)
         mech = mech.strip().decode("utf-8")
         if mech != mechanism:
+            pipe.stdin.close()
+            pipe.stdout.close()
             raise GSASLError, "GSASL returned different mechanism: " + mech
         result = authenticator.start(auth_properties)
         if isinstance(result, sasl.Failure):
+            pipe.stdin.close()
+            pipe.stdout.close()
             raise OurSASLError, result.reason
         response = result.encode()
         if response:
@@ -496,6 +501,7 @@ class TestSASLServervsGSASL(unittest.TestCase):
             stderr = open("/dev/null", "w")
         pipe = subprocess.Popen(cmd, bufsize = 1, stdout = subprocess.PIPE,
                                     stdin = subprocess.PIPE, stderr = stderr)
+        stderr.close()
         mech = pipe.stdout.readline().strip().decode("utf-8")
         logger.debug("IN: %r", mech)
         if mech != mechanism:
@@ -506,6 +512,8 @@ class TestSASLServervsGSASL(unittest.TestCase):
         else:
             result = authenticator.start(auth_prop, None)
         if isinstance(result, sasl.Failure):
+            pipe.stdin.close()
+            pipe.stdout.close()
             raise OurSASLError, result.reason
         if isinstance(result, sasl.Success):
             pipe.stdin.close()
@@ -539,6 +547,8 @@ class TestSASLServervsGSASL(unittest.TestCase):
             logger.debug("IN: %r", response)
             result = authenticator.response(decoded)
             if isinstance(result, sasl.Failure):
+                pipe.stdin.close()
+                pipe.stdout.close()
                 raise OurSASLError, result.reason
             if isinstance(result, sasl.Success):
                 success = result

@@ -606,7 +606,7 @@ class TestRosterClient(unittest.TestCase):
         item = payload[0]
         self.assertEqual(item.jid, JID("item1@example.org"))
         self.assertIsNone(item.name)
-        self.assertEquals(item.subscription, "remove")
+        self.assertEqual(item.subscription, "remove")
         self.assertFalse(item.approved)
         self.assertFalse(item.groups)
         response = stanza.make_result_response()

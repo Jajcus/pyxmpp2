@@ -5,6 +5,7 @@
 import unittest
 import re
 import base64
+import binascii
 import os
 
 import pyxmpp2.etree
@@ -29,31 +30,31 @@ from pyxmpp2.test._util import EventRecorder
 from pyxmpp2.test._util import InitiatorSelectTestCase
 from pyxmpp2.test._util import ReceiverSelectTestCase
 
-C2S_SERVER_STREAM_HEAD = ('<stream:stream version="1.0" from="127.0.0.1"'
-                            ' xmlns:stream="http://etherx.jabber.org/streams"'
-                            ' xmlns="jabber:client">')
-C2S_CLIENT_STREAM_HEAD = ('<stream:stream version="1.0" to="127.0.0.1"'
-                            ' xmlns:stream="http://etherx.jabber.org/streams"'
-                            ' xmlns="jabber:client">')
+C2S_SERVER_STREAM_HEAD = (b'<stream:stream version="1.0" from="127.0.0.1"'
+                            b' xmlns:stream="http://etherx.jabber.org/streams"'
+                            b' xmlns="jabber:client">')
+C2S_CLIENT_STREAM_HEAD = (b'<stream:stream version="1.0" to="127.0.0.1"'
+                            b' xmlns:stream="http://etherx.jabber.org/streams"'
+                            b' xmlns="jabber:client">')
 
-AUTH_FEATURES = """<stream:features>
+AUTH_FEATURES = b"""<stream:features>
      <mechanisms xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>
         <mechanism>PLAIN</mechanism>
      </mechanisms>
 </stream:features>"""
 
-BIND_FEATURES = """<stream:features>
+BIND_FEATURES = b"""<stream:features>
      <bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>
 </stream:features>"""
 
 PLAIN_AUTH = ("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl'"
                                             " mechanism='PLAIN'>{0}</auth>")
 
-STREAM_TAIL = '</stream:stream>'
+STREAM_TAIL = b'</stream:stream>'
         
-PARSE_ERROR_RESPONSE = ('<stream:error><xml-not-well-formed'
-                    '  xmlns="urn:ietf:params:xml:ns:xmpp-streams"/>'
-                                        '</stream:error></stream:stream>')
+PARSE_ERROR_RESPONSE = (b'<stream:error><xml-not-well-formed'
+                    b'  xmlns="urn:ietf:params:xml:ns:xmpp-streams"/>'
+                                        b'</stream:error></stream:stream>')
 
 TIMEOUT = 1.0 # seconds
 
@@ -71,18 +72,19 @@ class TestInitiator(InitiatorSelectTestCase):
         self.connect_transport()
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.server.write(AUTH_FEATURES)
-        xml = self.wait(expect = re.compile(r".*(<auth.*</auth>)"))
+        xml = self.wait(expect = re.compile(br".*(<auth.*</auth>)"))
         self.assertIsNotNone(xml)
         element = ElementTree.XML(xml)
         self.assertEqual(element.tag, "{urn:ietf:params:xml:ns:xmpp-sasl}auth")
         mech = element.get("mechanism")
         self.assertEqual(mech, "PLAIN")
-        data = element.text.decode("base64")
+        data = binascii.a2b_base64(element.text.encode("utf-8"))
         self.assertEqual(data, b"\000user\000secret")
         self.server.rdata = b""
         self.server.write(
                         b"<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>")
-        stream_start = self.wait(expect = re.compile(r"(<stream:stream[^>]*>)"))
+        stream_start = self.wait(expect = re.compile(
+                                                br"(<stream:stream[^>]*>)"))
         self.assertIsNotNone(stream_start)
         self.assertTrue(self.stream.authenticated)
         self.server.write(C2S_SERVER_STREAM_HEAD)
@@ -109,13 +111,13 @@ class TestInitiator(InitiatorSelectTestCase):
         self.connect_transport()
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.server.write(AUTH_FEATURES)
-        xml = self.wait(expect = re.compile(r".*(<auth.*</auth>)"))
+        xml = self.wait(expect = re.compile(br".*(<auth.*</auth>)"))
         self.assertIsNotNone(xml)
         element = ElementTree.XML(xml)
         self.assertEqual(element.tag, "{urn:ietf:params:xml:ns:xmpp-sasl}auth")
         mech = element.get("mechanism")
         self.assertEqual(mech, "PLAIN")
-        data = element.text.decode("base64")
+        data = binascii.a2b_base64(element.text.encode("utf-8"))
         self.assertNotEqual(data, b"\000user\000secret")
         self.server.write(b"""<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>
 <not-authorized/></failure>""")
@@ -123,9 +125,10 @@ class TestInitiator(InitiatorSelectTestCase):
             self.wait()
         self.assertFalse(self.stream.authenticated)
         self.server.disconnect()
+        self.wait()
         event_classes = [e.__class__ for e in handler.events_received]
-        self.assertEqual(event_classes, [ConnectingEvent,
-                    ConnectedEvent, StreamConnectedEvent, GotFeaturesEvent])
+        self.assertEqual(event_classes, [ConnectingEvent, ConnectedEvent,
+                    StreamConnectedEvent, GotFeaturesEvent, DisconnectedEvent])
  
 class TestReceiver(ReceiverSelectTestCase):
     def test_auth(self):
@@ -141,7 +144,7 @@ class TestReceiver(ReceiverSelectTestCase):
         self.stream.receive(self.transport, self.addr[0])
         self.client.write(C2S_CLIENT_STREAM_HEAD)
         xml = self.wait(expect = re.compile(
-                                r".*<stream:features>(.*)</stream:features>"))
+                                br".*<stream:features>(.*)</stream:features>"))
         self.assertIsNotNone(xml)
         element = ElementTree.XML(xml)
         self.assertEqual(element.tag,
@@ -152,12 +155,13 @@ class TestReceiver(ReceiverSelectTestCase):
         self.assertEqual(element[1].tag,
                                 "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
         self.assertEqual(element[1].text, "PLAIN")
-        self.client.write(PLAIN_AUTH.format(
-                                    base64.b64encode(b"\000user\000secret")))
-        xml = self.wait(expect = re.compile(r".*(<success.*>)"))
+        response = base64.standard_b64encode(b"\000user\000secret")
+        self.client.write(PLAIN_AUTH.format(response.decode("utf-8"))
+                                                    .encode("utf-8"))
+        xml = self.wait(expect = re.compile(br".*(<success.*>)"))
         self.assertIsNotNone(xml)
         self.client.write(C2S_CLIENT_STREAM_HEAD)
-        xml = self.wait(expect = re.compile(r".*(<stream:stream.*>)"))
+        xml = self.wait(expect = re.compile(br".*(<stream:stream.*>)"))
         self.assertIsNotNone(xml)
         self.assertTrue(self.stream.peer_authenticated)
         self.client.write(b"</stream:stream>")
@@ -181,7 +185,7 @@ class TestReceiver(ReceiverSelectTestCase):
         self.stream.receive(self.transport, self.addr[0])
         self.client.write(C2S_CLIENT_STREAM_HEAD)
         xml = self.wait(expect = re.compile(
-                                r".*<stream:features>(.*)</stream:features>"))
+                                br".*<stream:features>(.*)</stream:features>"))
         self.assertIsNotNone(xml)
         element = ElementTree.XML(xml)
         self.assertEqual(element.tag,
@@ -192,8 +196,9 @@ class TestReceiver(ReceiverSelectTestCase):
         self.assertEqual(element[1].tag,
                                 "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
         self.assertEqual(element[1].text, "PLAIN")
-        self.client.write(PLAIN_AUTH.format(
-                                    base64.b64encode(b"\000user\000bad")))
+        response = base64.standard_b64encode(b"\000user\000bad")
+        self.client.write(PLAIN_AUTH.format(response.decode("us-ascii"))
+                                                            .encode("utf-8"))
         with self.assertRaises(SASLAuthenticationFailed):
             self.wait()
         self.client.write(b"</stream:stream>")

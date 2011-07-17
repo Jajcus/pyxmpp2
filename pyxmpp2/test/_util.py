@@ -21,7 +21,7 @@ from pyxmpp2.mainloop.poll import PollMainLoop
 from pyxmpp2.mainloop.threads import ThreadPool
 from pyxmpp2.settings import XMPPSettings
 
-logger = logging.getLogger("pyxmpp2.test.test_util")
+logger = logging.getLogger("pyxmpp2.test._util")
 
 socket.setdefaulttimeout(5)
 
@@ -41,8 +41,8 @@ class NetReaderWritter(object):
     # pylint: disable=R0902
     def __init__(self, sock, need_accept = False):
         self.sock = sock
-        self.wdata = ""
-        self.rdata = ""
+        self.wdata = b""
+        self.rdata = b""
         self.eof = False
         self.error = False
         self.ready = not need_accept
@@ -69,7 +69,17 @@ class NetReaderWritter(object):
         """Do the TLS handshake. Called from the reader thread
         after `starttls` is called."""
         logger.debug("tst: starting tls handshake")
-        self.sock.do_handshake()
+        while True:
+            try:
+                self.sock.do_handshake()
+                break
+            except ssl.SSLError, err:
+                if err.args[0] == ssl.SSL_ERROR_WANT_READ:
+                    select.select([self.sock], [], [])
+                elif err.args[0] == ssl.SSL_ERROR_WANT_WRITE:
+                    select.select([], [self.sock], [])
+                else:
+                    raise
         logger.debug("tst: tls handshake started, resuming normal write")
         self.extra_on_read = None
         self.write_enabled = True
@@ -95,7 +105,7 @@ class NetReaderWritter(object):
             logger.debug("tst: wrapping the socket")
             self.sock = ssl.wrap_socket(*args, **kwargs)
             self.extra_on_read = self._do_tls_handshake
-            self.rdata = ""
+            self.rdata = b""
 
     def writter_run(self):
         """The writter thread function."""
@@ -151,6 +161,7 @@ class NetReaderWritter(object):
                             self.write_cond.notify()
                             break
                     if event & (select.POLLERR | select.POLLHUP):
+                        self.sock.close()
                         self.sock = None
                         self.error = True
                         self.eof_cond.notifyAll()
@@ -221,7 +232,7 @@ class NetworkTestCase(unittest.TestCase):
             sock.listen(1)
             sock1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock1.connect(sock.getsockname())
-            sock.accept()
+            sock.accept()[0].close()
             sock1.close()
             sock.close()
             cls.can_do_ipv4 = True
@@ -234,7 +245,7 @@ class NetworkTestCase(unittest.TestCase):
                 sock.listen(1)
                 sock1 = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
                 sock1.connect(sock.getsockname())
-                sock.accept()
+                sock.accept()[0].close()
                 sock1.close()
                 sock.close()
                 cls.can_do_ipv6 = True
@@ -342,6 +353,8 @@ class InitiatorSelectTestCase(NetworkTestCase):
         super(InitiatorSelectTestCase, self).tearDown()
         self.loop = None
         self.stream = None
+        if self.transport:
+            self.transport.close()
         self.transport = None
 
     def wait(self, timeout = TIMEOUT, expect = None):
@@ -424,6 +437,7 @@ class ReceiverSelectTestCase(NetworkTestCase):
         self.addr = sock.getsockname()
         self.start_client(self.addr)
         self.transport = TCPTransport(sock = sock.accept()[0])
+        sock.close()
         self.make_loop(handlers + [self.transport])
 
     def make_loop(self, handlers):
@@ -450,6 +464,8 @@ class ReceiverSelectTestCase(NetworkTestCase):
     def tearDown(self):
         self.loop = None
         self.stream = None
+        if self.transport:
+            self.transport.close()
         self.transport = None
         super(ReceiverSelectTestCase, self).tearDown()
 

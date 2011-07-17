@@ -4,6 +4,7 @@
 
 """Tests for pyxmpp2.jid"""
 
+import sys
 import unittest
 
 import logging
@@ -94,6 +95,10 @@ COMPARISIONS_FALSE = [
     'JID(u"1@b.c") < None',
     'None > JID(u"1@b.c")',
 ]
+
+if sys.version_info[0] >= 3:
+    COMPARISIONS_TRUE = [e.replace('u"', '"') for e in COMPARISIONS_TRUE]
+    COMPARISIONS_FALSE = [e.replace('u"', '"') for e in COMPARISIONS_FALSE]
 
 class TestJID(unittest.TestCase):
     def test_jid_from_string(self):

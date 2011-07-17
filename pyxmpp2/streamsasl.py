@@ -26,10 +26,10 @@ from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 
-import base64
 import logging
-from .etree import ElementTree, element_to_unicode
+from binascii import a2b_base64
 
+from .etree import ElementTree, element_to_unicode
 from .jid import JID
 from . import sasl
 from .exceptions import SASLNotAvailable, FatalStreamError
@@ -175,7 +175,7 @@ class StreamSASLHandler(StreamFeatureHandler):
         
         content = element.text.encode("us-ascii")
         ret = self.authenticator.start(stream.auth_properties,
-                                                base64.decodestring(content))
+                                                a2b_base64(content))
 
         if isinstance(ret, sasl.Success):
             element = ElementTree.Element(SUCCESS_TAG)
@@ -228,7 +228,7 @@ class StreamSASLHandler(StreamFeatureHandler):
             return False
 
         content = element.text.encode("us-ascii")
-        ret = self.authenticator.challenge(base64.decodestring(content))
+        ret = self.authenticator.challenge(a2b_base64(content))
         if isinstance(ret, sasl.Response):
             element = ElementTree.Element(RESPONSE_TAG)
             element.text = ret.encode()
@@ -254,7 +254,7 @@ class StreamSASLHandler(StreamFeatureHandler):
             return False
 
         content = element.text.encode("us-ascii")
-        ret = self.authenticator.response(base64.decodestring(content))
+        ret = self.authenticator.response(a2b_base64(content))
         if isinstance(ret, sasl.Success):
             element = ElementTree.Element(SUCCESS_TAG)
             element.text = ret.encode()
@@ -326,7 +326,7 @@ class StreamSASLHandler(StreamFeatureHandler):
         content = element.text
 
         if content:
-            data = base64.decodestring(content.encode("us-ascii"))
+            data = a2b_base64(content.encode("us-ascii"))
         else:
             data = None
         ret = self.authenticator.finish(data)

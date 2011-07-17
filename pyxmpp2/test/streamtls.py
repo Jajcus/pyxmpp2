@@ -18,30 +18,30 @@ from pyxmpp2.settings import XMPPSettings
 
 from pyxmpp2.test._util import EventRecorder, InitiatorSelectTestCase
 
-C2S_SERVER_STREAM_HEAD = ('<stream:stream version="1.0"'
-                            ' from="server.example.org"'
-                            ' xmlns:stream="http://etherx.jabber.org/streams"'
-                            ' xmlns="jabber:client">')
-C2S_CLIENT_STREAM_HEAD = ('<stream:stream version="1.0"'
-                            ' to="server.example.org"'
-                            ' xmlns:stream="http://etherx.jabber.org/streams"'
-                            ' xmlns="jabber:client">')
+C2S_SERVER_STREAM_HEAD = (b'<stream:stream version="1.0"'
+                            b' from="server.example.org"'
+                            b' xmlns:stream="http://etherx.jabber.org/streams"'
+                            b' xmlns="jabber:client">')
+C2S_CLIENT_STREAM_HEAD = (b'<stream:stream version="1.0"'
+                            b' to="server.example.org"'
+                            b' xmlns:stream="http://etherx.jabber.org/streams"'
+                            b' xmlns="jabber:client">')
 
-TLS_FEATURES = """<stream:features>
+TLS_FEATURES = b"""<stream:features>
      <starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls' />
 </stream:features>"""
-TLS_REQUIRED_FEATURES = """<stream:features>
+TLS_REQUIRED_FEATURES = b"""<stream:features>
      <starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'>
         <required />
      </starttls>
 </stream:features>"""
 
 
-EMPTY_FEATURES = """<stream:features/>"""
+EMPTY_FEATURES = b"""<stream:features/>"""
 
-PROCEED = "<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls' />"
+PROCEED = b"<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls' />"
 
-STREAM_TAIL = '</stream:stream>'
+STREAM_TAIL = b'</stream:stream>'
         
 class TestInitiator(InitiatorSelectTestCase):
     def test_enabled_optional(self):
@@ -58,7 +58,7 @@ class TestInitiator(InitiatorSelectTestCase):
         self.connect_transport()
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.server.write(TLS_FEATURES)
-        xml = self.wait(2, expect = re.compile(r".*(<starttls.*/>)"))
+        xml = self.wait(2, expect = re.compile(br".*(<starttls.*/>)"))
         self.assertIsNotNone(xml)
         element = XML(xml)
         self.assertEqual(element.tag, 
@@ -71,7 +71,7 @@ class TestInitiator(InitiatorSelectTestCase):
                             ca_certs = os.path.join(DATA_DIR, "ca.pem"),
                                 )
         stream_start = self.wait(expect = re.compile(
-                                    r"(<stream:stream[^>]*>)"))
+                                    br"(<stream:stream[^>]*>)"))
         self.assertIsNotNone(stream_start)
         self.assertTrue(self.stream.tls_established)
         self.stream.disconnect()
@@ -100,7 +100,7 @@ class TestInitiator(InitiatorSelectTestCase):
         self.connect_transport()
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.server.write(TLS_REQUIRED_FEATURES)
-        xml = self.wait(expect = re.compile(r".*(<starttls.*/>)"))
+        xml = self.wait(expect = re.compile(br".*(<starttls.*/>)"))
         self.assertIsNotNone(xml)
         element = XML(xml)
         self.assertEqual(element.tag, 
@@ -113,7 +113,7 @@ class TestInitiator(InitiatorSelectTestCase):
                             ca_certs = os.path.join(DATA_DIR, "ca.pem"),
                                 )
         stream_start = self.wait(expect = re.compile(
-                                                    r"(<stream:stream[^>]*>)"))
+                                                    br"(<stream:stream[^>]*>)"))
         self.assertIsNotNone(stream_start)
         self.assertTrue(self.stream.tls_established)
         self.stream.disconnect()
@@ -143,7 +143,7 @@ class TestInitiator(InitiatorSelectTestCase):
         self.server.write(C2S_SERVER_STREAM_HEAD)
         self.server.write(EMPTY_FEATURES)
         self.server.write(b"</stream:stream>")
-        self.wait()
+        self.wait(expect = re.compile(br".*(</stream:stream>)"))
         self.assertFalse(self.stream.tls_established)
         self.stream.disconnect()
         self.server.disconnect()

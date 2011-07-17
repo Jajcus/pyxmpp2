@@ -53,11 +53,12 @@ expected_events = []
 whole_stream = None
 
 def load_expected_events():
-    for line in open(os.path.join(DATA_DIR, "stream_info.txt")):
-        if line.startswith("#"):
-            continue
-        line = line.strip()
-        expected_events.append(EventTemplate(line))
+    with open(os.path.join(DATA_DIR, "stream_info.txt")) as stream_info:
+        for line in stream_info:
+            if line.startswith("#"):
+                continue
+            line = line.strip()
+            expected_events.append(EventTemplate(line))
 
 def load_whole_stream():
     # pylint: disable=W0603
@@ -69,7 +70,7 @@ class TestStreamReader(unittest.TestCase):
         self.expected_events = list(expected_events)
         self.handler = StreamHandler(self)
         self.reader = xmppparser.StreamReader(self.handler)
-        self.file = file(os.path.join(DATA_DIR, "stream.xml"))
+        self.file = open(os.path.join(DATA_DIR, "stream.xml"))
         self.chunk_start = 0
         self.chunk_end = 0
         self.whole_stream = ElementTree.ElementTree()

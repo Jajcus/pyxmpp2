@@ -18,20 +18,20 @@ from pyxmpp2.test._util import EventRecorder
 from pyxmpp2.test._util import InitiatorSelectTestCase
 from pyxmpp2.test._util import ReceiverSelectTestCase
 
-C2S_SERVER_STREAM_HEAD = ('<stream:stream version="1.0"'
-                            ' from="127.0.0.1"'
-                            ' xmlns:stream="http://etherx.jabber.org/streams"'
-                            ' xmlns="jabber:client">')
-C2S_CLIENT_STREAM_HEAD = ('<stream:stream version="1.0"'
-                            ' to="127.0.0.1"'
-                            ' xmlns:stream="http://etherx.jabber.org/streams"'
-                            ' xmlns="jabber:client">')
+C2S_SERVER_STREAM_HEAD = (b'<stream:stream version="1.0"'
+                            b' from="127.0.0.1"'
+                            b' xmlns:stream="http://etherx.jabber.org/streams"'
+                            b' xmlns="jabber:client">')
+C2S_CLIENT_STREAM_HEAD = (b'<stream:stream version="1.0"'
+                            b' to="127.0.0.1"'
+                            b' xmlns:stream="http://etherx.jabber.org/streams"'
+                            b' xmlns="jabber:client">')
 
-BIND_FEATURES = """<stream:features>
+BIND_FEATURES = b"""<stream:features>
      <bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>
 </stream:features>"""
 
-BIND_GENERATED_REQUEST = """<iq type="set" id="42">
+BIND_GENERATED_REQUEST = b"""<iq type="set" id="42">
   <bind  xmlns="urn:ietf:params:xml:ns:xmpp-bind">
   </bind>
 </iq>
@@ -44,7 +44,7 @@ BIND_GENERATED_RESPONSE = """<iq type="result" id="{0}">
 </iq>
 """
 
-BIND_PROVIDED_REQUEST = """<iq type="set" id="42">
+BIND_PROVIDED_REQUEST = b"""<iq type="set" id="42">
   <bind  xmlns="urn:ietf:params:xml:ns:xmpp-bind">
     <resource>Provided</resource>
   </bind>
@@ -59,11 +59,11 @@ BIND_PROVIDED_RESPONSE = """<iq type="result" id="{0}">
 """
 
 
-STREAM_TAIL = '</stream:stream>'
+STREAM_TAIL = b'</stream:stream>'
         
-PARSE_ERROR_RESPONSE = ('<stream:error><xml-not-well-formed'
-                    '  xmlns="urn:ietf:params:xml:ns:xmpp-streams"/>'
-                                        '</stream:error></stream:stream>')
+PARSE_ERROR_RESPONSE = (b'<stream:error><xml-not-well-formed'
+                    b'  xmlns="urn:ietf:params:xml:ns:xmpp-streams"/>'
+                                        b'</stream:error></stream:stream>')
 
 TIMEOUT = 1.0 # seconds
 
@@ -90,9 +90,11 @@ class TestBindingInitiator(InitiatorSelectTestCase):
         self.wait_short(1)
         self.server.write(BIND_FEATURES)
         req_id = self.wait(1,
-                    expect = re.compile(r".*<iq[^>]*id=[\"']([^\"']*)[\"']"))
+                    expect = re.compile(br".*<iq[^>]*id=[\"']([^\"']*)[\"']"))
         self.assertIsNotNone(req_id)
-        self.server.write(BIND_GENERATED_RESPONSE.format(req_id))
+        req_id = req_id.decode("utf-8")
+        self.server.write(BIND_GENERATED_RESPONSE.format(req_id)
+                                                            .encode("utf-8"))
         self.wait()
         self.assertFalse(self.stream.is_connected())
         event_classes = [e.__class__ for e in handler.events_received]
@@ -116,10 +118,11 @@ class TestBindingInitiator(InitiatorSelectTestCase):
         self.wait_short(1)
         self.server.write(BIND_FEATURES)
         req_id = self.wait(1,
-                    expect = re.compile(r".*<iq[^>]*id=[\"']([^\"']*)[\"'].*"
-                                            r"<resource>Provided</resource>"))
+                    expect = re.compile(br".*<iq[^>]*id=[\"']([^\"']*)[\"'].*"
+                                            br"<resource>Provided</resource>"))
         self.assertIsNotNone(req_id)
-        self.server.write(BIND_PROVIDED_RESPONSE.format(req_id))
+        req_id = req_id.decode("utf-8")
+        self.server.write(BIND_PROVIDED_RESPONSE.format(req_id).encode("utf-8"))
         self.wait()
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [ConnectingEvent,
@@ -139,14 +142,14 @@ class TestBindingReceiver(ReceiverSelectTestCase):
         processor.setup_stanza_handlers(handlers, "post-auth")
         self.client.write(C2S_CLIENT_STREAM_HEAD)
         features = self.wait(
-                expect = re.compile(r".*<stream:features>"
-                        r"(.*<bind.*urn:ietf:params:xml:ns:xmpp-bind.*)"
-                                                    r"</stream:features>"))
+                expect = re.compile(br".*<stream:features>"
+                        br"(.*<bind.*urn:ietf:params:xml:ns:xmpp-bind.*)"
+                                                    br"</stream:features>"))
         self.assertIsNotNone(features)
         self.client.write(BIND_GENERATED_REQUEST)
         resource = self.wait(
-                expect = re.compile(r".*<iq.*id=(?:\"42\"|'42').*>"
-                            r"<bind.*<jid>test@127.0.0.1/(.*)</jid>.*</bind>"))
+                expect = re.compile(br".*<iq.*id=(?:\"42\"|'42').*>"
+                            br"<bind.*<jid>test@127.0.0.1/(.*)</jid>.*</bind>"))
         self.assertTrue(resource)
         self.client.write(STREAM_TAIL)
         self.client.disconnect()
@@ -167,15 +170,15 @@ class TestBindingReceiver(ReceiverSelectTestCase):
         processor.setup_stanza_handlers(handlers, "post-auth")
         self.client.write(C2S_CLIENT_STREAM_HEAD)
         features = self.wait(
-                expect = re.compile(r".*<stream:features>"
-                    r"(.*<bind.*urn:ietf:params:xml:ns:xmpp-bind.*)"
-                                                    r"</stream:features>"))
+                expect = re.compile(br".*<stream:features>"
+                    br"(.*<bind.*urn:ietf:params:xml:ns:xmpp-bind.*)"
+                                                    br"</stream:features>"))
         self.assertIsNotNone(features)
         self.client.write(BIND_PROVIDED_REQUEST)
         resource = self.wait(
-                expect = re.compile(r".*<iq.*id=(?:\"42\"|'42').*>"
-                            r"<bind.*<jid>test@127.0.0.1/(.*)</jid>.*</bind>"))
-        self.assertEqual(resource, u"Provided")
+                expect = re.compile(br".*<iq.*id=(?:\"42\"|'42').*>"
+                            br"<bind.*<jid>test@127.0.0.1/(.*)</jid>.*</bind>"))
+        self.assertEqual(resource, b"Provided")
         self.client.write(STREAM_TAIL)
         self.client.disconnect()
         self.wait()
