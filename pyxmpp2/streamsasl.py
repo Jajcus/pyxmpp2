@@ -203,15 +203,15 @@ class StreamSASLHandler(StreamFeatureHandler):
 
         [receiver only]
         """
-        if not self._check_authorization(ret.properties, stream):
+        if not self._check_authorization(success.properties, stream):
             element = ElementTree.Element(FAILURE_TAG)
             ElementTree.SubElement(element, SASL_QNP + "invalid-authzid")
             return True
-        authzid = ret.properties.get("authzid")
+        authzid = success.properties.get("authzid")
         if authzid:
-            peer = JID(ret.authzid)
-        elif "username" in ret.properties:
-            peer = JID(ret.properties["username"], stream.me.domain)
+            peer = JID(success.authzid)
+        elif "username" in success.properties:
+            peer = JID(success.properties["username"], stream.me.domain)
         else:
             # anonymous
             peer = None
