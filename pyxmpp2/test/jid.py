@@ -13,6 +13,7 @@ from pyxmpp2 import xmppstringprep
 
 logger = logging.getLogger("pyxmpp2.test.jid")
 
+LONG_DOMAIN = (u"x"*60 + ".") * 16 + u"x" * 47
 VALID_JIDS = [
     (u"a@b/c",
         (u"a",u"b",u"c")),
@@ -38,8 +39,8 @@ VALID_JIDS = [
         (u"jajcuś",u"dżabber.example.com",u"Test")),
     (u"JAJCUŚ@DŻABBER.EXAMPLE.COM/TEST",
         (u"jajcuś",u"dżabber.example.com",u"TEST")),
-    (u"%s@%s/%s" % (u"x"*1023, u"x"*1023, u"x"*1023),
-        (u"x"*1023, u"x"*1023, u"x"*1023)),
+    (u"%s@%s/%s" % (u"x"*1023, LONG_DOMAIN, u"x"*1023),
+        (u"x"*1023, LONG_DOMAIN, u"x"*1023)),
 ]
 
 VALID_TUPLES = [
@@ -61,10 +62,9 @@ INVALID_JIDS = [
     u"/Test",
     u"#@$%#^$%#^&^$",
     u"<>@example.com",
-    u"test@example.com/(&*&^%$#@@!#",
-    u"\01\02\05@example.com",
-    u"test@\01\02\05",
-    u"test@example.com/\01\02\05",
+    u"\x01\x02\x05@example.com",
+    u"test@\x01\x02\x05",
+    u"test@example.com/\x01\x02\x05",
     u"%s@%s/%s" % (u"x"*1024, u"x"*1023, u"x"*1023),
     u"%s@%s/%s" % (u"x"*1023, u"x"*1024, u"x"*1023),
     u"%s@%s/%s" % (u"x"*1023, u"x"*1023, u"x"*1024),
@@ -98,11 +98,13 @@ COMPARISIONS_FALSE = [
 class TestJID(unittest.TestCase):
     def test_jid_from_string(self):
         for jid, expected_tuple in VALID_JIDS:
+            logging.debug(" checking {0!r}...".format(jid))
             jid = JID(jid)
             jtuple = (jid.local, jid.domain, jid.resource)
             self.assertEqual(jtuple, expected_tuple)
     def test_jid_from_tuple(self):
         for (local, domain, resource), jid in VALID_TUPLES:
+            logging.debug(" checking {0!r}...".format(jid))
             j = JID(local, domain, resource)
             self.assertEqual(unicode(j), jid)
     def test_invalid_jids(self):

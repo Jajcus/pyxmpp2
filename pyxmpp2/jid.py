@@ -25,6 +25,7 @@ from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 
+import re
 import weakref
 import warnings
 import socket
@@ -32,7 +33,15 @@ import socket
 from encodings import idna
 
 from .xmppstringprep import NODEPREP, RESOURCEPREP
-from .exceptions import JIDError
+from .exceptions import JIDError, StringprepError
+
+# to enforce the UseSTD3ASCIIRules flag of IDNA
+GOOD_OUTER = u"[^\x00-\x2C\x2E-\x2F\x3A-\x40\x5B-\x60\x7B-\x7F-]"
+GOOD_INNER = u"[^\x00-\x2C\x2E-\x2F\x3A-\x40\x5B-\x60\x7B-\x7F]"
+STD3_LABEL_RE = re.compile(u"^{0}({1}*{0})?$".format(GOOD_OUTER, GOOD_INNER))
+
+# '.' equivalents, according to IDNA
+UNICODE_DOT_RE = re.compile(u"[\u3002\uFF0E\uFF61]")
 
 def are_domains_equal(domain1, domain2):
     """Compare two International Domain Names.
@@ -161,9 +170,12 @@ class JID(object):
         if not data:
             return None
         data = unicode(data)
-        local = NODEPREP.prepare(data)
+        try:
+            local = NODEPREP.prepare(data)
+        except StringprepError, err:
+            raise JIDError(u"Local part invalid: {0}".format(err))
         if len(local.encode("utf-8")) > 1023:
-            raise JIDError("Node name too long")
+            raise JIDError(u"Local part too long")
         return local
 
     @staticmethod
@@ -178,7 +190,7 @@ class JID(object):
         :raise JIDError: if the domain name is too long."""
         if not data:
             raise JIDError("Domain must be given")
-        data = data.rstrip(".")
+        data = unicode(data)
         if not data:
             raise JIDError("Domain must be given")
         if u'[' in data:
@@ -201,9 +213,20 @@ class JID(object):
                 return socket.inet_ntop(socket.AF_INET, addr)
             except socket.error:
                 pass
-        data = unicode(data)
+        data = UNICODE_DOT_RE.sub(u".", data)
+        data = data.rstrip(u".")
         labels = data.split(u".")
-        labels = [idna.nameprep(label) for label in labels]
+        try:
+            labels = [idna.nameprep(label) for label in labels]
+        except UnicodeError:
+            raise JIDError(u"Domain name invalid")
+        for label in labels:
+            if not STD3_LABEL_RE.match(label):
+                raise JIDError(u"Domain name invalid")
+            try:
+                idna.ToASCII(label)
+            except UnicodeError:
+                raise JIDError(u"Domain name invalid")
         domain = u".".join(labels)
         if len(domain.encode("utf-8")) > 1023:
             raise JIDError(u"Domain name too long")
@@ -222,7 +245,10 @@ class JID(object):
         if not data:
             return None
         data = unicode(data)
-        resource = RESOURCEPREP.prepare(data)
+        try:
+            resource = RESOURCEPREP.prepare(data)
+        except StringprepError, err:
+            raise JIDError(u"Local part invalid: {0}".format(err))
         if len(resource.encode("utf-8")) > 1023:
             raise JIDError("Resource name too long")
         return resource
