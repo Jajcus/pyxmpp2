@@ -24,12 +24,12 @@ from pyxmpp2.settings import XMPPSettings
 from pyxmpp2.interfaces import EventHandler, event_handler, QUIT
 from pyxmpp2.interfaces import StanzaRoute
 
-from test_util import EventRecorder
-from test_util import InitiatorSelectTestCase
-from test_util import InitiatorPollTestMixIn, InitiatorThreadedTestMixIn
-from test_util import InitiatorGLibTestMixIn, ReceiverGLibTestMixIn
-from test_util import ReceiverSelectTestCase
-from test_util import ReceiverPollTestMixIn, ReceiverThreadedTestMixIn
+from pyxmpp2.test._util import EventRecorder
+from pyxmpp2.test._util import InitiatorSelectTestCase
+from pyxmpp2.test._util import InitiatorPollTestMixIn, InitiatorThreadedTestMixIn
+from pyxmpp2.test._util import InitiatorGLibTestMixIn, ReceiverGLibTestMixIn
+from pyxmpp2.test._util import ReceiverSelectTestCase
+from pyxmpp2.test._util import ReceiverPollTestMixIn, ReceiverThreadedTestMixIn
 
 C2S_SERVER_STREAM_HEAD = '<stream:stream version="1.0" from="127.0.0.1" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
 C2S_CLIENT_STREAM_HEAD = '<stream:stream version="1.0" to="127.0.0.1" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'

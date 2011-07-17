@@ -19,7 +19,7 @@ from pyxmpp2.exceptions import TLSNegotiationFailed
 from pyxmpp2.jid import JID
 from pyxmpp2.settings import XMPPSettings
 
-from test_util import EventRecorder, InitiatorSelectTestCase
+from pyxmpp2.test._util import EventRecorder, InitiatorSelectTestCase
 
 C2S_SERVER_STREAM_HEAD = '<stream:stream version="1.0" from="server.example.org" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
 C2S_CLIENT_STREAM_HEAD = '<stream:stream version="1.0" to="server.example.org" xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client">'
