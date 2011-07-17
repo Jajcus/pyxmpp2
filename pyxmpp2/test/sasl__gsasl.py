@@ -555,6 +555,7 @@ class TestSASLServervsGSASL(unittest.TestCase):
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():
+    check_gsasl()
     setup_logging()
 
 if __name__ == "__main__":
