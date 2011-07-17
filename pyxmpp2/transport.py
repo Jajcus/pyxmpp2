@@ -675,8 +675,17 @@ class TCPTransport(XMPPTransport, IOHandler):
             else:
                 self._auth_properties['channel-binding'] = {
                                                     "tls-unique": tls_unique}
-        self.event(TLSConnectedEvent(self._socket.cipher(),
-                                                self._socket.getpeercert()))
+        try:
+            cipher = self._socket.cipher()
+        except AttributeError:
+            # SSLSocket.cipher doesn't work on PyPy
+            cipher = "unknown"
+        try:
+            cert = self._socket.getpeercert()
+        except AttributeError:
+            # SSLSocket.cipher doesn't work on PyPy
+            cert = None
+        self.event(TLSConnectedEvent(cipher, cert))
 
     def handle_read(self):
         """
