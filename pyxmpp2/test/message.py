@@ -80,12 +80,10 @@ class TestMessage(unittest.TestCase):
         xml = m.as_xml()
         self.check_message_full( Message(xml) )
 
-def suite():
-     suite = unittest.TestSuite()
-     suite.addTest(unittest.makeSuite(TestMessage))
-     return suite
+from pyxmpp2.test._support import load_tests, setup_logging
 
-if __name__ == '__main__':
-    unittest.TextTestRunner(verbosity=2).run(suite())
+def setUpModule():
+    setup_logging()
 
-# vi: sts=4 et sw=4
+if __name__ == "__main__":
+    unittest.main()

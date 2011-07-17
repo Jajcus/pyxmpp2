@@ -552,17 +552,10 @@ class TestSASLServervsGSASL(unittest.TestCase):
         else:
             return False, None
 
-def suite():
-    check_gsasl()
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestSASLClientvsGSASL))
-    #suite.addTest(unittest.makeSuite(TestSASLServervsGSASL))
-    return suite
+from pyxmpp2.test._support import load_tests, setup_logging
 
-if __name__ == '__main__':
-    logger = logging.getLogger()
-    logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.INFO)
-    unittest.TextTestRunner(verbosity=2).run(suite())
+def setUpModule():
+    setup_logging()
 
-# vi: sts=4 et sw=4
+if __name__ == "__main__":
+    unittest.main()

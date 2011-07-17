@@ -95,12 +95,10 @@ class TestPresence(unittest.TestCase):
         xml = p.as_xml()
         self.check_presence_full( Presence(xml) )
 
-def suite():
-     suite = unittest.TestSuite()
-     suite.addTest(unittest.makeSuite(TestPresence))
-     return suite
+from pyxmpp2.test._support import load_tests, setup_logging
 
-if __name__ == '__main__':
-    unittest.TextTestRunner(verbosity=2).run(suite())
+def setUpModule():
+    setup_logging()
 
-# vi: sts=4 et sw=4
+if __name__ == "__main__":
+    unittest.main()

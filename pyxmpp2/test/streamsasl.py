@@ -196,17 +196,10 @@ class TestReceiver(ReceiverSelectTestCase):
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [StreamConnectedEvent, DisconnectedEvent])
  
-def suite():
-     suite = unittest.TestSuite()
-     suite.addTest(unittest.makeSuite(TestInitiator))
-     suite.addTest(unittest.makeSuite(TestReceiver))
-     return suite
+from pyxmpp2.test._support import load_tests, setup_logging
 
-if __name__ == '__main__':
-    import logging
-    logger = logging.getLogger()
-    logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.ERROR)
-    unittest.TextTestRunner(verbosity=2).run(suite())
+def setUpModule():
+    setup_logging()
 
-# vi: sts=4 et sw=4
+if __name__ == "__main__":
+    unittest.main()
