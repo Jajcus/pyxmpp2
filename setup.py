@@ -67,6 +67,9 @@ setup(
         'pyxmpp2.ext',
         'pyxmpp2.test',
     ],
+    package_data = {
+        'pyxmpp2.test': ['data/*.pem', 'data/*.txt', 'data/*.xml'],
+    },
     test_suite = "pyxmpp2.test.discover",
     **extra
 )
