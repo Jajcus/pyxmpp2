@@ -310,11 +310,27 @@ class JID(object):
             and self.resource == other.resource)
 
     def __ne__(self, other):
-        return not self.__eq__(other)
+        return not self == other
 
-    def __cmp__(self, other):
-        uni = self.as_unicode()
-        return cmp(uni, other)
+    def __lt__(self, other):
+        if other is None:
+            return False
+        return unicode(self) < unicode(other)
+
+    def __gt__(self, other):
+        if other is None:
+            return True
+        return unicode(self) > unicode(other)
+
+    def __le__(self, other):
+        if other is None:
+            return False
+        return unicode(self) <= unicode(other)
+
+    def __ge__(self, other):
+        if other is None:
+            return True
+        return unicode(self) >= unicode(other)
 
     def __hash__(self):
         return hash(self.local) ^ hash(self.domain) ^ hash(self.resource)
