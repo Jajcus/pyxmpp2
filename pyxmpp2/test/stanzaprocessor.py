@@ -183,7 +183,7 @@ class TestStanzaProcessor(unittest.TestCase):
             def handler2(self, stanza):
                 return parent.ignore_iq_set(stanza)
         self.proc.setup_stanza_handlers([Handlers()], "post-auth")
-        self.procrocess_stanzas(ALL_STANZAS)
+        self.process_stanzas(ALL_STANZAS)
         self.assertEqual(self.handlers_called, ["ignore_iq_get",
                                                     "ignore_iq_set"])
         self.assertFalse(self.stanzas_sent)
@@ -201,7 +201,7 @@ class TestStanzaProcessor(unittest.TestCase):
             def handler2(self, stanza):
                 return parent.reply_iq_set(stanza)
         self.proc.setup_stanza_handlers([Handlers()], "post-auth")
-        self.procrocess_stanzas(ALL_STANZAS)
+        self.process_stanzas(ALL_STANZAS)
         self.assertEqual(self.handlers_called, ["reply_iq_get",
                                                     "reply_iq_set"])
         self.assertEqual(len(self.stanzas_sent), 2)
@@ -213,7 +213,7 @@ class TestStanzaProcessor(unittest.TestCase):
                                                     ElementTree.XML(IQ4), True))
 
     def test_no_handlers(self):
-        self.procrocess_stanzas(ALL_STANZAS)
+        self.process_stanzas(ALL_STANZAS)
         self.assertEqual(self.handlers_called, [])
         self.assertFalse(self.handlers_called)
         self.assertEqual(len(self.stanzas_sent), 2)
@@ -238,7 +238,7 @@ class TestStanzaProcessor(unittest.TestCase):
             def handler1(self, stanza):
                 return parent.echo_message(stanza)
         self.proc.setup_stanza_handlers([Handlers()], "post-auth")
-        self.procrocess_stanzas(NON_IQ_STANZAS)
+        self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["echo_message", "echo_message",
                                                         "echo_message"])
         self.assertEqual(len(self.stanzas_sent), 3)
@@ -265,7 +265,7 @@ class TestStanzaProcessor(unittest.TestCase):
             def handler1(self, stanza):
                 return parent.pass2(stanza)
         self.proc.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
-        self.procrocess_stanzas(NON_IQ_STANZAS)
+        self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1", "pass2",
                                         "pass1", "pass2", "pass1", "pass2"])
         self.assertEqual(len(self.stanzas_sent), 0)
@@ -283,7 +283,7 @@ class TestStanzaProcessor(unittest.TestCase):
             def handler1(self, stanza):
                 return parent.pass2(stanza)
         self.proc.setup_stanza_handlers([Handlers2(), Handlers1()], "post-auth")
-        self.procrocess_stanzas(NON_IQ_STANZAS)
+        self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass2", "pass1",
                                         "pass2", "pass1", "pass2", "pass1"])
         self.assertEqual(len(self.stanzas_sent), 0)
@@ -302,7 +302,7 @@ class TestStanzaProcessor(unittest.TestCase):
             def handler1(self, stanza):
                 return parent.eat2(stanza)
         self.proc.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
-        self.procrocess_stanzas(NON_IQ_STANZAS)
+        self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["eat1", "eat1", "eat1"])
         self.assertEqual(len(self.stanzas_sent), 0)
 
@@ -319,7 +319,7 @@ class TestStanzaProcessor(unittest.TestCase):
             def handler1(self, stanza):
                 return parent.eat2(stanza)
         self.proc.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
-        self.procrocess_stanzas(NON_IQ_STANZAS)
+        self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1", "eat2", 
                                         "pass1", "eat2", "pass1", "eat2"])
         self.assertEqual(len(self.stanzas_sent), 0)
@@ -332,7 +332,7 @@ class TestStanzaProcessor(unittest.TestCase):
             def handler1(self, stanza):
                 return parent.pass1(stanza)
         self.proc.setup_stanza_handlers([Handlers()], "post-auth")
-        self.procrocess_stanzas(NON_IQ_STANZAS)
+        self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1"])
         self.assertEqual(len(self.stanzas_sent), 0)
 
@@ -349,7 +349,7 @@ class TestStanzaProcessor(unittest.TestCase):
             def handler1(self, stanza):
                 return parent.pass2(stanza)
         self.proc.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
-        self.procrocess_stanzas(NON_IQ_STANZAS)
+        self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1", "pass2",
                                                         "pass1", "pass2"])
         self.assertEqual(len(self.stanzas_sent), 0)
@@ -367,7 +367,7 @@ class TestStanzaProcessor(unittest.TestCase):
             def handler1(self, stanza):
                 return parent.pass2(stanza)
         self.proc.setup_stanza_handlers([Handlers2(), Handlers1()], "post-auth")
-        self.procrocess_stanzas(NON_IQ_STANZAS)
+        self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass2", "pass1",
                                                         "pass2", "pass1"])
         self.assertEqual(len(self.stanzas_sent), 0)
@@ -386,7 +386,7 @@ class TestStanzaProcessor(unittest.TestCase):
             def handler1(self, stanza):
                 return parent.eat2(stanza)
         self.proc.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
-        self.procrocess_stanzas(NON_IQ_STANZAS)
+        self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["eat1", "eat1"])
         self.assertEqual(len(self.stanzas_sent), 0)
 
@@ -403,7 +403,7 @@ class TestStanzaProcessor(unittest.TestCase):
             def handler1(self, stanza):
                 return parent.eat2(stanza)
         self.proc.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
-        self.procrocess_stanzas(NON_IQ_STANZAS)
+        self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1", "eat2", 
                                                     "pass1", "eat2"])
         self.assertEqual(len(self.stanzas_sent), 0)
@@ -416,7 +416,7 @@ class TestStanzaProcessor(unittest.TestCase):
             def handler1(self, stanza):
                 return parent.pass1(stanza)
         self.proc.setup_stanza_handlers([Handlers()], "post-auth")
-        self.procrocess_stanzas(NON_IQ_STANZAS)
+        self.process_stanzas(NON_IQ_STANZAS)
         self.assertEqual(self.handlers_called, ["pass1"])
         self.assertEqual(len(self.stanzas_sent), 0)
 

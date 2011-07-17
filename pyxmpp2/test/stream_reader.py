@@ -38,7 +38,7 @@ class EventTemplate:
 
 class StreamHandler(xmppparser.XMLStreamHandler):
     def __init__(self, test_case):
-        xmppparser.XMLStreamHandler.__init__()
+        xmppparser.XMLStreamHandler.__init__(self)
         self.test_case = test_case
     def stream_start(self, element):
         self.test_case.event("start", element)

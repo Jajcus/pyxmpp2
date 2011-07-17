@@ -31,7 +31,7 @@ from pyxmpp2.test._util import ReceiverSelectTestCase
 
 C2S_SERVER_STREAM_HEAD = ('<stream:stream version="1.0" from="127.0.0.1"'
                             ' xmlns:stream="http://etherx.jabber.org/streams"'
-                            'xmlns="jabber:client">')
+                            ' xmlns="jabber:client">')
 C2S_CLIENT_STREAM_HEAD = ('<stream:stream version="1.0" to="127.0.0.1"'
                             ' xmlns:stream="http://etherx.jabber.org/streams"'
                             ' xmlns="jabber:client">')
