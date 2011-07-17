@@ -19,6 +19,7 @@ from pyxmpp2.streamevents import *
 from pyxmpp2.exceptions import StreamParseError
 from pyxmpp2.jid import JID
 from pyxmpp2.message import Message
+from pyxmpp2.settings import XMPPSettings
 
 from pyxmpp2.interfaces import EventHandler, event_handler, QUIT
 from pyxmpp2.interfaces import StanzaRoute
@@ -251,23 +252,18 @@ class TestReceiverThreaded(ReceiverThreadedTestMixIn, TestReceiverSelect):
 class TestReceiverGLib(ReceiverGLibTestMixIn, TestReceiverSelect):
     pass
 
-def suite():
-     suite = unittest.TestSuite()
-     suite.addTest(unittest.makeSuite(TestInitiatorSelect))
-     suite.addTest(unittest.makeSuite(TestReceiverSelect))
-     suite.addTest(unittest.makeSuite(TestInitiatorPoll))
-     suite.addTest(unittest.makeSuite(TestReceiverPoll))
-     suite.addTest(unittest.makeSuite(TestInitiatorThreaded))
-     suite.addTest(unittest.makeSuite(TestReceiverThreaded))
-     suite.addTest(unittest.makeSuite(TestInitiatorGLib))
-     suite.addTest(unittest.makeSuite(TestReceiverGLib))
-     return suite
+from pyxmpp2.test._support import load_tests, setup_logging
 
-if __name__ == '__main__':
-    import logging
-    logger = logging.getLogger()
-    logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.INFO)
-    unittest.TextTestRunner(verbosity=2).run(suite())
+def setUpModule():
+    # reset the event queue
+    XMPPSettings._defs['event_queue'].default = None
+    setup_logging()
+
+def tearDownModule():
+    # reset the event queue
+    XMPPSettings._defs['event_queue'].default = None
+
+if __name__ == "__main__":
+    unittest.main()
 
 # vi: sts=4 et sw=4

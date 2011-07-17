@@ -4,16 +4,13 @@ EXAMPLES=echobot.py send_message_client.py  simple_send_message.py check_version
 PY2_EXAMPLES=$(addprefix examples/,$(EXAMPLES))
 PY3_EXAMPLES=$(addprefix py3-examples/,$(EXAMPLES))
 
-PY2_TESTS=$(wildcard tests/*.py)
-PY3_TESTS=$(subst tests/,py3-tests/,$(PY2_TESTS))
-
 PY2TO3=2to3-3.2
 
 PYTHON=python
 PYTHON3=python3
 
 .PHONY: all build test version dist install
-.PHONY: py3-all py3-build py3-test py3-install py3-tests
+.PHONY: py3-all py3-build py3-test py3-install
 .PHONY: update-doc doc pylint.log pylint ChangeLog www publish
 
 all: build test
@@ -24,8 +21,6 @@ build: version
 	umask 022 ; $(PYTHON) setup.py build
 	-cd examples && rm -f pyxmpp2 2>/dev/null && ln -s ../build/lib*/pyxmpp2 .
 	-cd examples && chmod a+x *.py
-	-cd tests && rm -f pyxmpp2 2>/dev/null && ln -s ../build/lib*/pyxmpp2 .
-	-cd tests && chmod a+x *.py
 
 py3-build: version $(PY3_EXAMPLES)
 	umask 022 ; $(PYTHON3) setup.py build --build-base=py3-build
@@ -39,16 +34,11 @@ py3-examples/%.py: examples/%.py
 	$(PY2TO3) --no-diffs -w -n $@
 	sed -i -e's/^\(#!.*python\)/\13/' $@
 
-py3-tests: $(PY3_TESTS)
-	
-py3-tests/%.py: tests/%.py
-	install -d py3-tests
-	cp -a $< $@
-	$(PY2TO3) --no-diffs -w -n $@
-	sed -i -e's/^\(#!.*python\)/\13/' $@
-
 test:
-	$(MAKE) -C tests tests
+	$(PYTHON) setup.py test
+
+py3-test:
+	$(PYTHON3) setup.py build --build-base=py3-build test
 
 doc:
 	$(MAKE) -C doc

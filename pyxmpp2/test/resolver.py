@@ -15,6 +15,8 @@ from pyxmpp2.resolver import DumbBlockingResolver, BlockingResolver
 from pyxmpp2.resolver import ThreadedResolver
 from pyxmpp2.settings import XMPPSettings
 
+logger = logging.getLogger("pyxmpp2.test.resolver")
+
 NO_RESULT = object()
 DUPLICATE = object()
 
@@ -22,7 +24,7 @@ class DummyEvent(Event):
     def __unicode__(self):
         return u"Dummy event"
 
-class TestResolver(unittest.TestCase):
+class _TestResolver(unittest.TestCase):
     def setUp(self):
         self.loop = main_loop_factory([])
         self.srv_result = NO_RESULT
@@ -172,7 +174,9 @@ class TestResolver(unittest.TestCase):
         results = sorted(self.address_result)
         self.assertEqual(results, expected)
 
-class TestDumbResolver(TestResolver):
+class _TestDumbResolver(_TestResolver):
+    def make_resolver(self, settings = None):
+        return DumbResolver(settings)
     def test_resolve_srv(self):
         resolver = self.make_resolver()
         self.loop.add_handler(resolver)
@@ -182,34 +186,27 @@ class TestDumbResolver(TestResolver):
         self.wait(1)
         self.assertEqual(self.srv_result, NO_RESULT)
 
-class TestBlockingResolver(TestResolver):
+class TestBlockingResolver(_TestResolver):
     def wait(self, timeout):
         return
 
     def make_resolver(self, settings = None):
         return BlockingResolver(settings)
 
-class TestDumbBlockingResolver(TestBlockingResolver, TestDumbResolver):
+class TestDumbBlockingResolver(TestBlockingResolver, _TestDumbResolver):
     def make_resolver(self, settings = None):
         return DumbBlockingResolver(settings)
 
-class TestThreadedResolver(TestResolver):
+class TestThreadedResolver(_TestResolver):
     def make_resolver(self, settings = None):
         return ThreadedResolver(settings, 10)
 
 
-def suite():
-     suite = unittest.TestSuite()
-     #suite.addTest(unittest.makeSuite(TestDumbBlockingResolver))
-     #suite.addTest(unittest.makeSuite(TestBlockingResolver))
-     suite.addTest(unittest.makeSuite(TestThreadedResolver))
-     return suite
+from pyxmpp2.test._support import load_tests, setup_logging
 
-if __name__ == '__main__':
-    import logging
-    logger = logging.getLogger()
-    logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.ERROR)
-    unittest.TextTestRunner(verbosity=2).run(suite())
+def setUpModule():
+    setup_logging()
 
-# vi: sts=4 et sw=4
+if __name__ == "__main__":
+    unittest.main()
+

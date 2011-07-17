@@ -11,8 +11,11 @@ import pyxmpp2.etree
 
 if "PYXMPP2_ETREE" not in os.environ:
     # one of tests fails when xml.etree.ElementTree is used
-    import xml.etree.cElementTree
-    pyxmpp2.etree.ElementTree = xml.etree.cElementTree
+    try:
+        import xml.etree.cElementTree
+        pyxmpp2.etree.ElementTree = xml.etree.cElementTree
+    except ImportError:
+        pass
 
 from pyxmpp2.etree import ElementTree
 

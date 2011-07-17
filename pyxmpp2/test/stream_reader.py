@@ -1,8 +1,11 @@
 #!/usr/bin/python -u
 # -*- coding: UTF-8 -*-
 
+import os
 import sys
 import logging
+
+from pyxmpp2.test._support import DATA_DIR
 
 logger = logging.getLogger("pyxmpp2.test.stream_reader")
 
@@ -47,7 +50,7 @@ expected_events = []
 whole_stream = None
 
 def load_expected_events():
-    for l in file("data/stream_info.txt"):
+    for l in file(os.path.join(DATA_DIR, "stream_info.txt")):
         if l.startswith("#"):
             continue
         l = l.strip()
@@ -55,14 +58,14 @@ def load_expected_events():
 
 def load_whole_stream():
     global whole_stream
-    whole_stream = ElementTree.parse("data/stream.xml")
+    whole_stream = ElementTree.parse(os.path.join(DATA_DIR, "stream.xml"))
 
 class TestStreamReader(unittest.TestCase):
     def setUp(self):
         self.expected_events = list(expected_events)
         self.handler = StreamHandler(self)
         self.reader = xmppparser.StreamReader(self.handler)
-        self.file = file("data/stream.xml")
+        self.file = file(os.path.join(DATA_DIR, "stream.xml"))
         self.chunk_start = 0
         self.chunk_end = 0
         self.whole_stream = ElementTree.ElementTree()
@@ -125,17 +128,12 @@ class TestStreamReader(unittest.TestCase):
             r = self.whole_stream.getroot()
             r.append(element)
 
-def suite():
+from pyxmpp2.test._support import load_tests, setup_logging
+
+def setUpModule():
     load_expected_events()
     load_whole_stream()
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestStreamReader))
-    return suite
+    setup_logging()
 
-if __name__ == '__main__':
-    logger = logging.getLogger()
-    logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.ERROR)
-    unittest.TextTestRunner(verbosity=2).run(suite())
-
-# vi: sts=4 et sw=4
+if __name__ == "__main__":
+    unittest.main()

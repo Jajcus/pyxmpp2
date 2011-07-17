@@ -65,6 +65,8 @@ setup(
         'pyxmpp2.mainloop',
         'pyxmpp2.sasl',
         'pyxmpp2.ext',
+        'pyxmpp2.test',
     ],
+    test_suite = "pyxmpp2.test.discover",
     **extra
 )
