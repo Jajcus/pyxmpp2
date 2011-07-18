@@ -139,11 +139,12 @@ wiki: https://github.com/Jajcus/pyxmpp2/wiki/Conformance-declaration
 .. _RFC 6122: http://xmpp.org/rfcs/rfc6122.html
 .. _XEP-0092: http://xmpp.org/extensions/xep-0092.html
 
-Further information
--------------------
+Links
+-----
 
 - Project GitHub page: https://github.com/Jajcus/pyxmpp2/
 - API reference: http://jajcus.github.com/pyxmpp2/api/
+- Code mirror at BitBucket: https://bitbucket.org/Jajcus/pyxmpp2
 
 Contact
 -------
