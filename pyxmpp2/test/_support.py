@@ -13,6 +13,24 @@ RESOURCES = ['network', 'lo-network', 'gsasl']
 if "TEST_USE" in os.environ:
     RESOURCES = os.environ["TEST_USE"].split()
 
+if "TEST_STACKDUMP_FILE" in os.environ:
+    import traceback
+    import threading
+    import time
+    def stack_dumper():
+        stackdump_file = open(os.environ.get("TEST_STACKDUMP_FILE"), "w")
+        while True:
+            time.sleep(5)
+            stackdump_file.write(time.ctime() + "\n")
+            frames = sys._current_frames()
+            for frame in frames.values():
+                traceback.print_stack(frame, file = stackdump_file)
+            stackdump_file.write("\n")
+            stackdump_file.flush()
+    thr = threading.Thread(target = stack_dumper)
+    thr.daemon = True
+    thr.start()
+
 # pylint: disable=W0602,C0103
 logging_ready = False
 def setup_logging():
