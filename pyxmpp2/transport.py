@@ -833,10 +833,18 @@ class TCPTransport(XMPPTransport, IOHandler):
         """
         IN_LOGGER.debug("IN: %r", data)
         if data:
-            self._reader.feed(data)
+            self.lock.release() # not to deadlock with the stream
+            try:
+                self._reader.feed(data)
+            finally:
+                self.lock.acquire()
         else:
             self._eof = True
-            self._stream.stream_eof()
+            self.lock.release() # not to deadlock with the stream
+            try:
+                self._stream.stream_eof()
+            finally:
+                self.lock.acquire()
             if not self._serializer:
                 if self._state != "closed":
                     self.event(DisconnectedEvent(self._dst_addr))
