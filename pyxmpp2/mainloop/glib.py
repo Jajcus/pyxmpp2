@@ -281,15 +281,14 @@ class GLibMainLoop(MainLoopBase):
                 self._anything_done = True
                 logger.debug("Dummy timeout func called")
                 return True
-            if not glib.main_context_default().pending():
-                tag = glib.timeout_add(int(timeout * 1000), dummy_cb)
-            else:
-                tag = None
             self._anything_done = False
+            tag = None
             logger.debug("Calling main_context_default().iteration()")
             while not self._anything_done:
+                if not glib.main_context_default().pending() and not tag:
+                    tag = glib.timeout_add(int(timeout * 1000), dummy_cb)
                 glib.main_context_default().iteration(True)
-            if tag is not None:
+            if tag:
                 glib.source_remove(tag)
             logger.debug("..main_context_default().iteration() exited")
         finally:
