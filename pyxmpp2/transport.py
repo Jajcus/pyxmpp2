@@ -55,6 +55,11 @@ logger = logging.getLogger("pyxmpp2.transport")
 IN_LOGGER = logging.getLogger("pyxmpp2.IN")
 OUT_LOGGER = logging.getLogger("pyxmpp2.OUT")
 
+BLOCKING_ERRORS = set()
+for name in ['EAGAIN', 'EWOULDBLOCK', 'WSAEWOULDBLOCK']:
+    if hasattr(errno, name):
+        BLOCKING_ERRORS.add(getattr(errno, name))
+
 class WriteJob(object):
     """Base class for objects put to the `TCPTransport` write queue."""
     # pylint: disable-msg=R0903
@@ -413,7 +418,7 @@ class TCPTransport(XMPPTransport, IOHandler):
                 except socket.error, err:
                     if err.args[0] == errno.EINTR:
                         continue
-                    if err.args[0] == errno.EWOULDBLOCK:
+                    if err.args[0] in BLOCKING_ERRORS:
                         wait_for_write(self._socket)
                         continue
                     raise
@@ -717,7 +722,7 @@ class TCPTransport(XMPPTransport, IOHandler):
                     except socket.error, err:
                         if err.args[0] == errno.EINTR:
                             continue
-                        elif err.args[0] == errno.EWOULDBLOCK:
+                        elif err.args[0] in BLOCKING_ERRORS:
                             break
                         elif err.args[0] == errno.ECONNRESET:
                             logger.warning("Connection reset by peer")
@@ -733,7 +738,7 @@ class TCPTransport(XMPPTransport, IOHandler):
                     except socket.error, err:
                         if err.args[0] == errno.EINTR:
                             continue
-                        elif err.args[0] == errno.EWOULDBLOCK:
+                        elif err.args[0] in BLOCKING_ERRORS:
                             break
                         elif err.args[0] == errno.ECONNRESET:
                             logger.warning("Connection reset by peer")
