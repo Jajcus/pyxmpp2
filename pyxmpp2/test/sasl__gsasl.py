@@ -329,7 +329,8 @@ class TestSASLClientvsGSASL(unittest.TestCase):
             stderr = open("/dev/null", "w")
         pipe = subprocess.Popen(cmd, bufsize = 1, stdout = subprocess.PIPE,
                         stdin = subprocess.PIPE, stderr = stderr)
-        stderr.close()
+        if stderr:
+            stderr.close()
         if extra_data:
             data = extra_data + b"\n"
             logger.debug("OUT: %r", data)
@@ -501,7 +502,8 @@ class TestSASLServervsGSASL(unittest.TestCase):
             stderr = open("/dev/null", "w")
         pipe = subprocess.Popen(cmd, bufsize = 1, stdout = subprocess.PIPE,
                                     stdin = subprocess.PIPE, stderr = stderr)
-        stderr.close()
+        if stderr:
+            stderr.close()
         mech = pipe.stdout.readline().strip().decode("utf-8")
         logger.debug("IN: %r", mech)
         if mech != mechanism:
