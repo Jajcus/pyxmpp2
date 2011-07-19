@@ -25,7 +25,7 @@ logger = logging.getLogger("pyxmpp2.test._util")
 
 socket.setdefaulttimeout(5)
 
-TIMEOUT = 5.0 # seconds
+TIMEOUT = 60.0 # seconds
 
 class NetReaderWritter(object):
     """Threaded network reader/writter.

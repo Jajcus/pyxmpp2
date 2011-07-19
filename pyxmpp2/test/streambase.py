@@ -109,7 +109,7 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         self.wait(expect = re.compile(b".*(</stream:stream>)"))
         self.server.write(STREAM_TAIL)
         self.server.disconnect()
-        self.wait(1)
+        self.wait()
         self.assertFalse(self.stream.is_connected())
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [ConnectingEvent, ConnectedEvent,
@@ -162,7 +162,7 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         self.stream.disconnect()
         self.server.write(STREAM_TAIL)
         self.server.disconnect()
-        self.wait(1)
+        self.wait()
         self.assertEqual(route.sent, [])
         self.assertEqual(route.received, [])
         event_classes = [e.__class__ for e in handler.events_received]
@@ -187,7 +187,7 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         self.server.disconnect()
         self.wait(expect = re.compile(b".*(</stream:stream>)"))
         self.stream.disconnect()
-        self.wait(1)
+        self.wait()
         self.assertEqual(route.sent, [])
         self.assertEqual(len(route.received), 1)
         stanza = route.received[0]
