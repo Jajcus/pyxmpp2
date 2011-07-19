@@ -131,6 +131,11 @@ class NetReaderWritter(object):
                 try:
                     ret = infd, _outfd, _errfd = select.select([self.sock], [],
                                                                         [], 5)
+                except select.error, err:
+                    if err == getattr(errno, "WSAEBADF", None):
+                        self.sock = None
+                        break
+                    raise
                 finally:
                     self.lock.acquire()
                 if not self.sock:
