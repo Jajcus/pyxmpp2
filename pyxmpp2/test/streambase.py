@@ -244,7 +244,7 @@ class TestReceiverSelect(ReceiverSelectTestCase):
         logger.debug(" done")
         self.assertTrue(self.client.eof)
         self.assertTrue(self.client.rdata.endswith(PARSE_ERROR_RESPONSE))
-        self.client.close()
+        self.client.disconnect()
         logger.debug("final wait...")
         self.wait()
         logger.debug(" done")
