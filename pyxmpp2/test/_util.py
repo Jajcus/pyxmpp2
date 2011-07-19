@@ -44,7 +44,6 @@ class NetReaderWritter(object):
         self.wdata = b""
         self.rdata = b""
         self.eof = False
-        self.error = False
         self.ready = not need_accept
         self._disconnect = False
         self.write_enabled = True
@@ -127,47 +126,34 @@ class NetReaderWritter(object):
         with self.lock:
             if not self.sock or self.eof:
                 return
-            poll = select.poll()
-            poll.register(self.sock, select.POLLIN | select.POLLERR 
-                                                        | select.POLLHUP)
             while not self.eof and self.sock is not None:
                 self.lock.release()
                 try:
-                    ret = poll.poll(5)
+                    ret = infd, _outfd, _errfd = select.select([self.sock], [],
+                                                                        [], 5)
                 finally:
                     self.lock.acquire()
                 if not self.sock:
                     break
-                for _fd, event in ret:
-                    if event & select.POLLIN:
-                        if self.extra_on_read:
-                            self.extra_on_read()
-                        elif self.ready:
-                            data = self.sock.recv(1024)
-                            if not data:
-                                logger.debug(u"tst IN: EOF")
-                                self.eof = True
-                                self.eof_cond.notifyAll()
-                            else:
-                                logger.debug(u"tst IN: " + repr(data))
-                                self.rdata += data
+                if infd:
+                    if self.extra_on_read:
+                        self.extra_on_read()
+                    elif self.ready:
+                        data = self.sock.recv(1024)
+                        if not data:
+                            logger.debug(u"tst IN: EOF")
+                            self.eof = True
+                            self.eof_cond.notifyAll()
                         else:
-                            sock1, self.peer = self.sock.accept()
-                            logger.debug(u"tst ACCEPT: " + repr(self.peer))
-                            poll.unregister(self.sock)
-                            self.sock.close()
-                            self.sock = sock1
-                            poll.register(self.sock, select.POLLIN 
-                                            | select.POLLERR | select.POLLHUP)
-                            self.ready = True
-                            self.write_cond.notify()
-                            break
-                    if event & (select.POLLERR | select.POLLHUP):
+                            logger.debug(u"tst IN: " + repr(data))
+                            self.rdata += data
+                    else:
+                        sock1, self.peer = self.sock.accept()
+                        logger.debug(u"tst ACCEPT: " + repr(self.peer))
                         self.sock.close()
-                        self.sock = None
-                        self.error = True
-                        self.eof_cond.notifyAll()
-                        break
+                        self.sock = sock1
+                        self.ready = True
+                        self.write_cond.notify()
 
     def write(self, data):
         """Queue data for write."""
@@ -201,7 +187,7 @@ class NetReaderWritter(object):
     def wait(self, timeout):
         """Wait for socket closing, an error or `timeout` seconds."""
         with self.eof_cond:
-            if not self.eof and not self.error:
+            if not self.eof:
                 self.eof_cond.wait(timeout)
 
 class NetworkTestCase(unittest.TestCase):
