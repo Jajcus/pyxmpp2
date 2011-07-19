@@ -56,7 +56,7 @@ IN_LOGGER = logging.getLogger("pyxmpp2.IN")
 OUT_LOGGER = logging.getLogger("pyxmpp2.OUT")
 
 BLOCKING_ERRORS = set()
-for name in ['EAGAIN', 'EWOULDBLOCK', 'WSAEWOULDBLOCK']:
+for name in ['EAGAIN', 'EWOULDBLOCK', 'WSAEWOULDBLOCK', 'EINPROGRESS']:
     if hasattr(errno, name):
         BLOCKING_ERRORS.add(getattr(errno, name))
 
@@ -339,7 +339,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         try:
             self._socket.connect(addr)
         except socket.error, err:
-            if err.args[0] == errno.EINPROGRESS:
+            if err.args[0] in BLOCKING_ERRORS:
                 self._set_state("connecting")
                 self._write_queue.append(ContinueConnect())
                 self._write_queue_cond.notify()
