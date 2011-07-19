@@ -59,6 +59,24 @@ def are_domains_equal(domain1, domain2):
     domain2 = domain2.encode("idna")
     return domain1.lower() == domain2.lower()
 
+def _validate_ip_address(family, address):
+    """Check if `address` is valid IP address and return it, in a normalized
+    form.
+
+    :Parameters:
+        - `family`: ``socket.AF_INET`` or ``socket.AF_INET6``
+        - `address`: the IP address to validate
+    """
+    try:
+        info = socket.getaddrinfo(address, 0, family, socket.SOCK_STREAM, 0,
+                                                        socket.AI_NUMERICHOST)
+        if not info:
+            raise ValueError("Bad IP address")
+        addr = info[0][4]
+        return socket.getnameinfo(addr, socket.AI_NUMERICHOST)[0]
+    except socket.gaierror:
+        raise ValueError("Bad IP address")
+
 class JID(object):
     """JID.
 
@@ -196,22 +214,16 @@ class JID(object):
         if u'[' in data:
             if data[0] == u'[' and data[-1] == u']':
                 try:
-                    # decode...
-                    addr = socket.inet_pton(socket.AF_INET6, data[1:-1])
-                    # ...and normalize
-                    return "[{0}]".format(
-                                    socket.inet_ntop(socket.AF_INET6, addr))
-                except socket.error:
+                    addr = _validate_ip_address(socket.AF_INET6, data[1:-1])
+                    return "[{0}]".format(addr)
+                except ValueError:
                     raise JIDError(u"Invalid IPv6 literal in JID domainpart")
             else:
                 raise JIDError(u"Invalid use of '[' or ']' in JID domainpart")
         elif data[0].isdigit() and data[-1].isdigit():
             try:
-                # try to decode as IPv4...
-                addr = socket.inet_pton(socket.AF_INET, data)
-                # ...and normalize
-                return socket.inet_ntop(socket.AF_INET, addr)
-            except socket.error:
+                addr = _validate_ip_address(socket.AF_INET6, data)
+            except ValueError:
                 pass
         data = UNICODE_DOT_RE.sub(u".", data)
         data = data.rstrip(u".")
