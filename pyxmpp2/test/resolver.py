@@ -8,12 +8,22 @@ import time
 
 from socket import AF_INET, AF_INET6
 
+try:
+    import dns
+    HAVE_DNSPYTHON=True
+except ImportError:
+    HAVE_DNSPYTHON=False
+
 from pyxmpp2.mainloop import main_loop_factory
 from pyxmpp2.mainloop.interfaces import Event
 
 from pyxmpp2.resolver import is_ipv6_available
-from pyxmpp2.resolver import DumbBlockingResolver, BlockingResolver
-from pyxmpp2.resolver import ThreadedResolver
+from pyxmpp2.resolver import DumbBlockingResolver
+
+if HAVE_DNSPYTHON:
+    from pyxmpp2.resolver import BlockingResolver
+    from pyxmpp2.resolver import ThreadedResolver
+
 from pyxmpp2.settings import XMPPSettings
 
 from pyxmpp2.test import _support
@@ -192,7 +202,8 @@ class _TestDumbResolver(_TestResolver):
         self.wait(1)
         self.assertEqual(self.srv_result, NO_RESULT)
 
-@unittest.skipIf("network" not in _support.RESOURCES, "network usage disabled")
+@unittest.skipUnless("network" in _support.RESOURCES, "network usage disabled")
+@unittest.skipUnless(HAVE_DNSPYTHON, "DNSPython not available")
 class TestBlockingResolver(_TestResolver):
     def wait(self, timeout = 1):
         return
@@ -200,12 +211,16 @@ class TestBlockingResolver(_TestResolver):
     def make_resolver(self, settings = None):
         return BlockingResolver(settings)
 
-@unittest.skipIf("network" not in _support.RESOURCES, "network usage disabled")
-class TestDumbBlockingResolver(TestBlockingResolver, _TestDumbResolver):
+@unittest.skipUnless("network" in _support.RESOURCES, "network usage disabled")
+class TestDumbBlockingResolver(_TestDumbResolver):
+    def wait(self, timeout = 1):
+        return
+
     def make_resolver(self, settings = None):
         return DumbBlockingResolver(settings)
 
-@unittest.skipIf("network" not in _support.RESOURCES, "network usage disabled")
+@unittest.skipUnless("network" in _support.RESOURCES, "network usage disabled")
+@unittest.skipUnless(HAVE_DNSPYTHON, "DNSPython not available")
 class TestThreadedResolver(_TestResolver):
     def make_resolver(self, settings = None):
         return ThreadedResolver(settings, 10)
