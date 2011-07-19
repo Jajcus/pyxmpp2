@@ -125,6 +125,8 @@ class NetReaderWritter(object):
     def reader_run(self):
         """The reader thread function."""
         with self.lock:
+            if not self.sock or self.eof:
+                return
             poll = select.poll()
             poll.register(self.sock, select.POLLIN | select.POLLERR 
                                                         | select.POLLHUP)
@@ -543,5 +545,4 @@ class EventRecorder(EventHandler):
         """Handle the `DisconnectedEvent`: abort the main loop."""
         # pylint: disable=R0201
         event.stream.event(QUIT)
-
 
