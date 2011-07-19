@@ -182,10 +182,10 @@ class _TestResolver(unittest.TestCase):
         self.assertEqual(len(self.address_result), len(addresses))
         expected = [[]] * 20
         if is_ipv6_available():
-            expected += [[(2, '127.0.0.1')], [(10, '::1')],
-                                            [(10, '::1'), (2, '127.0.0.1')]]
+            expected += [[(AF_INET, '127.0.0.1')], [(AF_INET6, '::1')],
+                                [(AF_INET6, '::1'), (AF_INET, '127.0.0.1')]]
         else:
-            expected += [[], [(2, '127.0.0.1')], [(2, '127.0.0.1')]]
+            expected += [[], [(AF_INET, '127.0.0.1')], [(2, '127.0.0.1')]]
         results = sorted(self.address_result)
         self.assertEqual(results, expected)
 
