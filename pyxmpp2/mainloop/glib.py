@@ -280,13 +280,17 @@ class GLibMainLoop(MainLoopBase):
                 "Dummy callback function to force event if none are pending."
                 self._anything_done = True
                 logger.debug("Dummy timeout func called")
-                return False
+                return True
             if not glib.main_context_default().pending():
-                glib.timeout_add(int(timeout * 1000), dummy_cb)
+                tag = glib.timeout_add(int(timeout * 1000), dummy_cb)
+            else:
+                tag = None
             self._anything_done = False
             logger.debug("Calling main_context_default().iteration()")
             while not self._anything_done:
                 glib.main_context_default().iteration(True)
+            if tag is not None:
+                glib.source_remove(tag)
             logger.debug("..main_context_default().iteration() exited")
         finally:
             self._stack.pop()
