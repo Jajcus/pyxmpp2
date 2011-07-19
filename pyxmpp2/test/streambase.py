@@ -267,15 +267,7 @@ class TestReceiverGLib(ReceiverGLibTestMixIn, TestReceiverSelect):
 from pyxmpp2.test._support import load_tests, setup_logging
 
 def setUpModule():
-    # pylint: disable=W0212
-    # reset the event queue
-    XMPPSettings._defs['event_queue'].default = None
     setup_logging()
-
-def tearDownModule():
-    # pylint: disable=W0212
-    # reset the event queue
-    XMPPSettings._defs['event_queue'].default = None
 
 if __name__ == "__main__":
     unittest.main()

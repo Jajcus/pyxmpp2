@@ -256,6 +256,9 @@ class NetworkTestCase(unittest.TestCase):
         """Initialize class instance for a new test."""
         self.server = None
         self.client = None
+        # pylint: disable=W0212
+        # reset the event queue
+        XMPPSettings._defs['event_queue'].default = None
 
     def tearDown(self):
         """Stop the server and client connections started."""
@@ -263,6 +266,9 @@ class NetworkTestCase(unittest.TestCase):
             self.server.close()
         if self.client:
             self.client.close()
+        # pylint: disable=W0212
+        # reset the event queue
+        XMPPSettings._defs['event_queue'].default = None
 
     def start_server(self, ip_version = 4):
         """Create the `server` object, start its thread and return
