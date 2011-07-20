@@ -221,28 +221,18 @@ class NetworkTestCase(unittest.TestCase):
             raise unittest.SkipTest("loopback network usage disabled")
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.bind(("127.0.0.1", 0))
-            sock.listen(1)
-            sock1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock1.connect(sock.getsockname())
-            sock.accept()[0].close()
-            sock1.close()
             sock.close()
             cls.can_do_ipv4 = True
-        except socket.error:
+        except socket.error, err:
+            logger.debug("socket error: {0} while testing IPv4".format(err))
             pass
         if socket.has_ipv6:
             try:
                 sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-                sock.bind(("::1", 0))
-                sock.listen(1)
-                sock1 = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-                sock1.connect(sock.getsockname())
-                sock.accept()[0].close()
-                sock1.close()
                 sock.close()
                 cls.can_do_ipv6 = True
-            except socket.error:
+            except socket.error, err:
+                logger.debug("socket error: {0} while testing IPv6".format(err))
                 pass
 
     def setUp(self):
