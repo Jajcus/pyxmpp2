@@ -469,7 +469,7 @@ class ThreadPool(MainLoop):
         logger.debug("Closing the io handlers...")
         for handler in self.io_handlers:
             handler.close()
-        if self.event_thread.is_alive():
+        if self.event_thread and self.event_thread.is_alive():
             logger.debug("Sending the QUIT signal")
             self.event_queue.put(QUIT)
         logger.debug("  sent")
