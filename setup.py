@@ -4,7 +4,7 @@ import os.path
 import sys
 
 from distribute_setup import use_setuptools
-use_setuptools("0.6.14")
+use_setuptools("0.6.19")
     
 from setuptools import setup
 
