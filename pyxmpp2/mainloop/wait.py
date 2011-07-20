@@ -54,5 +54,5 @@ else:
         """Wait up to `timeout` seconds until `socket` is ready for writing.
         """
         writable = select.select([], [socket], [], timeout)[1]
-        return writable(writable)
+        return bool(writable)
 
