@@ -29,11 +29,14 @@ import re
 import weakref
 import warnings
 import socket
+import logging
 
 from encodings import idna
 
 from .xmppstringprep import NODEPREP, RESOURCEPREP
 from .exceptions import JIDError, StringprepError
+
+logger = logging.getLogger("pyxmpp2.jid")
 
 # to enforce the UseSTD3ASCIIRules flag of IDNA
 GOOD_OUTER = u"[^\x00-\x2C\x2E-\x2F\x3A-\x40\x5B-\x60\x7B-\x7F-]"
@@ -70,11 +73,20 @@ def _validate_ip_address(family, address):
     try:
         info = socket.getaddrinfo(address, 0, family, socket.SOCK_STREAM, 0,
                                                         socket.AI_NUMERICHOST)
-        if not info:
-            raise ValueError("Bad IP address")
-        addr = info[0][4]
-        return socket.getnameinfo(addr, socket.AI_NUMERICHOST)[0]
-    except socket.gaierror:
+    except socket.gaierror, err:
+        logger.debug("gaierror: {0} for {1!r}".format(err, address))
+        raise ValueError("Bad IP address")
+
+    if not info:
+        logger.debug("getaddrinfo result empty")
+        raise ValueError("Bad IP address")
+    addr = info[0][4]
+    logger.debug(" got address: {0!r}".format(addr))
+
+    try:
+        return socket.getnameinfo(addr, socket.NI_NUMERICHOST)[0]
+    except socket.gaierror, err:
+        logger.debug("gaierror: {0} for {1!r}".format(err, addr))
         raise ValueError("Bad IP address")
 
 class JID(object):
@@ -216,14 +228,16 @@ class JID(object):
                 try:
                     addr = _validate_ip_address(socket.AF_INET6, data[1:-1])
                     return "[{0}]".format(addr)
-                except ValueError:
+                except ValueError, err:
+                    logger.debug("ValueError: {0}".format(err))
                     raise JIDError(u"Invalid IPv6 literal in JID domainpart")
             else:
                 raise JIDError(u"Invalid use of '[' or ']' in JID domainpart")
         elif data[0].isdigit() and data[-1].isdigit():
             try:
-                addr = _validate_ip_address(socket.AF_INET6, data)
-            except ValueError:
+                addr = _validate_ip_address(socket.AF_INET, data)
+            except ValueError, err:
+                logger.debug("ValueError: {0}".format(err))
                 pass
         data = UNICODE_DOT_RE.sub(u".", data)
         data = data.rstrip(u".")
