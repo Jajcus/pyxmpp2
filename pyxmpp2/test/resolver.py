@@ -30,8 +30,16 @@ from pyxmpp2.test import _support
 
 logger = logging.getLogger("pyxmpp2.test.resolver")
 
-NO_RESULT = object()
-DUPLICATE = object()
+class _Const(object):
+    def __init__(self, name):
+        self.name = name
+    def __str__(self):
+        return self.name
+    def __repr__(self):
+        return self.name
+
+NO_RESULT = _Const("NO_RESULT")
+DUPLICATE = _Const("DUPLICATE")
 
 class DummyEvent(Event):
     # pylint: disable=W0232,R0903
@@ -40,6 +48,9 @@ class DummyEvent(Event):
 
 class _TestResolver(unittest.TestCase):
     def setUp(self):
+        # pylint: disable=W0212
+        # reset the event queue
+        XMPPSettings._defs['event_queue'].default = None
         self.loop = main_loop_factory([])
         self.srv_result = NO_RESULT
         self.address_result = NO_RESULT
@@ -55,7 +66,6 @@ class _TestResolver(unittest.TestCase):
 
     def tearDown(self):
         self.loop.quit()
-        self.loop = None
 
     def make_resolver(self, settings = None):
         raise NotImplementedError
