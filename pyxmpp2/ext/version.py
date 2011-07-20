@@ -32,7 +32,7 @@ from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 
-import os
+import platform
 import logging
 
 from ..etree import ElementTree
@@ -168,8 +168,8 @@ def _os_name_factory(settings):
     """Factory for the :r:`software_os setting` default.
     """
     # pylint: disable-msg=W0613,W0142
-    uname = os.uname()
-    return u"{0} {2} {4}".format(*uname)
+    return u"{0} {1} {2}".format(platform.system(), platform.release(),
+                                                        platform.machine())
  
 def _version_factory(settings):
     """Factory for the :r:`software_version setting` default.

@@ -3,7 +3,7 @@
 # pylint: disable=C0111
 
 import unittest
-import os
+import platform
 
 from pyxmpp2.etree import ElementTree
 
@@ -76,8 +76,8 @@ class TestVersionProvider(unittest.TestCase):
         self.assertIsInstance(payload, VersionPayload)
         self.assertEqual(payload.name, "PyXMPP2")
         self.assertEqual(payload.version, pyxmpp2.version.version)
-        uname = os.uname()
-        expected = u" ".join((uname[0], uname[2], uname[4]))
+        expected = u" ".join((platform.system(), platform.release(),
+                                                        platform.machine()))
         self.assertEqual(payload.os_name, expected)
 
     def test_custom(self):
