@@ -42,29 +42,12 @@ from .interfaces import stream_element_handler
 
 logger = logging.getLogger("pyxmpp2.streamsasl")
 
-class DefaultClientPasswordManager(sasl.PasswordManager):
-    """Default password manager."""
-    def __init__(self, settings):
-        self.settings = settings
-
-    def get_password(self, username, acceptable_formats, properties):
-        if "plain" not in acceptable_formats:
-            return None, None
-
-        if "username" in self.settings:
-            our_name = self.settings["username"]
-        elif "local_jid" in properties:
-            our_name = properties["local_jid"].local
-        else:
-            our_name = None
-
-        if (our_name is not None and our_name == username) or our_name is None:
-            return self.settings["password"], "plain"
-        else:
-            return None, None
-
-class DefaultServerPasswordManager(sasl.PasswordManager):
-    """Default password manager."""
+class DefaultPasswordDatabase(sasl.PasswordDatabase):
+    """Default password database.
+    
+    Uses the :r:`user_passwords setting` or :r:`username setting` 
+    and :r:`password setting`.
+    """
     def __init__(self, settings):
         self.settings = settings
 
@@ -163,7 +146,7 @@ class StreamSASLHandler(StreamFeatureHandler):
             logger.debug("Authentication already started")
             return False
 
-        password_manager = self.settings["server_password_manager"]
+        password_db = self.settings["password_database"]
         mechanism = element.get("mechanism")
         if not mechanism:
             stream.send_stream_error("bad-format")
@@ -171,7 +154,7 @@ class StreamSASLHandler(StreamFeatureHandler):
 
         stream.auth_method_used = mechanism
         self.authenticator = sasl.server_authenticator_factory(mechanism, 
-                                                            password_manager)
+                                                                password_db)
         
         content = element.text.encode("us-ascii")
         ret = self.authenticator.start(stream.auth_properties,
@@ -396,6 +379,8 @@ class StreamSASLHandler(StreamFeatureHandler):
             props["username"] = username
         if authzid is not None:
             props["authzid"] = authzid
+        if "password" in self.settings:
+            props["password"] = self.settings["password"]
         props["available_mechanisms"] = self.peer_sasl_mechanisms
         enabled = sasl.filter_mechanism_list(
                             self.settings['sasl_mechanisms'], props,
@@ -415,10 +400,8 @@ class StreamSASLHandler(StreamFeatureHandler):
                                                     " our SASL mechanisms")
         logger.debug("Our mechanism: {0!r}".format(mechanism))
 
-        password_manager = self.settings["client_password_manager"]
         stream.auth_method_used = mechanism
-        self.authenticator = sasl.client_authenticator_factory(mechanism,
-                                                            password_manager)
+        self.authenticator = sasl.client_authenticator_factory(mechanism)
         initial_response = self.authenticator.start(props)
         if not isinstance(initial_response, sasl.Response):
             raise SASLAuthenticationFailed("SASL initiation failed")
@@ -459,16 +442,10 @@ XMPPSettings.add_setting(u"insecure_auth", basic = True,
         cmdline_help = u"Enable insecure SASL mechanisms over unencrypted channels",
         doc = u"""Enable insecure SASL mechanisms over unencrypted channels"""
     )
-XMPPSettings.add_setting(u"client_password_manager", 
-        type = sasl.PasswordManager,
-        factory = DefaultClientPasswordManager,
-        default_d = "A `DefaultClientPasswordManager` instance",
-        doc = u"""Object providing user password on client."""
-    )
-XMPPSettings.add_setting(u"server_password_manager", 
-        type = sasl.PasswordManager,
-        factory = DefaultServerPasswordManager,
-        default_d = "A `DefaultServerPasswordManager` instance",
+XMPPSettings.add_setting(u"password_database", 
+        type = sasl.PasswordDatabase,
+        factory = DefaultPasswordDatabase,
+        default_d = "A `DefaultPasswordDatabase` instance",
         doc = u"""Object providing or checking user passwords on server."""
     )
 

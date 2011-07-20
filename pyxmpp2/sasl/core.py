@@ -38,6 +38,8 @@ mechanism-dependant, but these are the usually expected properties:
   * For input to the ``start()`` method:
 
     * ``"username"`` - the user name. Required by all password based mechanisms.
+    * ``"password"`` - the user's password.  Required by all password based
+      mechanisms.
     * ``"authzid"`` - authorization id. Optional for most mechanisms.
     * ``"security-layer"`` - security layer if any. ``"TLS"`` when TLS is in
       use.
@@ -60,14 +62,6 @@ mechanism-dependant, but these are the usually expected properties:
     * ``"authzid"`` - the authorization id
     * ``"realm"`` - the realm
 
-Password manager
-----------------
-
-Authentication properties are bound to specific connection or even an
-authentication session and the password is not included there. That is because
-password retrieval may be more complicated or require user action.
-
-The `PasswordManager` object is used to provide or check a user password.
 """
 
 from __future__ import absolute_import, division
@@ -99,13 +93,13 @@ SERVER_MECHANISMS_D = {}
 SERVER_MECHANISMS = []
 SECURE_SERVER_MECHANISMS = []
         
-class PasswordManager:
-    """Base class for password managers.
+class PasswordDatabase:
+    """Password database interface.
 
-    Password manager is an object responsible for providing or verification
-    of authentication credentials.
+    PasswordDatabase object is responsible for providing or verification of
+    user authentication credentials on a server.
 
-    All the methods of `PasswordManager` class may be overridden in derived
+    All the methods of the `PasswordDatabase` may be overridden in derived
     classes for specific authentication and authorization policy.
     """
     # pylint: disable-msg=W0232,R0201
@@ -194,15 +188,16 @@ class PasswordManager:
         logger.debug("got password in unknown format: {0!r}".format(pwd_format))
         return False
 
-    def generate_nonce(self):
-        """Generate a random string for digest authentication challenges.
 
-        The string should be cryptographicaly secure random pattern.
+def default_nonce_factory():
+    """Generate a random string for digest authentication challenges.
 
-        :return: the string generated.
-        :returntype: `bytes`
-        """
-        return uuid.uuid4().hex.encode("us-ascii")
+    The string should be cryptographicaly secure random pattern.
+
+    :return: the string generated.
+    :returntype: `bytes`
+    """
+    return uuid.uuid4().hex.encode("us-ascii")
 
 class Reply(object):
     """Base class for SASL authentication reply objects.
@@ -312,16 +307,9 @@ class ClientAuthenticator:
     client authentication process.
     """
     __metaclass__ = ABCMeta
-    def __init__(self, password_manager):
-        """Initialize a `ClientAuthenticator` object.
-
-        :Parameters:
-            - `password_manager`: a password manager providing authentication
-              credentials.
-        :Types:
-            - `password_manager`: `PasswordManager`
-        """
-        self.password_manager = password_manager
+    def __init__(self):
+        """Initialize a `ClientAuthenticator` object."""
+        pass
 
     @abstractclassmethod
     def are_properties_sufficient(cls, properties):
@@ -391,15 +379,15 @@ class ServerAuthenticator:
     client authentication process.
     """
     __metaclass__ = ABCMeta
-    def __init__(self, password_manager):
+    def __init__(self, password_database):
         """Initialize a `ServerAuthenticator` object.
 
         :Parameters:
-            - `password_manager`: a password manager providing authentication
-              credential verfication.
+            - `password_database`: a password database
         :Types:
-            - `password_manager`: `PasswordManager`"""
-        self.password_manager = password_manager
+            - `password_database`: `PasswordDataBase`
+        """
+        self.password_database = password_database
 
     @abstractmethod
     def start(self, properties, initial_response):

@@ -26,7 +26,8 @@ __docformat__ = "restructuredtext en"
 
 import logging
 
-from .core import Reply, Response, Challenge, Success, Failure, PasswordManager
+from .core import Reply, Response, Challenge, Success, Failure
+from .core import PasswordDatabase
 from .core import CLIENT_MECHANISMS, SECURE_CLIENT_MECHANISMS
 from .core import SERVER_MECHANISMS, SECURE_SERVER_MECHANISMS
 from .core import CLIENT_MECHANISMS_D, SERVER_MECHANISMS_D
@@ -43,18 +44,14 @@ except ImportError:
 
 logger = logging.getLogger("pyxmpp2.sasl")
 
-def client_authenticator_factory(mechanism, password_manager):
-    """Create a client authenticator object for given SASL mechanism and
-    password manager.
+def client_authenticator_factory(mechanism):
+    """Create a client authenticator object for given SASL mechanism.
 
     :Parameters:
         - `mechanism`: name of the SASL mechanism ("PLAIN", "DIGEST-MD5" or
           "GSSAPI").
-        - `password_manager`: name of the password manager object providing
-          authentication credentials.
     :Types:
         - `mechanism`: `unicode`
-        - `password_manager`: `PasswordManager`
 
     :raises `KeyError`: if no client authenticator is available for this
               mechanism
@@ -62,19 +59,19 @@ def client_authenticator_factory(mechanism, password_manager):
     :return: new authenticator.
     :returntype: `sasl.core.ClientAuthenticator`"""
     authenticator = CLIENT_MECHANISMS_D[mechanism]
-    return authenticator(password_manager)
+    return authenticator()
 
-def server_authenticator_factory(mechanism, password_manager):
+def server_authenticator_factory(mechanism, password_database):
     """Create a server authenticator object for given SASL mechanism and
-    password manager.
+    password databaser.
 
     :Parameters:
         - `mechanism`: name of the SASL mechanism ("PLAIN", "DIGEST-MD5" or "GSSAPI").
-        - `password_manager`: name of the password manager object to be used
+        - `password_database`: name of the password database object to be used
           for authentication credentials verification.
     :Types:
         - `mechanism`: `str`
-        - `password_manager`: `PasswordManager`
+        - `password_database`: `PasswordDatabase`
 
     :raises `KeyError`: if no server authenticator is available for this
               mechanism
@@ -82,7 +79,7 @@ def server_authenticator_factory(mechanism, password_manager):
     :return: new authenticator.
     :returntype: `sasl.core.ServerAuthenticator`"""
     authenticator = SERVER_MECHANISMS_D[mechanism]
-    return authenticator(password_manager)
+    return authenticator(password_database)
 
 def filter_mechanism_list(mechanisms, properties, allow_insecure = False,
                             server_side = False):
@@ -100,6 +97,7 @@ def filter_mechanism_list(mechanisms, properties, allow_insecure = False,
 
     :returntype: `list` of `unicode`
     """
+    # pylint: disable=W0212
     result = []
     for mechanism in mechanisms:
         try:

@@ -74,7 +74,7 @@ def check_gsasl():
         gsasl_server_mechanisms = [s for s in stdout.decode("us-ascii").split()]
         logger.debug("server mechanisms: {0!r}".format(gsasl_server_mechanisms))
 
-class PasswordManager(sasl.PasswordManager):
+class PasswordDatabase(sasl.PasswordDatabase):
     def __init__(self, username, password, realms = None):
         self.username = username
         self.password = password
@@ -104,10 +104,10 @@ class TestSASLClientvsGSASL(unittest.TestCase):
     def test_PLAIN_good_pass_no_authzid(self):
         if "PLAIN" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no PLAIN support")
-        pwm = PasswordManager("username", "good")
-        authenticator = sasl.client_authenticator_factory("PLAIN", pwm)
+        authenticator = sasl.client_authenticator_factory("PLAIN")
         auth_prop = {
                         "username": u"username", 
+                        "password": u"good", 
                       }
         ok, props = self.try_with_gsasl("PLAIN", authenticator, auth_prop)
         self.assertTrue(ok)
@@ -116,10 +116,10 @@ class TestSASLClientvsGSASL(unittest.TestCase):
     def test_PLAIN_good_pass_authzid(self):
         if "PLAIN" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no PLAIN support")
-        pwm = PasswordManager("username", "good")
-        authenticator = sasl.client_authenticator_factory("PLAIN", pwm)
+        authenticator = sasl.client_authenticator_factory("PLAIN")
         auth_prop = {
                             "username": u"username", 
+                            "password": u"good", 
                             "authzid": u"zid", 
                           }
         ok, props = self.try_with_gsasl("PLAIN", authenticator, auth_prop)
@@ -129,10 +129,10 @@ class TestSASLClientvsGSASL(unittest.TestCase):
     def test_PLAIN_bad_pass_no_authzid(self):
         if "PLAIN" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no PLAIN support")
-        pwm = PasswordManager("username", "bad")
-        authenticator = sasl.client_authenticator_factory("PLAIN", pwm)
+        authenticator = sasl.client_authenticator_factory("PLAIN")
         auth_prop = {
                         "username": u"username", 
+                        "password": u"bad", 
                       }
         ok, props = self.try_with_gsasl("PLAIN", authenticator, auth_prop)
         self.assertFalse(ok)
@@ -141,10 +141,10 @@ class TestSASLClientvsGSASL(unittest.TestCase):
     def test_DIGEST_MD5_good_pass_no_authzid(self):
         if "DIGEST-MD5" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no DIGEST-MD5 support")
-        pwm = PasswordManager("username", "good")
-        authenticator = sasl.client_authenticator_factory("DIGEST-MD5", pwm)
+        authenticator = sasl.client_authenticator_factory("DIGEST-MD5")
         auth_prop = {
                         "username": u"username",
+                        "password": u"good", 
                         "service-type": u"xmpp",
                         "service-domain": u"pyxmpp.jajcus.net",
                         "service-hostname": u"test.pyxmpp.jajcus.net",
@@ -159,10 +159,10 @@ class TestSASLClientvsGSASL(unittest.TestCase):
     def test_DIGEST_MD5_good_pass_authzid(self):
         if "DIGEST-MD5" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no DIGEST-MD5 support")
-        pwm = PasswordManager("username", "good")
-        authenticator = sasl.client_authenticator_factory("DIGEST-MD5", pwm)
+        authenticator = sasl.client_authenticator_factory("DIGEST-MD5")
         auth_prop = {
                         "username": u"username",
+                        "password": u"good", 
                         "service-type": u"xmpp",
                         "service-domain": u"pyxmpp.jajcus.net",
                         "service-hostname": u"test.pyxmpp.jajcus.net",
@@ -178,10 +178,10 @@ class TestSASLClientvsGSASL(unittest.TestCase):
     def test_DIGEST_MD5_bad_pass_no_authzid(self):
         if "DIGEST-MD5" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no DIGEST-MD5 support")
-        pwm = PasswordManager("username", "bad")
-        authenticator = sasl.client_authenticator_factory("DIGEST-MD5", pwm)
+        authenticator = sasl.client_authenticator_factory("DIGEST-MD5")
         auth_prop = {
                         "username": u"username",
+                        "password": u"bad", 
                         "service-type": u"xmpp",
                         "service-domain": u"pyxmpp.jajcus.net",
                         "service-hostname": u"test.pyxmpp.jajcus.net",
@@ -195,10 +195,10 @@ class TestSASLClientvsGSASL(unittest.TestCase):
     def test_SCRAM_SHA_1_good_pass_no_authzid(self):
         if "SCRAM-SHA-1" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
-        pwm = PasswordManager("username", "good")
-        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1", pwm)
+        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1")
         auth_prop = {
                         "username": u"username",
+                        "password": u"good", 
                       }
         ok, props = self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
                                             ["--no-cb"])
@@ -208,10 +208,10 @@ class TestSASLClientvsGSASL(unittest.TestCase):
     def test_SCRAM_SHA_1_good_pass_authzid(self):
         if "SCRAM-SHA-1" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
-        pwm = PasswordManager("username", "good")
-        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1", pwm)
+        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1")
         auth_prop = {
                         "username": u"username",
+                        "password": u"good", 
                         "authzid": u"zid",
                       }
         ok, props = self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
@@ -222,10 +222,10 @@ class TestSASLClientvsGSASL(unittest.TestCase):
     def test_SCRAM_SHA_1_bad_pass_no_authzid(self):
         if "SCRAM-SHA-1" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
-        pwm = PasswordManager("username", "bad")
-        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1", pwm)
+        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1")
         auth_prop = {
                         "username": u"username",
+                        "password": u"bad", 
                       }
         ok, dummy = self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
                                             ["--no-cb"])
@@ -235,13 +235,12 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         # Check protection from channel-binding downgrade.
         if "SCRAM-SHA-1-PLUS" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
-        pwm = PasswordManager("username", "good")
-        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1",
-                                                                            pwm)
+        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1")
         auth_prop = {
                         "enabled_mechanisms": ["SCRAM-SHA-1",
                                                     "SCRAM-SHA-1-PLUS"],
                         "username": u"username",
+                        "password": u"good", 
                       }
         cb_data = b"0123456789ab"
         ok, dummy = self.try_with_gsasl("SCRAM-SHA-1",
@@ -254,12 +253,11 @@ class TestSASLClientvsGSASL(unittest.TestCase):
     def test_SCRAM_SHA_1_PLUS_good_pw_good_cb(self):
         if "SCRAM-SHA-1-PLUS" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1-PLUS support")
-        pwm = PasswordManager("username", "good")
-        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1-PLUS",
-                                                                            pwm)
+        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1-PLUS")
         cb_data = b"0123456789ab"
         auth_prop = {
                         "username": u"username",
+                        "password": u"good", 
                         "channel-binding": {
                             "tls-unique": cb_data,
                         },
@@ -276,12 +274,11 @@ class TestSASLClientvsGSASL(unittest.TestCase):
     def test_SCRAM_SHA_1_PLUS_bad_pw_good_cb(self):
         if "SCRAM-SHA-1-PLUS" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1-PLUS support")
-        pwm = PasswordManager("username", "bad")
-        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1-PLUS",
-                                                                            pwm)
+        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1-PLUS")
         cb_data = b"0123456789ab"
         auth_prop = {
                         "username": u"username",
+                        "password": u"bad", 
                         "channel-binding": {
                             "tls-unique": cb_data,
                         },
@@ -297,12 +294,11 @@ class TestSASLClientvsGSASL(unittest.TestCase):
     def test_SCRAM_SHA_1_PLUS_good_pw_bad_cb(self):
         if "SCRAM-SHA-1-PLUS" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1-PLUS support")
-        pwm = PasswordManager("username", "good")
-        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1-PLUS",
-                                                                            pwm)
+        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1-PLUS")
         cb_data = b"0123456789ab"
         auth_prop = {
                         "username": u"username",
+                        "password": u"good", 
                         "channel-binding": {
                             "tls-unique": cb_data,
                         },
@@ -417,8 +413,8 @@ class TestSASLServervsGSASL(unittest.TestCase):
     def test_PLAIN_good_pass_no_authzid(self):
         if "PLAIN" not in gsasl_client_mechanisms:
             raise unittest.SkipTest("GSASL has no PLAIN support")
-        pwm = PasswordManager("username", "good")
-        authenticator = sasl.server_authenticator_factory("PLAIN", pwm)
+        pwdb = PasswordDatabase("username", "good")
+        authenticator = sasl.server_authenticator_factory("PLAIN", pwdb)
         ok, props = self.try_with_gsasl("PLAIN", authenticator, {})
         self.assertTrue(ok)
         self.assertFalse(props.get("authzid"))
@@ -426,8 +422,8 @@ class TestSASLServervsGSASL(unittest.TestCase):
     def test_PLAIN_bad_pass_no_authzid(self):
         if "PLAIN" not in gsasl_client_mechanisms:
             raise unittest.SkipTest("GSASL has no PLAIN support")
-        pwm = PasswordManager("username", "bad")
-        authenticator = sasl.server_authenticator_factory("PLAIN", pwm)
+        pwdb = PasswordDatabase("username", "bad")
+        authenticator = sasl.server_authenticator_factory("PLAIN", pwdb)
         with self.assertRaises(OurSASLError) as err:
             self.try_with_gsasl("PLAIN", authenticator, {})
         self.assertEqual(err.exception.args[0], "not-authorized")
@@ -435,8 +431,8 @@ class TestSASLServervsGSASL(unittest.TestCase):
     def test_DIGEST_MD5_good_pass_no_authzid(self):
         if "DIGEST-MD5" not in gsasl_client_mechanisms:
             raise unittest.SkipTest( "GSASL has no DIGEST-MD5 support")
-        pwm = PasswordManager("username", "good")
-        authenticator = sasl.server_authenticator_factory("DIGEST-MD5", pwm)
+        pwdb = PasswordDatabase("username", "good")
+        authenticator = sasl.server_authenticator_factory("DIGEST-MD5", pwdb)
         auth_prop = {
                         "service-type": u"xmpp",
                         "service-domain": u"pyxmpp.jajcus.net",
@@ -454,8 +450,8 @@ class TestSASLServervsGSASL(unittest.TestCase):
     def test_DIGEST_MD5_good_pass_authzid(self):
         if "DIGEST-MD5" not in gsasl_client_mechanisms:
             raise unittest.SkipTest( "GSASL has no DIGEST-MD5 support")
-        pwm = PasswordManager("username", "good")
-        authenticator = sasl.server_authenticator_factory("DIGEST-MD5", pwm)
+        pwdb = PasswordDatabase("username", "good")
+        authenticator = sasl.server_authenticator_factory("DIGEST-MD5", pwdb)
         auth_prop = {
                         "service-type": u"xmpp",
                         "service-domain": u"pyxmpp.jajcus.net",
@@ -473,8 +469,8 @@ class TestSASLServervsGSASL(unittest.TestCase):
     def test_DIGEST_MD5_bad_pass_no_authzid(self):
         if "DIGEST-MD5" not in gsasl_client_mechanisms:
             raise unittest.SkipTest( "GSASL has no DIGEST-MD5 support")
-        pwm = PasswordManager("username", "bad")
-        authenticator = sasl.server_authenticator_factory("DIGEST-MD5", pwm)
+        pwdb = PasswordDatabase("username", "bad")
+        authenticator = sasl.server_authenticator_factory("DIGEST-MD5", pwdb)
         auth_prop = {
                         "service-type": u"xmpp",
                         "service-domain": u"pyxmpp.jajcus.net",

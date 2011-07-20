@@ -36,7 +36,7 @@ from base64 import standard_b64encode
 
 from .core import ClientAuthenticator, ServerAuthenticator
 from .core import Failure, Response, Challenge, Success, Failure
-from .core import sasl_mechanism
+from .core import sasl_mechanism, default_nonce_factory
 from .saslprep import SASLPREP
         
 logger = logging.getLogger("pyxmpp2.sasl.scram")
@@ -124,26 +124,24 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         - `realm`: current authentication realm
     """
     # pylint: disable-msg=R0902
-    def __init__(self, hash_name, channel_binding, password_manager):
+    def __init__(self, hash_name, channel_binding):
         """Initialize a `SCRAMClientAuthenticator` object.
 
         :Parameters:
             - `hash_function_name`: hash function name, e.g. ``"SHA-1"``
             - `channel_binding`: `True` to enable channel binding
-            - `password_manager`: name of the password manager object providing
-              authentication credentials.
         :Types:
             - `hash_function_name`: `unicode`
             - `channel_binding`: `bool`
-            - `password_manager`: `PasswordManager`
         """
-        ClientAuthenticator.__init__(self, password_manager)
+        ClientAuthenticator.__init__(self)
         SCRAMOperations.__init__(self, hash_name)
         self.name = "SCRAM-{0}".format(hash_name)
         if channel_binding:
             self.name += "-PLUS"
         self.channel_binding = channel_binding
         self.username = None
+        self.password = None
         self.authzid = None
         self._c_nonce = None
         self._server_first_message = False
@@ -156,12 +154,13 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
 
     @classmethod
     def are_properties_sufficient(cls, properties):
-        return "username" in properties
+        return "username" in properties and "password" in properties
 
     def start(self, properties):
         self.username = properties["username"]
+        self.password = properties["password"]
         self.authzid = properties.get("authzid", u"")
-        c_nonce = self.password_manager.generate_nonce()
+        c_nonce = properties.get("nonce_factory", default_nonce_factory)()
         if not VALUE_CHARS_RE.match(c_nonce):
             c_nonce = standard_b64encode(c_nonce)
         self._c_nonce = c_nonce
@@ -250,34 +249,15 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
 
         return self._make_response(nonce, salt, iteration_count)
 
-    def _get_salted_password(self, salt, iteration_count):
-        """Compute the ClientKey from the password provided by the password
-        manager.
-        """
-        password, pformat = self.password_manager.get_password(self.username, 
-                                                        ["plain"], {})
-
-        if password is None or pformat != "plain":
-            logger.debug("Couldn't get plain password."
-                            " Password: {0!} Format: {0!r}".format(
-                                                    password, pformat))
-            return None
-
-        salted_password = self.Hi(self.Normalize(password), salt,
-                                                            iteration_count)
-        self._salted_password = salted_password
-        return salted_password
-
     def _make_response(self, nonce, salt, iteration_count):
         """Make a response for the first challenge from the server.
 
         :return: the response or a failure indicator.
         :returntype: `sasl.Response` or `sasl.Failure`
         """
-        salted_password = self._get_salted_password(salt, iteration_count)
-        if salted_password is None:
-            return Failure("password-unavailable")
-
+        self._salted_password = self.Hi(self.Normalize(self.password), salt,
+                                                            iteration_count)
+        self.password = None # not needed any more
         if self.channel_binding:
             channel_binding = b"c=" + standard_b64encode(self._gs2_header +
                                                                 self._cb_data)
@@ -287,7 +267,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         # pylint: disable=C0103
         client_final_message_without_proof = (channel_binding + b",r=" + nonce)
         
-        client_key = self.HMAC(salted_password, b"Client Key")
+        client_key = self.HMAC(self._salted_password, b"Client Key")
         stored_key = self.H(client_key)
         auth_message = ( self._client_first_message_bare + b"," +
                                     self._server_first_message + b"," +
@@ -330,8 +310,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
             logger.debug("No verifier value in the final message")
             return Failure("bad-succes")
         
-        salted_password = self._salted_password
-        server_key = self.HMAC(salted_password, b"Server Key")
+        server_key = self.HMAC(self._salted_password, b"Server Key")
         server_signature = self.HMAC(server_key, self._auth_message)
         if server_signature != a2b_base64(verifier):
             logger.debug("Server verifier does not match")
@@ -375,9 +354,8 @@ class SCRAM_SHA_1_ClientAuthenticator(SCRAMClientAuthenticator):
     """The SCRAM-SHA-1 client authenticator.
     """
     # pylint: disable=C0103
-    def __init__(self, password_manager):
-        SCRAMClientAuthenticator.__init__(self, "SHA-1", False,
-                                                            password_manager)
+    def __init__(self):
+        SCRAMClientAuthenticator.__init__(self, "SHA-1", False)
 
 if getattr(ssl, "HAS_TLS_UNIQUE", None):
     @sasl_mechanism("SCRAM-SHA-1-PLUS", 90)
@@ -385,9 +363,8 @@ if getattr(ssl, "HAS_TLS_UNIQUE", None):
         """The SCRAM-SHA-1-PLUS client authenticator.
         """
         # pylint: disable=C0103
-        def __init__(self, password_manager):
-            SCRAMClientAuthenticator.__init__(self, "SHA-1", True,
-                                                            password_manager)
+        def __init__(self):
+            SCRAMClientAuthenticator.__init__(self, "SHA-1", True)
         @classmethod
         def are_properties_sufficient(cls, properties):
             ret = super(SCRAM_SHA_1_PLUS_ClientAuthenticator, cls

@@ -24,7 +24,7 @@ from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 
-from binascii import b2a_hex, a2b_hex
+from binascii import b2a_hex
 import re
 import logging
 
@@ -32,7 +32,7 @@ import hashlib
 
 from .core import ClientAuthenticator, ServerAuthenticator
 from .core import Failure, Response, Challenge, Success, Failure
-from .core import sasl_mechanism
+from .core import sasl_mechanism, default_nonce_factory
         
 logger = logging.getLogger("pyxmpp2.sasl.digest_md5")
 
@@ -205,28 +205,21 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         - ``"authzid"`` - authorization id
     """
     # pylint: disable-msg=R0902
-    def __init__(self, password_manager):
-        """Initialize a `DigestMD5ClientAuthenticator` object.
-
-        :Parameters:
-            - `password_manager`: name of the password manager object providing
-              authentication credentials.
-        :Types:
-            - `password_manager`: `PasswordManager`"""
-        ClientAuthenticator.__init__(self, password_manager)
+    def __init__(self):
+        """Initialize a `DigestMD5ClientAuthenticator` object."""
+        ClientAuthenticator.__init__(self)
         self.username = None
         self.rspauth_checked = None
         self.response_auth = None
         self.authzid = None
-        self.pformat = None
         self.realm = None
-        self.password = None
         self.nonce_count = None
         self.in_properties = None
 
     @classmethod
     def are_properties_sufficient(cls, properties):
         return ("username" in properties
+                and "password" in properties
                 and "service-type" in properties
                 and "service-domain" in properties)
 
@@ -234,8 +227,6 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         self.username = properties["username"]
         self.authzid = properties.get("authzid", "")
         self.in_properties = properties
-        self.password = None
-        self.pformat = None
         self.nonce_count = 0
         self.response_auth = None
         self.rspauth_checked = False
@@ -298,24 +289,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         if not nonce:
             logger.debug("nonce not given")
             return Failure("bad-challenge")
-        self._get_password()
         return self._make_response(charset, realms, nonce)
-
-    def _get_password(self):
-        """Retrieve user's password from the password manager.
-
-        Set `self.password` to the password and `self.pformat`
-        to its format name ('plain' or 'md5:user:realm:pass')."""
-        if self.password is None:
-            self.password, self.pformat = self.password_manager.get_password(
-                        self.username, ["plain", "md5:user:realm:pass"], 
-                                                        self.in_properties)
-        if not self.password or self.pformat not in (
-                                            "plain", "md5:user:realm:pass"):
-            logger.debug("Couldn't get plain password."
-                            " Password: {0!} Format: {0!r}".format(
-                                                self.password, self.pformat))
-            return Failure("password-unavailable")
 
     def _make_response(self, charset, realms, nonce):
         """Make a response for the first challenge from the server.
@@ -349,7 +323,8 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         username = _quote(username)
         params.append(b'username="' + username + b'"')
 
-        cnonce = self.password_manager.generate_nonce()
+        cnonce = self.in_properties.get(
+                                    "nonce_factory", default_nonce_factory)()
         cnonce = _quote(cnonce)
         params.append(b'cnonce="' + cnonce + b'"')
 
@@ -387,17 +362,14 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         else:
             authzid = b""
 
-        if self.pformat == "md5:user:realm:pass":
-            urp_hash = a2b_hex(self.password)
-        else:
-            try:
-                epasswd = self.password.encode(charset)
-            except UnicodeError:
-                logger.debug("Couldn't encode password to {0!r}" 
-                                                            .format(charset))
-                return Failure("incompatible-charset")
-            logger.debug("Encoded password: {0!r}".format(epasswd))
-            urp_hash = _make_urp_hash(username, realm, epasswd)
+        try:
+            epasswd = self.in_properties["password"].encode(charset)
+        except UnicodeError:
+            logger.debug("Couldn't encode password to {0!r}" 
+                                                        .format(charset))
+            return Failure("incompatible-charset")
+        logger.debug("Encoded password: {0!r}".format(epasswd))
+        urp_hash = _make_urp_hash(username, realm, epasswd)
 
         response = _compute_response(urp_hash, nonce, cnonce, nonce_count,
                                                         authzid, digest_uri)
@@ -538,15 +510,9 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         - ``"username"`` - user name
         - ``"authzid"`` - authorization id
     """
-    def __init__(self, password_manager):
-        """Initialize a `DigestMD5ServerAuthenticator` object.
-
-        :Parameters:
-            - `password_manager`: name of the password manager object providing
-              authentication credential verification.
-        :Types:
-            - `password_manager`: `PasswordManager`"""
-        ServerAuthenticator.__init__(self, password_manager)
+    def __init__(self, password_database):
+        """Initialize a `DigestMD5ServerAuthenticator` object."""
+        ServerAuthenticator.__init__(self, password_database)
         self.nonce = None
         self.last_nonce_count = None
         self.in_properties = None
@@ -569,7 +535,9 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
             if self.realm:
                 realm = _quote(self.realm.encode("utf-8"))
                 params.append(b'realm="' + realm + b'"')
-        nonce = _quote(self.password_manager.generate_nonce())
+        nonce = self.in_properties.get(
+                                    "nonce_factory", default_nonce_factory)()
+        nonce = _quote(nonce)
         self.nonce = nonce
         params.append(b'nonce="' + nonce + b'"')
         params.append(b'qop="auth"')
@@ -739,7 +707,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         digest_uri_uq = digest_uri.replace(b'\\', b'')
         props = dict(self.in_properties)
         props["realm"] = realm_uq.decode("utf-8")
-        password, pformat = self.password_manager.get_password(
+        password, pformat = self.password_database.get_password(
                                         username_uq.decode("utf-8"),
                             (u"plain", u"md5:user:realm:pass"), props)
         if pformat == u"md5:user:realm:pass":

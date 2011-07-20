@@ -46,8 +46,8 @@ class PlainClientAuthenticator(ClientAuthenticator):
         - ``"username"`` - user name
         - ``"authzid"`` - authorization id
     """
-    def __init__(self, password_manager):
-        ClientAuthenticator.__init__(self, password_manager)
+    def __init__(self):
+        ClientAuthenticator.__init__(self)
         self.username = None
         self.finished = None
         self.password = None
@@ -56,7 +56,7 @@ class PlainClientAuthenticator(ClientAuthenticator):
 
     @classmethod
     def are_properties_sufficient(cls, properties):
-        return "username" in properties
+        return "username" in properties and "password" in properties
 
     def start(self, properties):
         self.properties = properties
@@ -70,15 +70,10 @@ class PlainClientAuthenticator(ClientAuthenticator):
             logger.debug(u"Already authenticated")
             return Failure(u"extra-challenge")
         self.finished = True
-        if self.password is None:
-            self.password, pformat = self.password_manager.get_password(
-                                    self.username, "plain", self.properties)
-        if self.password is None or pformat != "plain":
-            logger.debug(u"Couldn't retrieve plain password")
-            return Failure(u"password-unavailable")
+        password = self.properties["password"]
         return Response(b"\000".join(( self.authzid.encode("utf-8"),
                             self.username.encode("utf-8"),
-                            self.password.encode("utf-8"))))
+                            password.encode("utf-8"))))
 
     def finish(self, data):
         return Success({"username": self.username, "authzid": self.authzid})
@@ -94,8 +89,8 @@ class PlainServerAuthenticator(ServerAuthenticator):
         - ``"username"`` - user name
         - ``"authzid"`` - authorization id
     """
-    def __init__(self, password_manager):
-        ServerAuthenticator.__init__(self, password_manager)
+    def __init__(self, password_database):
+        ServerAuthenticator.__init__(self, password_database)
         self.properties = None
 
     def start(self, properties, initial_response):
@@ -116,7 +111,7 @@ class PlainServerAuthenticator(ServerAuthenticator):
         out_props = {"username": username, "authzid": authzid}
         props = dict(self.properties)
         props.update(out_props)
-        if not self.password_manager.check_password(username, password,
+        if not self.password_database.check_password(username, password,
                                                             self.properties):
             logger.debug("Bad password. Response was: {0!r}".format(response))
             return Failure("not-authorized")
