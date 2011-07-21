@@ -484,12 +484,125 @@ class TestSASLServervsGSASL(unittest.TestCase):
                                 "--quality-of-protection=qop-auth"])
         self.assertEqual(err.exception.args[0], "not-authorized")
 
+    def test_SCRAM_SHA_1_good_pass_no_authzid(self):
+        if "SCRAM-SHA-1" not in gsasl_client_mechanisms:
+            raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
+        pwdb = PasswordDatabase("username", "good")
+        authenticator = sasl.server_authenticator_factory("SCRAM-SHA-1", pwdb)
+        auth_prop = { "enabled_mechanisms": ["SCRAM-SHA-1"]}
+        ok, props = self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
+                                                        [ "--no-cb"])
+        self.assertTrue(ok)
+        self.assertIsNone(props.get("authzid"))
+
+    def test_SCRAM_SHA_1_good_pass_authzid(self):
+        if "SCRAM-SHA-1" not in gsasl_client_mechanisms:
+            raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
+        pwdb = PasswordDatabase("username", "good")
+        authenticator = sasl.server_authenticator_factory("SCRAM-SHA-1", pwdb)
+        auth_prop = { }
+        ok, props = self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
+                                        [ "--no-cb", "--authorization-id=zid"])
+        self.assertTrue(ok)
+        self.assertEqual(props.get("authzid"), "zid")
+
+    def test_SCRAM_SHA_1_quote(self):
+        if "SCRAM-SHA-1" not in gsasl_client_mechanisms:
+            raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
+        pwdb = PasswordDatabase("pi=3,14", "good")
+        authenticator = sasl.server_authenticator_factory("SCRAM-SHA-1", pwdb)
+        auth_prop = { }
+        ok, props = self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
+                            [ "--no-cb", "--authorization-id=2,72"],
+                            username = "pi=3,14")
+        self.assertTrue(ok)
+        self.assertEqual(props.get("authzid"), "2,72")
+
+
+    def test_SCRAM_SHA_1_bad_username(self):
+        if "SCRAM-SHA-1" not in gsasl_client_mechanisms:
+            raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
+        pwdb = PasswordDatabase("bad", "good")
+        authenticator = sasl.server_authenticator_factory("SCRAM-SHA-1", pwdb)
+        auth_prop = { }
+        with self.assertRaises(OurSASLError) as err:
+            self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
+                                                                [ "--no-cb"])
+        self.assertEqual(err.exception.args[0], "not-authorized")
+
+    def test_SCRAM_SHA_1_bad_pass_no_authzid(self):
+        if "SCRAM-SHA-1" not in gsasl_client_mechanisms:
+            raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
+        pwdb = PasswordDatabase("username", "bad")
+        authenticator = sasl.server_authenticator_factory("SCRAM-SHA-1", pwdb)
+        auth_prop = { }
+        with self.assertRaises(OurSASLError) as err:
+            self.try_with_gsasl("SCRAM-SHA-1", authenticator,
+                                                auth_prop, [ "--no-cb"])
+        self.assertEqual(err.exception.args[0], "not-authorized")
+
+    def test_SCRAM_SHA_1_good_pass_downgrade(self):
+        if "SCRAM-SHA-1" not in gsasl_client_mechanisms:
+            raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
+        pwdb = PasswordDatabase("username", "good")
+        authenticator = sasl.server_authenticator_factory("SCRAM-SHA-1", pwdb)
+        auth_prop = { "enabled_mechanisms": ["SCRAM-SHA-1", "SCRAM-SHA-1-PLUS"]}
+        cb_data = b"0123456789ab"
+        with self.assertRaises(OurSASLError) as err:
+            self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
+                                    extra_data = standard_b64encode(cb_data))
+        self.assertEqual(err.exception.args[0], "not-authorized")
+
+    def test_SCRAM_SHA_1_PLUS_good_pass_authzid(self):
+        if "SCRAM-SHA-1-PLUS" not in gsasl_client_mechanisms:
+            raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1-PLUS support")
+        pwdb = PasswordDatabase("username", "good")
+        authenticator = sasl.server_authenticator_factory("SCRAM-SHA-1-PLUS",
+                                                                        pwdb)
+        cb_data = b"0123456789ab"
+        auth_prop = { "channel-binding": {"tls-unique": cb_data} }
+        ok, props = self.try_with_gsasl("SCRAM-SHA-1-PLUS", authenticator,
+                                        auth_prop, ["--authorization-id=zid"],
+                                    extra_data = standard_b64encode(cb_data))
+        self.assertTrue(ok)
+        self.assertEqual(props.get("authzid"), "zid")
+
+    def test_SCRAM_SHA_1_PLUS_bad_pass_no_authzid(self):
+        if "SCRAM-SHA-1-PLUS" not in gsasl_client_mechanisms:
+            raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1-PLUS support")
+        pwdb = PasswordDatabase("username", "bad")
+        authenticator = sasl.server_authenticator_factory("SCRAM-SHA-1-PLUS",
+                                                                        pwdb)
+        cb_data = b"0123456789ab"
+        auth_prop = { "channel-binding": {"tls-unique": cb_data} }
+        with self.assertRaises(OurSASLError) as err:
+            self.try_with_gsasl("SCRAM-SHA-1-PLUS", authenticator, auth_prop,
+                                    extra_data = standard_b64encode(cb_data))
+        self.assertEqual(err.exception.args[0], "not-authorized")
+
+    def test_SCRAM_SHA_1_PLUS_good_pass_bad_cb(self):
+        if "SCRAM-SHA-1-PLUS" not in gsasl_client_mechanisms:
+            raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1-PLUS support")
+        pwdb = PasswordDatabase("username", "good")
+        authenticator = sasl.server_authenticator_factory("SCRAM-SHA-1-PLUS",
+                                                                        pwdb)
+        cb_data = b"0123456789ab"
+        auth_prop = { "channel-binding": {"tls-unique": cb_data} }
+        bad_cb_data = b"ab0123456789"
+        with self.assertRaises(OurSASLError) as err:
+            self.try_with_gsasl("SCRAM-SHA-1-PLUS", authenticator, auth_prop,
+                                extra_data = standard_b64encode(bad_cb_data))
+        self.assertEqual(err.exception.args[0], "not-authorized")
+
+
+
     @staticmethod
-    def try_with_gsasl(mechanism, authenticator, auth_prop, gsasl_args = []):
+    def try_with_gsasl(mechanism, authenticator, auth_prop, gsasl_args = [],
+                                    extra_data = None, username = "username"):
         # pylint: disable=W0102,R0914,R0912,R0915
         cmd = ["gsasl", "--client",
                 "--mechanism=" + mechanism, "--password=good",
-                "--authentication-id=username"] + gsasl_args
+                "--authentication-id={0}".format(username)] + gsasl_args
         if logger.isEnabledFor(logging.DEBUG):
             stderr = None
             logger.debug("cmd: %r", " ".join(cmd))
@@ -500,7 +613,17 @@ class TestSASLServervsGSASL(unittest.TestCase):
                                     stdin = subprocess.PIPE, stderr = stderr)
         if stderr:
             stderr.close()
-        mech = pipe.stdout.readline().strip().decode("utf-8")
+        if extra_data:
+            data = extra_data + b"\n"
+            logger.debug("OUT: %r", data)
+            pipe.stdin.write(data)
+            pipe.stdin.flush()
+        mech = pipe.stdout.readline()
+        logger.debug("IN: %r", mech)
+        if extra_data and extra_data in mech:
+            mech = pipe.stdout.readline()
+            logger.debug("IN: %r", mech)
+        mech = mech.strip().decode("utf-8")
         logger.debug("IN: %r", mech)
         if mech != mechanism:
             raise GSASLError, "GSASL returned different mechanism: " + mech

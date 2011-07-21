@@ -138,6 +138,7 @@ class TestReceiver(ReceiverSelectTestCase):
                                 u"user_passwords": {
                                         u"user": u"secret",
                                     },
+                                u"sasl_mechanisms": ["SCRAM-SHA-1", "PLAIN"],
                                 })
         self.stream = StreamBase(u"jabber:client", None,
                             [StreamSASLHandler(settings), handler], settings)
@@ -151,7 +152,7 @@ class TestReceiver(ReceiverSelectTestCase):
                                 "{urn:ietf:params:xml:ns:xmpp-sasl}mechanisms")
         self.assertEqual(element[0].tag,
                                 "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
-        self.assertEqual(element[0].text, "DIGEST-MD5")
+        self.assertEqual(element[0].text, "SCRAM-SHA-1")
         self.assertEqual(element[1].tag,
                                 "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
         self.assertEqual(element[1].text, "PLAIN")
@@ -179,6 +180,7 @@ class TestReceiver(ReceiverSelectTestCase):
                                 u"user_passwords": {
                                         u"user": u"secret",
                                     },
+                                u"sasl_mechanisms": ["SCRAM-SHA-1", "PLAIN"],
                                 })
         self.stream = StreamBase(u"jabber:client", None,
                             [StreamSASLHandler(settings), handler], settings)
@@ -192,7 +194,7 @@ class TestReceiver(ReceiverSelectTestCase):
                                 "{urn:ietf:params:xml:ns:xmpp-sasl}mechanisms")
         self.assertEqual(element[0].tag,
                                 "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
-        self.assertEqual(element[0].text, "DIGEST-MD5")
+        self.assertEqual(element[0].text, "SCRAM-SHA-1")
         self.assertEqual(element[1].tag,
                                 "{urn:ietf:params:xml:ns:xmpp-sasl}mechanism")
         self.assertEqual(element[1].text, "PLAIN")
