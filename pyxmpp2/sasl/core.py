@@ -107,8 +107,6 @@ class PasswordDatabase:
     def get_password(self, username, acceptable_formats, properties):
         """Get the password for user authentication.
 
-        [both client or server]
-
         By default returns (None, None) providing no password. Should be
         overridden in derived classes unless only `check_password` functionality
         is available.
@@ -137,8 +135,6 @@ class PasswordDatabase:
 
     def check_password(self, username, password, properties):
         """Check the password validity.
-
-        [server only]
 
         Used by plain-text authentication mechanisms.
 
@@ -323,7 +319,7 @@ class ClientAuthenticator:
         :Parameters:
             - `properties`: the `authentication properties`_
         :Types:
-            `properties`: mapping
+            - `properties`: mapping
 
         :Return: if the mechanism can be used with those properties
         """
@@ -388,6 +384,25 @@ class ServerAuthenticator:
             - `password_database`: `PasswordDataBase`
         """
         self.password_database = password_database
+
+    @classmethod
+    def are_properties_sufficient(cls, properties):
+        """Check if the provided properties are sufficient for
+        this authentication mechanism.
+
+        If `are_properties_sufficient` returns False for given `properties`
+        mapping, the `start` method of `cls` instance will also fail with
+        such argument.
+
+        :Parameters:
+            - `properties`: the `authentication properties`_
+        :Types:
+            - `properties`: mapping
+
+        :Return: if the mechanism can be used with those properties
+        """
+        # pylint: disable=E0213,W0613,R0201
+        return True
 
     @abstractmethod
     def start(self, properties, initial_response):
