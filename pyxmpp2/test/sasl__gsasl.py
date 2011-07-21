@@ -219,6 +219,20 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         self.assertTrue(ok)
         self.assertEqual(props.get("authzid"), "zid")
 
+    def test_SCRAM_SHA_1_quoting(self):
+        if "SCRAM-SHA-1" not in gsasl_server_mechanisms:
+            raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
+        authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1")
+        auth_prop = {
+                        "username": u"pi=3,14",
+                        "password": u"good", 
+                        "authzid": u"e=2,72",
+                      }
+        ok, props = self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
+                                            ["--no-cb"], username = "pi=3,14")
+        self.assertTrue(ok)
+        self.assertEqual(props.get("authzid"), "e=2,72")
+
     def test_SCRAM_SHA_1_bad_pass_no_authzid(self):
         if "SCRAM-SHA-1" not in gsasl_server_mechanisms:
             raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
@@ -312,11 +326,11 @@ class TestSASLClientvsGSASL(unittest.TestCase):
 
     @staticmethod
     def try_with_gsasl(mechanism, authenticator, auth_properties, 
-                                    gsasl_args = [], extra_data = None):
+                    gsasl_args = [], extra_data = None, username = "username"):
         # pylint: disable=W0102,R0914,R0912,R0915
         cmd = ["gsasl", "--server",
                 "--mechanism=" + mechanism, "--password=good", 
-                "-a username"] + gsasl_args
+                "--authentication-id={0}".format(username)] + gsasl_args
         if logger.isEnabledFor(logging.DEBUG):
             stderr = None
             logger.debug("cmd: %r", " ".join(cmd))
@@ -506,17 +520,17 @@ class TestSASLServervsGSASL(unittest.TestCase):
         self.assertTrue(ok)
         self.assertEqual(props.get("authzid"), "zid")
 
-    def test_SCRAM_SHA_1_quote(self):
+    def test_SCRAM_SHA_1_quoting(self):
         if "SCRAM-SHA-1" not in gsasl_client_mechanisms:
             raise unittest.SkipTest( "GSASL has no SCRAM-SHA-1 support")
         pwdb = PasswordDatabase("pi=3,14", "good")
         authenticator = sasl.server_authenticator_factory("SCRAM-SHA-1", pwdb)
         auth_prop = { }
         ok, props = self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
-                            [ "--no-cb", "--authorization-id=2,72"],
+                            [ "--no-cb", "--authorization-id=e=2,72"],
                             username = "pi=3,14")
         self.assertTrue(ok)
-        self.assertEqual(props.get("authzid"), "2,72")
+        self.assertEqual(props.get("authzid"), "e=2,72")
 
 
     def test_SCRAM_SHA_1_bad_username(self):

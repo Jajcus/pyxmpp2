@@ -223,23 +223,23 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
             cb_flag = b"p=" + cb_type.encode("utf-8")
         else:
             plus_name = self.name + "-PLUS"
-            # TODO: ok?
             if plus_name in properties.get("enabled_mechanisms", []):
+                # -PLUS is enabled (supported) on our side,
+                # but was not selected - that means it was not included
+                # in the server features
                 cb_flag = b"y"
             else:
                 cb_flag = b"n"
 
         if self.authzid:
-            # TODO: ',' and '=' quoting
-            authzid = b"a=" + self.authzid.encode("utf-8")
+            authzid = b"a=" + self.escape(self.authzid.encode("utf-8"))
         else:
             authzid = b""
         gs2_header = cb_flag + b"," + authzid + b","
         self._gs2_header = gs2_header
         nonce = b"r=" + c_nonce 
-        # TODO: ',' and '=' quoting
-        client_first_message_bare = (b"n=" + self.username.encode("utf-8") + 
-                                                        b"," + nonce)
+        client_first_message_bare = (b"n=" + 
+                self.escape(self.username.encode("utf-8")) + b"," + nonce)
         self._client_first_message_bare = client_first_message_bare
         client_first_message = gs2_header + client_first_message_bare
         return Response(client_first_message)
