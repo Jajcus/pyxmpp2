@@ -587,6 +587,19 @@ class SCRAMServerAuthenticator(SCRAMOperations, ServerAuthenticator):
 @sasl_mechanism("SCRAM-SHA-1", 80)
 class SCRAM_SHA_1_ClientAuthenticator(SCRAMClientAuthenticator):
     """The SCRAM-SHA-1 client authenticator.
+
+    Authentication properties used:
+
+        - ``"username"`` - user name (required)
+        - ``"authzid"`` - authorization id (optional)
+        - ``"enabled_mechanisms"`` - list of mechanism enabled on the client.
+          Used to detect when an attacker removes the -PLUS version from the
+          list of mechanism supported by the server.
+
+    Authentication properties returned:
+        
+        - ``"username"`` - user name
+        - ``"authzid"`` - authorization id
     """
     # pylint: disable=C0103
     def __init__(self):
@@ -595,6 +608,18 @@ class SCRAM_SHA_1_ClientAuthenticator(SCRAMClientAuthenticator):
 @sasl_mechanism("SCRAM-SHA-1-PLUS", 90)
 class SCRAM_SHA_1_PLUS_ClientAuthenticator(SCRAMClientAuthenticator):
     """The SCRAM-SHA-1-PLUS client authenticator.
+
+    Authentication properties used: same as for 
+    `SCRAM_SHA_1_ClientAuthenticator`, plus:
+
+        - ``"channel-binding"`` - channel-binding data, as a dictionary
+          channel-binding-type (`unicode`) -> channel-binding data(`bytes`).
+          Channel binding type should be 'tls-unique', as other may be not
+          supported by the other side.
+
+    Authentication properties returned: same as for 
+    `SCRAM_SHA_1_ClientAuthenticator`
+        
     """
     # pylint: disable=C0103
     def __init__(self):
@@ -610,6 +635,23 @@ class SCRAM_SHA_1_PLUS_ClientAuthenticator(SCRAMClientAuthenticator):
 @sasl_mechanism("SCRAM-SHA-1", 80)
 class SCRAM_SHA_1_ServerAuthenticator(SCRAMServerAuthenticator):
     """The SCRAM-SHA-1 server authenticator.
+
+    Authentication properties used:
+
+        - ``"enabled_mechanisms"`` - list of mechanism enabled on the server.
+          Used to detect when an attacker removes the -PLUS version from the
+          list of mechanism supported by the server while it is sent to the
+          client.
+        - ``"SCRAM-salt"`` - salt to be applied on a plain text password
+          (default: a random string)
+        - ``"SCRAM-iteration-count"`` - iteration-count parameter for hashing
+          a plain text password (default: 4096)
+
+    Authentication properties returned:
+        
+        - ``"username"`` - user name
+        - ``"authzid"`` - authorization id
+
     """
     # pylint: disable=C0103
     def __init__(self, password_database):
@@ -619,6 +661,18 @@ class SCRAM_SHA_1_ServerAuthenticator(SCRAMServerAuthenticator):
 @sasl_mechanism("SCRAM-SHA-1-PLUS", 90)
 class SCRAM_SHA_1_PLUS_ServerAuthenticator(SCRAMServerAuthenticator):
     """The SCRAM-SHA-1-PLUS server authenticator.
+
+    Authentication properties used: same as for 
+    `SCRAM_SHA_1_ServerAuthenticator`, plus:
+
+        - ``"channel-binding"`` - channel-binding data, as a dictionary
+          channel-binding-type (`unicode`) -> channel-binding data(`bytes`).
+          Channel binding type should be 'tls-unique', as other may be not
+          supported by the other side.
+
+    Authentication properties returned: same as for 
+    `SCRAM_SHA_1_ServerAuthenticator`
+     
     """
     # pylint: disable=C0103
     def __init__(self, password_database):
