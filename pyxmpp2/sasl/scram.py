@@ -29,7 +29,6 @@ import re
 import logging
 import hashlib
 import hmac
-import ssl
 
 from binascii import a2b_base64
 from base64 import standard_b64encode
@@ -357,19 +356,18 @@ class SCRAM_SHA_1_ClientAuthenticator(SCRAMClientAuthenticator):
     def __init__(self):
         SCRAMClientAuthenticator.__init__(self, "SHA-1", False)
 
-if getattr(ssl, "HAS_TLS_UNIQUE", None):
-    @sasl_mechanism("SCRAM-SHA-1-PLUS", 90)
-    class SCRAM_SHA_1_PLUS_ClientAuthenticator(SCRAMClientAuthenticator):
-        """The SCRAM-SHA-1-PLUS client authenticator.
-        """
-        # pylint: disable=C0103
-        def __init__(self):
-            SCRAMClientAuthenticator.__init__(self, "SHA-1", True)
-        @classmethod
-        def are_properties_sufficient(cls, properties):
-            ret = super(SCRAM_SHA_1_PLUS_ClientAuthenticator, cls
-                                    ).are_properties_sufficient(properties)
-            if not ret:
-                return False
-            return bool(properties.get("channel-binding"))
+@sasl_mechanism("SCRAM-SHA-1-PLUS", 90)
+class SCRAM_SHA_1_PLUS_ClientAuthenticator(SCRAMClientAuthenticator):
+    """The SCRAM-SHA-1-PLUS client authenticator.
+    """
+    # pylint: disable=C0103
+    def __init__(self):
+        SCRAMClientAuthenticator.__init__(self, "SHA-1", True)
+    @classmethod
+    def are_properties_sufficient(cls, properties):
+        ret = super(SCRAM_SHA_1_PLUS_ClientAuthenticator, cls
+                                ).are_properties_sufficient(properties)
+        if not ret:
+            return False
+        return bool(properties.get("channel-binding"))
 

@@ -32,6 +32,11 @@ import errno
 import logging
 import ssl
 
+try:
+    from ssl import CHANNEL_BINDING_TYPES
+except ImportError:
+    CHANNEL_BINDING_TYPES = []
+
 from functools import partial
 from collections import deque
 
@@ -672,7 +677,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         self._tls_state = "connected"
         self._set_state("connected")
         self._auth_properties['security-layer'] = "TLS"
-        if hasattr(self._socket, "get_channel_binding"):
+        if "tls-unique" in CHANNEL_BINDING_TYPES:
             try:
                 tls_unique = self._socket.get_channel_binding("tls-unique")
             except ValueError:

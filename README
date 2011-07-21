@@ -84,6 +84,8 @@ Features
 
       - PLAIN
       - DIGEST-MD5
+      - SCRAM-SHA-1 (initiator only)
+      - SCRAM-SHA-1-PLUS (initiator only; python 3.3, not released yet, needed)
 
   - Resource binding
 
