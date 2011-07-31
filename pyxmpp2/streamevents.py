@@ -203,7 +203,7 @@ class ResolvingSRVEvent(StreamEvent):
         self.domain = domain
         self.service = service
     def __unicode__(self):
-        return u"Resolving SRV record of '{0}' for '{1}...".format(
+        return u"Resolving SRV record of '{0}' for '{1}'...".format(
                                                 self.service, self.domain)
 
 class StreamConnectedEvent(StreamEvent):
