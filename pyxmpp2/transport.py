@@ -324,8 +324,6 @@ class TCPTransport(XMPPTransport, IOHandler):
                     self._set_state("aborted")
                     raise DNSError("Could not resolve address record for {0!r}"
                                                                 .format(name))
-            else:
-                self._dst_nameports = addrs
             self._dst_addrs = [ (family, (addr, port)) for (family, addr)
                                                                     in addrs ]
             self._set_state("connect")
