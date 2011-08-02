@@ -523,7 +523,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         next `prepare` call, when connected return `HandlerReady()`
         """
         result = HandlerReady()
-        logger.debug("TCPHandler.prepare(): state: {0!r}".format(self._state))
+        logger.debug("TCPTransport.prepare(): state: {0!r}".format(self._state))
         with self.lock:
             if self._state in ("connected", "closing", "closed", "aborted"):
                 # no need to call prepare() .fileno() is stable
@@ -540,7 +540,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             else:
                 # wait for i/o, but keep calling prepare()
                 result = PrepareAgain(None)
-        logger.debug("TCPHandler.prepare(): new state: {0!r}"
+        logger.debug("TCPTransport.prepare(): new state: {0!r}"
                                                         .format(self._state))
         return result
 
