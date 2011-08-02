@@ -335,14 +335,14 @@ class TCPTransport(XMPPTransport, IOHandler):
         
         """
         family, addr = self._dst_addrs.pop(0)
-        if not self._socket or self._family != family:
-            self._socket = socket.socket(family, socket.SOCK_STREAM)
-            self._socket.setblocking(False)
+        self._socket = socket.socket(family, socket.SOCK_STREAM)
+        self._socket.setblocking(False)
         self._dst_addr = addr
         self._family  = family
         try:
             self._socket.connect(addr)
         except socket.error, err:
+            logger.debug("Connect error: {0}".format(err))
             if err.args[0] in BLOCKING_ERRORS:
                 self._set_state("connecting")
                 self._write_queue.append(ContinueConnect())
