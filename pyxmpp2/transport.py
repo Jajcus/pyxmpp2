@@ -386,7 +386,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         except socket.error, err:
             logger.debug("Connect error: {0}".format(err))
             if err.args[0] == errno.EISCONN:
-                break
+                pass
             elif err.args[0] in BLOCKING_ERRORS:
                 return None
             elif self._dst_addrs:
