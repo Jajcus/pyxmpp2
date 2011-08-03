@@ -55,7 +55,7 @@ if sys.version_info.major < 3:
 handler = MyHandler(JID(target_jid), message)
 settings = XMPPSettings({
                             u"password": your_password,
-                            u"tls_enable": True,
+                            u"starttls": True,
                             u"tls_verify_peer": False,
                         })
 client = Client(JID(your_jid), [handler], settings)
