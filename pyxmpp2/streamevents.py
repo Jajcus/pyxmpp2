@@ -235,21 +235,19 @@ class TLSConnectedEvent(StreamEvent):
         - `cipher`: a three-value tuple containing the name of the cipher being
           used, the version of the SSL protocol that defines its use, and the
           number of secret bits being used
-        - `peer_certificate`: dictionary describing the peer certificate 
+        - `peer_certificate`: certificate data
     :Types:
-        - `peer`: `pyxmpp2.jid.JID`
+        - `cipher`: `unicode`
+        - `peer_certificate`: `pyxmpp2.cert.Certificate`
     """
     def __init__(self, cipher, peer_certificate):
         self.cipher = cipher
         self.peer_certificate = peer_certificate
     def __unicode__(self):
-        if self.peer_certificate and 'subject' in self.peer_certificate:
-            dname = u", ".join( [ u", ".join(
-                        [ u"{0}={1}".format(k,v) for k, v in dn_tuple ] ) 
-                            for dn_tuple in self.peer_certificate["subject"] ])
+        if self.peer_certificate and self.peer_certificate.display_name:
             return (u"TLS connected to {0} using {1} cipher {2} ({3} bits)"
-                                .format(dname, self.cipher[0], self.cipher[1], 
-                                                                self.cipher[2]))
+                    .format(self.peer_certificate.display_name,
+                            self.cipher[0], self.cipher[1], self.cipher[2]))
         return u"TLS connected using {0} cipher {1} ({2} bits)".format(
                             self.cipher[0], self.cipher[1], self.cipher[2])
 

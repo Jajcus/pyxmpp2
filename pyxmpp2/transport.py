@@ -51,6 +51,7 @@ from .xmppserializer import XMPPSerializer
 from .xmppparser import StreamReader
 from .mainloop.wait import wait_for_write
 from .interfaces import XMPPTransport
+from .cert import get_certificate_from_ssl_socket
 
 # pylint: disable=W0611
 from . import resolver  
@@ -638,14 +639,14 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._write_queue_cond.notify()
 
     def getpeercert(self):
-        """Return the peer certificate. The format is the same
-        as for the standard :std:`ssl.SSLSocket.getpeercert()` method,
-        but may (in future) include data not normally recognized by Python.
+        """Return the peer certificate. 
+        
+        :ReturnType: `pyxmpp2.cert.Certificate`
         """
         with self.lock:
             if not self._socket or self._tls_state != "connected":
                 raise ValueError("Not TLS-connected")
-            return self._socket.getpeercert()
+            return get_certificate_from_ssl_socket(self._socket)
 
     def _initiate_starttls(self, **kwargs):
         """Initiate starttls handshake over the socket.
@@ -693,7 +694,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             # SSLSocket.cipher doesn't work on PyPy
             cipher = "unknown"
         try:
-            cert = self._socket.getpeercert()
+            cert = get_certificate_from_ssl_socket(self._socket)
         except AttributeError:
             # SSLSocket.cipher doesn't work on PyPy
             cert = None

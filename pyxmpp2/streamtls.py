@@ -35,8 +35,6 @@ from .etree import ElementTree
 from .constants import TLS_QNP
 from .streambase import FatalStreamError
 from .exceptions import TLSNegotiationFailed
-from .exceptions import JIDError
-from .jid import JID
 from .settings import XMPPSettings
 from .streamevents import TLSConnectedEvent
 
@@ -203,48 +201,29 @@ class StreamTLSHandler(StreamFeatureHandler, EventHandler):
         """Default certificate verification callback for TLS connections.
 
         :Parameters:
-            - `cert`: certificate information, as returned by
-              :std:`ssl.SSLSocket.getpeercert`
+            - `cert`: certificate information
+        :Types:
+            - `cert`: `CertificateData`
 
-        :return: computed verification result."""
+        :return: computed verification result.
+        """
         try:
             logger.debug("tls_is_certificate_valid(cert = {0!r})".format(cert))
             if not cert:
                 logger.warning("No TLS certificate information received.")
                 return False
-            valid_hostname_found = False
-            logger.debug(u" tls: checking peer name in the certificate"
-                                    u" should be: {0}".format(stream.peer))
-            if 'subject' in cert:
-                for rdns in cert['subject']:
-                    for key, value in rdns:
-                        if key != 'commonName':
-                            continue
-                        try:
-                            value = JID(value)
-                        except JIDError:
-                            continue
-                        if value == stream.peer:
-                            logger.debug(" good commonName: {0}".format(value))
-                            valid_hostname_found = True
-                        else:
-                            logger.debug(" {0} != {1}".format(value, 
-                                                                stream.peer))
-            if 'subjectAltName' in cert:
-                for key, value in cert['subjectAltName']:
-                    if key != 'DNS':
-                        continue
-                    try:
-                        value = JID(value)
-                    except JIDError:
-                        continue
-                    if value == stream.peer:
-                        logger.debug(" good subjectAltName({0}): {1}"
-                                                            .format(key, value))
-                        valid_hostname_found = True
-                    else:
-                        logger.debug(" {0} != {1}".format(value, stream.peer))
-            return valid_hostname_found
+            if not cert.validated:
+                logger.warning("TLS certificate not validated.")
+                return False
+            srv_type = stream.transport._dst_service # pylint: disable=W0212
+            if cert.verify_server(stream.peer, srv_type):
+                logger.debug(" tls: certificate valid for {0!r}"
+                                                        .format(stream.peer))
+                return True
+            else:
+                logger.debug(" tls: certificate not valid for {0!r}"
+                                                        .format(stream.peer))
+                return False
         except:
             logger.exception("Exception caught while checking a certificate")
             raise
