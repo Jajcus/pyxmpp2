@@ -217,7 +217,9 @@ class JID(object):
         :Types:
             - `data`: `unicode`
 
-        :raise JIDError: if the domain name is too long."""
+        :raise JIDError: if the domain name is too long.
+        """
+        # pylint: disable=R0912
         if not data:
             raise JIDError("Domain must be given")
         data = unicode(data)
@@ -238,7 +240,6 @@ class JID(object):
                 addr = _validate_ip_address(socket.AF_INET, data)
             except ValueError, err:
                 logger.debug("ValueError: {0}".format(err))
-                pass
         data = UNICODE_DOT_RE.sub(u".", data)
         data = data.rstrip(u".")
         labels = data.split(u".")

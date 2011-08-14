@@ -33,6 +33,7 @@ import logging
 import ssl
 
 try:
+    # pylint: disable=E0611
     from ssl import CHANNEL_BINDING_TYPES
 except ImportError:
     CHANNEL_BINDING_TYPES = []
@@ -62,9 +63,9 @@ IN_LOGGER = logging.getLogger("pyxmpp2.IN")
 OUT_LOGGER = logging.getLogger("pyxmpp2.OUT")
 
 BLOCKING_ERRORS = set()
-for name in ['EAGAIN', 'EWOULDBLOCK', 'WSAEWOULDBLOCK', 'EINPROGRESS']:
-    if hasattr(errno, name):
-        BLOCKING_ERRORS.add(getattr(errno, name))
+for __name in ['EAGAIN', 'EWOULDBLOCK', 'WSAEWOULDBLOCK', 'EINPROGRESS']:
+    if hasattr(errno, __name):
+        BLOCKING_ERRORS.add(getattr(errno, __name))
 
 class WriteJob(object):
     """Base class for objects put to the `TCPTransport` write queue."""
@@ -682,6 +683,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         self._auth_properties['security-layer'] = "TLS"
         if "tls-unique" in CHANNEL_BINDING_TYPES:
             try:
+                # pylint: disable=E1103
                 tls_unique = self._socket.get_channel_binding("tls-unique")
             except ValueError:
                 pass

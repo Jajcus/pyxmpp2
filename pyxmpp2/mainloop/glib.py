@@ -39,7 +39,7 @@ def hold_exception(method):
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
         """Wrapper for methods decorated with `hold_exception`."""
-        # pylint: disable=W0703
+        # pylint: disable=W0703,W0212
         try:
             return method(self, *args, **kwargs)
         except Exception:

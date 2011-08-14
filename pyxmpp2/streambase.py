@@ -651,11 +651,15 @@ class StreamBase(XMLStreamHandler):
 
     @property
     def auth_properties(self):
+        """Authentication properties of the stream.
+
+        Derived from the transport with 'local-jid' and 'service-type' added.
+        """
         if self.transport:
             props = dict(self.transport.auth_properties)
         else:
             props = {}
-        props["local_jid"] = self.me
+        props["local-jid"] = self.me
         props["service-type"] = "xmpp"
         return props
 

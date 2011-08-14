@@ -105,7 +105,7 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
         - `stream`: `clientstream.ClientStream`
         - `roster_client`: `RosterClient`
     """
-    # pylint: disable-msg=R0902
+    # pylint: disable=R0902,R0904
     def __init__(self, jid, handlers, settings = None, main_loop = None):
         """Initialize a Client object.
 
@@ -300,6 +300,7 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
 def _initial_presence_factory(settings):
     """Factory for the :r:`initial_presence setting` default.
     """
+    # pylint: disable=W0613
     return Presence()
 
 XMPPSettings.add_setting(u"initial_presence",

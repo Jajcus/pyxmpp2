@@ -9,10 +9,10 @@ import time
 from socket import AF_INET, AF_INET6
 
 try:
-    import dns
-    HAVE_DNSPYTHON=True
+    import dns # pylint: disable=W0611
+    HAVE_DNSPYTHON = True
 except ImportError:
-    HAVE_DNSPYTHON=False
+    HAVE_DNSPYTHON = False
 
 from pyxmpp2.mainloop import main_loop_factory
 from pyxmpp2.mainloop.interfaces import Event
@@ -31,6 +31,7 @@ from pyxmpp2.test import _support
 logger = logging.getLogger("pyxmpp2.test.resolver")
 
 class _Const(object):
+    # pylint: disable=R0903
     def __init__(self, name):
         self.name = name
     def __str__(self):
