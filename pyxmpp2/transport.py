@@ -695,11 +695,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         except AttributeError:
             # SSLSocket.cipher doesn't work on PyPy
             cipher = "unknown"
-        try:
-            cert = get_certificate_from_ssl_socket(self._socket)
-        except AttributeError:
-            # SSLSocket.cipher doesn't work on PyPy
-            cert = None
+        cert = get_certificate_from_ssl_socket(self._socket)
         self.event(TLSConnectedEvent(cipher, cert))
 
     def handle_read(self):

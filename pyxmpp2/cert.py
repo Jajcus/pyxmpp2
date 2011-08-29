@@ -207,7 +207,11 @@ class BasicCertificateData(CertificateData):
         """Load certificate data from an SSL socket.
         """
         cert = cls()
-        data = ssl_socket.getpeercert()
+        try:
+            data = ssl_socket.getpeercert()
+        except AttributeError:
+            # PyPy doesn't have .getppercert
+            return cert
         if not data:
             return cert
         cert.validated = True
