@@ -20,4 +20,4 @@ commonName		= server.example.org
 [ v3_req ]
 basicConstraints = CA:FALSE
 keyUsage = nonRepudiation, digitalSignature, keyEncipherment
-subjectAltName=DNS:server.example.org,otherName:1.3.6.1.5.5.7.8.7;UTF8:_xmpp-server.server.example.org
+subjectAltName=DNS:server.example.org,otherName:1.3.6.1.5.5.7.8.7;IA5:_xmpp-server.server.example.org
