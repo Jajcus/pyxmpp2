@@ -61,16 +61,23 @@ class TestCertFunctions(unittest.TestCase):
         self.assertTrue(cert.validated)
         self.assertTrue("server.example.org" in cert.common_names)
     
-    @unittest.skipUnless("lo-network" in _support.RESOURCES, 
-                                        "network usage disabled")
     @unittest.skipUnless(HAVE_PYASN1, "No pyasn1")
-    def test_get_certificate_from_file(self):
+    def test_get_server_certificate_from_file(self):
         cert_path = os.path.join(_support.DATA_DIR, "server.pem")
         cert = get_certificate_from_file(cert_path)
         self.assertIsNotNone(cert)
         self.assertIsInstance(cert, ASN1CertificateData)
         self.assertFalse(cert.validated)
         self.assertTrue("server.example.org" in cert.common_names)
+ 
+    @unittest.skipUnless(HAVE_PYASN1, "No pyasn1")
+    def test_get_client_certificate_from_file(self):
+        cert_path = os.path.join(_support.DATA_DIR, "client.pem")
+        cert = get_certificate_from_file(cert_path)
+        self.assertIsNotNone(cert)
+        self.assertIsInstance(cert, ASN1CertificateData)
+        self.assertFalse(cert.validated)
+        self.assertTrue("user@server.example.org" in cert.alt_names["XmppAddr"])
  
 # pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
