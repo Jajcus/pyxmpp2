@@ -33,9 +33,9 @@ try:
     from pyasn1_modules.rfc2459 import Certificate, DirectoryString, MAX, Name
     from pyasn1_modules import pem
     from pyasn1.codec.der import decoder as der_decoder
-    from pyasn1.type.char import BMPString, IA5String
+    from pyasn1.type.char import BMPString, IA5String, UTF8String
     from pyasn1.type.univ import Sequence, SequenceOf, Choice
-    from pyasn1.type.univ import Any, ObjectIdentifier
+    from pyasn1.type.univ import Any, ObjectIdentifier, OctetString
     from pyasn1.type.namedtype import NamedTypes, NamedType
     from pyasn1.type.useful import GeneralizedTime
     from pyasn1.type.constraint import ValueSizeConstraint
@@ -284,11 +284,14 @@ dn_oids = {
 
 def _decode_asn1_string(data):
     if isinstance(data, BMPString):
-        return bytes(data).decode("utf-16")
+        return bytes(data).decode("utf-16-be")
     else:
         return bytes(data).decode("utf-8")
 
 if HAVE_PYASN1:
+    XMPPADDR_OID = ObjectIdentifier('1.3.6.1.5.5.7.8.5')
+    SRVNAME_OID = ObjectIdentifier('1.3.6.1.5.5.7.8.7')
+    SUBJECT_ALT_NAME_OID = ObjectIdentifier('2.5.29.17')
     class OtherName(Sequence):
         componentType = NamedTypes(
                 NamedType('type-id', ObjectIdentifier()),
@@ -308,11 +311,23 @@ if HAVE_PYASN1:
                     IA5String().subtype(implicitTag = tag.Tag(
                         tag.tagClassContext, tag.tagFormatSimple, 2))),
                 NamedType('x400Address',
-                    Any().subtype(implicitTag = tag.Tag(
+                    OctetString().subtype(implicitTag = tag.Tag(
                         tag.tagClassContext, tag.tagFormatSimple, 3))),
                 NamedType('directoryName',
                     Name().subtype(implicitTag = tag.Tag(
                         tag.tagClassContext, tag.tagFormatSimple, 4))),
+                NamedType('ediPartyName',
+                    OctetString().subtype(implicitTag = tag.Tag(
+                        tag.tagClassContext, tag.tagFormatSimple, 5))),
+                NamedType('uniformResourceIdentifier',
+                    IA5String().subtype(implicitTag = tag.Tag(
+                        tag.tagClassContext, tag.tagFormatSimple, 6))),
+                NamedType('iPAddress',
+                    OctetString().subtype(implicitTag = tag.Tag(
+                        tag.tagClassContext, tag.tagFormatSimple, 7))),
+                NamedType('registeredID',
+                    ObjectIdentifier().subtype(implicitTag = tag.Tag(
+                        tag.tagClassContext, tag.tagFormatSimple, 8))),
                 )
 
     class GeneralNames(SequenceOf):                                              
@@ -385,19 +400,55 @@ class ASN1CertificateData(CertificateData):
             result.not_after = datetime.strptime(not_after, "%Y%m%d%H%M%SZ")
         else:
             result.not_after = datetime.strptime(not_after, "%y%m%d%H%M%SZ")
+        result.alt_names = defaultdict(list)
         extensions = tbs_cert.getComponentByName('extensions')
         if extensions:
             for extension in extensions:
                 logger.debug("Extension: {0!r}".format(extension))
                 oid = extension.getComponentByName('extnID')
                 logger.debug("OID: {0!r}".format(oid))
-                if oid != ObjectIdentifier('2.5.29.17'):
+                if oid != SUBJECT_ALT_NAME_OID:
                     continue
                 value = extension.getComponentByName('extnValue')
                 logger.debug("Value: {0!r}".format(value))
-                #alt_name = der_decoder.decode(value, 
-                #                            asn1Spec = GeneralNames())[0]
-                #logger.debug("SubjectAltName: {0!r}".format(alt_name))
+                if isinstance(value, Any):
+                    # should be OctetString, but is Any 
+                    # in pyasn1_modules-0.0.1a
+                    value = der_decoder.decode(value, 
+                                                asn1Spec = OctetString())[0]
+                alt_names = der_decoder.decode(value, 
+                                            asn1Spec = GeneralNames())[0]
+                logger.debug("SubjectAltName: {0!r}".format(alt_names))
+                for alt_name in alt_names:
+                    tname = alt_name.getName()
+                    comp = alt_name.getComponent()
+                    if tname == "dNSName":
+                        key = "DNS"
+                        value = _decode_asn1_string(comp)
+                    elif tname == "uniformResourceIdentifier":
+                        key = "URI"
+                        value = _decode_asn1_string(comp)
+                    elif tname == "otherName":
+                        oid = comp.getComponentByName("type-id")
+                        value = comp.getComponentByName("value")
+                        if oid == XMPPADDR_OID:
+                            key = "XmppAddr"
+                            value = der_decoder.decode(value,
+                                                    asn1Spec = UTF8String())[0]
+                            value = _decode_asn1_string(value)
+                        elif oid == SRVNAME_OID:
+                            key = "SRVName"
+                            value = der_decoder.decode(value,
+                                                    asn1Spec = IA5String())[0]
+                            value = _decode_asn1_string(value)
+                        else:
+                            logger.debug("Unknown other name: {0}".format(oid))
+                            continue
+                    else:
+                        logger.debug("Unsupported general name: {0}"
+                                                                .format(tname))
+                        continue
+                    result.alt_names[key].append(value)
         return result
 
     @classmethod
