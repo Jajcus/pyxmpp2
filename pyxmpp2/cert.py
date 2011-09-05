@@ -76,12 +76,19 @@ class CertificateData(object):
         :Returtype: `list` of `JID`
         """
         result = []
-        if "XmppAddr" in self.alt_names or "DNS" in self.alt_names:
-            addrs =  self.alt_names.get("XmppAddr", []) + self.alt_names.get(
-                                                                    "DNS", [])
+        if ("XmppAddr" in self.alt_names or "DNS" in self.alt_names
+                                                or "SRVName" in alt_names):
+            addrs =  self.alt_names.get("XmppAddr", []) 
+            addrs += [ addr for addr in self.alt_names.get("DNS", [])
+                                            if not addr.startswith("*.") ]
+            addrs += [ addr.split(".", 1)[1] for addr 
+                                        in self.alt_names.get("SRVName", [])
+                                        if addr.startswith("_xmpp-server.") ]
+            warn_bad = True
         elif self.common_names:
             addrs = [addr for addr in self.common_names
                                 if "@" not in addr and "/" not in addr]
+            warn_bad = False
         else:
             return []
         for addr in addrs:
@@ -90,7 +97,8 @@ class CertificateData(object):
                 if jid not in result:
                     result.append(jid)
             except JIDError, err:
-                logger.warning(u"Bad JID in the certificate: {0!r}: {1}"
+                if warn_bad:
+                    logger.warning(u"Bad JID in the certificate: {0!r}: {1}"
                                                             .format(addr, err))
         return result
 
@@ -213,6 +221,7 @@ class BasicCertificateData(CertificateData):
         except AttributeError:
             # PyPy doesn't have .getppercert
             return cert
+        logger.debug("Certificate data from ssl module: {0!r}".format(data))
         if not data:
             return cert
         cert.validated = True
@@ -261,17 +270,17 @@ class BasicCertificateData(CertificateData):
             self.alt_names[key] = new
 
 DN_OIDS = {
-        (2, 5, 4, 41): u"Name",
-        (2, 5, 4, 4): u"Surname",
-        (2, 5, 4, 42): u"GivenName",
-        (2, 5, 4, 43): u"Initials",
-        (2, 5, 4, 3): u"CommonName",
-        (2, 5, 4, 7): u"LocalityName",
-        (2, 5, 4, 8): u"StateOrProvinceName",
-        (2, 5, 4, 10): u"OrganizationName",
-        (2, 5, 4, 11): u"OrganizationalUnitName",
-        (2, 5, 4, 12): u"Title",
-        (2, 5, 4, 6): u"CountryName",
+        (2, 5, 4, 41): u"name",
+        (2, 5, 4, 4): u"surname",
+        (2, 5, 4, 42): u"givenName",
+        (2, 5, 4, 43): u"initials",
+        (2, 5, 4, 3): u"commonName",
+        (2, 5, 4, 7): u"localityName",
+        (2, 5, 4, 8): u"stateOrProvinceName",
+        (2, 5, 4, 10): u"organizationName",
+        (2, 5, 4, 11): u"organizationalUnitName",
+        (2, 5, 4, 12): u"title",
+        (2, 5, 4, 6): u"countryName",
 }
 
 def _decode_asn1_string(data):
@@ -353,8 +362,7 @@ class ASN1CertificateData(CertificateData):
     _cert_asn1_type = None
     @classmethod
     def from_ssl_socket(cls, ssl_socket):
-        """Load certificate data from an SSL socket.
-        """
+        
         try:
             data = ssl_socket.getpeercert(True)
         except AttributeError:
@@ -435,7 +443,7 @@ class ASN1CertificateData(CertificateData):
                     except UnicodeError:
                         logger.debug("Cannot decode value: {0!r}".format(value))
                         continue
-                    if val_type == u"CommonName":
+                    if val_type == u"commonName":
                         self.common_names.append(value)
                     rdnss_list.append((val_type, value))
                 subject_name.append(tuple(rdnss_list))
