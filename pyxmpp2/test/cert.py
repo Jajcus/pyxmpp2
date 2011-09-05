@@ -32,6 +32,7 @@ def socket_with_cert(cert_path, key_path, cacert_path):
     def thread_func():
         try:
             sock, addr = listen_sock.accept()
+            sock.setblocking(True)
             try:
                 ssl_sock = ssl.wrap_socket(sock, key_path, cert_path,
                                             True, ca_certs = cacert_path)
@@ -39,7 +40,8 @@ def socket_with_cert(cert_path, key_path, cacert_path):
                 sock.close()
         finally:
             listen_sock.close()
-    thread = threading.Thread(target = thread_func)
+    thread = threading.Thread(target = thread_func, 
+                        name = "pyxmpp2.test.cert certificate provider thread")
     thread.daemon = True
     thread.start()
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
