@@ -169,8 +169,8 @@ class TestBasicCertificateData(unittest.TestCase):
                     JID("xmppaddr1.example.org"), JID("xmppaddr2.example.org")]
         self.assertEqual(set(cert.get_jids()), set(jids))
 
-    def _test_client1_cert_fields(self):
-        cert = self.load_certificate("client", False)
+    def test_client1_cert_fields(self):
+        cert = self.load_certificate("client1", False)
         self.assertEqual(cert.subject_name, (
                                 (('organizationName', u'PyXMPP'),),
                                 (('organizationalUnitName', u'Unit Tests'),),
