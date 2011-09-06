@@ -34,10 +34,10 @@ def socket_with_cert(cert_path, key_path, cacert_path, server_cert = True):
     addr = listen_sock.getsockname()
     def thread_func():
         try:
-            sock, addr = listen_sock.accept()
-            sock.setblocking(True)
+            sock = listen_sock.accept()[0]
+            sock.setblocking(True) # pylint: disable=E1101
             try:
-                ssl_sock = ssl.wrap_socket(sock, key_path, cert_path,
+                ssl.wrap_socket(sock, key_path, cert_path,
                              server_side = server_cert, ca_certs = cacert_path)
             finally:
                 sock.close()
@@ -63,8 +63,8 @@ class TestCertFunctions(unittest.TestCase):
     @unittest.skipUnless("lo-network" in _support.RESOURCES, 
                                         "network usage disabled")
     def test_get_certificate_from_ssl_socket(self):
-        socket = socket_with_cert("server.pem", "server-key.pem", "ca.pem")
-        cert = get_certificate_from_ssl_socket(socket)
+        sock = socket_with_cert("server.pem", "server-key.pem", "ca.pem")
+        cert = get_certificate_from_ssl_socket(sock)
         self.assertIsNotNone(cert)
         if HAVE_PYASN1:
             self.assertIsInstance(cert, ASN1CertificateData)
@@ -96,8 +96,8 @@ class TestBasicCertificateData(unittest.TestCase):
     def load_certificate(name, server_cert = True):
         cert_file = name + ".pem"
         key_file = name + "-key.pem"
-        socket = socket_with_cert(cert_file, key_file, "ca.pem", server_cert)
-        return BasicCertificateData.from_ssl_socket(socket)
+        sock = socket_with_cert(cert_file, key_file, "ca.pem", server_cert)
+        return BasicCertificateData.from_ssl_socket(sock)
 
     def test_server_cert_fields(self):
         cert = self.load_certificate("server", True)
@@ -117,6 +117,16 @@ class TestBasicCertificateData(unittest.TestCase):
                             u"organizationalUnitName=Unit Tests, "
                             u"commonName=server.example.org")
         self.assertEqual(cert.get_jids(), [JID("server.example.org")])
+
+    def test_verify_server(self):
+        cert = self.load_certificate("server", True)
+        self.assertTrue(cert.verify_server(u"server.example.org"))
+        self.assertTrue(cert.verify_server(JID(u"server.example.org")))
+        self.assertFalse(cert.verify_server(u"wrong.example.org"))
+        self.assertFalse(cert.verify_server(JID(u"wrong.example.org")))
+        self.assertFalse(cert.verify_server(u"example.org"))
+        self.assertFalse(cert.verify_server(u"sub.server.example.org"))
+
 
     def test_client_cert_fields(self):
         cert = self.load_certificate("client", False)
@@ -154,8 +164,8 @@ class TestBasicCertificateData(unittest.TestCase):
                                     u"*.wild.example.org"])
         if not isinstance(cert, BasicCertificateData):
             self.assertEqual(list(cert.alt_names["SRVName"]),
-                                    [u"_xmpp-server.srv1.example.org",
-                                        u"_xmpp-server.srv2.example.org"])
+                                    [u"_xmpp-client.client-srv.example.org",
+                                        u"_xmpp-server.server-srv.example.org"])
             self.assertEqual(list(cert.alt_names["XmppAddr"]),
                                     [u"xmppaddr1.example.org",
                                         u"xmppaddr2.example.org"])
@@ -164,8 +174,8 @@ class TestBasicCertificateData(unittest.TestCase):
                             u"commonName=common-name.example.org")
         jids = [JID("dns1.example.org"), JID("dns2.example.org")]
         if not isinstance(cert, BasicCertificateData):
-            jids += [
-                    JID("srv1.example.org"), JID("srv2.example.org"),
+            jids += [ JID("client-srv.example.org"),
+                    JID("server-srv.example.org"),
                     JID("xmppaddr1.example.org"), JID("xmppaddr2.example.org")]
         self.assertEqual(set(cert.get_jids()), set(jids))
 
@@ -192,6 +202,23 @@ class TestBasicCertificateData(unittest.TestCase):
             self.assertEqual(cert.get_jids(), [JID("user1@server.example.org"),
                                             JID("user2@server.example.org")])
 
+    def test_verify_server1_wrong(self):
+        cert = self.load_certificate("server1", True)
+        self.assertFalse(cert.verify_server(u"common-name.example.org"))
+        self.assertFalse(cert.verify_server(u"example.org"))
+        self.assertFalse(cert.verify_server(u"bad.example.org"))
+        self.assertFalse(cert.verify_server(u"wild.example.org"))
+        self.assertFalse(cert.verify_server(u"sub.sub.wild.example.org"))
+        self.assertFalse(cert.verify_server(u"client-srv.example.org",
+                                                                "xmpp-server"))
+        self.assertFalse(cert.verify_server(u"server-srv.example.org"))
+        self.assertFalse(cert.verify_server(u"server-srv.example.org",
+                                                                "xmpp-client"))
+
+    def test_verify_server1_dns(self):
+        cert = self.load_certificate("server1", True)
+        self.assertTrue(cert.verify_server(u"dns1.example.org"))
+        self.assertTrue(cert.verify_server(u"dns2.example.org"))
 
 @unittest.skipUnless(HAVE_PYASN1, "No pyasn1")
 class TestASN1CertificateData(TestBasicCertificateData):
@@ -200,6 +227,24 @@ class TestASN1CertificateData(TestBasicCertificateData):
         cert_file = os.path.join(_support.DATA_DIR, name + ".pem")
         return ASN1CertificateData.from_file(cert_file)
  
+    def test_verify_server1_srv(self):
+        cert = self.load_certificate("server1", True)
+        self.assertTrue(cert.verify_server(u"client-srv.example.org"))
+        self.assertTrue(cert.verify_server(u"client-srv.example.org",
+                                                                "xmpp-client"))
+        self.assertTrue(cert.verify_server(u"server-srv.example.org",
+                                                                "xmpp-server"))
+
+    def test_verify_server1_xmppaddr(self):
+        cert = self.load_certificate("server1", True)
+        self.assertTrue(cert.verify_server(u"xmppaddr1.example.org"))
+        self.assertTrue(cert.verify_server(u"xmppaddr2.example.org"))
+
+    def test_verify_server1_wildcard(self):
+        cert = self.load_certificate("server1", True)
+        self.assertTrue(cert.verify_server(u"sub.wild.example.org"))
+        self.assertTrue(cert.verify_server(u"somethinelse.wild.example.org"))
+
 # pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
 

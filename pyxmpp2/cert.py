@@ -77,13 +77,14 @@ class CertificateData(object):
         """
         result = []
         if ("XmppAddr" in self.alt_names or "DNS" in self.alt_names
-                                                or "SRVName" in alt_names):
+                                            or "SRVName" in self.alt_names):
             addrs =  self.alt_names.get("XmppAddr", []) 
             addrs += [ addr for addr in self.alt_names.get("DNS", [])
                                             if not addr.startswith("*.") ]
             addrs += [ addr.split(".", 1)[1] for addr 
                                         in self.alt_names.get("SRVName", [])
-                                        if addr.startswith("_xmpp-server.") ]
+                            if (addr.startswith("_xmpp-server.")
+                                    or addr.startswith("_xmpp-client."))]
             warn_bad = True
         elif self.common_names:
             addrs = [addr for addr in self.common_names
@@ -115,21 +116,44 @@ class CertificateData(object):
         :Return: `True` if the certificate is valid for given name, `False`
         otherwise.
         """
-        # TODO: wildcards
         server_jid = JID(server_name)
         if "XmppAddr" not in self.alt_names and "DNS" not in self.alt_names \
                                 and "SRV" not in self.alt_names:
             return self.verify_jid_against_common_name(server_jid)
-        for name in self.alt_names.get("DNS", []) + self.alt_names.get(
-                                                            "XmppAddr", []):
+        names = [name for name in self.alt_names.get("DNS", [])
+                                        if not name.startswith(u"*.")]
+        names += self.alt_names.get("XmppAddr", [])
+        for name in names:
+            logger.debug("checking {0!r} against {1!r}".format(server_jid,
+                                                                name))
             try:
                 jid = JID(name)
             except ValueError:
+                logger.debug("Not a valid JID: {0!r}".format(name))
                 continue
             if jid == server_jid:
+                logger.debug("Match!")
                 return True
-        if srv_type:
-            return self.verify_jid_against_srv_name(jid, srv_type)
+        if srv_type and self.verify_jid_against_srv_name(server_jid, srv_type):
+            return True
+        wildcards = [name[2:] for name in self.alt_names.get("DNS", [])
+                                                if name.startswith("*.")]
+        if not wildcards or not "." in server_jid.domain:
+            return False
+        logger.debug("checking {0!r} against wildcard domains: {1!r}"
+                                                .format(server_jid, wildcards))
+        server_domain = JID(domain = server_jid.domain.split(".", 1)[1])
+        for domain in wildcards:
+            logger.debug("checking {0!r} against {1!r}".format(server_domain,
+                                                                domain))
+            try:
+                jid = JID(domain)
+            except ValueError:
+                logger.debug("Not a valid JID: {0!r}".format(name))
+                continue
+            if jid == server_domain:
+                logger.debug("Match!")
+                return True
         return False
 
     def verify_jid_against_common_name(self, jid):
@@ -167,14 +191,19 @@ class CertificateData(object):
         """
         srv_prefix = u"_" + srv_type + u"."
         srv_prefix_l = len(srv_prefix)
-        for srv in self.alt_names.get("SRV", []):
+        for srv in self.alt_names.get("SRVName", []):
+            logger.debug("checking {0!r} against {1!r}".format(jid,
+                                                                srv))
             if not srv.startswith(srv_prefix):
+                logger.debug("{0!r} does not start with {1!r}"
+                                                .format(srv, srv_prefix))
                 continue
             try:
                 srv_jid = JID(srv[srv_prefix_l:])
             except ValueError:
                 continue
             if srv_jid == jid:
+                logger.debug("Match!")
                 return True
         return False
 
@@ -362,7 +391,8 @@ class ASN1CertificateData(CertificateData):
     _cert_asn1_type = None
     @classmethod
     def from_ssl_socket(cls, ssl_socket):
-        
+        """Get certificate data from an SSL socket.
+        """
         try:
             data = ssl_socket.getpeercert(True)
         except AttributeError:
