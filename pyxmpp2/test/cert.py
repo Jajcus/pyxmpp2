@@ -149,6 +149,7 @@ class TestBasicCertificateData(unittest.TestCase):
         if not isinstance(cert, BasicCertificateData):
             self.assertEqual(cert.get_jids(), [JID("user@server.example.org")])
 
+
     def test_server1_cert_fields(self):
         cert = self.load_certificate("server1", True)
         self.assertEqual(cert.subject_name, (
@@ -244,6 +245,37 @@ class TestASN1CertificateData(TestBasicCertificateData):
         cert = self.load_certificate("server1", True)
         self.assertTrue(cert.verify_server(u"sub.wild.example.org"))
         self.assertTrue(cert.verify_server(u"somethinelse.wild.example.org"))
+
+    def test_verify_client(self):
+        cert = self.load_certificate("client", False)
+        self.assertEqual(cert.verify_client(), JID("user@server.example.org"))
+        self.assertEqual(cert.verify_client(JID("user@server.example.org")),
+                                               JID("user@server.example.org"))
+        self.assertEqual(cert.verify_client(JID("other@server.example.org")),
+                                               JID("user@server.example.org"))
+        self.assertEqual(cert.verify_client(domains = ["server.example.org"]),
+                                               JID("user@server.example.org"))
+        self.assertIsNone(cert.verify_client(domains = ["bad.example.org"]))
+        
+        cert = self.load_certificate("server", True)
+        self.assertIsNone(cert.verify_client())
+
+    def test_verify_client1(self):
+        cert = self.load_certificate("client1", False)
+        self.assertEqual(cert.verify_client(), JID("user1@server.example.org"))
+        self.assertEqual(cert.verify_client(JID("user1@server.example.org")),
+                                               JID("user1@server.example.org"))
+        self.assertEqual(cert.verify_client(JID("user2@server.example.org")),
+                                               JID("user2@server.example.org"))
+        self.assertEqual(cert.verify_client(JID("other@server.example.org")),
+                                               JID("user1@server.example.org"))
+        self.assertEqual(cert.verify_client(domains = ["server.example.org"]),
+                                               JID("user1@server.example.org"))
+        self.assertIsNone(cert.verify_client(domains = ["bad.example.org"]))
+        
+        cert = self.load_certificate("server1", True)
+        self.assertIsNone(cert.verify_client())
+
 
 # pylint: disable=W0611
 from pyxmpp2.test._support import load_tests, setup_logging
