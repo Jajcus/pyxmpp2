@@ -65,6 +65,7 @@ setup(
         'pyxmpp2.mainloop',
         'pyxmpp2.sasl',
         'pyxmpp2.ext',
+        'pyxmpp2.server',
         'pyxmpp2.test',
     ],
     package_data = {
