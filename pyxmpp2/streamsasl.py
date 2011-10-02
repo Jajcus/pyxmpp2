@@ -375,6 +375,9 @@ class StreamSASLHandler(StreamFeatureHandler):
             raise SASLNotAvailable("Peer doesn't support SASL")
 
         props = dict(stream.auth_properties)
+        if not props.get("service-domain") and (
+                                        stream.peer and stream.peer.domain):
+            props["service-domain"] = stream.peer.domain
         if username is not None:
             props["username"] = username
         if authzid is not None:
