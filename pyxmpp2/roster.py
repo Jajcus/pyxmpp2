@@ -636,7 +636,10 @@ class Roster(RosterPayload, Mapping):
         """
         if jid not in self._jids:
             raise KeyError(jid)
-        index = self._jids.pop(jid)
+        index = self._jids[jid]
+        for i in range(index, len(self._jids)):
+            self._jids[self._items[i].jid] -= 1
+        del self._jids[jid]
         del self._items[index]
 
 class RosterClient(XMPPFeatureHandler, EventHandler):

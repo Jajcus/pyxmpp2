@@ -129,7 +129,7 @@ class PollMainLoop(MainLoopBase):
             timeout = min(next_timeout, timeout)
         for handler in list(self._unprepared_handlers):
             self._configure_io_handler(handler)
-        events = self.poll.poll(timeout)
+        events = self.poll.poll(timeout * 1000)
         self._timeout = None
         for (fileno, event) in events:
             if event & select.POLLHUP:
