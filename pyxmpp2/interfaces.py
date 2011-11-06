@@ -213,6 +213,17 @@ class XMPPFeatureHandler:
     __metaclass__ = ABCMeta
     stanza_processor = None
 
+def feature_uri(uri):
+    """Decorating attaching a feature URI (for Service Discovery or Capability 
+    to a XMPPFeatureHandler class."""
+    def decorator(class_):
+        """Returns a decorated class"""
+        if "_pyxmpp_feature_uris" not in class_.__dict__:
+            class_._pyxmpp_feature_uris = set()
+        class_._pyxmpp_feature_uris.add(uri)
+        return class_
+    return decorator
+
 def _iq_handler(iq_type, payload_class, payload_key, usage_restriction):
     """Method decorator generator for decorating <iq type='get'/> stanza
     handler methods in `XMPPFeatureHandler` subclasses.

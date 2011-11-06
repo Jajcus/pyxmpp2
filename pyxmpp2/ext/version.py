@@ -40,7 +40,7 @@ from ..etree import ElementTree
 from ..version import version as pyxmpp2_version # pylint: disable=E0611
 from ..settings import XMPPSettings
 from ..iq import Iq
-from ..interfaces import XMPPFeatureHandler
+from ..interfaces import XMPPFeatureHandler, feature_uri
 from ..interfaces import iq_get_stanza_handler
 from ..interfaces import StanzaPayload, payload_element_name
 
@@ -98,6 +98,7 @@ class VersionPayload(StanzaPayload):
             sub.text = self.os_name
         return element
 
+@feature_uri("jabber:iq:version")
 class VersionProvider(XMPPFeatureHandler):
     """Provides the Software version (XEP-0092) service.
 
