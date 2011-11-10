@@ -347,7 +347,6 @@ class XMPPSerializer(object):
 # thread local data to store XMPPSerializer instance used by the `serialize`
 # function
 _THREAD = threading.local()
-_THREAD.serializer = None
 
 def serialize(element):
     """Serialize an XMPP element.
@@ -362,7 +361,7 @@ def serialize(element):
         :Return: serialized element
         :Returntype: `unicode`
     """
-    if _THREAD.serializer is None:
+    if getattr(_THREAD, "serializer", None) is None:
         _THREAD.serializer = XMPPSerializer("jabber:client")
         _THREAD.serializer.emit_head(None, None)
     return _THREAD.serializer.emit_stanza(element)
