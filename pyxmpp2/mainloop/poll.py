@@ -63,7 +63,12 @@ class PollMainLoop(MainLoopBase):
         fileno = handler.fileno()
         if old_fileno is not None and fileno != old_fileno:
             del self._handlers[old_fileno]
-            self.poll.unregister(old_fileno)
+            try:
+                self.poll.unregister(old_fileno)
+            except KeyError:
+                # The socket has changed, but the old one isn't registered,
+                # e.g. ``prepare`` wants to connect again
+                pass
         if not prepared:
             self._unprepared_handlers[handler] = fileno
         if not fileno:
