@@ -32,8 +32,8 @@ from .core import sasl_mechanism
 @sasl_mechanism("EXTERNAL", False, 20)
 class ExternalClientAuthenticator(ClientAuthenticator):
     """Provides client-side External SASL (TLS-Identify) authentication."""
-    def __init__(self):
-        ClientAuthenticator.__init__(self)
+    def __init__(self, settings = None):
+        ClientAuthenticator.__init__(self, settings)
         self.authzid = None
 
     @classmethod

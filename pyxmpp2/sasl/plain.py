@@ -46,8 +46,8 @@ class PlainClientAuthenticator(ClientAuthenticator):
         - ``"username"`` - user name
         - ``"authzid"`` - authorization id
     """
-    def __init__(self):
-        ClientAuthenticator.__init__(self)
+    def __init__(self, settings=None):
+        ClientAuthenticator.__init__(self, settings)
         self.username = None
         self.finished = None
         self.password = None
