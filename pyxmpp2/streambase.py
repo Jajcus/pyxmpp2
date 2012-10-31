@@ -655,10 +655,9 @@ class StreamBase(XMLStreamHandler):
 
         Derived from the transport with 'local-jid' and 'service-type' added.
         """
+        props = dict(self.settings["extra_auth_properties"])
         if self.transport:
-            props = dict(self.transport.auth_properties)
-        else:
-            props = {}
+            props.update(self.transport.auth_properties)
         props["local-jid"] = self.me
         props["service-type"] = "xmpp"
         return props
@@ -678,6 +677,11 @@ XMPPSettings.add_setting(u"languages", type = u"list of ``unicode``",
         doc = u"""When the remote entity selects one of these languages
 on their stream, the same language will be sent in our stream declaration."""
     )
+XMPPSettings.add_setting(u"extra_auth_properties", type = "dictionary",
+        default = {},
+        doc = u"""Extra properties to pass to the SASL authenticators."""
+    )
+
 XMPPSettings.add_setting(u"extra_ns_prefixes", type = "prefix -> uri mapping",
         default = {},
         doc = u"""Extra namespace prefix declarations to use at the stream root
