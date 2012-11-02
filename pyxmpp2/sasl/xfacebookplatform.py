@@ -25,22 +25,12 @@ from __future__ import absolute_import, division
 
 __docformat__ = "restructuredtext en"
 
-import base64
-
 import logging
 
 from .core import ClientAuthenticator, Response, Success
 from .core import sasl_mechanism
         
-from abc import ABCMeta, abstractmethod
-import time, json, urllib
-
-try:
-        # pylint: disable=E0611
-            from abc import abstractclassmethod
-except ImportError:
-        # pylint: disable=C0103
-            abstractclassmethod = classmethod
+import time, urllib
 
 logger = logging.getLogger("pyxmpp2.sasl.xfb")
 
@@ -48,12 +38,14 @@ logger = logging.getLogger("pyxmpp2.sasl.xfb")
 class XFacebookPlatformClientAuthenticator(ClientAuthenticator):
     """Provides client-side XFacebookPlatform authentication."""
     def __init__(self):
+        self.access_token = None
+        self.api_key = None
         ClientAuthenticator.__init__(self)
 
-    @abstractclassmethod
+    @classmethod
     def are_properties_sufficient(cls, properties):
-        if 'facebook_access_token' in properties \
-            and 'facebook_api_key' in properties:
+        if ('facebook_access_token' in properties
+                            and 'facebook_api_key' in properties):
             return True
         return False
 
@@ -71,8 +63,8 @@ class XFacebookPlatformClientAuthenticator(ClientAuthenticator):
         out_params['api_key'] = self.api_key
         out_params['call_id'] = float(round(time.time() * 1000))
         out_params['v'] = '1.0'
-        out_json = urllib.urlencode(out_params)
-        return Response(out_json)
+        data = urllib.urlencode(out_params)
+        return Response(data)
 
     def finish(self, data):
         return Success(None)
