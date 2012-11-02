@@ -9,6 +9,7 @@ import threading
 import select
 import logging
 import ssl
+import errno
 
 from pyxmpp2.test import _support
 
@@ -123,6 +124,7 @@ class NetReaderWritter(object):
 
     def reader_run(self):
         """The reader thread function."""
+        WSAEBADF = getattr(errno, "WSAEBADF", None)
         with self.lock:
             if not self.sock or self.eof:
                 return
@@ -132,7 +134,7 @@ class NetReaderWritter(object):
                     ret = infd, _outfd, _errfd = select.select([self.sock], [],
                                                                         [], 5)
                 except select.error, err:
-                    if err == getattr(errno, "WSAEBADF", None):
+                    if WSAEBADF and err == WSAEBADF:
                         self.sock = None
                         break
                     raise
