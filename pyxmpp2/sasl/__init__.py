@@ -36,6 +36,7 @@ from . import plain
 from . import external
 from . import digest_md5
 from . import scram
+from . import xfacebookplatform
 
 try:
     from . import gssapi
