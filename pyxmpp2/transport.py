@@ -769,6 +769,10 @@ class TCPTransport(XMPPTransport, IOHandler):
         Handle an error reported.
         """
         with self.lock:
+            if self._state == 'connecting' and self._dst_addrs:
+                self._hup = False
+                self._set_state("connect")
+                return
             self._socket.close()
             self._socket = None
             self._set_state("aborted")
