@@ -15,6 +15,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
+"""Tornado main loop integration."""
+
 from __future__ import absolute_import, division
 
 import logging
@@ -44,6 +46,7 @@ class TornadoMainLoop(MainLoopBase):
         self._configure_io_handler(handler)
 
     def _configure_io_handler(self, handler):
+        """Register an io-handler at the polling object."""
         if self.check_events():
             return
         if handler in self._unprepared_handlers:
@@ -55,6 +58,8 @@ class TornadoMainLoop(MainLoopBase):
         fileno = handler.fileno()
         if old_fileno is not None and fileno != old_fileno:
             del self._handlers[old_fileno]
+            # remove_handler won't raise something like KeyError if the fd
+            # isn't registered; it will just print a debug log.
             self.io_loop.remove_handler(old_fileno)
         if not prepared:
             self._unprepared_handlers[handler] = fileno
@@ -68,11 +73,11 @@ class TornadoMainLoop(MainLoopBase):
         if handler.is_writable():
             logger.debug(" {0!r} writable".format(handler))
             events |= ioloop.IOLoop.WRITE
+
+        if self._handlers[fileno] == events:
+            return
+        self._handlers[fileno] = events
         if events:
-            if update and self._handlers[fileno] == events:
-                return
-            else:
-                self._handlers[fileno] = events
             logger.debug(" registering {0!r} handler fileno {1} for"
                             " events {2}".format(handler, fileno, events))
             if update:
@@ -81,8 +86,6 @@ class TornadoMainLoop(MainLoopBase):
                 self.io_loop.add_handler(
                     fileno, partial(self._handle_event, handler), events
                 )
-        else:
-            self._handlers[fileno] = events
 
     def _prepare_io_handler(self, handler):
         """Call the `interfaces.IOHandler.prepare` method and
@@ -127,6 +130,7 @@ class TornadoMainLoop(MainLoopBase):
         for dummy, method in inspect.getmembers(handler, callable):
             if not hasattr(method, "_pyxmpp_timeout"):
                 continue
+            # pylint: disable=W0212
             logger.debug(" registering {0!r} handler with timeout {1}".format(
                 handler, method._pyxmpp_timeout))
             handler._tornado_timeout = self.io_loop.add_timeout(
@@ -137,12 +141,8 @@ class TornadoMainLoop(MainLoopBase):
         for dummy, method in inspect.getmembers(handler, callable):
             if not hasattr(method, "_tornado_timeout"):
                 continue
+            # pylint: disable=W0212
             self.io_loop.remove_timeout(method._tornado_timeout)
-
-    def _remove_io_handler(self, handler):
-        fileno = handler.fileno()
-        if fileno is not None:
-            self.io_loop.remove_handler(fileno)
 
     def quit(self):
         self._quit = True
@@ -165,6 +165,8 @@ class TornadoMainLoop(MainLoopBase):
         return False
 
     def _handle_event(self, handler, fd, event):
+        """handle I/O events"""
+        # pylint: disable=C0103
         logger.debug('_handle_event: %r, %r, %r', handler, fd, event)
         if event & ioloop.IOLoop.ERROR:
             handler.handle_hup()
