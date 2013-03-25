@@ -74,7 +74,7 @@ class TornadoMainLoop(MainLoopBase):
             logger.debug(" {0!r} writable".format(handler))
             events |= ioloop.IOLoop.WRITE
 
-        if self._handlers[fileno] == events:
+        if self._handlers.get(fileno, None) == events:
             return
         self._handlers[fileno] = events
         if events:
