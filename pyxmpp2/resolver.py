@@ -254,6 +254,11 @@ class DumbBlockingResolver(Resolver):
                                                                         err))
             callback([])
             return
+        except IOError as err:
+            logger.warning("Couldn't resolve {0!r}, unexpected error: {1}"
+                                                        .format(hostname,err))
+            callback([])
+            return
         if family == socket.AF_UNSPEC:
             tmp = ret
             if self.settings["prefer_ipv6"]:
