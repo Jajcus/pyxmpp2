@@ -11,6 +11,9 @@ PY2TO3=2to3-3.2
 PYTHON=python
 PYTHON3=python3
 
+PYLINT=pylint
+PYTHON3_PYLINT=py3lint
+
 .PHONY: all build test version dist install
 .PHONY: py3-all py3-build py3-test py3-install
 .PHONY: update-doc doc pylint.log pylint ChangeLog www publish
@@ -51,7 +54,13 @@ update-doc:
 pylint:	pylint.log
 
 pylint.log: build
-	./auxtools/pylint.sh $(CHECK_MODULE) | tee pylint.log
+	PYLINT="$(PYLINT)" ./auxtools/pylint.sh $(CHECK_MODULE) | tee pylint.log
+
+py3lint: py3lint.log
+
+py3lint.log: py3-build
+	BUILD="py3-build" PYLINT="$(PYTHON3_PYLINT)" ./auxtools/pylint.sh $(CHECK_MODULE) | tee py3lint.log
+
 
 ChangeLog: 
 	test -d .git && make cl-stamp || :
