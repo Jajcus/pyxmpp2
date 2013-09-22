@@ -53,7 +53,7 @@ XMPP Data
 
 The basic functionality of the XMPP protocol is to send XML data between
 entities using XML container elements called 'stanzas'. There are three
-types of stanzas: 
+types of stanzas:
 
   - ``<message />`` stanzas to send a unicast message to another entity
   - ``<iq />`` stanzas for simple request-response exchange

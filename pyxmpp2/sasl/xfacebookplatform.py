@@ -29,7 +29,7 @@ import logging
 
 from .core import ClientAuthenticator, Response, Success
 from .core import sasl_mechanism
-        
+
 import time, urllib
 
 logger = logging.getLogger("pyxmpp2.sasl.xfb")

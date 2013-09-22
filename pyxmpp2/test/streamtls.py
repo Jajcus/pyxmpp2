@@ -42,13 +42,13 @@ EMPTY_FEATURES = b"""<stream:features/>"""
 PROCEED = b"<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls' />"
 
 STREAM_TAIL = b'</stream:stream>'
-        
+
 class TestInitiator(InitiatorSelectTestCase):
     def test_enabled_optional(self):
         """Test TLS enabled in settings, and optional on the server."""
         settings = XMPPSettings({
-                        u"starttls": True, 
-                        u"tls_cacert_file": os.path.join(DATA_DIR, "ca.pem"), 
+                        u"starttls": True,
+                        u"tls_cacert_file": os.path.join(DATA_DIR, "ca.pem"),
                                 })
         handler = EventRecorder()
         handlers = [StreamTLSHandler(settings), handler]
@@ -61,7 +61,7 @@ class TestInitiator(InitiatorSelectTestCase):
         xml = self.wait(2, expect = re.compile(br".*(<starttls.*/>)"))
         self.assertIsNotNone(xml)
         element = XML(xml)
-        self.assertEqual(element.tag, 
+        self.assertEqual(element.tag,
                                 "{urn:ietf:params:xml:ns:xmpp-tls}starttls")
         self.server.write(PROCEED)
         self.server.starttls(self.server.sock,
@@ -89,8 +89,8 @@ class TestInitiator(InitiatorSelectTestCase):
         """Test TLS enabled in settings, and required on the server."""
         self.start_server()
         settings = XMPPSettings({
-                        u"starttls": True, 
-                        u"tls_cacert_file": os.path.join(DATA_DIR, "ca.pem"), 
+                        u"starttls": True,
+                        u"tls_cacert_file": os.path.join(DATA_DIR, "ca.pem"),
                                 })
         handler = EventRecorder()
         handlers = [StreamTLSHandler(settings), handler]
@@ -103,7 +103,7 @@ class TestInitiator(InitiatorSelectTestCase):
         xml = self.wait(expect = re.compile(br".*(<starttls.*/>)"))
         self.assertIsNotNone(xml)
         element = XML(xml)
-        self.assertEqual(element.tag, 
+        self.assertEqual(element.tag,
                                 "{urn:ietf:params:xml:ns:xmpp-tls}starttls")
         self.server.write(PROCEED)
         self.server.starttls(self.server.sock,
@@ -131,8 +131,8 @@ class TestInitiator(InitiatorSelectTestCase):
         """Test TLS enabled in settings, and missing on the server."""
         self.start_server()
         settings = XMPPSettings({
-                        u"starttls": True, 
-                        u"tls_cacert_file": os.path.join(DATA_DIR, "ca.pem"), 
+                        u"starttls": True,
+                        u"tls_cacert_file": os.path.join(DATA_DIR, "ca.pem"),
                                 })
         handler = EventRecorder()
         handlers = [StreamTLSHandler(settings), handler]
@@ -157,9 +157,9 @@ class TestInitiator(InitiatorSelectTestCase):
         """Test TLS required in settings, and missing on the server."""
         self.start_server()
         settings = XMPPSettings({
-                        u"starttls": True, 
-                        u"tls_require": True, 
-                        u"tls_cacert_file": os.path.join(DATA_DIR, "ca.pem"), 
+                        u"starttls": True,
+                        u"tls_require": True,
+                        u"tls_cacert_file": os.path.join(DATA_DIR, "ca.pem"),
                                 })
         handler = EventRecorder()
         handlers = [StreamTLSHandler(settings), handler]

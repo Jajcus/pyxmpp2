@@ -51,7 +51,7 @@ PLAIN_AUTH = ("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl'"
                                             " mechanism='PLAIN'>{0}</auth>")
 
 STREAM_TAIL = b'</stream:stream>'
-        
+
 PARSE_ERROR_RESPONSE = (b'<stream:error><xml-not-well-formed'
                     b'  xmlns="urn:ietf:params:xml:ns:xmpp-streams"/>'
                                         b'</stream:error></stream:stream>')
@@ -62,7 +62,7 @@ class TestInitiator(InitiatorSelectTestCase):
     def test_auth(self):
         handler = EventRecorder()
         settings = XMPPSettings({
-                                u"username": u"user", 
+                                u"username": u"user",
                                 u"password": u"secret",
                                 })
         self.stream = StreamBase(u"jabber:client", None,
@@ -95,13 +95,13 @@ class TestInitiator(InitiatorSelectTestCase):
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [ConnectingEvent, ConnectedEvent,
                     StreamConnectedEvent, GotFeaturesEvent,
-                    AuthenticatedEvent, StreamRestartedEvent, GotFeaturesEvent, 
+                    AuthenticatedEvent, StreamRestartedEvent, GotFeaturesEvent,
                     DisconnectedEvent])
- 
+
     def test_auth_fail(self):
         handler = EventRecorder()
         settings = XMPPSettings({
-                                u"username": u"user", 
+                                u"username": u"user",
                                 u"password": u"bad",
                                 })
         self.stream = StreamBase(u"jabber:client", None,
@@ -129,7 +129,7 @@ class TestInitiator(InitiatorSelectTestCase):
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [ConnectingEvent, ConnectedEvent,
                     StreamConnectedEvent, GotFeaturesEvent, DisconnectedEvent])
- 
+
 class TestReceiver(ReceiverSelectTestCase):
     def test_auth(self):
         handler = EventRecorder()
@@ -172,7 +172,7 @@ class TestReceiver(ReceiverSelectTestCase):
         self.assertEqual(event_classes, [
                                 StreamConnectedEvent, AuthenticatedEvent,
                                 StreamRestartedEvent, DisconnectedEvent])
- 
+
     def test_auth_fail(self):
         handler = EventRecorder()
         self.start_transport([handler])

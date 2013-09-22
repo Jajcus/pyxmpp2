@@ -54,13 +54,13 @@ class ClientStream(StreamBase):
             settings = XMPPSettings()
         if "resource" not in settings:
             settings["resource"] = jid.resource
-        StreamBase.__init__(self, STANZA_CLIENT_NS, stanza_route, 
+        StreamBase.__init__(self, STANZA_CLIENT_NS, stanza_route,
                                                         handlers, settings)
         self.me = JID(jid.local, jid.domain)
-    
+
     def initiate(self, transport, to = None):
         """Initiate an XMPP connection over the `transport`.
-        
+
         :Parameters:
             - `transport`: an XMPP transport instance
             - `to`: peer name (defaults to own jid domain part)

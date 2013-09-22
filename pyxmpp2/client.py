@@ -19,7 +19,7 @@
 
 The `Client` class provides the base for client applications.
 
-To create an XMPP client session applications should create a `Client` instance 
+To create an XMPP client session applications should create a `Client` instance
 providing in the constructor: a client JID, settings and handlers providing
 application behaviour (the list may contain a single handler object which will
 be 'the application). The `Client` class will provide some other handlers:
@@ -29,7 +29,7 @@ be 'the application). The `Client` class will provide some other handlers:
 The roster itself is available via the `Client.roster` property.
 
 The `Client` object will open an XMPP stream after the `Client.connect` method
-is called. It will send the initial presence (specified by 
+is called. It will send the initial presence (specified by
 the :r:`initial_presence setting` ) upon log-in and the final presence on
 log-out.  Other presence handling, including subscriptions is the
 responsibility of the application.
@@ -163,7 +163,7 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
                 self._close_stream()
 
             transport = TCPTransport(self.settings)
-            
+
             addr = self.settings["server"]
             if addr:
                 service = None
@@ -261,7 +261,7 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
 
         This method should be called periodically from the application's
         main loop.
-        
+
         :Return: suggested delay (in seconds) before the next call to this
                                                                     method.
         :Returntype: `int`
@@ -289,7 +289,7 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
     def roster_client_factory(self):
         """Creates the `RosterClient` instance for the `roster_client`
         attribute.
-        
+
         Subclasses can provide different behaviour by overriding this. The
         overriding method can return `None` if no roster client is needed.
 

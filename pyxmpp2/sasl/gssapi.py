@@ -32,7 +32,7 @@ import logging
 
 from .core import ClientAuthenticator, Response, Success
 from .core import sasl_mechanism
-        
+
 logger = logging.getLogger("pyxmpp2.sasl.gssapi")
 
 @sasl_mechanism("GSSAPI", 75)
@@ -54,7 +54,7 @@ class GSSAPIClientAuthenticator(ClientAuthenticator):
     def start(self, properties):
         self.username = properties["username"]
         self.authzid = properties.get("authzid")
-        _unused, self._gss = kerberos.authGSSClientInit(self.authzid or 
+        _unused, self._gss = kerberos.authGSSClientInit(self.authzid or
                     "{0}@{1}".format("xmpp", properties["service-hostname"]))
         self.step = 0
         return self.challenge(b"")

@@ -679,7 +679,7 @@ class Form(StanzaPayloadObject):
         self.instructions = None
         if (xmlnode.type != "element" or xmlnode.name != "x"
                 or xmlnode.ns().content != DATAFORM_NS):
-            raise ValueError("Not a form: " + xmlnode.serialize()) 
+            raise ValueError("Not a form: " + xmlnode.serialize())
         self.type = xmlnode.prop("type")
         if not self.type in self.allowed_types:
             raise BadRequestProtocolError("Bad form type: %r" % (self.type,))

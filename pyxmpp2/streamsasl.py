@@ -44,8 +44,8 @@ logger = logging.getLogger("pyxmpp2.streamsasl")
 
 class DefaultPasswordDatabase(sasl.PasswordDatabase):
     """Default password database.
-    
-    Uses the :r:`user_passwords setting` or :r:`username setting` 
+
+    Uses the :r:`user_passwords setting` or :r:`username setting`
     and :r:`password setting`.
     """
     def __init__(self, settings):
@@ -101,7 +101,7 @@ class StreamSASLHandler(StreamFeatureHandler):
         [receving entity only]
 
         :returns: update <features/> element."""
-        mechs = self.settings['sasl_mechanisms'] 
+        mechs = self.settings['sasl_mechanisms']
         if mechs and not stream.authenticated:
             sub = ElementTree.SubElement(features, MECHANISMS_TAG)
             for mech in mechs:
@@ -153,9 +153,9 @@ class StreamSASLHandler(StreamFeatureHandler):
             raise FatalStreamError("<sasl:auth/> with no mechanism")
 
         stream.auth_method_used = mechanism
-        self.authenticator = sasl.server_authenticator_factory(mechanism, 
+        self.authenticator = sasl.server_authenticator_factory(mechanism,
                                                                 password_db)
-        
+
         content = element.text.encode("us-ascii")
         ret = self.authenticator.start(stream.auth_properties,
                                                 a2b_base64(content))
@@ -260,7 +260,7 @@ class StreamSASLHandler(StreamFeatureHandler):
     def _check_authorization(self, properties, stream):
         """Check authorization id and other properties returned by the
         authentication mechanism.
-        
+
         [receiving entity only]
 
         Allow only no authzid or authzid equal to current username@domain
@@ -445,7 +445,7 @@ XMPPSettings.add_setting(u"insecure_auth", basic = True,
         cmdline_help = u"Enable insecure SASL mechanisms over unencrypted channels",
         doc = u"""Enable insecure SASL mechanisms over unencrypted channels"""
     )
-XMPPSettings.add_setting(u"password_database", 
+XMPPSettings.add_setting(u"password_database",
         type = sasl.PasswordDatabase,
         factory = DefaultPasswordDatabase,
         default_d = "A `DefaultPasswordDatabase` instance",

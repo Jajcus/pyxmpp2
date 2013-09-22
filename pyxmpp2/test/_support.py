@@ -34,7 +34,7 @@ if "TEST_STACKDUMP_FILE" in os.environ:
 # pylint: disable=W0602,C0103
 logging_ready = False
 def setup_logging():
-    """Set up logging for the tests. 
+    """Set up logging for the tests.
 
     Log level used depends on number of '-v' in sys.argv
     """
@@ -59,7 +59,7 @@ def filter_tests(suite):
             result.addTest(filter_tests(test))
         elif not test.__class__.__name__.startswith("_"):
             result.addTest(test)
-    return result 
+    return result
 
 def load_tests(loader, tests, pattern):
     """Use default test list, just remove the classes which names start with

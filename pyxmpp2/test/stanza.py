@@ -7,7 +7,7 @@ import unittest
 import re
 
 from pyxmpp2.etree import ElementTree
-        
+
 from pyxmpp2.interfaces import StanzaPayload
 from pyxmpp2.interfaces import payload_element_name
 
@@ -23,11 +23,11 @@ STANZA0 = "<presence xmlns='jabber:client' />"
 STANZA1 = "<presence xmlns='jabber:server'><status>STATUS</status></presence>"
 STANZA2 = "<message xmlns='jabber:client' />"
 STANZA3 = """
-<presence from='a@b.c/d' to='e@f.g/h' id='666' type='unavailable' 
+<presence from='a@b.c/d' to='e@f.g/h' id='666' type='unavailable'
                                                 xmlns='jabber:client'/>
 """
 STANZA4 = """
-<message from='a@b.c/d' to='e@f.g' id='666' type='chat' 
+<message from='a@b.c/d' to='e@f.g' id='666' type='chat'
                                                     xmlns='jabber:client'>
         <subject>Subject</subject>
         <body>Body</body>
@@ -101,7 +101,7 @@ class TestStanza(unittest.TestCase):
         self.assertEqual(stanza3.stanza_type, u"unavailable")
         self.assertEqual(stanza3.stanza_id, u'666')
     def test_stanza_build(self):
-        stanza = Stanza("presence", from_jid = JID('a@b.c/d'), 
+        stanza = Stanza("presence", from_jid = JID('a@b.c/d'),
                             to_jid = JID('e@f.g/h'), stanza_id = '666',
                             stanza_type = 'unavailable')
         self.assertTrue(xml_elements_equal(stanza.as_xml(),
@@ -114,7 +114,7 @@ class TestStanza(unittest.TestCase):
             element2 = ElementTree.XML(stanza.serialize())
             self.assertTrue(xml_elements_equal(element1, element2, True))
     def test_serialize2(self):
-        stanza = Stanza("presence", from_jid = JID('a@b.c/d'), 
+        stanza = Stanza("presence", from_jid = JID('a@b.c/d'),
                             to_jid = JID('e@f.g/h'), stanza_id = '666',
                             stanza_type = 'unavailable')
         xml = stanza.serialize()
@@ -152,7 +152,7 @@ class TestStanza(unittest.TestCase):
                                                             payload.as_xml()))
 
     def test_stanza_set_custom_payload(self):
-        stanza7 = Stanza("iq", from_jid = JID('a@b.c/d'), 
+        stanza7 = Stanza("iq", from_jid = JID('a@b.c/d'),
                             to_jid = JID('e@f.g/h'), stanza_id = '666',
                             stanza_type='get')
         payload = TestPayload(data = u"Test")

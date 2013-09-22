@@ -118,7 +118,7 @@ class TestStreamReader(unittest.TestCase):
     def event(self, event, element):
         logger.debug(" event: {0!r} element: {1!r}".format(event, element))
         expected = self.expected_events.pop(0)
-        self.assertTrue(event==expected.event, "Got %r, expected %r" % 
+        self.assertTrue(event==expected.event, "Got %r, expected %r" %
                                                     (event, expected.event))
         if expected.offset < self.chunk_start:
             self.fail("Delayed event: %r. Expected at: %i, found at %i:%i"

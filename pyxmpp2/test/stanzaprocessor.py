@@ -21,30 +21,30 @@ from pyxmpp2.utils import xml_elements_equal
 
 
 IQ1 = """
-<iq xmlns="jabber:client" from='source@example.com/res' 
+<iq xmlns="jabber:client" from='source@example.com/res'
                                 to='dest@example.com' type='get' id='1'>
 <payload xmlns="http://pyxmpp.jajcus.net/xmlns/test"><abc/></payload>
 </iq>"""
 
 IQ2 = """
-<iq xmlns="jabber:client" to='source@example.com/res' 
+<iq xmlns="jabber:client" to='source@example.com/res'
                                 from='dest@example.com' type='result' id='1'>
 <payload xmlns="http://pyxmpp.jajcus.net/xmlns/test"><abc/></payload>
 </iq>"""
 
 IQ3 = """
-<iq xmlns="jabber:client" from='source@example.com/res' 
+<iq xmlns="jabber:client" from='source@example.com/res'
                                 to='dest@example.com' type='set' id='2'>
 <payload xmlns="http://pyxmpp.jajcus.net/xmlns/test"><abc/></payload>
 </iq>"""
 
 IQ4 = """
-<iq xmlns="jabber:client" to='source@example.com/res' 
+<iq xmlns="jabber:client" to='source@example.com/res'
                                 from='dest@example.com' type='result' id='2'>
 </iq>"""
 
 MESSAGE1 = """
-<message xmlns="jabber:client" from='source@example.com/res' 
+<message xmlns="jabber:client" from='source@example.com/res'
                                 to='dest@example.com' type='normal' id='1'>
 <subject>Subject</subject>
 <body>The body</body>
@@ -76,7 +76,7 @@ PRESENCE4 = """<presence xmlns="jabber:client" to='source@example.com/res'
 
 ALL_STANZAS = (IQ1, IQ2, IQ3, IQ4, MESSAGE1, MESSAGE2, MESSAGE3,
             PRESENCE1, PRESENCE2, PRESENCE3, PRESENCE4)
-NON_IQ_STANZAS = (MESSAGE1, MESSAGE2, MESSAGE3, 
+NON_IQ_STANZAS = (MESSAGE1, MESSAGE2, MESSAGE3,
                     PRESENCE1, PRESENCE2, PRESENCE3, PRESENCE4)
 
 class TestStanzaFactory(unittest.TestCase):
@@ -154,7 +154,7 @@ class TestStanzaProcessor(unittest.TestCase):
                     subject = stanza.subject,
                     body = stanza.body)
         return message
-    
+
     def eat1(self, stanza):
         # pylint: disable=W0613
         self.handlers_called.append("eat1")
@@ -209,7 +209,7 @@ class TestStanzaProcessor(unittest.TestCase):
         self.assertTrue(xml_elements_equal(stanza1.as_xml(),
                                                     ElementTree.XML(IQ2), True))
         stanza2 = self.stanzas_sent[1]
-        self.assertTrue(xml_elements_equal(stanza2.as_xml(), 
+        self.assertTrue(xml_elements_equal(stanza2.as_xml(),
                                                     ElementTree.XML(IQ4), True))
 
     def test_no_handlers(self):
@@ -320,7 +320,7 @@ class TestStanzaProcessor(unittest.TestCase):
                 return parent.eat2(stanza)
         self.proc.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
         self.process_stanzas(NON_IQ_STANZAS)
-        self.assertEqual(self.handlers_called, ["pass1", "eat2", 
+        self.assertEqual(self.handlers_called, ["pass1", "eat2",
                                         "pass1", "eat2", "pass1", "eat2"])
         self.assertEqual(len(self.stanzas_sent), 0)
 
@@ -404,7 +404,7 @@ class TestStanzaProcessor(unittest.TestCase):
                 return parent.eat2(stanza)
         self.proc.setup_stanza_handlers([Handlers1(), Handlers2()], "post-auth")
         self.process_stanzas(NON_IQ_STANZAS)
-        self.assertEqual(self.handlers_called, ["pass1", "eat2", 
+        self.assertEqual(self.handlers_called, ["pass1", "eat2",
                                                     "pass1", "eat2"])
         self.assertEqual(len(self.stanzas_sent), 0)
 

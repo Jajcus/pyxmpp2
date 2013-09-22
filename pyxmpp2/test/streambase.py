@@ -43,7 +43,7 @@ C2S_CLIENT_STREAM_HEAD = (b'<stream:stream version="1.0"'
                             b' xmlns="jabber:client">')
 
 STREAM_TAIL = b'</stream:stream>'
-        
+
 PARSE_ERROR_RESPONSE = (b'<stream:error><not-well-formed'
                     b'  xmlns="urn:ietf:params:xml:ns:xmpp-streams"/>'
                                         b'</stream:error></stream:stream>')
@@ -114,7 +114,7 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [ConnectingEvent, ConnectedEvent,
                                     StreamConnectedEvent, DisconnectedEvent])
- 
+
     def test_parse_error(self):
         handler = IgnoreEventHandler()
         self.stream = StreamBase(u"jabber:client", None, [])
@@ -168,7 +168,7 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [ConnectingEvent, ConnectedEvent,
                                     StreamConnectedEvent, DisconnectedEvent])
- 
+
     def test_stanza_receive(self):
         handler = IgnoreEventHandler()
         route = RecordingRoute()
@@ -196,7 +196,7 @@ class TestInitiatorSelect(InitiatorSelectTestCase):
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [ConnectingEvent, ConnectedEvent,
                                     StreamConnectedEvent, DisconnectedEvent])
- 
+
 @unittest.skipIf(not hasattr(select, "poll"), "No poll() support")
 class TestInitiatorPoll(InitiatorPollTestMixIn, TestInitiatorSelect):
     pass

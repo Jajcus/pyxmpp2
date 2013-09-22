@@ -45,10 +45,10 @@ logger = logging.getLogger("pyxmpp2.stanzaprocessor")
 
 def stanza_factory(element, return_path = None, language = None):
     """Creates Iq, Message or Presence object for XML stanza `element`
-    
+
     :Parameters:
         - `element`: the stanza XML element
-        - `return_path`: object through which responses to this stanza should 
+        - `return_path`: object through which responses to this stanza should
           be sent (will be weakly referenced by the stanza object).
         - `language`: default language for the stanza
     :Types:
@@ -169,7 +169,7 @@ class StanzaProcessor(StanzaRoute):
                                                 .format(stanza_id, ufrom))
             logger.debug(" from_jid: {0!r} peer: {1!r}  me: {2!r}"
                                         .format(from_jid, self.peer, self.me))
-            if ( (from_jid == self.peer or from_jid == self.me 
+            if ( (from_jid == self.peer or from_jid == self.me
                             or self.me and from_jid == self.me.bare()) ):
                 try:
                     logger.debug("  trying id={0!r} from=None"
@@ -363,7 +363,7 @@ class StanzaProcessor(StanzaRoute):
                     return True
         except ProtocolError, err:
             typ = stanza.stanza_type
-            if typ != 'error' and (typ != 'result' 
+            if typ != 'error' and (typ != 'result'
                                                 or stanza.stanza_type != 'iq'):
                 response = stanza.make_error_response(err.xmpp_name)
                 self.send(response)
@@ -502,7 +502,7 @@ class StanzaProcessor(StanzaRoute):
         self.process_stanza(stanza)
 
     def send(self, stanza):
-        """Send a stanza somwhere. 
+        """Send a stanza somwhere.
 
         The default implementation sends it via the `uplink` if it is defined
         or raises the `NoRouteError`.

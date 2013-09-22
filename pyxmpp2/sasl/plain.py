@@ -29,7 +29,7 @@ import logging
 from .core import ClientAuthenticator, ServerAuthenticator
 from .core import Success, Failure, Challenge, Response
 from .core import sasl_mechanism
-        
+
 logger = logging.getLogger("pyxmpp2.sasl.plain")
 
 @sasl_mechanism("PLAIN", 10)
@@ -42,7 +42,7 @@ class PlainClientAuthenticator(ClientAuthenticator):
         - ``"authzid"`` - authorization id (optional)
 
     Authentication properties returned:
-        
+
         - ``"username"`` - user name
         - ``"authzid"`` - authorization id
     """
@@ -85,7 +85,7 @@ class PlainServerAuthenticator(ServerAuthenticator):
     Authentication properties used: None
 
     Authentication properties returned:
-        
+
         - ``"username"`` - user name
         - ``"authzid"`` - authorization id
     """

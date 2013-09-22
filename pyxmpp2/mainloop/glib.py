@@ -209,7 +209,7 @@ class GLibMainLoop(MainLoopBase):
         for dummy, method in inspect.getmembers(handler, callable):
             if not hasattr(method, "_pyxmpp_timeout"):
                 continue
-            tag = glib.timeout_add(int(method._pyxmpp_timeout * 1000), 
+            tag = glib.timeout_add(int(method._pyxmpp_timeout * 1000),
                                                 self._timeout_cb, method)
             self._timer_sources[method] = tag
 
@@ -221,7 +221,7 @@ class GLibMainLoop(MainLoopBase):
             tag = self._timer_sources.pop(method, None)
             if tag is not None:
                 glib.source_remove(tag)
-    
+
     @hold_exception
     def _timeout_cb(self, method):
         """Call the timeout handler due.
@@ -255,7 +255,7 @@ class GLibMainLoop(MainLoopBase):
                 main_loop.run()
                 logger.debug("..main_loop.run() exited")
             else:
-                tag = glib.timeout_add(int(timeout * 1000), 
+                tag = glib.timeout_add(int(timeout * 1000),
                                             self._loop_timeout_cb, main_loop)
                 try:
                     logger.debug("Calling main_loop.run()")
@@ -269,7 +269,7 @@ class GLibMainLoop(MainLoopBase):
             (exc_type, exc_value, ext_stack), self.exc_info = (self.exc_info,
                                                                         None)
             raise exc_type, exc_value, ext_stack
-    
+
     def loop_iteration(self, timeout = 1):
         self._stack.append(None)
         try:

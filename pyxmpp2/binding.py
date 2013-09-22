@@ -53,7 +53,7 @@ BIND_RESOURCE_TAG = BIND_QNP + u"resource"
 @payload_element_name(FEATURE_BIND)
 class ResourceBindingPayload(StanzaPayload):
     """Resource binding <iq/> stanza payload.
-    
+
     :Ivariables:
         - `jid`: content of the <jid/> child element
         - `resource`: content of the <resource/> child element
@@ -150,7 +150,7 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
         stanza = Iq(stanza_type = "set")
         payload = ResourceBindingPayload(resource = resource)
         stanza.set_payload(payload)
-        self.stanza_processor.set_response_handlers(stanza, 
+        self.stanza_processor.set_response_handlers(stanza,
                                         self._bind_success, self._bind_error)
         stream.send(stanza)
         stream.event(BindingResourceEvent(resource))

@@ -33,7 +33,7 @@ import hashlib
 from .core import ClientAuthenticator, ServerAuthenticator
 from .core import Failure, Response, Challenge, Success, Failure
 from .core import sasl_mechanism, default_nonce_factory
-        
+
 logger = logging.getLogger("pyxmpp2.sasl.digest_md5")
 
 QUOTE_RE = re.compile(br"(?<!\\)\\(.)")
@@ -200,7 +200,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         - ``"realms"`` - list of acceptable realms (optional)
 
     Authentication properties returned:
-        
+
         - ``"username"`` - user name
         - ``"authzid"`` - authorization id
     """
@@ -249,7 +249,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
             return Failure("bad-challenge")
 
         # workaround for some buggy implementations
-        challenge = challenge.split(b'\x00')[0] 
+        challenge = challenge.split(b'\x00')[0]
 
         if self.response_auth:
             return self._final_challenge(challenge)
@@ -365,7 +365,7 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         try:
             epasswd = self.in_properties["password"].encode(charset)
         except UnicodeError:
-            logger.debug("Couldn't encode password to {0!r}" 
+            logger.debug("Couldn't encode password to {0!r}"
                                                         .format(charset))
             return Failure("incompatible-charset")
         logger.debug("Encoded password: {0!r}".format(epasswd))
@@ -506,7 +506,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         - ``"realm"`` - the realm to use ``"realms"`` is not set (optional)
 
     Authentication properties returned:
-        
+
         - ``"username"`` - user name
         - ``"authzid"`` - authorization id
     """
@@ -573,7 +573,7 @@ class DigestMD5ServerAuthenticator(ServerAuthenticator):
         :return: a challenge, a success indicator or a failure indicator.
         :returntype: `sasl.Challenge`, `sasl.Success` or `sasl.Failure`"""
         # pylint: disable-msg=R0912
-        
+
         # workaround for some SASL implementations
         response = response.split(b'\x00')[0]
 

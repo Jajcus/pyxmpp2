@@ -12,30 +12,30 @@ from pyxmpp2.stanzapayload import XMLPayload
 from pyxmpp2.error import StanzaErrorElement
 
 IQ1 = """
-<iq xmlns="jabber:client" from='source@example.com/res' 
+<iq xmlns="jabber:client" from='source@example.com/res'
                                 to='dest@example.com' type='get' id='1'>
 <payload xmlns="http://pyxmpp.jajcus.net/xmlns/test"><abc/></payload>
 </iq>"""
 
 IQ2 = """
-<iq xmlns="jabber:client" to='source@example.com/res' 
+<iq xmlns="jabber:client" to='source@example.com/res'
                                 from='dest@example.com' type='result' id='1'>
 <payload xmlns="http://pyxmpp.jajcus.net/xmlns/test"><abc/></payload>
 </iq>"""
 
 IQ3 = """
-<iq xmlns="jabber:client" from='source@example.com/res' 
+<iq xmlns="jabber:client" from='source@example.com/res'
                                 to='dest@example.com' type='set' id='2'>
 <payload xmlns="http://pyxmpp.jajcus.net/xmlns/test"><abc/></payload>
 </iq>"""
 
 IQ4 = """
-<iq xmlns="jabber:client" to='source@example.com/res' 
+<iq xmlns="jabber:client" to='source@example.com/res'
                                 from='dest@example.com' type='result' id='2'>
 </iq>"""
 
 IQ5 = """
-<iq xmlns="jabber:client" to='source@example.com/res' 
+<iq xmlns="jabber:client" to='source@example.com/res'
                                 from='dest@example.com' type='error' id='1'>
 <payload xmlns="http://pyxmpp.jajcus.net/xmlns/test"><abc/></payload>
 <error type="modify"><bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>
@@ -50,10 +50,10 @@ class TestIq(unittest.TestCase):
         self.assertEqual(iq.stanza_id, "1")
         payload = iq.get_all_payload()
         self.assertTrue(payload)
-        self.assertEqual(payload[0].xml_element_name, 
+        self.assertEqual(payload[0].xml_element_name,
                             "{http://pyxmpp.jajcus.net/xmlns/test}payload")
         self.assertTrue(len(payload[0].element) > 0)
-        self.assertEqual(payload[0].element[0].tag, 
+        self.assertEqual(payload[0].element[0].tag,
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         self.assertFalse(iq.error)
 
@@ -64,10 +64,10 @@ class TestIq(unittest.TestCase):
         self.assertEqual(iq.stanza_id, "1")
         payload = iq.get_all_payload()
         self.assertTrue(payload)
-        self.assertEqual(payload[0].xml_element_name, 
+        self.assertEqual(payload[0].xml_element_name,
                                 "{http://pyxmpp.jajcus.net/xmlns/test}payload")
         self.assertTrue(len(payload[0].element) > 0)
-        self.assertEqual(payload[0].element[0].tag, 
+        self.assertEqual(payload[0].element[0].tag,
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         self.assertFalse(iq.error)
 
@@ -78,10 +78,10 @@ class TestIq(unittest.TestCase):
         self.assertEqual(iq.stanza_id, "2")
         payload = iq.get_all_payload()
         self.assertTrue(payload)
-        self.assertEqual(payload[0].xml_element_name, 
+        self.assertEqual(payload[0].xml_element_name,
                                 "{http://pyxmpp.jajcus.net/xmlns/test}payload")
         self.assertTrue(len(payload[0].element) > 0)
-        self.assertEqual(payload[0].element[0].tag, 
+        self.assertEqual(payload[0].element[0].tag,
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         self.assertFalse(iq.error)
 
@@ -101,10 +101,10 @@ class TestIq(unittest.TestCase):
         self.assertEqual(iq.stanza_id, "1")
         payload = iq.get_all_payload()
         self.assertTrue(payload)
-        self.assertEqual(payload[0].xml_element_name, 
+        self.assertEqual(payload[0].xml_element_name,
                                 "{http://pyxmpp.jajcus.net/xmlns/test}payload")
         self.assertTrue(len(payload[0].element) > 0)
-        self.assertEqual(payload[0].element[0].tag, 
+        self.assertEqual(payload[0].element[0].tag,
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         error = iq.error
         self.assertIsInstance(error, StanzaErrorElement)
@@ -133,7 +133,7 @@ class TestIq(unittest.TestCase):
                 stanza_id = 1)
         payload = ElementTree.Element(
                                 "{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        ElementTree.SubElement(payload, 
+        ElementTree.SubElement(payload,
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         iq.add_payload(payload)
@@ -148,7 +148,7 @@ class TestIq(unittest.TestCase):
                 stanza_id = 1)
         payload = ElementTree.Element(
                                 "{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        ElementTree.SubElement(payload, 
+        ElementTree.SubElement(payload,
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         iq.add_payload(payload)
@@ -163,7 +163,7 @@ class TestIq(unittest.TestCase):
                 stanza_id = 2)
         payload = ElementTree.Element(
                                 "{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        ElementTree.SubElement(payload, 
+        ElementTree.SubElement(payload,
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         iq.add_payload(payload)

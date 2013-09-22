@@ -92,7 +92,7 @@ SECURE_CLIENT_MECHANISMS = []
 SERVER_MECHANISMS_D = {}
 SERVER_MECHANISMS = []
 SECURE_SERVER_MECHANISMS = []
-        
+
 class PasswordDatabase:
     """Password database interface.
 
@@ -161,7 +161,7 @@ class PasswordDatabase:
         :returntype: `bool`
         """
         logger.debug("check_password{0!r}".format(
-                                            (username, password, properties))) 
+                                            (username, password, properties)))
         pwd, pwd_format = self.get_password(username,
                     (u"plain", u"md5:user:realm:password"), properties)
         if pwd_format == u"plain":
@@ -449,7 +449,7 @@ def _register_client_authenticator(klass, name):
     CLIENT_MECHANISMS_D[name] = klass
     items = sorted(CLIENT_MECHANISMS_D.items(), key = _key_func, reverse = True)
     CLIENT_MECHANISMS[:] = [k for (k, v) in items ]
-    SECURE_CLIENT_MECHANISMS[:] = [k for (k, v) in items 
+    SECURE_CLIENT_MECHANISMS[:] = [k for (k, v) in items
                                                     if v._pyxmpp_sasl_secure]
 
 def _register_server_authenticator(klass, name):
@@ -460,7 +460,7 @@ def _register_server_authenticator(klass, name):
     SERVER_MECHANISMS_D[name] = klass
     items = sorted(SERVER_MECHANISMS_D.items(), key = _key_func, reverse = True)
     SERVER_MECHANISMS[:] = [k for (k, v) in items ]
-    SECURE_SERVER_MECHANISMS[:] = [k for (k, v) in items 
+    SECURE_SERVER_MECHANISMS[:] = [k for (k, v) in items
                                                     if v._pyxmpp_sasl_secure]
 
 def sasl_mechanism(name, secure, preference = 50):

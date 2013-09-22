@@ -43,7 +43,7 @@ class ExternalClientAuthenticator(ClientAuthenticator):
     def start(self, properties):
         self.authzid = properties.get("authzid")
         # TODO: This isn't very XEP-0178'ish.
-        # XEP-0178 says "=" should be sent when only one id-on-xmppAddr is 
+        # XEP-0178 says "=" should be sent when only one id-on-xmppAddr is
         # in the cert, but we don't know that. Still, this conforms to the
         # standard and works.
         if self.authzid:

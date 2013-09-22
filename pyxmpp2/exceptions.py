@@ -149,7 +149,7 @@ class ProtocolError(Error):
     interface. Errors reported to the sender will be logged using
     "pyxmpp2.ProtocolError.reported" channel and the ignored errors using
     "pyxmpp2.ProtocolError.ignored" channel. Both with the "debug" level.
-    
+
     """
 
     logger_reported = logging.getLogger("pyxmpp2.ProtocolError.reported")

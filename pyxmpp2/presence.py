@@ -50,7 +50,7 @@ DENY_RESPONSES = {
 
 class Presence(Stanza):
     """<presence /> stanza.
-    
+
     """
     # pylint: disable-msg=R0902,R0904
     element_name = "presence"
@@ -62,7 +62,7 @@ class Presence(Stanza):
         """Initialize a `Presence` object.
 
         :Parameters:
-            - `element`: XML element 
+            - `element`: XML element
             - `from_jid`: sender JID.
             - `to_jid`: recipient JID.
             - `stanza_type`: staza type: one of: None, "available",
@@ -102,7 +102,7 @@ class Presence(Stanza):
             raise ValueError("Bad presence type")
         elif stanza_type == 'available':
             stanza_type = None
-        
+
         Stanza.__init__(self, element, from_jid = from_jid, to_jid = to_jid,
                         stanza_type = stanza_type, stanza_id = stanza_id,
                         error = error, error_cond = error_cond,
@@ -164,9 +164,9 @@ class Presence(Stanza):
         """Create a deep copy of the stanza.
 
         :returntype: `Presence`"""
-        result = Presence(None, self.from_jid, self.to_jid, 
+        result = Presence(None, self.from_jid, self.to_jid,
                         self.stanza_type, self.stanza_id, self.error,
-                        self._return_path(), 
+                        self._return_path(),
                         self._show, self._status, self._priority)
         if self._payload is None:
             self.decode_payload()
@@ -259,7 +259,7 @@ class Presence(Stanza):
         :return: new presence stanza.
         :returntype: `Presence`
         """
-        
+
         if self.stanza_type == "error":
             raise ValueError("Errors may not be generated in response"
                                                                 " to errors")

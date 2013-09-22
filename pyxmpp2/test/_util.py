@@ -30,7 +30,7 @@ TIMEOUT = 60.0 # seconds
 
 class NetReaderWritter(object):
     """Threaded network reader/writter.
-    
+
     :Ivariables:
         - `sock`: the socket
         - `wdata`: data to be sent
@@ -56,10 +56,10 @@ class NetReaderWritter(object):
 
     def start(self):
         """Start the reader and writter threads."""
-        reader_thread = threading.Thread(target = self.reader_run, 
+        reader_thread = threading.Thread(target = self.reader_run,
                                                             name = "Reader")
         reader_thread.daemon = True
-        writter_thread = threading.Thread(target = self.writter_run, 
+        writter_thread = threading.Thread(target = self.writter_run,
                                                             name = "Writter")
         writter_thread.daemon = True
         reader_thread.start()
@@ -87,7 +87,7 @@ class NetReaderWritter(object):
 
     def starttls(self, *args, **kwargs):
         """Request switching to TLS.
-        
+
         First waits untill all currently buffered data is sent.
 
         :Parameters:
@@ -199,7 +199,7 @@ class NetReaderWritter(object):
 
 class NetworkTestCase(unittest.TestCase):
     """Base class for networking test cases.
-    
+
     :Variables:
         - `can_do_ipv4`: `True` if IPv4 sockets are available
         - `can_do_ipv6`: `True` if IPv6 sockets are available
@@ -262,7 +262,7 @@ class NetworkTestCase(unittest.TestCase):
         self.server = NetReaderWritter(sock, need_accept = True)
         self.server.start()
         return sock.getsockname()
-    
+
     def make_listening_socket(self, ip_version = 4):
         """Create a listening socket on a random (OS-assigned) port
         on the loopback interface."""
@@ -288,7 +288,7 @@ class NetworkTestCase(unittest.TestCase):
     def start_client(self, sockaddr, ip_version = 4):
         """Create the `client` object, starts its threads anc
         connect it to the provided `sockaddr`.
-        
+
         :Return: its socket address"""
         if ip_version == 4:
             if not self.can_do_ipv4:
@@ -311,7 +311,7 @@ class NetworkTestCase(unittest.TestCase):
 class InitiatorSelectTestCase(NetworkTestCase):
     """Base class for XMPP initiator streams tests, using the
     `SelectMainLoop`.
-    
+
     :Ivariables:
         - `stream`: The stream tested (to be created by a test method)
         - `transport`: TCPTransport used by the stream
@@ -364,7 +364,7 @@ class InitiatorSelectTestCase(NetworkTestCase):
     def wait_short(self, timeout = 0.1):
         """Run a single main loop iteration."""
         self.loop.loop_iteration(timeout)
-    
+
 class InitiatorPollTestMixIn(object):
     """Base class for XMPP initiator streams tests, using the
     `PollMainLoop`"""
@@ -421,7 +421,7 @@ class ReceiverSelectTestCase(NetworkTestCase):
         self.addr = None
 
     def start_transport(self, handlers):
-        """Create a listening socket for the tested stream, 
+        """Create a listening socket for the tested stream,
         a transport a main loop and create a client connectiong to the
         socket."""
         sock = self.make_listening_socket()
@@ -488,7 +488,7 @@ class ReceiverThreadedTestMixIn(object):
         self.loop = ThreadPool(XMPPSettings({"upoll_interval": 0.1}), handlers)
 
     def start_transport(self, handlers):
-        """Create a listening socket for the tested stream, 
+        """Create a listening socket for the tested stream,
         a transport a main loop and create a client connectiong to the
         socket."""
         super(ReceiverThreadedTestMixIn, self).start_transport(handlers)
@@ -510,7 +510,7 @@ class ReceiverThreadedTestMixIn(object):
 class EventRecorder(EventHandler):
     """An event handler which records all events received and aborts the main
     loop on the `DisconnectedEvent`.
-    
+
     :Ivariables:
         - `events_received`: events received
     :Types:

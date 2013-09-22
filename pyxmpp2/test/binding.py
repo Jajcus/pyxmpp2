@@ -60,7 +60,7 @@ BIND_PROVIDED_RESPONSE = """<iq type="result" id="{0}">
 
 
 STREAM_TAIL = b'</stream:stream>'
-        
+
 PARSE_ERROR_RESPONSE = (b'<stream:error><xml-not-well-formed'
                     b'  xmlns="urn:ietf:params:xml:ns:xmpp-streams"/>'
                                         b'</stream:error></stream:stream>')
@@ -101,7 +101,7 @@ class TestBindingInitiator(InitiatorSelectTestCase):
         self.assertEqual(event_classes, [ConnectingEvent,
                     ConnectedEvent, StreamConnectedEvent, GotFeaturesEvent,
                     BindingResourceEvent, AuthorizedEvent, DisconnectedEvent])
- 
+
     def test_bind(self):
         handler = AuthorizedEventHandler()
         handlers = [ResourceBindingHandler(), handler]
@@ -128,7 +128,7 @@ class TestBindingInitiator(InitiatorSelectTestCase):
         self.assertEqual(event_classes, [ConnectingEvent,
                     ConnectedEvent, StreamConnectedEvent, GotFeaturesEvent,
                     BindingResourceEvent, AuthorizedEvent, DisconnectedEvent])
-   
+
 class TestBindingReceiver(ReceiverSelectTestCase):
     def test_bind_no_resource(self):
         handler = EventRecorder()
@@ -157,7 +157,7 @@ class TestBindingReceiver(ReceiverSelectTestCase):
         event_classes = [e.__class__ for e in handler.events_received]
         self.assertEqual(event_classes, [AuthenticatedEvent,
                     StreamConnectedEvent, AuthorizedEvent, DisconnectedEvent])
- 
+
     def test_bind_resource(self):
         handler = EventRecorder()
         handlers = [ResourceBindingHandler(), handler]

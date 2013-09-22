@@ -53,7 +53,7 @@ VALID_TUPLES = [
     ((u"jajcus",u"jajcus.net",u"Test"), u"jajcus@jajcus.net/Test"),
     ((u"Jajcus",u"jaJCus.net",u"Test"), u"jajcus@jajcus.net/Test"),
     ((u"Jajcus",u"jaJCus.net",u"test"), u"jajcus@jajcus.net/test"),
-    ((u"jajcuś",u"dżabber.example.com",u"Test"), 
+    ((u"jajcuś",u"dżabber.example.com",u"Test"),
                                         u"jajcuś@dżabber.example.com/Test"),
     ((u"JAJCUŚ",u"DŻABBER.EXAMPLE.COM",u"TEST"),
                                         u"jajcuś@dżabber.example.com/TEST"),
@@ -129,7 +129,7 @@ class TestJID(unittest.TestCase):
 class TestUncachedJID(TestJID):
     def setUp(self):
         # pylint: disable=W0404,W0212
-        import weakref 
+        import weakref
         JID.cache = weakref.WeakValueDictionary()
         self.saved_stringprep_cache_size = xmppstringprep._stringprep_cache_size
         xmppstringprep.set_stringprep_cache_size(0)

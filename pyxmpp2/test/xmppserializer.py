@@ -62,7 +62,7 @@ class TestXMPPSerializer(unittest.TestCase):
 
         # no prefix for stanza child
         self.assertTrue("<sub " in output)
-        
+
         # ...and its same-namespace child
         self.assertTrue("<sub1/" in output or "<sub1 " in output)
 

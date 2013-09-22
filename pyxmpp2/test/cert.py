@@ -43,7 +43,7 @@ def socket_with_cert(cert_path, key_path, cacert_path, server_cert = True):
                 sock.close()
         finally:
             listen_sock.close()
-    thread = threading.Thread(target = thread_func, 
+    thread = threading.Thread(target = thread_func,
                         name = "pyxmpp2.test.cert certificate provider thread")
     thread.daemon = True
     thread.start()
@@ -58,9 +58,9 @@ def socket_with_cert(cert_path, key_path, cacert_path, server_cert = True):
         return ssl.wrap_socket(client_sock, s_key_path, s_cert_path,
                         cert_reqs = ssl.CERT_REQUIRED, server_side = True,
                                                     ca_certs = cacert_path)
-    
+
 class TestCertFunctions(unittest.TestCase):
-    @unittest.skipUnless("lo-network" in _support.RESOURCES, 
+    @unittest.skipUnless("lo-network" in _support.RESOURCES,
                                         "network usage disabled")
     def test_get_certificate_from_ssl_socket(self):
         sock = socket_with_cert("server.pem", "server-key.pem", "ca.pem")
@@ -72,7 +72,7 @@ class TestCertFunctions(unittest.TestCase):
             self.assertIsInstance(cert, BasicCertificateData)
         self.assertTrue(cert.validated)
         self.assertTrue("server.example.org" in cert.common_names)
-    
+
     @unittest.skipUnless(HAVE_PYASN1, "No pyasn1")
     def test_get_server_certificate_from_file(self):
         cert_path = os.path.join(_support.DATA_DIR, "server.pem")
@@ -81,7 +81,7 @@ class TestCertFunctions(unittest.TestCase):
         self.assertIsInstance(cert, ASN1CertificateData)
         self.assertFalse(cert.validated)
         self.assertTrue("server.example.org" in cert.common_names)
- 
+
     @unittest.skipUnless(HAVE_PYASN1, "No pyasn1")
     def test_get_client_certificate_from_file(self):
         cert_path = os.path.join(_support.DATA_DIR, "client.pem")
@@ -160,7 +160,7 @@ class TestBasicCertificateData(unittest.TestCase):
         self.assertIsInstance(cert.not_after, datetime)
         self.assertGreater(cert.not_after, datetime.now())
         self.assertEqual(list(cert.common_names), [u"common-name.example.org"])
-        self.assertEqual(list(cert.alt_names["DNS"]), 
+        self.assertEqual(list(cert.alt_names["DNS"]),
                                 [u"dns1.example.org", u"dns2.example.org",
                                     u"*.wild.example.org"])
         if not isinstance(cert, BasicCertificateData):
@@ -227,7 +227,7 @@ class TestASN1CertificateData(TestBasicCertificateData):
     def load_certificate(name, server_cert = True):
         cert_file = os.path.join(_support.DATA_DIR, name + ".pem")
         return ASN1CertificateData.from_file(cert_file)
- 
+
     def test_verify_server1_srv(self):
         cert = self.load_certificate("server1", True)
         self.assertTrue(cert.verify_server(u"client-srv.example.org"))
@@ -256,7 +256,7 @@ class TestASN1CertificateData(TestBasicCertificateData):
         self.assertEqual(cert.verify_client(domains = ["server.example.org"]),
                                                JID("user@server.example.org"))
         self.assertIsNone(cert.verify_client(domains = ["bad.example.org"]))
-        
+
         cert = self.load_certificate("server", True)
         self.assertIsNone(cert.verify_client())
 
@@ -272,7 +272,7 @@ class TestASN1CertificateData(TestBasicCertificateData):
         self.assertEqual(cert.verify_client(domains = ["server.example.org"]),
                                                JID("user1@server.example.org"))
         self.assertIsNone(cert.verify_client(domains = ["bad.example.org"]))
-        
+
         cert = self.load_certificate("server1", True)
         self.assertIsNone(cert.verify_client())
 

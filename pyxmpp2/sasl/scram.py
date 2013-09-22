@@ -37,7 +37,7 @@ from .core import ClientAuthenticator, ServerAuthenticator
 from .core import Failure, Response, Challenge, Success, Failure
 from .core import sasl_mechanism, default_nonce_factory
 from .saslprep import SASLPREP
-        
+
 logger = logging.getLogger("pyxmpp2.sasl.scram")
 
 HASH_FACTORIES = {
@@ -237,8 +237,8 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
             authzid = b""
         gs2_header = cb_flag + b"," + authzid + b","
         self._gs2_header = gs2_header
-        nonce = b"r=" + c_nonce 
-        client_first_message_bare = (b"n=" + 
+        nonce = b"r=" + c_nonce
+        client_first_message_bare = (b"n=" +
                 self.escape(self.username.encode("utf-8")) + b"," + nonce)
         self._client_first_message_bare = client_first_message_bare
         client_first_message = gs2_header + client_first_message_bare
@@ -313,7 +313,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
 
         # pylint: disable=C0103
         client_final_message_without_proof = (channel_binding + b",r=" + nonce)
-        
+
         client_key = self.HMAC(self._salted_password, b"Client Key")
         stored_key = self.H(client_key)
         auth_message = ( self._client_first_message_bare + b"," +
@@ -356,7 +356,7 @@ class SCRAMClientAuthenticator(SCRAMOperations, ClientAuthenticator):
         if not verifier:
             logger.debug("No verifier value in the final message")
             return Failure("bad-succes")
-        
+
         server_key = self.HMAC(self._salted_password, b"Server Key")
         server_signature = self.HMAC(server_key, self._auth_message)
         if server_signature != a2b_base64(verifier):
@@ -447,7 +447,7 @@ class SCRAMServerAuthenticator(SCRAMOperations, ServerAuthenticator):
         if mext:
             logger.debug("Unsupported extension received: {0!r}".format(mext))
             return Failure("not-authorized")
-        
+
         gs2_header = match.group("gs2_header")
         cb_name = match.group("cb_name")
         if self.channel_binding:
@@ -480,7 +480,7 @@ class SCRAMServerAuthenticator(SCRAMOperations, ServerAuthenticator):
             self.out_properties['authzid'] = None
         username = self.unescape(match.group("username")).decode("utf-8")
         self.out_properties['username'] = username
-        
+
         nonce_factory = self.properties.get("nonce_factory",
                                                         default_nonce_factory)
 
@@ -489,7 +489,7 @@ class SCRAMServerAuthenticator(SCRAMOperations, ServerAuthenticator):
 
         s_pformat = "SCRAM-{0}-SaltedPassword".format(self.hash_function_name)
         k_pformat = "SCRAM-{0}-Keys".format(self.hash_function_name)
-        password, pformat = self.password_database.get_password(username, 
+        password, pformat = self.password_database.get_password(username,
                                            (s_pformat, "plain"), properties)
         if pformat == s_pformat:
             if password is not None:
@@ -530,8 +530,8 @@ class SCRAMServerAuthenticator(SCRAMOperations, ServerAuthenticator):
             s_nonce = standard_b64encode(s_nonce)
         nonce = c_nonce + s_nonce
         server_first_message = (
-                            b"r=" + nonce 
-                            + b",s=" + standard_b64encode(salt) 
+                            b"r=" + nonce
+                            + b",s=" + standard_b64encode(salt)
                             + b",i=" + str(iteration_count).encode("utf-8")
                             )
         self._nonce = nonce
@@ -573,13 +573,13 @@ class SCRAMServerAuthenticator(SCRAMOperations, ServerAuthenticator):
             self.H(client_key)
             logger.debug("Authentication failed (bad username)")
             return Failure("not-authorized")
-            
+
         client_signature = self.HMAC(self._stored_key, auth_message)
         client_key = self.XOR(client_signature, proof)
         if self.H(client_key) != self._stored_key:
             logger.debug("Authentication failed")
             return Failure("not-authorized")
-        
+
         server_signature = self.HMAC(self._server_key, auth_message)
         server_final_message = b"v=" + standard_b64encode(server_signature)
         return Success(self.out_properties, server_final_message)
@@ -597,7 +597,7 @@ class SCRAM_SHA_1_ClientAuthenticator(SCRAMClientAuthenticator):
           list of mechanism supported by the server.
 
     Authentication properties returned:
-        
+
         - ``"username"`` - user name
         - ``"authzid"`` - authorization id
     """
@@ -609,7 +609,7 @@ class SCRAM_SHA_1_ClientAuthenticator(SCRAMClientAuthenticator):
 class SCRAM_SHA_1_PLUS_ClientAuthenticator(SCRAMClientAuthenticator):
     """The SCRAM-SHA-1-PLUS client authenticator.
 
-    Authentication properties used: same as for 
+    Authentication properties used: same as for
     `SCRAM_SHA_1_ClientAuthenticator`, plus:
 
         - ``"channel-binding"`` - channel-binding data, as a dictionary
@@ -617,9 +617,9 @@ class SCRAM_SHA_1_PLUS_ClientAuthenticator(SCRAMClientAuthenticator):
           Channel binding type should be 'tls-unique', as other may be not
           supported by the other side.
 
-    Authentication properties returned: same as for 
+    Authentication properties returned: same as for
     `SCRAM_SHA_1_ClientAuthenticator`
-        
+
     """
     # pylint: disable=C0103
     def __init__(self):
@@ -648,7 +648,7 @@ class SCRAM_SHA_1_ServerAuthenticator(SCRAMServerAuthenticator):
           a plain text password (default: 4096)
 
     Authentication properties returned:
-        
+
         - ``"username"`` - user name
         - ``"authzid"`` - authorization id
 
@@ -662,7 +662,7 @@ class SCRAM_SHA_1_ServerAuthenticator(SCRAMServerAuthenticator):
 class SCRAM_SHA_1_PLUS_ServerAuthenticator(SCRAMServerAuthenticator):
     """The SCRAM-SHA-1-PLUS server authenticator.
 
-    Authentication properties used: same as for 
+    Authentication properties used: same as for
     `SCRAM_SHA_1_ServerAuthenticator`, plus:
 
         - ``"channel-binding"`` - channel-binding data, as a dictionary
@@ -670,9 +670,9 @@ class SCRAM_SHA_1_PLUS_ServerAuthenticator(SCRAMServerAuthenticator):
           Channel binding type should be 'tls-unique', as other may be not
           supported by the other side.
 
-    Authentication properties returned: same as for 
+    Authentication properties returned: same as for
     `SCRAM_SHA_1_ServerAuthenticator`
-     
+
     """
     # pylint: disable=C0103
     def __init__(self, password_database):

@@ -166,7 +166,7 @@ class StreamBase(XMLStreamHandler):
 
     def initiate(self, transport, to = None):
         """Initiate an XMPP connection over the `transport`.
-        
+
         :Parameters:
             - `transport`: an XMPP transport instance
             - `to`: peer name
@@ -206,7 +206,7 @@ class StreamBase(XMLStreamHandler):
 
     def _setup_stream_element_handlers(self):
         """Set up stream element handlers.
-        
+
         Scans the `handlers` list for `StreamFeatureHandler`
         instances and updates `_element_handlers` mapping with their
         methods decorated with @`stream_element_handler`
@@ -238,7 +238,7 @@ class StreamBase(XMLStreamHandler):
 
     def event(self, event): # pylint: disable-msg=R0201
         """Handle a stream event.
-        
+
         Called when connection state is changed.
 
         Should not be called with self.lock acquired!
@@ -264,7 +264,7 @@ class StreamBase(XMLStreamHandler):
 
     def stream_start(self, element):
         """Process <stream:stream> (stream start) tag received from peer.
-        
+
         `lock` is acquired when this method is called.
 
         :Parameters:
@@ -375,7 +375,7 @@ class StreamBase(XMLStreamHandler):
             - `descr`: `unicode`"""
         self.send_stream_error("not-well-formed")
         raise StreamParseError(descr)
- 
+
     def _send_stream_start(self, stream_id = None, stream_to = None):
         """Send stream start tag."""
         if self._output_state in ("open", "closed"):
@@ -393,7 +393,7 @@ class StreamBase(XMLStreamHandler):
             self.stream_id = stream_id
         else:
             self.stream_id = None
-        self.transport.send_stream_head(self.stanza_namespace, 
+        self.transport.send_stream_head(self.stanza_namespace,
                                         stream_from, stream_to,
                                     self.stream_id, language = self.language)
         self._output_state = "open"
@@ -670,7 +670,7 @@ XMPPSettings.add_setting(u"language", type = unicode, default = u"en",
         cmdline_help = u"Preferred language of the XMPP stream",
         doc = u"""The preferred language of the XMPP stream."""
     )
-XMPPSettings.add_setting(u"languages", type = u"list of ``unicode``", 
+XMPPSettings.add_setting(u"languages", type = u"list of ``unicode``",
         validator = XMPPSettings.validate_string_list,
         factory = _languages_factory,
         cmdline_help = u"Accepted languages of the XMPP stream",

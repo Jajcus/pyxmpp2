@@ -30,11 +30,11 @@ logger = logging.getLogger("pyxmpp2.stanzapayload")
 
 class XMLPayload(StanzaPayload):
     """Transparent XML payload for stanza.
-    
+
     This object can be used for any stanza payload.
     It doesn't decode the XML element, but instead keeps it in the ElementTree
     format.
-    
+
     :Ivariables:
         - `xml_element_name`: qualified name of the wrapped element
         - `element`: the wrapped element

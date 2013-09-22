@@ -85,7 +85,7 @@ class SessionHandler(StreamFeatureHandler, XMPPFeatureHandler, EventHandler):
         stanza = Iq(stanza_type = "set")
         payload = XMLPayload(ElementTree.Element(SESSION_TAG))
         stanza.set_payload(payload)
-        self.stanza_processor.set_response_handlers(stanza, 
+        self.stanza_processor.set_response_handlers(stanza,
                                         self._session_success,
                                         self._session_error)
         stream.send(stanza)

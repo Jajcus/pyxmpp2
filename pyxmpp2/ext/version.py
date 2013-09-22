@@ -18,7 +18,7 @@
 
 """Software Version query and advertisement.
 
-To advertise software version in your client or component add 
+To advertise software version in your client or component add
 a `VersionProvider` instance to your payload.
 
 To request a remote entity version information, use the
@@ -55,7 +55,7 @@ OS_TAG = _QNP + "os"
 @payload_element_name(QUERY_TAG)
 class VersionPayload(StanzaPayload):
     """Software version (XEP-0092) stanza payload.
-    
+
     :Ivariables:
         - `name`: software name
         - `version`: software version
@@ -152,7 +152,7 @@ def request_software_version(stanza_processor, target_jid, callback,
     payload = VersionPayload()
     stanza.set_payload(payload)
     def wrapper(stanza):
-        """Wrapper for the user-provided `callback` that extracts the payload 
+        """Wrapper for the user-provided `callback` that extracts the payload
         from stanza received."""
         payload = stanza.get_payload(VersionPayload)
         if payload is None:
@@ -171,7 +171,7 @@ def _os_name_factory(settings):
     # pylint: disable-msg=W0613,W0142
     return u"{0} {1} {2}".format(platform.system(), platform.release(),
                                                         platform.machine())
- 
+
 def _version_factory(settings):
     """Factory for the :r:`software_version setting` default.
     """
@@ -181,7 +181,7 @@ def _version_factory(settings):
         return unicode(pyxmpp2_version)
     else:
         return u"@PyXMPP2/{0}".format(pyxmpp2_version)
-    
+
 XMPPSettings.add_setting("software_name", type = unicode, basic = False,
     default = "PyXMPP2",
     cmdline_help = "Software name for XEP-0092 query.",

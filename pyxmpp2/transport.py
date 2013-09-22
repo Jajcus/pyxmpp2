@@ -55,7 +55,7 @@ from .interfaces import XMPPTransport
 from .cert import get_certificate_from_ssl_socket
 
 # pylint: disable=W0611
-from . import resolver  
+from . import resolver
 
 logger = logging.getLogger("pyxmpp2.transport")
 
@@ -208,11 +208,11 @@ class TCPTransport(XMPPTransport, IOHandler):
     def connect(self, addr, port = None, service = None):
         """Start establishing TCP connection with given address.
 
-        One of: `port` or `service` must be provided and `addr` must be 
+        One of: `port` or `service` must be provided and `addr` must be
         a domain name and not an IP address if `port` is not given.
 
         When `service` is given try an SRV lookup for that service
-        at domain `addr`. If `service` is not given or `addr` is an IP address, 
+        at domain `addr`. If `service` is not given or `addr` is an IP address,
         or the SRV lookup fails, connect to `port` at host `addr` directly.
 
         [initiating entity only]
@@ -269,7 +269,7 @@ class TCPTransport(XMPPTransport, IOHandler):
 
     def _got_srv(self, addrs):
         """Handle SRV lookup result.
-        
+
         :Parameters:
             - `addrs`: properly sorted list of (hostname, port) tuples
         """
@@ -310,7 +310,7 @@ class TCPTransport(XMPPTransport, IOHandler):
 
     def _got_addresses(self, name, port, addrs):
         """Handler DNS address record lookup result.
-        
+
         :Parameters:
             - `name`: the name requested
             - `port`: port number to connect to
@@ -333,8 +333,8 @@ class TCPTransport(XMPPTransport, IOHandler):
     def _start_connect(self):
         """Start connecting to the next address on the `_dst_addrs` list.
 
-        [ called with `lock` acquired ] 
-        
+        [ called with `lock` acquired ]
+
         """
         family, addr = self._dst_addrs.pop(0)
         self._socket = socket.socket(family, socket.SOCK_STREAM)
@@ -457,7 +457,7 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._stream = stream
             self._reader = StreamReader(stream)
 
-    def send_stream_head(self, stanza_namespace, stream_from, stream_to, 
+    def send_stream_head(self, stanza_namespace, stream_from, stream_to,
                         stream_id = None, version = u'1.0', language = None):
         """
         Send stream head via the transport.
@@ -558,14 +558,14 @@ class TCPTransport(XMPPTransport, IOHandler):
             if self._socket is not None:
                 return self._socket.fileno()
         return None
-    
+
     def is_readable(self):
         """
         :Return: `True` when the I/O channel can be read
         """
         return self._socket is not None and not self._eof and (
                     self._state in ("connected", "closing")
-                        or self._state == "tls-handshake" 
+                        or self._state == "tls-handshake"
                                         and self._tls_state == "want_read")
 
     def wait_for_readability(self):
@@ -634,7 +634,7 @@ class TCPTransport(XMPPTransport, IOHandler):
         """Request a TLS handshake on the socket ans switch
         to encrypted output.
         The handshake will start after any currently buffered data is sent.
-        
+
         :Parameters:
             - `kwargs`: arguments for :std:`ssl.wrap_socket`
         """
@@ -644,8 +644,8 @@ class TCPTransport(XMPPTransport, IOHandler):
             self._write_queue_cond.notify()
 
     def getpeercert(self):
-        """Return the peer certificate. 
-        
+        """Return the peer certificate.
+
         :ReturnType: `pyxmpp2.cert.Certificate`
         """
         with self.lock:
@@ -843,7 +843,7 @@ class TCPTransport(XMPPTransport, IOHandler):
     def _feed_reader(self, data):
         """Feed the stream reader with data received.
 
-        [ called with `lock` acquired ] 
+        [ called with `lock` acquired ]
 
         If `data` is None or empty, then stream end (peer disconnected) is
         assumed and the stream is closed.

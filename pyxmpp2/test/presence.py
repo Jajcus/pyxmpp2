@@ -35,10 +35,10 @@ class TestPresence(unittest.TestCase):
         self.assertEqual(pres.priority, 10)
         payload = pres.get_all_payload()
         self.assertTrue(payload)
-        self.assertEqual(payload[0].xml_element_name, 
+        self.assertEqual(payload[0].xml_element_name,
                                 "{http://pyxmpp.jajcus.net/xmlns/test}payload")
         self.assertTrue(len(payload[0].element) > 0)
-        self.assertEqual(payload[0].element[0].tag, 
+        self.assertEqual(payload[0].element[0].tag,
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
 
     def check_presence_empty(self, pres):
@@ -89,7 +89,7 @@ class TestPresence(unittest.TestCase):
                 priority = 10)
         payload = ElementTree.Element(
                                 "{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        ElementTree.SubElement(payload, 
+        ElementTree.SubElement(payload,
                                     "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         pres.add_payload(payload)

@@ -48,7 +48,7 @@ except ImportError:
 
 def is_ipv6_available():
     """Check if IPv6 is available.
-    
+
     :Return: `True` when an IPv6 socket can be created.
     """
     try:
@@ -59,7 +59,7 @@ def is_ipv6_available():
 
 def is_ipv4_available():
     """Check if IPv4 is available.
-    
+
     :Return: `True` when an IPv4 socket can be created.
     """
     try:
@@ -136,7 +136,7 @@ class ThreadedResolverBase(Resolver):
         self.lock = threading.RLock()
         self.max_threads = max_threads
         self.last_thread_n = 0
-        
+
     def _make_resolver(self):
         """Return the blocking resolver implementation that should be
         used by the resolver threads.
@@ -149,7 +149,7 @@ class ThreadedResolverBase(Resolver):
         with self.lock:
             for dummy in self.threads:
                 self.queue.put(None)
-        
+
     def _start_thread(self):
         """Start a new working thread unless the maximum number of threads
         has been reached or the request queue is empty.
@@ -172,7 +172,7 @@ class ThreadedResolverBase(Resolver):
         request = ("resolve_address", (hostname, callback, allow_cname))
         self._start_thread()
         self.queue.put(request)
-    
+
     def resolve_srv(self, domain, service, protocol, callback):
         request = ("resolve_srv", (domain, service, protocol, callback))
         self._start_thread()
@@ -200,7 +200,7 @@ class ThreadedResolverBase(Resolver):
 
 class DumbBlockingResolver(Resolver):
     """Simple blocking resolver using only the standard Python library.
-    
+
     This doesn't support SRV lookups!
 
     `resolve_srv` will raise NotImplementedError
@@ -269,7 +269,7 @@ if HAVE_DNSPYTHON:
     class BlockingResolver(Resolver):
         """Blocking resolver using the DNSPython package.
 
-        Both `resolve_srv` and `resolve_address` will block until the 
+        Both `resolve_srv` and `resolve_address` will block until the
         lookup completes or fail and then call the callback immediately.
         """
         def __init__(self, settings =  None):
@@ -277,7 +277,7 @@ if HAVE_DNSPYTHON:
                 self.settings = settings
             else:
                 self.settings = XMPPSettings()
-            
+
         def resolve_srv(self, domain, service, protocol, callback):
             """Start looking up an SRV record for `service` at `domain`.
 
@@ -379,7 +379,7 @@ if HAVE_DNSPYTHON:
         """Threaded resolver implementation using the DNSPython
         :dns:`dns.resolver` module.
         """
-        def _make_resolver(self):    
+        def _make_resolver(self):
             return BlockingResolver(self.settings)
 
     _DEFAULT_RESOLVER = BlockingResolver
@@ -387,7 +387,7 @@ else:
     _DEFAULT_RESOLVER = DumbBlockingResolver
 
 XMPPSettings.add_setting(u"dns_resolver", type = Resolver,
-        factory = _DEFAULT_RESOLVER, 
+        factory = _DEFAULT_RESOLVER,
         default_d = "A `{0}` instance".format(_DEFAULT_RESOLVER.__name__),
         doc = u"""The DNS resolver implementation to be used by PyXMPP."""
     )

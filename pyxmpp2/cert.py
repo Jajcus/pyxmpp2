@@ -78,10 +78,10 @@ class CertificateData(object):
         result = []
         if ("XmppAddr" in self.alt_names or "DNS" in self.alt_names
                                             or "SRVName" in self.alt_names):
-            addrs =  self.alt_names.get("XmppAddr", []) 
+            addrs =  self.alt_names.get("XmppAddr", [])
             addrs += [ addr for addr in self.alt_names.get("DNS", [])
                                             if not addr.startswith("*.") ]
-            addrs += [ addr.split(".", 1)[1] for addr 
+            addrs += [ addr.split(".", 1)[1] for addr
                                         in self.alt_names.get("SRVName", [])
                             if (addr.startswith("_xmpp-server.")
                                     or addr.startswith("_xmpp-client."))]
@@ -223,7 +223,7 @@ class CertificateData(object):
             - `domains`: `list` of `unicode`
 
         :Return: one of the jids in the certificate or `None` is no authorized
-        name is found. 
+        name is found.
         """
         jids = [jid for jid in self.get_jids() if jid.local]
         if not jids:

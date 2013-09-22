@@ -47,7 +47,7 @@ STARTTLS_TAG = TLS_QNP + u"starttls"
 REQUIRED_TAG = TLS_QNP + u"required"
 PROCEED_TAG = TLS_QNP + u"proceed"
 FAILURE_TAG = TLS_QNP + u"failure"
-        
+
 logger = logging.getLogger("pyxmpp2.streamtls")
 
 class StreamTLSHandler(StreamFeatureHandler, EventHandler):
@@ -117,7 +117,7 @@ class StreamTLSHandler(StreamFeatureHandler, EventHandler):
         if stream.tls_established:
             logger.warning("StartTLS offerred when already established")
             return StreamFeatureNotHandled("StartTLS", mandatory = required)
-            
+
         if self.settings["starttls"]:
             logger.debug("StartTLS negotiated")
             self._request_tls()
@@ -133,7 +133,7 @@ class StreamTLSHandler(StreamFeatureHandler, EventHandler):
         self.requested = True
         element = ElementTree.Element(STARTTLS_TAG)
         self.stream.write_element(element)
-    
+
     @stream_element_handler(FAILURE_TAG, "initiator")
     def _process_tls_failure(self, stream, element):
         """Handle the <failure /> element.
@@ -270,7 +270,7 @@ XMPPSettings.add_setting(u"tls_verify_callback", type = "callable",
         default = StreamTLSHandler.is_certificate_valid,
         doc = u"""A function to verify if a certificate is valid and if the
 remote party presenting this certificate is authorized to use the stream.
-The function must accept two arguments: a stream and the certificate 
+The function must accept two arguments: a stream and the certificate
 to verify."""
     )
 

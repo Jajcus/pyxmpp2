@@ -49,7 +49,7 @@ class Stanza(object):
         - `_namespace`: namespace of this stanza element
         - `_return_path`: weak reference to the return route object
     :Types:
-        - `_payload`: `list` of (`unicode`, `StanzaPayload`) 
+        - `_payload`: `list` of (`unicode`, `StanzaPayload`)
         - `_error`: `pyxmpp2.error.StanzaErrorElement`
         - `_namespace`: `unicode`
         - `_return_path`: weakref to `StanzaRoute`
@@ -59,7 +59,7 @@ class Stanza(object):
     def __init__(self, element, from_jid = None, to_jid = None,
                             stanza_type = None, stanza_id = None,
                             error = None, error_cond = None,
-                            return_path = None, language = None): 
+                            return_path = None, language = None):
         """Initialize a Stanza object.
 
         :Parameters:
@@ -140,7 +140,7 @@ class Stanza(object):
 
         if return_path is not None:
             self._return_path = weakref.ref(return_path)
-    
+
     def _decode_attributes(self):
         """Decode attributes of the stanza XML element
         and put them into the stanza properties."""
@@ -173,7 +173,7 @@ class Stanza(object):
         """Create a deep copy of the stanza.
 
         :returntype: `Stanza`"""
-        result = Stanza(self.element_name, self.from_jid, self.to_jid, 
+        result = Stanza(self.element_name, self.from_jid, self.to_jid,
                         self.stanza_type, self.stanza_id, self.error,
                         self._return_path())
         if self._payload is None:
@@ -221,8 +221,8 @@ class Stanza(object):
         """Return the XML stanza representation.
 
         This returns the original or cached XML representation, which
-        may be much more efficient than `as_xml`. 
-        
+        may be much more efficient than `as_xml`.
+
         Result of this function should never be modified.
 
         :returntype: :etree:`ElementTree.Element`"""
@@ -239,7 +239,7 @@ class Stanza(object):
         Iterates over stanza children and creates StanzaPayload objects for
         them. Called automatically by `get_payload()` and other methods that
         access the payload.
-        
+
         For the `Stanza` class stanza namespace child elements will also be
         included as the payload. For subclasses these are no considered
         payload."""
@@ -342,14 +342,14 @@ class Stanza(object):
     def mark_dirty(self):
         """Mark the stanza 'dirty' so the XML representation will be
         re-built the next time it is requested.
-        
+
         This should be called each time the payload attached to the stanza is
         modifed."""
         self._dirty = True
 
     def set_payload(self, payload):
-        """Set stanza payload to a single item. 
-        
+        """Set stanza payload to a single item.
+
         All current stanza content of will be dropped.
         Marks the stanza dirty.
 
@@ -368,7 +368,7 @@ class Stanza(object):
 
     def add_payload(self, payload):
         """Add new the stanza payload.
-        
+
         Marks the stanza dirty.
 
         :Parameters:
@@ -394,7 +394,7 @@ class Stanza(object):
               `StanzaPayload` classes whenever possible, otherwise the
               representation already available will be used (often
               `XMLPayload`)
-       
+
         :Returntype: `list` of `StanzaPayload`
         """
         if self._payload is None:
@@ -414,7 +414,7 @@ class Stanza(object):
         """Get the first payload item matching the given class
         and optional key.
 
-        Payloads may be addressed using a specific payload class or 
+        Payloads may be addressed using a specific payload class or
         via the generic `XMLPayload` element, though the `XMLPayload`
         representation is available only as long as the element is not
         requested by a more specific type.
@@ -432,7 +432,7 @@ class Stanza(object):
         :Types:
             - `payload_class`: `StanzaPayload`
             - `specialize`: `bool`
-      
+
         :Return: payload element found or `None`
         :Returntype: `StanzaPayload`
         """

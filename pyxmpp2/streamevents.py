@@ -33,9 +33,9 @@ class AuthenticatedEvent(StreamEvent):
     """Event raised after stream authentication is complete.
     Usually it happens after SASL authentication and before XMPP resource
     binding.
-    
+
     Default action: none
-    
+
     :Ivariables:
         - `authenticated_jid`: JID (bare) just authenticated
     :Types:
@@ -50,9 +50,9 @@ class AuthenticatedEvent(StreamEvent):
 class AuthorizedEvent(StreamEvent):
     """Event raised after stream authentication and authorization is complete.
     Usually it happens after SASL authentication and XMPP resource binding.
-    
+
     Default action: none
-    
+
     :Ivariables:
         - `authorized_jid`: JID just authorized to use the stream
     :Types:
@@ -67,7 +67,7 @@ class BindingResourceEvent(StreamEvent):
     """Emitted when resource binding is initiated for the stream.
 
     Probably useful only for connection progres monitoring.
-    
+
     :Ivariables:
         - `resource`: the resource
     :Types:
@@ -84,7 +84,7 @@ class BindingResourceEvent(StreamEvent):
 class ConnectedEvent(StreamEvent):
     """Emitted after the stream socket is connected, just before the actual
     XMPP exchange happens.
-    
+
     :Ivariables:
         - `sockaddr`: remote IP address and port
     :Types:
@@ -104,7 +104,7 @@ class ConnectingEvent(StreamEvent):
     single stream connection - several addresses may be tried until one answers.
 
     Probably useful only for connection progres monitoring.
-    
+
     :Ivariables:
         - `sockaddr`: remote IP address and port
     :Types:
@@ -121,7 +121,7 @@ class ConnectingEvent(StreamEvent):
 
 class ConnectionAcceptedEvent(StreamEvent):
     """Emitted when a new TCP connection is accepted.
-    
+
     :Ivariables:
         - `sockaddr`: remote IP address and port
     :Types:
@@ -137,9 +137,9 @@ class ConnectionAcceptedEvent(StreamEvent):
             return u"Connection received from {0}:{1}".format(ipaddr, port)
 
 class DisconnectedEvent(StreamEvent):
-    """Emitted when the stream is disconnected. No more stanzas will 
+    """Emitted when the stream is disconnected. No more stanzas will
     be received and no more stanzas can be sent via this stream.
-    
+
     :Ivariables:
         - `peer`: peer name
     :Types:
@@ -155,18 +155,18 @@ class GotFeaturesEvent(StreamEvent):
 
     Default action (skipped if the handler returns `True`) may be, depending
     on the features available, one of:
-      
+
     - StartTLS initiation
     - SASL authentication
     - Resource binding
-    
+
     :Ivariables:
         - `features`: the <stream:features/> element
     :Types:
         - `features`: :etree:`ElementTree.Element`
     """
     def __init__(self, features):
-        self.features = features 
+        self.features = features
     def __unicode__(self):
         return u"Got stream features"
 
@@ -176,7 +176,7 @@ class ResolvingAddressEvent(StreamEvent):
     for a hostname.
 
     Probably useful only for connection progres monitoring.
-    
+
     :Ivariables:
         - `hostname`: host name
     :Types:
@@ -191,7 +191,7 @@ class ResolvingSRVEvent(StreamEvent):
     """Emitted when staring to resolve an SRV DNS record for a domain.
 
     Probably useful only for connection progres monitoring.
-    
+
     :Ivariables:
         - `domain`: domain name
         - `service`: service name
@@ -209,7 +209,7 @@ class ResolvingSRVEvent(StreamEvent):
 class StreamConnectedEvent(StreamEvent):
     """Emitted when the initial stream handshake (<stream:stream> tag exchange)
     is completed, before any authentication.
-    
+
     :Ivariables:
         - `peer`: peer name
     :Types:
@@ -230,7 +230,7 @@ class TLSConnectingEvent(StreamEvent):
 
 class TLSConnectedEvent(StreamEvent):
     """Emitted when the TLS layer has been established.
-    
+
     :Ivariables:
         - `cipher`: a three-value tuple containing the name of the cipher being
           used, the version of the SSL protocol that defines its use, and the
@@ -254,7 +254,7 @@ class TLSConnectedEvent(StreamEvent):
 class StreamRestartedEvent(StreamEvent):
     """Emitted after stream is restarted (<stream:stream> tag exchange)
     e.g. after SASL.
-    
+
     :Ivariables:
         - `peer`: peer name
     :Types:

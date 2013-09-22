@@ -50,7 +50,7 @@ class Message(Stanza):
               "error", "groupchat"
             - `stanza_id`: stanza id -- value of stanza's "id" attribute. If
               not given, then unique for the session value is generated.
-            - `error_cond`: error condition name. Ignored if `stanza_type` 
+            - `error_cond`: error condition name. Ignored if `stanza_type`
               is not "error".
             - `language`: default language for the stanza content
             - `subject`: message subject,
@@ -133,7 +133,7 @@ class Message(Stanza):
         """Create a deep copy of the stanza.
 
         :returntype: `Message`"""
-        result = Message(None, self.from_jid, self.to_jid, 
+        result = Message(None, self.from_jid, self.to_jid,
                         self.stanza_type, self.stanza_id, self.error,
                         self._return_path(), self._subject, self._body,
                                                             self._thread)
@@ -195,7 +195,7 @@ class Message(Stanza):
             raise ValueError("Errors may not be generated in response"
                                                                 " to errors")
 
-        msg = Message(stanza_type = "error", from_jid = self.to_jid, 
+        msg = Message(stanza_type = "error", from_jid = self.to_jid,
                         to_jid = self.from_jid, stanza_id = self.stanza_id,
                         error_cond = cond,
                         subject = self._subject, body = self._body,

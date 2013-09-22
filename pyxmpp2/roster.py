@@ -18,11 +18,11 @@
 """XMPP-IM roster handling.
 
 This module provides a `Roster` class representing the roster (XMPP contact
-list), a `RosterClient` class for requesting the roster and manipulating 
+list), a `RosterClient` class for requesting the roster and manipulating
 the roster on server and related clases (`RosterItem`, `RosterPayload`).
 
 The roster contains JIDs of the contacts, their display names, names of the
-groups they belong to and presence subscription information. 
+groups they belong to and presence subscription information.
 
 The interface provided by this module can be used to add  and remove items
 in the roster and to change the name and group infromation of the items,
@@ -66,7 +66,7 @@ FEATURE_APPROVALS = "{urn:xmpp:features:pre-approval}sub"
 
 class RosterReceivedEvent(Event):
     """Event emitted when roster is received from server.
-    
+
     :Ivariables:
         - `roster_client`: roster client object that emitted this event
         - `roster`: the roster received
@@ -84,7 +84,7 @@ class RosterReceivedEvent(Event):
 
 class RosterUpdatedEvent(Event):
     """Event emitted when roster update is received.
-    
+
     :Ivariables:
         - `roster_client`: roster client object that emitted this event
         - `item`: the update received
@@ -103,7 +103,7 @@ class RosterUpdatedEvent(Event):
 
 class RosterNotReceivedEvent(Event):
     """Event emitted when a roster request fails.
-    
+
     :Ivariables:
         - `roster_client`: roster client object that emitted this event
         - `stanza`: the invalid or error stanza received, `None` in case of
@@ -115,7 +115,7 @@ class RosterNotReceivedEvent(Event):
     # pylint: disable=R0903
     def __init__(self, roster_client, stanza):
         self.roster_client = roster_client
-        self.stanza = stanza 
+        self.stanza = stanza
 
     def __unicode__(self):
         if self.stanza is None:
@@ -161,7 +161,7 @@ class RosterItem(object):
             - `jid`: entry jid
             - `name`: item visible name
             - `groups`: iterable of groups the item is member of
-            - `subscription`: subscription type (None, "to", "from", "both" 
+            - `subscription`: subscription type (None, "to", "from", "both"
                                                                     or "remove")
             - `ask`: "subscribe" if there was unreplied subscription request
               sent
@@ -196,7 +196,7 @@ class RosterItem(object):
             - `element`: the XML element
         :Types:
             - `element`: :etree:`ElementTree.Element`
-        
+
         :return: a freshly created roster item
         :returntype: `cls`
         """
@@ -374,8 +374,8 @@ class RosterItem(object):
 @payload_element_name(QUERY_TAG)
 class RosterPayload(StanzaPayload, Sequence):
     """<query/> element carried via a roster Iq stanza.
-    
-    Can contain a single item or whole roster with optional version 
+
+    Can contain a single item or whole roster with optional version
     information.
 
     len(), "in" and [] work like for a sequence of roster items.
@@ -410,7 +410,7 @@ class RosterPayload(StanzaPayload, Sequence):
             - `element`: the XML element
         :Types:
             - `element`: :etree:`ElementTree.Element`
-        
+
         :return: a freshly created roster payload
         :returntype: `cls`
         """
@@ -444,13 +444,13 @@ class RosterPayload(StanzaPayload, Sequence):
         for item in self._items:
             item.as_xml(element)
         return element
-    
+
     def __iter__(self):
         return iter(self._items)
 
     def __len__(self):
         return len(self._items)
-    
+
     def __getitem__(self, index):
         return self._items[index]
 
@@ -465,7 +465,7 @@ class RosterPayload(StanzaPayload, Sequence):
 
     def items(self):
         """Return the roster items.
-        
+
         :Returntype: iterable of `RosterType`
         """
         return self._items
@@ -474,7 +474,7 @@ class Roster(RosterPayload, Mapping):
     """Represents the XMPP roster (contact list).
 
     Works like an ordered JID->RosterItem dictionary with a few exceptions:
-        
+
         - the `items()` method returns roster items (values), not JIDs (keys)
         - for [] or get() a JID or a numeric index can be used
 
@@ -521,14 +521,14 @@ class Roster(RosterPayload, Mapping):
 
     def keys(self):
         """Return the JIDs in the roster.
-        
+
         :Returntype: iterable of `JID`
         """
         return self._jids.keys()
 
     def values(self):
         """Return the roster items.
-        
+
         :Returntype: iterable of `RosterType`
         """
         return self._items
@@ -584,7 +584,7 @@ class Roster(RosterPayload, Mapping):
         :Types:
             - `name`: `unicode`
             - `case_sensitive`: `bool`
-        
+
         :Returntype: `list` of `RosterItem`
         """
         result = []
@@ -598,7 +598,7 @@ class Roster(RosterPayload, Mapping):
         for item in self._items:
             if group in item.groups:
                 result.append(item)
-            elif not case_sensitive and group in [g.lower() for g 
+            elif not case_sensitive and group in [g.lower() for g
                                                             in item.groups]:
                 result.append(item)
         return result
@@ -765,7 +765,7 @@ class RosterClient(XMPPFeatureHandler, EventHandler):
         processor = self.stanza_processor
         request = Iq(stanza_type = "get")
         request.set_payload(RosterPayload(version = version))
-        processor.set_response_handlers(request, 
+        processor.set_response_handlers(request,
                                     self._get_success, self._get_error)
         processor.send(request)
 
@@ -925,7 +925,7 @@ class RosterClient(XMPPFeatureHandler, EventHandler):
             else:
                 logger.error("Roster change of '{0}' failed".format(item.jid))
         processor = self.stanza_processor
-        processor.set_response_handlers(stanza, 
+        processor.set_response_handlers(stanza,
                                     success_cb, error_cb)
         processor.send(stanza)
 

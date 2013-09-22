@@ -5,7 +5,7 @@
 import unittest
 
 from pyxmpp2.exceptions import StringprepError
-from pyxmpp2.sasl.saslprep import SASLPREP        
+from pyxmpp2.sasl.saslprep import SASLPREP
 
 class TestSASLprep(unittest.TestCase):
     # pylint: disable=R0903

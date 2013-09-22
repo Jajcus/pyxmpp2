@@ -96,7 +96,7 @@ class XMPPTransport:
     """Abstract base class for XMPP transport implementations."""
     # pylint: disable-msg=R0922,W0232
     __metaclass__ = ABCMeta
-    
+
     @abstractmethod
     def set_target(self, stream):
         """Make the `stream` the target for this transport instance.
@@ -134,11 +134,11 @@ class XMPPTransport:
         """
         # pylint: disable-msg=R0913
         pass
-    
+
     @abstractmethod
     def restart(self):
         """Restart the stream after SASL or StartTLS handshake.
-        
+
         For the initiator a new call to `send_stream_head` is required too."""
         pass
 
@@ -214,7 +214,7 @@ class XMPPFeatureHandler:
     stanza_processor = None
 
 def feature_uri(uri):
-    """Decorating attaching a feature URI (for Service Discovery or Capability 
+    """Decorating attaching a feature URI (for Service Discovery or Capability
     to a XMPPFeatureHandler class."""
     def decorator(class_):
         """Returns a decorated class"""
@@ -227,7 +227,7 @@ def feature_uri(uri):
 def _iq_handler(iq_type, payload_class, payload_key, usage_restriction):
     """Method decorator generator for decorating <iq type='get'/> stanza
     handler methods in `XMPPFeatureHandler` subclasses.
-    
+
     :Parameters:
         - `payload_class`: payload class expected
         - `payload_key`: payload class specific filtering key
@@ -247,11 +247,11 @@ def _iq_handler(iq_type, payload_class, payload_key, usage_restriction):
     return decorator
 
 
-def iq_get_stanza_handler(payload_class, payload_key = None, 
+def iq_get_stanza_handler(payload_class, payload_key = None,
                                             usage_restriction = "post-auth"):
     """Method decorator generator for decorating <iq type='get'/> stanza
     handler methods in `XMPPFeatureHandler` subclasses.
-    
+
     :Parameters:
         - `payload_class`: payload class expected
         - `payload_key`: payload class specific filtering key
@@ -263,11 +263,11 @@ def iq_get_stanza_handler(payload_class, payload_key = None,
     """
     return _iq_handler("get", payload_class, payload_key, usage_restriction)
 
-def iq_set_stanza_handler(payload_class, payload_key = None, 
+def iq_set_stanza_handler(payload_class, payload_key = None,
                                             usage_restriction = "post-auth"):
     """Method decorator generator for decorating <iq type='set'/> stanza
     handler methods in `XMPPFeatureHandler` subclasses.
-    
+
     :Parameters:
         - `payload_class`: payload class expected
         - `payload_key`: payload class specific filtering key
@@ -283,7 +283,7 @@ def _stanza_handler(element_name, stanza_type, payload_class, payload_key,
                                                             usage_restriction):
     """Method decorator generator for decorating <message/> or <presence/>
     stanza handler methods in `XMPPFeatureHandler` subclasses.
-    
+
     :Parameters:
         - `element_name`: "message" or "presence"
         - `stanza_type`: expected value of the 'type' attribute of the stanza
@@ -308,9 +308,9 @@ def _stanza_handler(element_name, stanza_type, payload_class, payload_key,
 
 def message_stanza_handler(stanza_type = None, payload_class = None,
                         payload_key = None, usage_restriction = "post-auth"):
-    """Method decorator generator for decorating <message/> 
+    """Method decorator generator for decorating <message/>
     stanza handler methods in `XMPPFeatureHandler` subclasses.
-    
+
     :Parameters:
         - `payload_class`: payload class expected
         - `stanza_type`: expected value of the 'type' attribute of the stanza.
@@ -327,12 +327,12 @@ def message_stanza_handler(stanza_type = None, payload_class = None,
         stanza_type = "normal"
     return _stanza_handler("message", stanza_type, payload_class, payload_key,
                                                             usage_restriction)
- 
+
 def presence_stanza_handler(stanza_type = None, payload_class = None,
                         payload_key = None, usage_restriction = "post-auth"):
-    """Method decorator generator for decorating <presence/> 
+    """Method decorator generator for decorating <presence/>
     stanza handler methods in `XMPPFeatureHandler` subclasses.
-    
+
     :Parameters:
         - `payload_class`: payload class expected
         - `stanza_type`: expected value of the 'type' attribute of the stanza.
@@ -391,7 +391,7 @@ class StanzaPayload:
 def payload_element_name(element_name):
     """Class decorator generator for decorationg
     `StanzaPayload` subclasses.
-    
+
     :Parameters:
         - `element_name`: XML element qname handled by the class
     :Types:
@@ -473,7 +473,7 @@ class StreamFeatureHandler:
             - `stream`: `StreamBase`
             - `features`: :etree:`ElementTree.Element`
 
-        :Return: 
+        :Return:
             - `StreamFeatureHandled` instance if a feature was recognized and
               handled
             - `StreamFeatureNotHandled` instance if a feature was recognized
@@ -501,7 +501,7 @@ class StreamFeatureHandler:
 def stream_element_handler(element_name, usage_restriction = None):
     """Method decorator generator for decorating stream element
     handler methods in `StreamFeatureHandler` subclasses.
-    
+
     :Parameters:
         - `element_name`: stream element QName
         - `usage_restriction`: optional usage restriction: "initiator" or

@@ -47,9 +47,9 @@ class XMPPSerializer(object):
     """Implementation of the XMPP serializer.
 
     Single instance of this class should be used for a single stream and never
-    reused. It will keep track of prefixes declared on the root element and 
+    reused. It will keep track of prefixes declared on the root element and
     used later.
-    
+
     :Ivariables:
         - `stanza_namespace`: the default namespace of the stream
         - `_prefixes`: mapping (prefix -> uri) of known namespace prefixes
@@ -103,7 +103,7 @@ class XMPPSerializer(object):
             raise ValueError, "Cannot change 'xml' prefix meaning"
         self._prefixes[namespace] = prefix
 
-    def emit_head(self, stream_from, stream_to, stream_id = None, 
+    def emit_head(self, stream_from, stream_to, stream_id = None,
                                             version = u'1.0', language = None):
         """Return the opening tag of the stream root element.
 
@@ -162,7 +162,7 @@ class XMPPSerializer(object):
         :Types:
             - `name`: `unicode`
             - `is_element`: `bool`
-        
+
         :Return: namespace URI, local name
         :returntype: `unicode`, `unicode`"""
         if name.startswith(u"{"):
@@ -178,7 +178,7 @@ class XMPPSerializer(object):
     def _make_prefix(self, declared_prefixes):
         """Make up a new namespace prefix, which won't conflict
         with `_prefixes` and prefixes declared in the current scope.
-        
+
         :Parameters:
             - `declared_prefixes`: namespace to prefix mapping for the current
               scope
@@ -188,7 +188,7 @@ class XMPPSerializer(object):
         :Returns: a new prefix
         :Returntype: `unicode`
         """
-        used_prefixes = set(self._prefixes.values()) 
+        used_prefixes = set(self._prefixes.values())
         used_prefixes |= set(declared_prefixes.values())
         while True:
             prefix = u"ns{0}".format(self._next_id)
@@ -199,18 +199,18 @@ class XMPPSerializer(object):
 
     def _make_prefixed(self, name, is_element, declared_prefixes, declarations):
         """Return namespace-prefixed tag or attribute name.
-        
+
         Add appropriate declaration to `declarations` when neccessary.
 
         If no prefix for an element namespace is defined, make the elements
         namespace default (no prefix). For attributes, make up a prefix in such
         case.
-        
+
         :Parameters:
             - `name`: QName ('{namespace-uri}local-name')
               to convert
             - `is_element`: `True` for element, `False` for an attribute
-            - `declared_prefixes`: mapping of prefixes already declared 
+            - `declared_prefixes`: mapping of prefixes already declared
               at this scope
             - `declarations`: XMLNS declarations on the current element.
         :Types:
@@ -300,7 +300,7 @@ class XMPPSerializer(object):
                                                                 declarations)
             start_tag += u' {0}={1}'.format(prefixed, quoteattr(value))
 
-        declarations = self._make_ns_declarations(declarations, 
+        declarations = self._make_ns_declarations(declarations,
                                                         declared_prefixes)
         if declarations:
             start_tag += u" " + declarations
@@ -339,7 +339,7 @@ class XMPPSerializer(object):
         """
         if not self._head_emitted:
             raise RuntimeError(".emit_head() must be called first.")
-        string = self._emit_element(element, level = 1, 
+        string = self._emit_element(element, level = 1,
                                     declared_prefixes = self._root_prefixes)
         return remove_evil_characters(string)
 

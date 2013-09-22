@@ -100,8 +100,8 @@ class IOHandler:
     @abstractmethod
     def prepare(self):
         """
-        Prepare the I/O handler for the event loop or an event loop 
-        iteration. 
+        Prepare the I/O handler for the event loop or an event loop
+        iteration.
 
         :Return: `HandlerReady()` if there is no need to call `prepare` again
             or `PrepareAgain()` otherwise.
@@ -194,7 +194,7 @@ def event_handler(event_class = None):
           should be called (use with care)
         - `QUIT`: to quit the main loop. Other handlers still will be called
           for current event and nother events in the queue.
-    
+
     :Parameters:
         - `event_class`: event class expected
     :Types:
@@ -213,9 +213,9 @@ class TimeoutHandler:
 
 def timeout_handler(interval, recurring = None):
     """Method decorator generator for decorating event handlers.
-    
+
     To be used on `TimeoutHandler` subclass methods only.
-    
+
     :Parameters:
         - `interval`: interval (in seconds) before the method will be called.
         - `recurring`: When `True`, the handler will be called each `interval`
@@ -260,7 +260,7 @@ class MainLoop:
             - `handler`: `IOHandler` or `EventHandler` or `TimeoutHandler`
         """
         pass
-    
+
     def delayed_call(self, delay, function):
         """Schedule function to be called from the main loop after `delay`
         seconds.
@@ -306,7 +306,7 @@ class MainLoop:
     @abstractmethod
     def loop(self, timeout = None):
         """Run the loop.
-        
+
         :Parameters:
             - `timeout`: time to loop, if not given the method will run
               until `finished`
@@ -323,7 +323,7 @@ class MainLoop:
             - `timeout`: maximum time (in seconds) to block for
         :Types:
             - `timeout`: `float`
-        
+
         """
         pass
 

@@ -93,7 +93,7 @@ class EventDispatcher(object):
 
     def remove_handler(self, handler):
         """Remove a handler object.
-        
+
         :Parameters:
             - `handler`: the object to remove
         """
@@ -189,7 +189,7 @@ class EventDispatcher(object):
 
 def _event_queue_factory(settings):
     """Create the default event queue object.
-    
+
     Use the :r:`event_queue_max_size setting` for the maximum queue size.
     """
     return Queue.Queue(settings["event_queue_max_size"])

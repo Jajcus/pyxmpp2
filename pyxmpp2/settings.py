@@ -64,12 +64,12 @@ class _SettingDefinition(object):
 
 class XMPPSettings(MutableMapping):
     """Container for various parameters used all over PyXMPP.
-    
+
     It can be used like a regular dictionary, but will provide reasonable
     defaults for PyXMPP for parameters which are not explicitely set.
 
     All known PyXMPP settings are included in the :r:`settings list`.
-    
+
     :CVariables:
         - `_defaults`: defaults for registered parameters.
         - `_defaults_factories`: factory functions providing default values
@@ -99,7 +99,7 @@ class XMPPSettings(MutableMapping):
             return self[key]
     def __contains__(self, key):
         """Check if a parameter is set.
-        
+
         :Parameters:
             - `key`: the parameter name
         :Types:
@@ -109,7 +109,7 @@ class XMPPSettings(MutableMapping):
     def __getitem__(self, key):
         """Get a parameter value. Return the default if no value is set
         and the default is provided by PyXMPP.
-        
+
         :Parameters:
             - `key`: the parameter name
         :Types:
@@ -118,7 +118,7 @@ class XMPPSettings(MutableMapping):
         return self.get(key, required = True)
     def __setitem__(self, key, value):
         """Set a parameter value.
-        
+
         :Parameters:
             - `key`: the parameter name
             - `value`: the new value
@@ -128,7 +128,7 @@ class XMPPSettings(MutableMapping):
         self._settings[unicode(key)] = value
     def __delitem__(self, key):
         """Unset a parameter value.
-        
+
         :Parameters:
             - `key`: the parameter name
         :Types:
@@ -137,7 +137,7 @@ class XMPPSettings(MutableMapping):
         del self._settings[key]
     def get(self, key, local_default = None, required = False):
         """Get a parameter value.
-        
+
         If parameter is not set, return `local_default` if it is not `None`
         or the PyXMPP global default otherwise.
 
@@ -166,13 +166,13 @@ class XMPPSettings(MutableMapping):
         return local_default
     def keys(self):
         """Return names of parameters set.
-        
+
         :Returntype: - `list` of `unicode`
         """
         return self._settings.keys()
     def items(self):
         """Return names and values of parameters set.
-        
+
         :Returntype: - `list` of tuples
         """
         return self._settings.items()
@@ -181,7 +181,7 @@ class XMPPSettings(MutableMapping):
         """Load settings from :std:`ArgumentParser` output.
 
         :Parameters:
-            - `args`: output of argument parsed based on the one 
+            - `args`: output of argument parsed based on the one
               returned by `get_arg_parser()`
         """
         for name, setting in self._defs.items():
@@ -211,10 +211,10 @@ class XMPPSettings(MutableMapping):
               and its value stored as a constant default.
             - `default_d`: description of the default value
             - `doc`: setting documentation
-            - `cmdline_help`: command line argument description. When not 
+            - `cmdline_help`: command line argument description. When not
               provided then the setting won't be available as a command-line
               option
-            - `basic`: when `True` the option is considered a basic option - 
+            - `basic`: when `True` the option is considered a basic option -
               one of those which should usually stay configurable in
               an application.
             - `validator`: function validating command-line option value string
@@ -233,7 +233,7 @@ class XMPPSettings(MutableMapping):
         """
         # pylint: disable-msg=W0622,R0913
         setting_def = _SettingDefinition(name, type, default, factory,
-                                            cache, default_d, doc, 
+                                            cache, default_d, doc,
                                             cmdline_help, validator, basic)
         if name not in cls._defs:
             cls._defs[name] = setting_def
@@ -258,7 +258,7 @@ class XMPPSettings(MutableMapping):
             return [x.strip() for x in value.split(u",")]
         except (AttributeError, TypeError, UnicodeError):
             raise ValueError("Bad string list")
-    
+
     @staticmethod
     def validate_positive_int(value):
         """Positive integer validator to be used with `add_setting`."""
@@ -285,7 +285,7 @@ class XMPPSettings(MutableMapping):
         :Types:
             - `start`: `int`
             - `stop`: `int`
-        
+
         :return: a validator function
         """
         def validate_int_range(value):
@@ -320,7 +320,7 @@ class XMPPSettings(MutableMapping):
         :Parameters:
             - `settings`: list of PyXMPP2 settings to consider. By default
               all 'basic' settings are provided.
-            - `option_prefix`: custom prefix for PyXMPP2 options. E.g. 
+            - `option_prefix`: custom prefix for PyXMPP2 options. E.g.
               ``'--xmpp'`` to differentiate them from not xmpp-related
               application options.
             - `add_help`: when `True` a '--help' option will be included
@@ -328,13 +328,13 @@ class XMPPSettings(MutableMapping):
         :Types:
             - `settings`: list of `unicode`
             - `option_prefix`: `str`
-            - `add_help`: 
+            - `add_help`:
 
         :return: an argument parser object.
         :returntype: :std:`argparse.ArgumentParser`
         """
         # pylint: disable-msg=R0914,R0912
-        parser = argparse.ArgumentParser(add_help = add_help, 
+        parser = argparse.ArgumentParser(add_help = add_help,
                                             prefix_chars = option_prefix[0])
         if settings is None:
             settings = cls.list_all(basic = True)

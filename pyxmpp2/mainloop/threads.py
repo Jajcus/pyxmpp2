@@ -76,7 +76,7 @@ class IOThread(object):
         """Start the thread.
         """
         self.thread.start()
-    
+
     def is_alive(self):
         """Check if the thread is alive."""
         return self.thread.is_alive()
@@ -123,8 +123,8 @@ class ReadingThread(IOThread):
 
     This thread will be also the one to call the `IOHandler.prepare` method
     until HandlerReady is returned.
-    
-    It can be used (together with `WrittingThread`) instead of 
+
+    It can be used (together with `WrittingThread`) instead of
     a main loop."""
     def __init__(self, settings, io_handler, name = None, daemon = True,
                                                             exc_queue = None):
@@ -135,7 +135,7 @@ class ReadingThread(IOThread):
 
     def run(self):
         """The thread function.
-        
+
         First, call the handler's 'prepare' method until it returns
         `HandlerReady` then loop waiting for the socket input and calling
         'handle_read' on the handler.
@@ -175,8 +175,8 @@ class ReadingThread(IOThread):
 
 class WrittingThread(IOThread):
     """A thread reading from io_handler.
-    
-    It can be used (together with `WrittingThread`) instead of 
+
+    It can be used (together with `WrittingThread`) instead of
     a main loop."""
     def __init__(self, settings, io_handler, name = None, daemon = True,
                                                             exc_queue = None):
@@ -187,8 +187,8 @@ class WrittingThread(IOThread):
 
     def run(self):
         """The thread function.
-        
-        Loop waiting for the handler and socket being writable and calling 
+
+        Loop waiting for the handler and socket being writable and calling
         `interfaces.IOHandler.handle_write`.
         """
         while not self._quit:
@@ -207,7 +207,7 @@ class WrittingThread(IOThread):
 
 class EventDispatcherThread(object):
     """Event dispatcher thread.
-    
+
     :Ivariables:
         - `name`: thread name (for debugging)
         - `event_queue`: the event queue to poll
@@ -301,7 +301,7 @@ class TimeoutThread(object):
         """Start the thread.
         """
         self.thread.start()
-    
+
     def is_alive(self):
         """Check if the thread is alive."""
         return self.thread.is_alive()
@@ -508,7 +508,7 @@ class ThreadPool(MainLoop):
     @property
     def started(self):
         return self.event_thread is not None
-        
+
     def quit(self):
         self.event_queue.put(QUIT)
 

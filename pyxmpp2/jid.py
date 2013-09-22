@@ -55,7 +55,7 @@ def are_domains_equal(domain1, domain2):
     :Types:
         - `domain1`: `unicode`
         - `domain2`: `unicode`
-    
+
     :return: True `domain1` and `domain2` are equal as domain names."""
 
     domain1 = domain1.encode("idna")
@@ -121,7 +121,7 @@ class JID(object):
             obj = cls.cache.get(unicode(local_or_jid))
             if obj:
                 return obj
-            
+
         obj = object.__new__(cls)
 
         if local_or_jid:
@@ -142,7 +142,7 @@ class JID(object):
         object.__setattr__(obj, "domain", domain)
         object.__setattr__(obj, "resource", resource)
         return obj
-    
+
     def __setattr__(self, name, value):
         raise RuntimeError("JID objects are immutable!")
 
@@ -160,7 +160,7 @@ class JID(object):
             - `data`: the JID string
             - `check`: when `False` then the JID is not checked for
               specification compliance.
-              
+
         :Return: (localpart, domainpart, resourcepart) tuple"""
         parts1 = data.split(u"/", 1)
         parts2 = parts1[0].split(u"@", 1)

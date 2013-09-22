@@ -106,7 +106,7 @@ class _TestResolver(unittest.TestCase):
         resolver.resolve_srv("lo.test.pyxmpp.jajcus.net",
                                 "xmpp-client", "tcp", self.srv_callback)
         self.wait(1)
-        self.assertEqual(self.srv_result, 
+        self.assertEqual(self.srv_result,
                                 [('lo-host.test.pyxmpp.jajcus.net.', 15222)])
 
     def test_resolve_address(self):
@@ -117,7 +117,7 @@ class _TestResolver(unittest.TestCase):
         self.wait(1)
         if is_ipv6_available():
             self.assertEqual(self.address_result, [
-                                        (AF_INET6, "::1"), 
+                                        (AF_INET6, "::1"),
                                         (AF_INET,  "127.0.0.1")])
         else:
             self.assertEqual(self.address_result, [(AF_INET, "127.0.0.1")])
@@ -132,7 +132,7 @@ class _TestResolver(unittest.TestCase):
         if is_ipv6_available():
             self.assertEqual(self.address_result, [
                                         (AF_INET,  "127.0.0.1"),
-                                        (AF_INET6, "::1")]) 
+                                        (AF_INET6, "::1")])
         else:
             self.assertEqual(self.address_result, [(AF_INET, "127.0.0.1")])
 

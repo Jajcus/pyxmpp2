@@ -81,7 +81,7 @@ class FireAndForget(EventHandler):
         """Quit the main loop upon disconnection."""
         # pylint: disable=W0613,R0201
         return QUIT
- 
+
 def send_message(source_jid, password, target_jid, body, subject = None,
                 message_type = "chat", message_thread = None, settings = None):
     """Star an XMPP session and send a message, then exit.

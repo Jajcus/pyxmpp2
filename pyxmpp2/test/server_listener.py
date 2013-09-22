@@ -80,7 +80,7 @@ class TestListenerSelect(unittest.TestCase):
             self.accepted.append((sock, address))
 
     def test_listener(self):
-        listener = TCPListener(socket.AF_INET, ('127.0.0.1', TEST_PORT), 
+        listener = TCPListener(socket.AF_INET, ('127.0.0.1', TEST_PORT),
                                                                 self.accept)
         loop = self.make_loop([listener])
         loop.loop_iteration(0.1)

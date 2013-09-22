@@ -11,7 +11,7 @@ from pyxmpp2.jid import JID
 from pyxmpp2.stanzapayload import XMLPayload
 
 MESSAGE1 = """
-<message xmlns="jabber:client" from='source@example.com/res' 
+<message xmlns="jabber:client" from='source@example.com/res'
                                 to='dest@example.com' type='normal' id='1'>
 <subject>Subject</subject>
 <body>The body</body>
@@ -32,10 +32,10 @@ class TestMessage(unittest.TestCase):
         self.assertEqual(msg.thread, u"thread-id")
         payload = msg.get_all_payload()
         self.assertTrue(payload)
-        self.assertEqual(payload[0].xml_element_name, 
+        self.assertEqual(payload[0].xml_element_name,
                             "{http://pyxmpp.jajcus.net/xmlns/test}payload")
         self.assertTrue(len(payload[0].element) > 0)
-        self.assertEqual(payload[0].element[0].tag, 
+        self.assertEqual(payload[0].element[0].tag,
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
 
     def check_message_empty(self, msg):
@@ -74,7 +74,7 @@ class TestMessage(unittest.TestCase):
                 thread = u"thread-id")
         payload = ElementTree.Element(
                             "{http://pyxmpp.jajcus.net/xmlns/test}payload")
-        ElementTree.SubElement(payload, 
+        ElementTree.SubElement(payload,
                                 "{http://pyxmpp.jajcus.net/xmlns/test}abc")
         payload = XMLPayload(payload)
         msg.add_payload(payload)

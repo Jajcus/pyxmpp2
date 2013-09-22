@@ -175,17 +175,17 @@ STANZA_ERRORS_Q = dict([( "{{{0}}}{1}".format(STANZA_ERROR_NS, x[0]), x[1])
 
 OBSOLETE_CONDITIONS = {
             # changed between RFC 3920 and RFC 6120
-            "{urn:ietf:params:xml:ns:xmpp-streams}xml-not-well-formed": 
+            "{urn:ietf:params:xml:ns:xmpp-streams}xml-not-well-formed":
                     "{urn:ietf:params:xml:ns:xmpp-streams}not-well-formed",
-            "{urn:ietf:params:xml:ns:xmpp-streams}invalid-id": 
+            "{urn:ietf:params:xml:ns:xmpp-streams}invalid-id":
                                                 UNDEFINED_STREAM_CONDITION,
-            "{urn:ietf:params:xml:ns:xmpp-stanzas}payment-required": 
+            "{urn:ietf:params:xml:ns:xmpp-stanzas}payment-required":
                                                 UNDEFINED_STANZA_CONDITION,
 }
 
 class ErrorElement(object):
     """Base class for both XMPP stream and stanza errors
-   
+
     :Ivariables:
         - `condition`: the condition element
         - `text`: human-readable error description
@@ -219,7 +219,7 @@ class ErrorElement(object):
         self.custom_condition = []
         self.language = language
         if isinstance(element_or_cond, basestring):
-            self.condition = ElementTree.Element(self.cond_qname_prefix 
+            self.condition = ElementTree.Element(self.cond_qname_prefix
                                                         + element_or_cond)
         elif not isinstance(element_or_cond, ElementClass):
             raise TypeError, "Element or unicode string expected"
@@ -347,7 +347,7 @@ class StreamErrorElement(ErrorElement):
 
 class StanzaErrorElement(ErrorElement):
     """Stanza error element.
-    
+
     :Ivariables:
         - `error_type`: 'type' of the error, one of: 'auth', 'cancel',
           'continue', 'modify', 'wait'
@@ -408,7 +408,7 @@ class StanzaErrorElement(ErrorElement):
         error_type = element.get(u"type")
         if error_type:
             self.error_type = error_type
- 
+
     def get_message(self):
         """Get the standard English message for the error.
 
@@ -422,12 +422,12 @@ class StanzaErrorElement(ErrorElement):
 
     def as_xml(self, stanza_namespace = None): # pylint: disable-msg=W0221
         """Return the XML error representation.
-        
+
         :Parameters:
             - `stanza_namespace`: namespace URI of the containing stanza
         :Types:
             - `stanza_namespace`: `unicode`
-        
+
         :returntype: :etree:`ElementTree.Element`"""
         if stanza_namespace:
             self.error_qname = "{{{0}}}error".format(stanza_namespace)

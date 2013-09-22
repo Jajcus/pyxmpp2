@@ -12,7 +12,7 @@ from pyxmpp2 import sasl
 from pyxmpp2.sasl.core import CLIENT_MECHANISMS_D
 
 from pyxmpp2.test import _support
-    
+
 import logging
 
 logger = logging.getLogger("pyxmpp2.tests.sasl_gsasl")
@@ -32,7 +32,7 @@ def check_gsasl():
     global gsasl_client_mechanisms
     global gsasl_server_mechanisms
     try:
-        pipe = subprocess.Popen(["gsasl", "--version"], 
+        pipe = subprocess.Popen(["gsasl", "--version"],
                                     stdout = subprocess.PIPE)
         stdout = pipe.communicate()[0]
         code = pipe.wait()
@@ -106,8 +106,8 @@ class TestSASLClientvsGSASL(unittest.TestCase):
             raise unittest.SkipTest( "GSASL has no PLAIN support")
         authenticator = sasl.client_authenticator_factory("PLAIN")
         auth_prop = {
-                        "username": u"username", 
-                        "password": u"good", 
+                        "username": u"username",
+                        "password": u"good",
                       }
         ok, props = self.try_with_gsasl("PLAIN", authenticator, auth_prop)
         self.assertTrue(ok)
@@ -118,9 +118,9 @@ class TestSASLClientvsGSASL(unittest.TestCase):
             raise unittest.SkipTest( "GSASL has no PLAIN support")
         authenticator = sasl.client_authenticator_factory("PLAIN")
         auth_prop = {
-                            "username": u"username", 
-                            "password": u"good", 
-                            "authzid": u"zid", 
+                            "username": u"username",
+                            "password": u"good",
+                            "authzid": u"zid",
                           }
         ok, props = self.try_with_gsasl("PLAIN", authenticator, auth_prop)
         self.assertTrue(ok)
@@ -131,8 +131,8 @@ class TestSASLClientvsGSASL(unittest.TestCase):
             raise unittest.SkipTest( "GSASL has no PLAIN support")
         authenticator = sasl.client_authenticator_factory("PLAIN")
         auth_prop = {
-                        "username": u"username", 
-                        "password": u"bad", 
+                        "username": u"username",
+                        "password": u"bad",
                       }
         ok, props = self.try_with_gsasl("PLAIN", authenticator, auth_prop)
         self.assertFalse(ok)
@@ -144,14 +144,14 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         authenticator = sasl.client_authenticator_factory("DIGEST-MD5")
         auth_prop = {
                         "username": u"username",
-                        "password": u"good", 
+                        "password": u"good",
                         "service-type": u"xmpp",
                         "service-domain": u"pyxmpp.jajcus.net",
                         "service-hostname": u"test.pyxmpp.jajcus.net",
                       }
         ok, props = self.try_with_gsasl("DIGEST-MD5", authenticator, auth_prop,
                         ["--service=xmpp", "--realm=jajcus.net",
-                         "--host=test.pyxmpp.jajcus.net", 
+                         "--host=test.pyxmpp.jajcus.net",
                          "--service-name=pyxmpp.jajcus.net"])
         self.assertTrue(ok)
         self.assertFalse(props.get("authzid"))
@@ -162,7 +162,7 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         authenticator = sasl.client_authenticator_factory("DIGEST-MD5")
         auth_prop = {
                         "username": u"username",
-                        "password": u"good", 
+                        "password": u"good",
                         "service-type": u"xmpp",
                         "service-domain": u"pyxmpp.jajcus.net",
                         "service-hostname": u"test.pyxmpp.jajcus.net",
@@ -170,7 +170,7 @@ class TestSASLClientvsGSASL(unittest.TestCase):
                       }
         ok, props = self.try_with_gsasl("DIGEST-MD5", authenticator, auth_prop,
                         ["--service=xmpp", "--realm=jajcus.net",
-                         "--host=test.pyxmpp.jajcus.net", 
+                         "--host=test.pyxmpp.jajcus.net",
                          "--service-name=pyxmpp.jajcus.net"])
         self.assertTrue(ok)
         self.assertEqual(props.get("authzid"), u"zid")
@@ -181,14 +181,14 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         authenticator = sasl.client_authenticator_factory("DIGEST-MD5")
         auth_prop = {
                         "username": u"username",
-                        "password": u"bad", 
+                        "password": u"bad",
                         "service-type": u"xmpp",
                         "service-domain": u"pyxmpp.jajcus.net",
                         "service-hostname": u"test.pyxmpp.jajcus.net",
                       }
         ok, dummy = self.try_with_gsasl("DIGEST-MD5", authenticator, auth_prop,
                         ["--service=xmpp", "--realm=jajcus.net",
-                         "--host=test.pyxmpp.jajcus.net", 
+                         "--host=test.pyxmpp.jajcus.net",
                          "--service-name=pyxmpp.jajcus.net"])
         self.assertFalse(ok)
 
@@ -198,7 +198,7 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1")
         auth_prop = {
                         "username": u"username",
-                        "password": u"good", 
+                        "password": u"good",
                       }
         ok, props = self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
                                             ["--no-cb"])
@@ -211,7 +211,7 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1")
         auth_prop = {
                         "username": u"username",
-                        "password": u"good", 
+                        "password": u"good",
                         "authzid": u"zid",
                       }
         ok, props = self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
@@ -225,7 +225,7 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1")
         auth_prop = {
                         "username": u"pi=3,14",
-                        "password": u"good", 
+                        "password": u"good",
                         "authzid": u"e=2,72",
                       }
         ok, props = self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
@@ -239,7 +239,7 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         authenticator = sasl.client_authenticator_factory("SCRAM-SHA-1")
         auth_prop = {
                         "username": u"username",
-                        "password": u"bad", 
+                        "password": u"bad",
                       }
         ok, dummy = self.try_with_gsasl("SCRAM-SHA-1", authenticator, auth_prop,
                                             ["--no-cb"])
@@ -254,7 +254,7 @@ class TestSASLClientvsGSASL(unittest.TestCase):
                         "enabled_mechanisms": ["SCRAM-SHA-1",
                                                     "SCRAM-SHA-1-PLUS"],
                         "username": u"username",
-                        "password": u"good", 
+                        "password": u"good",
                       }
         cb_data = b"0123456789ab"
         ok, dummy = self.try_with_gsasl("SCRAM-SHA-1",
@@ -271,14 +271,14 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         cb_data = b"0123456789ab"
         auth_prop = {
                         "username": u"username",
-                        "password": u"good", 
+                        "password": u"good",
                         "channel-binding": {
                             "tls-unique": cb_data,
                         },
                       }
         ok, props = self.try_with_gsasl("SCRAM-SHA-1-PLUS",
                                         authenticator,
-                                        auth_prop, 
+                                        auth_prop,
                                     extra_data = standard_b64encode(cb_data))
         self.assertTrue(ok)
         self.assertFalse(props.get("authzid"))
@@ -292,14 +292,14 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         cb_data = b"0123456789ab"
         auth_prop = {
                         "username": u"username",
-                        "password": u"bad", 
+                        "password": u"bad",
                         "channel-binding": {
                             "tls-unique": cb_data,
                         },
                       }
         ok, dummy = self.try_with_gsasl("SCRAM-SHA-1-PLUS",
                                         authenticator,
-                                        auth_prop, 
+                                        auth_prop,
                                     extra_data = standard_b64encode(cb_data))
         self.assertFalse(ok)
 
@@ -312,7 +312,7 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         cb_data = b"0123456789ab"
         auth_prop = {
                         "username": u"username",
-                        "password": u"good", 
+                        "password": u"good",
                         "channel-binding": {
                             "tls-unique": cb_data,
                         },
@@ -320,16 +320,16 @@ class TestSASLClientvsGSASL(unittest.TestCase):
         cb_data = b"BAD_BAD_BAD_"
         ok, dummy = self.try_with_gsasl("SCRAM-SHA-1-PLUS",
                                         authenticator,
-                                        auth_prop, 
+                                        auth_prop,
                                     extra_data = standard_b64encode(cb_data))
         self.assertFalse(ok)
 
     @staticmethod
-    def try_with_gsasl(mechanism, authenticator, auth_properties, 
+    def try_with_gsasl(mechanism, authenticator, auth_properties,
                     gsasl_args = [], extra_data = None, username = "username"):
         # pylint: disable=W0102,R0914,R0912,R0915
         cmd = ["gsasl", "--server",
-                "--mechanism=" + mechanism, "--password=good", 
+                "--mechanism=" + mechanism, "--password=good",
                 "--authentication-id={0}".format(username)] + gsasl_args
         if logger.isEnabledFor(logging.DEBUG):
             stderr = None

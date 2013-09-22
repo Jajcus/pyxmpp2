@@ -36,8 +36,8 @@ class Iq(Stanza):
     """<message /> stanza class."""
     # pylint: disable-msg=R0902
     element_name = "message"
-    def __init__(self, element = None, from_jid = None, to_jid = None, 
-                            stanza_type = None, stanza_id = None, 
+    def __init__(self, element = None, from_jid = None, to_jid = None,
+                            stanza_type = None, stanza_id = None,
                             error = None, error_cond=None, return_path = None,
                             language = None):
         """Initialize an `Iq` object.
@@ -50,7 +50,7 @@ class Iq(Stanza):
               or "error".
             - `stanza_id`: stanza id -- value of stanza's "id" attribute. If
               not given, then unique for the session value is generated.
-            - `error_cond`: error condition name. Ignored if `stanza_type` 
+            - `error_cond`: error condition name. Ignored if `stanza_type`
               is not "error".
             - `language`: default language for the stanza content
         :Types:
@@ -70,7 +70,7 @@ class Iq(Stanza):
                 raise ValueError("Missing iq type")
         elif stanza_type not in IQ_TYPES:
             raise ValueError("Bad iq type")
-        
+
         if element is None and stanza_id is None and stanza_type in (
                                                                 "get", "set"):
             stanza_id = self.gen_id()
@@ -79,13 +79,13 @@ class Iq(Stanza):
             element = "iq"
         elif not isinstance(element, ElementClass):
             raise TypeError("Couldn't make Iq from " + repr(element))
-        
+
         Stanza.__init__(self, element, from_jid = from_jid, to_jid = to_jid,
                         stanza_type = stanza_type, stanza_id = stanza_id,
-                        error = error, error_cond = error_cond, 
+                        error = error, error_cond = error_cond,
                         return_path = return_path, language = language)
-        
-        
+
+
         if self.element_name != "iq":
             raise ValueError("The element is not <iq/>")
 
@@ -93,7 +93,7 @@ class Iq(Stanza):
         """Create a deep copy of the stanza.
 
         :returntype: `Iq`"""
-        result = Iq(None, self.from_jid, self.to_jid, 
+        result = Iq(None, self.from_jid, self.to_jid,
                         self.stanza_type, self.stanza_id, self.error,
                         self._return_path())
         if self._payload is None:
@@ -118,7 +118,7 @@ class Iq(Stanza):
             raise ValueError("Errors may not be generated for"
                                                 " 'result' and 'error' iq")
 
-        stanza = Iq(stanza_type="error", from_jid = self.to_jid, 
+        stanza = Iq(stanza_type="error", from_jid = self.to_jid,
                         to_jid = self.from_jid, stanza_id = self.stanza_id,
                         error_cond = cond)
         if self._payload is None:
@@ -141,12 +141,12 @@ class Iq(Stanza):
         stanza = Iq(stanza_type = "result", from_jid = self.to_jid,
                         to_jid = self.from_jid, stanza_id = self.stanza_id)
         return stanza
-    
+
     def add_payload(self, payload):
         """Add new the stanza payload. Fails if there is already some
         payload element attached (<iq/> stanza can contain only one payload
         element)
-        
+
         Marks the stanza dirty.
 
         :Parameters:
