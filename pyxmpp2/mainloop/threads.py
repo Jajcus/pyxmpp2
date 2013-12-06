@@ -441,9 +441,9 @@ class ThreadPool(MainLoop):
         """
         if handler not in self.timeout_handlers:
             return
-        self.io_handlers.remove(handler)
+        self.timeout_handlers.remove(handler)
         for thread in self.timeout_threads:
-            if thread.handler_method.im_self is handler:
+            if thread.method.im_self is handler:
                 thread.stop()
 
     def start(self, daemon = False):
