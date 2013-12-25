@@ -85,7 +85,7 @@ class IOThread(object):
         """Request the thread to stop."""
         self._quit = True
 
-    def join(self, timeout):
+    def join(self, timeout=None):
         """Join the thread (wait until it stops)."""
         return self.thread.join(timeout)
 
@@ -240,7 +240,7 @@ class EventDispatcherThread(object):
         """Check if the thread is alive."""
         return self.thread.is_alive()
 
-    def join(self, timeout):
+    def join(self, timeout=None):
         """Join the thread."""
         return self.thread.join(timeout)
 
@@ -310,7 +310,7 @@ class TimeoutThread(object):
         """Request the thread to stop."""
         self._quit = True
 
-    def join(self, timeout):
+    def join(self, timeout=None):
         """Join the thread (wait until it stops)."""
         return self.thread.join(timeout)
 
