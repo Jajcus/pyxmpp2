@@ -172,7 +172,7 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
                 service = self.settings["c2s_service"]
 
             transport.connect(addr, self.settings["c2s_port"], service)
-            handlers = self._base_handlers
+            handlers = self._base_handlers[:]
             handlers += self.handlers + [self]
             self.clear_response_handlers()
             self.setup_stanza_handlers(handlers, "pre-auth")
@@ -224,7 +224,7 @@ class Client(StanzaProcessor, TimeoutHandler, EventHandler):
                 return
             self.me = event.stream.me
             self.peer = event.stream.peer
-            handlers = self._base_handlers
+            handlers = self._base_handlers[:]
             handlers += self.handlers + [self]
             self.setup_stanza_handlers(handlers, "post-auth")
 
