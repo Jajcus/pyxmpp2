@@ -303,9 +303,9 @@ class ClientAuthenticator:
     client authentication process.
     """
     __metaclass__ = ABCMeta
-    def __init__(self):
+    def __init__(self, settings = None):
         """Initialize a `ClientAuthenticator` object."""
-        pass
+        self.settings = settings
 
     @abstractclassmethod
     def are_properties_sufficient(cls, properties):

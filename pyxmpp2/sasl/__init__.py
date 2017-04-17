@@ -45,7 +45,7 @@ except ImportError:
 
 logger = logging.getLogger("pyxmpp2.sasl")
 
-def client_authenticator_factory(mechanism):
+def client_authenticator_factory(mechanism, settings = None):
     """Create a client authenticator object for given SASL mechanism.
 
     :Parameters:
@@ -60,7 +60,7 @@ def client_authenticator_factory(mechanism):
     :return: new authenticator.
     :returntype: `sasl.core.ClientAuthenticator`"""
     authenticator = CLIENT_MECHANISMS_D[mechanism]
-    return authenticator()
+    return authenticator(settings)
 
 def server_authenticator_factory(mechanism, password_database):
     """Create a server authenticator object for given SASL mechanism and

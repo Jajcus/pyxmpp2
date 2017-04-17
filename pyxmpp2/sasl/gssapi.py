@@ -39,8 +39,8 @@ logger = logging.getLogger("pyxmpp2.sasl.gssapi")
 class GSSAPIClientAuthenticator(ClientAuthenticator):
     """Provides client-side GSSAPI SASL (Kerberos 5) authentication."""
 
-    def __init__(self):
-        ClientAuthenticator.__init__(self)
+    def __init__(self, settings=None):
+        ClientAuthenticator.__init__(self, settings)
         self.username = None
         self._gss = None
         self.step = None

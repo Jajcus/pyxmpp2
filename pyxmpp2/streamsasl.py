@@ -404,7 +404,7 @@ class StreamSASLHandler(StreamFeatureHandler):
         logger.debug("Our mechanism: {0!r}".format(mechanism))
 
         stream.auth_method_used = mechanism
-        self.authenticator = sasl.client_authenticator_factory(mechanism)
+        self.authenticator = sasl.client_authenticator_factory(mechanism, self.settings)
         initial_response = self.authenticator.start(props)
         if not isinstance(initial_response, sasl.Response):
             raise SASLAuthenticationFailed("SASL initiation failed")

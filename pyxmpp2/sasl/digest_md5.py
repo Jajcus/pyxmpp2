@@ -205,9 +205,9 @@ class DigestMD5ClientAuthenticator(ClientAuthenticator):
         - ``"authzid"`` - authorization id
     """
     # pylint: disable-msg=R0902
-    def __init__(self):
+    def __init__(self, settings=None):
         """Initialize a `DigestMD5ClientAuthenticator` object."""
-        ClientAuthenticator.__init__(self)
+        ClientAuthenticator.__init__(self, settings)
         self.username = None
         self.rspauth_checked = None
         self.response_auth = None
