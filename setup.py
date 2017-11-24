@@ -3,13 +3,6 @@
 import os.path
 import sys
 
-try:
-    # use setuptools 0.6.19 if distribute is installed
-    from distribute_setup import use_setuptools
-    use_setuptools("0.6.19")
-except ImportError:
-    pass
-
 from setuptools import setup
 
 version = "2.0alpha2-git"
