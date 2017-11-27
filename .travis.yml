@@ -1,0 +1,21 @@
+language: python
+python:
+    - "2.7"
+    - "3.2"
+    - "3.3"
+    - "3.4"
+    - "3.5"
+    - "3.6"
+install:
+    - pip install dnspython
+script: python setup.py build test
+deploy:
+    provider: pypi
+    user: jajcus
+    password:
+        secure: YM0t/EjB42YcAhEPbnxFczNOU370qq0ditvCPSHYKrMOCIvFvQHyT1BPvoBdxV4QNTHOL9D6QjdHEP9RDTR//HI+wrqhHBQC3cRHF7/2/QAWYkHJpK/ACHnOEs9CMNRgteuQqqna5MVcGAhxj4xdYCfQIP4oxaRUPBoWx4h6A024h3E28lIkrNzWGuapV1mX2lx+GPc+UTzVso0M3v+IM3jlmo8PCiwWh+zMFD68vraLnsv1b9T+mceNKmntTmqOi9cjd4jZJNE/R3EH1rXon5jeCo+cR1fZub6nZPlXzuz3TqSPuRz9XMCF+kbqUqQG4Aavw65Oq0/ENlrUx4b9fCmmZjacUlYfaTzjiiMzdHTosGtH93pXveykAFr2per3A3X9LV2H9QzNSc0K/uYkJ6UAas5jKl/afTRAEFqeC1btZqwNN9R3OxqYm57mtg3kZsvj9WQ0ptlvMjIQ9mWNU72+smQvDjoJL+7weYoooGp25w9+RQads3jsYl37Sz+H5j+JbRwQztlFDn0tVQskTHmn9blUb/CWGxDxRahHZbpBziquMI2WvjubvjpE1EOfDHrStdcEpLI1Dyd2vXly04CC7RvFY1OrllwHZK/r0YTMQ0/RXP3K/hMqD6uXHw1OlF5ebHl37DljdOxUOqLOz5P2t/PkPe3ohkS5MGIjHnI=
+    on:
+        tags: true
+        branch: master
+
+# vi: sts=4 sw=4 et
