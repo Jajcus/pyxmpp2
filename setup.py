@@ -16,8 +16,8 @@ if (not os.path.exists(os.path.join("pyxmpp2","version.py"))
         sys.exit(0)
 else:
     exec(open(os.path.join("pyxmpp2", "version.py")).read())
-    
-    
+
+
 if version.endswith("-git"):
     download_url = None
 else:

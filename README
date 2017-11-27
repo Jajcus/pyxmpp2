@@ -73,7 +73,7 @@ Features
     - stream errors
 
   - StartTLS:
-   
+
     - initiator (client) side implemented
     - cerificate verification:
 
@@ -138,7 +138,7 @@ Features
 
 A bit more formal list of the XMPP features implemented is available in the
 wiki: https://github.com/Jajcus/pyxmpp2/wiki/Conformance-declaration
- 
+
 .. _RFC 6120: http://xmpp.org/rfcs/rfc6120.html
 .. _RFC 6121: http://xmpp.org/rfcs/rfc6121.html
 .. _RFC 6122: http://xmpp.org/rfcs/rfc6122.html
@@ -148,7 +148,7 @@ Links
 -----
 
 - Project GitHub page: https://github.com/Jajcus/pyxmpp2/
-- API reference: http://jajcus.github.com/pyxmpp2/api/
+- API reference: http://jajcus.github.io/pyxmpp2/api/
 - Code mirror at BitBucket: https://bitbucket.org/Jajcus/pyxmpp2
 
 Contact

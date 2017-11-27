@@ -1,7 +1,0 @@
-Changes from PyXMPP 1.x
------------------------
-
-- ElementTree API used instead of libxml2. This not only removes one
-  dependency, but also makes memory management much easier.
-
- vi: spell spelllang=en
