@@ -18,7 +18,7 @@ The goal of this project is to rewrite PyXMPP so:
 Requirements
 ------------
 
-- Python 2.7 or 3.2
+- Python 2.7 or 3.3 or newer
 - `DNSPython`_  Limited functionality is available without it.
 
 .. _DNSPython: http://www.dnspython.org/
@@ -27,7 +27,7 @@ Python 3 support
 ----------------
 
 The source code is written for Python 2.7, but automated facilities are
-available for conversion to 3.2. For this to work you need the `Distribute`_
+available for conversion to 3.3. For this to work you need the `Distribute`_
 package installed for Python 3.
 
 .. _Distribute: http://pypi.python.org/pypi/distribute
