@@ -5,7 +5,7 @@ import sys
 
 from setuptools import setup
 
-version = "2.0alpha2-git"
+version = "2.0.0"
 
 if (not os.path.exists(os.path.join("pyxmpp2","version.py"))
                                     or "make_version" in sys.argv):
