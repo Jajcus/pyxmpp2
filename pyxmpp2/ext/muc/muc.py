@@ -86,7 +86,7 @@ class MucRoomHandler:
         """
         Called when a requested configuration form is received.
 
-        The form, after filling-in shoul be passed to `self.room_state.configure_room`.
+        The form, after filling-in should be passed to `self.room_state.configure_room`.
 
         :Parameters:
             - `form`: the configuration form.
@@ -98,7 +98,7 @@ class MucRoomHandler:
 
     def room_configured(self):
         """
-        Called after a successfull room configuration.
+        Called after a successful room configuration.
         """
         pass
 
@@ -759,7 +759,7 @@ class MucRoomState:
 
         :Parameters:
             - `form`: the configuration parameters. Should be a 'submit' form made by filling-in
-              the configuration form retireved using `self.request_configuration_form` or
+              the configuration form retrieved using `self.request_configuration_form` or
               a 'cancel' form.
         :Types:
             - `form`: `Form`

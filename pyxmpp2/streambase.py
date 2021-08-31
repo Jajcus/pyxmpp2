@@ -432,7 +432,7 @@ class StreamBase(XMLStreamHandler):
     def _make_stream_features(self):
         """Create the <features/> element for the stream.
 
-        [receving entity only]
+        [receiving entity only]
 
         :returns: new <features/> element
         :returntype: :etree:`ElementTree.Element`"""

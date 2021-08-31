@@ -72,7 +72,7 @@ class StreamTLSHandler(StreamFeatureHandler, EventHandler):
     def make_stream_tls_features(self, stream, features):
         """Update the <features/> element with StartTLS feature.
 
-        [receving entity only]
+        [receiving entity only]
 
         :Parameters:
             - `features`: the <features/> element of the stream.

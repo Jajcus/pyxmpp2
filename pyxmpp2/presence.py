@@ -67,7 +67,7 @@ class Presence(Stanza):
             - `to_jid`: recipient JID.
             - `stanza_type`: staza type: one of: None, "available",
               "unavailable", "subscribe", "subscribed", "unsubscribe",
-              "unsubscribed" or "error". "available" is automaticaly changed to
+              "unsubscribed" or "error". "available" is automatically changed to
               None.
             - `stanza_id`: stanza id -- value of stanza's "id" attribute
             - `language`: default language for the stanza content

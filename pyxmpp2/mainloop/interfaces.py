@@ -136,7 +136,7 @@ class IOHandler:
     @abstractmethod
     def handle_hup(self):
         """
-        Handle the 'channel hungup' state. The handler should not be writtable
+        Handle the 'channel hungup' state. The handler should not be writable
         after this.
         """
         pass

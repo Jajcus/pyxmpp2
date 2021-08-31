@@ -110,7 +110,7 @@ class JID(object):
               Unicode representation of the JID.
             - `domain`: domain part of the JID
             - `resource`: resource part of the JID
-            - `check`: if `False` then JID is not checked for specifiaction
+            - `check`: if `False` then JID is not checked for specification
               compliance.
         """
 

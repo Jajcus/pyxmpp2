@@ -57,7 +57,7 @@ class Resolver:
 
         `callback` will be called with a properly sorted list of (hostname,
         port) pairs on success. The list will be empty on error and it will
-        contain only (".", 0) when the service is explicitely disabled.
+        contain only (".", 0) when the service is explicitly disabled.
 
         :Parameters:
             - `domain`: domain name to look up

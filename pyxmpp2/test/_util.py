@@ -29,7 +29,7 @@ socket.setdefaulttimeout(5)
 TIMEOUT = 60.0 # seconds
 
 class NetReaderWritter(object):
-    """Threaded network reader/writter.
+    """Threaded network reader/writer.
 
     :Ivariables:
         - `sock`: the socket
@@ -55,15 +55,15 @@ class NetReaderWritter(object):
         self.peer = None
 
     def start(self):
-        """Start the reader and writter threads."""
+        """Start the reader and writer threads."""
         reader_thread = threading.Thread(target = self.reader_run,
                                                             name = "Reader")
         reader_thread.daemon = True
-        writter_thread = threading.Thread(target = self.writter_run,
-                                                            name = "Writter")
-        writter_thread.daemon = True
+        writer_thread = threading.Thread(target = self.writer_run,
+                                                            name = "Writer")
+        writer_thread.daemon = True
         reader_thread.start()
-        writter_thread.start()
+        writer_thread.start()
 
     def _do_tls_handshake(self):
         """Do the TLS handshake. Called from the reader thread
@@ -107,8 +107,8 @@ class NetReaderWritter(object):
             self.extra_on_read = self._do_tls_handshake
             self.rdata = b""
 
-    def writter_run(self):
-        """The writter thread function."""
+    def writer_run(self):
+        """The writer thread function."""
         with self.write_cond:
             while self.sock is not None:
                 while self.ready and self.wdata and self.write_enabled:
@@ -422,7 +422,7 @@ class ReceiverSelectTestCase(NetworkTestCase):
 
     def start_transport(self, handlers):
         """Create a listening socket for the tested stream,
-        a transport a main loop and create a client connectiong to the
+        a transport a main loop and create a client connecting to the
         socket."""
         sock = self.make_listening_socket()
         self.addr = sock.getsockname()
@@ -489,7 +489,7 @@ class ReceiverThreadedTestMixIn(object):
 
     def start_transport(self, handlers):
         """Create a listening socket for the tested stream,
-        a transport a main loop and create a client connectiong to the
+        a transport a main loop and create a client connecting to the
         socket."""
         super(ReceiverThreadedTestMixIn, self).start_transport(handlers)
         self.loop.start()

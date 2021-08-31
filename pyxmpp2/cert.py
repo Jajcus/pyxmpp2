@@ -107,7 +107,7 @@ class CertificateData(object):
         """Verify certificate for a server.
 
         :Parameters:
-            - `server_name`: name of the server presenting the cerificate
+            - `server_name`: name of the server presenting the certificate
             - `srv_type`: service type requested, as used in the SRV record
         :Types:
             - `server_name`: `unicode` or `JID`
@@ -178,7 +178,7 @@ class CertificateData(object):
         return False
 
     def verify_jid_against_srv_name(self, jid, srv_type):
-        """Check if the cerificate is valid for given domain-only JID
+        """Check if the certificate is valid for given domain-only JID
         and a service type.
 
         :Parameters:

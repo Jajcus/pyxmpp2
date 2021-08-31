@@ -108,7 +108,7 @@ class ResourceBindingHandler(StreamFeatureHandler, XMPPFeatureHandler):
         """Add resource binding feature to the <features/> element of the
         stream.
 
-        [receving entity only]
+        [receiving entity only]
 
         :returns: update <features/> element.
         """

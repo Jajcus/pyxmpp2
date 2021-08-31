@@ -599,7 +599,7 @@ class Form(StanzaPayloadObject):
     def make_submit(self, keep_types = False):
         """Make a "submit" form using data in `self`.
 
-        Remove uneeded information from the form. The information removed
+        Remove unneeded information from the form. The information removed
         includes: title, instructions, field labels, fixed fields etc.
 
         :raise ValueError: when any required field has no value.

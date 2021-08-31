@@ -54,7 +54,7 @@ class CacheItem(object):
         - `freshness_time`: time when the object stops being fresh.
         - `expire_time`: time when the object expires.
         - `purge_time`: time when the object should be purged. When 0 then
-          item will never be automaticaly purged.
+          item will never be automatically purged.
         - `_lock`: lock for thread safety.
     :Types:
         - `value`: `instance`
@@ -78,7 +78,7 @@ class CacheItem(object):
             - `freshness_period`: time interval after which the object stops being fresh.
             - `expiration_period`: time interval after which the object expires.
             - `purge_period`: time interval after which the object should be purged. When 0 then
-              item will never be automaticaly purged.
+              item will never be automatically purged.
             - `state`: initial state.
         :Types:
             - `address`: any hashable
@@ -148,7 +148,7 @@ class CacheFetcher:
     An instance of a fetcher class is created for each object requested and
     not found in the cache, then `fetch` method is called to initialize
     the asynchronous retrieval process. Fetcher object's `got_it` method
-    should be called on a successfull retrieval and `error` otherwise.
+    should be called on a successful retrieval and `error` otherwise.
     `timeout` will be called when the request timeouts.
 
     :Ivariables:
@@ -226,7 +226,7 @@ class CacheFetcher:
         raise RuntimeError("Pure virtual method called")
 
     def got_it(self, value, state = "new"):
-        """Handle a successfull retrieval and call apriopriate handler.
+        """Handle a successful retrieval and call apriopriate handler.
 
         Should be called when retrieval succeeds.
 
@@ -376,7 +376,7 @@ class Cache:
             purge_period = None):
         """Request an object with given address and state not worse than
         `state`. The object will be taken from cache if available, and
-        created/fetched otherwise. The request is asynchronous -- this metod
+        created/fetched otherwise. The request is asynchronous -- this method
         doesn't return the object directly, but the `object_handler` is called
         as soon as the object is available (this may be before `request_object`
         returns and may happen in other thread). On error the `error_handler`
@@ -411,7 +411,7 @@ class Cache:
             - `expiration_period`: time interval after which the item created
               should become 'stale'.
             - `purge_period`: time interval after which the item created
-              shuld be removed from the cache.
+              should be removed from the cache.
         :Types:
             - `address`: any hashable
             - `state`: "new", "fresh", "old" or "stale"
@@ -704,7 +704,7 @@ class CacheSuite:
         """Request an object of given class, with given address and state not
         worse than `state`. The object will be taken from cache if available,
         and created/fetched otherwise. The request is asynchronous -- this
-        metod doesn't return the object directly, but the `object_handler` is
+        method doesn't return the object directly, but the `object_handler` is
         called as soon as the object is available (this may be before
         `request_object` returns and may happen in other thread). On error the
         `error_handler` will be called, and on timeout -- the
@@ -740,7 +740,7 @@ class CacheSuite:
             - `expiration_period`: time interval after which the item created
               should become 'stale'.
             - `purge_period`: time interval after which the item created
-              shuld be removed from the cache.
+              should be removed from the cache.
         :Types:
             - `object_class`: `classobj`
             - `address`: any hashable

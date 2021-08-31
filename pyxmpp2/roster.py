@@ -691,7 +691,7 @@ class RosterClient(XMPPFeatureHandler, EventHandler):
         """Save the roster to an XML file.
 
         Can be used to save the last know roster copy for faster loading
-        of a verisoned roster (if server supports that).
+        of a versioned roster (if server supports that).
 
         :Parameters:
             - `dest`: file name or a file object
