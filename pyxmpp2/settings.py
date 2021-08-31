@@ -66,7 +66,7 @@ class XMPPSettings(MutableMapping):
     """Container for various parameters used all over PyXMPP.
 
     It can be used like a regular dictionary, but will provide reasonable
-    defaults for PyXMPP for parameters which are not explicitely set.
+    defaults for PyXMPP for parameters which are not explicitly set.
 
     All known PyXMPP settings are included in the :r:`settings list`.
 
@@ -75,7 +75,7 @@ class XMPPSettings(MutableMapping):
         - `_defaults_factories`: factory functions providing default values
           which cannot be hard-coded.
     :Ivariables:
-        - `_settings`: current values of the parameters explicitely set.
+        - `_settings`: current values of the parameters explicitly set.
     """
     _defs = {}
     def __init__(self, data = None):

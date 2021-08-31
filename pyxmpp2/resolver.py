@@ -216,7 +216,7 @@ class DumbBlockingResolver(Resolver):
 
     def resolve_srv(self, domain, service, protocol, callback):
         raise NotImplementedError("The DumbBlockingResolver cannot resolve"
-                " SRV records. DNSPython or target hostname explicitely set"
+                " SRV records. DNSPython or target hostname explicitly set"
                                                                 " required")
 
     def resolve_address(self, hostname, callback, allow_cname = True):
@@ -288,7 +288,7 @@ if HAVE_DNSPYTHON:
 
             `callback` will be called with a properly sorted list of (hostname,
             port) pairs on success. The list will be empty on error and it will
-            contain only (".", 0) when the service is explicitely disabled.
+            contain only (".", 0) when the service is explicitly disabled.
 
             :Parameters:
                 - `domain`: domain name to look up

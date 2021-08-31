@@ -100,7 +100,7 @@ class LegacyClientStream(ClientStream):
         ClientStream._post_connect(self)
 
     def _post_auth(self):
-        """Unregister legacy authentication handlers after successfull
+        """Unregister legacy authentication handlers after successful
         authentication."""
         ClientStream._post_auth(self)
         if not self.initiator:

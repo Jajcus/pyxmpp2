@@ -204,7 +204,7 @@ class Register(StanzaPayloadObject):
 
         :Parameters:
             - `form_type`: If "form", then a form to fill-in should be
-              returned. If "sumbit", then a form with submitted data.
+              returned. If "submit", then a form with submitted data.
         :Types:
             - `form_type`: `unicode`
 

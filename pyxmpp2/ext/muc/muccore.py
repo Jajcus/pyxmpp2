@@ -282,7 +282,7 @@ class MucItem(MucItemBase):
         - `role`: role of the user.
         - `jid`: JID of the user.
         - `nick`: nickname of the user.
-        - `actor`: actor modyfying the user data.
+        - `actor`: actor modifying the user data.
         - `reason`: reason of change of the user data.
     :Types:
         - `affiliation`: `str`
@@ -302,7 +302,7 @@ class MucItem(MucItemBase):
             - `role`: role of the user.
             - `jid`: JID of the user.
             - `nick`: nickname of the user.
-            - `actor`: actor modyfying the user data.
+            - `actor`: actor modifying the user data.
             - `reason`: reason of change of the user data.
         :Types:
             - `xmlnode_or_affiliation`: `libxml2.xmlNode` or `str`
@@ -327,7 +327,7 @@ class MucItem(MucItemBase):
             - `role`: role of the user.
             - `jid`: JID of the user.
             - `nick`: nickname of the user.
-            - `actor`: actor modyfying the user data.
+            - `actor`: actor modifying the user data.
             - `reason`: reason of change of the user data.
         :Types:
             - `affiliation`: `str`
@@ -418,7 +418,7 @@ class MucStatus(MucItemBase):
     MUC <item/> element - describes special meaning of a stanza
 
     :Ivariables:
-        - `code`: staus code, as defined in JEP 45
+        - `code`: status code, as defined in JEP 45
     :Types:
         - `code`: `int`
     """
@@ -677,7 +677,7 @@ class MucPresence(Presence,MucStanzaExt):
             - `to_jid`: recipient JID.
             - `stanza_type`: staza type: one of: None, "available", "unavailable",
               "subscribe", "subscribed", "unsubscribe", "unsubscribed" or
-              "error". "available" is automaticaly changed to_jid None.
+              "error". "available" is automatically changed to_jid None.
             - `stanza_id`: stanza id -- value of stanza's "id" attribute
             - `show`: "show" field of presence stanza. One of: None, "away",
               "xa", "dnd", "chat".

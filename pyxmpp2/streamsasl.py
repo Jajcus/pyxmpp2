@@ -98,7 +98,7 @@ class StreamSASLHandler(StreamFeatureHandler):
     def make_stream_features(self, stream, features):
         """Add SASL features to the <features/> element of the stream.
 
-        [receving entity only]
+        [receiving entity only]
 
         :returns: update <features/> element."""
         mechs = self.settings['sasl_mechanisms']
